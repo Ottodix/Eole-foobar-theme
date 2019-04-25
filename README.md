@@ -4,6 +4,8 @@ This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 
 THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
+![alt text](https://raw.githubusercontent.com/Ottodix/Eole-foobar-theme/master/preview.png)
+
 ## Installation
 
 0. Close foobar.
