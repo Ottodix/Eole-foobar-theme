@@ -1,14 +1,11 @@
 IMPORTANT : THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
-DOWNLOAD URL ---------------------------------------
-http://www.mediafire.com/download/a8ofu62wi8incyo/eole.zip
-
 INSTALLATION  ---------------------------------------
 
 0: Close foobar.
 
-1: Copy everything from this directory into your foobar installation directory (so the 3 folders: components, themes and plugins). 
-The archive contain all the files and the required foobar components (columns UI, ui hacks, jscript panel, shpeck, elplaylist, panel stack splitter, playcount). 
+1: Download this github repository and copy everything into your foobar installation directory (so the 4 folders: components, user-components, themes and plugins). 
+The archive contain all the files and the required foobar components (columns UI, ui hacks, spider monkey panel, shpeck, elplaylist, panel stack splitter, playcount). 
 
 2: Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
 
@@ -16,11 +13,13 @@ The archive contain all the files and the required foobar components (columns UI
 
 4: For the lyrics on the "now playing" tab, you need to configure the sources of the ESlyrics component. Click the Foobar button on top > File > Preferences > Tools > ESlyrics > Search. Click on "Update".
 
-5: Configure the winamp directory in shpeck for the visualisations, it's at the bottom of the preferences window : Click the Foobar button on top > File > Preferences > Visualisations > Shpeck. Click on the browse buttom and select the directory [YOUR_FOOBAR_DIRECTORY]\plugins\winamp. Now on the visualisation tab, you can do a right click and select Milkdrop in the "Autostart Plugin" submenu.
+5: Configure the winamp directory in shpeck for the visualisations, it's at the bottom of the preferences window: Click the Foobar button on top > File > Preferences > Visualisations > Shpeck. Click on the browse buttom and select the directory [YOUR_FOOBAR_DIRECTORY]\plugins\winamp. Now on the visualisation tab, you can do a right click and select Milkdrop in the "Autostart Plugin" submenu.
 
 WARNING : shpeck is an unstable component, so if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: hold SHIFT and right click the visualisation tab at the top and select Properties. In the properties window, turn the value of "_PROPERTY show visualisation tab" to false). And remove the speck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout.
 
-6: That's it
+6: Optionaly, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [YOUR_FOOBAR_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
+
+END: That's it! Enjoy your sound.
 
 USEFUL TO KNOW  ---------------------------------------
 
