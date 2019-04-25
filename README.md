@@ -4,7 +4,7 @@ This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 
 THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
-## Installation!
+## Installation
 
 0. Close foobar.
 
