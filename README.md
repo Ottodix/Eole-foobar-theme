@@ -10,7 +10,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 0. Close foobar.
 
-1. Download this github repository and copy everything into your foobar installation directory (so the 4 folders: components, user-components, themes and plugins). 
+1. Download this [github repository](https://github.com/Ottodix/Eole-foobar-theme/zipball/master/) and copy everything into your foobar installation directory (so the 4 folders: components, user-components, themes and plugins). 
 The archive contain all the files and the required foobar components (columns UI, ui hacks, spider monkey panel, shpeck, elplaylist, panel stack splitter, playcount). 
 
 2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
