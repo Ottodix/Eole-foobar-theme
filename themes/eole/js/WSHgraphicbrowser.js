@@ -3670,9 +3670,9 @@ oBrowser = function(name) {
 			}	
 			this.get_metrics_called	= false;
 			this.totalTracks = this.list.Count;
-			gTime_covers = fb.CreateProfiler();			
-			gTime_covers.Reset();
-			console.log("get albums started time:"+gTime_covers.Time);		
+			//gTime_covers = fb.CreateProfiler();			
+			//gTime_covers.Reset();
+			//console.log("get albums started time:"+gTime_covers.Time);		
         }
 		
         var i = this.groups.length, k = start, temp = "", string_compare = str_comp;
@@ -3806,7 +3806,7 @@ oBrowser = function(name) {
 			this.firstInitialisation=false; 
 			if(properties.showheaderbar) g_headerbar.setDisplayedInfo(); 
 			this.list = undefined;
-			console.log("get albums finished time:"+gTime_covers.Time);			
+			//console.log("get albums finished time:"+gTime_covers.Time);			
 		}
         this.rowsCount = Math.ceil(this.groups.length / this.totalColumns);
         g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
