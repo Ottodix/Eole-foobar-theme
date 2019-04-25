@@ -37,7 +37,7 @@ That's it! Enjoy your sound.
 
 ## Credits
 - [TheQwertiest](https://github.com/TheQwertiest): Spider Monkey Panel, which powers most of this theme [foo_spider_monkey_panel](https://github.com/TheQwertiest/foo_spider_monkey_panel)
-- [marc2003](https://github.com/marc2k3): original [foo_jscript_panel](https://github.com/TheQwertiest/foo_spider_monkey_panel)
+- [marc2003](https://github.com/marc2k3): original [foo_jscript_panel](https://github.com/marc2k3/foo_jscript_panel)
 - [T.P. Wang](https://hydrogenaud.io/index.php?action=profile;u=44175): original [WSH Panel Mod](https://code.google.com/archive/p/foo-wsh-panel-mod).
 - [Br3tt aka Falstaff](https://www.deviantart.com/br3tt): original code for most of the panels
 - [WilB](https://hydrogenaud.io/index.php?action=profile;u=33113): original code of the library tree panel, and biography panel
