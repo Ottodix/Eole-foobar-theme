@@ -1,0 +1,13 @@
+Winamp version = 0x5050
+Plugin long name = "MilkDrop v2.24", version=200, subversion=5
+Enumeration of Display Adapters:
+1. Driver=igdumdim32.dll
+    Description=Intel(R) HD Graphics 4600
+    DeviceName=\\.\DISPLAY1
+    DriverVersion=0x000F10A0 (655378)
+    VendorId=32902
+    DeviceId=1046
+    SubSysId=0x18DD1043
+    Revision=6
+    WHQLLevel=0
+    GUID=D7B78E66 4756 11CF 53 63 D2 38 BB C2 C7 35

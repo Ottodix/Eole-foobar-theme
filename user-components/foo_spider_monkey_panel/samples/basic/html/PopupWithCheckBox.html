@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="x-ua-compatible" content="IE=8"/>
+        <link rel="stylesheet" type="text/css" href="styles10.css">
+        <style type="text/css">
+            input[type="checkbox"] { float:left; display: inline; position: relative; width: 15px; border: 0; padding: 2px 1px; } 
+            input[type="checkbox"]:focus { border:1px solid #0078D7; padding: 1px 0; } 
+            input[type="checkbox"]:hover:focus { border:1px solid #0078D7; padding: 1px 0; } 
+            input[type="checkbox"]:hover { border:1px solid #000000; padding: 1px 0; } 
+            .label_for_checkbox { float:left; padding-top: 1px; } 
+            .input_checkbox { position: relative; top: -1px; margin-right: 1px; } 
+            .cnt { font:caption; margin: 10px; word-wrap: break-word; white-space: pre-wrap; } 
+            .input_cnt_block { position: absolute; left: 14px; bottom: 15px; } 
+            .button_ok { width: 70px; position: absolute; right: 8px; bottom: 8px; } 
+        </style>
+        <title>Placeholder title</title>
+    </head>
+    <body>
+        <div id="div_text" class="cnt">Placeholder main text</div>
+        <div class="input_cnt_block">
+            <input id="input_checkbox" type="checkbox"/>
+            <label id="label_for_checkbox" class="label_for_checkbox">Placeholder checkbox text</label>
+        </div>
+        <button class="button_ok" id="btn_ok">OK</button>
+        <script>   
+            // helpers
+            function close_window() {
+                window.open('', '_self', '');
+                window.close();
+            }
+
+            // parse data
+            var parsed_args;
+            var callback_fn;
+            try {
+                parsed_args = window.external.dialogArguments.toArray();
+            }
+            catch(e) {
+            }
+            if (parsed_args) {
+                document.title = parsed_args[0];
+                window.div_text.innerText = parsed_args[1];
+                var labelInnerHtml = window.label_for_checkbox.innerHTML;
+                window.label_for_checkbox.innerHTML = labelInnerHtml.replace(/Placeholder checkbox text/g, parsed_args[2]);
+                callback_fn = parsed_args[3];
+            }
+
+            // main script
+            var window_w = 358;
+            var window_h = 425;
+            window_h = 83 + window.div_text.offsetHeight + window.btn_ok.offsetHeight;
+            if (window_w < window_h + 50) {
+                window_w += 50;
+            
+                window.resizeTo(window_w, window_h);
+                window_h = 83 + window.div_text.offsetHeight + window.btn_ok.offsetHeight;
+            }
+            window.resizeTo(window_w, window_h);
+            
+            window.input_checkbox.checked = false;
+
+            window.btn_ok.onclick = function () {
+                callback_fn && callback_fn("ok", window.input_checkbox.checked);
+                close_window();
+            };
+
+            window.document.body.focus();
+            window.btn_ok.focus();
+        </script>
+    </body>
+</html>

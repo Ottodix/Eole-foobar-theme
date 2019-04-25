@@ -1,0 +1,10 @@
+1   If anything goes wrong, check the popup window/console. It should tell you where the code is
+    that caused the error.
+2   Error handling is useful to create more stable scripts.
+3   Do NOT call repaint functions such as window.Repaint() in callback function on_size() {}.
+4   Do NOT assign parameter "gr" from function on_paint(gr) {} with other value, nor 
+    store "gr" in another variable.
+5   Remember to retrieve window width and height in on_size() callback, because their values
+    during startup is not reliable.
+6   It's NOT recommended to create objects in callback function on_paint(), since it will be
+    called frenquently.

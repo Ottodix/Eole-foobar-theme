@@ -1,0 +1,1 @@
+Use `Preferences > Tools > Spider Monkey Panel` to import these.

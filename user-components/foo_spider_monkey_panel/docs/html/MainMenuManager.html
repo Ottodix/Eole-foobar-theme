@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Class: MainMenuManager | Class: MainMenuManager</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Class: MainMenuManager</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-callbacks.html">callbacks</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:callbacks_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-callbacks.html#~on_always_on_top_changed">on_always_on_top_changed</a></li><li><a href="module-callbacks.html#~on_char">on_char</a></li><li><a href="module-callbacks.html#~on_colours_changed">on_colours_changed</a></li><li><a href="module-callbacks.html#~on_cursor_follow_playback_changed">on_cursor_follow_playback_changed</a></li><li><a href="module-callbacks.html#~on_drag_drop">on_drag_drop</a></li><li><a href="module-callbacks.html#~on_drag_enter">on_drag_enter</a></li><li><a href="module-callbacks.html#~on_drag_leave">on_drag_leave</a></li><li><a href="module-callbacks.html#~on_drag_over">on_drag_over</a></li><li><a href="module-callbacks.html#~on_dsp_preset_changed">on_dsp_preset_changed</a></li><li><a href="module-callbacks.html#~on_focus">on_focus</a></li><li><a href="module-callbacks.html#~on_font_changed">on_font_changed</a></li><li><a href="module-callbacks.html#~on_get_album_art_done">on_get_album_art_done</a></li><li><a href="module-callbacks.html#~on_item_focus_change">on_item_focus_change</a></li><li><a href="module-callbacks.html#~on_item_played">on_item_played</a></li><li><a href="module-callbacks.html#~on_key_down">on_key_down</a></li><li><a href="module-callbacks.html#~on_key_up">on_key_up</a></li><li><a href="module-callbacks.html#~on_library_items_added">on_library_items_added</a></li><li><a href="module-callbacks.html#~on_library_items_changed">on_library_items_changed</a></li><li><a href="module-callbacks.html#~on_library_items_removed">on_library_items_removed</a></li><li><a href="module-callbacks.html#~on_load_image_done">on_load_image_done</a></li><li><a href="module-callbacks.html#~on_main_menu">on_main_menu</a></li><li><a href="module-callbacks.html#~on_metadb_changed">on_metadb_changed</a></li><li><a href="module-callbacks.html#~on_mouse_lbtn_dblclk">on_mouse_lbtn_dblclk</a></li><li><a href="module-callbacks.html#~on_mouse_lbtn_down">on_mouse_lbtn_down</a></li><li><a href="module-callbacks.html#~on_mouse_lbtn_up">on_mouse_lbtn_up</a></li><li><a href="module-callbacks.html#~on_mouse_leave">on_mouse_leave</a></li><li><a href="module-callbacks.html#~on_mouse_mbtn_dblclk">on_mouse_mbtn_dblclk</a></li><li><a href="module-callbacks.html#~on_mouse_mbtn_down">on_mouse_mbtn_down</a></li><li><a href="module-callbacks.html#~on_mouse_mbtn_up">on_mouse_mbtn_up</a></li><li><a href="module-callbacks.html#~on_mouse_move">on_mouse_move</a></li><li><a href="module-callbacks.html#~on_mouse_rbtn_dblclk">on_mouse_rbtn_dblclk</a></li><li><a href="module-callbacks.html#~on_mouse_rbtn_down">on_mouse_rbtn_down</a></li><li><a href="module-callbacks.html#~on_mouse_rbtn_up">on_mouse_rbtn_up</a></li><li><a href="module-callbacks.html#~on_mouse_wheel">on_mouse_wheel</a></li><li><a href="module-callbacks.html#~on_mouse_wheel_h">on_mouse_wheel_h</a></li><li><a href="module-callbacks.html#~on_notify_data">on_notify_data</a></li><li><a href="module-callbacks.html#~on_output_device_changed">on_output_device_changed</a></li><li><a href="module-callbacks.html#~on_paint">on_paint</a></li><li><a href="module-callbacks.html#~on_playback_dynamic_info">on_playback_dynamic_info</a></li><li><a href="module-callbacks.html#~on_playback_dynamic_info_track">on_playback_dynamic_info_track</a></li><li><a href="module-callbacks.html#~on_playback_edited">on_playback_edited</a></li><li><a href="module-callbacks.html#~on_playback_follow_cursor_changed">on_playback_follow_cursor_changed</a></li><li><a href="module-callbacks.html#~on_playback_new_track">on_playback_new_track</a></li><li><a href="module-callbacks.html#~on_playback_order_changed">on_playback_order_changed</a></li><li><a href="module-callbacks.html#~on_playback_pause">on_playback_pause</a></li><li><a href="module-callbacks.html#~on_playback_queue_changed">on_playback_queue_changed</a></li><li><a href="module-callbacks.html#~on_playback_seek">on_playback_seek</a></li><li><a href="module-callbacks.html#~on_playback_starting">on_playback_starting</a></li><li><a href="module-callbacks.html#~on_playback_stop">on_playback_stop</a></li><li><a href="module-callbacks.html#~on_playback_time">on_playback_time</a></li><li><a href="module-callbacks.html#~on_playlist_item_ensure_visible">on_playlist_item_ensure_visible</a></li><li><a href="module-callbacks.html#~on_playlist_items_added">on_playlist_items_added</a></li><li><a href="module-callbacks.html#~on_playlist_items_removed">on_playlist_items_removed</a></li><li><a href="module-callbacks.html#~on_playlist_items_reordered">on_playlist_items_reordered</a></li><li><a href="module-callbacks.html#~on_playlist_items_selection_change">on_playlist_items_selection_change</a></li><li><a href="module-callbacks.html#~on_playlist_stop_after_current_changed">on_playlist_stop_after_current_changed</a></li><li><a href="module-callbacks.html#~on_playlist_switch">on_playlist_switch</a></li><li><a href="module-callbacks.html#~on_playlists_changed">on_playlists_changed</a></li><li><a href="module-callbacks.html#~on_replaygain_mode_changed">on_replaygain_mode_changed</a></li><li><a href="module-callbacks.html#~on_script_unload">on_script_unload</a></li><li><a href="module-callbacks.html#~on_selection_changed">on_selection_changed</a></li><li><a href="module-callbacks.html#~on_size">on_size</a></li><li><a href="module-callbacks.html#~on_volume_change">on_volume_change</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="ActiveXObject.html">ActiveXObject</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ActiveXObject_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="ActiveXObject.html#ActiveX_Get">ActiveX_Get</a></li><li><a href="ActiveXObject.html#ActiveX_Set">ActiveX_Set</a></li></ul></div></li><li><a href="ContextMenuManager.html">ContextMenuManager</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ContextMenuManager_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="ContextMenuManager.html#BuildMenu">BuildMenu</a></li><li><a href="ContextMenuManager.html#ExecuteByID">ExecuteByID</a></li><li><a href="ContextMenuManager.html#InitContext">InitContext</a></li><li><a href="ContextMenuManager.html#InitContextPlaylist">InitContextPlaylist</a></li><li><a href="ContextMenuManager.html#InitNowPlaying">InitNowPlaying</a></li></ul></div></li><li><a href="DropTargetAction.html">DropTargetAction</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="DropTargetAction_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="DropTargetAction.html#Base">Base</a></li><li><a href="DropTargetAction.html#Effect">Effect</a></li><li><a href="DropTargetAction.html#Playlist">Playlist</a></li><li><a href="DropTargetAction.html#Text">Text</a></li><li><a href="DropTargetAction.html#ToSelect">ToSelect</a></li></ul></div></li><li><a href="Enumerator.html">Enumerator</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Enumerator_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Enumerator.html#atEnd">atEnd</a></li><li><a href="Enumerator.html#item">item</a></li><li><a href="Enumerator.html#moveFirst">moveFirst</a></li><li><a href="Enumerator.html#moveNext">moveNext</a></li></ul></div></li><li><a href="FbFileInfo.html">FbFileInfo</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbFileInfo_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbFileInfo.html#InfoCount">InfoCount</a></li><li><a href="FbFileInfo.html#MetaCount">MetaCount</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbFileInfo.html#InfoFind">InfoFind</a></li><li><a href="FbFileInfo.html#InfoName">InfoName</a></li><li><a href="FbFileInfo.html#InfoValue">InfoValue</a></li><li><a href="FbFileInfo.html#MetaFind">MetaFind</a></li><li><a href="FbFileInfo.html#MetaName">MetaName</a></li><li><a href="FbFileInfo.html#MetaValue">MetaValue</a></li><li><a href="FbFileInfo.html#MetaValueCount">MetaValueCount</a></li></ul></div></li><li><a href="FbMetadbHandle.html">FbMetadbHandle</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbMetadbHandle_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbMetadbHandle.html#FileSize">FileSize</a></li><li><a href="FbMetadbHandle.html#Length">Length</a></li><li><a href="FbMetadbHandle.html#Path">Path</a></li><li><a href="FbMetadbHandle.html#RawPath">RawPath</a></li><li><a href="FbMetadbHandle.html#SubSong">SubSong</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbMetadbHandle.html#ClearStats">ClearStats</a></li><li><a href="FbMetadbHandle.html#Compare">Compare</a></li><li><a href="FbMetadbHandle.html#GetFileInfo">GetFileInfo</a></li><li><a href="FbMetadbHandle.html#RefreshStats">RefreshStats</a></li><li><a href="FbMetadbHandle.html#SetFirstPlayed">SetFirstPlayed</a></li><li><a href="FbMetadbHandle.html#SetLastPlayed">SetLastPlayed</a></li><li><a href="FbMetadbHandle.html#SetLoved">SetLoved</a></li><li><a href="FbMetadbHandle.html#SetPlayCount">SetPlayCount</a></li><li><a href="FbMetadbHandle.html#SetRating">SetRating</a></li></ul></div></li><li><a href="FbMetadbHandleList.html">FbMetadbHandleList</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbMetadbHandleList_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbMetadbHandleList.html#Count">Count</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbMetadbHandleList.html#Add">Add</a></li><li><a href="FbMetadbHandleList.html#AddRange">AddRange</a></li><li><a href="FbMetadbHandleList.html#AttachImage">AttachImage</a></li><li><a href="FbMetadbHandleList.html#BSearch">BSearch</a></li><li><a href="FbMetadbHandleList.html#CalcTotalDuration">CalcTotalDuration</a></li><li><a href="FbMetadbHandleList.html#CalcTotalSize">CalcTotalSize</a></li><li><a href="FbMetadbHandleList.html#Clone">Clone</a></li><li><a href="FbMetadbHandleList.html#Convert">Convert</a></li><li><a href="FbMetadbHandleList.html#Find">Find</a></li><li><a href="FbMetadbHandleList.html#GetLibraryRelativePaths">GetLibraryRelativePaths</a></li><li><a href="FbMetadbHandleList.html#Insert">Insert</a></li><li><a href="FbMetadbHandleList.html#InsertRange">InsertRange</a></li><li><a href="FbMetadbHandleList.html#MakeDifference">MakeDifference</a></li><li><a href="FbMetadbHandleList.html#MakeIntersection">MakeIntersection</a></li><li><a href="FbMetadbHandleList.html#MakeUnion">MakeUnion</a></li><li><a href="FbMetadbHandleList.html#OrderByFormat">OrderByFormat</a></li><li><a href="FbMetadbHandleList.html#OrderByPath">OrderByPath</a></li><li><a href="FbMetadbHandleList.html#OrderByRelativePath">OrderByRelativePath</a></li><li><a href="FbMetadbHandleList.html#RefreshStats">RefreshStats</a></li><li><a href="FbMetadbHandleList.html#Remove">Remove</a></li><li><a href="FbMetadbHandleList.html#RemoveAll">RemoveAll</a></li><li><a href="FbMetadbHandleList.html#RemoveAttachedImage">RemoveAttachedImage</a></li><li><a href="FbMetadbHandleList.html#RemoveAttachedImages">RemoveAttachedImages</a></li><li><a href="FbMetadbHandleList.html#RemoveById">RemoveById</a></li><li><a href="FbMetadbHandleList.html#RemoveRange">RemoveRange</a></li><li><a href="FbMetadbHandleList.html#Sort">Sort</a></li><li><a href="FbMetadbHandleList.html#UpdateFileInfoFromJSON">UpdateFileInfoFromJSON</a></li></ul></div></li><li><a href="FbPlaybackQueueItem.html">FbPlaybackQueueItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbPlaybackQueueItem_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbPlaybackQueueItem.html#Handle">Handle</a></li><li><a href="FbPlaybackQueueItem.html#PlaylistIndex">PlaylistIndex</a></li><li><a href="FbPlaybackQueueItem.html#PlaylistItemIndex">PlaylistItemIndex</a></li></ul></div></li><li><a href="FbPlayingItemLocation.html">FbPlayingItemLocation</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbPlayingItemLocation_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbPlayingItemLocation.html#IsValid">IsValid</a></li><li><a href="FbPlayingItemLocation.html#PlaylistIndex">PlaylistIndex</a></li><li><a href="FbPlayingItemLocation.html#PlaylistItemIndex">PlaylistItemIndex</a></li></ul></div></li><li><a href="FbPlaylistRecycler.html">FbPlaylistRecycler</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbPlaylistRecycler_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbPlaylistRecycler.html#Count">Count</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbPlaylistRecycler.html#GetContent">GetContent</a></li><li><a href="FbPlaylistRecycler.html#GetName">GetName</a></li><li><a href="FbPlaylistRecycler.html#Purge">Purge</a></li><li><a href="FbPlaylistRecycler.html#Restore">Restore</a></li></ul></div></li><li><a href="FbProfiler.html">FbProfiler</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbProfiler_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbProfiler.html#Time">Time</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbProfiler.html#Print">Print</a></li><li><a href="FbProfiler.html#Reset">Reset</a></li></ul></div></li><li><a href="FbTitleFormat.html">FbTitleFormat</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbTitleFormat_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="FbTitleFormat.html#Eval">Eval</a></li><li><a href="FbTitleFormat.html#EvalWithMetadb">EvalWithMetadb</a></li><li><a href="FbTitleFormat.html#EvalWithMetadbs">EvalWithMetadbs</a></li></ul></div></li><li><a href="FbTooltip.html">FbTooltip</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbTooltip_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="FbTooltip.html#Text">Text</a></li><li><a href="FbTooltip.html#TrackActivate">TrackActivate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="FbTooltip.html#Activate">Activate</a></li><li><a href="FbTooltip.html#Deactivate">Deactivate</a></li><li><a href="FbTooltip.html#GetDelayTime">GetDelayTime</a></li><li><a href="FbTooltip.html#SetDelayTime">SetDelayTime</a></li><li><a href="FbTooltip.html#SetMaxWidth">SetMaxWidth</a></li><li><a href="FbTooltip.html#TrackPosition">TrackPosition</a></li></ul></div></li><li><a href="FbUiSelectionHolder.html">FbUiSelectionHolder</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="FbUiSelectionHolder_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="FbUiSelectionHolder.html#SetPlaylistSelectionTracking">SetPlaylistSelectionTracking</a></li><li><a href="FbUiSelectionHolder.html#SetPlaylistTracking">SetPlaylistTracking</a></li><li><a href="FbUiSelectionHolder.html#SetSelection">SetSelection</a></li></ul></div></li><li><a href="GdiBitmap.html">GdiBitmap</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GdiBitmap_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="GdiBitmap.html#Height">Height</a></li><li><a href="GdiBitmap.html#Width">Width</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="GdiBitmap.html#ApplyAlpha">ApplyAlpha</a></li><li><a href="GdiBitmap.html#ApplyMask">ApplyMask</a></li><li><a href="GdiBitmap.html#Clone">Clone</a></li><li><a href="GdiBitmap.html#CreateRawBitmap">CreateRawBitmap</a></li><li><a href="GdiBitmap.html#GetColourScheme">GetColourScheme</a></li><li><a href="GdiBitmap.html#GetColourSchemeJSON">GetColourSchemeJSON</a></li><li><a href="GdiBitmap.html#GetGraphics">GetGraphics</a></li><li><a href="GdiBitmap.html#ReleaseGraphics">ReleaseGraphics</a></li><li><a href="GdiBitmap.html#Resize">Resize</a></li><li><a href="GdiBitmap.html#RotateFlip">RotateFlip</a></li><li><a href="GdiBitmap.html#SaveAs">SaveAs</a></li><li><a href="GdiBitmap.html#StackBlur">StackBlur</a></li></ul></div></li><li><a href="GdiFont.html">GdiFont</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GdiFont_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="GdiFont.html#Height">Height</a></li><li><a href="GdiFont.html#Name">Name</a></li><li><a href="GdiFont.html#Size">Size</a></li><li><a href="GdiFont.html#Style">Style</a></li></ul></div></li><li><a href="GdiGraphics.html">GdiGraphics</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GdiGraphics_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GdiGraphics.html#CalcTextHeight">CalcTextHeight</a></li><li><a href="GdiGraphics.html#CalcTextWidth">CalcTextWidth</a></li><li><a href="GdiGraphics.html#DrawEllipse">DrawEllipse</a></li><li><a href="GdiGraphics.html#DrawImage">DrawImage</a></li><li><a href="GdiGraphics.html#DrawLine">DrawLine</a></li><li><a href="GdiGraphics.html#DrawPolygon">DrawPolygon</a></li><li><a href="GdiGraphics.html#DrawRect">DrawRect</a></li><li><a href="GdiGraphics.html#DrawRoundRect">DrawRoundRect</a></li><li><a href="GdiGraphics.html#DrawString">DrawString</a></li><li><a href="GdiGraphics.html#EstimateLineWrap">EstimateLineWrap</a></li><li><a href="GdiGraphics.html#FillEllipse">FillEllipse</a></li><li><a href="GdiGraphics.html#FillGradRect">FillGradRect</a></li><li><a href="GdiGraphics.html#FillPolygon">FillPolygon</a></li><li><a href="GdiGraphics.html#FillRoundRect">FillRoundRect</a></li><li><a href="GdiGraphics.html#FillSolidRect">FillSolidRect</a></li><li><a href="GdiGraphics.html#GdiAlphaBlend">GdiAlphaBlend</a></li><li><a href="GdiGraphics.html#GdiDrawBitmap">GdiDrawBitmap</a></li><li><a href="GdiGraphics.html#GdiDrawText">GdiDrawText</a></li><li><a href="GdiGraphics.html#MeasureString">MeasureString</a></li><li><a href="GdiGraphics.html#SetInterpolationMode">SetInterpolationMode</a></li><li><a href="GdiGraphics.html#SetSmoothingMode">SetSmoothingMode</a></li><li><a href="GdiGraphics.html#SetTextRenderingHint">SetTextRenderingHint</a></li></ul></div></li><li><a href="GdiGraphics-MeasureStringInfo.html">MeasureStringInfo</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GdiGraphics~MeasureStringInfo_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="GdiGraphics-MeasureStringInfo.html#Chars">Chars</a></li><li><a href="GdiGraphics-MeasureStringInfo.html#Height">Height</a></li><li><a href="GdiGraphics-MeasureStringInfo.html#Lines">Lines</a></li><li><a href="GdiGraphics-MeasureStringInfo.html#Width">Width</a></li><li><a href="GdiGraphics-MeasureStringInfo.html#X">X</a></li><li><a href="GdiGraphics-MeasureStringInfo.html#Y">Y</a></li></ul></div></li><li><a href="GdiRawBitmap.html">GdiRawBitmap</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GdiRawBitmap_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="GdiRawBitmap.html#Height">Height</a></li><li><a href="GdiRawBitmap.html#Width">Width</a></li></ul></div></li><li><a href="MainMenuManager.html">MainMenuManager</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MainMenuManager_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="MainMenuManager.html#BuildMenu">BuildMenu</a></li><li><a href="MainMenuManager.html#ExecuteByID">ExecuteByID</a></li><li><a href="MainMenuManager.html#Init">Init</a></li></ul></div></li><li><a href="MenuObject.html">MenuObject</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MenuObject_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="MenuObject.html#AppendMenuItem">AppendMenuItem</a></li><li><a href="MenuObject.html#AppendMenuSeparator">AppendMenuSeparator</a></li><li><a href="MenuObject.html#AppendTo">AppendTo</a></li><li><a href="MenuObject.html#CheckMenuItem">CheckMenuItem</a></li><li><a href="MenuObject.html#CheckMenuRadioItem">CheckMenuRadioItem</a></li><li><a href="MenuObject.html#TrackPopupMenu">TrackPopupMenu</a></li></ul></div></li><li><a href="ThemeManager.html">ThemeManager</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ThemeManager_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="ThemeManager.html#DrawThemeBackground">DrawThemeBackground</a></li><li><a href="ThemeManager.html#IsThemePartDefined">IsThemePartDefined</a></li><li><a href="ThemeManager.html#SetPartAndStateID">SetPartAndStateID</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="console.html">console</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="console_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="console.html#.log">log</a></li></ul></div></li><li><a href="fb.html">fb</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="fb_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="fb.html#.AlwaysOnTop">AlwaysOnTop</a></li><li><a href="fb.html#.ComponentPath">ComponentPath</a></li><li><a href="fb.html#.CursorFollowPlayback">CursorFollowPlayback</a></li><li><a href="fb.html#.FoobarPath">FoobarPath</a></li><li><a href="fb.html#.IsPaused">IsPaused</a></li><li><a href="fb.html#.IsPlaying">IsPlaying</a></li><li><a href="fb.html#.PlaybackFollowCursor">PlaybackFollowCursor</a></li><li><a href="fb.html#.PlaybackLength">PlaybackLength</a></li><li><a href="fb.html#.PlaybackTime">PlaybackTime</a></li><li><a href="fb.html#.ProfilePath">ProfilePath</a></li><li><a href="fb.html#.ReplaygainMode">ReplaygainMode</a></li><li><a href="fb.html#.StopAfterCurrent">StopAfterCurrent</a></li><li><a href="fb.html#.Volume">Volume</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="fb.html#.AcquireUiSelectionHolder">AcquireUiSelectionHolder</a></li><li><a href="fb.html#.AddDirectory">AddDirectory</a></li><li><a href="fb.html#.AddFiles">AddFiles</a></li><li><a href="fb.html#.CheckClipboardContents">CheckClipboardContents</a></li><li><a href="fb.html#.ClearPlaylist">ClearPlaylist</a></li><li><a href="fb.html#.CopyHandleListToClipboard">CopyHandleListToClipboard</a></li><li><a href="fb.html#.CreateContextMenuManager">CreateContextMenuManager</a></li><li><a href="fb.html#.CreateHandleList">CreateHandleList</a></li><li><a href="fb.html#.CreateMainMenuManager">CreateMainMenuManager</a></li><li><a href="fb.html#.CreateProfiler">CreateProfiler</a></li><li><a href="fb.html#.DoDragDrop">DoDragDrop</a></li><li><a href="fb.html#.Exit">Exit</a></li><li><a href="fb.html#.GetClipboardContents">GetClipboardContents</a></li><li><a href="fb.html#.GetFocusItem">GetFocusItem</a></li><li><a href="fb.html#.GetLibraryItems">GetLibraryItems</a></li><li><a href="fb.html#.GetLibraryRelativePath">GetLibraryRelativePath</a></li><li><a href="fb.html#.GetNowPlaying">GetNowPlaying</a></li><li><a href="fb.html#.GetOutputDevices">GetOutputDevices</a></li><li><a href="fb.html#.GetQueryItems">GetQueryItems</a></li><li><a href="fb.html#.GetSelection">GetSelection</a></li><li><a href="fb.html#.GetSelections">GetSelections</a></li><li><a href="fb.html#.GetSelectionType">GetSelectionType</a></li><li><a href="fb.html#.IsLibraryEnabled">IsLibraryEnabled</a></li><li><a href="fb.html#.IsMainMenuCommandChecked">IsMainMenuCommandChecked</a></li><li><a href="fb.html#.IsMetadbInMediaLibrary">IsMetadbInMediaLibrary</a></li><li><a href="fb.html#.LoadPlaylist">LoadPlaylist</a></li><li><a href="fb.html#.Next">Next</a></li><li><a href="fb.html#.Pause">Pause</a></li><li><a href="fb.html#.Play">Play</a></li><li><a href="fb.html#.PlayOrPause">PlayOrPause</a></li><li><a href="fb.html#.Prev">Prev</a></li><li><a href="fb.html#.Random">Random</a></li><li><a href="fb.html#.RunContextCommand">RunContextCommand</a></li><li><a href="fb.html#.RunContextCommandWithMetadb">RunContextCommandWithMetadb</a></li><li><a href="fb.html#.RunMainMenuCommand">RunMainMenuCommand</a></li><li><a href="fb.html#.SavePlaylist">SavePlaylist</a></li><li><a href="fb.html#.SetOutputDevice">SetOutputDevice</a></li><li><a href="fb.html#.ShowConsole">ShowConsole</a></li><li><a href="fb.html#.ShowLibrarySearchUI">ShowLibrarySearchUI</a></li><li><a href="fb.html#.ShowPopupMessage">ShowPopupMessage</a></li><li><a href="fb.html#.ShowPreferences">ShowPreferences</a></li><li><a href="fb.html#.Stop">Stop</a></li><li><a href="fb.html#.TitleFormat">TitleFormat</a></li><li><a href="fb.html#.VolumeDown">VolumeDown</a></li><li><a href="fb.html#.VolumeMute">VolumeMute</a></li><li><a href="fb.html#.VolumeUp">VolumeUp</a></li></ul></div></li><li><a href="gdi.html">gdi</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="gdi_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="gdi.html#.CreateImage">CreateImage</a></li><li><a href="gdi.html#.Font">Font</a></li><li><a href="gdi.html#.Image">Image</a></li><li><a href="gdi.html#.LoadImageAsync">LoadImageAsync</a></li><li><a href="gdi.html#.LoadImageAsyncV2">LoadImageAsyncV2</a></li></ul></div></li><li><a href="plman.html">plman</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="plman_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="plman.html#.ActivePlaylist">ActivePlaylist</a></li><li><a href="plman.html#.PlaybackOrder">PlaybackOrder</a></li><li><a href="plman.html#.PlayingPlaylist">PlayingPlaylist</a></li><li><a href="plman.html#.PlaylistCount">PlaylistCount</a></li><li><a href="plman.html#.PlaylistRecycler">PlaylistRecycler</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="plman.html#.AddItemToPlaybackQueue">AddItemToPlaybackQueue</a></li><li><a href="plman.html#.AddLocations">AddLocations</a></li><li><a href="plman.html#.AddPlaylistItemToPlaybackQueue">AddPlaylistItemToPlaybackQueue</a></li><li><a href="plman.html#.ClearPlaylist">ClearPlaylist</a></li><li><a href="plman.html#.ClearPlaylistSelection">ClearPlaylistSelection</a></li><li><a href="plman.html#.CreateAutoPlaylist">CreateAutoPlaylist</a></li><li><a href="plman.html#.CreatePlaylist">CreatePlaylist</a></li><li><a href="plman.html#.DuplicatePlaylist">DuplicatePlaylist</a></li><li><a href="plman.html#.EnsurePlaylistItemVisible">EnsurePlaylistItemVisible</a></li><li><a href="plman.html#.ExecutePlaylistDefaultAction">ExecutePlaylistDefaultAction</a></li><li><a href="plman.html#.FindOrCreatePlaylist">FindOrCreatePlaylist</a></li><li><a href="plman.html#.FindPlaybackQueueItemIndex">FindPlaybackQueueItemIndex</a></li><li><a href="plman.html#.FindPlaylist">FindPlaylist</a></li><li><a href="plman.html#.FlushPlaybackQueue">FlushPlaybackQueue</a></li><li><a href="plman.html#.GetPlaybackQueueContents">GetPlaybackQueueContents</a></li><li><a href="plman.html#.GetPlaybackQueueHandles">GetPlaybackQueueHandles</a></li><li><a href="plman.html#.GetPlayingItemLocation">GetPlayingItemLocation</a></li><li><a href="plman.html#.GetPlaylistFocusItemIndex">GetPlaylistFocusItemIndex</a></li><li><a href="plman.html#.GetPlaylistItems">GetPlaylistItems</a></li><li><a href="plman.html#.GetPlaylistName">GetPlaylistName</a></li><li><a href="plman.html#.GetPlaylistSelectedItems">GetPlaylistSelectedItems</a></li><li><a href="plman.html#.InsertPlaylistItems">InsertPlaylistItems</a></li><li><a href="plman.html#.InsertPlaylistItemsFilter">InsertPlaylistItemsFilter</a></li><li><a href="plman.html#.IsAutoPlaylist">IsAutoPlaylist</a></li><li><a href="plman.html#.IsPlaylistItemSelected">IsPlaylistItemSelected</a></li><li><a href="plman.html#.IsPlaylistLocked">IsPlaylistLocked</a></li><li><a href="plman.html#.MovePlaylist">MovePlaylist</a></li><li><a href="plman.html#.MovePlaylistSelection">MovePlaylistSelection</a></li><li><a href="plman.html#.PlaylistItemCount">PlaylistItemCount</a></li><li><a href="plman.html#.RemoveItemFromPlaybackQueue">RemoveItemFromPlaybackQueue</a></li><li><a href="plman.html#.RemoveItemsFromPlaybackQueue">RemoveItemsFromPlaybackQueue</a></li><li><a href="plman.html#.RemovePlaylist">RemovePlaylist</a></li><li><a href="plman.html#.RemovePlaylistSelection">RemovePlaylistSelection</a></li><li><a href="plman.html#.RemovePlaylistSwitch">RemovePlaylistSwitch</a></li><li><a href="plman.html#.RenamePlaylist">RenamePlaylist</a></li><li><a href="plman.html#.SetActivePlaylistContext">SetActivePlaylistContext</a></li><li><a href="plman.html#.SetPlaylistFocusItem">SetPlaylistFocusItem</a></li><li><a href="plman.html#.SetPlaylistFocusItemByHandle">SetPlaylistFocusItemByHandle</a></li><li><a href="plman.html#.SetPlaylistSelection">SetPlaylistSelection</a></li><li><a href="plman.html#.SetPlaylistSelectionSingle">SetPlaylistSelectionSingle</a></li><li><a href="plman.html#.ShowAutoPlaylistUI">ShowAutoPlaylistUI</a></li><li><a href="plman.html#.SortByFormat">SortByFormat</a></li><li><a href="plman.html#.SortByFormatV2">SortByFormatV2</a></li><li><a href="plman.html#.SortPlaylistsByName">SortPlaylistsByName</a></li><li><a href="plman.html#.UndoBackup">UndoBackup</a></li></ul></div></li><li><a href="utils.html">utils</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="utils_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="utils.html#.Version">Version</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="utils.html#.CheckComponent">CheckComponent</a></li><li><a href="utils.html#.CheckFont">CheckFont</a></li><li><a href="utils.html#.ColourPicker">ColourPicker</a></li><li><a href="utils.html#.FileTest">FileTest</a></li><li><a href="utils.html#.FormatDuration">FormatDuration</a></li><li><a href="utils.html#.FormatFileSize">FormatFileSize</a></li><li><a href="utils.html#.GetAlbumArtAsync">GetAlbumArtAsync</a></li><li><a href="utils.html#.GetAlbumArtAsyncV2">GetAlbumArtAsyncV2</a></li><li><a href="utils.html#.GetAlbumArtEmbedded">GetAlbumArtEmbedded</a></li><li><a href="utils.html#.GetAlbumArtV2">GetAlbumArtV2</a></li><li><a href="utils.html#.GetSysColour">GetSysColour</a></li><li><a href="utils.html#.GetSystemMetrics">GetSystemMetrics</a></li><li><a href="utils.html#.Glob">Glob</a></li><li><a href="utils.html#.InputBox">InputBox</a></li><li><a href="utils.html#.IsKeyPressed">IsKeyPressed</a></li><li><a href="utils.html#.MapString">MapString</a></li><li><a href="utils.html#.PathWildcardMatch">PathWildcardMatch</a></li><li><a href="utils.html#.ReadINI">ReadINI</a></li><li><a href="utils.html#.ReadTextFile">ReadTextFile</a></li><li><a href="utils.html#.ShowHtmlDialog">ShowHtmlDialog</a></li><li><a href="utils.html#.WriteINI">WriteINI</a></li><li><a href="utils.html#.WriteTextFile">WriteTextFile</a></li></ul></div></li><li><a href="window.html">window</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="window.html#.DlgCode">DlgCode</a></li><li><a href="window.html#.Height">Height</a></li><li><a href="window.html#.ID">ID</a></li><li><a href="window.html#.InstanceType">InstanceType</a></li><li><a href="window.html#.IsTransparent">IsTransparent</a></li><li><a href="window.html#.IsVisible">IsVisible</a></li><li><a href="window.html#.MaxHeight">MaxHeight</a></li><li><a href="window.html#.MaxWidth">MaxWidth</a></li><li><a href="window.html#.MemoryLimit">MemoryLimit</a></li><li><a href="window.html#.MinHeight">MinHeight</a></li><li><a href="window.html#.MinWidth">MinWidth</a></li><li><a href="window.html#.Name">Name</a></li><li><a href="window.html#.PanelMemoryUsage">PanelMemoryUsage</a></li><li><a href="window.html#.TotalMemoryUsage">TotalMemoryUsage</a></li><li><a href="window.html#.Width">Width</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="window.html#.ClearInterval">ClearInterval</a></li><li><a href="window.html#.ClearTimeout">ClearTimeout</a></li><li><a href="window.html#.CreatePopupMenu">CreatePopupMenu</a></li><li><a href="window.html#.CreateThemeManager">CreateThemeManager</a></li><li><a href="window.html#.CreateTooltip">CreateTooltip</a></li><li><a href="window.html#.DefinePanel">DefinePanel</a></li><li><a href="window.html#.GetColourCUI">GetColourCUI</a></li><li><a href="window.html#.GetColourDUI">GetColourDUI</a></li><li><a href="window.html#.GetFontCUI">GetFontCUI</a></li><li><a href="window.html#.GetFontDUI">GetFontDUI</a></li><li><a href="window.html#.GetProperty">GetProperty</a></li><li><a href="window.html#.NotifyOthers">NotifyOthers</a></li><li><a href="window.html#.Reload">Reload</a></li><li><a href="window.html#.Repaint">Repaint</a></li><li><a href="window.html#.RepaintRect">RepaintRect</a></li><li><a href="window.html#.SetCursor">SetCursor</a></li><li><a href="window.html#.SetInterval">SetInterval</a></li><li><a href="window.html#.SetProperty">SetProperty</a></li><li><a href="window.html#.SetTimeout">SetTimeout</a></li><li><a href="window.html#.ShowConfigure">ShowConfigure</a></li><li><a href="window.html#.ShowProperties">ShowProperties</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li class="hidden"><a href="global.html#ArtPromiseResult">ArtPromiseResult</a></li><li><a href="global.html#clearInterval">clearInterval</a></li><li><a href="global.html#clearTimeout">clearTimeout</a></li><li class="hidden"><a href="global.html#float">float</a></li><li><a href="global.html#include">include</a></li><li><a href="global.html#setInterval">setInterval</a></li><li><a href="global.html#setTimeout">setTimeout</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>MainMenuManager</h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dt>
+    
+        <h4 class="name" id="MainMenuManager">
+            
+                MainMenuManager
+                
+            
+            <div class="container-source members">
+                <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
+                <code><a href="js_foo_spider_monkey_panel.js.html#line3293">line 3293</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id="BuildMenu">
+            
+                <span class="type-signature"></span>BuildMenu<span class="signature">(menu_obj, base_id, count)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
+                <code><a href="js_foo_spider_monkey_panel.js.html#line3299">line 3299</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>menu_obj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MenuObject.html">MenuObject</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>base_id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>count</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="ExecuteByID">
+            
+                <span class="type-signature"></span>ExecuteByID<span class="signature">(id)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
+                <code><a href="js_foo_spider_monkey_panel.js.html#line3305">line 3305</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="Init">
+            
+                <span class="type-signature"></span>Init<span class="signature">(root_name)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
+                <code><a href="js_foo_spider_monkey_panel.js.html#line3310">line 3310</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>root_name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Must be one of the following: 'file', 'view', 'edit', 'playback', 'library', 'help'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">NHN Entertainment. Frontend Development Lab</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = 'MainMenuManager_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
