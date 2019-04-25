@@ -23,7 +23,7 @@ WARNING : shpeck is an unstable component, so if it doesn't work or make foobar 
 
 6. Optionaly, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [YOUR_FOOBAR_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
 
-END. That's it! Enjoy your sound.
+That's it! Enjoy your sound.
 
 ## USEFUL TO KNOW
 
