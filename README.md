@@ -6,6 +6,10 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 ![alt text](https://raw.githubusercontent.com/Ottodix/Eole-foobar-theme/master/preview.png)
 
+## Participate to the theme
+
+If you've got some knowledge in javascript, feel free to report bugs and their fixes, or even new features for this theme. Open an issue ticket, and share the code on pastebin.com. Eventually, I can add your github account to the collaborators of this repository.
+
 ## Installation
 
 0. Close foobar.
