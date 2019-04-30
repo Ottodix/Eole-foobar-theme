@@ -8,6 +8,8 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 If you've got some knowledge in javascript, feel free to report bugs and their fixes, or even new features for this theme. Open an issue ticket, and share the code on pastebin.com, I'll review it and merge it to the master code. Eventually and finally, I can add your github account to the collaborators of this repository.
 
+## Preview
+
 ![alt text](https://raw.githubusercontent.com/Ottodix/Eole-foobar-theme/master/preview.png)
 
 ## Installation
