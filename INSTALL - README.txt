@@ -18,7 +18,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 \
 WARNING : shpeck is an unstable component, so if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: hold SHIFT and right click the visualisation tab at the top and select Properties. In the properties window, turn the value of "_PROPERTY show visualisation tab" to false). And remove the speck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout.
 
-6. Optionaly, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [YOUR_FOOBAR_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
+6. Optionally, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [YOUR_FOOBAR_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
 
 That's it! Enjoy your sound.
 
