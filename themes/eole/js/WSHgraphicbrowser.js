@@ -2715,6 +2715,7 @@ function draw_settings_menu(x,y,right_align){
 	var _menuBackground = window.CreatePopupMenu(); 
 	var _menuRating = window.CreatePopupMenu();
 	var _menuHeaderBar = window.CreatePopupMenu();
+	var _additionalInfos = window.CreatePopupMenu();
 	 /*var _menuDisplayedPlaylist = window.CreatePopupMenu();
 	_menuDisplayedPlaylist.AppendTo(_menu, MF_STRING, "Displayed Playlist");
 	_menuDisplayedPlaylist.AppendMenuItem(MF_STRING, 329, "Active Playlist");		
@@ -2784,18 +2785,25 @@ function draw_settings_menu(x,y,right_align){
 	
 	_menuTracklist.AppendMenuItem(MF_STRING, 11, "Activate tracklist");
 	_menuTracklist.CheckMenuItem(11, properties.expandInPlace);	
-	_menuTracklist.AppendMenuItem(MF_STRING, 28, "Show artist name for each track");
-	_menuTracklist.CheckMenuItem(28, properties.showArtistName);	
-	_menuTracklist.AppendMenuItem(MF_STRING, 36, "Show play count");
-	_menuTracklist.CheckMenuItem(36, properties.showPlaycount);		
-	_menuTracklist.AppendMenuItem(MF_STRING, 44, "Show codec");
-	_menuTracklist.CheckMenuItem(44, properties.showCodec);		
-	_menuTracklist.AppendMenuItem(MF_STRING, 43, "Show bitrate");
-	_menuTracklist.CheckMenuItem(43, properties.showBitrate);			
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
 	_menuTracklist.AppendMenuItem(MF_STRING, 29, "Show the cover on the right");
-	_menuTracklist.CheckMenuItem(29, properties.showlistShowCover);	
+	_menuTracklist.CheckMenuItem(29, properties.showlistShowCover);		
+
+	_menuTracklist.AppendMenuSeparator();
+
+	_additionalInfos.AppendMenuItem(MF_STRING, 28, "Show artist name for each track");
+	_additionalInfos.CheckMenuItem(28, properties.showArtistName);	
+	_additionalInfos.AppendMenuItem(MF_STRING, 36, "Show play count");
+	_additionalInfos.CheckMenuItem(36, properties.showPlaycount);		
+	_additionalInfos.AppendMenuItem(MF_STRING, 44, "Show codec");
+	_additionalInfos.CheckMenuItem(44, properties.showCodec);		
+	_additionalInfos.AppendMenuItem(MF_STRING, 43, "Show bitrate");
+	_additionalInfos.CheckMenuItem(43, properties.showBitrate);		
+	_additionalInfos.AppendMenuSeparator();	
+	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "Displayed in this order:");
+	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "[Artist name] ([Playcount] - [Codec] - [Bitrate])");	
+	_additionalInfos.AppendTo(_menuTracklist,MF_STRING, "Additional track infos");
 
 	_menuTracklist.AppendMenuSeparator();	
 	
@@ -3192,7 +3200,8 @@ function draw_settings_menu(x,y,right_align){
 	_menuProgressBar = undefined;	
 	_menuRating = undefined;	
 	_menuHeaderBar = undefined;
-	_menuBackground = undefined;	
+	_menuBackground = undefined;
+	_additionalInfos = undefined;
 }
 
 oScrollbar = function(parentObjectName) {
