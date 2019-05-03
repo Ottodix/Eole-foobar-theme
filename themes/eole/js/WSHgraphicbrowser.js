@@ -103,6 +103,8 @@ var properties = {
     drawProgressBar: window.GetProperty("TRACKLIST Draw a progress bar under song title", true),	
     AlbumArtProgressbar: window.GetProperty("TRACKLIST Blurred album art progress bar", false),		
     showPlaycount: window.GetProperty("TRACKLIST Show playcount", true),
+    showBitrate: window.GetProperty("TRACKLIST Show bitrate", false),
+    showCodec: window.GetProperty("TRACKLIST Show codec", false),
     showArtistName: window.GetProperty("TRACKLIST Show artist name", false),
     showRating: window.GetProperty("TRACKLIST Show rating in Track Row", false),
     showRatingSelected: window.GetProperty("TRACKLIST Show rating in Selected Track Row", false),	
@@ -116,7 +118,10 @@ var properties = {
     TFgrouping_populate: "%album artist% ^^ %album%",			
     TFsorting: window.GetProperty("MAINPANEL Library Sort TitleFormat", ""),	
     TFsorting_default: window.GetProperty("MAINPANEL Library Default Sort TitleFormat", ""),		
-    TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'0') ^^ %title% ^^ $if2(%rating%,0) ^^ $if(%length%,%length_seconds%,'ON AIR') ^^ $if2(%play_counter%,$if2(%play_count%,0))",	
+    TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'0') ^^ %title% ^^ $if2(%rating%,0) ^^ $if(%length%,%length_seconds%,'ON AIR')",	
+    TFbitrate: "$if2(%bitrate% kbit,'')",	
+    TFcodec: "$if2(%codec%,'')",	
+    TFplaycount: "$if2(%play_counter%,$if2(%play_count%,0))",			
     TFshowlist: "%album artist% ^^ %album% ^^ [' - Disc '%discnumber%] ^^ %date% ^^ %genre%",
 	TFshowlistReduced: "[%discnumber%]",
     TFgroupinfos: "%genre% ^^ %date%",	
@@ -176,6 +181,13 @@ var TF = {
 	date: fb.TitleFormat("%date%"),
 	play_count: fb.TitleFormat("%play_count%"),
 	title: fb.TitleFormat(properties.TFtitle),
+	titleC: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFcodec),
+	titleB: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFbitrate),
+	titleP: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFplaycount),
+	titleCB: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFcodec+' - '+properties.TFbitrate),
+	titlePC: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFplaycount+' - '+properties.TFcodec),
+	titlePB: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFplaycount+' - '+properties.TFbitrate),
+	titlePCB: fb.TitleFormat(properties.TFtitle+' ^^ '+properties.TFplaycount+' - '+properties.TFcodec+' - '+properties.TFbitrate),	
 	showlist: fb.TitleFormat(properties.TFshowlistReduced),	
 	showlistReduced: fb.TitleFormat(properties.TFshowlistReduced),
 	playback_time_seconds: fb.TitleFormat("%playback_time_seconds%"),
@@ -807,7 +819,26 @@ oRow = function(metadb,itemIndex) {
 	this.playcount_length = 0;	
 	this.cursorHand = false;
 	this.getTags = function(){
-		var TagsString = TF.title.EvalWithMetadb(metadb);
+		
+		if(properties.showPlaycount) {
+			if(properties.showCodec) {
+				if(properties.showBitrate) 
+					var TagsString = TF.titlePCB.EvalWithMetadb(metadb);
+				else
+					var TagsString = TF.titlePC.EvalWithMetadb(metadb);
+			} else if(properties.showBitrate)
+				var TagsString = TF.titlePB.EvalWithMetadb(metadb)				
+			else
+				var TagsString = TF.titleP.EvalWithMetadb(metadb)					
+		} else if(properties.showCodec) {
+			if(properties.showBitrate)
+				var TagsString = TF.titleCB.EvalWithMetadb(metadb);
+			else
+				var TagsString = TF.titleC.EvalWithMetadb(metadb);				
+		} else if(properties.showBitrate){
+			var TagsString = TF.titleB.EvalWithMetadb(metadb);	
+		} else
+			var TagsString = TF.title.EvalWithMetadb(metadb);
 		Tags = TagsString.split(" ^^ ");
 		this.tf_artist = Tags[0];
 		if(this.tf_artist=="?") this.tf_artist="Unknown artist";
@@ -822,6 +853,7 @@ oRow = function(metadb,itemIndex) {
 		};
 		this.tf_length_seconds = Tags[5];		
 		this.tf_length = Tags[5].toHHMMSS();
+
 		this.tf_playcount = Tags[6];
 	} 
 	this.getTags();
@@ -938,7 +970,7 @@ oRow = function(metadb,itemIndex) {
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title_text, g_font.normal);
 		
 
-		if(properties.showPlaycount){
+		if(properties.showPlaycount || properties.showCodec || properties.showBitrate){	
 			this.playcount_text = "  ("+this.tf_playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
 			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10) - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);		
@@ -972,7 +1004,7 @@ oRow = function(metadb,itemIndex) {
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = current_size-this.tracknumber_w+2;
 				gr.GdiDrawText(this.title_text, g_font.normal, albumartprogressbar_color_txt, (this.x + this.tracknumber_w + 10), this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-				if(properties.showPlaycount && ((this.x + this.tracknumber_w + 10 + this.title_length+this.playcount_length+5)<this.rating_x) || this.rating_x<=0){	
+				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((this.x + this.tracknumber_w + 10 + this.title_length+this.playcount_length+5)<this.rating_x) || this.rating_x<=0){	
 					gr.GdiDrawText(this.playcount_text, g_font.min2, albumartprogressbar_color_txt, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, current_size-this.tracknumber_w+2 - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 				}
         } 
@@ -2756,6 +2788,10 @@ function draw_settings_menu(x,y,right_align){
 	_menuTracklist.CheckMenuItem(28, properties.showArtistName);	
 	_menuTracklist.AppendMenuItem(MF_STRING, 36, "Show play count");
 	_menuTracklist.CheckMenuItem(36, properties.showPlaycount);		
+	_menuTracklist.AppendMenuItem(MF_STRING, 44, "Show codec");
+	_menuTracklist.CheckMenuItem(44, properties.showCodec);		
+	_menuTracklist.AppendMenuItem(MF_STRING, 43, "Show bitrate");
+	_menuTracklist.CheckMenuItem(43, properties.showBitrate);			
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
 	_menuTracklist.AppendMenuItem(MF_STRING, 29, "Show the cover on the right");
@@ -2972,6 +3008,18 @@ function draw_settings_menu(x,y,right_align){
 		case (idx == 36):
 			properties.showPlaycount = !properties.showPlaycount;
 			window.SetProperty("TRACKLIST Show playcount", properties.showPlaycount);
+			g_showlist.refresh();
+			brw.repaint();
+			break;		
+		case (idx == 44):
+			properties.showCodec = !properties.showCodec;
+			window.SetProperty("TRACKLIST Show codec", properties.showCodec);
+			g_showlist.refresh();
+			brw.repaint();
+			break;			
+		case (idx == 43):
+			properties.showBitrate = !properties.showBitrate;
+			window.SetProperty("TRACKLIST Show bitrate", properties.showBitrate);
 			g_showlist.refresh();
 			brw.repaint();
 			break;			
@@ -5388,8 +5436,6 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
-console.log(brw.groups_draw.length);
-console.log(brw.groups.length);
     cur_btn_down = chooseButton(x, y);
     if (cur_btn_down) {
 		btn_down = true;	

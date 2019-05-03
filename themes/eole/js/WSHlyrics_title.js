@@ -55,7 +55,6 @@ function get_colors() {
 	esl.ShowDesktopLyric = false;	
 	esl.DesktopLyricAlwaysOnTop = false;	
 };
-// ===================================================== // Wallpaper
 
 function on_mouse_rbtn_up(x, y){
         var _menu = window.CreatePopupMenu();	
