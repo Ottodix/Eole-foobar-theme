@@ -18,21 +18,20 @@ properties = {
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false)  		
 };
 
-var scrollbar_normal_cursor_color,scrollbar_hover_cursor_color;
-
 function get_colors() {
 	if(properties.darklayout){
-		bg_color = GetGrey(17);	
-		scrollbar_normal_cursor_color = GetGrey(255,60);
-		scrollbar_hover_cursor_color = GetGrey(225);	
-		rightline_color = GetGrey(255,20);		
+		colors.normal_bg = GetGrey(17);	
+		colors.scrollbar_normal_cursor = GetGrey(255,60);
+		colors.scrollbar_hover_cursor = GetGrey(225);	
+		colors.rightline = GetGrey(255,20);		
 	} else {
-		bg_color = GetGrey(255);		
-		scrollbar_normal_cursor_color = GetGrey(0,120);	
-		scrollbar_hover_cursor_color = GetGrey(0);		
-		rightline_color = GetGrey(210);
+		colors.normal_bg = GetGrey(255);		
+		colors.scrollbar_normal_cursor = GetGrey(0,120);	
+		colors.scrollbar_hover_cursor = GetGrey(0);		
+		colors.rightline = GetGrey(210);
 	}
-} get_colors();
+}
+get_colors();
 
 var drag_ajust=0;
 var g_drag = 0;
@@ -41,20 +40,20 @@ var hooverstate=false;
 var focus_item=plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist);
 
 function on_paint(gr) {
-	gr.FillSolidRect(0, 0, ww, wh, bg_color);
-	gr.FillSolidRect(ww-1, 0, 1, wh, rightline_color);
-	if(nowplayingplaylist_state.isActive() && !properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, rightline_color);	
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
+	gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);
+	if(nowplayingplaylist_state.isActive() && !properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
 	
     if(wh<playlist_item_size*playlist_count) {
 		scrollbar_top=Math.floor((focus_item*scrollbar_zone)/(playlist_count-1));
 		
 		if(!hooverstate){  
-			//gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, scrollbar_normal_cursor_color);	
+			//gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);	
 			
-			gr.FillSolidRect(ww-cScrollBar.normalWidth-1,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,scrollbar_normal_cursor_color); 
+			gr.FillSolidRect(ww-cScrollBar.normalWidth-1,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
 		}
 		else {          
-			gr.FillSolidRect(0,scrollbar_top, ww,scrollbar_size,scrollbar_hover_cursor_color);
+			gr.FillSolidRect(0,scrollbar_top, ww,scrollbar_size,colors.scrollbar_hover_cursor);
 		}
 	}
 }

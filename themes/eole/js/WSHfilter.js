@@ -6,7 +6,6 @@ var images = {
     noart: null,
     stream: null
 };
-var colors = {};
 var g_genre_cache=false;
 var Update_Required_function="";
 var browser_refresh_required=false;
@@ -123,7 +122,6 @@ var properties = {
     textLineHeight: 0,
     DrawRightLine: window.GetProperty("_PROPERTY: Draw a line on the right side", true),	
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
-	ResizeQLY: 2,
 	panelFontAdjustement: -1,
 	load_image_from_cache_direct: true	
 };
@@ -470,15 +468,6 @@ oImageCache = function () {
     };
 };
 
-function FormatCover(image, w, h, rawBitmap) {
-	if(!image || w<=0 || h<=0) return image;
-	if(rawBitmap) {
-		return image.Resize(w, h, properties.ResizeQLY).CreateRawBitmap();
-	} else {
-		return image.Resize(w, h, properties.ResizeQLY);
-	}
-};
-
 /* 
 ===================================================================================================
     Objects
@@ -619,8 +608,8 @@ oPlaylistManager = function(name) {
             var bg_margin_top = 2;
             var bg_margin_left = 10;
             var txt_margin = 10;
-            var bg_color = pm_color_bg;
-            var txt_color = pm_color_txt;
+            var bg_color = colors.pm_bg;
+            var txt_color = colors.pm_txt;
 			var gradient_size = 30;
             // scrollbar metrics
             if(this.rowTotal > this.totalRows) {
@@ -635,16 +624,16 @@ oPlaylistManager = function(name) {
 
 			//Overlay
 			height_top_fix = (properties.showHeaderBar ? (properties.showTagSwitcherBar ? properties.TagSwitcherBarHeight+properties.headerBarHeight : properties.headerBarHeight) : 0)	
-            gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, pm_color_overlay);
+            gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, colors.pm_overlay);
 			
 			//Shadows
-			gr.FillGradRect(cx,this.y-gradient_size,ww-(draw_right_line?1:0),gradient_size,90,pm_color_shadow_on,pm_color_shadow_off,0)
-			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(draw_right_line?1:0),gradient_size,90,pm_color_shadow_on,pm_color_shadow_off,1.0)
+			gr.FillGradRect(cx,this.y-gradient_size,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,0)
+			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,1.0)
 			//Main BG
-			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, pm_color_bg);
-			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, pm_color_border);
-			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, pm_color_border);			
-           // gr.FillSolidRect(cx + bg_margin_left, this.y + cPlaylistManager.topbarHeight - 2, this.w - bg_margin_left*2, 1, pm_color_bg4);
+			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, colors.pm_bg);
+			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, colors.pm_border);
+			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, colors.pm_border);			
+           // gr.FillSolidRect(cx + bg_margin_left, this.y + cPlaylistManager.topbarHeight - 2, this.w - bg_margin_left*2, 1, colors.pm_bg4);
             
             // ** items **
             var rowIdx = 0;
@@ -657,7 +646,7 @@ oPlaylistManager = function(name) {
                 this.playlists[i].y = cy;
                 
                 // ** item bg **
-                gr.FillSolidRect(cx + bg_margin_left+5, cy + bg_margin_top-3, cw - bg_margin_left*2-10 - this.scr_w, 1, pm_item_separator_line);
+                gr.FillSolidRect(cx + bg_margin_left+5, cy + bg_margin_top-3, cw - bg_margin_left*2-10 - this.scr_w, 1, colors.pm_item_separator_line);
                 
                 // ** item text **
                 // playlist total items
@@ -688,7 +677,7 @@ oPlaylistManager = function(name) {
                     if(cPlaylistManager.blink_row != 0) {
                         if(i == cPlaylistManager.blink_id - 1) {
                             if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {
-                                gr.FillSolidRect(cx + bg_margin_left, cy +(cPlaylistManager.topbarHeight-39), cw - bg_margin_left*2 - this.scr_w, ch, pm_color_blink);
+                                gr.FillSolidRect(cx + bg_margin_left, cy +(cPlaylistManager.topbarHeight-39), cw - bg_margin_left*2 - this.scr_w, ch, colors.pm_blink);
                             };
                         };
                     };
@@ -703,8 +692,8 @@ oPlaylistManager = function(name) {
                 if(cPlaylistManager.blink_row == 0) {
 					gr.GdiDrawText("+ Sent to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
                     if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {                        
-						gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-						gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);							
+						gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+						gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);							
                     };
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -713,8 +702,8 @@ oPlaylistManager = function(name) {
                 if(this.activeRow == 0) {
                     gr.GdiDrawText("+ Send to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
 					
-					gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-					gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);	
+					gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+					gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);	
 					
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -724,13 +713,13 @@ oPlaylistManager = function(name) {
             // draw activeIndex hover frame
             if(cPlaylistManager.blink_counter > -1 && cPlaylistManager.blink_row > 0) {
                 cy_ = this.y + cPlaylistManager.blink_row * ch;
-                gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);
+                gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
             } else {
                 if(this.activeRow > 0 && this.activeIndex > 0) {
                     if(cPlaylistManager.blink_counter < 0){
                         cy_ = this.y + this.activeRow * ch;
-						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-                        gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);
+						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+                        gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-33), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
                     };
                 };
             };
@@ -743,7 +732,7 @@ oPlaylistManager = function(name) {
                 var ratio = (this.scroll * ch) / (this.rowTotal * ch - this.scr_h);
                 this.scr_cursor_y = this.scr_y + Math.round((this.scr_h - this.scr_cursor_h) * ratio);
                 
-                gr.FillSolidRect(cx + cw - this.scr_w , this.scr_cursor_y, this.scr_w - 8, this.scr_cursor_h, pm_color_scrollbar);
+                gr.FillSolidRect(cx + cw - this.scr_w , this.scr_cursor_y, this.scr_w - 8, this.scr_cursor_h, colors.pm_scrollbar);
             };
         };
     };
@@ -945,8 +934,8 @@ oFilterBox = function() {
         this.images.resetIcon_dn = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_dn.GetGraphics();
             gb.SetSmoothingMode(2);
-            gb.DrawLine(4, 4, w-4, w-4, 1.0, reseticon_down);
-            gb.DrawLine(4, w-4, w-4, 4, 1.0, reseticon_down);
+            gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.reseticon_down);
+            gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.reseticon_down);
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
@@ -1150,8 +1139,8 @@ oTagSwitcherBar = function() {
 		var prev_text_width=0;
 
 		// draw background part above playlist (headerbar)
-		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, headerbar_bgcolor);
-		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, headerbar_line_maincolor);
+		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bgcolor);
+		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line_maincolor);
 		
 		//Calculate text size
 		total_txt_size = 0
@@ -1170,9 +1159,9 @@ oTagSwitcherBar = function() {
 			
 			brw.margin_left = 5;
 			if(this.items_txt[i].length==1){
-				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:btn_inactive_opacity);
+				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
-				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:btn_inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.btn_inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
@@ -1300,7 +1289,7 @@ oScrollbar = function(themed) {
         this.cursorImage_normal = gdi.CreateImage(this.cursorw, this.cursorh);
         var gb = this.cursorImage_normal.GetGraphics();
 		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
-		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, scrollbar_normal_cursor_color);
+		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);
 
         this.cursorImage_normal.ReleaseGraphics(gb);
         
@@ -1309,14 +1298,14 @@ oScrollbar = function(themed) {
         gb = this.cursorImage_hover.GetGraphics();
         // Draw Themed Scrollbar (lg/col)
 		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
-		gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,scrollbar_hover_cursor_color);
+		gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,colors.scrollbar_hover_cursor);
         this.cursorImage_hover.ReleaseGraphics(gb);
 		
         // down cursor Image
         this.cursorImage_down = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_down.GetGraphics();
 		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
-		gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,scrollbar_down_cursor_color);
+		gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,colors.scrollbar_down_cursor);
 
         this.cursorImage_down.ReleaseGraphics(gb);
 		
@@ -2497,8 +2486,8 @@ oBrowser = function(name) {
 							// BG under cover
 							if((properties.displayMode == 0 || properties.displayMode == 2) && properties.drawAlternateBG) {
 								if(i % 2 == 0 && !(i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i))) {
-									if(i==0) gr.FillSolidRect(ax, ay-properties.first_item_top_margin, aw, ah+properties.first_item_top_margin, g_color_alternate_row); 
-									else gr.FillSolidRect(ax, ay, aw, ah, g_color_alternate_row);
+									if(i==0) gr.FillSolidRect(ax, ay-properties.first_item_top_margin, aw, ah+properties.first_item_top_margin, colors.alternate_row); 
+									else gr.FillSolidRect(ax, ay, aw, ah, colors.alternate_row);
 								};
 							} else {
 								//gr.FillSolidRect(ax, ay, aw, ah, colors.normal_txt & 0x06ffffff);
@@ -2529,23 +2518,23 @@ oBrowser = function(name) {
 								
 								if((properties.displayMode == 0 || properties.displayMode == 2)){
 									if(i==0)
-										gr.FillSolidRect(ax, ay-properties.first_item_top_margin-1, aw, ah+properties.first_item_top_margin+1, selected_item_bg);
+										gr.FillSolidRect(ax, ay-properties.first_item_top_margin-1, aw, ah+properties.first_item_top_margin+1, colors.selected_item_bg);
 									else
-										gr.FillSolidRect(ax, ay, aw, ah, selected_item_bg);								
+										gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);								
 									//top
 									if(i!=0){
-										//gr.FillGradRect(ax, ay, track_gradient_size, 1, 0, selected_item_line,  selected_item_line, 1.0);
-										gr.FillSolidRect(ax+track_gradient_size, ay, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, selected_item_line);	
-										//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay, track_gradient_size, 1, 0, selected_item_line, selected_item_line, 1.0);		
+										//gr.FillGradRect(ax, ay, track_gradient_size, 1, 0, colors.selected_item_line,  colors.selected_item_line, 1.0);
+										gr.FillSolidRect(ax+track_gradient_size, ay, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, colors.selected_item_line);	
+										//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay, track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line, 1.0);		
 									}							
 									//bottom
-									//gr.FillGradRect(ax, ay+ah-1, track_gradient_size, 1, 0, selected_item_line,  selected_item_line, 1.0);
-									gr.FillSolidRect(ax+track_gradient_size, ay+ah-1, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, selected_item_line);		
-									//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay+ah-1, track_gradient_size, 1, 0, selected_item_line, selected_item_line, 1.0);
+									//gr.FillGradRect(ax, ay+ah-1, track_gradient_size, 1, 0, colors.selected_item_line,  colors.selected_item_line, 1.0);
+									gr.FillSolidRect(ax+track_gradient_size, ay+ah-1, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, colors.selected_item_line);		
+									//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay+ah-1, track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line, 1.0);
 								} else if(properties.displayMode == 1)	{
-									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, selected_item_bg);																
+									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);																
 									//if(this.activeIndex<0)
-										gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, selected_item_line);
+										gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, colors.selected_item_line);
 								}								
 												
 											
@@ -2560,9 +2549,9 @@ oBrowser = function(name) {
 								txt_color2 = colors.selected_txt;
 								selbg_color = colors.filter_selectedtext_bg;
 							} else {
-								txt_color1 = g_color_grid_txt;
-								txt_color2 = g_color_grid_txt;
-								selbg_color = g_color_grid_bg;
+								txt_color1 = colors.grid_txt;
+								txt_color2 = colors.grid_txt;
+								selbg_color = colors.grid_bg;
 							};
 						};
 
@@ -2573,10 +2562,10 @@ oBrowser = function(name) {
 									if(g_rightClickedIndex > -1 && properties.displayMode != 1 && properties.displayMode != 3) {
 										if(g_rightClickedIndex == i && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 											if(this.stampDrawMode) {
-												gr.FillSolidRect(ax, ay, width_marker_hover_item, ah, color_marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
 												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
 											} else {
-												gr.FillSolidRect(ax, ay, width_marker_hover_item, ah, color_marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
 												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.filter_selectedtext_bg & 0xddffffff);
 											};
 										};
@@ -2602,11 +2591,11 @@ oBrowser = function(name) {
 												} else if(ax>aw*(this.totalColumns-2)+aw/2){ //last column
 													hover_w = aw+2;												
 												}			
-												gr.FillSolidRect(ax, ay, hover_w, hover_h, selected_item_bg);												
-												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  selected_item_line);	
+												gr.FillSolidRect(ax, ay, hover_w, hover_h, colors.selected_item_bg);												
+												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  colors.selected_item_line);	
 												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
 											} else {
-												gr.FillSolidRect(ax, ay, width_marker_hover_item, ah, color_marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
 												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.filter_selectedtext_bg & 0xddffffff);
 											};
 										};
@@ -2658,8 +2647,8 @@ oBrowser = function(name) {
 										// grid text background rect
 										if(properties.displayMode == 3) {
 											if(i == this.selectedIndex) {
-												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,g_color_gridselected_bg);
-												//gr.DrawRect(ax+padding_covers-1, coverTop + coverWidth - properties.botGridHeight+1, im_w-1, properties.botGridHeight-2, 1.0, g_color_gridselected_bg);
+												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
+												//gr.DrawRect(ax+padding_covers-1, coverTop + coverWidth - properties.botGridHeight+1, im_w-1, properties.botGridHeight-2, 1.0, colors.gridselected_bg);
 											} else gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
 										};
 									};
@@ -2824,9 +2813,9 @@ oBrowser = function(name) {
 								if(((g_rightClickedIndex > -1 && g_rightClickedIndex == i) || i == this.activeIndex) && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 									//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
 									if(i==0)
-										gr.FillSolidRect(ax, ay-properties.first_item_top_margin, width_marker_hover_item, ah+properties.first_item_top_margin, color_marker_hover_item);
+										gr.FillSolidRect(ax, ay-properties.first_item_top_margin, colors.width_marker_hover_item, ah+properties.first_item_top_margin, colors.marker_hover_item);
 									else
-										gr.FillSolidRect(ax, ay, width_marker_hover_item, ah, color_marker_hover_item);						
+										gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);						
 									
 								};
 								
@@ -2941,18 +2930,18 @@ oBrowser = function(name) {
 		
 				//if(properties.darklayout) Draw bottom gradient
 				if(main_panel_state.isEqual(0))
-					gr.FillGradRect(0, wh-fading_bottom_height, ww, fading_bottom_height, 90, grad_bottom_color2,  grad_bottom_color_library_panel,1);
+					gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_color2,  colors.grad_bottom_color_library_panel,1);
 				else			
-					gr.FillGradRect(0, wh-fading_bottom_height, ww, fading_bottom_height, 90, grad_bottom_color2,  grad_bottom_color1,1);
+					gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_color2,  colors.grad_bottom_color1,1);
 				// Incremental Search Display
 				if(cList.search_string.length > 0) {
 					brw.tt_x = Math.floor(((brw.w) / 2) - (((cList.search_string.length*13)+(10*2)) / 2));
 					brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
 					brw.tt_w = Math.round((cList.search_string.length*13)+(10*2));
 					brw.tt_h = 40;
-					gr.FillSolidRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, keyboard_search_bg);
+					gr.FillSolidRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, colors.keyboard_search_bg);
 					try {
-						gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?keyboard_search_txtred:keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
+						gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?colors.keyboard_search_txtred:colors.keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
 					} catch(e) {console.log(e)};
 				};
 				
@@ -3045,7 +3034,7 @@ oBrowser = function(name) {
 					}
 					if(text1!='' || properties.sourceMode==0) {
 						gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, border_color);
+						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 5, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else {
 						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);						
@@ -3055,7 +3044,7 @@ oBrowser = function(name) {
 					var line_width = Math.min(130,Math.round(this.w-40));
 					var py = this.y + Math.round(this.h  / 2)-1;
 					gr.GdiDrawText("Loading...", g_font.plus4, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-					gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, border_color);						
+					gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);						
 					gr.GdiDrawText("Filter", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			};
 			
@@ -3071,8 +3060,8 @@ oBrowser = function(name) {
 				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.normal_bg);
 				height_top_fix1 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight-1 : 0;
 				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;				
-                gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), headerbar_bgcolor);
-                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((draw_right_line)?1:0), 1, headerbar_line_maincolor);
+                gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bgcolor);
+                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line_maincolor);
                 
 				if(g_filterbox.inputbox.text.length==0) {
 					var text_width = gr.CalcTextWidth(boxText,g_font.min1)
@@ -3093,7 +3082,7 @@ oBrowser = function(name) {
 				pman.draw(gr);
 			};	
 			
-			if(draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, rightline_color);	
+			if(draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
 						
             // draw scrollbar
             if(cScrollBar.enabled && pman.state !=1) {
@@ -4145,11 +4134,11 @@ function on_paint(gr) {
         // draw background under playlist
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
             gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh+PanelToggleButtons_height, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-            gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, (properties.wallpaperblurred)?wallpaper_overlay_blurred:wallpaper_overlay);
+            gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
         } else {
             if(g_wallpaperImg && properties.showwallpaper) {
                 gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh+PanelToggleButtons_height, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-                gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, (properties.wallpaperblurred)?wallpaper_overlay_blurred:wallpaper_overlay);
+                gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
             } else {
 				gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, colors.normal_bg);
 			}
@@ -4603,151 +4592,136 @@ function get_images() {
 
 
 function get_colors() {
+	get_colors_global();
 	if(properties.darklayout){		
-		wallpaper_overlay = GetGrey(25,230);
-		wallpaper_overlay_blurred = GetGrey(25,200);	
-
-		colors.normal_bg = GetGrey(17);		
-		colors.normal_txt = GetGrey(240,200);
-		colors.faded_txt = GetGrey(110);	
-		colors.full_txt = GetGrey(255);	
 		colors.selected_txt = GetGrey(255,200);
 		colors.filter_selectedtext_bg = RGBA(015,177,255,160);
-		g_color_alternate_row = GetGrey(0,30);
+
 		
-		g_color_grid_txt = GetGrey(255)	
-		g_color_grid_bg = GetGrey(0,190)		
-		g_color_gridselected_txt = GetGrey(0)	
-		g_color_gridselected_bg = GetGrey(255,155)	
+		colors.grid_txt = GetGrey(255)	
+		colors.grid_bg = GetGrey(0,190)		
+		colors.gridselected_txt = GetGrey(0)	
+		colors.gridselected_bg = GetGrey(255,155)	
 		
-		btn_inactive_opacity = 130;
-		btn_inactive_txt = GetGrey(140);	
+		colors.btn_inactive_opacity = 130;
+		colors.btn_inactive_txt = GetGrey(140);	
 		
-		grad_bottom_color1 = GetGrey(0,70);
-		grad_bottom_color_library_panel = GetGrey(0,70);		
-		grad_bottom_color2 = GetGrey(0,0);		
-		fading_bottom_height = 50;
+		colors.grad_bottom_color1 = GetGrey(0,70);
+		colors.grad_bottom_color_library_panel = GetGrey(0,70);		
+		colors.grad_bottom_color2 = GetGrey(0,0);		
+		colors.fading_bottom_height = 50;
 		
-		scrollbar_normal_cursor_color = GetGrey(255,60);	 		
-		scrollbar_hover_cursor_color = GetGrey(225);
-		scrollbar_down_cursor_color = scrollbar_hover_cursor_color;
+		colors.scrollbar_normal_cursor = GetGrey(255,60);	 		
+		colors.scrollbar_hover_cursor = GetGrey(225);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
 		
-		selected_item_bg = GetGrey(0,150);	
-		selected_item_line = GetGrey(255,30);	
-		color_marker_hover_item = GetGrey(255);
-		width_marker_hover_item = 1;		
+		colors.selected_item_bg = GetGrey(0,150);	
+		colors.selected_item_line = GetGrey(255,30);	
+		colors.marker_hover_item = GetGrey(255);
+		colors.width_marker_hover_item = 1;		
 		
-		keyboard_search_bg = GetGrey(0,205);
-		keyboard_search_txt = GetGrey(255,245);
-		keyboard_search_txtred = RGB(255,80,80);	
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,245);
+		colors.keyboard_search_txtred = RGB(255,80,80);	
 		
-		headerbar_bgcolor = GetGrey(15,200);	
-		headerbar_line_maincolor = GetGrey(255,38);	
+		colors.headerbar_bgcolor = GetGrey(15,200);	
+		colors.headerbar_line_maincolor = GetGrey(255,38);	
 		
-		border_color = GetGrey(255,50);	
+		colors.border = GetGrey(255,50);	
 		
-		rightline_color = GetGrey(255,25);	
-		reseticon_down = RGB(255,50,50);
+		colors.rightline = GetGrey(255,25);	
+		colors.reseticon_down = RGB(255,50,50);
 		
-		pm_color_overlay = GetGrey(0,200);		
-		pm_color_bg = GetGrey(0);
-		pm_color_shadow_on = GetGrey(0,35);	
-		pm_color_shadow_off = GetGrey(0,0);			
-		pm_color_border = GetGrey(255,55);		
-		pm_color_txt = GetGrey(255);
-		pm_color_bg2 = GetGrey(0,120);	
-		pm_color_bg3 = GetGrey(0,150);
-		pm_color_bg4 = GetGrey(255,40);
-		pm_item_separator_line = GetGrey(255,45);		
-		pm_color_item_bg1 = GetGrey(0,130);		
-		pm_color_item_bg2 = GetGrey(255,20);
-		pm_color_blink = GetGrey(255,15);	
-		pm_color_blink_rectline = GetGrey(70);	
-		pm_color_scrollbar = GetGrey(240);		
-		dragimage_color_border = GetGrey(255,75);
-		dragimage_color_bg = GetGrey(0);
-		dragimage_text = GetGrey(255);
-		dragimage_gradline1 = GetGrey(255,100);
-		dragimage_gradline2 = GetGrey(255,200);
+		colors.pm_overlay = GetGrey(0,200);		
+		colors.pm_bg = GetGrey(0);
+		colors.pm_shadow_on = GetGrey(0,35);	
+		colors.pm_shadow_off = GetGrey(0,0);			
+		colors.pm_border = GetGrey(255,55);		
+		colors.pm_txt = GetGrey(255);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);
+		colors.pm_item_separator_line = GetGrey(255,45);		
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_blink = GetGrey(255,15);	
+		colors.pm_blink_rectline = GetGrey(70);	
+		colors.pm_scrollbar = GetGrey(240);		
+		colors.dragimage_border = GetGrey(255,75);
+		colors.dragimage_bg = GetGrey(0);
+		colors.dragimage_text = GetGrey(255);
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);
 		
-		dragcover_overlay = GetGrey(0,85);	
-		dragcover_rectline = GetGrey(255,40);		
+		colors.dragcover_overlay = GetGrey(0,85);	
+		colors.dragcover_rectline = GetGrey(255,40);		
 	} else {		
-		wallpaper_overlay = GetGrey(255,235);
-		wallpaper_overlay_blurred = GetGrey(255,235);	
-		
-		if(properties.showwallpaper) colors.normal_bg = GetGrey(255);
-		else colors.normal_bg = GetGrey(245);
-		colors.normal_txt = GetGrey(0);
-		colors.faded_txt = GetGrey(140);
-		colors.full_txt = GetGrey(0);			
 		colors.selected_txt = GetGrey(0);
 
 		colors.filter_selectedtext_bg = RGBA(015,177,255,100);
-		g_color_alternate_row = GetGrey(0,5);
+
+		colors.grid_txt = GetGrey(255)	
+		colors.grid_bg = GetGrey(0,190)		
+		colors.gridselected_txt = GetGrey(0)	
+		colors.gridselected_bg = GetGrey(255,155)		
 		
-		g_color_grid_txt = GetGrey(255)	
-		g_color_grid_bg = GetGrey(0,190)		
-		g_color_gridselected_txt = GetGrey(0)	
-		g_color_gridselected_bg = GetGrey(255,155)		
+		colors.btn_inactive_opacity = 110;
+		colors.btn_inactive_txt = colors.faded_txt;	
 		
-		btn_inactive_opacity = 110;
-		btn_inactive_txt = colors.faded_txt;	
+		colors.grad_bottom_color1 = GetGrey(0,10);
+		colors.grad_bottom_color_library_panel = GetGrey(0,10);		
+		colors.grad_bottom_color2 = GetGrey(0,0);		
+		colors.fading_bottom_height = 30;
 		
-		grad_bottom_color1 = GetGrey(0,10);
-		grad_bottom_color_library_panel = GetGrey(0,10);		
-		grad_bottom_color2 = GetGrey(0,0);		
-		fading_bottom_height = 30;
+		colors.scrollbar_normal_cursor = GetGrey(0,120);
+		colors.scrollbar_hover_cursor = GetGrey(0);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;	
 		
-		scrollbar_normal_cursor_color = GetGrey(0,120);
-		scrollbar_hover_cursor_color = GetGrey(0);
-		scrollbar_down_cursor_color = scrollbar_hover_cursor_color;	
+		colors.selected_item_bg = GetGrey(0,17);	
+		colors.selected_item_line = GetGrey(0,16);	
+		colors.marker_hover_item = GetGrey(30);
+		colors.width_marker_hover_item = 2;	
 		
-		selected_item_bg = GetGrey(0,17);	
-		selected_item_line = GetGrey(0,16);	
-		color_marker_hover_item = GetGrey(30);
-		width_marker_hover_item = 2;	
-		
-		keyboard_search_bg = GetGrey(0,205);
-		keyboard_search_txt = GetGrey(255,205);
-		keyboard_search_txtred = RGB(255,80,80);	
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,205);
+		colors.keyboard_search_txtred = RGB(255,80,80);	
 		
 		if(properties.showwallpaper) {
-			headerbar_bgcolor = GetGrey(255,240);		
-			headerbar_line_maincolor = GetGrey(0,40);
+			colors.headerbar_bgcolor = GetGrey(255,240);		
+			colors.headerbar_line_maincolor = GetGrey(0,40);
 		} else {
-			headerbar_bgcolor = GetGrey(255,240);		
-			headerbar_line_maincolor = GetGrey(215);			
+			colors.headerbar_bgcolor = GetGrey(255,240);		
+			colors.headerbar_line_maincolor = GetGrey(215);			
 		}
 		
-		border_color = GetGrey(0,50);
+		colors.border = GetGrey(0,50);
 		
-		rightline_color = GetGrey(0,37);			
-		reseticon_down = RGB(255,50,50);
+		colors.rightline = GetGrey(0,37);			
+		colors.reseticon_down = RGB(255,50,50);
 		
-		pm_color_overlay = GetGrey(255,200);			
-		pm_color_bg = GetGrey(255);
-		pm_color_shadow_on = GetGrey(0,5);	
-		pm_color_shadow_off = GetGrey(0,0);		
-		pm_color_border = GetGrey(0,40);
-		pm_color_txt = GetGrey(0);
-		pm_color_bg2 = GetGrey(0,120);	
-		pm_color_bg3 = GetGrey(0,150);
-		pm_color_bg4 = GetGrey(255,40);		
-		pm_item_separator_line = GetGrey(0,20);
-		pm_color_item_bg1 = GetGrey(0,130);		
-		pm_color_item_bg2 = GetGrey(255,20);
-		pm_color_blink = GetGrey(0,10);	
-		pm_color_blink_rectline = GetGrey(211);	
-		pm_color_scrollbar = GetGrey(30);		
-		dragimage_color_border = GetGrey(0);
-		dragimage_color_bg = GetGrey(0);
-		dragimage_text = GetGrey(255);
-		dragimage_gradline1 = GetGrey(255,100);
-		dragimage_gradline2 = GetGrey(255,200);
+		colors.pm_overlay = GetGrey(255,200);			
+		colors.pm_bg = GetGrey(255);
+		colors.pm_shadow_on = GetGrey(0,5);	
+		colors.pm_shadow_off = GetGrey(0,0);		
+		colors.pm_border = GetGrey(0,40);
+		colors.pm_txt = GetGrey(0);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);		
+		colors.pm_item_separator_line = GetGrey(0,20);
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_blink = GetGrey(0,10);	
+		colors.pm_blink_rectline = GetGrey(211);	
+		colors.pm_scrollbar = GetGrey(30);		
+		colors.dragimage_border = GetGrey(0);
+		colors.dragimage_bg = GetGrey(0);
+		colors.dragimage_text = GetGrey(255);
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);
 		
-		dragcover_overlay = GetGrey(0,85);	
-		dragcover_rectline = GetGrey(0,105);			
+		colors.dragcover_overlay = GetGrey(0,85);	
+		colors.dragcover_rectline = GetGrey(0,105);			
 	}
 	get_images();
 };

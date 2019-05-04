@@ -28,30 +28,30 @@ function on_size() {
 }
 function on_paint(gr) {
 	gr.SetTextRenderingHint(globalProperties.TextRendering);	
-	gr.FillSolidRect(0, 0, ww, wh, colors.g_color_normal_bg);
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, padding_top, ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
 }
 function get_colors() {
 	if(properties.darklayout || properties.stick2darklayout){
-		wallpaper_overlay = GetGrey(0,180);
-		wallpaper_overlay_blurred = GetGrey(0,130);		
+		colors.wallpaper_overlay = GetGrey(0,180);
+		colors.wallpaper_overlay_blurred = GetGrey(0,130);		
 		      
-		colors.g_color_normal_bg = GetGrey(20);        
+		colors.normal_bg = GetGrey(20);        
 		colors.normal_txt = GetGrey(255,200);
 		colors.faded_txt = GetGrey(245);	
-		g_color_highlight_txt = RGB(255,193,0);	
+		colors.highlight_txt = RGB(255,193,0);	
 
 	} else {	
-		colors.g_color_normal_bg = GetGrey(255);           
-		wallpaper_overlay = GetGrey(255,235);
-		wallpaper_overlay_blurred = GetGrey(255,225);				
+		colors.normal_bg = GetGrey(255);           
+		colors.wallpaper_overlay = GetGrey(255,235);
+		colors.wallpaper_overlay_blurred = GetGrey(255,225);				
 		colors.normal_txt = GetGrey(0);
 		colors.faded_txt = GetGrey(245);	
-		g_color_highlight_txt = RGB(215,155,0);		
+		colors.highlight_txt = RGB(215,155,0);		
 	}	
 	esl.SetPanelTextNormalColor(colors.normal_txt);
-	esl.SetPanelTextHighlightColor(g_color_highlight_txt);	
-	esl.SetPanelTextBackgroundColor(colors.g_color_normal_bg);	
+	esl.SetPanelTextHighlightColor(colors.highlight_txt);	
+	esl.SetPanelTextBackgroundColor(colors.normal_bg);	
 	esl.ShowDesktopLyric = false;	
 	esl.DesktopLyricAlwaysOnTop = false;	
 };

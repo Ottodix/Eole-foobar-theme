@@ -65,16 +65,7 @@ oImageCache = function () {
 		window.Repaint();
 	}
 };
-function FormatCover(image, w, h, rawBitmap) {
-	if(!image || w<=0 || h<=0) return image;
-	if(rawBitmap) {
-		return image.Resize(w, h, properties.ResizeQLY).CreateRawBitmap();
-	} else {
-		try {
-			return image.Resize(w, h, properties.ResizeQLY);
-		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h,"error"); return null;}
-	}
-};
+
 if(layout_state.isEqual(0)) properties.showTrackInfo = showtrackinfo_big.isActive();
 else properties.showTrackInfo = showtrackinfo_small.isActive();
 
@@ -271,7 +262,7 @@ function build_images(){
 			gb.FillEllipse(1,1,volume_vars.ellipse_diameter_start+1,volume_vars.ellipse_diameter_start+1,volumeOncolor);			
 		} else if(properties.cursor_style==0) { 
 			gb.DrawEllipse(1,1,volume_vars.ellipse_diameter_start,volume_vars.ellipse_diameter_start,volume_vars.ellipse_line_width, volumeOncolor);				
-			gb.FillEllipse(1,1,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,ellipse_inner_color);			
+			gb.FillEllipse(1,1,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
 		}
 		gb.SetSmoothingMode(0);		
 	slider_cursor.ReleaseGraphics(gb);
@@ -285,7 +276,7 @@ function build_images(){
 			gb.FillEllipse(1,1,diameter_hover+1,diameter_hover+1,volumeOncolor);			
 		} else if(properties.cursor_style==0) { 
 			gb.DrawEllipse(1,1,diameter_hover,diameter_hover,volume_vars.ellipse_line_width, volumeOncolor);				
-			gb.FillEllipse(1,1,diameter_hover-volume_vars.ellipse_border_size*2,diameter_hover-volume_vars.ellipse_border_size*2,ellipse_inner_color);			
+			gb.FillEllipse(1,1,diameter_hover-volume_vars.ellipse_border_size*2,diameter_hover-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
 		}
 		gb.SetSmoothingMode(0);		
 	slider_cursor_hover.ReleaseGraphics(gb);
@@ -294,44 +285,41 @@ function build_images(){
 	build_buttons();
 	setSchedulerText();
 }
+var colors = {};
 function get_colors(){
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
 	else properties.darklayout = properties.minidarklayout;
 	
 	if(properties.darklayout) {		
-		wallpaper_overlay = GetGrey(0,200);
-		wallpaper_overlay_blurred = GetGrey(0,130);		
+		colors.wallpaper_overlay = GetGrey(0,200);
+		colors.wallpaper_overlay_blurred = GetGrey(0,130);		
 		colors.normal_bg = GetGrey(25);		
-		slidersOnColor=GetGrey(255);  
-		slidersOffColor=GetGrey(255,40);  		
-		ellipse_inner_color=GetGrey(0,20);
-		line_top_color_light = GetGrey(255,20);
-		line_top_color_dark = GetGrey(200);
-		line_bottom_color = GetGrey(40,200);		
-		dotted_progress_color = GetGrey(255,220);
-		txt_color = GetGrey(255);	
-		bgcolor = GetGrey(255,75);		
-		wallpaper_main_color = GetGrey(0,0);
+		colors.slidersOn=GetGrey(255);  
+		colors.slidersOff=GetGrey(255,40);  		
+		colors.ellipse_inner=GetGrey(0,20);
+		colors.line_top_light = GetGrey(255,20);
+		colors.line_top_dark = GetGrey(200);
+		colors.line_bottom = GetGrey(40,200);		
+		colors.dotted_progress = GetGrey(255,220);
+		colors.normal_txt = GetGrey(255);		
 	} else {			
-		wallpaper_overlay = GetGrey(255,235);
-		wallpaper_overlay_blurred = GetGrey(255,235);			
+		colors.wallpaper_overlay = GetGrey(255,235);
+		colors.wallpaper_overlay_blurred = GetGrey(255,235);			
 		colors.normal_bg = GetGrey(255);			
-		slidersOnColor=GetGrey(30);
-		slidersOffColor=GetGrey(30,32); 		
-		ellipse_inner_color=GetGrey(255);
-		line_top_color_light = GetGrey(255,20)		
-		line_top_color_dark = GetGrey(200);
-		line_bottom_color = GetGrey(40,200);		
-		dotted_progress_color = GetGrey(0);
-		txt_color = GetGrey(0);
-		bgcolor = GetGrey(201);	
-		wallpaper_main_color = GetGrey(0,0);		
+		colors.slidersOn=GetGrey(30);
+		colors.slidersOff=GetGrey(30,32); 		
+		colors.ellipse_inner=GetGrey(255);
+		colors.line_top_light = GetGrey(255,20)		
+		colors.line_top_dark = GetGrey(200);
+		colors.line_bottom = GetGrey(40,200);		
+		colors.dotted_progress = GetGrey(0);
+		colors.normal_txt = GetGrey(0);	
 	}
 	
-	volumeOncolor=slidersOnColor;
-	progressOncolor=slidersOnColor;
-	volumeOffcolor=slidersOffColor;
-	progressOffcolor=slidersOffColor;
+	volumeOncolor=colors.slidersOn;
+	progressOncolor=colors.slidersOn;
+	volumeOffcolor=colors.slidersOff;
+	progressOffcolor=colors.slidersOff;
 	
 	build_images();
 	adapt_display_to_layout();
@@ -726,7 +714,7 @@ function on_paint(gr) {
     };		
 	if(properties.showwallpaper && g_wallpaperImg) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?wallpaper_overlay_blurred:wallpaper_overlay);
+		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
 	}
 	
 	switch(true){
@@ -736,7 +724,7 @@ function on_paint(gr) {
 		case (main_panel_state.isEqual(1) && properties.playlists_dark_theme && layout_state.isEqual(0) && properties.darklayout):
 		case (main_panel_state.isEqual(2) && (properties.bio_dark_theme || properties.bio_stick_to_dark_theme) && layout_state.isEqual(0) && properties.darklayout):	
 		case (main_panel_state.isEqual(3) && layout_state.isEqual(0) && properties.darklayout):
-			gr.FillSolidRect(0, 0, ww, 1,line_top_color_light);					
+			gr.FillSolidRect(0, 0, ww, 1,colors.line_top_light);					
 		break;
 		case (properties.darklayout):
 		break;		
@@ -744,11 +732,11 @@ function on_paint(gr) {
 		case (main_panel_state.isEqual(0) && !properties.library_dark_theme && layout_state.isEqual(0)):
 		case (main_panel_state.isEqual(1) && !properties.playlists_dark_theme && layout_state.isEqual(0)):
 		case (main_panel_state.isEqual(2) && !(properties.bio_dark_theme || properties.bio_stick_to_dark_theme) && layout_state.isEqual(0)):	
-			gr.FillSolidRect(0, 0, ww, 1, line_top_color_dark);						
+			gr.FillSolidRect(0, 0, ww, 1, colors.line_top_dark);						
 		break;		
 	}	
-	gr.FillGradRect(ww, 0, 1, wh, 90,line_bottom_color,line_bottom_color);		
-	gr.FillGradRect(0, wh-1, ww, 1, 0,line_bottom_color,line_bottom_color);	
+	gr.FillGradRect(ww, 0, 1, wh, 90,colors.line_bottom,colors.line_bottom);		
+	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);	
 	
 	//Progress	
 	if(ww_progress > 0 && !(hideProgressWhenVolumeChange && VolumeSliderActive)) {
@@ -760,7 +748,7 @@ function on_paint(gr) {
 		} else {
 			var dot_x = progress_margin_left + ww_progress;
 			while (dot_x >= progress_margin_left + g_pos_progress + (fb.IsPlaying?ellipse_radius:0)) {
-				gr.FillSolidRect(dot_x, progress_margin_top+1, 1, 1, dotted_progress_color);
+				gr.FillSolidRect(dot_x, progress_margin_top+1, 1, 1, colors.dotted_progress);
 				dot_x = dot_x-3;
 			}
 		}	
@@ -778,21 +766,21 @@ function on_paint(gr) {
 	if(!(hideProgressWhenVolumeChange && VolumeSliderActive)) {
 		if(properties.showTrackInfo){ 
 			timeInfo_length = g_panel.get_time_length(gr);
-			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , txt_color, progress_margin_left, progress_margin_top + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left, progress_margin_top + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			var title_length = g_panel.get_title_length(gr);
-			gr.GdiDrawText(" -  "+g_text_artist, font_adjusted_italic , txt_color, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), progress_margin_top + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(" -  "+g_text_artist, font_adjusted_italic , colors.normal_txt, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), progress_margin_top + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			var artist_length = g_panel.get_artist_length(gr);
 			showTitleTooltip = (title_length+artist_length > ww_progress - timeInfo_length);
 			
-			if(!is_over_panel || layout_state.isEqual(0)) gr.GdiDrawText(text_length+" ", font_adjusted_italic , txt_color, progress_margin_left, progress_margin_top + time_margin_top, ww_progress+3, 10, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX); 		
+			if(!is_over_panel || layout_state.isEqual(0)) gr.GdiDrawText(text_length+" ", font_adjusted_italic , colors.normal_txt, progress_margin_left, progress_margin_top + time_margin_top, ww_progress+3, 10, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX); 		
 			
 		} else if(!is_over_panel || layout_state.isEqual(0)) {
 			if(properties.remaining_time)  {
-				gr.GdiDrawText(TimeElapsed, time_font, txt_color, progress_margin_left-55, progress_margin_top-8+time_margin_top, 40, 40,DT_RIGHT);
+				gr.GdiDrawText(TimeElapsed, time_font, colors.normal_txt, progress_margin_left-55, progress_margin_top-8+time_margin_top, 40, 40,DT_RIGHT);
 			} else {
-				gr.GdiDrawText(TimeRemaining, time_font, txt_color, progress_margin_left-55, progress_margin_top-8+time_margin_top, 40, 40,DT_RIGHT);
+				gr.GdiDrawText(TimeRemaining, time_font, colors.normal_txt, progress_margin_left-55, progress_margin_top-8+time_margin_top, 40, 40,DT_RIGHT);
 			}	
-			gr.GdiDrawText(TimeTotal, time_font, txt_color, progress_margin_left+ww_progress+15, progress_margin_top-8+time_margin_top, 40, 40);   		
+			gr.GdiDrawText(TimeTotal, time_font, colors.normal_txt, progress_margin_left+ww_progress+15, progress_margin_top-8+time_margin_top, 40, 40);   		
 		}		
 	}
 	//Volume
@@ -806,7 +794,7 @@ function on_paint(gr) {
 		} else {
 			var dot_x = volume_vars.margin_left + volume_vars.width;
 			while (dot_x > volume_vars.margin_left + volume_vars.volumesize + ellipse_radius) {
-				gr.FillSolidRect(dot_x, volume_vars.margin_top+1, 1, 1, dotted_progress_color);
+				gr.FillSolidRect(dot_x, volume_vars.margin_top+1, 1, 1, colors.dotted_progress);
 				dot_x = dot_x-3;
 			}		
 		}		

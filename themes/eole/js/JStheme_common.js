@@ -43,6 +43,7 @@ var globalProperties = {
 	playing_playlist : "Library Playback",
 	whole_library : "Whole Library",
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
+	ResizeQLY: 2,	
 }	
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 
@@ -114,6 +115,42 @@ var oCursor = function () {
 			break;			
 		}
     }  		
+}
+//Colors ------------------------------------------------------------------------------
+var colors = {};
+function get_colors_global(){
+	if(properties.darklayout){
+		colors.wallpaper_overlay = GetGrey(25,230);
+		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
+		
+		colors.normal_bg = GetGrey(17);
+		colors.normal_txt = GetGrey(240);
+		colors.faded_txt = GetGrey(110);	
+		colors.full_txt = GetGrey(255);			
+		colors.selected_bg = RGBA(015,177,255,160);
+		colors.highlight = RGB(255,175,050);
+		colors.alternate_row = GetGrey(0,30);
+		
+		colors.scrollbar_normal_cursor = GetGrey(255,60);
+		colors.scrollbar_hover_cursor = GetGrey(225);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;		
+	} else {
+		colors.wallpaper_overlay = GetGrey(255,235);
+		colors.wallpaper_overlay_blurred = GetGrey(255,235);	
+
+		colors.normal_bg = GetGrey(245);
+		
+		colors.normal_txt = GetGrey(0);
+		colors.faded_txt = GetGrey(140);
+        colors.full_txt = GetGrey(0);		
+		colors.selected_bg = RGBA(015,177,255,100);
+		colors.highlight = RGB(255,175,050);
+		colors.alternate_row = GetGrey(0,5);
+		
+		colors.scrollbar_normal_cursor = GetGrey(0,120);
+		colors.scrollbar_hover_cursor = GetGrey(0);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;			
+	}
 }
 //Files, Folders, FileSystemObject ----------------------------------------------------
 oFileSystObject = function () {
@@ -2038,6 +2075,16 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
+function FormatCover(image, w, h, rawBitmap) {
+	if(!image || w<=0 || h<=0) return image;
+	if(rawBitmap) {
+		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
+	} else {
+		try {
+			return image.Resize(w, h, globalProperties.ResizeQLY);
+		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image); return null;}
+	}
+};
 function check_cache(metadb, albumIndex, crc){
 	//if(crc=='undefined') return false;	
 
@@ -2162,14 +2209,14 @@ function createDragText(line1, line2, cover_size){
 	var rectangle_width = Math.min(Math.max(text1_width,text2_width),cover_size-40);
 
 	var sep_width = Math.min(text1_width,text2_width)+10;
-	gb.FillSolidRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-75,rectangle_width+40,30,dragimage_color_bg);
-	gb.FillSolidRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-45,rectangle_width+40,30,dragimage_color_bg);
+	gb.FillSolidRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-75,rectangle_width+40,30,colors.dragimage_bg);
+	gb.FillSolidRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-45,rectangle_width+40,30,colors.dragimage_bg);
 	
-	gb.FillGradRect(Math.round((cover_size-rectangle_width-40)/2)+Math.round((rectangle_width+40-sep_width)/2),cover_size-45,sep_width, 1, 0, dragimage_gradline1, dragimage_gradline2, 0.5);
-	gb.DrawRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-75,rectangle_width+39,59,1,dragimage_color_border);
+	gb.FillGradRect(Math.round((cover_size-rectangle_width-40)/2)+Math.round((rectangle_width+40-sep_width)/2),cover_size-45,sep_width, 1, 0, colors.dragimage_gradline1, colors.dragimage_gradline2, 0.5);
+	gb.DrawRect(Math.round((cover_size-rectangle_width-40)/2),cover_size-75,rectangle_width+39,59,1,colors.dragimage_border);
 
-	gb.GdiDrawText(line1, g_font.boldplus1,  dragimage_text, 10, cover_size-75, cover_size-20, 30, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
-	gb.GdiDrawText(line2, g_font.italicmin1,  dragimage_text, 10, cover_size-45, cover_size-20, 30, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
+	gb.GdiDrawText(line1, g_font.boldplus1,  colors.dragimage_text, 10, cover_size-75, cover_size-20, 30, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
+	gb.GdiDrawText(line2, g_font.italicmin1,  colors.dragimage_text, 10, cover_size-45, cover_size-20, 30, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
 	drag_img.ReleaseGraphics(gb);
 
 	return drag_img;
@@ -2185,10 +2232,10 @@ function createDragImg(img, cover_size, count){
 	gb.SetTextRenderingHint(2);
 	gb.SetSmoothingMode(0);	
 	gb.DrawImage(img, left_padding, top_padding, cover_size, cover_size, 0, 0, img.Width, img.Height);
-    gb.FillSolidRect(left_padding, top_padding, cover_size, cover_size, dragcover_overlay);
-	gb.FillSolidRect(left_padding,top_padding+cover_size-text_height,cover_size,text_height,dragimage_color_bg);
-	gb.DrawRect(left_padding, top_padding, cover_size-1, cover_size-1, 1.0,dragimage_color_border);	
-	gb.GdiDrawText(count+" tracks", g_font.italicmin1,  dragimage_text, left_padding, top_padding+cover_size-text_height, cover_size, text_height, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);	
+    gb.FillSolidRect(left_padding, top_padding, cover_size, cover_size, colors.dragcover_overlay);
+	gb.FillSolidRect(left_padding,top_padding+cover_size-text_height,cover_size,text_height,colors.dragimage_bg);
+	gb.DrawRect(left_padding, top_padding, cover_size-1, cover_size-1, 1.0,colors.dragimage_border);	
+	gb.GdiDrawText(count+" tracks", g_font.italicmin1,  colors.dragimage_text, left_padding, top_padding+cover_size-text_height, cover_size, text_height, DT_CENTER | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);	
 	drag_img.ReleaseGraphics(gb);
 
 	//drag_img = drag_img.Resize(cover_size, cover_size, 2);

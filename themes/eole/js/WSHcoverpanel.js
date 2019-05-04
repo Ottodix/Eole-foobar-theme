@@ -14,7 +14,6 @@ var properties = {
     bio_dark_theme: window.GetProperty("BIO dark theme", false),		
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
 	rawBitmap: false,
-	ResizeQLY: 2,
 	refreshRate: 50,	
 }
 
@@ -260,7 +259,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         }
 		
 		
-		if (this.state == ButtonStates.normal && opacity!=0) gr.FillGradRect(0,0, ww, wh, 0, color_btn_grad_borders, color_btn_grad_middle, 0.5);		
+		if (this.state == ButtonStates.normal && opacity!=0) gr.FillGradRect(0,0, ww, wh, 0, colors.btn_grad_borders, colors.btn_grad_middle, 0.5);		
         gr.DrawImage(b_img, this.x+Math.round((this.w-b_img.Width)/2), this.y, b_img.Width, b_img.Height, 0, 0, b_img.Width, b_img.Height,0,opacity);
     }
 
@@ -322,12 +321,12 @@ function on_paint(gr) {
 	g_cover.draw(gr,0,0);
 	
 	if(fb.IsPlaying){
-		gr.FillGradRect(0,-1, ww, wh+1, 270, color_grad_bottom, color_grad_top,1); 		
+		gr.FillGradRect(0,-1, ww, wh+1, 270, colors.grad_bottom, colors.grad_top,1); 		
 		if(properties.showVisualization && !fb.IsPaused && !Randomsetfocus) {
-			gr.FillGradRect(0,0, ww, wh, 0, color_visu_grad_borders, color_visu_grad_middle, 0.5);		
-			gr.FillSolidRect(visu_margin_left, wh/2-height_bar_1+global_vertical_fix+Visualization_top_m, bar_width, height_bar_1, animation_color);	
-			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, wh/2-height_bar_3+global_vertical_fix+Visualization_top_m, bar_width, height_bar_3, animation_color);			
-			gr.FillSolidRect(visu_margin_left + bar_margin*2 + bar_width*2, wh/2-height_bar_2+global_vertical_fix+Visualization_top_m, bar_width, height_bar_2, animation_color);		
+			gr.FillGradRect(0,0, ww, wh, 0, colors.visu_grad_borders, colors.visu_grad_middle, 0.5);		
+			gr.FillSolidRect(visu_margin_left, wh/2-height_bar_1+global_vertical_fix+Visualization_top_m, bar_width, height_bar_1, colors.animation);	
+			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, wh/2-height_bar_3+global_vertical_fix+Visualization_top_m, bar_width, height_bar_3, colors.animation);			
+			gr.FillSolidRect(visu_margin_left + bar_margin*2 + bar_width*2, wh/2-height_bar_2+global_vertical_fix+Visualization_top_m, bar_width, height_bar_2, colors.animation);		
 		} 
 	}
 	
@@ -338,16 +337,16 @@ function on_paint(gr) {
 		case (main_panel_state.isEqual(2) && properties.bio_dark_theme && layout_state.isEqual(0)):	
 		case (main_panel_state.isEqual(3) && layout_state.isEqual(0)):
 		case (properties.minimode_dark_theme && layout_state.isEqual(1)):
-			gr.FillSolidRect(0, 0, ww, border_top, border_color_light);					
+			gr.FillSolidRect(0, 0, ww, border_top, colors.border_light);					
 		break;
 		default:
-			gr.FillSolidRect(0, 0, ww, border_top, border_color_dark);						
+			gr.FillSolidRect(0, 0, ww, border_top, colors.border_dark);						
 		break;		
 	}		
 	
-	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, border_color_dark);
+	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, colors.border_dark);
 	
-	gr.FillGradRect(0, wh-1, ww, 1, 0,line_bottom_color,line_bottom_color);		
+	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);		
 }
 function on_size() {
     ww = window.Width;
@@ -498,16 +497,7 @@ oImageCache = function () {
 		window.Repaint();
 	}
 };
-function FormatCover(image, w, h, rawBitmap) {
-	if(!image || w<=0 || h<=0) return image;
-	if(rawBitmap) {
-		return image.Resize(w, h, properties.ResizeQLY).CreateRawBitmap();
-	} else {
-		try {
-			return image.Resize(w, h, properties.ResizeQLY);
-		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h,"error"); return null;}
-	}
-};
+
 oCover = function() {
 	this.w = 0;
 	this.h = 0;
@@ -522,15 +512,14 @@ oCover = function() {
 		this.resized = false;
 	}  	
 	this.isSetArtwork = function() {
-		return !(typeof(this.artwork) == "undefined" || !this.artwork)
+		return !(typeof(this.artwork) == "undefined" || !this.artwork || this.artwork==null)
 	}
 	this.setArtwork = function(image, resize) {
-		if(typeof(image) == "undefined" || !image) return;		
+		if(typeof(image) == "undefined" || !image || image==null) return;		
 		this.resized = false;
 		this.artwork = image;
 		if(resize && this.w>0 && this.h>0) {
 			this.resize();
-
 		} 
 	}	
 	this.getArtwork = function(metadb) {
@@ -564,7 +553,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 		save_image_to_cache(image, -1, cachekey);	
 		g_cover.setArtwork(image,true);
 		g_image_cache._cachelist[cachekey] = image;
-		g_image_cache._cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,properties.ResizeQLY);				
+		g_image_cache._cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);				
 	}
 	else g_cover.reset();
     window.Repaint();
@@ -940,27 +929,28 @@ function on_mouse_wheel(step, stepstrait, delta){
 	fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
     window.NotifyOthers("AdjustVolume", true);    
 }
+var colors = {};
 function get_colors(){
 	if(properties.darklayout) {
-		color_grad_bottom = GetGrey(0,125);
-		color_grad_top = GetGrey(0,30);
-		color_visu_grad_borders = GetGrey(0,0);
-		color_visu_grad_middle = GetGrey(0,50);
-		animation_color = GetGrey(255);		
-		color_btn_grad_borders = GetGrey(0,50);
-		color_btn_grad_middle = GetGrey(0,180);
+		colors.grad_bottom = GetGrey(0,125);
+		colors.grad_top = GetGrey(0,30);
+		colors.visu_grad_borders = GetGrey(0,0);
+		colors.visu_grad_middle = GetGrey(0,50);
+		colors.animation = GetGrey(255);		
+		colors.btn_grad_borders = GetGrey(0,50);
+		colors.btn_grad_middle = GetGrey(0,180);
 	} else {
-		color_grad_bottom = GetGrey(0,20);
-		color_grad_top = GetGrey(0,20);
-		color_visu_grad_borders = GetGrey(0,0);
-		color_visu_grad_middle = GetGrey(0,50);
-		animation_color = GetGrey(255);
-		color_btn_grad_borders = GetGrey(0,30);
-		color_btn_grad_middle = GetGrey(0,120);		
+		colors.grad_bottom = GetGrey(0,20);
+		colors.grad_top = GetGrey(0,20);
+		colors.visu_grad_borders = GetGrey(0,0);
+		colors.visu_grad_middle = GetGrey(0,50);
+		colors.animation = GetGrey(255);
+		colors.btn_grad_borders = GetGrey(0,30);
+		colors.btn_grad_middle = GetGrey(0,120);		
 	}
-	border_color_light = GetGrey(255,20);
-	border_color_dark = GetGrey(0,50);
-	line_bottom_color = GetGrey(40,200);	
+	colors.border_light = GetGrey(255,20);
+	colors.border_dark = GetGrey(0,50);
+	colors.line_bottom = GetGrey(40,200);	
 }
 function get_images(){
 	if(properties.darklayout) var theme_path = "controls_Dark"; else var theme_path = "controls_Light";	

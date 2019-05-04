@@ -58,7 +58,7 @@ function setSettingsBtn() {
 	settings_hover = gdi.CreateImage(23, 23);
 	gb = settings_hover.GetGraphics();
 		gb.SetSmoothingMode(2);
-		gb.FillEllipse(0,0,23,23,settings_hover_bg);
+		gb.FillEllipse(0,0,23,23,colors.settings_hover_bg);
 		gb.SetSmoothingMode(0);
 		/*gb.FillSolidRect(7,7,10,1,colors.normal_txt);
 		gb.FillSolidRect(7,10,10,1,colors.normal_txt);
@@ -73,19 +73,17 @@ function get_colors() {
 	if(properties.darklayout){
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);
-		settings_hover_bg = GetGrey(255,40);
-		headerbar_bgcolor = GetGrey(16);		
-		headerbar_line_maincolor = GetGrey(51);
-		grad_line_off_color = GetGrey(255,0);
-		rightline_color = GetGrey(255,20);			
+		colors.settings_hover_bg = GetGrey(255,40);
+		colors.headerbar_bg = GetGrey(16);		
+		colors.headerbar_line = GetGrey(51);
+		colors.rightline = GetGrey(255,20);			
 	} else {
 		colors.normal_txt = GetGrey(0);
 		colors.faded_txt = GetGrey(125);
-		settings_hover_bg = GetGrey(230);		
-		headerbar_bgcolor = GetGrey(255);
-		headerbar_line_maincolor = GetGrey(215);	
-		grad_line_off_color = GetGrey(255);
-		rightline_color = GetGrey(215);			
+		colors.settings_hover_bg = GetGrey(230);		
+		colors.headerbar_bg = GetGrey(255);
+		colors.headerbar_line = GetGrey(215);	
+		colors.rightline = GetGrey(215);			
 	}
 	setSettingsBtn();
 } get_colors();
@@ -750,9 +748,9 @@ function on_paint(gr) {
 		g_pinfo.refresh(true,10+g_pinfo.refresh_needed); 	
 		g_pinfo.refresh_needed = 0; 		
 	}
-    gr.FillSolidRect(0,0,ww,wh,headerbar_bgcolor); 
+    gr.FillSolidRect(0,0,ww,wh,colors.headerbar_bg); 
 		
-	gr.FillSolidRect(0, wh-1, ww-1, 1, headerbar_line_maincolor);
+	gr.FillSolidRect(0, wh-1, ww-1, 1, colors.headerbar_line);
 	
 	if(g_pinfo.items_width<0)
 		g_pinfo.items_width = gr.CalcTextWidth(g_pinfo.time_txt+' '+g_pinfo.items_txt,g_font.italic);	
@@ -775,9 +773,9 @@ function on_paint(gr) {
 	
 	drawAllButtons(gr);
 	
-	if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, rightline_color);	
+	if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
 	
-	if(filters_panel_state.isActive()) gr.FillSolidRect(0,0,ww-((nowplayingplaylist_state.isActive())?1:0),1,headerbar_line_maincolor);
+	if(filters_panel_state.isActive()) gr.FillSolidRect(0,0,ww-((nowplayingplaylist_state.isActive())?1:0),1,colors.headerbar_line);
 }
 var callback_avoid_populate=false;
 function on_playlist_items_added(playlist){

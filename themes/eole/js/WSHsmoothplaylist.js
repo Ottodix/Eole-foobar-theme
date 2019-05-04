@@ -75,7 +75,6 @@ var properties = {
     load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),		
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),	
 	margin_bottom:0,
-	ResizeQLY: 2,
 	panelFontAdjustement: 0,
 	load_image_from_cache_direct:true
 };
@@ -502,14 +501,7 @@ oImageCache = function () {
     };
 };
 
-function FormatCover(image, w, h, rawBitmap) {
-	if(!image || w<=0 || h<=0) return image;
-	if(rawBitmap) {
-		return image.Resize(w, h, properties.ResizeQLY).CreateRawBitmap();
-	} else {
-		return image.Resize(w, h, properties.ResizeQLY);
-	}
-};
+
 
 /* 
 ===================================================================================================
@@ -651,8 +643,8 @@ oPlaylistManager = function(name) {
             var bg_margin_top = 2;
             var bg_margin_left = 10;
             var txt_margin = 10;
-            var bg_color = pm_color_bg;
-            var txt_color = pm_color_txt;
+            var bg_color = colors.pm_bg;
+            var txt_color = colors.pm_txt;
 			var gradient_size = 30;
             // scrollbar metrics
             if(this.rowTotal > this.totalRows) {
@@ -667,16 +659,16 @@ oPlaylistManager = function(name) {
 
 			//Overlay
 			height_top_fix = (properties.showHeaderBar ? properties.headerBarHeight : 0)		
-            gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, pm_color_overlay);
+            gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, colors.pm_overlay);
 			
 			//Shadows
-			gr.FillGradRect(cx,this.y-gradient_size,ww-(draw_right_line?1:0),gradient_size,90,pm_color_shadow_on,pm_color_shadow_off,0)
-			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(draw_right_line?1:0),gradient_size,90,pm_color_shadow_on,pm_color_shadow_off,1.0)
+			gr.FillGradRect(cx,this.y-gradient_size,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,0)
+			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,1.0)
 			//Main BG
-			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, pm_color_bg);
-			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, pm_color_border);
-			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, pm_color_border);			
-           // gr.FillSolidRect(cx + bg_margin_left, this.y + cPlaylistManager.topbarHeight - 2, this.w - bg_margin_left*2, 1, pm_color_bg4);
+			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, colors.pm_bg);
+			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, colors.pm_border);
+			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, colors.pm_border);			
+           // gr.FillSolidRect(cx + bg_margin_left, this.y + cPlaylistManager.topbarHeight - 2, this.w - bg_margin_left*2, 1, colors.pm_bg4);
             
             // ** items **
             var rowIdx = 0;
@@ -690,7 +682,7 @@ oPlaylistManager = function(name) {
                 this.playlists[i].y = cy;
                 
                 // ** item bg **
-                gr.FillSolidRect(cx + bg_margin_left+5, cy + bg_margin_top-3, cw - bg_margin_left*2-10 - this.scr_w, 1, pm_item_separator_line);
+                gr.FillSolidRect(cx + bg_margin_left+5, cy + bg_margin_top-3, cw - bg_margin_left*2-10 - this.scr_w, 1, colors.pm_item_separator_line);
                 
                 // ** item text **
                 // playlist total items
@@ -721,7 +713,7 @@ oPlaylistManager = function(name) {
                     if(cPlaylistManager.blink_row != 0) {
                         if(i == cPlaylistManager.blink_id - 1) {
                             if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {
-                                gr.FillSolidRect(cx + bg_margin_left, cy +(cPlaylistManager.topbarHeight-40), cw - bg_margin_left*2 - this.scr_w, ch, pm_color_blink);
+                                gr.FillSolidRect(cx + bg_margin_left, cy +(cPlaylistManager.topbarHeight-40), cw - bg_margin_left*2 - this.scr_w, ch, colors.pm_blink);
                             };
                         };
                     };
@@ -737,8 +729,8 @@ oPlaylistManager = function(name) {
 					gr.GdiDrawText("+ Sent to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 34, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
                     if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {               
 						cy_ = this.y + cPlaylistManager.topbarHeight + (this.activeRow-1)*ch;
-						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-						gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);							
+						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+						gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);							
                     };
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 34, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -748,8 +740,8 @@ oPlaylistManager = function(name) {
                     gr.GdiDrawText("+ Send to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 34, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
 					
 					cy_ = this.y + cPlaylistManager.topbarHeight + (this.activeRow-1)*ch;
-					gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-					gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);	
+					gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+					gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);	
 					
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 34, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -759,13 +751,13 @@ oPlaylistManager = function(name) {
             // draw activeIndex hover frame
             if(cPlaylistManager.blink_counter > -1 && cPlaylistManager.blink_row > 0) {
                 cy_ = this.y + cPlaylistManager.blink_row * ch;
-                gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-36), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);
+                gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top +(cPlaylistManager.topbarHeight-36), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
             } else {
                 if(this.activeRow > 0 && this.activeIndex > 0) {
                     if(cPlaylistManager.blink_counter < 0){
                         cy_ = this.y + cPlaylistManager.topbarHeight + (this.activeRow-1)*ch;
-						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, pm_color_blink);
-                        gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, pm_color_blink_rectline);
+						gr.FillSolidRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
+                        gr.DrawRect(cx + bg_margin_left, cy_ + bg_margin_top-3, cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
                     };
                 };
             };
@@ -778,7 +770,7 @@ oPlaylistManager = function(name) {
                 var ratio = (this.scroll * ch) / (this.rowTotal * ch - this.scr_h);
                 this.scr_cursor_y = this.scr_y + Math.round((this.scr_h - this.scr_cursor_h) * ratio);
                 
-                gr.FillSolidRect(cx + cw - this.scr_w , this.scr_cursor_y, this.scr_w - 8, this.scr_cursor_h, pm_color_scrollbar);
+                gr.FillSolidRect(cx + cw - this.scr_w , this.scr_cursor_y, this.scr_w - 8, this.scr_cursor_h, colors.pm_scrollbar);
             };
         };
     };
@@ -977,8 +969,8 @@ oFilterBox = function() {
         this.images.resetIcon_dn = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_dn.GetGraphics();
             gb.SetSmoothingMode(2);
-            gb.DrawLine(4, 4, w-4, w-4, 1.0, reseticon_down);
-            gb.DrawLine(4, w-4, w-4, 4, 1.0, reseticon_down);
+            gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.reseticon_down);
+            gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.reseticon_down);
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
@@ -1234,7 +1226,7 @@ oScrollbar = function(themed) {
         var gb = this.cursorImage_normal.GetGraphics();
 		//gb.FillSolidRect(1, 0, this.cursorw-2, this.cursorh, blendColors(this.color_txt, this.color_bg, 0.5) & 0x88ffffff);
 		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);		
-		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, scrollbar_normal_cursor_color);		
+		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);		
         this.cursorImage_normal.ReleaseGraphics(gb);
         
         // hover cursor Image
@@ -1255,7 +1247,7 @@ oScrollbar = function(themed) {
         } else {
             //gb.FillSolidRect(1, 0, this.cursorw-2, this.cursorh, blendColors(this.color_txt, this.color_bg, 0.3) & 0x88ffffff);
             //gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
-			gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,scrollbar_hover_cursor_color);
+			gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,colors.scrollbar_hover_cursor);
         };
         this.cursorImage_hover.ReleaseGraphics(gb);
 		
@@ -1277,7 +1269,7 @@ oScrollbar = function(themed) {
         } else {
             //gb.FillSolidRect(1, 0, this.cursorw-2, this.cursorh, blendColors(this.color_txt, this.color_bg, 0.05) & 0x88ffffff);
             //gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
-			gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,scrollbar_down_cursor_color);
+			gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,colors.scrollbar_down_cursor);
         };
         this.cursorImage_down.ReleaseGraphics(gb);
 		
@@ -2182,7 +2174,7 @@ oBrowser = function(name) {
 			var img = gdi.CreateImage(width, height);
 			var gb = img.GetGraphics();
 			for (var i = 0; i < 5; i++) {
-				DrawPolyStar(gb, i*(star_size+star_padding), star_vpadding, star_size, star_indent, 10, 0, border_color, ((i<rating) ? on_color : off_color));
+				DrawPolyStar(gb, i*(star_size+star_padding), star_vpadding, star_size, star_indent, 10, 0, colors.border, ((i<rating) ? on_color : off_color));
 			}
 			img.ReleaseGraphics(gb);
 			ratingImages[rating] = img;
@@ -2310,16 +2302,16 @@ oBrowser = function(name) {
 							}						
                             if(this.groups[g].selected) {								
 								if(g>0) {
-									gr.FillGradRect(ax+gradient_m, ay - ((ghrh - 1) * ah)-line_vertical_fix, gradient_w-gradient_m, 1, 0, grad_line_color_bg, grad_line_maincolor, 1.0);
-									gr.FillGradRect(ax+gradient_w, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 1, 0, grad_line_maincolor, grad_line_maincolor, 1.0);		
-									gr.FillSolidRect(ax+gradient_m-1, ay - ((ghrh - 1) * ah)-line_vertical_fix, 2, 1, grad_line_color_bg);									
+									gr.FillGradRect(ax+gradient_m, ay - ((ghrh - 1) * ah)-line_vertical_fix, gradient_w-gradient_m, 1, 0, colors.grad_line_bg, colors.grad_line, 1.0);
+									gr.FillGradRect(ax+gradient_w, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 1, 0, colors.grad_line, colors.grad_line, 1.0);		
+									gr.FillSolidRect(ax+gradient_m-1, ay - ((ghrh - 1) * ah)-line_vertical_fix, 2, 1, colors.grad_line_bg);									
 								}
                             } else {
 
 								if(g>0) {
-									gr.FillGradRect(ax+gradient_m, ay - ((ghrh - 1) * ah)-line_vertical_fix, gradient_w-gradient_m, 1, 0, grad_line_color_bg, grad_line_maincolor, 1.0);
-									gr.FillGradRect(ax+gradient_w, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 1, 0, grad_line_maincolor, grad_line_maincolor, 1.0);			
-									gr.FillSolidRect(ax+gradient_m-1, ay - ((ghrh - 1) * ah)-line_vertical_fix, 2, 1, grad_line_color_bg);												
+									gr.FillGradRect(ax+gradient_m, ay - ((ghrh - 1) * ah)-line_vertical_fix, gradient_w-gradient_m, 1, 0, colors.grad_line_bg, colors.grad_line, 1.0);
+									gr.FillGradRect(ax+gradient_w, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 1, 0, colors.grad_line, colors.grad_line, 1.0);			
+									gr.FillSolidRect(ax+gradient_m-1, ay - ((ghrh - 1) * ah)-line_vertical_fix, 2, 1, colors.grad_line_bg);												
 								}
                                 //gr.FillGradRect(ax, ay - ((ghrh - 1) * ah), aw+this.paddingRight, ah * ghrh - 1, 90, 0, colors.normal_txt & 0x06ffffff, 1.0);
                                 //gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah), aw+this.paddingRight, ah * ghrh - 1, colors.normal_txt & 0x05ffffff);
@@ -2328,12 +2320,12 @@ oBrowser = function(name) {
 							
 							if(g_dragndrop_rowId>-1 && this.rows[g_dragndrop_rowId].albumId==g && this.rows[g_dragndrop_rowId].type!=0){
 								if(g==0) {
-									gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix+5, aw+this.paddingRight, 2, dragdrop_marker_line);
+									gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix+5, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 								}
-								else if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, dragdrop_marker_line);
-								else gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, dragdrop_marker_line);
+								else if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
+								else gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 							}							
-							if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay + ah + Math.round(ah/2), aw+this.paddingRight, 2, dragdrop_marker_line);
+							if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay + ah + Math.round(ah/2), aw+this.paddingRight, 2, colors.dragdrop_marker_line);
                             // ==========
                             // cover art
                             // ==========
@@ -2388,10 +2380,10 @@ oBrowser = function(name) {
 										console.log("DrawImage: invalid image ");
 									}									
 									if(!properties.circleMode)
-										gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, cover_rectline_color);
+										gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);
 									else {
 										gr.SetSmoothingMode(2);
-										gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, cover_rectline_color);		
+										gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
 										gr.SetSmoothingMode(0);
 									}									
 								} else if (this.groups[g].cover_img=="no_cover") {
@@ -2402,7 +2394,7 @@ oBrowser = function(name) {
                                     var cv_x = Math.floor(ax + dx + 1)-2;
                                     var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-2;									
 									gr.DrawImage(cover.nocover_img, cv_x+8, cv_y, cv_w, cv_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-									gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, cover_rectline_color);									
+									gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);									
                                 } else {
                                     var cv_x = Math.floor(ax + cover.margin + 1);
                                     var cv_y = Math.floor(ay - ((ghrh - 1) * ah) + cover.margin)+group_height_fix;
@@ -2459,11 +2451,11 @@ oBrowser = function(name) {
 							var t_selected = this.rows[i].selected;
 							
 							if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
-								var color_selected = grad_line_maincolor_selected;
-								var color_selected_off = grad_line_color_bg_selected;								
+								var color_selected = colors.grad_line_selected;
+								var color_selected_off = colors.grad_line_bg_selected;								
 							} else {
-								var color_selected = grad_line_maincolor;
-								var color_selected_off = grad_line_color_bg;									
+								var color_selected = colors.grad_line;
+								var color_selected_off = colors.grad_line_bg;									
 							}
                             if(t_selected) {
 								//top
@@ -2483,11 +2475,11 @@ oBrowser = function(name) {
 								if(properties.drawAlternateBG) {
 									if(properties.showGroupHeaders) {
 										if(this.rows[i].albumTrackId % 2 == 1) {
-											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, g_color_alternate_row);
+											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, colors.alternate_row);
 										};
 									} else {
 										if(this.rows[i].playlistTrackId % 2 == 1) {
-											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah,g_color_alternate_row);
+											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah,colors.alternate_row);
 										};
 									};
 								}
@@ -2496,11 +2488,11 @@ oBrowser = function(name) {
 									// default track bg (odd/even)
 									if(properties.showGroupHeaders) {
 										if(this.rows[i].albumTrackId % 2 != 0) {
-											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, g_color_alternate_row);
+											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, colors.alternate_row);
 										};
 									} else {
 										if(this.rows[i].playlistTrackId % 2 != 0) {
-											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, g_color_alternate_row);
+											gr.FillSolidRect(ax, ay, aw+this.paddingRight, ah, colors.alternate_row);
 										};
 									};
 								}
@@ -2512,10 +2504,10 @@ oBrowser = function(name) {
 							
 							//Drag_marker
 							if(g_dragndrop_rowId==i){
-								if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay-1, aw+this.paddingRight, 2, dragdrop_marker_line);
-								else gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, dragdrop_marker_line);
+								if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
+								else gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 							}
-							if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, dragdrop_marker_line);
+							if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
                             
 
                             // =====
@@ -2567,7 +2559,7 @@ oBrowser = function(name) {
 
                                     if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) { // now playing track
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
-											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, g_color_flash_bg);
+											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, colors.flash_bg);
 										}		
 										if(cNowPlaying.flashEnable && !properties.darklayout && properties.drawProgressBar && properties.AlbumArtProgressbar && (!properties.doubleRowShowCover || properties.showGroupHeaders)){
 											image_to_draw = images.now_playing_black;
@@ -2586,7 +2578,7 @@ oBrowser = function(name) {
                                         track_time_part = g_time_remaining;
 										
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
-											gr.DrawRect(-1, ay, ww+2, ah-1, 1.0, g_color_flash_rectline);
+											gr.DrawRect(-1, ay, ww+2, ah-1, 1.0, colors.flash_rectline);
 										}				
 																			
 										if(properties.doubleRowShowCover && !properties.showGroupHeaders) {
@@ -2617,10 +2609,10 @@ oBrowser = function(name) {
 
                                         if(track_time_part == "ON AIR") {
                                             gr.GdiDrawText(g_radio_title, g_font.normal, colors.normal_txt, tx+10, ay_1, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+10), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                                            gr.GdiDrawText(g_radio_artist,g_font.min1, g_color_fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                            gr.GdiDrawText(g_radio_artist,g_font.min1, colors.fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         } else {
                                             gr.GdiDrawText(track_title_part, g_font.normal, colors.normal_txt, tx+10, ay_1, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+10), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                                            gr.GdiDrawText(track_artist_part, g_font.italicmin1, g_color_fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                            gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay_1, cColumns.track_time_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 																													
@@ -2647,38 +2639,38 @@ oBrowser = function(name) {
 														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying(), true, ww, ah*16);
 													};						
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
-													pt.FillSolidRect(0, 0, total_size+15, ah,albumartprogressbar_color_overlay)	
+													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)	
 															
-													pt.DrawString(track_time_part, g_font.normal, albumartprogressbar_color_txt, 0, 1, total_size+6, ah_1, 554696704);
+													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 1, total_size+6, ah_1, 554696704);
 												playingText.ReleaseGraphics(pt);
 												
 												var progress_x = ax+22-properties.track_gradient_size
 												var progress_w = ax+current_size+7;			
 												
 												gr.DrawImage(playingText, progress_x, ay, progress_w, ah, 0, 0, current_size+3, ah, 0, 255);
-												gr.DrawRect(ax+22-properties.track_gradient_size, ay, ax+current_size+6, ah-1,1,albumartprogressbar_color_rectline)
+												gr.DrawRect(ax+22-properties.track_gradient_size, ay, ax+current_size+6, ah-1,1,colors.albumartprogressbar_rectline)
 												if(track_time_part == "ON AIR") {
-													gr.GdiDrawText(g_radio_title, g_font.normal, albumartprogressbar_color_txt, tx+11, ay_1, Math.min(text_limit,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);			
-													gr.GdiDrawText(g_radio_artist, g_font.italicmin1, albumartprogressbar_color_txt, tx+11, ay_2, Math.min(text_limit,tw-cColumns.track_time_part-15), ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+													gr.GdiDrawText(g_radio_title, g_font.normal, colors.albumartprogressbar_txt, tx+11, ay_1, Math.min(text_limit,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);			
+													gr.GdiDrawText(g_radio_artist, g_font.italicmin1, colors.albumartprogressbar_txt, tx+11, ay_2, Math.min(text_limit,tw-cColumns.track_time_part-15), ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 												} else {
 													var margin_left = tx+10 - progress_x;
-													gr.GdiDrawText(track_title_part, g_font.normal, albumartprogressbar_color_txt, progress_x + margin_left, ay_1, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);			
-													gr.GdiDrawText(track_artist_part, g_font.italicmin1, albumartprogressbar_color_txt, progress_x + margin_left, ay_2, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15), ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+													gr.GdiDrawText(track_title_part, g_font.normal, colors.albumartprogressbar_txt, progress_x + margin_left, ay_1, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);			
+													gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.albumartprogressbar_txt, progress_x + margin_left, ay_2, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15), ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 												};												
 
 											} else {
-												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, progressbar_maincolor, 1.0); //grad top
+												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, colors.progressbar, 1.0); //grad top
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay,1,1,progressbar_color_bg_off)  // 1px bug fix
-												gr.FillSolidRect(ax+25, ay, current_size+12-19, 1, progressbar_maincolor); //line top
+												gr.FillSolidRect(ax+25, ay, current_size+12-19, 1, colors.progressbar); //line top
 												
 												gr.FillGradRect(ax+25-properties.track_gradient_size, ay+1, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, ah-2, 0, progressbar_color_bg_off, progressbar_color_bg_on, 1.0); //grad main bg											
 												gr.FillSolidRect(ax+25, ay+1, current_size+11-19, ah-2, progressbar_color_bg_on); //main bg												
 												
-												gr.FillGradRect(ax+25-properties.track_gradient_size, ay-1+ah, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, progressbar_maincolor, 1.0); //grad bottom
+												gr.FillGradRect(ax+25-properties.track_gradient_size, ay-1+ah, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, colors.progressbar, 1.0); //grad bottom
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay-1+ah,1,1,progressbar_color_bg_off)  // 1px bug fix
-												gr.FillSolidRect(ax+25, ay-1+ah, current_size+12-19, 1, progressbar_maincolor); //line bottom	
-												if(t_selected) gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, grad_line_maincolor); //vertical line when selected											
-												gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, progressbar_maincolor);	//vertical line	
+												gr.FillSolidRect(ax+25, ay-1+ah, current_size+12-19, 1, colors.progressbar); //line bottom	
+												if(t_selected) gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, colors.grad_line); //vertical line when selected											
+												gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, colors.progressbar);	//vertical line	
 												gr.FillSolidRect(ax+current_size+18, ay+1, 2, ah+1, progressbar_color_shadow);	//vertical shadow			
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay+ah, current_size-5+properties.track_gradient_size, 2, progressbar_color_shadow);	//horizontal shadow	
 											}
@@ -2687,7 +2679,7 @@ oBrowser = function(name) {
 										try {								
 											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
-													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, rating_icon_on, rating_icon_off, rating_icon_border);
+													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
 												if(this.ratingImages && this.ratingImages.length==6) {
 													if(this.hoverRatingRow!=i) var rating = track_rating_part;
@@ -2727,21 +2719,21 @@ oBrowser = function(name) {
 												}													
 												gr.DrawImage(this.groups[g].cover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, this.groups[g].cover_img.Width, this.groups[g].cover_img.Height,0,255);											
 												if(!properties.circleMode)
-													gr.FillSolidRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, playing_cover_overlay);
+													gr.FillSolidRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, colors.playing_cover_overlay);
 												else {
 													gr.SetSmoothingMode(2);
-													gr.FillEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, playing_cover_overlay);				
+													gr.FillEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, colors.playing_cover_overlay);				
 													gr.SetSmoothingMode(0);
 												}	
 											} else if (this.groups[g].cover_img=="no_cover") {					
 												gr.DrawImage(cover.nocover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-												gr.FillSolidRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, playing_cover_overlay);					
+												gr.FillSolidRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, colors.playing_cover_overlay);					
 											}
 											if(!properties.circleMode)
-												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, (properties.drawProgressBar && properties.AlbumArtProgressbar) ? cover_rectline_color_AlbumArtProgressbar : cover_rectline_color);
+												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, (properties.drawProgressBar && properties.AlbumArtProgressbar) ? colors.cover_rectline_AlbumArtProgressbar : colors.cover_rectline);
 											else {
 												gr.SetSmoothingMode(2);
-												gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, 1.0, (properties.drawProgressBar && properties.AlbumArtProgressbar) ? cover_rectline_color_AlbumArtProgressbar : cover_rectline_color);				
+												gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, 1.0, (properties.drawProgressBar && properties.AlbumArtProgressbar) ? colors.cover_rectline_AlbumArtProgressbar : colors.cover_rectline);				
 												gr.SetSmoothingMode(0);
 											}	
 											
@@ -2798,17 +2790,17 @@ oBrowser = function(name) {
 												}													
 												gr.DrawImage(this.groups[g].cover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, this.groups[g].cover_img.Width, this.groups[g].cover_img.Height,0,255);
 												if(!properties.circleMode)
-													gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, cover_rectline_color);
+													gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
 												else {
 													gr.SetSmoothingMode(2);
-													gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, 1.0, cover_rectline_color);		
+													gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, 1.0, colors.cover_rectline);		
 													gr.SetSmoothingMode(0);
 												}
 											} else if (this.groups[g].cover_img=="no_cover") {					
 												gr.DrawImage(cover.nocover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, cover_rectline_color);									
+												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);									
 											} else {
-												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, cover_rectline_color);
+												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
 											};
 											var text_left_margin = cover.max_w+TrackCover_x;
 										}									
@@ -2838,15 +2830,15 @@ oBrowser = function(name) {
 											}
 										}
 										
-                                        if(!properties.doubleRowShowCover || properties.showGroupHeaders) gr.GdiDrawText(track_num_part, g_font_light, g_color_tracknumber_txt, ax+8, ay_1, cColumns.track_num_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                                        gr.GdiDrawText(track_artist_part, g_font.italicmin1, g_color_fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        if(!properties.doubleRowShowCover || properties.showGroupHeaders) gr.GdiDrawText(track_num_part, g_font_light, colors.tracknumber_txt, ax+8, ay_1, cColumns.track_num_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         gr.GdiDrawText(track_title_part, g_font.normal, colors.normal_txt, tx+10, ay_1, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+5), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay_1, cColumns.track_time_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         // rating Stars
 										try {
 											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
-													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, rating_icon_on, rating_icon_off, rating_icon_border);
+													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
 												if(this.ratingImages && this.ratingImages.length==6) {
 													if(this.hoverRatingRow!=i) var rating = track_rating_part;
@@ -2861,7 +2853,7 @@ oBrowser = function(name) {
                                     // calc text part width + dtaw text
                                     if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) { // now playing track
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
-											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, g_color_flash_bg);
+											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, colors.flash_bg);
 										}	
 										if(cNowPlaying.flashEnable && !properties.darklayout && properties.drawProgressBar && properties.AlbumArtProgressbar){
 											image_to_draw = images.now_playing_black;
@@ -2881,7 +2873,7 @@ oBrowser = function(name) {
 										
 
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
-											gr.DrawRect(-1, ay, ww+2, ah-1, 1.0, g_color_flash_rectline);
+											gr.DrawRect(-1, ay, ww+2, ah-1, 1.0, colors.flash_rectline);
 										}												
                                         //
                                         if(track_time_part == "ON AIR") {
@@ -2941,9 +2933,9 @@ oBrowser = function(name) {
 
 										
                                         if(track_time_part == "ON AIR") {
-                                            gr.GdiDrawText(g_radio_artist_final, g_font.normal, g_color_fadedsmall_txt, tx+this.rows[i].artist_part_w+10, ay, tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                            gr.GdiDrawText(g_radio_artist_final, g_font.normal, colors.fadedsmall_txt, tx+this.rows[i].artist_part_w+10, ay, tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         } else if(show_track_part2) {
-                                            gr.GdiDrawText(track_part2, g_font_light, g_color_fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                            gr.GdiDrawText(track_part2, g_font_light, colors.fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 																																											
@@ -2970,39 +2962,39 @@ oBrowser = function(name) {
 														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying(), true);
 													};						
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
-													pt.FillSolidRect(0, 0, total_size+15, ah,albumartprogressbar_color_overlay)	
+													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)	
 
-													pt.DrawString(track_time_part, g_font.normal, albumartprogressbar_color_txt, 0, 0, total_size+6, ah, 554696704);													
+													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 0, total_size+6, ah, 554696704);													
 												playingText.ReleaseGraphics(pt);
 												var progress_x = ax+22-properties.track_gradient_size
 												var progress_w = ax+current_size+5;
 												gr.DrawImage(playingText, progress_x, ay, progress_w, ah, 0, 0, current_size+3, ah, 0, 255);
-												gr.DrawRect(ax+22-properties.track_gradient_size, ay, ax+current_size+4, ah-1,1,albumartprogressbar_color_rectline)
+												gr.DrawRect(ax+22-properties.track_gradient_size, ay, ax+current_size+4, ah-1,1,colors.albumartprogressbar_rectline)
 												
 												if(track_time_part == "ON AIR") {
-														gr.GdiDrawText(g_radio_title, g_font.normal, albumartprogressbar_color_txt, tx+13, ay, Math.min(current_size-35,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);					
-														gr.GdiDrawText(g_radio_artist, g_font_light, albumartprogressbar_color_txt, tx+this.rows[i].artist_part_w+18, ay, Math.min(current_size-this.rows[i].artist_part_w-22,tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+														gr.GdiDrawText(g_radio_title, g_font.normal, colors.albumartprogressbar_txt, tx+13, ay, Math.min(current_size-35,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);					
+														gr.GdiDrawText(g_radio_artist, g_font_light, colors.albumartprogressbar_txt, tx+this.rows[i].artist_part_w+18, ay, Math.min(current_size-this.rows[i].artist_part_w-22,tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 												} else {
 														 
 														var margin_left = tx+13 - progress_x;
 
-														gr.GdiDrawText(track_part1, g_font.normal, albumartprogressbar_color_txt, tx+13, ay, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);					
-														gr.GdiDrawText(track_part2, g_font_light, albumartprogressbar_color_txt, tx+this.rows[i].track_part1+8, ay, Math.min(progress_w-margin_left-this.rows[i].track_part1+5,tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+														gr.GdiDrawText(track_part1, g_font.normal, colors.albumartprogressbar_txt, tx+13, ay, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);					
+														gr.GdiDrawText(track_part2, g_font_light, colors.albumartprogressbar_txt, tx+this.rows[i].track_part1+8, ay, Math.min(progress_w-margin_left-this.rows[i].track_part1+5,tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 														
 												};												
 											} else {												
-												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, progressbar_maincolor, 1.0); //grad top
+												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, colors.progressbar, 1.0); //grad top
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay,1,1,progressbar_color_bg_off)  // 1px bug fix
-												gr.FillSolidRect(ax+25, ay, current_size+12-19, 1, progressbar_maincolor); //line top
+												gr.FillSolidRect(ax+25, ay, current_size+12-19, 1, colors.progressbar); //line top
 												
 												gr.FillGradRect(ax+25-properties.track_gradient_size, ay+1, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, ah-2, 0, progressbar_color_bg_off, progressbar_color_bg_on, 1.0); //grad main bg											
 												gr.FillSolidRect(ax+25, ay+1, current_size+11-19, ah-2, progressbar_color_bg_on); //main bg											
 												
-												gr.FillGradRect(ax+25-properties.track_gradient_size, ay-1+ah, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, progressbar_maincolor, 1.0); //grad bottom
+												gr.FillGradRect(ax+25-properties.track_gradient_size, ay-1+ah, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, progressbar_color_bg_off, colors.progressbar, 1.0); //grad bottom
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay-1+ah,1,1,progressbar_color_bg_off) // 1px bug fix
-												gr.FillSolidRect(ax+25, ay-1+ah, current_size+12-19, 1, progressbar_maincolor); //line bottom		
-												gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, progressbar_maincolor);	//vertical line	
-												if(t_selected) gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, grad_line_maincolor); //vertical line when selected
+												gr.FillSolidRect(ax+25, ay-1+ah, current_size+12-19, 1, colors.progressbar); //line bottom		
+												gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, colors.progressbar);	//vertical line	
+												if(t_selected) gr.FillSolidRect(ax+current_size+17, ay+1, 1, ah-2, colors.grad_line); //vertical line when selected
 												gr.FillSolidRect(ax+current_size+18, ay+1, 2, ah+1, progressbar_color_shadow);	//vertical shadow		
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay+ah, current_size-5+properties.track_gradient_size, 2, progressbar_color_shadow);	//horizontal shadow	
 											}
@@ -3011,7 +3003,7 @@ oBrowser = function(name) {
 										try {
 											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
-													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, rating_icon_on, rating_icon_off, rating_icon_border);
+													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
 												if(this.ratingImages && this.ratingImages.length==6) {
 													if(this.hoverRatingRow!=i) var rating = track_rating_part;
@@ -3039,19 +3031,19 @@ oBrowser = function(name) {
 										
                                         var tx = ax + cColumns.track_num_part;
                                         var tw = aw - cColumns.track_num_part;
-                                        gr.GdiDrawText(track_num_part, g_font_light, g_color_tracknumber_txt, ax+10, ay, cColumns.track_num_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        gr.GdiDrawText(track_num_part, g_font_light, colors.tracknumber_txt, ax+10, ay, cColumns.track_num_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 										if(track_time_part == "ON AIR"){
 											 track_part1 = track_artist_part;
 											 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1 + " - ", g_font.normal) + 5 : 5;
 											 track_part1 = track_artist_part;
 											 track_part2 = "";
-											 track_part2_color = g_color_fadedsmall_txt											
+											 track_part2_color = colors.fadedsmall_txt											
 										} else if(properties.showGroupHeaders){
 											 track_part1 = track_title_part;
 											 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1 + " - ", g_font.normal) + 5 : 5;
 											 track_part1 = track_title_part;
 											 track_part2 = track_artist_part;
-											 track_part2_color = g_color_fadedsmall_txt;
+											 track_part2_color = colors.fadedsmall_txt;
 											 if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;											 
 											 if(properties.showToolTip) {
 												if((tw-cColumns.track_time_part-5-(this.rows[i].rating_length+5))<(this.rows[i].track_part1+this.rows[i].track_part2)){
@@ -3063,7 +3055,7 @@ oBrowser = function(name) {
 											track_part1 = track_artist_part;
 											track_part2 = track_title_part;
 											if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;
-											if(track_part1.length>0) track_part2_color = g_color_fadedsmall_txt
+											if(track_part1.length>0) track_part2_color = colors.fadedsmall_txt
 											else  track_part2_color = colors.normal_txt
 											if(properties.showToolTip) {
 												if((tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5))<(this.rows[i].track_part2)){
@@ -3084,7 +3076,7 @@ oBrowser = function(name) {
 										try {
 											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
-													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, rating_icon_on, rating_icon_off, rating_icon_border);
+													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
 												if(this.ratingImages && this.ratingImages.length==6) {	
 													if(this.hoverRatingRow!=i) var rating = track_rating_part;
@@ -3102,7 +3094,7 @@ oBrowser = function(name) {
 						var t_selected = false;
                         if(properties.drawAlternateBG && ay > -1 && ay < this.h) {
                             if(this.rows[i].albumTrackId % 2 == 1) {
-                                gr.FillSolidRect(ax, ay, aw, ah, g_color_alternate_row);
+                                gr.FillSolidRect(ax, ay, aw, ah, colors.alternate_row);
                             };
                         };
                         break;
@@ -3110,7 +3102,7 @@ oBrowser = function(name) {
 
                 };
 				//if(properties.darklayout) Draw bottom gradient
-				gr.FillGradRect(0, wh-fading_bottom_height, ww, fading_bottom_height, 90, grad_bottom_color2,  grad_bottom_color1,1);		
+				gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);		
 
                 // Incremental Search Display
                 if(cList.search_string.length > 0) {
@@ -3118,9 +3110,9 @@ oBrowser = function(name) {
                     brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
                     brw.tt_w = Math.round((cList.search_string.length*13)+(10*2));
                     brw.tt_h = 40;
-                    gr.FillSolidRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h,keyboard_search_bg);
+                    gr.FillSolidRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h,colors.keyboard_search_bg);
                     try {
-                        gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?keyboard_search_txtred:keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
+                        gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?colors.keyboard_search_txtred:colors.keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
                     } catch(e) {};
                 };
 
@@ -3145,13 +3137,13 @@ oBrowser = function(name) {
 						}
 					}
 					gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-					gr.FillSolidRect(this.x+this.w/2-75,py, 150, 1, border_color);
+					gr.FillSolidRect(this.x+this.w/2-75,py, 150, 1, colors.border);
 					gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
             } else { // no track, playlist is empty
 					var px = 0;
 					var py = this.y + Math.round(this.h  / 2)-1;
 					gr.GdiDrawText("Loading...", g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 35, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-					gr.FillSolidRect(this.x+this.w/2-75,py, 150, 1, border_color);						
+					gr.FillSolidRect(this.x+this.w/2-75,py, 150, 1, colors.border);						
 					gr.GdiDrawText("Playlist viewer", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
             };
 			
@@ -3162,10 +3154,9 @@ oBrowser = function(name) {
                 //var boxText = "  "+this.groups.length+" album"+(this.groups.length>1?"s  ":"  ");
                 var boxText = (this.totaltracks > 1 ? this.totaltracks+" items" : this.totaltracks+" item");
                 // draw background part above playlist (headerbar)
-				gr.FillSolidRect(0, 0, ww, properties.headerBarHeight, headerbar_bgcolor);
+				gr.FillSolidRect(0, 0, ww, properties.headerBarHeight, colors.headerbar_bg);
 
-				//gr.FillGradRect(headerBar_gradient_m, properties.headerBarHeight, gradient_w-headerBar_gradient_m, 1, 0, headerbar_line_bgcolor, headerbar_line_maincolor, 1.0);
-				gr.FillGradRect(this.x+(this.drawLeftLine?1:0), properties.headerBarHeight, ww, 1, 0, headerbar_line_maincolor, headerbar_line_maincolor, 1.0);	
+				gr.FillGradRect(this.x+(this.drawLeftLine?1:0), properties.headerBarHeight, ww, 1, 0, colors.headerbar_line, colors.headerbar_line, 1.0);	
 				                
 				if(g_filterbox.inputbox.text.length>0) {
 					var text_width = gr.CalcTextWidth(boxText,g_font.min1)
@@ -3185,7 +3176,7 @@ oBrowser = function(name) {
 				}
             };
 			
-			if(this.drawLeftLine) gr.FillSolidRect(0, 0, 1, wh, leftline_color);
+			if(this.drawLeftLine) gr.FillSolidRect(0, 0, 1, wh, colors.leftline);
 
 			//if(cScrollBar.enabled || (g_cursor.x > ww - cScrollBar.width && g_cursor.x < ww && g_cursor.y > properties.headerBarHeight && g_cursor.y < wh))  {
 			if(cScrollBar.enabled && pman.state !=1)  {
@@ -4733,11 +4724,11 @@ function on_paint(gr) {
         // draw background under playlist
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
             gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-            gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?wallpaper_overlay_blurred:wallpaper_overlay);
+            gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
         } else {
             if(g_wallpaperImg && properties.showwallpaper) {
                 gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-                gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?wallpaper_overlay_blurred:wallpaper_overlay);
+                gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
             } else {
                 gr.FillSolidRect(0, 0, ww, wh, colors.g_color_normal_bg);
             }
@@ -5182,187 +5173,184 @@ function get_images() {
 
 function get_colors() {
 	if(properties.darklayout){
-		wallpaper_overlay = GetGrey(10,225);
-		wallpaper_overlay_blurred = GetGrey(0,200);	
+		colors.wallpaper_overlay = GetGrey(10,225);
+		colors.wallpaper_overlay_blurred = GetGrey(0,200);	
 		
 		colors.g_color_normal_bg = GetGrey(17);
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);
-		g_color_fadedsmall_txt = GetGrey(200);			
-		g_color_tracknumber_txt = GetGrey(230);	
+		colors.fadedsmall_txt = GetGrey(200);			
+		colors.tracknumber_txt = GetGrey(230);	
 		colors.g_color_selected_bg = RGBA(015,177,255,160);
-		g_color_alternate_row = GetGrey(0,20);
-		g_color_flash_bg = GetGrey(255,30),
-		g_color_flash_rectline = GetGrey(255,61),
+		colors.alternate_row = GetGrey(0,20);
+		colors.flash_bg = GetGrey(255,30),
+		colors.flash_rectline = GetGrey(255,61),
 		
-		rating_icon_on = GetGrey(255);
-		rating_icon_off = GetGrey(255,60);
-		rating_icon_border = GetGrey(255,0);
+		colors.rating_icon_on = GetGrey(255);
+		colors.rating_icon_off = GetGrey(255,60);
+		colors.rating_icon_border = GetGrey(255,0);
 		
-		border_color = GetGrey(255,50);	
-		border_color_dark = GetGrey(0,60);		
-		border_color_light = border_color;			
-		border_color_0 = GetGrey(255,50);		
+		colors.border = GetGrey(255,50);	
+		colors.border_dark = GetGrey(0,60);		
+		colors.border_light = colors.border;			
+		colors.border_0 = GetGrey(255,50);		
 		
-		scrollbar_normal_cursor_color = GetGrey(255,90);				
-		scrollbar_hover_cursor_color = GetGrey(225);
-		scrollbar_down_cursor_color = scrollbar_hover_cursor_color;
+		colors.scrollbar_normal_cursor = GetGrey(255,90);				
+		colors.scrollbar_hover_cursor = GetGrey(225);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
 		
-		cover_rectline_color = GetGrey(255,40);
-		cover_rectline_color_AlbumArtProgressbar = GetGrey(255,90);
+		colors.cover_rectline = GetGrey(255,40);
+		colors.cover_rectline_AlbumArtProgressbar = GetGrey(255,90);
 		
-		playing_cover_overlay = GetGrey(0,180);			
+		colors.playing_cover_overlay = GetGrey(0,180);			
 		
-		grad_line_maincolor = GetGrey(255,35);
-		grad_line_color_bg = GetGrey(0,0);
-		grad_line_maincolor_selected = GetGrey(255,35);
-		grad_line_color_bg_selected = GetGrey(0,0);
+		colors.grad_line = GetGrey(255,35);
+		colors.grad_line_bg = GetGrey(0,0);
+		colors.grad_line_selected = GetGrey(255,35);
+		colors.grad_line_bg_selected = GetGrey(0,0);
 		
-		grad_bottom_color1 = GetGrey(0,70);
-		grad_bottom_color2 = GetGrey(0,0);	
-		fading_bottom_height = 39;
+		colors.grad_bottom_1 = GetGrey(0,70);
+		colors.grad_bottom_2 = GetGrey(0,0);	
+		colors.fading_bottom_height = 39;
 		
-		dragdrop_marker_line = GetGrey(255);
+		colors.dragdrop_marker_line = GetGrey(255);
 		
-		keyboard_search_bg = GetGrey(0,205);
-		keyboard_search_txt = GetGrey(255,245);
-		keyboard_search_txtred = RGB(255,80,80);		
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,245);
+		colors.keyboard_search_txtred = RGB(255,80,80);		
 
-		reseticon_down = RGB(255,50,50);		
+		colors.reseticon_down = RGB(255,50,50);		
 		
-		headerbar_bgcolor = GetGrey(15,200);	
-		headerbar_line_maincolor = GetGrey(255,38);	
-		headerbar_line_bgcolor = GetGrey(255,50);		
-		headerBar_gradient_m = 0;
+		colors.headerbar_bg = GetGrey(15,200);	
+		colors.headerbar_line = GetGrey(255,38);	
+		colors.headerbar_line_bg = GetGrey(255,50);		
 		
-		leftline_color = GetGrey(255,40);	
+		colors.leftline = GetGrey(255,40);	
 		
-		progressbar_maincolor = GetGrey(255,45);
-		progressbar_color_bg_off = GetGrey(0,0);
-		progressbar_color_bg_on = GetGrey(255,20);		
-		progressbar_color_shadow = GetGrey(0,15)		
-		albumartprogressbar_color_txt = GetGrey(255);	
-		albumartprogressbar_color_overlay = GetGrey(0,80);	
-		albumartprogressbar_color_rectline = GetGrey(255,40);	
+		colors.progressbar = GetGrey(255,45);
+		colors.progressbar_bg_off = GetGrey(0,0);
+		colors.progressbar_bg_on = GetGrey(255,20);		
+		colors.progressbar_shadow = GetGrey(0,15)		
+		colors.albumartprogressbar_txt = GetGrey(255);	
+		colors.albumartprogressbar_overlay = GetGrey(0,80);	
+		colors.albumartprogressbar_rectline = GetGrey(255,40);	
 		
-		pm_color_overlay = GetGrey(0,200);		
-		pm_color_bg = GetGrey(0);
-		pm_color_shadow_on = GetGrey(0,35);	
-		pm_color_shadow_off = GetGrey(0,0);			
-		pm_color_border = GetGrey(255,55);		
-		pm_color_txt = GetGrey(255);
-		pm_color_bg2 = GetGrey(0,120);	
-		pm_color_bg3 = GetGrey(0,150);
-		pm_color_bg4 = GetGrey(255,40);
-		pm_item_separator_line = GetGrey(255,45);		
-		pm_color_item_bg1 = GetGrey(0,130);		
-		pm_color_item_bg2 = GetGrey(255,20);
-		pm_color_blink = GetGrey(255,15);	
-		pm_color_blink_rectline = GetGrey(70);	
-		pm_color_scrollbar = GetGrey(240);	
-		dragimage_color_border = GetGrey(255,75);	
-		dragimage_color_bg = GetGrey(0);		
-		dragimage_text = GetGrey(255);		
-		dragimage_gradline1 = GetGrey(255,100);
-		dragimage_gradline2 = GetGrey(255,200);		
+		colors.pm_overlay = GetGrey(0,200);		
+		colors.pm_bg = GetGrey(0);
+		colors.pm_shadow_on = GetGrey(0,35);	
+		colors.pm_shadow_off = GetGrey(0,0);			
+		colors.pm_border = GetGrey(255,55);		
+		colors.pm_txt = GetGrey(255);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);
+		colors.pm_item_separator_line = GetGrey(255,45);		
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_blink = GetGrey(255,15);	
+		colors.pm_blink_rectline = GetGrey(70);	
+		colors.pm_scrollbar = GetGrey(240);	
+		colors.dragimage_border = GetGrey(255,75);	
+		colors.dragimage_bg = GetGrey(0);		
+		colors.dragimage_text = GetGrey(255);		
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);		
 	} else {
 		colors.g_color_normal_bg = GetGrey(255);		
 		colors.normal_txt = GetGrey(0,255);		
-		g_color_tracknumber_txt = GetGrey(130);
-		g_color_alternate_row = GetGrey(0,4);
+		colors.tracknumber_txt = GetGrey(130);
+		colors.alternate_row = GetGrey(0,4);
 		colors.g_color_selected_bg = RGBA(015,177,255,100);
 		
-		rating_icon_on = GetGrey(0);	
-		rating_icon_off = GetGrey(0,30);	
-		rating_icon_border = GetGrey(0,0);
+		colors.rating_icon_on = GetGrey(0);	
+		colors.rating_icon_off = GetGrey(0,30);	
+		colors.rating_icon_border = GetGrey(0,0);
 		
-		border_color = GetGrey(0,50);
-		border_color_dark = border_color;		
-		border_color_light = GetGrey(255,50);;				
+		colors.border = GetGrey(0,50);
+		colors.border_dark = colors.border;		
+		colors.border_light = GetGrey(255,50);;				
 		if(properties.showwallpaper){
-			border_color_0 = GetGrey(0,45);				
+			colors.border_0 = GetGrey(0,45);				
 		} else { 
-			border_color_0 = GetGrey(0,0);		
+			colors.border_0 = GetGrey(0,0);		
 		}		
 		
-		cover_rectline_color = GetGrey(0,30);	
-		cover_rectline_color_AlbumArtProgressbar = GetGrey(255,90);
+		colors.cover_rectline = GetGrey(0,30);	
+		colors.cover_rectline_AlbumArtProgressbar = GetGrey(255,90);
 		
-		playing_cover_overlay = GetGrey(0,150);	
+		colors.playing_cover_overlay = GetGrey(0,150);	
 		
-		wallpaper_overlay = GetGrey(255,235);
-		wallpaper_overlay_blurred = GetGrey(255,235);			
+		colors.wallpaper_overlay = GetGrey(255,235);
+		colors.wallpaper_overlay_blurred = GetGrey(255,235);			
 		
-		g_color_flash_bg = GetGrey(0,10);		
-		g_color_flash_rectline = GetGrey(0,41);		
+		colors.flash_bg = GetGrey(0,10);		
+		colors.flash_rectline = GetGrey(0,41);		
 
-		scrollbar_normal_cursor_color = GetGrey(0,130);	
-		scrollbar_hover_cursor_color = GetGrey(0);
-		scrollbar_down_cursor_color = scrollbar_hover_cursor_color;
+		colors.scrollbar_normal_cursor = GetGrey(0,130);	
+		colors.scrollbar_hover_cursor = GetGrey(0);
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
 		
-		keyboard_search_bg = GetGrey(0,205);
-		keyboard_search_txt = GetGrey(255,205);
-		keyboard_search_txtred = RGB(255,80,80);			
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,205);
+		colors.keyboard_search_txtred = RGB(255,80,80);			
 		
-		reseticon_down = RGB(255,50,50);
+		colors.reseticon_down = RGB(255,50,50);
 		
 		if(properties.showwallpaper) {
-			headerbar_bgcolor = GetGrey(255,240);		
-			headerbar_line_maincolor = GetGrey(215);			
-			headerbar_line_bgcolor = GetGrey(215);	
-			headerBar_gradient_m=0;
+			colors.headerbar_bg = GetGrey(255,240);		
+			colors.headerbar_line = GetGrey(215);			
+			colors.headerbar_line_bg = GetGrey(215);	
 			colors.faded_txt = GetGrey(90);
-			g_color_fadedsmall_txt = GetGrey(90);			
+			colors.fadedsmall_txt = GetGrey(90);			
 		} else {
-			headerbar_bgcolor = GetGrey(255,240);		
-			headerbar_line_maincolor = GetGrey(215);			
-			headerbar_line_bgcolor = GetGrey(255);	
-			headerBar_gradient_m=gradient_m;
+			colors.headerbar_bg = GetGrey(255,240);		
+			colors.headerbar_line = GetGrey(215);			
+			colors.headerbar_line_bg = GetGrey(255);	
 			colors.faded_txt = GetGrey(125);
-			g_color_fadedsmall_txt = GetGrey(125);			
+			colors.fadedsmall_txt = GetGrey(125);			
 		}
 		
-		leftline_color = GetGrey(210);	
+		colors.leftline = GetGrey(210);	
 		
-		grad_line_maincolor = GetGrey(0,36);
-		grad_line_color_bg = GetGrey(255,0);	
-		grad_line_maincolor_selected = GetGrey(0,16);
-		grad_line_color_bg_selected = GetGrey(255,0);
+		colors.grad_line = GetGrey(0,36);
+		colors.grad_line_bg = GetGrey(255,0);	
+		colors.grad_line_selected = GetGrey(0,16);
+		colors.grad_line_bg_selected = GetGrey(255,0);
 		
-		grad_bottom_color1 = GetGrey(0,10);
-		grad_bottom_color2 = GetGrey(0,0);
-		fading_bottom_height = 39;		
+		colors.grad_bottom_1 = GetGrey(0,10);
+		colors.grad_bottom_2 = GetGrey(0,0);
+		colors.fading_bottom_height = 39;		
 		
-		dragdrop_marker_line = GetGrey(0);
+		colors.dragdrop_marker_line = GetGrey(0);
 		
-		progressbar_maincolor = GetGrey(0,70);	
-		progressbar_color_bg_off = GetGrey(255,0);
-		progressbar_color_bg_on = GetGrey(255,60);		
-		progressbar_color_shadow = GetGrey(0,5);
-		albumartprogressbar_color_txt = GetGrey(255);	
-		albumartprogressbar_color_overlay = GetGrey(0,80);	
-		albumartprogressbar_color_rectline = GetGrey(0,40);	
+		colors.progressbar = GetGrey(0,70);	
+		colors.progressbar_bg_off = GetGrey(255,0);
+		colors.progressbar_bg_on = GetGrey(255,60);		
+		colors.progressbar_shadow = GetGrey(0,5);
+		colors.albumartprogressbar_txt = GetGrey(255);	
+		colors.albumartprogressbar_overlay = GetGrey(0,80);	
+		colors.albumartprogressbar_rectline = GetGrey(0,40);	
 		
-		pm_color_overlay = GetGrey(255,200);			
-		pm_color_bg = GetGrey(255);
-		pm_color_shadow_on = GetGrey(0,5);	
-		pm_color_shadow_off = GetGrey(0,0);		
-		pm_color_border = GetGrey(0,40);
-		pm_color_txt = GetGrey(0);
-		pm_color_bg2 = GetGrey(0,120);	
-		pm_color_bg3 = GetGrey(0,150);
-		pm_color_bg4 = GetGrey(255,40);		
-		pm_item_separator_line = GetGrey(0,20);
-		pm_color_item_bg1 = GetGrey(0,130);		
-		pm_color_item_bg2 = GetGrey(255,20);
-		pm_color_blink = GetGrey(0,10);	
-		pm_color_blink_rectline = GetGrey(211);	
-		pm_color_scrollbar = GetGrey(30);	
-		dragimage_color_border = GetGrey(0);	
-		dragimage_color_bg = GetGrey(0);
-		dragimage_text = GetGrey(255);
-		dragimage_gradline1 = GetGrey(255,100);
-		dragimage_gradline2 = GetGrey(255,200);		
+		colors.pm_overlay = GetGrey(255,200);			
+		colors.pm_bg = GetGrey(255);
+		colors.pm_shadow_on = GetGrey(0,5);	
+		colors.pm_shadow_off = GetGrey(0,0);		
+		colors.pm_border = GetGrey(0,40);
+		colors.pm_txt = GetGrey(0);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);		
+		colors.pm_item_separator_line = GetGrey(0,20);
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_blink = GetGrey(0,10);	
+		colors.pm_blink_rectline = GetGrey(211);	
+		colors.pm_scrollbar = GetGrey(30);	
+		colors.dragimage_border = GetGrey(0);	
+		colors.dragimage_bg = GetGrey(0);
+		colors.dragimage_text = GetGrey(255);
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);		
 	}
 };
 
