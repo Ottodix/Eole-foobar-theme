@@ -2160,14 +2160,14 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
-function FormatCover(image, w, h, rawBitmap) {
+function FormatCover(image, w, h, rawBitmap, callID) {
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
 		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
 	} else {
 		try {
 			return image.Resize(w, h, globalProperties.ResizeQLY);
-		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image); return null;}
+		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image+", callID:"+callID); return null;}
 	}
 };
 function check_cache(metadb, albumIndex, crc){

@@ -2204,7 +2204,7 @@ oShowList = function(parentPanelName) {
 					}
 					if(brw.groups_draw[this.idx].cover_img_full==null) brw.GetAlbumCover(this.idx);
 					
-					if(typeof this.cover_img == 'undefined' || !this.cover_img) this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false);
+					if(typeof this.cover_img == 'undefined' || !this.cover_img) this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false, "showlistShowCover");
 					gr.DrawImage(this.cover_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.coverRealSize, this.coverRealSize, 0, 0, this.cover_img.Width, this.cover_img.Height);					
 				}
 				
@@ -4122,7 +4122,7 @@ oBrowser = function(name) {
 		this.groups[idx].cover_img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
 		if (typeof this.groups[idx].cover_img_full !== "undefined" && this.groups[idx].cover_img_full!=null) {
 			var gb;			
-			var img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);			
+			var img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover_fast");			
 			var cover_img = gdi.CreateImage(this.coverRealWith, this.coverRealWith);
 			gb = cover_img.GetGraphics();
 				gb.SetSmoothingMode(0);
@@ -4143,12 +4143,12 @@ oBrowser = function(name) {
 		var img_final = null;
 		var img_full = null;
 		if (typeof this.groups[idx].cover_img_full !== "undefined" && this.groups[idx].cover_img_full!=null) {
-			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
 			if (typeof img_full !== "undefined" && img_full!=null) {
 				this.groups[idx].cover_img_full = img_full;
-				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover2");
 			}
 		}
 		this.groups[idx].cover_img = img_final;
