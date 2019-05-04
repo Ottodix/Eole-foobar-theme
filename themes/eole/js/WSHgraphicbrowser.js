@@ -2646,13 +2646,18 @@ oHeaderbar = function(name) {
 				brw.populate(9,true);				
 				break;		
 			case (idx == 3006):				
-				new_TFsorting = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting);
-				if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
-					properties.TFsorting = new_TFsorting;
-					window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-					g_showlist.idx=-1;
-					brw.populate(5,true);	
-				}
+				//new_TFsorting = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting);
+				try {
+					new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", brw.currentSorting, true);
+					if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+						properties.TFsorting = new_TFsorting;
+						window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
+						g_showlist.idx=-1;
+						brw.populate(5,true);	
+					}			   
+				} catch(e) {
+					// Dialog was closed by pressing Esc, Cancel or the Close button.
+				}				
 				break;					
 			case (idx == 3007):
 				brw.dont_sort_on_next_populate = true;			
@@ -2682,14 +2687,19 @@ oHeaderbar = function(name) {
 				g_showlist.idx=-1;
 				brw.populate(5,false);	
 				break;				
-			case (idx == 4001):				
-				new_TFgrouping = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom grouping", properties.TFgrouping);
-				if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
-					properties.TFgrouping = new_TFgrouping;
-					TF.grouping = fb.TitleFormat(properties.TFgrouping);
-					window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
-					g_showlist.idx=-1;
-					brw.populate(5,false);	
+			case (idx == 4001):			
+			//	new_TFgrouping = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom grouping", brw.current_grouping);
+				try {
+				   new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.\n\n", "Custom grouping", brw.current_grouping, true);
+					if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
+						properties.TFgrouping = new_TFgrouping;
+						TF.grouping = fb.TitleFormat(properties.TFgrouping);
+						window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
+						g_showlist.idx=-1;
+						brw.populate(5,false);	
+					}				   
+				} catch(e) {
+					// Dialog was closed by pressing Esc, Cancel or the Close button.
 				}
 				break;				
 			case (idx == 3100):
@@ -3750,19 +3760,26 @@ oBrowser = function(name) {
         while(k < this.totalTracks){
             if(properties.TFgrouping.length > 0) {
                 group_string = TF.grouping.EvalWithMetadb(this.list[k]);
+				this.current_grouping = properties.TFgrouping;
             } else {
 				if(this.showFilterBox){
-					if(properties.SingleMultiDisc)
+					if(properties.SingleMultiDisc) {
 						trackinfos = TF.grouping_singlemultidisc_filterbox.EvalWithMetadb(this.list[k]);
-					else
-						trackinfos = TF.grouping_default_filterbox.EvalWithMetadb(this.list[k]);						
+						this.current_grouping = properties.TFgrouping_singlemultidisc;
+					} else {
+						trackinfos = TF.grouping_default_filterbox.EvalWithMetadb(this.list[k]);
+						this.current_grouping = properties.TFgrouping_default;
+					}						
 					arr = trackinfos.split(" ^^ ");
-					group_string = arr[0]+arr[1];					
+					group_string = arr[0]+arr[1];		
 				} else {
-					if(properties.SingleMultiDisc)
+					if(properties.SingleMultiDisc) {
 						trackinfos = TF.grouping_singlemultidisc.EvalWithMetadb(this.list[k]);
-					else
+						this.current_grouping = properties.TFgrouping_singlemultidisc;
+					} else {
 						trackinfos = TF.grouping_default.EvalWithMetadb(this.list[k]);
+						this.current_grouping = properties.TFgrouping_default;
+					}
 					group_string = trackinfos;
 				}
             }
@@ -4003,7 +4020,7 @@ oBrowser = function(name) {
 	this.getSourcePlaylist = function() {
 		return this.SourcePlaylistIdx; 		
 	}		
-    this.populate = function(call_id, force_sorting, keep_showlist, playlistIdx) {	console.log(properties.TFsorting);	
+    this.populate = function(call_id, force_sorting, keep_showlist, playlistIdx) {	
 		force_sorting = typeof force_sorting !== 'undefined' ? force_sorting : false;
 		keep_showlist = typeof keep_showlist !== 'undefined' ? keep_showlist : false;	
 		playlistIdx = typeof playlistIdx !== 'undefined' ? playlistIdx : -1;			

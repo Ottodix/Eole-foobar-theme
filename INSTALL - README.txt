@@ -6,7 +6,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 0. Close foobar.
 
-1. Copy everything into your foobar installation directory (so the 3 folders: user-components, themes and plugins). The archive contain all the files and the required foobar components (columns UI, ui hacks, spider monkey panel, shpeck, elplaylist, panel stack splitter, playcount). 
+1. Copy everything into your foobar installation directory (so the 3 folders: components, themes and plugins). The archive contain all the files and the required foobar components (columns UI, ui hacks, spider monkey panel, shpeck, elplaylist, panel stack splitter, playcount). 
 
 2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
 
