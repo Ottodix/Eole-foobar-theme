@@ -1,4 +1,3 @@
-var colors = {};
 var properties = {
 	panelName: 'WSHlibrary_tree',		
     darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
@@ -748,8 +747,8 @@ function userinterface() {
     }
 
     this.get_colors = function() {
-        this.backcol = colors.normal_bg;
-        this.backcolsel = colors.g_color_selected_bg;
+        this.backcol = colors.lightgrey_bg;
+        this.backcolsel = colors.selected_bg;
         this.linecol = set_custom_col(window.GetProperty("_Custom.Colour Node Lines", ""), 1);
         this.txt_box = set_custom_col(window.GetProperty("_Custom.Colour Search Name", ""), 0);
         this.s_linecol = colors.headerbar_line;
@@ -2706,8 +2705,8 @@ function searchLibrary() {
 		var selection_bg_y = p.s_sp * 0.5+this.y-1;
 		var selection_bg_w = Math.min(p.s_x + get_cursor_x(e), clamp) - selection_bg_x;
 		var selection_bg_h = p.s_sp +this.y - selection_bg_y;
-		//gr.FillSolidRect(selection_bg_x, selection_bg_y, selection_bg_w, selection_bg_h, colors.g_color_selected_bg);		
-        gr.DrawLine(Math.min(p.s_x + get_cursor_x(s), clamp), selection_bg_y, Math.min(p.s_x + get_cursor_x(e), clamp), selection_bg_y, selection_bg_h, colors.g_color_selected_bg);
+		//gr.FillSolidRect(selection_bg_x, selection_bg_y, selection_bg_w, selection_bg_h, colors.selected_bg);		
+        gr.DrawLine(Math.min(p.s_x + get_cursor_x(s), clamp), selection_bg_y, Math.min(p.s_x + get_cursor_x(e), clamp), selection_bg_y, selection_bg_h, colors.selected_bg);
     }
     var get_cursor_pos = function(x) {
         var im = gdi.CreateImage(1, 1),
@@ -3192,7 +3191,7 @@ function on_paint(gr) {
 		pman.draw(gr);
 	};
 
-    gr.FillSolidRect(ui.w - 1, 0, 1, ui.h, colors.rightline);	
+    gr.FillSolidRect(ui.w - 1, 0, 1, ui.h, colors.sidesline);	
     if (ui.scrollbar_show && pman.state !=1) sbar.draw(gr);
 }
 
@@ -4409,18 +4408,8 @@ function on_focus(is_focused) {
 };
 
 function get_colors() {
-    if (properties.darklayout) {
-        colors.wallpaper_overlay = GetGrey(25, 230);
-        colors.wallpaper_overlay_blurred = GetGrey(25, 200);
-
-		colors.normal_bg = GetGrey(17);	
-        colors.normal_txt = GetGrey(240, 200);
-        colors.faded_txt = GetGrey(130);
-        colors.full_txt = GetGrey(255);		
-        colors.selected_txt = GetGrey(255, 200);
-        colors.g_color_selected_bg = RGBA(015, 177, 255, 160);
-        colors.alternate_row = GetGrey(0, 30);
-
+	get_colors_global();
+    if (properties.darklayout) {	
 		colors.btn_inactive_opacity = 140;
 		colors.inactive_txt = GetGrey(140);		
 
@@ -4439,60 +4428,14 @@ function get_colors() {
         colors.grad_bottom_2 = GetGrey(0, 0);
         colors.fading_bottom_height = 50;
 
-		colors.scrollbar_normal_cursor = GetGrey(255,60);
-        colors.scrollbar_hover_cursor = GetGrey(225);
-        colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
-
 		colors.selected_item_bg = GetGrey(0,150);	
 		colors.selected_item_line = GetGrey(255,30);	
-        colors.marker_hover_item = GetGrey(255);
-		colors.width_marker_hover_item = 1;
-		
-        colors.keyboard_search_bg = GetGrey(0, 205);
-        colors.keyboard_search_txt = GetGrey(255, 245);
-        colors.keyboard_search_txtred = RGB(255, 80, 80);
 
 		colors.headerbar_bg = GetGrey(17,200);	
 		colors.headerbar_line = GetGrey(255,38);	
-		colors.border = GetGrey(255,50);
-		
-        colors.rightline = GetGrey(255, 25);
-        colors.reseticon_down = RGB(255, 50, 50);
-		colors.settings_hover_bg = GetGrey(255,40);
-		
-        colors.pm_overlay = GetGrey(0, 200);
-        colors.pm_bg = GetGrey(0);
-        colors.pm_shadow_on = GetGrey(0, 35);
-        colors.pm_shadow_off = GetGrey(0, 0);
-        colors.pm_border = GetGrey(255, 55);
-        colors.pm_txt = GetGrey(255);
-        colors.pm_bg2 = GetGrey(0, 120);
-        colors.pm_bg3 = GetGrey(0, 150);
-        colors.pm_bg4 = GetGrey(255, 40);
-        colors.pm_item_separator_line = GetGrey(255, 45);
-        colors.pm_item_bg1 = GetGrey(0, 130);
-        colors.pm_item_bg2 = GetGrey(255, 20);
-        colors.pm_blink = GetGrey(255, 15);
-        colors.pm_blink_rectline = GetGrey(70);
-        colors.pm_scrollbar = GetGrey(240);
-		colors.dragimage_border = GetGrey(255,75);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);		
+
+		colors.settings_hover_bg = GetGrey(255,40);	
     } else {
-        colors.wallpaper_overlay = GetGrey(255, 235);
-        colors.wallpaper_overlay_blurred = GetGrey(255, 235);
-
-        if (properties.showwallpaper) colors.normal_bg = GetGrey(255);
-        else colors.normal_bg = GetGrey(245);
-        colors.normal_txt = GetGrey(0);
-        colors.faded_txt = GetGrey(140);
-        colors.full_txt = GetGrey(0);		
-        colors.selected_txt = GetGrey(0);
-        colors.g_color_selected_bg = RGBA(015, 177, 255, 100);
-		colors.alternate_row = GetGrey(0,5);
-
 		colors.btn_inactive_opacity = 110;
 		colors.inactive_txt = colors.faded_txt;		
 		
@@ -4510,18 +4453,8 @@ function get_colors() {
         colors.grad_bottom_2 = GetGrey(0, 0);
         colors.fading_bottom_height = 30;
 
-        colors.scrollbar_normal_cursor = GetGrey(0,120);
-		colors.scrollbar_hover_cursor = GetGrey(0);
-        colors.scrollbar_down_cursor = colors.scrollbar_normal_cursor;
-
 		colors.selected_item_bg = GetGrey(0,17);	
 		colors.selected_item_line = GetGrey(0,16);	
-        colors.marker_hover_item = GetGrey(30);
-		colors.width_marker_hover_item = 2;
-		
-        colors.keyboard_search_bg = GetGrey(0, 205);
-        colors.keyboard_search_txt = GetGrey(255, 205);
-        colors.keyboard_search_txtred = RGB(255, 80, 80);
 
         if (properties.showwallpaper) {
             colors.headerbar_bg = GetGrey(255, 240);
@@ -4530,35 +4463,7 @@ function get_colors() {
             colors.headerbar_bg = GetGrey(255, 240);
             colors.headerbar_line = GetGrey(215);
         }
-		colors.border = GetGrey(0,50);
-		
-        colors.rightline = GetGrey(0, 37);
-        colors.reseticon_down = RGB(255, 50, 50);
-		colors.settings_hover_bg = GetGrey(230);		
-		
-        colors.pm_overlay = GetGrey(255, 200);
-        colors.pm_bg = GetGrey(255);
-        colors.pm_shadow_on = GetGrey(0, 5);
-        colors.pm_shadow_off = GetGrey(0, 0);
-        colors.pm_border = GetGrey(0, 40);
-        colors.pm_txt = GetGrey(0);
-        colors.pm_bg2 = GetGrey(0, 120);
-        colors.pm_bg3 = GetGrey(0, 150);
-        colors.pm_bg4 = GetGrey(255, 40);
-        colors.pm_item_separator_line = GetGrey(0, 20);
-        colors.pm_item_bg1 = GetGrey(0, 130);
-        colors.pm_item_bg2 = GetGrey(255, 20);
-        colors.pm_blink = GetGrey(0, 10);
-        colors.pm_blink_rectline = GetGrey(211);
-        colors.pm_scrollbar = GetGrey(30);
-		colors.dragimage_border = GetGrey(0);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);
-		
-		colors.dragcover_overlay = GetGrey(0,85);	
-		colors.dragcover_rectline = GetGrey(0,105);			
+		colors.settings_hover_bg = GetGrey(230);			
     }
 };
 var images = Array();

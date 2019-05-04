@@ -3581,11 +3581,9 @@ var colors = {};
 function get_colors() {
 	if(ppt.blurDark){	
 		colors.bg = GetGrey(40);			
-		colors.normal_txt = GetGrey(255,200);
 		colors.faded_txt = GetGrey(245);	
 	} else {	
 		colors.bg = GetGrey(40);				
-		colors.normal_txt = GetGrey(0);
 		colors.faded_txt = GetGrey(100);
 	}	
 };

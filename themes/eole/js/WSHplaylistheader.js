@@ -1,4 +1,3 @@
-var colors = {};
 var properties = {
 	panelName: 'WSHplaylistheader',	
     globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
@@ -70,20 +69,13 @@ function setSettingsBtn() {
 	settings_hover.ReleaseGraphics(gb);	
 } 
 function get_colors() {
+	get_colors_global();		
 	if(properties.darklayout){
-		colors.normal_txt = GetGrey(240);
-		colors.faded_txt = GetGrey(110);
-		colors.settings_hover_bg = GetGrey(255,40);
-		colors.headerbar_bg = GetGrey(16);		
-		colors.headerbar_line = GetGrey(51);
-		colors.rightline = GetGrey(255,20);			
+		colors.settings_hover_bg = GetGrey(255,40);	
+		colors.headerbar_line = GetGrey(51);	
 	} else {
-		colors.normal_txt = GetGrey(0);
-		colors.faded_txt = GetGrey(125);
 		colors.settings_hover_bg = GetGrey(230);		
-		colors.headerbar_bg = GetGrey(255);
-		colors.headerbar_line = GetGrey(215);	
-		colors.rightline = GetGrey(215);			
+		colors.headerbar_line = GetGrey(215);			
 	}
 	setSettingsBtn();
 } get_colors();
@@ -748,7 +740,7 @@ function on_paint(gr) {
 		g_pinfo.refresh(true,10+g_pinfo.refresh_needed); 	
 		g_pinfo.refresh_needed = 0; 		
 	}
-    gr.FillSolidRect(0,0,ww,wh,colors.headerbar_bg); 
+    gr.FillSolidRect(0,0,ww,wh,colors.normal_bg); 
 		
 	gr.FillSolidRect(0, wh-1, ww-1, 1, colors.headerbar_line);
 	
@@ -773,7 +765,7 @@ function on_paint(gr) {
 	
 	drawAllButtons(gr);
 	
-	if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
+	if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
 	
 	if(filters_panel_state.isActive()) gr.FillSolidRect(0,0,ww-((nowplayingplaylist_state.isActive())?1:0),1,colors.headerbar_line);
 }

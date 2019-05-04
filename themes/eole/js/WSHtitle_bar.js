@@ -243,8 +243,8 @@ function setDarkLayout(){
 }
 function get_colors(){
 	setDarkLayout();
-	if (properties.darklayout) {
-		colors.normal_bg = GetGrey(16);			
+	get_colors_global();	
+	if (properties.darklayout) {	
 		colors.wallpaper_overlay = GetGrey(0,233);
 		colors.wallpaper_overlay_blurred = GetGrey(0,140);		
 		colors.albumartbg_overlay = GetGrey(0,80);	
@@ -254,15 +254,13 @@ function get_colors(){
 		colors.active_tab_line_height = 1;
 		
 		colors.inactive_txt = GetGrey(110);		
-		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(240);
-		colors.full_txt = GetGrey(255);	
 		
 		colors.search_txt = GetGrey(240);		
 		colors.search_reset_icon = GetGrey(255);
 		colors.bottom_line = GetGrey(255,35);		
 		colors.icons_folder = "white";
-		colors.selected_bg = RGBA(15,177,255,160);
+
 		colors.titlebar_btn_hover_bg = GetGrey(255,50);	
 		colors.settings_btn_hover_bg = GetGrey(255,30);
 		if(compact_titlebar.isActive()) {
@@ -274,8 +272,7 @@ function get_colors(){
 		}			
 		cSearchBox.marginBottom = 3;
 	}
-	else {
-		colors.normal_bg = GetGrey(255);				
+	else {			
 		colors.wallpaper_overlay = GetGrey(255,252);
 		colors.wallpaper_overlay_blurred = GetGrey(255,252);
 		colors.albumartbg_overlay = GetGrey(0,80);	
@@ -284,10 +281,8 @@ function get_colors(){
 		colors.inactive_txt = GetGrey(0);
 		colors.active_tab = GetGrey(0);
 		colors.active_tab_line_height = 2;
-		
-		colors.normal_txt = GetGrey(0);
-		colors.faded_txt = GetGrey(0);
-        colors.full_txt = GetGrey(0);		
+
+		colors.faded_txt = GetGrey(0);	
 		
 		colors.search_txt = GetGrey(70);		
 	
@@ -295,7 +290,7 @@ function get_colors(){
 		colors.search_reset_icon = GetGrey(0);		
 		colors.bottom_line =  GetGrey(210);	
 		colors.icons_folder = "";
-		colors.selected_bg = RGBA(15,177,255,100);	
+
 		colors.titlebar_btn_hover_bg = GetGrey(0,27);		
 		colors.settings_btn_hover_bg = GetGrey(0,7);
 		if(compact_titlebar.isActive()) {

@@ -633,7 +633,6 @@ oPlaylistManager = function(name) {
 			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, colors.pm_bg);
 			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, colors.pm_border);
 			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, colors.pm_border);			
-           // gr.FillSolidRect(cx + bg_margin_left, this.y + cPlaylistManager.topbarHeight - 2, this.w - bg_margin_left*2, 1, colors.pm_bg4);
             
             // ** items **
             var rowIdx = 0;
@@ -944,14 +943,14 @@ oFilterBox = function() {
 	//this.getImages();
     
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "", colors.normal_txt, 0, 0, colors.filter_selectedtext_bg, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw");
         this.inputbox.autovalidation = true;
     };
 	this.on_init();
     
     this.reset_layout = function() {
         this.inputbox.textcolor = colors.normal_txt;
-        this.inputbox.backselectioncolor = colors.filter_selectedtext_bg;
+        this.inputbox.backselectioncolor = colors.selected_bg;
 		
 		var item_txt = new Array("", "Albums...", "Artists...", "Genres...");
 		if(!properties.showTagSwitcherBar) var boxText = item_txt[properties.tagMode];	
@@ -1216,7 +1215,7 @@ oScrollbar = function(themed) {
     this.buttonClick = false;
     this.cursorHover = false;
     this.cursorDrag = false;	
-    this.color_bg = colors.normal_bg;
+    this.color_bg = colors.lightgrey_bg;
     this.color_txt = colors.normal_txt;
     
     if(this.themed) {
@@ -1226,7 +1225,7 @@ oScrollbar = function(themed) {
     };
     
     this.setNewColors = function() {
-        this.color_bg = colors.normal_bg;
+        this.color_bg = colors.lightgrey_bg;
         this.color_txt = colors.normal_txt;  
         this.setButtons();
         this.setCursorButton();
@@ -2545,9 +2544,9 @@ oBrowser = function(name) {
 						} else { // panelMode = 3 (Grid)
 							// background selection
 							if(i == this.selectedIndex) {
-								txt_color1 = (properties.enableCustomColors ? colors.selected_txt : colors.normal_bg);
-								txt_color2 = colors.selected_txt;
-								selbg_color = colors.filter_selectedtext_bg;
+								txt_color1 = colors.full_txt;
+								txt_color2 = colors.full_txt;
+								selbg_color = colors.selected_bg;
 							} else {
 								txt_color1 = colors.grid_txt;
 								txt_color2 = colors.grid_txt;
@@ -2563,10 +2562,10 @@ oBrowser = function(name) {
 										if(g_rightClickedIndex == i && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 											if(this.stampDrawMode) {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
+												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
 											} else {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.filter_selectedtext_bg & 0xddffffff);
+												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.selected_bg & 0xddffffff);
 											};
 										};
 									} else {
@@ -2593,10 +2592,10 @@ oBrowser = function(name) {
 												}			
 												gr.FillSolidRect(ax, ay, hover_w, hover_h, colors.selected_item_bg);												
 												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  colors.selected_item_line);	
-												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
+												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
 											} else {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.filter_selectedtext_bg & 0xddffffff);
+												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.selected_bg & 0xddffffff);
 											};
 										};
 									};
@@ -2811,7 +2810,7 @@ oBrowser = function(name) {
 
 								// Hover effect
 								if(((g_rightClickedIndex > -1 && g_rightClickedIndex == i) || i == this.activeIndex) && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
-									//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.filter_selectedtext_bg & 0xd0ffffff);
+									//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
 									if(i==0)
 										gr.FillSolidRect(ax, ay-properties.first_item_top_margin, colors.width_marker_hover_item, ah+properties.first_item_top_margin, colors.marker_hover_item);
 									else
@@ -3057,7 +3056,7 @@ oBrowser = function(name) {
                 var boxText = nb_groups+" "+item_txt[properties.tagMode]+(nb_groups > 1 ? "s  " : "  ");
 
                 // draw background part above playlist (headerbar)
-				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.normal_bg);
+				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.lightgrey_bg);
 				height_top_fix1 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight-1 : 0;
 				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;				
                 gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bgcolor);
@@ -3082,7 +3081,7 @@ oBrowser = function(name) {
 				pman.draw(gr);
 			};	
 			
-			if(draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
+			if(draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
 						
             // draw scrollbar
             if(cScrollBar.enabled && pman.state !=1) {
@@ -4140,7 +4139,7 @@ function on_paint(gr) {
                 gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh+PanelToggleButtons_height, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
                 gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
             } else {
-				gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, colors.normal_bg);
+				gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, colors.lightgrey_bg);
 			}
         }	
 		
@@ -4594,10 +4593,7 @@ function get_images() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout){		
-		colors.selected_txt = GetGrey(255,200);
-		colors.filter_selectedtext_bg = RGBA(015,177,255,160);
 
-		
 		colors.grid_txt = GetGrey(255)	
 		colors.grid_bg = GetGrey(0,190)		
 		colors.gridselected_txt = GetGrey(0)	
@@ -4611,54 +4607,12 @@ function get_colors() {
 		colors.grad_bottom_color2 = GetGrey(0,0);		
 		colors.fading_bottom_height = 50;
 		
-		colors.scrollbar_normal_cursor = GetGrey(255,60);	 		
-		colors.scrollbar_hover_cursor = GetGrey(225);
-		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
-		
 		colors.selected_item_bg = GetGrey(0,150);	
 		colors.selected_item_line = GetGrey(255,30);	
-		colors.marker_hover_item = GetGrey(255);
-		colors.width_marker_hover_item = 1;		
-		
-		colors.keyboard_search_bg = GetGrey(0,205);
-		colors.keyboard_search_txt = GetGrey(255,245);
-		colors.keyboard_search_txtred = RGB(255,80,80);	
 		
 		colors.headerbar_bgcolor = GetGrey(15,200);	
 		colors.headerbar_line_maincolor = GetGrey(255,38);	
-		
-		colors.border = GetGrey(255,50);	
-		
-		colors.rightline = GetGrey(255,25);	
-		colors.reseticon_down = RGB(255,50,50);
-		
-		colors.pm_overlay = GetGrey(0,200);		
-		colors.pm_bg = GetGrey(0);
-		colors.pm_shadow_on = GetGrey(0,35);	
-		colors.pm_shadow_off = GetGrey(0,0);			
-		colors.pm_border = GetGrey(255,55);		
-		colors.pm_txt = GetGrey(255);
-		colors.pm_bg2 = GetGrey(0,120);	
-		colors.pm_bg3 = GetGrey(0,150);
-		colors.pm_bg4 = GetGrey(255,40);
-		colors.pm_item_separator_line = GetGrey(255,45);		
-		colors.pm_item_bg1 = GetGrey(0,130);		
-		colors.pm_item_bg2 = GetGrey(255,20);
-		colors.pm_blink = GetGrey(255,15);	
-		colors.pm_blink_rectline = GetGrey(70);	
-		colors.pm_scrollbar = GetGrey(240);		
-		colors.dragimage_border = GetGrey(255,75);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);
-		
-		colors.dragcover_overlay = GetGrey(0,85);	
-		colors.dragcover_rectline = GetGrey(255,40);		
 	} else {		
-		colors.selected_txt = GetGrey(0);
-
-		colors.filter_selectedtext_bg = RGBA(015,177,255,100);
 
 		colors.grid_txt = GetGrey(255)	
 		colors.grid_bg = GetGrey(0,190)		
@@ -4672,56 +4626,16 @@ function get_colors() {
 		colors.grad_bottom_color_library_panel = GetGrey(0,10);		
 		colors.grad_bottom_color2 = GetGrey(0,0);		
 		colors.fading_bottom_height = 30;
-		
-		colors.scrollbar_normal_cursor = GetGrey(0,120);
-		colors.scrollbar_hover_cursor = GetGrey(0);
-		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;	
-		
+
 		colors.selected_item_bg = GetGrey(0,17);	
 		colors.selected_item_line = GetGrey(0,16);	
-		colors.marker_hover_item = GetGrey(30);
-		colors.width_marker_hover_item = 2;	
 		
-		colors.keyboard_search_bg = GetGrey(0,205);
-		colors.keyboard_search_txt = GetGrey(255,205);
-		colors.keyboard_search_txtred = RGB(255,80,80);	
-		
+		colors.headerbar_bgcolor = GetGrey(255,240);
 		if(properties.showwallpaper) {
-			colors.headerbar_bgcolor = GetGrey(255,240);		
 			colors.headerbar_line_maincolor = GetGrey(0,40);
-		} else {
-			colors.headerbar_bgcolor = GetGrey(255,240);		
+		} else {	
 			colors.headerbar_line_maincolor = GetGrey(215);			
-		}
-		
-		colors.border = GetGrey(0,50);
-		
-		colors.rightline = GetGrey(0,37);			
-		colors.reseticon_down = RGB(255,50,50);
-		
-		colors.pm_overlay = GetGrey(255,200);			
-		colors.pm_bg = GetGrey(255);
-		colors.pm_shadow_on = GetGrey(0,5);	
-		colors.pm_shadow_off = GetGrey(0,0);		
-		colors.pm_border = GetGrey(0,40);
-		colors.pm_txt = GetGrey(0);
-		colors.pm_bg2 = GetGrey(0,120);	
-		colors.pm_bg3 = GetGrey(0,150);
-		colors.pm_bg4 = GetGrey(255,40);		
-		colors.pm_item_separator_line = GetGrey(0,20);
-		colors.pm_item_bg1 = GetGrey(0,130);		
-		colors.pm_item_bg2 = GetGrey(255,20);
-		colors.pm_blink = GetGrey(0,10);	
-		colors.pm_blink_rectline = GetGrey(211);	
-		colors.pm_scrollbar = GetGrey(30);		
-		colors.dragimage_border = GetGrey(0);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);
-		
-		colors.dragcover_overlay = GetGrey(0,85);	
-		colors.dragcover_rectline = GetGrey(0,105);			
+		}	
 	}
 	get_images();
 };

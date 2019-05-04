@@ -1,4 +1,3 @@
-var colors = {};
 var padding_top = 27;
 var padding_bottom = 5;
 var padding_left = 35;
@@ -15,7 +14,7 @@ var properties = {
     wallpaperdisplay: window.GetProperty("Wallpaper 0=Filling 1=Adjust 2=Stretch", 2),	
 	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),		
-	stick2darklayout: window.GetProperty("_DISPLAY: stick to Dark layout", false),		
+	stick2darklayout: window.GetProperty("_DISPLAY: stick to Dark layout", true),		
     album_review: window.GetProperty("_SYSTEM: Display album review", false)
 }
 function on_mouse_move(x,y,m){
@@ -32,21 +31,10 @@ function on_paint(gr) {
 	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, padding_top, ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
 }
 function get_colors() {
+	get_colors_global();
 	if(properties.darklayout || properties.stick2darklayout){
-		colors.wallpaper_overlay = GetGrey(0,180);
-		colors.wallpaper_overlay_blurred = GetGrey(0,130);		
-		      
-		colors.normal_bg = GetGrey(20);        
-		colors.normal_txt = GetGrey(255,200);
-		colors.faded_txt = GetGrey(245);	
 		colors.highlight_txt = RGB(255,193,0);	
-
-	} else {	
-		colors.normal_bg = GetGrey(255);           
-		colors.wallpaper_overlay = GetGrey(255,235);
-		colors.wallpaper_overlay_blurred = GetGrey(255,225);				
-		colors.normal_txt = GetGrey(0);
-		colors.faded_txt = GetGrey(245);	
+	} else {	         
 		colors.highlight_txt = RGB(215,155,0);		
 	}	
 	esl.SetPanelTextNormalColor(colors.normal_txt);

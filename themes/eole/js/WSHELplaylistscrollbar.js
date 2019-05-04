@@ -1,4 +1,3 @@
-var colors = {};
 function RGB(r,g,b){ return (0xff000000|(r<<16)|(g<<8)|(b)); }
 function RGBA(r, g, b, a) {
     return ((a << 24) | (r << 16) | (g << 8) | (b))
@@ -19,16 +18,9 @@ properties = {
 };
 
 function get_colors() {
+	get_colors_global();	
 	if(properties.darklayout){
-		colors.normal_bg = GetGrey(17);	
-		colors.scrollbar_normal_cursor = GetGrey(255,60);
-		colors.scrollbar_hover_cursor = GetGrey(225);	
-		colors.rightline = GetGrey(255,20);		
-	} else {
-		colors.normal_bg = GetGrey(255);		
-		colors.scrollbar_normal_cursor = GetGrey(0,120);	
-		colors.scrollbar_hover_cursor = GetGrey(0);		
-		colors.rightline = GetGrey(210);
+	} else {	
 	}
 }
 get_colors();
@@ -41,8 +33,8 @@ var focus_item=plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist);
 
 function on_paint(gr) {
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);
-	if(nowplayingplaylist_state.isActive() && !properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);	
+	gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
+	if(nowplayingplaylist_state.isActive() && !properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
 	
     if(wh<playlist_item_size*playlist_count) {
 		scrollbar_top=Math.floor((focus_item*scrollbar_zone)/(playlist_count-1));

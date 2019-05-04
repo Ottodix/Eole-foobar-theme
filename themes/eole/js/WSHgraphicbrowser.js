@@ -1,4 +1,3 @@
-var colors = {};
 var found=false;
 var imgFolderPath = theme_img_path + "\\graphic_browser\\";
 var doubleClick=false;
@@ -112,11 +111,14 @@ var properties = {
 	showlistShowCover: window.GetProperty("TRACKLIST Show cover", true),		
     SortBy: window.GetProperty("MAINPANEL Sort albums by", "standard"),		
     SortDescending: window.GetProperty("MAINPANEL sort descending", false),	
+    SingleMultiDisc: window.GetProperty("_SYSTEM: Display one thumbnail for multi discs", false),	
     TFgrouping: window.GetProperty("MAINPANEL Library Group TitleFormat", ""),
     TFgrouping_default_filterbox: "%album artist% ^^ %album%[' - Disc '%discnumber%] ^^ %genre% ^^ %date% ^^ %title%",	
     TFgrouping_default: "%album artist% ^^ %album%[' - Disc '%discnumber%]",	
+    TFgrouping_singlemultidisc_filterbox: "%album artist% ^^ %album% ^^ %genre% ^^ %date% ^^ %title%",	
+    TFgrouping_singlemultidisc: "%album artist% ^^ %album%",		
     TFgrouping_populate: "%album artist% ^^ %album%",			
-    TFsorting: window.GetProperty("MAINPANEL Library Sort TitleFormat", ""),	
+    TFsorting: "",	
     TFsorting_default: window.GetProperty("MAINPANEL Library Default Sort TitleFormat", ""),		
     TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'0') ^^ %title% ^^ $if2(%rating%,0) ^^ $if(%length%,%length_seconds%,'ON AIR')",	
     TFbitrate: "$if2(%bitrate% kbit,'')",	
@@ -172,6 +174,8 @@ var TF = {
 	grouping: fb.TitleFormat(properties.TFgrouping),
 	grouping_default_filterbox: fb.TitleFormat(properties.TFgrouping_default_filterbox),		
 	grouping_default : fb.TitleFormat(properties.TFgrouping_default),		
+	grouping_singlemultidisc_filterbox : fb.TitleFormat(properties.TFgrouping_singlemultidisc_filterbox),	
+	grouping_singlemultidisc : fb.TitleFormat(properties.TFgrouping_singlemultidisc),		
 	grouping_populate : fb.TitleFormat(properties.TFgrouping_populate),		
 	groupinfos: fb.TitleFormat(properties.TFgroupinfos+" ^^ "+globalProperties.crc),			
 	albumartist: fb.TitleFormat("%album artist%"),	
@@ -394,7 +398,7 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.g_color_selected_bg, g_sendResponse, "brw", g_fsize+1, g_font.italicplus2);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1, g_font.italicplus2);
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
@@ -594,13 +598,13 @@ oPlaylistManager = function (parentObjName) {
         gr.FillSolidRect(this.x, 0, this.w, this.h, colors.pm_bg);
 
         if(this.side=="right") {
-            gr.DrawLine(this.x, 0, this.x-0, this.y + this.h, 1.0, colors.pm_line);
+            gr.DrawLine(this.x, 0, this.x-0, this.y + this.h, 1.0, colors.pm_border);
         } else {
-            gr.DrawLine(this.x+this.w, 0, this.x+0+this.w, this.y + this.h, 1.0, colors.pm_line);
+            gr.DrawLine(this.x+this.w, 0, this.x+0+this.w, this.y + this.h, 1.0, colors.pm_border);
         }
-		gr.FillGradRect(this.x, 0, this.w, colors.fading_bottom_height-30, 90,colors.pm_bgtopstart,  colors.pm_bgtopend,1);
+		//gr.FillGradRect(this.x, 0, this.w, colors.fading_bottom_height-30, 90,colors.pm_bgtopstart,  colors.pm_bgtopend,1);
 
-        gr.DrawLine(this.x+20, this.y + this.headerHeight-6, this.x+this.w-25, this.y+this.headerHeight-6, 1.0, colors.pm_innerline);		
+        gr.DrawLine(this.x+20, this.y + this.headerHeight-6, this.x+this.w-25, this.y+this.headerHeight-6, 1.0, colors.pm_item_separator_line);		
 		
 		if(this.ishoverHeader)
 			gr.GdiDrawText("Create New Playlist", g_font.normal, colors.normal_txt, this.x+20, this.y+17, this.w-20, this.headerHeight, DT_VCENTER | DT_NOPREFIX);
@@ -1650,7 +1654,6 @@ oShowList = function(parentPanelName) {
 			this.showlist_scroll_btns_line = GetGrey(0,20);
 			this.showlist_scroll_btns_icon = GetGrey(255);
 			this.scrollbar_border_color = colors.border_dark;
-			this.scrollbar_border_color_0 = colors.border_0;
 			
 			this.progressbar_linecolor1 = light.progressbar_linecolor1;
 			this.progressbar_linecolor2 = light.progressbar_linecolor2;	
@@ -1681,8 +1684,7 @@ oShowList = function(parentPanelName) {
 			this.showlist_scroll_btns_line = GetGrey(255,50);
 			this.showlist_scroll_btns_icon = GetGrey(0);
 			this.scrollbar_border_color = colors.border_light;		
-			this.scrollbar_border_color_0 = colors.border_light;	
-
+			
 			this.progressbar_linecolor1 = dark.progressbar_linecolor1;
 			this.progressbar_linecolor2 = dark.progressbar_linecolor2;	
 			this.progressbar_color_bg_off = dark.progressbar_color_bg_off;
@@ -2541,7 +2543,10 @@ oHeaderbar = function(name) {
 		GroupMenu.AppendTo(basemenu, MF_STRING, "Group By");
 
 		GroupMenu.AppendMenuItem(MF_STRING, 4000, "Default (Album, artist)");				
-		GroupMenu.AppendMenuItem(MF_STRING, 4001, "Custom titleformat...");	              		
+		GroupMenu.AppendMenuItem(MF_STRING, 4001, "Custom titleformat...");	    
+		GroupMenu.AppendMenuSeparator();			
+		GroupMenu.AppendMenuItem(MF_STRING, 4002, "Combine all tracks of a multi-disc album");	
+		GroupMenu.CheckMenuItem(4002, properties.SingleMultiDisc);				
 		
 		checked_item=0;
 		switch (true) {
@@ -2675,7 +2680,7 @@ oHeaderbar = function(name) {
 				TF.grouping = fb.TitleFormat("");
 				window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
 				g_showlist.idx=-1;
-				brw.populate(5,true);	
+				brw.populate(5,false);	
 				break;				
 			case (idx == 4001):				
 				new_TFgrouping = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom grouping", properties.TFgrouping);
@@ -2684,7 +2689,7 @@ oHeaderbar = function(name) {
 					TF.grouping = fb.TitleFormat(properties.TFgrouping);
 					window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
 					g_showlist.idx=-1;
-					brw.populate(5,true);	
+					brw.populate(5,false);	
 				}
 				break;				
 			case (idx == 3100):
@@ -2695,7 +2700,13 @@ oHeaderbar = function(name) {
 				break;	
 			case (idx == 3102):
 				window.Reload();
-				break;			
+				break;		
+			case (idx == 4002):
+				properties.SingleMultiDisc = !properties.SingleMultiDisc;
+				window.SetProperty("_SYSTEM: Display one thumbnail for multi discs", properties.SingleMultiDisc);
+				g_showlist.idx=-1;
+				brw.populate("MultiDisc",false);		
+				break;				
 		}
 		basemenu = undefined;
 		menu_settings = undefined;
@@ -3741,11 +3752,17 @@ oBrowser = function(name) {
                 group_string = TF.grouping.EvalWithMetadb(this.list[k]);
             } else {
 				if(this.showFilterBox){
-					trackinfos = TF.grouping_default_filterbox.EvalWithMetadb(this.list[k]);
+					if(properties.SingleMultiDisc)
+						trackinfos = TF.grouping_singlemultidisc_filterbox.EvalWithMetadb(this.list[k]);
+					else
+						trackinfos = TF.grouping_default_filterbox.EvalWithMetadb(this.list[k]);						
 					arr = trackinfos.split(" ^^ ");
-					group_string = arr[0]+arr[1]+arr[2];					
+					group_string = arr[0]+arr[1];					
 				} else {
-					trackinfos = TF.grouping_default.EvalWithMetadb(this.list[k]);
+					if(properties.SingleMultiDisc)
+						trackinfos = TF.grouping_singlemultidisc.EvalWithMetadb(this.list[k]);
+					else
+						trackinfos = TF.grouping_default.EvalWithMetadb(this.list[k]);
 					group_string = trackinfos;
 				}
             }
@@ -3986,7 +4003,7 @@ oBrowser = function(name) {
 	this.getSourcePlaylist = function() {
 		return this.SourcePlaylistIdx; 		
 	}		
-    this.populate = function(call_id, force_sorting, keep_showlist, playlistIdx) {	
+    this.populate = function(call_id, force_sorting, keep_showlist, playlistIdx) {	console.log(properties.TFsorting);	
 		force_sorting = typeof force_sorting !== 'undefined' ? force_sorting : false;
 		keep_showlist = typeof keep_showlist !== 'undefined' ? keep_showlist : false;	
 		playlistIdx = typeof playlistIdx !== 'undefined' ? playlistIdx : -1;			
@@ -4367,7 +4384,7 @@ oBrowser = function(name) {
             }
 			
 			this.drawRightLine = nowplayinglib_state.isActive();
-			if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);
+			if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
 
             if(this.groups_draw.length == 0) { // library empty
                 var px = 0;
@@ -4384,7 +4401,7 @@ oBrowser = function(name) {
 						gr.FillSolidRect(this.w/2 -125, py-46, 250, 1, colors.border);						
 						gr.GdiDrawText("Click here to configure the Media Library.", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else if(playlistname==globalProperties.selection_playlist || playlistname==globalProperties.playing_playlist) {
-						gr.FillGradRect(this.w/2 -150, py-46, 300, 1, 0, colors.border_0, colors.border, 0.5);
+						gr.FillSolidRect(this.w/2 -150, py-46, 300, 1, colors.border);	
 						gr.GdiDrawText(playlistname+" :",  g_font.plus10, colors.normal_txt, px, py - 80, this.w, 35, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);			
 						gr.GdiDrawText("Nothing to show.", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);						
 					} else {
@@ -6131,7 +6148,7 @@ function on_mouse_leave() {
 //=================================================// Fonts & Colors
 
 function get_colors() {
-
+	get_colors_global();
 	dark = {		
 		normal_txt : GetGrey(240),
 		faded_txt : GetGrey(210),		
@@ -6182,32 +6199,13 @@ function get_colors() {
 		border_color_colored_darklayout : GetGrey(255,30)
 	}
 	
-	if(properties.darklayout){		
-		colors.normal_bg = GetGrey(17);		
-		colors.wallpaper_overlay = GetGrey(25,230);
-		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
-		
+	if(properties.darklayout){			
 		colors.grad_bottom_1 = GetGrey(0,70);
 		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 65;
-		
-		colors.border = GetGrey(255,50);	
-		colors.border_dark = GetGrey(0,60);		
-		colors.border_light = colors.border;			
-		colors.border_0 = GetGrey(255,50);
-		
-		colors.normal_txt = GetGrey(240);
-		colors.faded_txt = GetGrey(110);
-		colors.full_txt = GetGrey(255);			
-		colors.g_color_selected_bg = RGBA(015,177,255,160);
-		
+				
 		colors.flash_bg = GetGrey(255,40);
-		colors.flash_rectline = GetGrey(255,71);	
-
-		colors.scrollbar_normal_cursor = GetGrey(255,90);		
-		colors.scrollbar_hover_cursor = GetGrey(225);	
-		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;			
-		colors.scrollbar_cursor_outline = GetGrey(0,60);		
+		colors.flash_rectline = GetGrey(255,71);		
 		
 		image_playing_playlist = now_playing_progress1;
 		
@@ -6218,9 +6216,7 @@ function get_colors() {
 		colors.headerbar_grad2 = GetGrey(0,0);
 		colors.headerbar_resize_btn = GetGrey(255,200);	
 		colors.headerbar_resize_btnhv = GetGrey(255);
-		colors.no_headerbar_top = GetGrey(0,0);
-		
-		colors.rightline = GetGrey(255,30);			
+		colors.no_headerbar_top = GetGrey(0,0);	
 		
 		colors.albumartprogressbar_txt = GetGrey(255);	
 		colors.albumartprogressbar_overlay = GetGrey(0,80);	
@@ -6251,23 +6247,7 @@ function get_colors() {
 		colors.dragcover_overlay = GetGrey(0,85);	
 		colors.dragcover_rectline = GetGrey(255,40);	
 		colors.dragcover_itemsbg = GetGrey(240,255);	
-		colors.dragcover_itemstxt = GetGrey(0);	
-		
-		//Playlist Manager
-		colors.pm_overlay = GetGrey(0,200);			
-		colors.pm_bg = GetGrey(0,225);
-		colors.pm_bgtopstart = GetGrey(0);	
-		colors.pm_bgtopend = GetGrey(0,0);	
-		colors.pm_line = GetGrey(255,45);	
-		colors.pm_innerline = GetGrey(255,45);
-		colors.pm_hover_row_bg = GetGrey(255,40);
-		colors.dragimage_border = GetGrey(255,75);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);
-		//Filter Box
-		colors.reseticon_down = RGB(255,50,50);			
+		colors.dragcover_itemstxt = GetGrey(0);			
 		
 		colors.showlist_bg = GetGrey(0);	
 		colors.showlist_border_color = GetGrey(255,50);		
@@ -6280,47 +6260,21 @@ function get_colors() {
 		colors.showlist_selected_grad2_play=GetGrey(255,30);		
 		colors.showlist_scroll_btns_bg = GetGrey(255);
 		colors.showlist_scroll_btns_icon = GetGrey(0);
-		colors.showlist_hscr_margin_left = 0;
 		colors.showlist_dragtrackbg = GetGrey(255,175);	
 		colors.showlist_dragitemstxt = GetGrey(0);		
-	} else {	
-		colors.normal_bg = GetGrey(255);		
-		colors.wallpaper_overlay = GetGrey(255,235);
-		colors.wallpaper_overlay_blurred = GetGrey(255,235);	
-		
+	} else {			
 		colors.grad_bottom_1 = GetGrey(230,90);
 		colors.grad_bottom_2 = GetGrey(230,0);
 		colors.fading_bottom_height = 39;
 		
 		colors.grad_bottom_12 = GetGrey(0,15);
 		colors.grad_bottom_22 = GetGrey(0,0);			
-		
-		colors.border = GetGrey(0,50);
-		colors.border_dark = colors.border;		
-		colors.border_light = GetGrey(255,50);;				
-		if(properties.showwallpaper || properties.showListColoredOneColor || properties.showListColoredBlurred || properties.showListColoredMixedColor){
-			colors.border_0 = GetGrey(0,45);	
-			colors.showlist_hscr_margin_left = 0;				
-		} else { 
-			colors.border_0 = GetGrey(0,0);
-			colors.showlist_hscr_margin_left = 13;				
-		}
-		
-		colors.normal_txt = GetGrey(0);
-		colors.faded_txt = GetGrey(140);
-        colors.full_txt = GetGrey(0);		
-		colors.g_color_selected_bg = RGBA(015,177,255,100);
-		
+
 		colors.flash_bg = GetGrey(0,10);		
 		colors.flash_rectline = GetGrey(0,41);	
 
 		image_playing_playlist = now_playing_img1;	
-		
-		colors.scrollbar_normal_cursor = GetGrey(0,130);	
-		colors.scrollbar_hover_cursor=GetGrey(0);
-		colors.scrollbar_down_cursor=GetGrey(0);		
-		colors.scrollbar_cursor_outline = GetGrey(255,60);
-		
+
 		colors.headerbar_bg = GetGrey(255,240);
 		colors.headerbar_line_maincolor = GetGrey(210);	
 		colors.headerbar_settings_bghv = GetGrey(230);
@@ -6330,7 +6284,6 @@ function get_colors() {
 		colors.headerbar_resize_btnhv = GetGrey(0);
 		colors.no_headerbar_top = GetGrey(255);
 		
-		colors.rightline = GetGrey(0,45);		
 		
 		colors.albumartprogressbar_txt = GetGrey(255);	
 		colors.albumartprogressbar_overlay = GetGrey(0,80);	
@@ -6361,23 +6314,6 @@ function get_colors() {
 		colors.dragcover_rectline = GetGrey(0,105);	
 		colors.dragcover_itemsbg = GetGrey(20);	
 		colors.dragcover_itemstxt = GetGrey(255);	
-		
-		//Playlist Manager
-		colors.pm_overlay = GetGrey(255,200);		
-		colors.pm_bg = GetGrey(255,245);
-		colors.pm_bgtopstart = GetGrey(255);	
-		colors.pm_bgtopend = GetGrey(255,0);	
-		colors.pm_line = GetGrey(0,40);		
-		colors.pm_innerline = GetGrey(0,30);
-		colors.pm_hover_row_bg = GetGrey(0,20);
-		colors.dragimage_border = GetGrey(0);
-		colors.dragimage_bg = GetGrey(0);
-		colors.dragimage_text = GetGrey(255);
-		colors.dragimage_gradline1 = GetGrey(255,100);
-		colors.dragimage_gradline2 = GetGrey(255,200);
-		
-		//Filter Box
-		colors.reseticon_down = RGB(255,50,50);		
 		
 		colors.showlist_bg = GetGrey(0,10);	
 		colors.showlist_border_color = GetGrey(210);
@@ -6642,11 +6578,11 @@ function on_metadb_changed(metadbs, fromhook) {
 			g_rating_updated = false;
 			return;			
 		};	
-		if(brw.SourcePlaylistIdx==plman.ActivePlaylist){
+		//if(brw.SourcePlaylistIdx==plman.ActivePlaylist){
 			timer.brw_populate('on_metadb_changed',false,true);			
 			//brw.populate(32,false,true);		
 			return;
-		}
+		//}
 		var columnsOffset_saved = g_showlist.columnsOffset;
 		// refresh meta datas of the grid
 		var total = brw.groups.length;

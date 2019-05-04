@@ -119,28 +119,71 @@ var oCursor = function () {
 //Colors ------------------------------------------------------------------------------
 var colors = {};
 function get_colors_global(){
-	if(properties.darklayout){
+	if(properties.darklayout || properties.stick2darklayout){
 		colors.wallpaper_overlay = GetGrey(25,230);
 		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
 		
 		colors.normal_bg = GetGrey(17);
+		colors.lightgrey_bg = GetGrey(17);		
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);	
 		colors.full_txt = GetGrey(255);			
+		
 		colors.selected_bg = RGBA(015,177,255,160);
 		colors.highlight = RGB(255,175,050);
 		colors.alternate_row = GetGrey(0,30);
 		
 		colors.scrollbar_normal_cursor = GetGrey(255,60);
 		colors.scrollbar_hover_cursor = GetGrey(225);
-		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;		
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
+		colors.scrollbar_cursor_outline = GetGrey(0,60);	
+
+		colors.pm_overlay = GetGrey(0,200);		
+		colors.pm_bg = GetGrey(0);
+		colors.pm_shadow_on = GetGrey(0,35);	
+		colors.pm_shadow_off = GetGrey(0,0);			
+		colors.pm_border = GetGrey(255,55);		
+		colors.pm_txt = GetGrey(255);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);
+		colors.pm_item_separator_line = GetGrey(255,45);		
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_hover_row_bg = GetGrey(255,40);		
+		colors.pm_blink = GetGrey(255,15);	
+		colors.pm_blink_rectline = GetGrey(70);	
+		colors.pm_scrollbar = GetGrey(240);		
+		colors.dragimage_border = GetGrey(255,75);
+		colors.dragimage_bg = GetGrey(0);
+		colors.dragimage_text = GetGrey(255);
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);
+		colors.dragcover_overlay = GetGrey(0,85);	
+		colors.dragcover_rectline = GetGrey(255,40);	
+		
+		colors.reseticon_down = RGB(255,50,50);	
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,245);
+		colors.keyboard_search_txtred = RGB(255,80,80);	
+
+		colors.sidesline = GetGrey(255,25);		
+		colors.border = GetGrey(255,50);	
+		colors.border_dark = GetGrey(0,60);		
+		colors.border_light = colors.border;			
+		colors.border_0 = GetGrey(255,50);
+		
+		colors.marker_hover_item = GetGrey(255);
+		colors.width_marker_hover_item = 1;		
+		colors.dragdrop_marker_line = GetGrey(255,205);		
 	} else {
 		colors.wallpaper_overlay = GetGrey(255,235);
 		colors.wallpaper_overlay_blurred = GetGrey(255,235);	
 
-		colors.normal_bg = GetGrey(245);
+		colors.normal_bg = GetGrey(255);
+		colors.lightgrey_bg = GetGrey(245);
 		
-		colors.normal_txt = GetGrey(0);
+		colors.normal_txt = GetGrey(0);		
 		colors.faded_txt = GetGrey(140);
         colors.full_txt = GetGrey(0);		
 		colors.selected_bg = RGBA(015,177,255,100);
@@ -149,7 +192,49 @@ function get_colors_global(){
 		
 		colors.scrollbar_normal_cursor = GetGrey(0,120);
 		colors.scrollbar_hover_cursor = GetGrey(0);
-		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;			
+		colors.scrollbar_down_cursor = colors.scrollbar_hover_cursor;
+		colors.scrollbar_cursor_outline = GetGrey(255,60);	
+		
+		colors.pm_overlay = GetGrey(255,200);			
+		colors.pm_bg = GetGrey(255);
+		colors.pm_shadow_on = GetGrey(0,5);	
+		colors.pm_shadow_off = GetGrey(0,0);		
+		colors.pm_border = GetGrey(0,40);
+		colors.pm_txt = GetGrey(0);
+		colors.pm_bg2 = GetGrey(0,120);	
+		colors.pm_bg3 = GetGrey(0,150);
+		colors.pm_bg4 = GetGrey(255,40);		
+		colors.pm_item_separator_line = GetGrey(0,20);
+		colors.pm_item_bg1 = GetGrey(0,130);		
+		colors.pm_item_bg2 = GetGrey(255,20);
+		colors.pm_hover_row_bg = GetGrey(0,20);
+		colors.pm_blink = GetGrey(0,10);	
+		colors.pm_blink_rectline = GetGrey(211);	
+		colors.pm_scrollbar = GetGrey(30);		
+		colors.dragimage_border = GetGrey(0);
+		colors.dragimage_bg = GetGrey(0);
+		colors.dragimage_text = GetGrey(255);
+		colors.dragimage_gradline1 = GetGrey(255,100);
+		colors.dragimage_gradline2 = GetGrey(255,200);
+		
+		colors.dragcover_overlay = GetGrey(0,85);	
+		colors.dragcover_rectline = GetGrey(0,105);		
+
+		colors.reseticon_down = RGB(255,50,50);		
+		colors.keyboard_search_bg = GetGrey(0,205);
+		colors.keyboard_search_txt = GetGrey(255,205);
+		colors.keyboard_search_txtred = RGB(255,80,80);	
+		
+		colors.sidesline = GetGrey(0,37);
+		colors.border = GetGrey(0,50);
+		colors.border_dark = colors.border;		
+		colors.border_light = GetGrey(255,50);
+		colors.border_0 = GetGrey(0,0);
+		
+		colors.marker_hover_item = GetGrey(30);
+		colors.width_marker_hover_item = 2;		
+		colors.dragdrop_marker_line = GetGrey(20);
+		
 	}
 }
 //Files, Folders, FileSystemObject ----------------------------------------------------

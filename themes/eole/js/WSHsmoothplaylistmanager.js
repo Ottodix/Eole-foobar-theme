@@ -374,7 +374,7 @@ oScrollbar = function(themed) {
     this.buttonClick = false;
     this.cursorHover = false;
     this.cursorDrag = false;
-    this.color_bg = colors.normal_bg;
+    this.color_bg = colors.lightgrey_bg;
     this.color_txt = colors.normal_txt;
     
     if(this.themed) {
@@ -384,7 +384,7 @@ oScrollbar = function(themed) {
     };
     
     this.setNewColors = function() {
-        this.color_bg = colors.normal_bg;
+        this.color_bg = colors.lightgrey_bg;
         this.color_txt = colors.normal_txt;  
         this.setButtons();
         this.setCursorButton();
@@ -1057,9 +1057,9 @@ oBrowser = function(name) {
                         // target location mark
                         if(cPlaylistManager.drag_target_id == i) {
                             if(cPlaylistManager.drag_target_id > cPlaylistManager.drag_source_id) {
-                                gr.FillSolidRect(ax, ay + properties.rowHeight - 2, aw-1, 2, colors.dragReorder_playlist_marker);
+                                gr.FillSolidRect(ax, ay + properties.rowHeight - 2, aw-1, 2, colors.dragdrop_marker_line);
                             } else if(cPlaylistManager.drag_target_id < cPlaylistManager.drag_source_id) {
-                                gr.FillSolidRect(ax, ay + 1, aw-1, 2, colors.dragReorder_playlist_marker);
+                                gr.FillSolidRect(ax, ay + 1, aw-1, 2, colors.dragdrop_marker_line);
                             };
                         };
                         
@@ -1194,7 +1194,7 @@ oBrowser = function(name) {
 			if(cScrollBar.enabled)  {
 				brw.scrollbar && brw.scrollbar.draw(gr);
 			};			
-			gr.FillSolidRect(ww-1, 0, 1, wh, colors.rightline);
+			gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
         };
     };
         
@@ -1684,7 +1684,7 @@ oBrowser = function(name) {
             // set rename it
             var rh = properties.rowHeight - 10;
             var tw = this.w - rh - 20;
-            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.normal_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
+            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
             this.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
             this.inputboxID = id;
             // activate inputbox for edit
@@ -1724,7 +1724,7 @@ oBrowser = function(name) {
             // set rename it
             var rh = properties.rowHeight - 10;
             var tw = this.w - rh - 20;
-            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.normal_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
+            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
             this.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
             this.inputboxID = id;
             // activate inputbox for edit
@@ -1759,7 +1759,7 @@ oBrowser = function(name) {
 			/*
             var rh = properties.rowHeight - 10;
             var tw = this.w - rh - 10;
-            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.normal_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
+            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
             this.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
             this.inputboxID = id;
             // activate inputbox for edit
@@ -2154,17 +2154,17 @@ function on_paint(gr) {
 	
     if(!g_1x1) {		
         // draw background under playlist
-		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg)
+		gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg)
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
             gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
             gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
         } else {
-            //gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
+            //gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg);
             if(g_wallpaperImg && properties.showwallpaper) {
                 gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
                 gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
             } else {
-                gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
+                gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg);
             }
         }
 		
@@ -2505,8 +2505,6 @@ function get_colors() {
 	if(properties.darklayout){		
 		colors.selected_item_bg = GetGrey(0,150);	
 		colors.selected_item_line = GetGrey(255,30);			
-		colors.marker_hover_item = GetGrey(255);
-		colors.width_marker_hover_item = 1;
 		
 		colors.dragdrop_bg_selected_item = GetGrey(0,190);	
 		colors.dragdrop_line_selected_item = GetGrey(255,45);	
@@ -2518,17 +2516,9 @@ function get_colors() {
 		
 		colors.headerbar_bg = GetGrey(15,200);	
 		colors.headerbar_line = GetGrey(255,38);	
-		colors.border = GetGrey(255,50);	
-		
-		colors.rightline = GetGrey(255,25);
-		colors.reseticon_down = RGB(255,50,50);
-		
-		colors.dragReorder_playlist_marker = GetGrey(255,205);
 	} else {	
 		colors.selected_item_bg = GetGrey(0,17);	
 		colors.selected_item_line = GetGrey(0,16);	
-		colors.marker_hover_item = GetGrey(30);
-		colors.width_marker_hover_item = 2;
 		
 		colors.dragdrop_bg_selected_item = GetGrey(220);	
 		colors.dragdrop_line_selected_item = GetGrey(205);
@@ -2545,12 +2535,6 @@ function get_colors() {
 			colors.headerbar_bg = GetGrey(255,240);		
 			colors.headerbar_line = GetGrey(215);			
 		}		
-		colors.border = GetGrey(0,50);
-		
-		colors.rightline = GetGrey(0,37);
-		colors.reseticon_down = RGB(255,50,50);	
-		
-		colors.dragReorder_playlist_marker = GetGrey(20);
 	}		
 };
 
@@ -2636,7 +2620,7 @@ function on_key_down(vkey) {
                     if(rowId > -1) {
                         var rh = properties.rowHeight - 10;
                         var tw = brw.w - rh - 10;
-                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.normal_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw");
+                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw");
                         brw.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
                         brw.inputboxID = rowId;
                         // activate inputbox for edit

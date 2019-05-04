@@ -289,11 +289,10 @@ var colors = {};
 function get_colors(){
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
 	else properties.darklayout = properties.minidarklayout;
-	
+	get_colors_global();	
 	if(properties.darklayout) {		
 		colors.wallpaper_overlay = GetGrey(0,200);
-		colors.wallpaper_overlay_blurred = GetGrey(0,130);		
-		colors.normal_bg = GetGrey(25);		
+		colors.wallpaper_overlay_blurred = GetGrey(0,130);			
 		colors.slidersOn=GetGrey(255);  
 		colors.slidersOff=GetGrey(255,40);  		
 		colors.ellipse_inner=GetGrey(0,20);
@@ -304,8 +303,7 @@ function get_colors(){
 		colors.normal_txt = GetGrey(255);		
 	} else {			
 		colors.wallpaper_overlay = GetGrey(255,235);
-		colors.wallpaper_overlay_blurred = GetGrey(255,235);			
-		colors.normal_bg = GetGrey(255);			
+		colors.wallpaper_overlay_blurred = GetGrey(255,235);					
 		colors.slidersOn=GetGrey(30);
 		colors.slidersOff=GetGrey(30,32); 		
 		colors.ellipse_inner=GetGrey(255);
@@ -313,7 +311,6 @@ function get_colors(){
 		colors.line_top_dark = GetGrey(200);
 		colors.line_bottom = GetGrey(40,200);		
 		colors.dotted_progress = GetGrey(0);
-		colors.normal_txt = GetGrey(0);	
 	}
 	
 	volumeOncolor=colors.slidersOn;
