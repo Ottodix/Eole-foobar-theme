@@ -2482,14 +2482,7 @@ oHeaderbar = function(name) {
                 break;
         }
     }
-
-	this.draw_header_menu = function(x,y,right_align){
-		var basemenu = window.CreatePopupMenu();
-		if (typeof x == "undefined") x=this.MarginLeft-7;
-		if (typeof y == "undefined") y=this.padding_top+28;
-			
-		basemenu.AppendMenuItem(MF_STRING, 1, "Settings...");
-		basemenu.AppendMenuSeparator();
+	this.append_sort_menu = function(basemenu,actions){
 		if(!plman.IsAutoPlaylist(plman.ActivePlaylist)){
 			var SortMenu = window.CreatePopupMenu(); //Custom Entries
 			SortMenu.AppendTo(basemenu, MF_STRING, "Sort By");
@@ -2536,9 +2529,80 @@ oHeaderbar = function(name) {
 			SortMenu.CheckMenuItem(3008, properties.SortDescending);			
 			SortMenu.AppendMenuSeparator();			
 			SortMenu.AppendMenuItem(MF_STRING, 3009, "Set current sorting as default");
-			SortMenu.CheckMenuItem(3009, (brw.currentSorting==properties.TFsorting_default));				
+			SortMenu.CheckMenuItem(3009, (brw.currentSorting==properties.TFsorting_default));	
+
+			actions[3000] = function(){	
+				properties.TFsorting = "";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
+				g_showlist.idx=-1;
+				brw.populate(4,true);	
+			}				
+			actions[3001] = function(){	
+				properties.TFsorting = sort_by_album_artist+"#1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
+				g_showlist.idx=-1;
+				brw.populate(5,true);				
+			}	   
+			actions[3002] = function(){	
+				properties.TFsorting = sort_by_title+"#1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
+				g_showlist.idx=-1;
+				brw.populate(6,true);				
+			}	    
+			actions[3003] = function(){	
+				properties.TFsorting = sort_by_tracknumber+"#1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
+				g_showlist.idx=-1;
+				brw.populate(7,true);				
+			}	
+			actions[3004] = function(){	
+				properties.TFsorting = sort_by_date+"#1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
+				g_showlist.idx=-1;
+				brw.populate(8,true);				
+			}		
+			actions[3005] = function(){	
+				properties.TFsorting = sort_by_date_added+"#-1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
+				g_showlist.idx=-1;
+				brw.populate(9,true);				
+			}		
+			actions[3006] = function(){			
+				try {
+					new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", brw.currentSorting, true);
+					if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+						properties.TFsorting = new_TFsorting;
+						window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
+						g_showlist.idx=-1;
+						brw.populate(5,true);	
+					}			   
+				} catch(e) {
+				}				
+			}					
+			actions[3007] = function(){	
+				brw.dont_sort_on_next_populate = true;			
+				plman.SortByFormat(plman.ActivePlaylist,"");
+				g_showlist.idx=-1;
+				brw.populate("randomize",true);
+			}			
+			actions[3008] = function(){	
+                properties.SortDescending = !properties.SortDescending;	
+                window.SetProperty("MAINPANEL sort descending", properties.SortDescending);
+				g_showlist.idx=-1;
+				brw.populate(11,true);				
+			}	
+			actions[3009] = function(){	
+				if(properties.TFsorting_default != properties.TFsorting){
+					properties.TFsorting_default = properties.TFsorting;
+					window.SetProperty("MAINPANEL Library Default Sort TitleFormat", properties.TFsorting_default);					
+				} else {
+					properties.TFsorting_default = "";
+					window.SetProperty("MAINPANEL Default library Sort TitleFormat", "");						
+				}
+			}			
 		}	
-		
+	}
+	this.append_group_menu = function(basemenu,actions){
 		var GroupMenu = window.CreatePopupMenu(); //Custom Entries
 		GroupMenu.AppendTo(basemenu, MF_STRING, "Group By");
 
@@ -2546,8 +2610,7 @@ oHeaderbar = function(name) {
 		GroupMenu.AppendMenuItem(MF_STRING, 4001, "Custom titleformat...");	    
 		GroupMenu.AppendMenuSeparator();			
 		GroupMenu.AppendMenuItem(MF_STRING, 4002, "Combine all tracks of a multi-disc album");	
-		GroupMenu.CheckMenuItem(4002, properties.SingleMultiDisc);				
-		
+		GroupMenu.CheckMenuItem(4002, properties.SingleMultiDisc);	
 		checked_item=0;
 		switch (true) {
 			case (properties.TFgrouping.length == 0):
@@ -2558,8 +2621,48 @@ oHeaderbar = function(name) {
 				break;				
 			
 		}
-		GroupMenu.CheckMenuRadioItem(4000, 4001, checked_item);	
+		GroupMenu.CheckMenuRadioItem(4000, 4001, checked_item);
+
+		actions[4000] = function(){	
+			properties.TFgrouping = ""
+			TF.grouping = fb.TitleFormat("");
+			window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
+			g_showlist.idx=-1;
+			brw.populate(5,false);	
+		}
+		actions[4001] = function(){	
+			try {
+			   new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.\n\n", "Custom grouping", brw.current_grouping, true);
+				if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
+					properties.TFgrouping = new_TFgrouping;
+					TF.grouping = fb.TitleFormat(properties.TFgrouping);
+					window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
+					g_showlist.idx=-1;
+					brw.populate(5,false);	
+				}				   
+			} catch(e) {
+			}
+		}
+		actions[4002] = function(){	
+			properties.SingleMultiDisc = !properties.SingleMultiDisc;
+			window.SetProperty("_SYSTEM: Display one thumbnail for multi discs", properties.SingleMultiDisc);
+			g_showlist.idx=-1;
+			brw.populate("MultiDisc",false);		
+		}				
+	}
+	this.draw_header_menu = function(x,y,right_align){
+		var basemenu = window.CreatePopupMenu();
+		var actions = Array();
 		
+		if (typeof x == "undefined") x=this.MarginLeft-7;
+		if (typeof y == "undefined") y=this.padding_top+28;
+		
+		basemenu.AppendMenuItem(MF_STRING, 1, "Settings...");
+		basemenu.AppendMenuSeparator();
+
+		this.append_sort_menu(basemenu, actions);
+		this.append_group_menu(basemenu, actions);
+
 		basemenu.AppendMenuSeparator();        
 		basemenu.AppendMenuItem(MF_STRING, 35, "Tracks properties");
 		if(fb.IsPlaying) basemenu.AppendMenuItem(MF_STRING, 36, "Show now playing");
@@ -2585,7 +2688,7 @@ oHeaderbar = function(name) {
 		
 		switch (true) {
             case (idx == 1):
-                draw_settings_menu(x,y,right_align);
+                draw_settings_menu(x,y,right_align,false);
                 break;  		
             case (idx == 5):
                 window.Reload();
@@ -2608,100 +2711,7 @@ oHeaderbar = function(name) {
                 break;				
 			case (idx >= 1000 && idx < 2001):
 				SetGenre(idx-1000,plman.GetPlaylistItems(plman.ActivePlaylist));
-				break;			
-			case (idx == 3000):
-				properties.TFsorting = "";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
-				g_showlist.idx=-1;
-				brw.populate(4,true);	
-				break;				
-			case (idx == 3001):
-				properties.TFsorting = sort_by_album_artist+"#1";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
-				g_showlist.idx=-1;
-				brw.populate(5,true);				
-				break;	   
-			case (idx == 3002):
-				properties.TFsorting = sort_by_title+"#1";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
-				g_showlist.idx=-1;
-				brw.populate(6,true);				
-				break;	    
-			case (idx == 3003):
-				properties.TFsorting = sort_by_tracknumber+"#1";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-				g_showlist.idx=-1;
-				brw.populate(7,true);				
-				break;	
-			case (idx == 3004):
-				properties.TFsorting = sort_by_date+"#1";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);		
-				g_showlist.idx=-1;
-				brw.populate(8,true);				
-				break;		
-			case (idx == 3005):
-				properties.TFsorting = sort_by_date_added+"#-1";
-				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-				g_showlist.idx=-1;
-				brw.populate(9,true);				
-				break;		
-			case (idx == 3006):				
-				//new_TFsorting = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting);
-				try {
-					new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", brw.currentSorting, true);
-					if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
-						properties.TFsorting = new_TFsorting;
-						window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-						g_showlist.idx=-1;
-						brw.populate(5,true);	
-					}			   
-				} catch(e) {
-					// Dialog was closed by pressing Esc, Cancel or the Close button.
-				}				
-				break;					
-			case (idx == 3007):
-				brw.dont_sort_on_next_populate = true;			
-				plman.SortByFormat(plman.ActivePlaylist,"");
-				g_showlist.idx=-1;
-				brw.populate("randomize",true);
-				break;			
-			case (idx == 3008):
-                properties.SortDescending = !properties.SortDescending;	
-                window.SetProperty("MAINPANEL sort descending", properties.SortDescending);
-				g_showlist.idx=-1;
-				brw.populate(11,true);				
-				break;	
-			case (idx == 3009):
-				if(properties.TFsorting_default != properties.TFsorting){
-					properties.TFsorting_default = properties.TFsorting;
-					window.SetProperty("MAINPANEL Library Default Sort TitleFormat", properties.TFsorting_default);					
-				} else {
-					properties.TFsorting_default = "";
-					window.SetProperty("MAINPANEL Default library Sort TitleFormat", "");						
-				}
-				break;
-			case (idx == 4000):				
-				properties.TFgrouping = ""
-				TF.grouping = fb.TitleFormat("");
-				window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
-				g_showlist.idx=-1;
-				brw.populate(5,false);	
-				break;				
-			case (idx == 4001):			
-			//	new_TFgrouping = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom grouping", brw.current_grouping);
-				try {
-				   new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.\n\n", "Custom grouping", brw.current_grouping, true);
-					if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
-						properties.TFgrouping = new_TFgrouping;
-						TF.grouping = fb.TitleFormat(properties.TFgrouping);
-						window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
-						g_showlist.idx=-1;
-						brw.populate(5,false);	
-					}				   
-				} catch(e) {
-					// Dialog was closed by pressing Esc, Cancel or the Close button.
-				}
-				break;				
+				break;							
 			case (idx == 3100):
 				window.ShowProperties();
 				break;			
@@ -2711,20 +2721,16 @@ oHeaderbar = function(name) {
 			case (idx == 3102):
 				window.Reload();
 				break;		
-			case (idx == 4002):
-				properties.SingleMultiDisc = !properties.SingleMultiDisc;
-				window.SetProperty("_SYSTEM: Display one thumbnail for multi discs", properties.SingleMultiDisc);
-				g_showlist.idx=-1;
-				brw.populate("MultiDisc",false);		
-				break;				
 		}
+		if(actions[idx]) actions[idx]();
+		
 		basemenu = undefined;
 		menu_settings = undefined;
 		if (typeof SortMenu != "undefined") SortMenu = undefined;		
 		if (typeof GroupMenu != "undefined") GroupMenu = undefined;			
 	}
 }	
-function draw_settings_menu(x,y,right_align){
+function draw_settings_menu(x,y,right_align,sort_group){
 	var _menu = window.CreatePopupMenu();	
 	var _menu2 = window.CreatePopupMenu();
 	var _menu2A = window.CreatePopupMenu();	 
@@ -2736,44 +2742,18 @@ function draw_settings_menu(x,y,right_align){
 	var _menuRating = window.CreatePopupMenu();
 	var _menuHeaderBar = window.CreatePopupMenu();
 	var _additionalInfos = window.CreatePopupMenu();
-	 /*var _menuDisplayedPlaylist = window.CreatePopupMenu();
-	_menuDisplayedPlaylist.AppendTo(_menu, MF_STRING, "Displayed Playlist");
-	_menuDisplayedPlaylist.AppendMenuItem(MF_STRING, 329, "Active Playlist");		
-	_menuDisplayedPlaylist.AppendMenuItem(MF_STRING, 330, "Full Library");	
+	var actions = Array();
 	
-	var pl_count = plman.PlaylistCount;
-	if(pl_count > 1) {
-		_menuDisplayedPlaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
-	};
-	for(var i=0; i < pl_count; i++) {
-		if(i != this.playlist) {
-			playlist_name = plman.GetPlaylistName(i);
-			_menuDisplayedPlaylist.AppendMenuItem(MF_STRING, 331 + i, plman.GetPlaylistName(i));
-		};
-	};	
-	if(properties.lockOnPlaylistNamed!="") var playlist_idx = check_playlist(properties.lockOnPlaylistNamed);
-	else  var playlist_idx = -1;
-	if(playlist_idx>-1) {
-		_menuDisplayedPlaylist.CheckMenuItem(331 + playlist_idx, true);
-	} else {
-		_menuDisplayedPlaylist.CheckMenuItem(329, properties.followActivePlaylist);
-		_menuDisplayedPlaylist.CheckMenuItem(330, properties.lockOnFullLibrary);
-	}	
-	_menuDisplayedPlaylist.AppendMenuSeparator();
-	_menuDisplayedPlaylist.AppendMenuItem(MF_STRING, 328, "Switch to Active playlist or Full Library depending on the filters state");	
-	_menuDisplayedPlaylist.CheckMenuItem(328, properties.enableAutoSwitchPlaylistMode);	*/
-	
+	if(sort_group){
+		g_headerbar.append_sort_menu(_menu, actions);
+		g_headerbar.append_group_menu(_menu, actions);
+		_menu.AppendMenuSeparator();		
+	}
 	_menu.AppendMenuItem(MF_STRING, 10, "Always follow playback");
 	_menu.CheckMenuItem(10, properties.followNowPlaying);		
 	_menu.AppendMenuItem(MF_STRING, 31, "Show tooltips");
 	_menu.CheckMenuItem(31, properties.showToolTip);		
-	/*_menu.AppendMenuSeparator();	
-	_menu.AppendMenuItem(MF_STRING, 14, "Enable disk cover cache");
-	_menu.CheckMenuItem(14, globalProperties.enableDiskCache);	
-	_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 12, "Load all covers at startup");
-	_menu.CheckMenuItem(12, globalProperties.load_covers_at_startup);	
-	_menu.AppendMenuItem(MF_STRING, 26, "Show cover loading progress");
-	_menu.CheckMenuItem(26, properties.show_covers_progress);	*/
+	
 	_menu.AppendMenuSeparator();		
 	_menuHeaderBar.AppendMenuItem(MF_STRING, 27, "Show");
 	_menuHeaderBar.CheckMenuItem(27, properties.showheaderbar);		
@@ -2792,7 +2772,6 @@ function draw_settings_menu(x,y,right_align){
 	_menuFilters.CheckMenuItem(39, properties.displayToggleBtns);	
 	_menuFilters.AppendTo(_menu,MF_STRING, "Left menu");
 	
-	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 25, "Show date over album art");
 	_menuGroupDisplay.CheckMenuItem(25, properties.showdateOverCover);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 37, "Circle Artwork");
@@ -2802,7 +2781,6 @@ function draw_settings_menu(x,y,right_align){
 	
 	_menuGroupDisplay.AppendTo(_menu,MF_STRING, "Covers style");
 		
-	
 	_menuTracklist.AppendMenuItem(MF_STRING, 11, "Activate tracklist");
 	_menuTracklist.CheckMenuItem(11, properties.expandInPlace);	
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
@@ -2853,8 +2831,6 @@ function draw_settings_menu(x,y,right_align){
 	
 	_menuTracklist.AppendTo(_menu,MF_STRING, "Tracklist");
 	
-
-	
 	_menu2.AppendMenuItem(MF_STRING, 200, "Enable");
 	_menu2.CheckMenuItem(200, properties.showwallpaper);
 	_menu2.AppendMenuItem(MF_STRING, 220, "Blur");
@@ -2892,7 +2868,6 @@ function draw_settings_menu(x,y,right_align){
 		case (idx == 8):
 			scroll = scroll_ = 0;
 			brw.populate(0);
-			//g_sendResponse();
 			break;
 		case (idx == 9):       
 			delete_full_cache();
@@ -3212,6 +3187,8 @@ function draw_settings_menu(x,y,right_align){
 			brw.populate(0);
 			break;				
 	}	
+	if(actions[idx]) actions[idx]();	
+	
 	_menu = undefined;
 	_menu2 = undefined;
 	_menu2A = undefined;	
@@ -5744,6 +5721,8 @@ function on_mouse_rbtn_down(x, y){
 	var track_clicked=false;
 	var album_clicked=false;
 	var track_clicked_metadb = false;
+	var actions = Array();
+	
 	brw.setActiveRow(x,y);
 	if(brw.activeIndex != brw.activeIndexSaved) {
 		brw.activeIndexSaved = brw.activeIndex;
@@ -5865,14 +5844,14 @@ function on_mouse_rbtn_down(x, y){
 					album_clicked = true;
 					
 					sendTo.AppendTo(_menu, MF_STRING, "Send to...");
-					sendTo.AppendMenuItem(MF_STRING, 3000, "A new playlist...");
+					sendTo.AppendMenuItem(MF_STRING, 5000, "A new playlist...");
 					var pl_count = plman.PlaylistCount;
 					if(pl_count > 1) {
 						sendTo.AppendMenuItem(MF_SEPARATOR, 0, "");
 					};
 					for(var i=0; i < pl_count; i++) {
 						if(i != this.playlist && !plman.IsAutoPlaylist(i)) {
-							sendTo.AppendMenuItem(MF_STRING, 3001 + i, plman.GetPlaylistName(i));
+							sendTo.AppendMenuItem(MF_STRING, 5001 + i, plman.GetPlaylistName(i));
 						};
 					};						
 					metadblist_selection = g_showlist.pl;
@@ -5882,6 +5861,9 @@ function on_mouse_rbtn_down(x, y){
             }
         }
 		if(!track_clicked && !album_clicked){
+			g_headerbar.append_sort_menu(_menu, actions);
+			g_headerbar.append_group_menu(_menu, actions);
+			_menu.AppendMenuSeparator();				
 			_menu.AppendMenuItem(MF_STRING, 35, "Tracks properties");
 			drawSeparator = true;
 		}			
@@ -5904,7 +5886,7 @@ function on_mouse_rbtn_down(x, y){
         idx = _menu.TrackPopupMenu(x,y);
         switch(true) {
 		    case (idx == 1):
-                draw_settings_menu(x,y,false);
+                draw_settings_menu(x,y,false,(track_clicked || album_clicked));
                 break;  			
             case (idx == 5):
                 window.Reload();
@@ -5979,11 +5961,12 @@ function on_mouse_rbtn_down(x, y){
 			case (idx == 10000):
 				g_genre_cache.build_from_library();	
 				break;						
-			case (idx > 3000):
-				var insert_index = plman.PlaylistItemCount(idx-3001);
-				plman.InsertPlaylistItems((idx-3001), insert_index, metadblist_selection, false);
+			case (idx > 5000):
+				var insert_index = plman.PlaylistItemCount(idx-5001);
+				plman.InsertPlaylistItems((idx-5001), insert_index, metadblist_selection, false);
 				break;				
         }
+		if(actions[idx]) actions[idx]();		
         Context = undefined;
         _menu = undefined;
 		sendTo = undefined;
