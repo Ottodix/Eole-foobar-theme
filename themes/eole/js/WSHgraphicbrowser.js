@@ -4097,7 +4097,7 @@ oBrowser = function(name) {
 	this.GetAlbumCover_fast = function(idx){
 		idx = this.groups_draw[idx].idx;
 		this.groups[idx].cover_img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
-		if (typeof this.groups[idx].cover_img_full !== "undefined" && this.groups[idx].cover_img_full!=null) {
+		if (typeof this.groups[idx].cover_img_full == "undefined" && this.groups[idx].cover_img_full!=null) {
 			var gb;			
 			var img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover_fast");			
 			var cover_img = gdi.CreateImage(this.coverRealWith, this.coverRealWith);
@@ -4119,11 +4119,12 @@ oBrowser = function(name) {
 		idx = this.groups_draw[idx].idx;
 		var img_final = null;
 		var img_full = null;
-		if (typeof this.groups[idx].cover_img_full !== "undefined" && this.groups[idx].cover_img_full!=null) {
+		
+		if (typeof this.groups[idx].cover_img_full == "object") {
 			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
-			if (typeof img_full !== "undefined" && img_full!=null) {
+			if (typeof img_full == "object") {
 				this.groups[idx].cover_img_full = img_full;
 				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover2");
 			}
@@ -5233,7 +5234,6 @@ oImageCache = function () {
 		brw.groups[albumIndex].tid=-1;
 		brw.groups[albumIndex].load_requested = 0;
 		this._cachelist[brw.groups[albumIndex].cachekey] = null;
-		//brw.GetAlbumCover(albumIndex);
 	}
 
 };
