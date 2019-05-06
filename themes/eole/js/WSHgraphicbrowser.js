@@ -2581,7 +2581,7 @@ oHeaderbar = function(name) {
 			}					
 			actions[3007] = function(){	
 				brw.dont_sort_on_next_populate = true;			
-				plman.SortByFormat(plman.ActivePlaylist,"");
+				plman.SortByFormat(brw.SourcePlaylistIdx,"");
 				g_showlist.idx=-1;
 				brw.populate("randomize",true);
 			}			
