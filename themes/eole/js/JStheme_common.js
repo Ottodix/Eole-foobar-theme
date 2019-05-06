@@ -2272,9 +2272,9 @@ const get_albumArt_async = async(metadb, albumIndex, need_stub, only_embed, no_l
 
 function save_image_to_cache(image, albumIndex, cachekey){
 	cachekey = typeof cachekey !== 'undefined' ? cachekey : false;	
-	if(cachekey == "undefined") return false;
 	if(!cachekey && typeof(brw) !== "undefined") var crc = brw.groups[albumIndex].cachekey;
 	else var crc = cachekey;
+	if(cachekey == "undefined") return false;	
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;	
 	if(!g_files.FileExists(filename)){
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
