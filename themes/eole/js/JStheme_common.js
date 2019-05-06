@@ -2276,7 +2276,7 @@ function save_image_to_cache(image, albumIndex, cachekey){
 	else var crc = cachekey;
 	if(cachekey == "undefined") return false;	
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;	
-	if(!g_files.FileExists(filename)){
+	if(!g_files.FileExists(filename)){ 
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
 			image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
