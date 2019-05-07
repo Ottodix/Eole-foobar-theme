@@ -4120,11 +4120,11 @@ oBrowser = function(name) {
 		var img_final = null;
 		var img_full = null;
 		
-		if (typeof this.groups[idx].cover_img_full == "object") {
+		if (typeof this.groups[idx].cover_img_full == "object" && this.groups[idx].cover_img_full != null) {
 			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
-			if (typeof img_full == "object") {
+			if (typeof img_full == "object" && img_full != null) {
 				this.groups[idx].cover_img_full = img_full;
 				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover2");
 			}
