@@ -471,18 +471,17 @@ oImageCache = function () {
 		old_cachekey = nowPlaying_cachekey;
 		nowPlaying_cachekey = process_cachekey(metadb);				
 		if(nowPlaying_cachekey==old_cachekey) return null;	
-		try{img = this._cachelist[nowPlaying_cachekey];}catch(e){}
+		try {
+			img = this._cachelist[nowPlaying_cachekey];
+		} catch(e){}
 
-		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
+		if (typeof(img) != "object" && globalProperties.enableDiskCache ) {			
 			cache_exist = check_cache(metadb, 0, nowPlaying_cachekey);	
-			// load img from cache	
-			
 			if(cache_exist) {	
 				img = load_image_from_cache_direct(metadb, cache_exist);
 				cover_path = cover_img_cache+"\\"+cache_exist+"."+globalProperties.ImageCacheExt;
 			} else {
 				get_albumArt_async(metadb,AlbumArtId.front);
-				//utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
 			}
 		} 
 		return img;
@@ -512,10 +511,10 @@ oCover = function() {
 		this.resized = false;
 	}  	
 	this.isSetArtwork = function() {
-		return !(typeof(this.artwork) == "undefined" || !this.artwork || this.artwork==null)
+		return !(typeof(this.artwork) != "object")
 	}
 	this.setArtwork = function(image, resize) {
-		if(typeof(image) == "undefined" || !image || image==null) return;		
+		if(typeof(image) != "object") return;		
 		this.resized = false;
 		this.artwork = image;
 		if(resize && this.w>0 && this.h>0) {
@@ -529,7 +528,7 @@ oCover = function() {
 	this.resize = function(w,h) {
 		var w = typeof w !== 'undefined' ? w : this.w;	
 		var h = typeof h !== 'undefined' ? h : this.h;
-		this.artwork_resized = FormatCover(this.artwork,this.w+1,this.h+1,properties.rawBitmap);	
+		this.artwork_resized = FormatCover(this.artwork,this.w+1,this.h+1,properties.rawBitmap, "resize");	
 		this.resized = true;	
 	}  	
     this.setSize = function(w, h) {
