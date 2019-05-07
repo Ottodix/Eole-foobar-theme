@@ -474,7 +474,6 @@ oImageCache = function () {
 		try {
 			img = this._cachelist[nowPlaying_cachekey];
 		} catch(e){}
-
 		if (typeof(img) != "object" && globalProperties.enableDiskCache ) {			
 			cache_exist = check_cache(metadb, 0, nowPlaying_cachekey);	
 			if(cache_exist) {	
