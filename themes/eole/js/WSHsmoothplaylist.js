@@ -2340,9 +2340,11 @@ oBrowser = function(name) {
                                     }
                                 } else if(this.groups[g].cover_type == 0) {
                                     this.groups[g].cover_img = images.noart;
+									this.groups[g].mask_applied = false;
 									g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 } else if(this.groups[g].cover_type == 3) {
 									this.groups[g].cover_img = images.stream;
+									this.groups[g].mask_applied = false;
 									g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 };															
                                 if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
@@ -2384,16 +2386,7 @@ oBrowser = function(name) {
 										gr.SetSmoothingMode(2);
 										gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
 										gr.SetSmoothingMode(0);
-									}									
-								} else if (this.groups[g].cover_img=="no_cover") {
-                                    var cv_w = coverWidth - cover.margin * 2-cover.padding;
-                                    var cv_h = coverWidth - cover.margin * 2-cover.padding;
-                                    var dx = (cover.max_w - cv_w) / 2;
-                                    var dy = (cover.max_h - cv_h) / 2;
-                                    var cv_x = Math.floor(ax + dx + 1)-2;
-                                    var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-2;									
-									gr.DrawImage(cover.nocover_img, cv_x+8, cv_y, cv_w, cv_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-									gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);									
+									}														
                                 } else {
                                     var cv_x = Math.floor(ax + cover.margin + 1);
                                     var cv_y = Math.floor(ay - ((ghrh - 1) * ah) + cover.margin)+group_height_fix;
@@ -2699,10 +2692,7 @@ oBrowser = function(name) {
 													gr.FillEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, colors.playing_cover_overlay);				
 													gr.SetSmoothingMode(0);
 												}	
-											} else if (this.groups[g].cover_img=="no_cover") {					
-												gr.DrawImage(cover.nocover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-												gr.FillSolidRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, colors.playing_cover_overlay);					
-											}
+											} 
 											if(!properties.circleMode)
 												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, (properties.drawProgressBar && properties.AlbumArtProgressbar) ? colors.cover_rectline_AlbumArtProgressbar : colors.cover_rectline);
 											else {
@@ -2769,10 +2759,7 @@ oBrowser = function(name) {
 													gr.SetSmoothingMode(2);
 													gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1, TrackCover_w-2, TrackCover_h-2, 1.0, colors.cover_rectline);		
 													gr.SetSmoothingMode(0);
-												}
-											} else if (this.groups[g].cover_img=="no_cover") {					
-												gr.DrawImage(cover.nocover_img, TrackCover_x+8, ay+cover.trackMargin, TrackCover_w, TrackCover_h, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height, 0, 245);
-												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);									
+												}								
 											} else {
 												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
 											};
