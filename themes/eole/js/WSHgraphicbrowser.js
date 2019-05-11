@@ -4960,7 +4960,7 @@ function positionButtons(){
 	if(properties.darklayout){
 		if(!libraryfilter_state.isActive()){
 			buttons.filterToggle.N_img = white_images.filter_on_icon
-			buttonsfilterToggle.H_img = white_images.filter_on_hover_icon
+			buttons.filterToggle.H_img = white_images.filter_on_hover_icon
 		} else {
 			buttons.filterToggle.N_img = white_images.filter_off_icon
 			buttons.filterToggle.H_img = white_images.filter_off_hover_icon			
