@@ -3489,6 +3489,15 @@ oBrowser = function(name) {
 			this.groups[i].tid=-1;
 		}
 	}		
+    this.refresh_one_image = function (albumIndex) {
+		this.groups[albumIndex].cover_img_full=null;
+		if(g_showlist.idx == albumIndex) g_showlist.cover_img=null;	
+		this.groups[albumIndex].mask_applied=false;
+		this.groups[albumIndex].cover_img=null;
+		this.groups[albumIndex].tid=-1;
+		this.groups[albumIndex].load_requested = 0;
+		g_image_cache._cachelist[this.groups[albumIndex].cachekey] = null;
+	}		
     this.refresh_all_images = function () {
 		this.coverMask = false;		
 		this.dateCircleBG = false;			
@@ -4739,16 +4748,9 @@ oImageCache = function () {
         };
         return img;		
     };	
-    this.refresh = function (metadb, albumIndex) {
-		brw.groups[albumIndex].cover_img_full=null;
-		if(g_showlist.idx == albumIndex) g_showlist.cover_img=null;		
-		brw.groups[albumIndex].cover_img=null;
-		brw.groups[albumIndex].tid=-1;
-		brw.groups[albumIndex].load_requested = 0;
-		this._cachelist[brw.groups[albumIndex].cachekey] = null;
-		//brw.GetAlbumCover(albumIndex);
-	}
-
+    this.reset = function(key) {
+        this._cachelist[key] = null;
+    };	
 };
 
 function ClearCoversTimers(){
@@ -5344,7 +5346,7 @@ function on_mouse_rbtn_down(x, y){
                 break;	
             case (idx == 19):	
 				delete_file_cache(brw.groups_draw[check__].metadb, check__);
-				g_image_cache.refresh(brw.groups_draw[check__].pl[0],check__);
+				brw.refresh_one_image(check__);
 				window.NotifyOthers("RefreshImageCover",brw.groups_draw[check__].metadb)
                 break;					
             case (idx == 35):	

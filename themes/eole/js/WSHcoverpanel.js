@@ -487,15 +487,9 @@ oImageCache = function () {
 		} 
 		return img;
     };	
-    this.refresh = function (metadb, cachekey) {
-		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
-		if(globalProperties.enableDiskCache) delete_file_cache(metadb,0, cachekey);
-		g_cover.reset();
-		this._cachelist[cachekey] = null;
-		nowPlaying_cachekey = "";
-		g_cover.getArtwork(metadb);
-		window.Repaint();
-	}
+    this.reset = function(key) {
+        this._cachelist[key] = null;
+    };
 };
 
 oCover = function() {
@@ -545,6 +539,15 @@ oCover = function() {
 		else		
 			gr.DrawImage(this.artwork, this.x, this.y, this.w, this.h, 0, 0, this.artwork.Width, this.artwork.Height);				
     };
+    this.refresh = function (metadb, cachekey) {
+		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
+		if(globalProperties.enableDiskCache) delete_file_cache(metadb,0, cachekey);
+		this.reset();
+		g_image_cache.reset();
+		nowPlaying_cachekey = "";
+		this.getArtwork(metadb);
+		window.Repaint();
+	}
 };
 function on_get_album_art_done(metadb, art_id, image, image_path) {
     cover_path = image_path;
@@ -620,7 +623,7 @@ function on_notify_data(name, info) {
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
 			if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
-				g_image_cache.refresh(fb.GetNowPlaying());
+				g_cover.refresh(fb.GetNowPlaying());
 		break;  					
 		case "cover_cache_finalized": 
 			g_image_cache._cachelist = cloneImgs(info);
@@ -849,7 +852,7 @@ function on_mouse_rbtn_up(x, y){
                 fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
                 break;	
             case (idx == 8):
-				g_image_cache.refresh(now_playing_track);
+				g_cover.refresh(now_playing_track);
 				window.NotifyOthers("RefreshImageCover",now_playing_track);
                 break;					
             case (idx == 30):

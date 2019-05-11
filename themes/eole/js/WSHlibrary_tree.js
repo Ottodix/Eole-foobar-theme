@@ -16,7 +16,6 @@ var properties = {
 
 var g_wallpaperImg = null;
 var update_wallpaper = false;
-var g_image_cache = false;
 var g_on_mouse_lbtn_dblclk = false;
 var g_rightClickedIndex = -1;
 var playing_track_playcount = 0;
@@ -4595,36 +4594,10 @@ function on_notify_data(name, info) {
 		break; 			
 		case "wallpaperBlur":
 			if(window.IsVisible) toggleBlurWallpaper(info);
-		break; 	
-		case "cover_cache_finalized": 
-			g_image_cache._cachelist = cloneImgs(info);
-			window.Repaint();
-		break;		
+		break; 		
     };
 };
 //=================================================// Cover Tools
-oImageCache = function () {
-    this._cachelist = Array();
-    this.hit = function (metadb) {	
-		var img;
-		old_cachekey = nowPlaying_cachekey;
-		nowPlaying_cachekey = process_cachekey(metadb);				
-		if(nowPlaying_cachekey==old_cachekey) return null;	
-		try{img = this._cachelist[nowPlaying_cachekey];}catch(e){}
-		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
-			cache_exist = check_cache(metadb, 0, nowPlaying_cachekey);	
-			// load img from cache				
-			if(cache_exist) {	
-				img = load_image_from_cache_direct(metadb, cache_exist);
-				cover_path = cover_img_cache+"\\"+cache_exist+"."+globalProperties.ImageCacheExt;
-			} else get_albumArt_async(metadb, AlbumArtId.front); //utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
-		} else get_albumArt_async(metadb, AlbumArtId.front); //utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
-		return img;
-    };	
-    this.reset = function(key) {
-        this._cachelist[key] = null;
-    };
-};
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
 	properties.showwallpaper = wallpaper_state;
@@ -4661,7 +4634,6 @@ function on_init() {
 	men = new menu_object();
 	pman = new oPlaylistManager("pman");
 	pman.populate(exclude_active = false, reset_scroll = true);
-	g_image_cache = new oImageCache();
 	timer = new oTimers();
 	timer.lib('on_init');
 	

@@ -57,13 +57,9 @@ oImageCache = function () {
 		}
 		return img;
     };	
-    this.refresh = function (metadb, cachekey) {
-		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
-		if(globalProperties.enableDiskCache) delete_file_cache(metadb,0, cachekey);
-		this._cachelist[cachekey] = null;
-		window.NotifyOthers("RefreshImageCover",metadb);
-		window.Repaint();
-	}
+    this.reset = function(key) {
+        this._cachelist[key] = null;
+    };	
 };
 
 if(layout_state.isEqual(0)) properties.showTrackInfo = showtrackinfo_big.isActive();

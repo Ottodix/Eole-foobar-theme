@@ -1646,6 +1646,7 @@ oBrowser = function(name) {
 	this.timer_populate_id = 0;	
 	this.timer_populate_is_first = false;	
 	this.drag_moving = false;
+	this.force_SelectedDraw = false;
     this.launch_populate = function() {
 		brw.populate(is_first_populate = true,0);
 		pman.populate(exclude_active = false, reset_scroll = true);
@@ -1848,6 +1849,7 @@ oBrowser = function(name) {
     this.showNowPlaying = function() {
         if(fb.IsPlaying) {
             try{
+				this.force_SelectedDraw = true;
                 if(this.current_sourceMode == 1 || this.current_sourceMode == 3) {
                     if(plman.PlayingPlaylist != plman.ActivePlaylist) {
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;
@@ -2493,7 +2495,7 @@ oBrowser = function(name) {
 								//gr.DrawRect(ax, ay, aw-1, ah-1, 1.0, colors.normal_txt & 0x07ffffff);
 							};
 							// background selection
-							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex) {
+							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist || this.force_SelectedDraw)) || i == g_rightClickedIndex) {
 								txt_color1 = colors.normal_txt;
 								txt_color2 = colors.faded_txt;														
 								var track_gradient_size=0;
@@ -3273,7 +3275,7 @@ oBrowser = function(name) {
             case "right":			
                 g_rightClickedIndex = this.activeIndex;
 				this.clearMultipleSelectedItem();
-				this.selectedIndex = g_rightClickedIndex;
+				//this.selectedIndex = g_rightClickedIndex;
                 if(this.ishover && this.activeIndex > -1) {
                     this.item_context_menu(x, y, this.activeIndex);
                 } else {
@@ -3471,8 +3473,11 @@ oBrowser = function(name) {
 		this.metadblist_selection = this.groups[albumIndex].pl.Clone();
 		
 		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
-		_menu.AppendMenuSeparator();	
-		
+		_menu.AppendMenuSeparator();
+		if(fb.IsPlaying && this.current_sourceMode==0){	
+			_menu.AppendMenuItem(MF_STRING, 1011, "Locate now playing group");
+			_menu.AppendMenuSeparator();
+		}
 		if(properties.displayMode==1 || properties.displayMode==2 || properties.displayMode==3){	   
 			_menu.AppendMenuItem(MF_STRING, 1010, "Refresh this image");
 		}
@@ -3528,6 +3533,10 @@ oBrowser = function(name) {
                 this.repaint();
 				window.NotifyOthers("RefreshImageCover",this.groups[albumIndex].metadb)				
 				break;
+			case 1011:
+				this.showNowPlaying();
+				
+				break;				
 			case 2000:
 				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);
