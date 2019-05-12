@@ -1325,10 +1325,10 @@ function draw_main_menu(x,y){
 	appearance_menu.AppendMenuSeparator();  	
 	
 	mem_solicitation = window.CreatePopupMenu();
-	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "Minimum");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "Keep loaded covers in memory");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "Load all covers at startup");
-	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "Load all covers && artist thumbnails at startup");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "0 - Minimum");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "1 - Keep loaded covers in memory");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "2 - Load all covers at startup");
+	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "3 - Load all covers && artist thumbnails at startup");	
 	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
 	mem_solicitation.AppendTo(appearance_menu, MF_STRING, "Covers && Memory usage");
 	
