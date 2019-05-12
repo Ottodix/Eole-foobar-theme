@@ -42,11 +42,11 @@ timers = {
     hideVolume: false,
 };
 oImageCache = function () {
-    this._cachelist = Array();
+    this.cachelist = Array();
     this.hit = function (metadb) {	
 		var img;
 		cachekey = process_cachekey(metadb);				
-		try{img = this._cachelist[cachekey];}catch(e){}
+		try{img = this.cachelist[cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
 			cache_exist = check_cache(metadb, 0, cachekey);	
 			// load img from cache				
@@ -58,8 +58,11 @@ oImageCache = function () {
 		return img;
     };	
     this.reset = function(key) {
-        this._cachelist[key] = null;
+        this.cachelist[key] = null;
     };	
+	this.resetAll = function(){
+		this.cachelist = Array();
+	};	
 };
 
 if(layout_state.isEqual(0)) properties.showTrackInfo = showtrackinfo_big.isActive();
@@ -1116,6 +1119,7 @@ function on_playback_new_track(metadb) {
 		old_cachekey = nowplaying_cachekey;
 		nowplaying_cachekey = process_cachekey(metadb);
 		if(old_cachekey!=nowplaying_cachekey) {
+			if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();			
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 		}		
 	};
@@ -1352,6 +1356,11 @@ function on_key_down(vkey) {
 }	
 function on_notify_data(name, info) {
     switch(name) {	
+		case "MemSolicitation":
+			globalProperties.mem_solicitation = info;
+			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
+			window.Reload();			
+		break; 	
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);			
@@ -1382,7 +1391,7 @@ function on_notify_data(name, info) {
 			window.Repaint();
 		break; 			
 		case "cover_cache_finalized": 
-			g_image_cache._cachelist = cloneImgs(info);
+			//g_image_cache.cachelist = cloneImgs(info);
 			window.Repaint();
 		break;		
 		case "SetRandom":

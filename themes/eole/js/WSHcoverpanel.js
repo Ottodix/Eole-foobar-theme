@@ -465,13 +465,13 @@ function on_drag_drop(action, x, y, mask) {
 };
 //=================================================// Cover Tools
 oImageCache = function () {
-    this._cachelist = Array();
+    this.cachelist = Array();
     this.hit = function (metadb) {	
 		var img;
 		old_cachekey = nowPlaying_cachekey;
 		nowPlaying_cachekey = process_cachekey(metadb);				
 		if(nowPlaying_cachekey==old_cachekey) return null;	
-		try{img = this._cachelist[nowPlaying_cachekey];}catch(e){}
+		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
 			cache_exist = check_cache(metadb, 0, nowPlaying_cachekey);	
@@ -488,8 +488,11 @@ oImageCache = function () {
 		return img;
     };	
     this.reset = function(key) {
-        this._cachelist[key] = null;
+        this.cachelist[key] = null;
     };
+	this.resetAll = function(){
+		this.cachelist = Array();
+	};	
 };
 
 oCover = function() {
@@ -518,6 +521,7 @@ oCover = function() {
 	}	
 	this.getArtwork = function(metadb) {
 		var img = g_image_cache.hit(metadb);
+		if(typeof(image) == "object" && image!=null && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();		
 		this.setArtwork(img,true);	
 	}		
 	this.resize = function(w,h) {
@@ -555,8 +559,8 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 		cachekey = process_cachekey(metadb);
 		save_image_to_cache(image, -1, cachekey);	
 		g_cover.setArtwork(image,true);
-		g_image_cache._cachelist[cachekey] = image;
-		g_image_cache._cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);				
+		g_image_cache.cachelist[cachekey] = image;
+		g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);				
 	}
 	else g_cover.reset();
     window.Repaint();
@@ -585,6 +589,11 @@ function on_layout_change() {
 }	
 function on_notify_data(name, info) {
     switch(name) {
+		case "MemSolicitation":
+			globalProperties.mem_solicitation = info;
+			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
+			window.Reload();			
+		break; 		
 		case "mouse_move":
 			last_mouse_move_notified = info;
 		break;	
@@ -626,7 +635,7 @@ function on_notify_data(name, info) {
 				g_cover.refresh(fb.GetNowPlaying());
 		break;  					
 		case "cover_cache_finalized": 
-			g_image_cache._cachelist = cloneImgs(info);
+			//g_image_cache.cachelist = cloneImgs(info);
 			window.Repaint();
 		break;		
 		case "playRandom":

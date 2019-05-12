@@ -382,9 +382,9 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 
 //=================================================// Cover Tools
 oImageCache = function () {
-    this._cachelist = Array();
+    this.cachelist = Array();
     this.hit = function (metadb, albumIndex) {
-        try{var img = this._cachelist[brw.groups[albumIndex].cachekey];}catch(e){}
+        try{var img = this.cachelist[brw.groups[albumIndex].cachekey];}catch(e){}
         if (typeof(img) == "undefined" || img == null) { // if image not in cache, we load it asynchronously	
                 brw.groups[albumIndex].crc = check_cache(metadb, albumIndex);
                 if(globalProperties.enableDiskCache && brw.groups[albumIndex].crc && brw.groups[albumIndex].crc!='undefined' && brw.groups[albumIndex].load_requested == 0) {
@@ -433,8 +433,11 @@ oImageCache = function () {
         return img;
     };
     this.reset = function(key) {
-        this._cachelist[key] = null;
+        this.cachelist[key] = null;
     };
+	this.resetAll = function(){
+		this.cachelist = Array();
+	};	
     this.getit = function (metadb, albumId, image) {
         var cw = globalProperties.thumbnailWidthMax;
         var ch = cw;
@@ -476,7 +479,7 @@ oImageCache = function () {
         };
         if(cover_type == 1) {
 			try {
-				this._cachelist[brw.groups[albumId].cachekey] = img;
+				this.cachelist[brw.groups[albumId].cachekey] = img;
 			}
 			catch (e) {
 				
@@ -2038,6 +2041,7 @@ oBrowser = function(name) {
 		} else {
 			console.log("--> populate Smoothplaylist with ActivePlaylist call_id:"+call_id+' Parent panel:'+properties.ParentName);
 		}
+		if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();		
 		if(properties.showHeaderBar) g_filterbox.set_default_text();
         this.list = plman.GetPlaylistItems(g_active_playlist);
         this.init_groups();
@@ -2370,11 +2374,11 @@ oBrowser = function(name) {
                                 } else if(this.groups[g].cover_type == 0) {
                                     this.groups[g].cover_img = images.noart;
 									this.groups[g].mask_applied = false;
-									g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 } else if(this.groups[g].cover_type == 3) {
 									this.groups[g].cover_img = images.stream;
 									this.groups[g].mask_applied = false;
-									g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 };															
                                 if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 									if(!this.groups[g].cover_formated){
@@ -2695,10 +2699,10 @@ oBrowser = function(name) {
 												}
 											} else if(this.groups[g].cover_type == 0) {
 												this.groups[g].cover_img = images.noart;
-												g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = images.stream;
-												g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};									
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated){
@@ -2735,9 +2739,9 @@ oBrowser = function(name) {
 											if(properties.circleMode) var y_adjust = 1;
 											else var y_adjust = 0;
 											if(g_elapsed_seconds == 0 || g_elapsed_seconds / 2 == Math.floor(g_elapsed_seconds / 2)) {
-												gr.DrawImage(images.now_playing_0, ax+TrackCover_x+((properties.doubleRowShowCover)?4:0), ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_0.Width, images.now_playing_0.Height, 0, 0, images.now_playing_0.Width, images.now_playing_0.Height, 0, 255);
+												gr.DrawImage(images.now_playing_0, ax+TrackCover_x+((properties.showGroupHeaders)?4:9), ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_0.Width, images.now_playing_0.Height, 0, 0, images.now_playing_0.Width, images.now_playing_0.Height, 0, 255);
 											} else {
-												gr.DrawImage(images.now_playing_1, ax+TrackCover_x+((properties.doubleRowShowCover)?4:0),  ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_1.Width, images.now_playing_1.Height, 0, 0, images.now_playing_1.Width, images.now_playing_1.Height, 0, 255);
+												gr.DrawImage(images.now_playing_1, ax+TrackCover_x+((properties.showGroupHeaders)?4:9),  ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_1.Width, images.now_playing_1.Height, 0, 0, images.now_playing_1.Width, images.now_playing_1.Height, 0, 255);
 											};		
 																						
 										} else {
@@ -2763,10 +2767,10 @@ oBrowser = function(name) {
 												}
 											} else if(this.groups[g].cover_type == 0) {
 												this.groups[g].cover_img = images.noart;
-												g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = images.stream;
-												g_image_cache._cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};										
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated){
@@ -6291,6 +6295,11 @@ function stopFlashNowPlaying() {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "MemSolicitation":
+			globalProperties.mem_solicitation = info;
+			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
+			window.Reload();			
+		break; 		
 		case "set_font":
 			properties.globalFontAdjustement = info;
 			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
@@ -6523,7 +6532,7 @@ function on_notify_data(name, info) {
 			brw.showFocusedItem();
 			break;	
 		case "cover_cache_finalized": 
-			g_image_cache._cachelist = cloneImgs(info);
+			//g_image_cache.cachelist = cloneImgs(info);
 			//console.log("smoothplaylist image_cache size: "+info.length);
 			window.Repaint();
 		break;	

@@ -1323,12 +1323,22 @@ function draw_main_menu(x,y){
 	appearance_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");		
 	appearance_menu.AppendMenuSeparator();  	
-	appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
+	
+	mem_solicitation = window.CreatePopupMenu();
+	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "Minimum");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "Keep loaded covers in memory");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "Load all covers at startup");
+	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "Load all covers && artist thumbnails at startup");	
+	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
+	mem_solicitation.AppendTo(appearance_menu, MF_STRING, "Covers && Memory usage");
+	
+	appearance_menu.AppendMenuSeparator();		
+	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4023, "Load all covers at startup");
 	appearance_menu.CheckMenuItem(4023, globalProperties.load_covers_at_startup);
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4024, "Load all artist thumbnails at startup");
-	appearance_menu.CheckMenuItem(4024, globalProperties.load_artist_img_at_startup);			
+	appearance_menu.CheckMenuItem(4024, globalProperties.load_artist_img_at_startup);	*/		
 	appearance_menu.AppendMenuItem(MF_STRING, 4026, "Reset images cache");	
 	
 	basemenu.AppendMenuSeparator(); 
@@ -1614,6 +1624,18 @@ function draw_main_menu(x,y){
 	case (idx == 4038):		
 		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 		break;			
+	case (idx == 4040):	
+		setMemoryUsageGlobaly(0);
+		break;	
+	case (idx == 4041):	
+		setMemoryUsageGlobaly(1);
+		break;	
+	case (idx == 4042):	
+		setMemoryUsageGlobaly(2);
+		break;	
+	case (idx == 4043):	
+		setMemoryUsageGlobaly(3);	
+		break;			
     case (idx == 4988):
 		if(properties.savedFilterState>=0 && !properties.displayToggleBtns) filters_panel_state.setValue(properties.savedFilterState);
 		else filters_panel_state.setValue(1);		
@@ -1725,6 +1747,10 @@ function on_focus(is_focused) {
 }
 function on_notify_data(name, info) {
     switch(name) {	
+		case "MemSolicitation":
+			globalProperties.enableDiskCache = info;
+			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);			
+		break; 	
 		case "history_previous":
 			g_searchbox.clearInputbox(false);
 			window.Repaint();

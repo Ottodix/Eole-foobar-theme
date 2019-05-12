@@ -30,9 +30,11 @@ var globalProperties = {
 	miniMode_minwidth: 150,
 	minMode_minheight:200,	
 	tooltip_delay:500,	
+	mem_solicitation:window.GetProperty("GLOBAL memory solicitation", 0),	
 	enable_screensaver:window.GetProperty("GLOBAL enable screensaver", false),
 	escape_on_mouse_move:window.GetProperty("GLOBAL screensaver escape on mouse move", false),	
 	mseconds_before_screensaver:window.GetProperty("GLOBAL screensaver mseconds before activation", 60000),
+	loaded_covers2memory:window.GetProperty("COVER keep loaded covers in memory", false),		
     load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),		
     load_artist_img_at_startup: window.GetProperty("ARTIST IMG Load all at startup", true),	
 	enableDiskCache: window.GetProperty("COVER Disk Cache",true),
@@ -47,6 +49,32 @@ var globalProperties = {
 }	
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 
+function setMemoryParameters(){
+	switch(true) {
+		case (globalProperties.mem_solicitation==0):
+			globalProperties.loaded_covers2memory = false;		
+			globalProperties.load_covers_at_startup = false;
+			globalProperties.load_artist_img_at_startup = false;			
+		break;
+		case (globalProperties.mem_solicitation==1):
+			globalProperties.loaded_covers2memory = true;		
+			globalProperties.load_covers_at_startup = false;
+			globalProperties.load_artist_img_at_startup = false;			
+		break;
+		case (globalProperties.mem_solicitation==2):
+			globalProperties.loaded_covers2memory = true;		
+			globalProperties.load_covers_at_startup = true;
+			globalProperties.load_artist_img_at_startup = false;			
+		break;
+		case (globalProperties.mem_solicitation==3):
+			globalProperties.loaded_covers2memory = true;		
+			globalProperties.load_covers_at_startup = true;
+			globalProperties.load_artist_img_at_startup = true;			
+		break;		
+	}
+}
+setMemoryParameters();
+console.log(globalProperties.mem_solicitation+" "+globalProperties.load_covers_at_startup)
 var cScrollBar = {
     enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
     visible: true,
@@ -762,6 +790,12 @@ function findSelectionPlaylist(){
 		if(found_selectionPlaylist) break;
 	};	
 	return pidx_selection;
+}
+function setMemoryUsageGlobaly(mem_solicitation){
+	globalProperties.mem_solicitation = mem_solicitation;
+	window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
+	window.NotifyOthers("MemSolicitation",globalProperties.mem_solicitation);	
+	//window.NotifyOthers("WSH_panels_reload",true);
 }
 function enableDiskCacheGlobaly(){
 	globalProperties.enableDiskCache = !globalProperties.enableDiskCache;
@@ -2180,7 +2214,16 @@ function check_cache(metadb, albumIndex, crc){
     };
     return false;
 };
+function check_cache2(metadb, albumIndex, crc){
+	//if(crc=='undefined') return false;	
 
+	var crc = typeof crc !== 'undefined' ? crc : brw.groups[albumIndex].cachekey;
+	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;			
+    if(g_files.FileExists(filename)) {
+        return filename;
+    };
+    return false;
+};
 function delete_file_cache(metadb, albumIndex, crc, delete_at_startup){
 	var crc = typeof crc !== 'undefined' ? crc : brw.groups[albumIndex].cachekey;
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
@@ -2249,9 +2292,17 @@ function load_image_from_cache_direct(metadb, crc){
 		return -1;
 	}
 };
+function load_image_from_cache_direct2(filename){
+	try{
+        var img = gdi.Image(filename);
+        return img;		
+	} catch(e){
+		return -1;
+	}
+};
 function get_albumArt(metadb,cachekey){
 	var cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
-	try{var artwork_img = g_image_cache._cachelist[cachekey];}catch(e){}
+	try{var artwork_img = g_image_cache.cachelist[cachekey];}catch(e){}
 	if ((typeof(artwork_img) == "undefined" || artwork_img == null) && globalProperties.enableDiskCache) {			
 		var cache_exist = check_cache(metadb, 0, cachekey);	
 		// load img from cache				
@@ -2423,7 +2474,7 @@ function setWallpaperImg(defaultpath, metadb, progressbar_art, width, height, bl
     if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
 		try{
 			cachekey = process_cachekey(metadb)		
-			var tmp_img = g_image_cache._cachelist[cachekey];
+			var tmp_img = g_image_cache.cachelist[cachekey];
 			if (typeof tmp_img == "undefined" || tmp_img==null) {
 				tracktype = TrackType(metadb.RawPath.substring(0, 4));
 				if(tracktype == 3) tmp_img = cover.stream_img			
