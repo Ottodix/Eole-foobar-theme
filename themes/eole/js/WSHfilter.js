@@ -5039,6 +5039,7 @@ function on_playlists_changed() {
 };
 
 function on_playlist_switch() {
+	brw.force_SelectedDraw = false;
     if(window.IsVisible) {
 		if(g_avoid_on_playlist_switch_callbacks_on_sendItemToPlaylist) {
 			if(timers.avoidPlaylistSwitch) clearTimeout(timers.avoidPlaylistSwitch);
@@ -5074,7 +5075,7 @@ function on_playlist_items_added(playlist_idx) {
 			return;
 		}
 		g_avoid_on_playlist_items_removed=true;
-
+		//if(playlist_idx==brw.selectionIdx) brw.force_SelectedDraw = false;
 		if(brw.current_sourceMode == 1 || brw.current_sourceMode == 2) {
 			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
 				brw.populate(is_first_populate = false,8);
@@ -5091,7 +5092,7 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 			return;
 		}
 		g_avoid_on_playlist_items_added = true;
-		
+		//if(playlist_idx==brw.selectionIdx) brw.force_SelectedDraw = false;
 		if(playlist_idx == g_active_playlist && new_count == 0) scroll = scroll_ = 0;
 
 		if(brw.current_sourceMode == 1 || brw.current_sourceMode == 2) {
