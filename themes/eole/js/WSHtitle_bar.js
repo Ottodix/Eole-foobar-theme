@@ -1016,6 +1016,9 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuItem(MF_STRING, 1900, "Resume panel state on startup");
 		_menu.CheckMenuItem(1900, properties.Remember_previous_state)
 		
+		_menu.AppendMenuItem(MF_STRING, 1901, "Hide visualization panel");
+		_menu.CheckMenuItem(1901, !properties.show_visualization)
+		
 		_menu.AppendMenuSeparator();
 		_menu_button.AppendMenuItem(MF_STRING, 1806, "Now playing");
 		_menu_button.CheckMenuItem(1806, properties.showNowPlayingBtn);		
@@ -1116,7 +1119,14 @@ function draw_settings_menu(x,y){
 				properties.Remember_previous_state = !properties.Remember_previous_state;
 				window.SetProperty("Resume panel state on startup, except on visualization tab", properties.Remember_previous_state);
 				window.Repaint();
-				break;			
+				break;		
+			case (idx == 1901):
+				properties.show_visualization = !properties.show_visualization;
+				window.SetProperty("_PROPERTY show visualization tab", properties.show_visualization);
+				get_colors();
+				adapt_buttons_to_layout();				
+				window.Repaint();
+				break;				
 			case (idx == 2000):
 				properties.showwallpaper = !properties.showwallpaper;
 				window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
@@ -1204,6 +1214,7 @@ function draw_main_menu(x,y){
     child6.AppendTo(basemenu, MF_STRING, "Help");
     child7.AppendTo(basemenu, MF_STRING, "Now Playing"); 
 	
+	skin_settings_menu = window.CreatePopupMenu();
 	library_menu = window.CreatePopupMenu();
 	playlists_menu = window.CreatePopupMenu();
 	bio_menu = window.CreatePopupMenu();	
@@ -1229,13 +1240,13 @@ function draw_main_menu(x,y){
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Custom width...");	
 	
 	if(layout_state.isEqual(1)){	
-		minimode_menu.AppendTo(basemenu,MF_STRING, "Panel layout");		
+		minimode_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");		
 		minimode_menu.AppendMenuItem(MF_STRING, 3990, "Dark theme");	
 		minimode_menu.CheckMenuItem(3990, properties.minimode_dark_theme);
 		wallpaper_visibility.AppendTo(minimode_menu,MF_STRING, "Wallpapers visibility");			
 		wallpaper_blur.AppendTo(minimode_menu,MF_STRING, "Wallpapers blur");		 		
 	} else if(main_panel_state.isEqual(0)){
-		library_menu.AppendTo(basemenu,MF_STRING, "Panel layout");	
+		library_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");	
 		nowplaying.AppendTo(library_menu,MF_STRING, "Right playlist");		
 		left_menu = window.CreatePopupMenu();
 		left_menu.AppendTo(library_menu,MF_STRING, "Left menu");
@@ -1251,7 +1262,7 @@ function draw_main_menu(x,y){
 		wallpaper_visibility.AppendTo(library_menu,MF_STRING, "Wallpapers visibility");			
 		wallpaper_blur.AppendTo(library_menu,MF_STRING, "Wallpapers blur");					
 	} else if(main_panel_state.isEqual(1)){
-		playlists_menu.AppendTo(basemenu,MF_STRING, "Panel layout");	
+		playlists_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");	
 		nowplaying.AppendTo(playlists_menu,MF_STRING, "Right playlist");
 		playlistpanel_menu = window.CreatePopupMenu();
 		playlistpanel_menu.AppendTo(playlists_menu,MF_STRING, "Playlist panel");
@@ -1281,7 +1292,7 @@ function draw_main_menu(x,y){
 		wallpaper_visibility.AppendTo(playlists_menu,MF_STRING, "Wallpapers visibility");			
 		wallpaper_blur.AppendTo(playlists_menu,MF_STRING, "Wallpapers blur");			
 	} else if(main_panel_state.isEqual(2)){
-		bio_menu.AppendTo(basemenu,MF_STRING, "Panel layout");
+		bio_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");
 	
 		nowplaying.AppendTo(bio_menu,MF_STRING, "Right playlist");
 		
@@ -1302,14 +1313,14 @@ function draw_main_menu(x,y){
 		wallpaper_visibility.AppendTo(bio_menu,MF_STRING, "Wallpapers visibility");			
 		wallpaper_blur.AppendTo(bio_menu,MF_STRING, "Wallpapers blur");			
 	} else if(main_panel_state.isEqual(3)){
-		visu_menu.AppendTo(basemenu,MF_STRING, "Panel layout");		
+		visu_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");		
 		nowplaying.AppendTo(visu_menu,MF_STRING, "Right playlist");
 		visu_menu.AppendMenuSeparator();
 		visu_menu.AppendMenuItem(MF_STRING, 4003, "Dark theme");
 		visu_menu.CheckMenuItem(4003, properties.visualization_dark_theme);	
 	}
 	
-	appearance_menu.AppendTo(basemenu, MF_STRING, "Global layout");		
+	appearance_menu.AppendTo(skin_settings_menu, MF_STRING, "Global layout");		
 	font_size = window.CreatePopupMenu();
 	font_size.AppendTo(appearance_menu,MF_STRING, "Font size");	
 	font_size.AppendMenuItem(MF_STRING, 4012, "Increase");	
@@ -1341,7 +1352,9 @@ function draw_main_menu(x,y){
 	appearance_menu.CheckMenuItem(4024, globalProperties.load_artist_img_at_startup);	*/		
 	appearance_menu.AppendMenuItem(MF_STRING, 4026, "Reset images cache");	
 	
-	basemenu.AppendMenuSeparator(); 
+	
+	
+	skin_settings_menu.AppendMenuSeparator(); 
 
 	var schedulerMenu = window.CreatePopupMenu();
 	schedulerMenu.AppendMenuItem(MF_STRING, 3018, "Do nothing");
@@ -1374,7 +1387,7 @@ function draw_main_menu(x,y){
 				break;				
 		}		
 	schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);		
-	schedulerMenu.AppendTo(basemenu, MF_STRING, "Scheduler");		
+	schedulerMenu.AppendTo(skin_settings_menu, MF_STRING, "Scheduler");		
  	
 	_screensaver.AppendMenuItem(MF_STRING, 4015, "Activate Now");	
 	_screensaver.AppendMenuSeparator(); 
@@ -1387,17 +1400,19 @@ function draw_main_menu(x,y){
 	_screensaver.AppendMenuItem(MF_STRING, 4020, "Light theme");		
 	_screensaver.AppendMenuItem(MF_STRING, 4019, "Dark theme");	
 	_screensaver.CheckMenuRadioItem(4019, 4020, (properties.screensaver_dark_theme)?4019:4020);		
-	_screensaver.AppendTo(basemenu,MF_STRING, "Idle screen");		
+	_screensaver.AppendTo(skin_settings_menu,MF_STRING, "Idle screen");		
 	
 	if(layout_state.isEqual(0)) {
-		basemenu.AppendMenuItem(MF_STRING, 4010, "Compact player");	
+		skin_settings_menu.AppendMenuItem(MF_STRING, 4010, "Compact player");	
 		if(g_uihacks.getFullscreenState())
-			basemenu.AppendMenuItem(MF_STRING, 4009, "Quit Fullscreen");	
+			skin_settings_menu.AppendMenuItem(MF_STRING, 4009, "Quit Fullscreen");	
 		else
-			basemenu.AppendMenuItem(MF_STRING, 4009, "Fullscreen");			
+			skin_settings_menu.AppendMenuItem(MF_STRING, 4009, "Fullscreen");			
 	} else {
-		basemenu.AppendMenuItem(MF_STRING, 4011, "Main player");			
+		skin_settings_menu.AppendMenuItem(MF_STRING, 4011, "Main player");			
 	}
+	
+	skin_settings_menu.AppendTo(basemenu, MF_STRING, "Skin settings");	
 	
     menuman1.Init("file");
     menuman2.Init("edit");
