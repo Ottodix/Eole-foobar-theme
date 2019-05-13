@@ -1123,6 +1123,7 @@ function draw_settings_menu(x,y){
 			case (idx == 1901):
 				properties.show_visualization = !properties.show_visualization;
 				window.SetProperty("_PROPERTY show visualization tab", properties.show_visualization);
+				if(main_panel_state.isEqual(3)) main_panel_state.setValue(0);
 				get_colors();
 				adapt_buttons_to_layout();				
 				window.Repaint();
