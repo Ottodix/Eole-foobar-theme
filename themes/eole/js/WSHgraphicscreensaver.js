@@ -2200,13 +2200,16 @@ oHeaderbar = function(name) {
 				brw.populate(9,true);				
 				break;		
 			case (idx == 3006):				
-				new_TFsorting = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting);
-				if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
-					properties.TFsorting = new_TFsorting;
-					window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-					g_showlist.idx=-1;
-					brw.populate(5,true);	
-				}
+				try {
+					new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", brw.currentSorting, true);
+					if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+						properties.TFsorting = new_TFsorting;
+						window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
+						g_showlist.idx=-1;
+						brw.populate(5,true);	
+					}			   
+				} catch(e) {
+				}	
 				break;					
 			case (idx == 3007):
 				brw.dont_sort_on_next_populate = true;			
@@ -2235,13 +2238,16 @@ oHeaderbar = function(name) {
 				brw.populate(5,true);	
 				break;				
 			case (idx == 4001):				
-				new_TFgrouping = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom grouping", properties.TFgrouping);
-				if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
-					properties.TFgrouping = new_TFgrouping;
-					TF.grouping = fb.TitleFormat(properties.TFgrouping);
-					window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
-					g_showlist.idx=-1;
-					brw.populate(5,true);	
+				try {
+				   new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.\n\n", "Custom grouping", brw.current_grouping, true);
+					if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
+						properties.TFgrouping = new_TFgrouping;
+						TF.grouping = fb.TitleFormat(properties.TFgrouping);
+						window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);	
+						g_showlist.idx=-1;
+						brw.populate(5,false);	
+					}				   
+				} catch(e) {
 				}
 				break;				
 			case (idx == 3100):

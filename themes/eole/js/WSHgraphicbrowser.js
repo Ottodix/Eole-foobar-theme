@@ -160,6 +160,7 @@ var properties = {
 	showlistheightMin:147,
 	showlistheightMinCover:147,
 	showlistCoverMaxSize:232,
+	showlistCoverMinSize:132,	
 	showlistCoverMargin:28,	
 	load_image_from_cache_direct:true		
 }
@@ -234,6 +235,7 @@ timers = {
 	showToolTip: false,
 	ratingUpdate: false,
 	generic: false,
+	avoidShowNowPlaying : false,
 };
 cNowPlaying = {
     flashEnable: false,
@@ -269,7 +271,7 @@ var cover = {
 };
 var cover_path = new RegExp("(artwork)|(cover)|(scan)|(image)");
 var cover_img = cover.masks.split(";");  
-
+var avoidShowNowPlaying = false;
 // ---------------------------------------------------------------------- // Objects
 var g_filterbox = null;
 
@@ -1824,7 +1826,7 @@ oShowList = function(parentPanelName) {
 		}	    
 		return this.rows_[0];
 	}		
-	this.select_all = function() {
+	this.selectAll = function() {
 		var listIndex = [];
 		var IndexStart=brw.groups_draw[this.idx].trackIndex;
 		var IndexEnd=IndexStart+brw.groups_draw[this.idx].pl.Count-1;
@@ -1887,14 +1889,13 @@ oShowList = function(parentPanelName) {
 			this.reset(this.idx, this.rowIdx);
 		}
 	}
-	this.refresh_rows = function(){				
+	this.refreshRows = function(){				
 		for(var i = this.rows_.length; i--;) {
 			this.rows_[i].refresh();
 		} 
 	}	
     this.calcHeight = function(playlist, idx,columnsOffset) {		
 		columnsOffset = typeof columnsOffset !== 'undefined' ? columnsOffset : 0;		
-		this.CoverSize = properties.showlistCoverMaxSize;
 		
 		var playlist = brw.groups_draw[idx].pl;		
 
@@ -1915,8 +1916,18 @@ oShowList = function(parentPanelName) {
 			this.heightMin = properties.showlistheightMin;	
 		}		
 		
-		this.setMarginRight();
-		
+		this.CoverSize = properties.showlistCoverMaxSize;
+		this.totalColsVisMax=1;
+		var decrement_count = 1;
+		while(this.CoverSize > properties.showlistCoverMinSize && this.totalColsVisMax==1){
+			this.setMarginRight();
+			// how many columns visibles?
+			this.totalColsVisMax = Math.floor((brw.w - this.MarginLeft - this.MarginRight) / this.columnWidthMin);
+			if(this.totalColsVisMax > 2) this.totalColsVisMax = 2;
+			else if(this.totalColsVisMax < 1) this.totalColsVisMax = 1;
+			this.CoverSize -= decrement_count;			
+			decrement_count++;
+		}
 		if(properties.showlistScrollbar)
 			this.heightMax = window.Height-brw.rowHeight-100;
 		else
@@ -1934,11 +1945,6 @@ oShowList = function(parentPanelName) {
 				this.isPlaying = true;
 			}
         }
-		
-        // how many columns visibles?
-        this.totalColsVisMax = Math.floor((brw.w - this.MarginLeft - this.MarginRight) / this.columnWidthMin);
-        if(this.totalColsVisMax > 2) this.totalColsVisMax = 2;
-        else if(this.totalColsVisMax < 1) this.totalColsVisMax = 1;
 
         if(this.totalColsVisMax > properties.showlistMaxColumns && properties.showlistMaxColumns>0) this.totalColsVisMax = properties.showlistMaxColumns;		
 
@@ -6703,7 +6709,7 @@ function on_notify_data(name, info) {
 			if(properties.showRating && g_showlist.idx > -1){
 				if(window.IsVisible && !timers.ratingUpdate){
 					timers.ratingUpdate = setTimeout(function(){
-						g_showlist.refresh_rows();
+						g_showlist.refreshRows();
 						brw.repaint();
 						clearTimeout(timers.ratingUpdate);
 						timers.ratingUpdate=false;
@@ -6783,7 +6789,8 @@ function on_notify_data(name, info) {
 		break; 		
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
-			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce')){
+			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
+				avoidShowNowPlaying = true;				
 				if(info!=null) {
 					brw.focus_on_now_playing(info);
 				} else {
@@ -6793,8 +6800,14 @@ function on_notify_data(name, info) {
 						FocusOnNowPlaying = false;
 						clearTimeout(timers.showItem);
 						timers.showItem = false;
-					}, 7000);                    		
+					}, 2000);                    		
 				}	
+				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
+				timers.avoidShowNowPlaying = setTimeout(function() {
+					avoidShowNowPlaying = false;
+					clearTimeout(timers.avoidShowNowPlaying);
+					timers.avoidShowNowPlaying = false;
+				}, 500);					
 			}			
             break;
         case "WSH_panels_reload":
@@ -6891,12 +6904,14 @@ function on_key_down(vkey) {
 			if(g_showlist.haveSelectedRows()){
 				var metadblist_selection = plman.GetPlaylistSelectedItems(brw.getSourcePlaylist());
 				if(!plman.IsAutoPlaylist(brw.getSourcePlaylist()) && metadblist_selection.Count>0) {
+					function delete_confirmation(status, confirmed) {
+						if(confirmed){
+							plman.RemovePlaylistSelection(brw.getSourcePlaylist(), false);
+							plman.SetPlaylistSelectionSingle(brw.getSourcePlaylist(), plman.GetPlaylistFocusItemIndex(brw.getSourcePlaylist()), true);	
+						}		
+					}					
 					var QuestionString = 'Delete '+metadblist_selection.Count+' selected file(s) from current library selection ?';
-					var result = MsgBox(QuestionString, 4, "Please confirm");
-					if (result == 6) {						
-						plman.RemovePlaylistSelection(brw.getSourcePlaylist(), false);
-						plman.SetPlaylistSelectionSingle(brw.getSourcePlaylist(), plman.GetPlaylistFocusItemIndex(brw.getSourcePlaylist()), true);
-					}
+					HtmlDialog("Please confirm", QuestionString, 'Yes', 'No', delete_confirmation);						
 				};
 			}
 			break;
@@ -6919,7 +6934,7 @@ function on_key_down(vkey) {
 			case KMask.ctrl:
 				if(vkey==65) { // CTRL+A
 					if(g_showlist.idx>-1){
-						g_showlist.select_all();
+						g_showlist.selectAll();
 						brw.repaint();
 					}
 				};

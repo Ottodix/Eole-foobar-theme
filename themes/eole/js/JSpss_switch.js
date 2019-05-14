@@ -81,10 +81,13 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		this.setValue(parseInt(this.value)+increment_value);		
 	}	
 	this.userInputValue = function (msg,title) {
-		new_value = InputBox(msg, title, this.value);
-		if (!(new_value == "" || typeof new_value == 'undefined')) {
-			this.setValue(new_value);
-		}
+		try {
+			new_value = utils.InputBox(window.ID, msg, title, this.value, true);
+			if (!(new_value == "" || typeof new_value == 'undefined')) {
+				this.setValue(new_value);
+			}			   
+		} catch(e) {
+		}				
 	}		
 	this.getFileValue();
 }

@@ -151,6 +151,7 @@ var first_on_size = true;
 var nowplaying_cachekey = '';
 var toPlaylistIdx = -1;
 var g_avoid_playlist_displayed_switch = false;
+var avoidShowNowPlaying = false;
 if(!properties.showGroupHeaders) properties.extraRowsNumber=0;
 cTouch = {
     down: false,
@@ -266,6 +267,8 @@ timers = {
 	reactive_playlist: false,
 	callback_avoid_populate: false,
 	ratingUpdate: false,
+	avoidShowNowPlaying : false,
+	avoidPlaylistSwitch : false,
 };
 
 dragndrop = {
@@ -2794,7 +2797,14 @@ oBrowser = function(name) {
 													gr.SetSmoothingMode(0);
 												}								
 											} else {
-												gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin+TrackCover_y, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
+												if(!properties.circleMode)
+													gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin+TrackCover_y, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
+												else {
+													gr.SetSmoothingMode(2);
+													gr.DrawEllipse(TrackCover_x+9, ay+cover.trackMargin+1+TrackCover_y, TrackCover_w-2, TrackCover_h-2, 1.0, colors.cover_rectline);		
+													gr.SetSmoothingMode(0);
+												}													
+												//gr.DrawRect(TrackCover_x+8, ay+cover.trackMargin+TrackCover_y, TrackCover_w-1, TrackCover_h-1, 1.0, colors.cover_rectline);
 											};
 											var text_left_margin = TrackText_x;
 										}									
@@ -6311,9 +6321,16 @@ function on_notify_data(name, info) {
 		break;		
         case "FocusOnNowPlayingForce":		
         case "FocusOnNowPlaying":
-			if(window.IsVisible) {
+			if(window.IsVisible && !avoidShowNowPlaying) {
 				brw.showNowPlaying();
-			}
+				avoidShowNowPlaying = true;
+				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
+				timers.avoidShowNowPlaying = setTimeout(function() {
+					avoidShowNowPlaying = false;
+					clearTimeout(timers.avoidShowNowPlaying);
+					timers.avoidShowNowPlaying = false;
+				}, 500);				
+			} else avoidShowNowPlaying = false;
             break;
 		case"stopFlashNowPlaying":
 			stopFlashNowPlaying();

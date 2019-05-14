@@ -663,6 +663,7 @@ function userinterface() {
     this.pad = window.GetProperty(" Tree Indent", 19);
     this.scrollbar_show = window.GetProperty(" Scrollbar Show", true);
     this.scr_w = this.scrollbar_show ? window.GetProperty(" Scrollbar Width", 12) : 0;
+	this.force_SelectedDraw = false;	
     window.SetProperty("_CUSTOM COLOURS: EMPTY = DEFAULT", "R-G-B (any) or R-G-B-A (not Text...), e.g. 255-0-0");
     var R = function(c) {
         return c >> 16 & 0xff;
@@ -1001,7 +1002,11 @@ function scrollbar() {
         if (!this.b_is_dragging || this.row_count <= this.rows_drawn) return;
         this.check_scroll(Math.round((y - this.initial_drag_y - this.but_h) / this.drag_distance_per_row) * this.row_h);
     }
-
+	this.middle_scroll = function(new_scroll) {
+		var middle = p.sp/2.5;
+		var middle_scroll = new_scroll - Math.floor(middle - middle%this.row_h);
+		this.check_scroll(middle_scroll);
+	}
     this.check_scroll = function(new_scroll) {
         var s = Math.max(0, Math.min(new_scroll, this.scrollable_lines * this.row_h));
         if (s == this.scroll) return;
@@ -1597,7 +1602,7 @@ function library_manager() {
         /* Draw tree -> */
         if (!p.base || p.s_txt) pop.buildTree(this.root, 0);	
         if (p.base) pop.branch(this.root[0],p.base,true);
-		
+
         console.log("--> populate Library Tree in: " + this.time.Time / 1000 + " seconds call_id:"+callID);
         var gp = p.grp_split.length,
             tot = this.list.Count;
@@ -1893,14 +1898,13 @@ function populate() {
 		g_tooltip.Deactivate();			
     }
     this.gen_pl = btn_pl[1] == 1 ? true : false,
-	this.get_sel_items = function() {console.log("this.get_sel_items"+1)
+	this.get_sel_items = function() {
 		this.sel_items = [];
 		this.sel_group_count = 0;
 		for (var i = 0; i < this.tree.length; i++) {
 			if (this.tree[i].sel) {
 				this.sel_items.push.apply(this.sel_items, this.tree[i].item);
 				this.sel_group_count++;
-				console.log("this.get_sel_items"+2)
 			}
 		}
 		this.sel_items = uniq(this.sel_items);
@@ -2118,6 +2122,38 @@ function populate() {
 	this.clearSelectedItem = function(){
 		for (var k = 0; k < this.tree.length; k++) this.tree[k].sel = false;		
 	}
+	this.showNowPlaying = function(){
+		var now_playing = fb.GetNowPlaying();
+		var np_item = np_node = -1;
+		var dont_scroll = false;
+        if (fb.IsPlaying && now_playing) {
+			var items = p.items();
+			for (var i = 0; i < lib.list.Count; i++) items.Add(lib.list[i]);
+            for (i = 0; i < items.Count; i++) {
+                if (now_playing.Compare(items[i])) {
+                    np_item = i;
+                    break;
+                }
+			}
+			if(np_item>=0) {	
+				for (var i = 0; i < this.tree.length; i++){
+					var v = this.tree[i];
+					if (v.item.includes(np_item)) {
+							np_node = i;
+							if(pop.tree[np_node].child.length < 1 && (!pop.show_aggregate_item || np_node>0)) {
+								pop.branch(pop.tree[np_node]);
+							}							
+					}	
+				};			
+				if(np_node>=0) {
+					pop.clearSelectedItem();	
+					pop.tree[np_node].sel = true;
+					ui.force_SelectedDraw = true;
+					sbar.middle_scroll(np_node * ui.row_h);
+				}
+			}
+		}
+	}
     this.load = function(list, type, add, send, def_pl, insert) {
         var i = 0,
             np_item = -1,
@@ -2130,6 +2166,7 @@ function populate() {
             for (var i = 0; i < list.length; i++) items.Add(p.list[list[i]]);
         } else var items = list.Clone();
         if (custom_sort.length) items.OrderByFormat(fb.TitleFormat(custom_sort), 1);
+	
         /*if (fb.IsPlaying && !add && fb.GetNowPlaying()) {
             for (i = 0; i < items.Count; i++)
                 if (fb.GetNowPlaying().Compare(items[i])) {
@@ -2266,7 +2303,7 @@ function populate() {
             if (this.line_l && ui.linestyle<2) gr.FillSolidRect(ln_x, ln_y, 1, ln_h, ui.linecol);
         }
         for (i = s; i < e; i++) {
-            if ((this.tree[i].sel && ui.backcolsel != 0 &&  (plman.GetPlaylistName(plman.ActivePlaylist)==lib_playlist)) || g_rightClickedIndex == i) {
+            if ((this.tree[i].sel && ui.backcolsel != 0 && (plman.GetPlaylistName(plman.ActivePlaylist)==lib_playlist || ui.force_SelectedDraw)) || g_rightClickedIndex == i) {
                 item_y = ui.row_h * i + p.s_h - sbar.delta;
                 item_x = Math.round(ui.pad * this.tree[i].tr + ui.margin);
                 if (ui.node_style>=0 || !this.tree[i].track) item_x = item_x + ui.symbol_w;
@@ -3575,6 +3612,8 @@ function menu_object() {
         if (y > p.s_h && pop.tree.length > ix && ix >= 0 && pop.check_ix(pop.tree[ix], x, y, false)) {
             menu.AppendMenuItem(MF_STRING, 7004, "Settings...");	
             menu.AppendMenuSeparator();
+            menu.AppendMenuItem(MF_STRING, 7006, "Locate now playing group");	
+            menu.AppendMenuSeparator();
 			
 			var show_collapse = false
 			for(var i=0; i < pop.tree.length; i++) {
@@ -3656,6 +3695,8 @@ function menu_object() {
 		} else if(idx==7005){
 			pop.branch_chg(pop.tree[0]);
 			pop.buildTree(lib.root, 0, true, true);
+		} else if(idx==7006){
+			pop.showNowPlaying();		
 		} else if(idx==9999){
 			if(pop.show_aggregate_item && ix==0) openFolder(first_item,-1);
 			else openFolder(first_item,pop.tree[ix].tr);		
@@ -3741,9 +3782,7 @@ function openFolder(item,level){
 }
 function showSettingsMenu(x,y){
 	var menu = window.CreatePopupMenu();
-	
-	console.log("showSettingsMenu");
-	
+
 	menu.AppendMenuItem(MF_STRING, 7000, "Switch to filters");	
 	menu.AppendMenuItem(MF_SEPARATOR, 0, 0);		
 
@@ -4046,7 +4085,6 @@ function showOptionsMenu(x,y,reduced){
 		window.SetProperty(" Node: Auto Expand Single Childs", pop.autoExpandSingleChild);
 		window.Repaint();	
 	} else if(idx==7024){
-		console.log("okkkkkkk")
 		showSettingsMenu(x,y);		
 	} else if(idx==7016){
 		p.tooltip = !p.tooltip;
@@ -4190,6 +4228,7 @@ function on_playlists_changed() {
 	}	
 };
 function on_playlist_switch() {
+	ui.force_SelectedDraw = false;	
     if(window.IsVisible) {
 		pman.populate(exclude_active = false, reset_scroll = false);
 		if(pop.pln != plman.ActivePlaylist){
@@ -4274,7 +4313,7 @@ function on_mouse_lbtn_down(x, y) {
 		g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
 	}		
 }
-function on_mouse_rbtn_down(x, y, mask) {			
+function on_mouse_rbtn_down(x, y, mask) {
 	if(pman.state == 1) {
 		pman.on_mouse("right", x, y);
 	};
@@ -4533,6 +4572,9 @@ function get_images() {
 };
 function on_notify_data(name, info) {
     switch(name) {
+        case "FocusOnNowPlayingForce":				
+			if(window.IsVisible) pop.showNowPlaying();	
+        break;				
 		case "set_font":
 			properties.globalFontAdjustement = info;
 			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),			

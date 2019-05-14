@@ -956,12 +956,15 @@ function on_mouse_rbtn_up(x, y){
 				escapeOnMouseMove(!globalProperties.escape_on_mouse_move);	
                 break;			
             case (idx == 11):
-				new_mseconds_before_screensaver = InputBox("Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000);
-				if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
-					globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
-					if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
-					globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
-					setScreensaverTime(globalProperties.mseconds_before_screensaver);
+				try {
+					new_mseconds_before_screensaver = utils.InputBox(window.ID, "Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000, true);
+					if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
+						globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
+						if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
+						globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
+						setScreensaverTime(globalProperties.mseconds_before_screensaver);
+					}				   
+				} catch(e) {
 				}				
                 break;		
             case (idx == 12):
@@ -1093,12 +1096,15 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;
 			case (idx == 1809):
-				new_caption_format = InputBox("Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom windows title", properties.tracktitle_format);
-				if (!(new_caption_format == "" || typeof new_caption_format == 'undefined')) {
-					properties.tracktitle_format = new_caption_format;
-					window.SetProperty("_DISPLAY: Track title format", properties.tracktitle_format);	
-					eval_caption_title(fb.GetNowPlaying());
-				}
+				try {
+					new_caption_format = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom windows title", properties.tracktitle_format, true);
+					if (!(new_caption_format == "" || typeof new_caption_format == 'undefined')) {
+						properties.tracktitle_format = new_caption_format;
+						window.SetProperty("_DISPLAY: Track title format", properties.tracktitle_format);	
+						eval_caption_title(fb.GetNowPlaying());
+					}			   
+				} catch(e) {
+				}					
 				window.Repaint();
 				break;		
 			case (idx == 1810):
@@ -1334,27 +1340,25 @@ function draw_main_menu(x,y){
 	nowplayinglobal.AppendTo(appearance_menu,MF_STRING, "Right playlist");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");		
-	appearance_menu.AppendMenuSeparator();  	
-	
-	mem_solicitation = window.CreatePopupMenu();
-	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "0 - Minimum");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "1 - Keep loaded covers in memory");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "2 - Load all covers at startup");
-	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "3 - Load all covers && artist thumbnails at startup");	
-	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
-	mem_solicitation.AppendTo(appearance_menu, MF_STRING, "Covers && Memory usage");
-	
-	appearance_menu.AppendMenuSeparator();		
+
 	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4023, "Load all covers at startup");
 	appearance_menu.CheckMenuItem(4023, globalProperties.load_covers_at_startup);
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4024, "Load all artist thumbnails at startup");
 	appearance_menu.CheckMenuItem(4024, globalProperties.load_artist_img_at_startup);	*/		
-	appearance_menu.AppendMenuItem(MF_STRING, 4026, "Reset images cache");	
-	
-	
-	
+		
+	skin_settings_menu.AppendMenuSeparator(); 
+	mem_solicitation = window.CreatePopupMenu();
+	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "0 - Minimum");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "1 - Keep loaded covers in memory");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "2 - Load all covers at startup");
+	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "3 - Load all covers && artist thumbnails at startup");	
+	mem_solicitation.AppendMenuSeparator();	
+	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4026, "Reset images cache");
+	mem_solicitation.AppendTo(skin_settings_menu, MF_STRING, "Covers && Memory usage");
+
 	skin_settings_menu.AppendMenuSeparator(); 
 
 	var schedulerMenu = window.CreatePopupMenu();
@@ -1569,13 +1573,16 @@ function draw_main_menu(x,y){
 		escapeOnMouseMove(!globalProperties.escape_on_mouse_move);	
 		break;		
 	case (idx == 4018):
-		new_mseconds_before_screensaver = InputBox("Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000);
-		if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
-			globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
-			if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
-			globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
-			setScreensaverTime(globalProperties.mseconds_before_screensaver);
-		}				
+		try {
+			new_mseconds_before_screensaver = utils.InputBox(window.ID, "Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000, true);
+			if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
+				globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
+				if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
+				globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
+				setScreensaverTime(globalProperties.mseconds_before_screensaver);
+			}				   
+		} catch(e) {
+		}		
 		break;			
 	case (idx == 4019):
 		properties.screensaver_dark_theme=true;
@@ -2364,8 +2371,13 @@ function on_init(){
 
 	if(fb.IsPlaying) caption_title = fb.TitleFormat("[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]").Eval();
 	if(settings_file_not_found){
-		MsgBox('Looks like you just installed this theme.\n\If you encounter visual bugs just after the installation, try to close and restart foobar, they may go away.\n\nUseful tip: most panels have a settings menu available with a right-click.\n\nNote: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.\n\nThis cache is based on the %album artist% & %album% tags.\n\nAfter updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.\n\nThanks for using EOLE!', vb.OKOnly, "Welcome to EOLE");
+		var welcome_msg_timer = setTimeout(function(){
+			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>');
+			clearTimeout(welcome_msg_timer);
+			welcome_msg_timer=false;
+		}, 200); 	
 		RefreshPSS();	
-	}	
+	} else {	
+	}
 }
 on_init();

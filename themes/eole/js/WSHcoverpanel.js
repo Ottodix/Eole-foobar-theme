@@ -11,7 +11,8 @@ var properties = {
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),	
     screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),	
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
-    bio_dark_theme: window.GetProperty("BIO dark theme", false),		
+    bio_dark_theme: window.GetProperty("BIO dark theme", false),	
+    dble_click_action: window.GetProperty("PROPERTY double click action", 0),	
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
 	rawBitmap: false,
 	refreshRate: 50,	
@@ -385,13 +386,16 @@ function on_mouse_lbtn_down(x, y) {
 
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
-	/*if(fb.IsPlaying && layout_state.isEqual(0) && main_panel_state.isEqual(0) && getNowPlayingState()==1){
-		showNowPlaying(true);         
-	}
-    else */
 	if(fb.IsPlaying) {
-		fb.Pause();
-		window.NotifyOthers("stopFlashNowPlaying",true);
+		switch(true){
+			case (properties.dble_click_action==0):
+				fb.Pause();
+				window.NotifyOthers("stopFlashNowPlaying",true);		
+			break;
+			case (properties.dble_click_action==1):
+				showNowPlaying(true); 
+			break;		
+		}
 	} 
 }
 
@@ -818,7 +822,7 @@ function on_mouse_rbtn_up(x, y){
 				try {
 					WshShell.Run("\"" + cover_path + "\"", 0);
 				} catch(e) {
-					MsgBox("Image not found, this cover is probably embedded inside the audio file.", vb.OKOnly,"error");
+					HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
 				}			
                 break;				
             case (idx == 2):
@@ -911,11 +915,18 @@ function draw_settings_menu(x,y){
         var _menu = window.CreatePopupMenu();
         var idx;
 		
+		var _dble_click_menu = window.CreatePopupMenu();
+		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
+		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");		
+		_dble_click_menu.CheckMenuRadioItem(3, 4, 3+properties.dble_click_action);		
+		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double  click action");     
+		_menu.AppendMenuSeparator();
+		
 		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");		
 		_menu.CheckMenuItem(1,properties.showVisualization);
 		_menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
 		_menu.CheckMenuItem(2, coverpanel_state.isActive());		
-		
+
         idx = _menu.TrackPopupMenu(x,y,0x0020);
         switch(true) {
 			case (idx == 1):
@@ -927,6 +938,14 @@ function draw_settings_menu(x,y){
 				break;	
             case (idx == 2):
 				coverpanel_state.toggleValue();
+                break;			
+            case (idx == 3):
+				properties.dble_click_action = 0;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+                break;		
+            case (idx == 4):
+				properties.dble_click_action = 1;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
                 break;					
             default:
 				return true;

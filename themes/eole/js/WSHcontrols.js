@@ -840,7 +840,7 @@ function is_hover_track_info(x,y){
     if(y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+ww_progress-timeInfo_length) return true;
     return false;    
 }
-function on_mouse_lbtn_down(x,y,m){
+function on_mouse_lbtn_down(x,y,m){	
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);
 	//Volume
     if(is_hover_volume_slider(x,y) && !is_hover_volume_btn(x,y)) {volume_vars.drag = true;}
@@ -897,9 +897,13 @@ function on_mouse_lbtn_up(x,y,m){
         if(down_btn && down_btn.text == cur_btn.text) cur_btn.onMouse('lbtn_up',x,y);
         window.Repaint();
     }
-    down_btn = false;	
+    down_btn = false;
+	mouse_dble_clic = false;	
 }
 function on_mouse_lbtn_dblclk(x, y) {
+	if(is_hover_track_info(x,y)) {
+		showNowPlaying(true);
+	}
     if (cur_btn) {
         cur_btn.onDbleClick();
         window.Repaint();

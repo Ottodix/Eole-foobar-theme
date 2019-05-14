@@ -74,7 +74,7 @@ function setMemoryParameters(){
 	}
 }
 setMemoryParameters();
-console.log(globalProperties.mem_solicitation+" "+globalProperties.load_covers_at_startup)
+
 var cScrollBar = {
     enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
     visible: true,
@@ -143,6 +143,68 @@ var oCursor = function () {
 			break;			
 		}
     }  		
+}
+// HTML dialogs ---------------------------------------------------------------------
+function get_windows_version() {
+    let version = '';
+	var WshShell = new ActiveXObject("WScript.Shell");
+    try {
+        version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
+        version += '.';
+        version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
+
+        return version;
+    }
+    catch (e) {
+    }
+
+    try {
+        version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
+
+        return version;
+    }
+    catch (e) {
+    }
+
+    return '6.1';
+}
+function window_ok_callback(status, clicked) {
+    text = `Dialog was closed with ${status} and checkbox ${clicked}\n`
+        + '>> Click Me To Open Dialog <<';
+    window.Repaint();
+}
+function htmlCode(directory,filename) {
+    let htmlCode = utils.ReadTextFile(directory+"\\"+filename);
+    
+    let cssPath = directory;
+    if ( get_windows_version() === '6.1' ) {
+        cssPath += "\\styles7.css";
+    }
+    else {
+        cssPath += "\\styles10.css";
+    }
+    htmlCode = htmlCode.replace(/href="styles10.css"/i, `href="${cssPath}"`);
+    return htmlCode;
+};
+function HtmlMsg(msg_title, msg_content, btn_label){
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","MsgBox.html"), {
+		data: [msg_title, msg_content, btn_label, null],            
+	});
+}
+function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","ConfirmDialog.html"), {
+		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],            
+	});
+}
+function chooseMemorySettings(title,top_msg,bottom_msg){
+	function ok_callback(status, mem_solicitation) {
+		if(mem_solicitation==globalProperties.mem_solicitation) return;
+		else if(mem_solicitation>=0 && mem_solicitation<=3) setMemoryUsageGlobaly(Number(mem_solicitation));
+		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","RadioDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg],  
+	});
 }
 //Colors ------------------------------------------------------------------------------
 var colors = {};
@@ -801,20 +863,20 @@ function enableDiskCacheGlobaly(){
 	globalProperties.enableDiskCache = !globalProperties.enableDiskCache;
 	window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
 	window.NotifyOthers("DiskCacheState",globalProperties.enableDiskCache);
-	if(globalProperties.enableDiskCache) MsgBox("The disk image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nAfter updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.", vb.OKOnly, "Explanation on the disk image cache")			
-	else  MsgBox("Warning: foobar may be slower without the disk image cache enabled.\n\nRestart foobar to fully disable it.", vb.OKOnly, "Explanation on the disk image cache");		
+	if(globalProperties.enableDiskCache) HtmlMsg("Explanation on the disk image cache", "The disk image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nAfter updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.", "Ok")			
+	else  HtmlMsg("Explanation on the disk image cache", "Warning: foobar may be slower without the disk image cache enabled.\n\nRestart foobar to fully disable it.", "Ok");		
 }
 function enableCoversAtStartupGlobaly(){
 	globalProperties.load_covers_at_startup = !globalProperties.load_covers_at_startup;
 	window.SetProperty("COVER Load all at startup", globalProperties.load_covers_at_startup);
 	window.NotifyOthers("LoadAllCoversState",globalProperties.load_covers_at_startup);					
-	if(globalProperties.load_covers_at_startup) MsgBox(((!globalProperties.enableDiskCache)?"This option will work better if the disk image cache is enabled and already built (check the option just below).\n\n":"")+"Foobar memory usage is higher when this option is enabled , because all the covers are loaded into the memory, but if your library isn't outsized, it should be okey.\n\nIf you want to update a cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nRestart foobar to start loading all the covers.", vb.OKOnly, "Explanation on the disk image cache")			
+	if(globalProperties.load_covers_at_startup) HtmlMsg("Explanation on the disk image cache", ((!globalProperties.enableDiskCache)?"This option will work better if the disk image cache is enabled and already built (check the option just below).\n\n":"")+"Foobar memory usage is higher when this option is enabled , because all the covers are loaded into the memory, but if your library isn't outsized, it should be okey.\n\nIf you want to update a cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nRestart foobar to start loading all the covers.", "Ok")			
 }
 function enableArtistImgAtStartupGlobaly(){
 	globalProperties.load_artist_img_at_startup = !globalProperties.load_artist_img_at_startup;
 	window.SetProperty("ARTIST IMG Load all at startup", globalProperties.load_artist_img_at_startup);
 	window.NotifyOthers("LoadAllArtistImgState",globalProperties.load_artist_img_at_startup);	
-	if(globalProperties.load_artist_img_at_startup) MsgBox(((!globalProperties.enableDiskCache)?"This option will work better if the disk image cache is enabled and already built (check the option just below).\n\n":"")+"Foobar memory usage is higher when this option is enabled , because all the artist thumbnails are loaded into the memory, but if your library isn't outsized, it should be okey.\n\nIf you want to update an artist thumbnail, you must manually refresh it in foobar, do a right click over the artist thumbnail which need to be refreshed, and you will have a menu item for that.\n\nThe disk image cache is based on the %album artist% tag.\n\nRestart foobar to start loading all the covers.", vb.OKOnly, "Explanation on the disk image cache")		
+	if(globalProperties.load_artist_img_at_startup) HtmlMsg("Explanation on the disk image cache",((!globalProperties.enableDiskCache)?"This option will work better if the disk image cache is enabled and already built (check the option just below).\n\n":"")+"Foobar memory usage is higher when this option is enabled , because all the artist thumbnails are loaded into the memory, but if your library isn't outsized, it should be okey.\n\nIf you want to update an artist thumbnail, you must manually refresh it in foobar, do a right click over the artist thumbnail which need to be refreshed, and you will have a menu item for that.\n\nThe disk image cache is based on the %album artist% tag.\n\nRestart foobar to start loading all the covers.", "Ok")		
 }
 function hibernate_computer(){
 	//WshShell.Run("%windir%\\System32\\rundll32.exe powrprof.dll, SetSuspendState 0,1,0", 0);
@@ -941,7 +1003,6 @@ vb.Function.eval = function (func) {
     return vbe.Eval(func + '(' + args.join(', ') + ')');
 };
 
-var InputBox = vb.Function('InputBox');
 var MsgBox = vb.Function('MsgBox');
 vb.OKOnly = 0;
 vb.OKCancel = 1;
@@ -1431,41 +1492,46 @@ function SetGenre(GenreNumber, plist_items, max_items, clean_file){
 	var max_items = typeof max_items !== 'undefined' ? max_items : 9000;
 	var clean_file = typeof clean_file !== 'undefined' ? clean_file : false;	
     if(plist_items.Count>max_items) {
-         var result = MsgBox("The current playlist contain more than "+max_items+" files. Please use the standard properties dialog.", vb.OKOnly, "Error");
+         var result = HtmlMsg("Error", "The current playlist contain more than "+max_items+" files. Please use the standard properties dialog.", "Ok");
 		 return false;
     } else {
+		function update_confirmation(status, confirmed) {
+			if(confirmed){
+				var arr = [];
+				for (var i = 0; i < plist_items.Count; i++) {
+					arr.push({
+						"genre" : [g_genre_cache.genreList[GenreNumber][0]] // we can use an array here for multiple value tags
+					});
+				}
+				var str = JSON_stringify(arr);
+				plist_items.UpdateFileInfoFromJSON(str);	
+			}		
+		}					
         var QuestionString = "Updating "+plist_items.Count+" files genre to '"+g_genre_cache.genreList[GenreNumber][0]+"' ?";
-        var result = MsgBox(QuestionString, 4, "Please confirm");
-        if (result == 6) {			   
-			// an empty array
-			var arr = [];
-			for (var i = 0; i < plist_items.Count; i++) {
-				arr.push({
-					"genre" : [g_genre_cache.genreList[GenreNumber][0]] // we can use an array here for multiple value tags
-				});
-			}
-			var str = JSON_stringify(arr);
-			plist_items.UpdateFileInfoFromJSON(str);		   		
-        }
+		HtmlDialog("Please confirm", QuestionString, 'Yes', 'No', update_confirmation);
     }
 	return false;		
 }
 // The items must be selected before calling this function
 function removeItems(plist_items, plist_Idx, ask_for_confirmation){
 	var ask_for_confirmation = typeof ask_for_confirmation !== 'undefined' ? ask_for_confirmation : true;	
-	if(!plist_items) {
+	if(!plist_items) {	
+		function delete_confirmation(status, confirmed) {
+			if(confirmed){
+				plman.ClearPlaylist(plist_Idx)		 
+			}		
+		}					
         var QuestionString = "Remove all the files ("+plman.PlaylistItemCount(plist_Idx)+") from this playlist ("+plman.GetPlaylistName(plist_Idx)+") ?";
-        var result = MsgBox(QuestionString, 4, "Please confirm");
-        if (result == 6) {			   
-			plman.ClearPlaylist(plist_Idx)			   	
-        }		
+		HtmlDialog("Please confirm", QuestionString, 'Yes', 'No', delete_confirmation);				
     } else {
 		if(ask_for_confirmation){
+			function delete_confirmation(status, confirmed) {
+				if(confirmed){
+					plman.RemovePlaylistSelection(plist_Idx)			 
+				}		
+			}					
 			var QuestionString = "Remove "+plist_items.Count+" file"+((plist_items.Count>1)?"s":"")+" from this playlist ("+plman.GetPlaylistName(plist_Idx)+") ?";
-			var result = MsgBox(QuestionString, 4, "Please confirm");
-			if (result == 6) {			   
-				plman.RemovePlaylistSelection(plist_Idx)			   	
-			}
+			HtmlDialog("Please confirm", QuestionString, 'Yes', 'No', delete_confirmation);
 		} else plman.RemovePlaylistSelection(plist_Idx)
     }
 	return false;		
@@ -2242,9 +2308,9 @@ function delete_file_cache(metadb, albumIndex, crc, delete_at_startup){
 				window.SetProperty("COVER cachekey of covers to delete on next startup", properties.deleteSpecificImageCache);
 			}
 			if(delete_at_startup && delete_at_startup==true)
-				MsgBox("The cached cover can't be deleted.\nTry to close foobar and delete the following file manually :\n\n"+cover_img_cache + "\\" + crc, vb.OKOnly, "Can't delete this file");
+				HtmlMsg("Can't delete this file", "The cached cover can't be deleted.\nTry to close foobar and delete the following file manually :\n\n"+cover_img_cache + "\\" + crc, "Ok");
 			else
-				MsgBox("The cached cover image can't be refreshed from foobar currently (file in use), but foobar will try to refresh it on next startup", vb.OKOnly, "Can't delete this file");				
+				HtmlMsg("Can't delete this file", "The cached cover image can't be refreshed from foobar currently (file in use), but foobar will try to refresh it on next startup", "Ok");				
 		};		
         return true;
     };
@@ -2263,12 +2329,14 @@ function delete_full_cache(){
 		globalProperties.deleteDiskCache=false;
 		window.SetProperty("COVER delete cover cache on next startup", false);
 	} else {
+		function delete_confirmation(status, confirmed) {
+			if(confirmed){
+				window.SetProperty("COVER delete cover cache on next startup", true);	
+				fb.Exit(); 				 
+			}		
+		}					
 		var QuestionString = "Do you really want to fully reset the image cache ?\n\nIf you confirm, the image cache will be refreshed on next startup. Foobar will exit, please restart it manually.";
-        var result = MsgBox(QuestionString, 4, "Please confirm");
-        if (result == 6) {	 
-			window.SetProperty("COVER delete cover cache on next startup", true);	
-			fb.Exit(); 			
-		}	
+		HtmlDialog("Please confirm", QuestionString, 'Yes', 'No', delete_confirmation);		
 	}
 }
 
