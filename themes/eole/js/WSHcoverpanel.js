@@ -14,6 +14,7 @@ var properties = {
     bio_dark_theme: window.GetProperty("BIO dark theme", false),	
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),	
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
+	tintOnHover : true,
 	rawBitmap: false,
 	refreshRate: 50,	
 }
@@ -330,7 +331,7 @@ function on_paint(gr) {
 			gr.FillSolidRect(visu_margin_left + bar_margin*2 + bar_width*2, wh/2-height_bar_2+global_vertical_fix+Visualization_top_m, bar_width, height_bar_2, colors.animation);		
 		} 
 	}
-	
+
 	drawAllButtons(gr);	 
 	switch(true){
 		case (main_panel_state.isEqual(0) && properties.library_dark_theme && layout_state.isEqual(0)):
@@ -346,7 +347,6 @@ function on_paint(gr) {
 	}		
 	
 	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, colors.border_dark);
-	
 	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);		
 }
 function on_size() {
@@ -401,10 +401,13 @@ function on_mouse_lbtn_dblclk(x, y) {
 
 function on_mouse_move(x, y, m) {    
     if(g_cursor.x == x && g_cursor.y == y) return;
-	g_cursor.onMouse("move", x, y, m);		
+	g_cursor.onMouse("move", x, y, m);
+	g_cover.onMouse("move", x, y, m);
 }
 
 function on_mouse_leave() {
+	g_cursor.onMouse("leave", 0, 0);
+	g_cover.onMouse("leave", 0, 0);
     g_down = false;    
     if (cur_btn) {
         cur_btn.changeState(ButtonStates.normal);
@@ -506,6 +509,7 @@ oCover = function() {
 	this.y = 0;		
 	this.resized = false;
 	this.artwork = null;
+	this.tintDrawed = false;
 	this.repaint = function() {window.Repaint()}  
 	this.reset = function() {
 		this.artwork = null;
@@ -545,7 +549,11 @@ oCover = function() {
 		if(this.resized)
 			gr.DrawImage(this.artwork_resized, this.x-1, this.y-1, this.w+1, this.h+1, 0, 0, this.artwork_resized.Width, this.artwork_resized.Height);		
 		else		
-			gr.DrawImage(this.artwork, this.x, this.y, this.w, this.h, 0, 0, this.artwork.Width, this.artwork.Height);				
+			gr.DrawImage(this.artwork, this.x, this.y, this.w, this.h, 0, 0, this.artwork.Width, this.artwork.Height);		
+		if(properties.tintOnHover && this.isHover){
+			gr.FillSolidRect(0, 0, ww, wh, colors.overlay_on_hover);
+			this.tintDrawed = true;
+		}
     };
     this.refresh = function (metadb, cachekey) {
 		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
@@ -556,6 +564,48 @@ oCover = function() {
 		this.getArtwork(metadb);
 		window.Repaint();
 	}
+    this.onMouse = function (state, x, y, m) {    
+		switch(state){
+			case 'lbtn_down':
+				this.down_x = x;
+				this.down_y = y;				
+			break;				
+			case 'lbtn_up':
+				this.up_x = x;
+				this.up_y = y;				
+			break;
+			case 'dble_click':
+				this.down_x = x;
+				this.down_y = y;				
+			break;
+			case 'move':
+				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h){
+					g_cursor.setCursor(IDC_HAND);
+					if(!this.isHover){
+						this.isHover = true;
+						if(properties.tintOnHover && !this.tintDrawed){
+							window.Repaint();
+						}
+					}
+				} else {
+					g_cursor.setCursor(IDC_ARROW);
+					this.isHover = false;
+					this.tintDrawed = false;
+					window.Repaint();					
+				}
+			break;
+			case 'leave':
+				this.x = -1;
+				this.y = -1;
+				if(this.isHover){
+					g_cursor.setCursor(IDC_ARROW);					
+					this.isHover = false;
+					this.tintDrawed = false;
+					window.Repaint();					
+				}
+			break;			
+		}
+    }	
 };
 function on_get_album_art_done(metadb, art_id, image, image_path) {
     cover_path = image_path;
@@ -982,6 +1032,7 @@ function get_colors(){
 	colors.border_light = GetGrey(255,20);
 	colors.border_dark = GetGrey(0,50);
 	colors.line_bottom = GetGrey(40,200);	
+	colors.overlay_on_hover = GetGrey(0,150);		
 }
 function get_images(){
 	if(properties.darklayout) var theme_path = "controls_Dark"; else var theme_path = "controls_Light";	

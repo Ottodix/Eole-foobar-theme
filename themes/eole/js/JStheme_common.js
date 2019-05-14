@@ -142,7 +142,14 @@ var oCursor = function () {
 				this.y = -1;
 			break;			
 		}
-    }  		
+    }
+	this.setCursor = function(cursor_code){
+		this.cursor = cursor_code;
+		window.SetCursor(cursor_code);
+	}
+	this.getCursor = function(){
+		return this.cursor;
+	}
 }
 // HTML dialogs ---------------------------------------------------------------------
 function get_windows_version() {

@@ -931,6 +931,7 @@ function on_mouse_move(x,y,m){
 		if(timers.hideVolume!==false) {clearTimeout(timers.hideVolume);timers.hideVolume=false;}
         hoovervolume=true; 		
         if(is_hover_volume_slider(x,y)) {		
+			g_cursor.setCursor(IDC_HAND);		
 			if(!repaint_volume) {
 				repaint_volume = true;
 				calculate_volume_ellipse_vars(true);
@@ -941,6 +942,7 @@ function on_mouse_move(x,y,m){
 		else if(!volume_vars.drag){ResetVolume();}
     } else if(hoovervolume && !volume_vars.drag){
 		ResetVolume();
+		g_cursor.setCursor(IDC_ARROW);		
 		if(!timers.hideVolume) showVolumeSlider(false);
 	} else if(!timers.hideVolume && !volume_vars.drag && VolumeSliderActive) {
 		showVolumeSlider(false);
@@ -963,6 +965,7 @@ function on_mouse_move(x,y,m){
 	//Progress
 	m_pos_progress = clamp(x-progress_margin_left, 0, ww_progress);	
 	if(is_hover_progress(x,y)){
+		g_cursor.setCursor(IDC_HAND);
 		hooverprogress=true;        
 		if(!repaint_progress) {
 			repaint_progress = true;            
@@ -970,6 +973,7 @@ function on_mouse_move(x,y,m){
 		}				 
            
 	} else if(hooverprogress && !progress_vars.drag){
+		g_cursor.setCursor(IDC_ARROW);
 		ResetProgress();
 	}
   
@@ -1011,9 +1015,15 @@ function on_mouse_move(x,y,m){
         repaint = true;
         return;
     } else {        
-        old && old.changeState(ButtonStates.normal);
-        cur_btn && cur_btn.changeState(ButtonStates.hover);
-        repaint = true;	
+        if(old){
+			old.changeState(ButtonStates.normal);
+			g_cursor.setCursor(IDC_ARROW);			
+		}
+        if(cur_btn){
+			cur_btn.changeState(ButtonStates.hover);		
+			g_cursor.setCursor(IDC_HAND);
+		}
+        repaint = true;			
     }
 	if(repaint) window.Repaint();
 }
