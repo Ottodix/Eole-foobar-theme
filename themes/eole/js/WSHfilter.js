@@ -4627,7 +4627,7 @@ function get_colors() {
 		colors.grid_bg = GetGrey(0,190)		
 		colors.gridselected_txt = GetGrey(0)	
 		colors.gridselected_bg = GetGrey(255,155)	
-		
+
 		colors.btn_inactive_opacity = 130;
 		colors.btn_inactive_txt = GetGrey(140);	
 		
@@ -4666,6 +4666,7 @@ function get_colors() {
 			colors.headerbar_line_maincolor = GetGrey(215);			
 		}	
 	}
+	colors.selected_txt = colors.normal_txt;	
 	get_images();
 };
 
