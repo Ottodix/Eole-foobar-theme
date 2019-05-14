@@ -2280,9 +2280,7 @@ function check_cache(metadb, albumIndex, crc){
     };
     return false;
 };
-function check_cache2(metadb, albumIndex, crc){
-	//if(crc=='undefined') return false;	
-
+function check_cacheV2(metadb, albumIndex, crc){
 	var crc = typeof crc !== 'undefined' ? crc : brw.groups[albumIndex].cachekey;
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;			
     if(g_files.FileExists(filename)) {
@@ -2360,7 +2358,15 @@ function load_image_from_cache_direct(metadb, crc){
 		return -1;
 	}
 };
-function load_image_from_cache_direct2(filename){
+function load_image_from_cacheV2(filename){
+	try{
+        var tdi = gdi.LoadImageAsync(window.ID, filename);
+        return tdi;	
+	} catch(e){
+		return -1;
+	}	
+};
+function load_image_from_cache_directV2(filename){
 	try{
         var img = gdi.Image(filename);
         return img;		

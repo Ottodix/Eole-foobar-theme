@@ -5163,36 +5163,36 @@ oImageCache = function () {
 		}
 		var img = this.cachelist[cachekey];
         if (typeof img == "undefined" || img==null) { // if image not in cache, we load it asynchronously
-			
-			if(globalProperties.enableDiskCache && albumIndex>-1) brw.groups[albumIndex].crc = check_cache(metadb, albumIndex);
-			if(globalProperties.enableDiskCache && albumIndex>-1 && brw.groups[albumIndex].crc && brw.groups[albumIndex].load_requested == 0) {
+			if(globalProperties.enableDiskCache && albumIndex>-1) brw.groups[albumIndex].cover_filename = check_cacheV2(metadb, albumIndex);
+			if(globalProperties.enableDiskCache && albumIndex>-1 && brw.groups[albumIndex].cover_filename && brw.groups[albumIndex].load_requested == 0) {
 					//Dont save as its already in the cache
 					brw.groups[albumIndex].save_requested=true;
 					// load img from cache
 					if(!isScrolling){
-						var img = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
+						var img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename);
 						brw.groups[albumIndex].load_requested = 2;
 						brw.repaint();
 						cover_load_timer = Array();
-						//brw.cover_repaint();	
 					} else if(!direct_return){
 						if(cover_load_timer.length<10) {
 							cover_load_timer[cover_load_timer.length] = setTimeout(function(){
-								try {
-									if(properties.load_image_from_cache_direct) {
-										img = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
-										g_image_cache.cachelist[cachekey] = img;
-										brw.groups[albumIndex].load_requested = 2;
-									} else {
-										brw.groups[albumIndex].tid = load_image_from_cache(metadb, brw.groups[albumIndex].crc);
-										brw.groups[albumIndex].load_requested = 1;										
-									}										
-								} catch(e) {console.log("timers.coverLoad line 5133 failed")};
-								cover_load_timer.pop();
+								if(brw.groups[albumIndex].load_requested == 0){
+									try {
+										brw.groups[albumIndex].load_requested = (properties.load_image_from_cache_direct)?2:1;									
+										if(properties.load_image_from_cache_direct) {
+											img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename);
+											g_image_cache.cachelist[cachekey] = img;
+										} else {
+											brw.groups[albumIndex].tid = load_image_from_cacheV2(brw.groups[albumIndex].cover_filename);									
+										}										
+									} catch(e) {console.log("timers.coverLoad line 5133 failed")};
+									cover_load_timer.pop();
+									brw.repaint();	
+								}
 							}, 5);
 						}						
 					} else {
-						img = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc)
+						img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename)
 						if(img) {
 							this.cachelist[cachekey] = img
 						} else this.cachelist[cachekey] = cover.nocover_img;						
@@ -5204,7 +5204,6 @@ oImageCache = function () {
 					if(albumIndex<0) {
 						var art_id = -1;
 						try{
-							//utils.GetAlbumArtAsync(window.ID, metadb, art_id);
 							get_albumArt_async(metadb,art_id);
 						} catch(e){console.log("timers.coverLoad line 5151 failed")}			
 					} else if(cover_load_timer.length<20){
@@ -5212,7 +5211,6 @@ oImageCache = function () {
 							var art_id = albumIndex + 5;
 							try{
 								get_albumArt_async(metadb,art_id);
-								//utils.GetAlbumArtAsync(window.ID, metadb, art_id);
 							} catch(e){console.log("timers.coverLoad line 5157 failed")}								
 							clearTimeout(cover_load_timer[cover_load_timer.length-1]);
 							cover_load_timer.pop();
