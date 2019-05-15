@@ -1292,7 +1292,6 @@ oShowList = function(parentPanelName) {
 			quickSearch(g_showlist.pl[0],"album");
 		},false,false,false,ButtonStates.normal,255),		
 		artist : new SimpleButton(0, 0, 0, 0, "artistLink", function () {
-			console.log("ehoeho");
 			quickSearch(g_showlist.pl[0],"artist");
 		},false,false,false,ButtonStates.normal,255),
 		genre : new SimpleButton(0, 0, 0, 0, "genreLink", function () {
@@ -1553,6 +1552,10 @@ oShowList = function(parentPanelName) {
 				}
                 break;	
             case "up":
+				if(this.cursor!=IDC_ARROW && !this.scrollbar_cursor_hover) {
+					this.cursor = IDC_ARROW;
+					g_cursor.setCursor(IDC_ARROW);																			
+				}			
                 break;	
             case "leave":
 				for (var i in this.links) {
@@ -1567,15 +1570,6 @@ oShowList = function(parentPanelName) {
 						this.links[i].changeState(ButtonStates.hover);
 					} else this.links[i].changeState(ButtonStates.normal);
 				}
-				/*if(isHoverBtn && this.cursor!=IDC_HAND){
-					window.SetCursor(IDC_HAND);
-					this.cursor = IDC_HAND;
-					brw.repaint();
-				} else if(!isHoverBtn && this.cursor!=IDC_ARROW){
-					window.SetCursor(IDC_ARROW);
-					this.cursor = IDC_ARROW;		
-					brw.repaint();					
-				}*/
 				if(properties.showToolTip && !(g_dragA || g_dragR)){
 					if(!this.ishoverTextTop && this.tooltipActivated) {
 						g_tooltip.Deactivate();	
@@ -1608,7 +1602,19 @@ oShowList = function(parentPanelName) {
 						this.click_down_scrollbar = false;
 					}	
 					if(g_showlist.drag_showlist_hscrollbar){
-						g_showlist.drag_x = x;		
+						this.drag_x = x;
+						if(this.cursor!=IDC_HAND){						
+							g_cursor.setCursor(IDC_HAND);
+							this.cursor = IDC_HAND;			
+						}						
+					} else if(this.scrollbar_cursor_hover && this.cursor!=IDC_HAND) {
+						if(this.cursor!=IDC_HAND){						
+							g_cursor.setCursor(IDC_HAND);
+							this.cursor = IDC_HAND;			
+						}									
+					} else if(!this.scrollbar_cursor_hover && this.cursor!=IDC_ARROW) {
+						this.cursor = IDC_ARROW;
+						g_cursor.setCursor(IDC_ARROW);																			
 					}
 				}				
                 break;								
@@ -1761,12 +1767,7 @@ oShowList = function(parentPanelName) {
 		this.playing_row_h = 0;
 		this.selected_row = false;
 		this.last_click_row_index = -1;
-		
-		/*if(this.cursor!=IDC_ARROW) {
-			window.SetCursor(IDC_ARROW);
-			this.cursor = IDC_ARROW;
-		}*/
-		
+
 		if(properties.showListColoredOneColor) {
 			this.getColorSchemeFromImage();	
 		} else if(properties.showListColoredMixedColor) {
@@ -5674,17 +5675,25 @@ function on_mouse_lbtn_up(x, y, m) {
 	g_showlist_click_on_next=false;
 	g_showlist_click_on_prev=false;		
 	if(g_showlist.idx > -1 && !g_showlist.drag_showlist_hscrollbar) {
-		if(g_showlist.totalCols > g_showlist.totalColsVis) {
+		if(g_showlist.totalCols > g_showlist.totalColsVis) {	
 			if((g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("up", x, y) == ButtonStates.hover) {
 				g_showlist_click_on_prev=true;						
 				g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
-				if(g_showlist.columnsOffset == 0) g_showlist.prev_bt.state = ButtonStates.normal;
+				if(g_showlist.columnsOffset == 0) {
+					g_showlist.prev_bt.state = ButtonStates.normal;
+					g_cursor.setCursor(IDC_ARROW);
+					g_showlist.prev_bt.cursor = IDC_ARROW;						
+				}
 				brw.repaint();
 			}
 			else if((g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("up", x, y) == ButtonStates.hover) {
 				g_showlist_click_on_next=true;
 				g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
-				if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) g_showlist.next_bt.state = ButtonStates.normal;
+				if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) {
+					g_showlist.next_bt.state = ButtonStates.normal;
+					g_cursor.setCursor(IDC_ARROW);
+					g_showlist.prev_bt.cursor = IDC_ARROW;						
+				}				
 				brw.repaint();
 			}
 			else if(y > g_showlist.hscr_y && y < g_showlist.hscr_y + g_showlist.hscr_height && x < g_showlist.hscr_x && !g_showlist_click_on_prev ){
@@ -5697,10 +5706,6 @@ function on_mouse_lbtn_up(x, y, m) {
 				g_showlist_click_on_next=true;			
 				g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
 				if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) g_showlist.next_bt.state = ButtonStates.normal;
-				
-                //(g_showlist.columnsOffset == 0) && g_showlist.prev_bt.checkstate("move", x, y);
-               // (g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("move", x, y);				
-				
 				brw.repaint();						
 			}
 		}

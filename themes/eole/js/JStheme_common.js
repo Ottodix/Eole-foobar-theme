@@ -1944,6 +1944,7 @@ button = function (normal, hover, down) {
     this.h = this.img[0].Height;
     this.state = ButtonStates.normal;
     this.hide = false;	
+	this.active = true;
 	this.cursor = IDC_ARROW;
     this.update = function (normal, hover, down) {
         this.img = Array(normal, hover, down, down);
@@ -2003,9 +2004,7 @@ button = function (normal, hover, down) {
 		} else if((this.old==ButtonStates.hover || this.old==ButtonStates.down) && this.state!=ButtonStates.hover && this.state!=ButtonStates.down && this.cursor!=IDC_ARROW) {
 			g_cursor.setCursor(IDC_ARROW);
 			this.cursor = IDC_ARROW;			
-		}
-		
-		//console.log(brw.resize_drag+' '+brw.resize_bt.state+' '+ButtonStates.down)
+		} 
 		if(event=="hover") return this.ishover;
         return this.state;
     };
