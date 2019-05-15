@@ -3444,12 +3444,13 @@ function SimpleButtonManager(){
 		}
 	}	
 }
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
+function SimpleButton(x, y, w, h, name, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
+	this.name = name;
     this.text = text;
     this.fonClick = fonClick;
     this.fonDbleClick = fonDbleClick;
@@ -3461,6 +3462,36 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
 	
+    this.ToggleVisibility = function () {
+		this.visible = !this.visible;	
+    } 
+    this.setVisibility = function (visible) {
+		this.visible = visible;	
+    } 	
+    this.isVisible = function () {	
+		return true;
+	}
+	this.displayLabel = function (new_state){
+		this.display_label = new_state;
+	}
+	this.toUpperCase = function (new_state){
+		this.upperCase = new_state;
+	}	
+	this.imgXAdjust = function (value){
+		this.img_x_adjustement = value;	
+	}		
+	this.imgYAdjust = function (value){
+		this.img_y_adjustement = value;		
+	}	
+	this.txtXAdjust = function (value){
+		this.txt_x_adjustement = value;	
+	}	
+	this.txtYAdjust = function (value){
+		this.txt_y_adjustement = value;	
+	}
+	this.setPadding = function (value){
+		this.padding = value;
+	}
     this.containXY = function (x, y) {
 		if(this.x<0) return (window.Width+this.x-this.w <= x) && (x <= window.Width + this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
@@ -3517,6 +3548,27 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+				break;				
+			case 'lbtn_up':
+				if (this.containXY(x, y) && this.isVisible()) {
+					this.changeState(ButtonStates.hover);
+				} else this.changeState(ButtonStates.normal);
+				this.fonUp && this.fonUp();				
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick();}
+				else {
+					this.onMouse("lbtn_down",x,y);					
+				}			
+			break;
+			case 'rbtn_down':
+			break;		
+		}
+    }  	
 }
 
 var lyrics_off_icon = gdi.Image(theme_img_path + "\\icons\\nowplaying_off.png");   
@@ -3529,51 +3581,56 @@ var lyrics_on_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplayin
 var lyrics_on_hover_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on_hover.png"); 	
 var lyrics_off_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_off.png");  
 
-var btns_manager = new SimpleButtonManager();
-btns_manager.addButton("lyricsReduce",-20, 8, 15, lyrics_off_icon.Height, "Show Lyrics", function () {
+
+
+lyrics_reduce = new SimpleButton(-20, 8, 15, lyrics_off_icon.Height, "lyricsReduce", "Show Lyrics", function () {
 		lyrics_state.decrement(1);
 		positionButtons();
 		window.Repaint();		
-    },false,lyrics_off_icon,lyrics_off_hover_icon,ButtonStates.normal,255);
-btns_manager.addButton("lyricsIncrease",-45, 8, 15, lyrics_off_icon.Height, "Show Lyrics", function () {
+    },false, lyrics_off_icon, lyrics_off_hover_icon, ButtonStates.normal,255);
+lyrics_increase = new SimpleButton(-45, 8, 15, lyrics_off_icon.Height, "lyricsReduce", "Show Lyrics", function () {
 		lyrics_state.increment(1);
 		positionButtons();
 		window.Repaint();		
-    },false,lyrics_on_icon,lyrics_on_hover_icon,ButtonStates.normal,255);	
+    },false, lyrics_on_icon, lyrics_on_hover_icon, ButtonStates.normal,255);	
 	
+var btns_manager = new JSButtonGroup("top-right", 0, 0, 'btns_manager', true);
+btns_manager.addButtons([lyrics_reduce,lyrics_increase], [0,0,0,0]);
+var g_cursor = new oCursor();
+
 function positionButtons(){
-	btns_manager.buttons.lyricsReduce.first_draw = true;
+	lyrics_reduce.first_draw = true;
 	if(ppt.blurDark){
-		btns_manager.buttons.lyricsReduce.N_img = lyrics_on_icon_white;
-		btns_manager.buttons.lyricsReduce.H_img = lyrics_on_hover_icon_white;
-		btns_manager.buttons.lyricsReduce.text = "";
+		lyrics_reduce.N_img = lyrics_on_icon_white;
+		lyrics_reduce.H_img = lyrics_on_hover_icon_white;
+		lyrics_reduce.text = "";
 		
-		btns_manager.buttons.lyricsIncrease.N_img = lyrics_off_icon_white;
-		btns_manager.buttons.lyricsIncrease.H_img = lyrics_off_hover_icon_white;
-		btns_manager.buttons.lyricsIncrease.text = "";			
+		lyrics_increase.N_img = lyrics_off_icon_white;
+		lyrics_increase.H_img = lyrics_off_hover_icon_white;
+		lyrics_increase.text = "";			
 	} else {
-		btns_manager.buttons.lyricsReduce.N_img = lyrics_on_icon;
-		btns_manager.buttons.lyricsReduce.H_img = lyrics_on_hover_icon;
-		btns_manager.buttons.lyricsReduce.text = "";
+		lyrics_reduce.N_img = lyrics_on_icon;
+		lyrics_reduce.H_img = lyrics_on_hover_icon;
+		lyrics_reduce.text = "";
 		
-		btns_manager.buttons.lyricsIncrease.N_img = lyrics_off_icon;
-		btns_manager.buttons.lyricsIncrease.H_img = lyrics_off_hover_icon;
-		btns_manager.buttons.lyricsIncrease.text = "";				
+		lyrics_increase.N_img = lyrics_off_icon;
+		lyrics_increase.H_img = lyrics_off_hover_icon;
+		lyrics_increase.text = "";				
 	}
 	if(lyrics_state.isMaximumValue()) {	
-		btns_manager.buttons.lyricsIncrease.hide = true;	
-		btns_manager.buttons.lyricsReduce.hide = false;			
+		lyrics_increase.hide = true;	
+		lyrics_reduce.hide = false;			
 	} else if(lyrics_state.isMinimumValue()) {
-		btns_manager.buttons.lyricsIncrease.text = "Lyrics";
-		btns_manager.buttons.lyricsIncrease.first_draw=true;
-		btns_manager.buttons.lyricsIncrease.x = -20;		
-		btns_manager.buttons.lyricsReduce.hide = true;
-		btns_manager.buttons.lyricsIncrease.hide = false;		
+		lyrics_increase.text = "Lyrics";
+		lyrics_increase.first_draw=true;
+		lyrics_increase.x = -20;		
+		lyrics_reduce.hide = true;
+		lyrics_increase.hide = false;		
 	} else {
-		btns_manager.buttons.lyricsReduce.hide = false;		
-		btns_manager.buttons.lyricsIncrease.hide = false;	
-		btns_manager.buttons.lyricsIncrease.w = 15;
-		btns_manager.buttons.lyricsIncrease.x = -45;		
+		lyrics_reduce.hide = false;		
+		lyrics_increase.hide = false;	
+		lyrics_increase.w = 15;
+		lyrics_increase.x = -45;		
 	}
 }
 

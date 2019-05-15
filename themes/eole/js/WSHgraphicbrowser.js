@@ -96,6 +96,7 @@ var properties = {
     followNowPlaying: window.GetProperty("TRACKLIST Always Follow Now Playing", true),
     refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true), 
+    expandOnHover: window.GetProperty("TRACKLIST Expand on hover", true), 	
     showListColoredOneColor: window.GetProperty("TRACKLIST Color according to albumart (main color)", false),
     showListColoredBlurred: window.GetProperty("TRACKLIST Color according to albumart (blurred)", false),	
     showListColoredMixedColor: window.GetProperty("TRACKLIST Color according to albumart (mix of both)", false),		
@@ -2235,7 +2236,7 @@ oShowList = function(parentPanelName) {
 }
 
 
-oHeaderbar = function(name) {
+oHeaderBar = function(name) {
 	this.mainTxt="";
 	this.timeTxt="";
 	this.itemsTxt="";
@@ -2781,6 +2782,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		
 	_menuTracklist.AppendMenuItem(MF_STRING, 11, "Activate tracklist");
 	_menuTracklist.CheckMenuItem(11, properties.expandInPlace);	
+	/*_menuTracklist.AppendMenuItem(MF_STRING, 45, "Expand on hover cover");
+	_menuTracklist.CheckMenuItem(45, properties.expandOnHover);	*/	
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
 	_menuTracklist.AppendMenuItem(MF_STRING, 29, "Show the cover on the right");
@@ -2882,6 +2885,14 @@ function draw_settings_menu(x,y,right_align,sort_group){
 				g_showlist.h = 0;}
 			brw.repaint();
 			break;
+		case (idx == 45):
+			properties.expandOnHover = !properties.expandOnHover;
+			window.SetProperty("TRACKLIST expand on hover", properties.expandOnHover);
+			if(!properties.expandOnHover){
+				g_showlist.idx = -1;
+				g_showlist.h = 0;}
+			brw.repaint();
+			break;			
 		case (idx == 12):
 			enableCoversAtStartupGlobaly();
 			break;	
@@ -4988,7 +4999,7 @@ function positionButtons(){
 	} else {
 		buttons.filterToggle.changeState(ButtonStates.hide);
 	}
-} positionButtons();
+} 
 
 function chooseButton(x, y) {
     for (var i in buttons) {
@@ -5024,6 +5035,8 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else g_cursor.setCursor(IDC_ARROW);					
         return old_state;
     }    
     this.draw = function (gr) {
@@ -7000,10 +7013,10 @@ function on_init() {
 	brw.startTimer();
 	
 	g_cursor = new oCursor();	
-	g_headerbar = new oHeaderbar("g_headerbar");
+	g_headerbar = new oHeaderBar("g_headerbar");
 	g_filterbox = new oFilterBox();
 	g_filterbox.inputbox.visible = true;
-
+	positionButtons();
 	g_tooltip = new oTooltip('brw');
 	
 	g_resizing = new Resizing();

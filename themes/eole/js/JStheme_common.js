@@ -1049,7 +1049,8 @@ var ButtonStates = {
     normal: 0,
     hover: 1,
     down: 2,
-    hide: 3
+    hide: 3,
+    active: 4,		
 }
 var AlbumArtId = {
 	front: 0,
@@ -1993,6 +1994,10 @@ button = function (normal, hover, down) {
         };
 		if(this.state==ButtonStates.hover && !this.ishover) this.state = ButtonStates.normal;
         if(this.state!=this.old) this.repaint();
+		
+		if(this.old!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else if(this.old==ButtonStates.hover && this.state!=ButtonStates.hover) g_cursor.setCursor(IDC_ARROW);		
+		
         return this.state;
     };
 };

@@ -500,24 +500,24 @@ function build_buttons(){
 			},false,images.reduce_icon,images.reduce_icon,-1,false,colors.titlebar_btn_hover_bg,true)		
 		}
 		
-		all_btns = new JSButtonGroup("top-left", 0, 0);
+		all_btns = new JSButtonGroup("top-left", 0, 0, 'all_btns', false);
 		all_btns.addButtons(buttons, [0,0,0,0]);
 		
-		topleft_btns = new JSButtonGroup("top-left", 0, 0);
+		topleft_btns = new JSButtonGroup("top-left", 0, 0, 'topleft_btns', true);
 		topleft_btns.addButtons([buttons.Settings], [0,0,0,0]);
 		topleft_btns.setPadding([0,7,0,2]);
 		
-		main_panel_btns = new JSButtonGroup("top-left", btn.left_m, btn.top_m);
+		main_panel_btns = new JSButtonGroup("top-left", btn.left_m, btn.top_m, 'main_panel_btns', true);
 		main_panel_btns.addButtons([buttons.Library,buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,btn.margin+2,0,0]);
 		main_panel_btns.setPadding(btn.padding);
 		
-		window_btns = new JSButtonGroup("top-right", 0, 0);
+		window_btns = new JSButtonGroup("top-right", 0, 0, 'window_btns', false);
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
 		
-		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m);
+		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m, 'additional_btns', true);
 		additional_btns.addButtons([buttons.NowPlaying,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);	
 		
-		compact_btns = new JSButtonGroup("top-left", 0, -1);
+		compact_btns = new JSButtonGroup("top-left", 0, -1, 'compact_btns', true);
 		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);	
 		compact_btns.addButtons([buttons.Library], [0,0,0,btn.margin+5]);	
 		compact_btns.addButtons([buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,0,0,btn.margin]);		
@@ -851,11 +851,19 @@ function on_mouse_move(x,y,m){
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);	
     g_searchbox.on_mouse("move", x, y);
+	topleft_btns.on_mouse("move",x,y);
+	main_panel_btns.on_mouse("move",x,y);
+	window_btns.on_mouse("move",x,y);
+	compact_btns.on_mouse("move",x,y);
 	all_btns.on_mouse("move",x,y);	
 }
 
 function on_mouse_leave() {
     g_searchbox.on_mouse("leave", 0, 0);	
+	topleft_btns.on_mouse("leave");
+	main_panel_btns.on_mouse("leave");
+	window_btns.on_mouse("leave");
+	compact_btns.on_mouse("leave");	
 	all_btns.on_mouse("leave");
 	window.Repaint();
 }

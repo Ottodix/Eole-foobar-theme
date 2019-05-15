@@ -1174,6 +1174,10 @@ oTagSwitcherBar = function() {
 		for(i = 0; i < this.items_txt.length; i++) {
 			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
 		}
+		if(prev_hover_item!=this.hoverItem){
+			if(this.hoverItem==-1)g_cursor.setCursor(IDC_ARROW);			
+			else g_cursor.setCursor(IDC_HAND);
+		}
 		return (prev_hover_item!=this.hoverItem);
 	}
     this.on_mouse = function(event, x, y, delta) {

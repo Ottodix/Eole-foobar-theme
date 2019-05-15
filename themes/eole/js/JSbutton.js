@@ -32,6 +32,7 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
     this.changeState = function (state) {
+		if(this.state==ButtonStates.active) return;
         var old = this.state;
         this.state = state;
         return old;
@@ -106,11 +107,9 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 			case ButtonStates.normal:
 				b_img=this.N_img;
 				break;
+			case ButtonStates.active:				
 			case ButtonStates.hover:
 				b_img=this.H_img;
-				break;
-			case ButtonStates.hoverinactive:
-				b_img=this.N_img;
 				break;
 			case ButtonStates.down:
 				b_img=this.D_img;       
@@ -143,6 +142,9 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 				gr.FillSolidRect(this.x, -1, this.w-1, this.h, colors.settings_btn_hover_bg);
 			}	
 		}
+		
+		//if(main_panel_state.isEqual(this.btn_index) && this.state!=ButtonStates.active) this.changeState(ButtonStates.active);
+		//if(this.state==ButtonStates.active) this.changeState(ButtonStates.normal);
 		
 		if(this.hover_bar_bottom && !this.hover_color && (main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down))
 			gr.FillSolidRect(this.x, wh-colors.active_tab_line_height, this.w, colors.active_tab_line_height, colors.active_tab);
@@ -185,7 +187,6 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 				break;				
 			case 'lbtn_up':
 				if (this.containXY(x, y) && this.isVisible()) {
-					//console.log("lbtn_up hover "+this.name)
 					this.changeState(ButtonStates.hover);
 				} else this.changeState(ButtonStates.normal);
 				this.fonUp && this.fonUp();				
@@ -197,21 +198,22 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 				}			
 			break;
 			case 'rbtn_down':
-			break;			
+			break;		
 		}
-        
     }  
 }
-function JSButtonGroup(alignment, x, y){
+function JSButtonGroup(alignment, x, y, name, adaptCursor){
 	this.alignment = alignment;		
 	this.x = x;
 	this.y = y;
 	this.hide = false;
 	this.buttons = {};
 	this.cur_btn = null;
-	this.cur_btn_down = null;	
+	this.cur_btn_down = null;
+	this.name = name;	
 	this.g_down = false;
 	this.w = -1;
+	this.adaptCursor = adaptCursor;
 	this.addButton = function(btn_object, btn_margins){
 		this.buttons[button_object.name] = {
 			obj : btn_object,
@@ -309,7 +311,7 @@ function JSButtonGroup(alignment, x, y){
 						//gr.FillSolidRect(this.x + x_shift + this.buttons[i].obj.w, 10, 1, this.buttons[i].obj.h-20, colors.settings_btn_line);
 					break;	
 					case "top-right":
-						this.buttons[i].obj.draw(gr,ww - this.x - this.buttons[i].obj.w - x_shift,this.y);	
+						this.buttons[i].obj.draw(gr,window.Width - this.x - this.buttons[i].obj.w - x_shift,this.y);	
 					break;				
 				};
 				x_shift += this.buttons[i].obj.w + this.buttons[i].margins[1];
@@ -324,22 +326,31 @@ function JSButtonGroup(alignment, x, y){
 				var old = this.cur_btn;
 				this.cur_btn = this.chooseButton(x, y);
 				if (old == this.cur_btn) {
+					if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND);
 					if (this.g_down) return;
 				} else if (this.g_down && this.cur_btn && this.cur_btn.state != ButtonStates.down) {
 					old && old.changeState(ButtonStates.normal);
 					this.cur_btn.changeState(ButtonStates.down);
 					window.Repaint();
 				} else {
-					old && old.changeState(ButtonStates.normal);
-					this.cur_btn && this.cur_btn.changeState(ButtonStates.hover);
+					if(old){
+						old.changeState(ButtonStates.normal);
+						if(g_cursor.getCursor()==IDC_HAND) g_cursor.setCursor(IDC_ARROW);			
+					}
+					if(this.cur_btn){
+						this.cur_btn.changeState(ButtonStates.hover);		
+						if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND);
+					}						
 					window.Repaint();
-				}			
+				}
+			
 			break;
             case "leave":
 				this.g_down = false;  
 				if (this.cur_btn) {
 					this.cur_btn.changeState(ButtonStates.normal);
 					this.cur_btn=null;   
+					g_cursor.setCursor(IDC_ARROW);
 					window.Repaint();					
 				}			
 			break;

@@ -1032,7 +1032,7 @@ function get_colors(){
 	colors.border_light = GetGrey(255,20);
 	colors.border_dark = GetGrey(0,50);
 	colors.line_bottom = GetGrey(40,200);	
-	colors.overlay_on_hover = GetGrey(0,150);		
+	colors.overlay_on_hover = GetGrey(0,130);		
 }
 function get_images(){
 	if(properties.darklayout) var theme_path = "controls_Dark"; else var theme_path = "controls_Light";	
