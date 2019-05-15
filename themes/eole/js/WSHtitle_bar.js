@@ -474,6 +474,7 @@ function build_buttons(){
 			}, false,false,images.idle_img,images.idle_img,-1, false, false, true),				
 			ShowSearch: new JSButton(-150, btn.top_m, btn.width_small_btns, btn.height, "", "search", function () {
 				toggleSearch();
+				g_cursor.setCursor(IDC_ARROW);					
 			}, false,false,images.search_toggle_img,images.search_toggle_img,-1, false, false, true),				
 			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", function () {
 				draw_main_menu(0, 28);
@@ -668,7 +669,7 @@ function adapt_buttons_to_layout(){
 			window_btns.setBtnsHeight(29);
 			additional_btns.setBtnsWidth(btn.width_small_btns);		
 		}
-		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true);
+		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true) - (!properties.alwaysShowSearch?buttons.ShowSearch.w+5:0);
 		
 		if(!properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
 			cSearchBoxMainLight.marginRight -= 10;
@@ -2035,6 +2036,7 @@ oSearch = function() {
 		if(!this.hide) {
 			buttons.ShowSearch.setVisibility(false);
 		} else {
+			if(this.hide && !properties.alwaysShowSearch) g_cursor.setCursor(IDC_ARROW);
 			buttons.ShowSearch.setVisibility(true);
 			this.clearInputbox(true);
 		}
@@ -2147,6 +2149,7 @@ oSearch = function() {
 				this.isHoverHistoryOld = this.isHoverHistory;
 				this.checkHover(x,y);
 				if(!this.hide) this.inputbox.check("move", x, y);
+				this.search_bt.checkstate("move", x, y);				
                 if((this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) && !this.hide) this.reset_bt.checkstate("move", x, y);
 				if(x > this.x+this.w-cSearchBox.paddingRight && x<this.x+this.w && y>cSearchBox.marginTop && !this.hide) this.isHoverHistory = true;
 				else this.isHoverHistory = false;

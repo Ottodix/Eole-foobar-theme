@@ -163,7 +163,8 @@ var properties = {
 	showlistCoverMaxSize:232,
 	showlistCoverMinSize:132,	
 	showlistCoverMargin:28,	
-	load_image_from_cache_direct:true		
+	load_image_from_cache_direct:true,
+	veryTighCoverActiveZone : true,	
 }
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
 properties.smooth_expand_value = properties.smooth_expand_value < 0 ? 0 : properties.smooth_expand_value > 0.9 ? 0.9 : properties.smooth_expand_value;
@@ -458,10 +459,12 @@ oFilterBox = function() {
             case "lbtn_up":
 				if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && this.inputbox.text.length > 0) {
 					this.clearInputbox();
-                } else if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
+                } 
+				this.search_bt.checkstate("up", x, y)
+				/*if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 					this.inputbox.activate(x,y);
 					this.inputbox.repaint();				
-				}
+				}*/
 				this.inputbox.check("up", x, y);				
                 break;
             case "lbtn_dblclk":
@@ -472,6 +475,7 @@ oFilterBox = function() {
                 break;
             case "move":
 				this.inputbox.check("move", x, y);
+				this.search_bt.checkstate("move", x, y);				
                 if(this.inputbox.text.length > 0) this.reset_bt.checkstate("move", x, y);
                 break;
         }
@@ -4644,21 +4648,36 @@ oBrowser = function(name) {
 						}
                     }
                 } else {				
-                    this.activeRow = Math.ceil((y + scroll_ - this.y  - this.CoverMarginTop) / this.rowHeight) - 1;
+                    this.activeRow = Math.ceil((y + scroll_ - this.y - this.CoverMarginTop) / this.rowHeight) - 1;
                 }
             } else {		
-                this.activeRow = Math.ceil((y + scroll_ - this.y  - this.CoverMarginTop) / this.rowHeight) - 1;
+                this.activeRow = Math.ceil((y + scroll_ - this.y - this.CoverMarginTop) / this.rowHeight) - 1;
             }
             
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
-				if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
-					this.activeColumn = 0;
-					this.activeIndex = -1;	
+				if(properties.veryTighCoverActiveZone){
+					if((y + scroll_ - this.y - this.CoverMarginTop-1 - g_showlist.h)%this.rowHeight>this.coverRealWith){
+						this.activeColumn = 0;
+						this.activeIndex = -1;						
+					} else if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+						this.activeColumn = 0;
+						this.activeIndex = -1;	
+					} else {
+						if(x < this.x + this.marginLR) this.activeColumn=0;
+						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
+						this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
+						this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+					}				
 				} else {
-					if(x < this.x + this.marginLR) this.activeColumn=0;
-					else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
-					this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
-					this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
+						this.activeColumn = 0;
+						this.activeIndex = -1;	
+					} else {
+						if(x < this.x + this.marginLR) this.activeColumn=0;
+						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
+						this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
+						this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+					}
 				}
             } else {
                 this.activeIndex = -1;	
@@ -5495,6 +5514,7 @@ function on_mouse_lbtn_down(x, y, m) {
     if(g_showlist.idx > -1) {
         if(g_showlist.close_bt.checkstate("down", x, y)){
 			g_showlist.close_bt.state=ButtonStates.hide;
+			g_showlist.close_bt.isdown = false;
 			g_showlist.idx = -1;
 			g_showlist.h = 0;		
 			g_cursor.setCursor(IDC_ARROW);

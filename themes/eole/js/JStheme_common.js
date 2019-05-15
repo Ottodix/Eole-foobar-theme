@@ -1966,6 +1966,8 @@ button = function (normal, hover, down) {
          case "down":
             switch(this.state) {
              case ButtonStates.normal:
+                this.state = ButtonStates.normal;
+                break;			 
              case ButtonStates.hover:
                 this.state = this.ishover ? ButtonStates.down : ButtonStates.normal;
 				this.isdown = true;

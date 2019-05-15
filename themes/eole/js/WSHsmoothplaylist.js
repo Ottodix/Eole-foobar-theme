@@ -1055,6 +1055,7 @@ oFilterBox = function() {
                 break;
             case "move":
 				this.inputbox.check("move", x, y);
+				this.search_bt.checkstate("move", x, y);				
                 if(this.inputbox.text.length > 0) this.reset_bt.checkstate("move", x, y);
                 break;
         };

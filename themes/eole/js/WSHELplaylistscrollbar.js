@@ -40,11 +40,11 @@ function on_paint(gr) {
 		scrollbar_top=Math.floor((focus_item*scrollbar_zone)/(playlist_count-1));
 		
 		if(!hooverstate){  
-			//gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);	
-			
+			if(g_cursor.getCursor()!=IDC_ARROW) g_cursor.setCursor(IDC_ARROW);			
 			gr.FillSolidRect(ww-cScrollBar.normalWidth-1,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
 		}
 		else {          
+			if(g_cursor.getCursor()!=IDC_HAND) g_cursor.setCursor(IDC_HAND);			
 			gr.FillSolidRect(0,scrollbar_top, ww,scrollbar_size,colors.scrollbar_hover_cursor);
 		}
 	}

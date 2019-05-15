@@ -162,7 +162,7 @@ oTagSwitcherBar = function() {
 			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
 		}
 		if(prev_hover_item!=this.hoverItem){
-			if(this.hoverItem==-1)g_cursor.setCursor(IDC_ARROW);			
+			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW);			
 			else g_cursor.setCursor(IDC_HAND);
 		}
 		return (prev_hover_item!=this.hoverItem);
@@ -515,7 +515,8 @@ oPlaylistManager = function(name) {
             case "up":
                 ui.drag_clicked = false;
                 if(ui.drag_moving) {
-                    window.SetCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW);
+                    //window.SetCursor(IDC_ARROW);
                     this.drop_done = false;
                     if(this.activeIndex > -1) {
 						var list = pop.sel_items;
@@ -2491,7 +2492,8 @@ function populate() {
 		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !(sbar.hover || sbar.b_is_dragging) && !p.s_search && m_i>=0) {
 			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6) {
 				ui.drag_moving = true;
-				window.SetCursor(IDC_HELP);
+				//window.SetCursor(IDC_HELP);
+				g_cursor.setCursor(IDC_HELP);
 				pop.deactivate_tooltip();
 				pman.state = 1;
 				if(timers.hidePlaylistManager) {
@@ -2812,19 +2814,22 @@ function searchLibrary() {
 	}
     this.leave = function() {
 		if(this.cursorSet) {
-			window.SetCursor(IDC_ARROW);				
+			//window.SetCursor(IDC_ARROW);
+			if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);
 			this.cursorSet = false;
 		}
     }	
     this.move = function(x, y) {
 		this.hover = (y < p.s_h && y > this.y && x > ui.margin + ui.row_h * 0.6 && x < p.s_x + p.s_w2);
 		if(this.hover && !ui.drag_moving) {
-			window.SetCursor(IDC_IBEAM);		
+			//window.SetCursor(IDC_IBEAM);	
+			g_cursor.setCursor(IDC_IBEAM);
 			this.cursorSet = true;
 		}
         if (!this.hover || !this.lbtn_down) {
 			if(!this.hover && this.cursorSet) {
-				window.SetCursor(IDC_ARROW);					
+				//window.SetCursor(IDC_ARROW);
+				if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);				
 				this.cursorSet = false;
 			}
 			return;
@@ -3241,6 +3246,7 @@ function button_manager() {
         scr = [];
     this.btns = [];
     this.b = null;
+	this.cursor = IDC_ARROW;
     var browser = function(c) {
         if (!run(c)) fb.ShowPopupMessage("Unable to launch your default browser.", "Library Tree");
     }
@@ -3330,6 +3336,7 @@ function button_manager() {
         if (b) this.btns[b].changestate("hover");
         if (this.b) this.btns[this.b].changestate("normal");
         this.b = b;
+
         return this.b;
     }
 
@@ -3364,9 +3371,17 @@ function button_manager() {
         this.changestate = function(state) {
             if (state == "hover") {
                 this.img = this.img_hover;
+				if(g_cursor.getCursor()!=IDC_HAND) {
+					g_cursor.setCursor(IDC_HAND);
+					this.cursor = IDC_HAND;
+				}				
             } else {
                 this.img = this.img_normal;
-            }
+				if(this.cursor!=IDC_ARROW){
+					g_cursor.setCursor(IDC_ARROW);
+					this.cursor = IDC_ARROW;
+				}
+            }			
             window.RepaintRect(this.x, this.y, this.w, this.h);
         }
         this.x = x;
@@ -3400,7 +3415,7 @@ function button_manager() {
         }
 		this.btns = [];
         if (p.s_show) {
-            this.btns.s_img = new btn(qx-4, qy, qh, qh, 3, "", "", "", {
+            this.btns.s_img = new btn(qx-4, qy, images.search_icon.Width, qh, 3, "", "", "", {
                 normal: images.search_icon,
                 hover: images.search_icon
             }, function() {
@@ -4410,10 +4425,11 @@ function on_mouse_mbtn_down(x, y) {
 
 function on_mouse_move(x, y, m) {
     if (p.m_x == x && p.m_y == y) return;
-	g_cursor.onMouse("move", x, y, m);		
+	g_cursor.onMouse("move", x, y, m);	
 	
-    if (p.s_show || ui.scrollbar_show) but.move(x, y);
     if (p.s_show) sL.move(x, y);
+    if (p.s_show || ui.scrollbar_show) but.move(x, y);
+
     pop.move(x, y);
     sbar.move(x, y);
     if(pman.state == 1) {
