@@ -1017,11 +1017,11 @@ function on_mouse_move(x,y,m){
     } else {        
         if(old){
 			old.changeState(ButtonStates.normal);
-			g_cursor.setCursor(IDC_ARROW);			
+			//g_cursor.setCursor(IDC_ARROW);			
 		}
         if(cur_btn){
 			cur_btn.changeState(ButtonStates.hover);		
-			g_cursor.setCursor(IDC_HAND);
+			//g_cursor.setCursor(IDC_HAND);
 		}
         repaint = true;			
     }
@@ -2763,9 +2763,11 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
     this.changeState = function (state) {
-        var old = this.state;
+        var old_state = this.state;
         this.state = state;
-        return old;
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else g_cursor.setCursor(IDC_ARROW);					
+        return old_state;
     }    
     this.Togglehide = function () {
 		this.hide = !this.hide;	
@@ -2907,7 +2909,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 			case 'lbtn_up':
 				this.fonUp && this.fonUp();
 				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide) {
-					this.state = ButtonStates.hover;
+					this.changeState(ButtonStates.hover);
 				}
 			break;
 			case 'dble_click':
@@ -3146,7 +3148,8 @@ oSlider = function(parentObjectName, min, max) {
 //=================================================// Cover Tools
 
 
-function on_init(){	
+function on_init(){		
+	g_cursor = new oCursor();	
 	g_panel = new oPanel();	
 	get_font();	
 	get_colors();
@@ -3155,7 +3158,6 @@ function on_init(){
 	g_genre_cache = new oGenreCache();	
 	g_image_cache = new oImageCache();	
 	g_resizing = new Resizing();
-	g_cursor = new oCursor();
 	evalTimeDisplayed();
 	fb.StopAfterCurrent = false;
 	setSchedulerText();

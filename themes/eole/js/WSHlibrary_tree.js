@@ -1749,6 +1749,7 @@ function populate() {
     this.line_l = 0;
     this.sel_items = [];
     this.tree = [];
+    this.setCursor = IDC_ARROW;	
     if (!window.GetProperty("SYSTEM.Playlist Checked", false)) fb.ShowPopupMessage("Library Tree uses the following playlist by default:\n\nLibrary Selection\n\nIf you wish to use a different playlist, change the one used by Library Tree in panel properties.", "Library Tree");
     window.SetProperty("SYSTEM.Playlist Checked", true);
     var arr_index = function(arr, item) {
@@ -1771,9 +1772,23 @@ function populate() {
             symb_style = 1;
         }
     }
-    var draw_node = function(gr, parent, x, y, hover) {
+    var draw_node = function(gr, parent, x, y, hover, index) {
 		symb_style = (ui.node_themed)? ui.node_style : 0;
 		y = Math.round(y);
+		if(hover) {
+			if(g_cursor.getCursor()!=IDC_HAND) {
+				g_cursor.setCursor(IDC_HAND);
+				pop.cursor = IDC_HAND;
+				pop.setCursor = IDC_HAND;	
+			}
+		} else {
+			if(g_cursor.getCursor()!=IDC_ARROW && pop.cursor != IDC_HAND) {
+				if(pop.setCursor==IDC_HAND) {
+					g_cursor.setCursor(IDC_ARROW);
+					pop.setCursor = IDC_ARROW;	
+				}
+			}	
+		}			
         switch (symb_style) {
             case 0:
                 if (parent) {
@@ -2318,6 +2333,7 @@ function populate() {
 				gr.FillSolidRect(0, item_y+ui.row_h-1, ui.w, 1, colors.selected_item_line);
             }
         }
+		this.cursor = IDC_ARROW;
         for (i = s; i < e; i++) {
             item_y = ui.row_h * i + p.s_h - sbar.delta;
             nm = this.tree[i].name;
@@ -2337,7 +2353,7 @@ function populate() {
                 var y2 = ui.row_h * i + y1 + Math.floor(ui.node_sz / 2);
                 if (!this.tree[i].track) {
                     if (ui.linecol && ui.linestyle<2) gr.FillSolidRect(item_x + ui.node_sz, y2, 4 * ui.node_sz / 11, 1, ui.linecol);
-                    draw_node(gr, this.tree[i].child.length < 1, item_x, item_y + p.node_y, m_i == i && hover_node);
+                    draw_node(gr, this.tree[i].child.length < 1, item_x, item_y + p.node_y, m_i == i && hover_node, i);
                 } else if (ui.linecol && (this.tree[i].tr>0 || ui.linestyle<2)) gr.FillSolidRect(item_x + Math.ceil(ui.node_sz / 2), y2, 7 * ui.node_sz / 11, 1, ui.linecol);
             //} else if (!this.tree[i].track) gr.GdiDrawText(this.tree[i].child.length < 1 ? ui.expand : ui.collapse, ui.font, ui.textsymbcol, item_x, item_y, ui.w - item_x - p.r_mg, ui.row_h, p.lc);
             if (ui.node_style>=0 || !this.tree[i].track) item_x = item_x + ui.symbol_w;

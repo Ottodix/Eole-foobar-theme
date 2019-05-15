@@ -4656,7 +4656,7 @@ oBrowser = function(name) {
             
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((y + scroll_ - this.y - this.CoverMarginTop-1 - g_showlist.h)%this.rowHeight>this.coverRealWith){
+					if((y + scroll_ - this.y - this.CoverMarginTop-1 - ((y > g_showlist.y)?g_showlist.h:0))%this.rowHeight>this.coverRealWith){
 						this.activeColumn = 0;
 						this.activeIndex = -1;						
 					} else if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
