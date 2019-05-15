@@ -1282,12 +1282,13 @@ oShowList = function(parentPanelName) {
 	this.selected_row = false;
 	this.track_rated = false;
 	this.tf_genre = '';
-	this.cursor = '';
+	this.cursor = IDC_ARROW;
 	this.links = {
 		album : new SimpleButton(0, 0, 0, 0, "albumLink", function () {
 			quickSearch(g_showlist.pl[0],"album");
 		},false,false,false,ButtonStates.normal,255),		
 		artist : new SimpleButton(0, 0, 0, 0, "artistLink", function () {
+			console.log("ehoeho");
 			quickSearch(g_showlist.pl[0],"artist");
 		},false,false,false,ButtonStates.normal,255),
 		genre : new SimpleButton(0, 0, 0, 0, "genreLink", function () {
@@ -1541,7 +1542,10 @@ oShowList = function(parentPanelName) {
             case "down":
 				if(this.ishover || brw.activeIndex < 0) changed = this.clearSelection();
 				for (var i in this.links) {
-					if (this.links[i].state == ButtonStates.hover) this.links[i].onClick();
+					if (this.links[i].state == ButtonStates.hover) {
+						
+						this.links[i].onClick();
+					}
 				}
                 break;	
             case "up":
@@ -1559,15 +1563,15 @@ oShowList = function(parentPanelName) {
 						this.links[i].changeState(ButtonStates.hover);
 					} else this.links[i].changeState(ButtonStates.normal);
 				}
-				if(isHoverBtn && this.cursor!='hand'){
+				/*if(isHoverBtn && this.cursor!=IDC_HAND){
 					window.SetCursor(IDC_HAND);
-					this.cursor = 'hand';
+					this.cursor = IDC_HAND;
 					brw.repaint();
-				} else if(!isHoverBtn && this.cursor!=''){
+				} else if(!isHoverBtn && this.cursor!=IDC_ARROW){
 					window.SetCursor(IDC_ARROW);
-					this.cursor = '';		
+					this.cursor = IDC_ARROW;		
 					brw.repaint();					
-				}
+				}*/
 				if(properties.showToolTip && !(g_dragA || g_dragR)){
 					if(!this.ishoverTextTop && this.tooltipActivated) {
 						g_tooltip.Deactivate();	
@@ -1754,10 +1758,10 @@ oShowList = function(parentPanelName) {
 		this.selected_row = false;
 		this.last_click_row_index = -1;
 		
-		if(this.cursor!='') {
+		/*if(this.cursor!=IDC_ARROW) {
 			window.SetCursor(IDC_ARROW);
-			this.cursor = '';
-		}
+			this.cursor = IDC_ARROW;
+		}*/
 		
 		if(properties.showListColoredOneColor) {
 			this.getColorSchemeFromImage();	
@@ -2757,7 +2761,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuHeaderBar.AppendMenuItem(MF_STRING, 27, "Show");
 	_menuHeaderBar.CheckMenuItem(27, properties.showheaderbar);		
 	_menuHeaderBar.AppendMenuSeparator();
-	_menuHeaderBar.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 30, "Show Filter field");
+	_menuHeaderBar.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 30, "Show filter field");
 	_menuHeaderBar.CheckMenuItem(30, properties.showFilterBox);		
 	_menuHeaderBar.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 41, "Show total time");
 	_menuHeaderBar.CheckMenuItem(41, properties.showTotalTime);		
@@ -4033,10 +4037,10 @@ oBrowser = function(name) {
 		} 
 		g_showlist.idx = -1;
 		g_showlist.h = 0;
-		if(g_showlist.cursor!='') {
+		/*if(g_showlist.cursor!=IDC_ARROW) {
 			window.SetCursor(IDC_ARROW);
-			g_showlist.cursor = '';
-		}					
+			g_showlist.cursor = IDC_ARROW;
+		}					*/
 
 		g_history.saveCurrent();			
 	
@@ -4435,6 +4439,7 @@ oBrowser = function(name) {
 		if(this.resize_click || this.resize_drag) {
 			this.resize_click = false;
 			this.resize_drag = false;
+			this.resize_bt.checkstate("up", g_cursor.x, g_cursor.y);
 			this.resize_bt.repaint();
 		}	
 	}	
@@ -4454,6 +4459,7 @@ oBrowser = function(name) {
 		if(this.resize_click || this.resize_drag) {
 			this.resize_click = false;
 			this.resize_drag = false;
+			this.resize_bt.checkstate("up", g_cursor.x, g_cursor.y);
 			this.resize_bt.repaint();
 		}
 		this.dragEnable=false;	
@@ -4471,6 +4477,7 @@ oBrowser = function(name) {
                     this.resize_click = true;
                     this.resize_sourceX = x;
                     this.resize_sourceY = y;
+					this.resize_bt.checkstate("down", g_cursor.x, g_cursor.y);
 					this.moveResizeBtn(x,y);
                     this.repaint();
                     return;
@@ -4509,8 +4516,7 @@ oBrowser = function(name) {
                 break;
             case "lbtn_up":
                 if(this.resize_click || this.resize_drag) {
-                    if(!this.resize_bt.checkstate("hover", x, y)) this.resize_bt.state = ButtonStates.normal;
-					else this.resize_bt.state = ButtonStates.hover;
+					this.resize_bt.checkstate("up", g_cursor.x, g_cursor.y);
                     this.resize_click = false;
                     this.resize_drag = false;
                     this.resize_bt.repaint();
@@ -5019,6 +5025,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.N_img = N_img;
     this.H_img = H_img;  
 	this.opacity = opacity;
+	this.cursor = IDC_ARROW;
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
 	
@@ -5035,8 +5042,13 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
-		else g_cursor.setCursor(IDC_ARROW);					
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
+			g_cursor.setCursor(IDC_HAND);	
+			this.cursor = IDC_HAND;
+		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover){
+			g_cursor.setCursor(IDC_ARROW);	
+			this.cursor = IDC_ARROW;
+		}			
         return old_state;
     }    
     this.draw = function (gr) {
@@ -5485,6 +5497,8 @@ function on_mouse_lbtn_down(x, y, m) {
 			g_showlist.close_bt.state=ButtonStates.hide;
 			g_showlist.idx = -1;
 			g_showlist.h = 0;		
+			g_cursor.setCursor(IDC_ARROW);
+			g_showlist.close_bt.cursor = IDC_ARROW;				
 		}
         if(g_showlist.totalCols > g_showlist.totalColsVis) {
             (g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("down", x, y);
@@ -6074,9 +6088,6 @@ function on_mouse_move(x, y, m) {
 		}			
         //brw.repaint();
     //}
-       
-    g_cursor.x = x;
-    g_cursor.y = y;
 }
 
 function on_mouse_wheel(step, stepstrait, delta){

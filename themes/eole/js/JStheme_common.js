@@ -1944,6 +1944,7 @@ button = function (normal, hover, down) {
     this.h = this.img[0].Height;
     this.state = ButtonStates.normal;
     this.hide = false;	
+	this.cursor = IDC_ARROW;
     this.update = function (normal, hover, down) {
         this.img = Array(normal, hover, down, down);
         this.w = this.img[0].Width;
@@ -1967,20 +1968,20 @@ button = function (normal, hover, down) {
              case ButtonStates.normal:
              case ButtonStates.hover:
                 this.state = this.ishover ? ButtonStates.down : ButtonStates.normal;
+				this.isdown = true;
                 break;
             };
             break;
          case "up":
             this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
+			this.isdown = false;
             break;
          case "right":
-
              break;
          case "move":
             switch(this.state) {
              case ButtonStates.normal:
              case ButtonStates.hover:
-				
                 this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
                 break;
             };
@@ -1989,15 +1990,21 @@ button = function (normal, hover, down) {
             this.state = this.isdown ? ButtonStates.down : ButtonStates.normal;
             break;
          case "hover":
-            return this.ishover;
             break;			
         };
 		if(this.state==ButtonStates.hover && !this.ishover) this.state = ButtonStates.normal;
         if(this.state!=this.old) this.repaint();
+
+		if(this.cursor!=IDC_HAND && (this.state==ButtonStates.hover || this.state==ButtonStates.down)) {
+			g_cursor.setCursor(IDC_HAND);	
+			this.cursor = IDC_HAND;
+		} else if((this.old==ButtonStates.hover || this.old==ButtonStates.down) && this.state!=ButtonStates.hover && this.state!=ButtonStates.down && this.cursor!=IDC_ARROW) {
+			g_cursor.setCursor(IDC_ARROW);
+			this.cursor = IDC_ARROW;			
+		}
 		
-		if(this.old!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
-		else if(this.old==ButtonStates.hover && this.state!=ButtonStates.hover) g_cursor.setCursor(IDC_ARROW);		
-		
+		//console.log(brw.resize_drag+' '+brw.resize_bt.state+' '+ButtonStates.down)
+		if(event=="hover") return this.ishover;
         return this.state;
     };
 };

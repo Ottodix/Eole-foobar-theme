@@ -2287,7 +2287,7 @@ function draw_settings_menu(x,y){
 	_menu.AppendMenuSeparator();		
 	_menu.AppendMenuItem(MF_STRING, 27, "Show header bar");
 	_menu.CheckMenuItem(27, properties.showheaderbar);		
-	_menu.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 30, "Show Filter field");
+	_menu.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 30, "Show filter field");
 	_menu.CheckMenuItem(30, properties.showFilterBox);			
 	_menu.AppendMenuItem(MF_STRING, 25, "Show date over album art");
 	_menu.CheckMenuItem(25, properties.showdateOverCover);	

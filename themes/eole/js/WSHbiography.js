@@ -1323,7 +1323,15 @@ function Buttons() {
              if (!v.hide && (!this.Dn || this.Dn == v.name)) return v.trace(x, y);
         });
         let hand = false;
-        check_scrollBtns(x, y, hover_btn); if (hover_btn) hand = hover_btn.hand; if (!tb.down) window.SetCursor(!hand ? 32512 : 32649);
+        check_scrollBtns(x, y, hover_btn); if (hover_btn) hand = hover_btn.hand; if (!tb.down) {
+			if(!hand && this.hand) {
+				window.SetCursor(32512);
+				this.hand = false;
+			} else if(hover_btn){
+				window.SetCursor(32649);
+				this.hand = true;
+			}
+		}
         if (hover_btn && hover_btn.hide) {if (cur_btn) {cur_btn.cs("normal"); transition.start();} cur_btn = null; return null;} // btn hidden, ignore
         if (cur_btn === hover_btn) return cur_btn;
         if (cur_btn) {cur_btn.cs("normal"); transition.start();} // return prev btn to normal state
@@ -2825,6 +2833,7 @@ function on_playlist_items_removed() {on_item_focus_change();}
 function on_playlist_switch() {on_item_focus_change();}
 function on_mouse_lbtn_dblclk(x, y) {but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dblclk(x, y); if (!p.dblClick) return; if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; p.click(x, y);}
 function on_mouse_lbtn_down(x, y) {
+	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 	var hover_btn = btns_manager.on_mouse("lbtn_down",x, y);
 	if(!hover_btn){
 		if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; tb.lbtn_dn(x, y); but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dn(x, y); img.lbtn_dn(x, y);
@@ -2836,9 +2845,16 @@ function on_mouse_lbtn_up(x, y) {
 		t.scrollbar_type().lbtn_drag_up(x, y); if (!p.dblClick && !but.Dn) p.click(x, y); t.scrollbar_type().lbtn_up(x, y); p.clicked = false; tb.lbtn_up(x, y); but.lbtn_up(x, y); img.lbtn_up(x, y);
 	}
 }
-function on_mouse_leave() {p.leave(); but.leave(); t.scrollbar_type().leave(); img.leave(); p.m_y = -1;btns_manager.on_mouse("leave");}
+function on_mouse_leave() {p.leave(); but.leave(); t.scrollbar_type().leave(); img.leave(); p.m_y = -1;btns_manager.on_mouse("leave");
+	g_cursor.x = 0;
+    g_cursor.y = 0;
+}
 function on_mouse_mbtn_up(x, y) {p.mbtn_up(x, y);}
-function on_mouse_move(x, y) {if (p.m_x == x && p.m_y == y) return; p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;btns_manager.on_mouse("move",x, y);}
+function on_mouse_move(x, y, m) {
+    if(x == g_cursor.x && y == g_cursor.y) return;
+	g_cursor.onMouse("move", x, y, m);	  	
+	p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;btns_manager.on_mouse("move",x, y);
+}
 function on_mouse_rbtn_up(x, y) {men.rbtn_up(x, y); return true;}
 function on_mouse_wheel(step) {switch (p.zoom()) {case false: if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true); else if (p.text_trace) {if (!ppt.img_only) t.scrollbar_type().wheel(step, false);} else img.wheel(step); break; case true: ui.wheel(step); if (utils.IsKeyPressed(0x11)) but.wheel(step); if (utils.IsKeyPressed(0x10)) {if (!p.text_trace) img.wheel(step); if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true);} break;}}
 function on_script_unload() {if (p.server) {window.NotifyOthers("script_unload_bio", 0); timer.clear(timer.img);} but.on_script_unload();}
@@ -3466,9 +3482,11 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }
     this.changeState = function (state) {
-        var old = this.state;
+        var old_state = this.state;
         this.state = state;
-        return old;
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else g_cursor.setCursor(IDC_ARROW);					
+        return old_state;
     }    
     this.draw = function (gr) {
 				
@@ -3528,7 +3546,7 @@ var lyrics_off_hover_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\no
 var lyrics_on_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on.png"); 
 var lyrics_on_hover_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on_hover.png"); 	
 var lyrics_off_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_off.png");  
-
+var g_cursor = new oCursor();
 var btns_manager = new SimpleButtonManager();
 btns_manager.addButton("lyricsReduce",-20, 8, 15, lyrics_off_icon.Height, "Show Lyrics", function () {
 		lyrics_state.decrement(1);

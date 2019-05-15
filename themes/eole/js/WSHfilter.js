@@ -5474,9 +5474,11 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
     this.changeState = function (state) {
-        var old = this.state;
+        var old_state = this.state;
         this.state = state;
-        return old;
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else g_cursor.setCursor(IDC_ARROW);					
+        return old_state;
     }    
     this.draw = function (gr) {
         if (this.state == ButtonStates.hide) return;

@@ -141,7 +141,7 @@ function positionButtons(){
 		//buttons.NowPlayingToggle.changeState(ButtonStates.normal);
 		buttons.Settings.changeState(ButtonStates.hide);		
 	}
-} positionButtons();
+} 
 
 //=================================================// Titleformat field
 var TF = {
@@ -182,9 +182,11 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
     this.changeState = function (state) {
-        var old = this.state;
+        var old_state = this.state;
         this.state = state;
-        return old;
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		else g_cursor.setCursor(IDC_ARROW);					
+        return old_state;
     }    
     this.draw = function (gr) {
         if (this.state == ButtonStates.hide) return;
@@ -858,6 +860,8 @@ function on_mouse_leave() {
         window.Repaint();
         cur_btn=null;        
     } 
+	g_cursor.x = 0;
+    g_cursor.y = 0;	
 }
 function on_mouse_lbtn_down(x, y) {     
     cur_btn_down = chooseButton(x, y);
@@ -948,5 +952,6 @@ function on_init(){
 	g_tooltip = new oTooltip();
 	g_pinfo = new playlistInfo();
 	g_pinfo.refresh_needed = 4;
+	positionButtons();
 }
 on_init();

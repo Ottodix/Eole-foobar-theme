@@ -2488,7 +2488,7 @@ function populate() {
 
     this.move = function(x, y) {
 		
-		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !sbar.b_is_dragging && !p.s_search) {
+		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !(sbar.hover || sbar.b_is_dragging) && !p.s_search && m_i>=0) {
 			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6) {
 				ui.drag_moving = true;
 				window.SetCursor(IDC_HELP);
