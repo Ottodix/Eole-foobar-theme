@@ -402,7 +402,7 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1, g_font.italicplus2);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1+properties.globalFontAdjustement, g_font.italicplus2);
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
@@ -3606,7 +3606,7 @@ oBrowser = function(name) {
 	this.previousPlaylistIdx = -1;
 	this.found_searched_track = false;
 	this.setSizeFirstCall = false;
-	this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
+	this.fontDate = gdi.Font("Arial", g_fsize-1+properties.globalFontAdjustement, 2);
     this.cover_img_mask = null;	
 	this.coverMask = false;
 	this.dateCircleBG = false;
@@ -6384,9 +6384,11 @@ function get_colors() {
 
 function on_font_changed() {
     get_font();
+	brw.fontDate = gdi.Font("Arial", g_fsize-1+properties.globalFontAdjustement, 2);	
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
 	brw.get_metrics_called = false;
+	g_filterbox.on_init();
 	on_size();
 }
 
