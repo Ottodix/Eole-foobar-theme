@@ -2291,6 +2291,9 @@ function FormatCover(image, w, h, rawBitmap, callID) {
 		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image+", callID:"+callID); return null;}
 	}
 };
+function isImage(variable){
+	return (typeof variable == 'object' && variable!=null)
+}
 function check_cache(metadb, albumIndex, crc){
 	//if(crc=='undefined') return false;	
 
