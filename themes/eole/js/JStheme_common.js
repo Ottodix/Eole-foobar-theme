@@ -20,6 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
+    theme_version: '1.0.1',	
     thumbnailWidthMax: 300,
     coverCacheWidthMax: 400,
 	TextRendering: 4,
