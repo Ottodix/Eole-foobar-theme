@@ -86,6 +86,7 @@ var properties = {
 	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
     default_CoverShadowOpacity: window.GetProperty("COVER Shadow Opacity", 0),		
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
+    showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),		
 	circleMode: window.GetProperty("COVER Circle artwork", false),	
 	centerText: window.GetProperty("COVER Center text", true),	
     DragToPlaylist: window.GetProperty("MAINPANEL Enable dragging to a playlist", true), 	
@@ -1299,8 +1300,8 @@ oShowList = function(parentPanelName) {
 		},false,false,false,ButtonStates.normal,255),		
 	}
 	this.getColorSchemeFromImage = function() {	
-        if(typeof this.cover_img != 'object' || this.cover_img==null) {
-			brw.GetAlbumCover(this.idx);
+        if(!isImage(this.cover_img)) {
+			if(!isImage(brw.groups_draw[this.idx].cover_img_full)) brw.GetAlbumCover(this.idx);
 			this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false, "showlistShowCover");
 
 			this.setShowListArrow();
@@ -2782,6 +2783,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 25, "Show date over album art");
 	_menuGroupDisplay.CheckMenuItem(25, properties.showdateOverCover);	
+	_menuGroupDisplay.AppendMenuItem(MF_STRING, 26, "Show disc number over album art");
+	_menuGroupDisplay.CheckMenuItem(26, properties.showDiscNbOverCover);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 37, "Circle Artwork");
 	_menuGroupDisplay.CheckMenuItem(37, properties.circleMode);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 38, "Center text");
@@ -2967,9 +2970,10 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();			
 			break;
 		case (idx == 26):
-			properties.show_covers_progress = !properties.show_covers_progress;
-			window.SetProperty("COVER Show loading progress", properties.show_covers_progress);
-			break;				
+			properties.showDiscNbOverCover = !properties.showDiscNbOverCover;
+			window.SetProperty("COVER Show Disc number over album art", properties.showDiscNbOverCover);
+			brw.repaint();
+			break;			
 		case (idx == 27):
 			properties.showheaderbar = !properties.showheaderbar;
 			window.SetProperty("MAINPANEL Show Header Bar", properties.showheaderbar);
@@ -4148,7 +4152,7 @@ oBrowser = function(name) {
 		idx = this.groups_draw[idx].idx;
 		var img_final = null;
 		var img_full = null;
-		
+
 		if (typeof this.groups[idx].cover_img_full == "object" && this.groups[idx].cover_img_full != null) {
 			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
 		} else {		
