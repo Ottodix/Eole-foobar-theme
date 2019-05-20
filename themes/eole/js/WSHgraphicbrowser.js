@@ -1299,15 +1299,18 @@ oShowList = function(parentPanelName) {
 			quickSearch(g_showlist.pl[0],"genre");
 		},false,false,false,ButtonStates.normal,255),		
 	}
-	this.getColorSchemeFromImage = function() {	
-        if(!isImage(this.cover_img)) {
-			if(!isImage(brw.groups_draw[this.idx].cover_img_full)) brw.GetAlbumCover(this.idx);
-			this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false, "showlistShowCover");
+	this.setCover = function(){
+		if(!isImage(brw.groups_draw[this.idx].cover_img_full)) {
+			brw.GetAlbumCover(this.idx);
+		}
+		this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false, "showlistShowCover");
 
-			this.setShowListArrow();
-			this.setColumnsButtons(false);
-			this.setCloseButton(false);				
-		} 
+		this.setShowListArrow();
+		this.setColumnsButtons(false);
+		this.setCloseButton(false);						
+	}
+	this.getColorSchemeFromImage = function() {	
+        if(!isImage(this.cover_img)) this.setCover();
 		if(typeof this.cover_img != 'object' || this.cover_img==null) return;
 
 		if(properties.circleMode)
@@ -1768,7 +1771,9 @@ oShowList = function(parentPanelName) {
 		this.playing_row_h = 0;
 		this.selected_row = false;
 		this.last_click_row_index = -1;
-
+		if(!isImage(this.cover_img)){
+			this.setCover();
+		}
 		if(properties.showListColoredOneColor) {
 			this.getColorSchemeFromImage();	
 		} else if(properties.showListColoredMixedColor) {
@@ -2050,6 +2055,9 @@ oShowList = function(parentPanelName) {
     this.draw = function(gr) {
 	
 		if(this.idx < 0) return;
+		if(!isImage(this.cover_img)){
+			this.setCover();
+		}
 		if((properties.showListColoredMixedColor || properties.showListColoredOneColor) && !this.getColorSchemeFromImageDone){
 			this.getColorSchemeFromImage();	
 		}
@@ -2206,7 +2214,7 @@ oShowList = function(parentPanelName) {
                 }
 				
 				//draw album cover								
-				if(properties.showlistShowCover && this.idx > -1 && typeof this.cover_img == 'object' && this.cover_img!=null && (this.h-this.delta_)<40){
+				if(properties.showlistShowCover && this.idx > -1 && isImage(this.cover_img) && (this.h-this.delta_)<40){
 					if(properties.CoverShadowOpacity>0) {
 						if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealSize, this.coverRealSize, colors.cover_shadow,10);
 						gr.DrawImage(this.cover_shadow, this.x+this.w-this.CoverSize+this.marginCover-8, this.y+this.marginTop+this.marginCover-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
