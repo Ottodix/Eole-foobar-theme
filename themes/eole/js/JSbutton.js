@@ -326,7 +326,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				var old = this.cur_btn;
 				this.cur_btn = this.chooseButton(x, y);
 				if (old == this.cur_btn) {
-					if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND);
+					if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND, this.name);
 					if (this.g_down) return;
 				} else if (this.g_down && this.cur_btn && this.cur_btn.state != ButtonStates.down) {
 					old && old.changeState(ButtonStates.normal);
@@ -339,7 +339,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 					}
 					if(this.cur_btn){
 						this.cur_btn.changeState(ButtonStates.hover);		
-						if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND);
+						if(this.cur_btn && this.cur_btn.state!=ButtonStates.active && this.adaptCursor) g_cursor.setCursor(IDC_HAND, this.name);
 					}						
 					window.Repaint();
 				}
