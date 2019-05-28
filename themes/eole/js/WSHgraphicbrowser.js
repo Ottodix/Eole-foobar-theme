@@ -86,7 +86,8 @@ var properties = {
 	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
     default_CoverShadowOpacity: window.GetProperty("COVER Shadow Opacity", 0),		
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
-    showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),		
+    showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),	
+    leftFilterState: window.GetProperty("MAINPANEL Left filter state", "genre"),	
 	circleMode: window.GetProperty("COVER Circle artwork", false),	
 	centerText: window.GetProperty("COVER Center text", true),	
     DragToPlaylist: window.GetProperty("MAINPANEL Enable dragging to a playlist", true), 	
@@ -128,7 +129,7 @@ var properties = {
     TFplaycount: "$if2(%play_counter%,$if2(%play_count%,0))",			
     TFshowlist: "%album artist% ^^ %album% ^^ [' - Disc '%discnumber%] ^^ %date% ^^ %genre%",
 	TFshowlistReduced: "[%discnumber%]",
-    TFgroupinfos: "%genre% ^^ %date%",	
+    TFgroupinfos: "%genre% ^^ %date% ^^ %discnumber%",	
     tf_crc_artist: fb.TitleFormat("$crc32('artists'$meta(artist,0))"),	
     smooth_scroll_value: window.GetProperty("MAINPANEL Smooth Scroll value (0 to disable)", 0.5),
     smooth_expand_value: window.GetProperty("TRACKLIST Smooth Expand value (0 to disable)", 0.3),
@@ -367,7 +368,7 @@ oFilterBox = function() {
 		else icon_theme_subfolder = "";				
 		
 		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");		
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon);
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -394,7 +395,7 @@ oFilterBox = function() {
         this.images.resetIcon_dn.ReleaseGraphics(gb);
                 
         if(typeof(this.reset_bt) == "undefined") {
-            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
+            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
         } else {
             this.reset_bt.img[0] = this.images.resetIcon_off;
             this.reset_bt.img[1] = this.images.resetIcon_ov;
@@ -1308,10 +1309,17 @@ oShowList = function(parentPanelName) {
 		this.setShowListArrow();
 		this.setColumnsButtons(false);
 		this.setCloseButton(false);						
+<<<<<<< HEAD
+	}	
+	this.getColorSchemeFromImage = function() {	
+        if(!isImage(this.cover_img)) this.setCover();
+		if(!isImage(this.cover_img)) return;
+=======
 	}
 	this.getColorSchemeFromImage = function() {	
         if(!isImage(this.cover_img)) this.setCover();
 		if(typeof this.cover_img != 'object' || this.cover_img==null) return;
+>>>>>>> 5f9c499e5b8d60b0cf2730fdd8ac9dbb15118aef
 
 		if(properties.circleMode)
 			image = brw.groups_draw[this.idx].cover_img_full; 
@@ -1445,7 +1453,7 @@ oShowList = function(parentPanelName) {
 			this.closeTracklist_ov.ReleaseGraphics(gb);
 					
 			if(typeof(this.close_bt) == "undefined") {
-				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov);
+				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov,"showlist_close");
 			} else {
 				this.close_bt.img[0] = this.closeTracklist_off;
 				this.close_bt.img[1] = this.closeTracklist_ov;
@@ -1512,7 +1520,7 @@ oShowList = function(parentPanelName) {
 			this.prevColumn_ov.ReleaseGraphics(gb);
 
 			if(typeof(this.prev_bt) == "undefined") {
-				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov);
+				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov,"showlist_prev");
 			} else {
 				this.prev_bt.img[0] = this.prevColumn_off;
 				this.prev_bt.img[1] = this.prevColumn_ov;
@@ -1520,7 +1528,7 @@ oShowList = function(parentPanelName) {
 			}
 
 			if(typeof(this.next_bt) == "undefined") {
-				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov);
+				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov,"showlist_next");
 			} else {
 				this.next_bt.img[0] = this.nextColumn_off;
 				this.next_bt.img[1] = this.nextColumn_ov;
@@ -1608,12 +1616,12 @@ oShowList = function(parentPanelName) {
 					if(g_showlist.drag_showlist_hscrollbar){
 						this.drag_x = x;
 						if(this.cursor!=IDC_HAND){						
-							g_cursor.setCursor(IDC_HAND);
+							g_cursor.setCursor(IDC_HAND,"showlist_scrollbar");
 							this.cursor = IDC_HAND;			
 						}						
 					} else if(this.scrollbar_cursor_hover && this.cursor!=IDC_HAND) {
 						if(this.cursor!=IDC_HAND){						
-							g_cursor.setCursor(IDC_HAND);
+							g_cursor.setCursor(IDC_HAND,"showlist_scrollbar");
 							this.cursor = IDC_HAND;			
 						}									
 					} else if(!this.scrollbar_cursor_hover && this.cursor!=IDC_ARROW) {
@@ -2057,7 +2065,11 @@ oShowList = function(parentPanelName) {
 		if(this.idx < 0) return;
 		if(!isImage(this.cover_img)){
 			this.setCover();
+<<<<<<< HEAD
+		}		
+=======
 		}
+>>>>>>> 5f9c499e5b8d60b0cf2730fdd8ac9dbb15118aef
 		if((properties.showListColoredMixedColor || properties.showListColoredOneColor) && !this.getColorSchemeFromImageDone){
 			this.getColorSchemeFromImage();	
 		}
@@ -2300,7 +2312,7 @@ oHeaderBar = function(name) {
 		this.full_library_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.FullLibraryButton) == "undefined") {
-			this.FullLibraryButton = new button(this.full_library_off, this.full_library_hover, this.full_library_off);
+			this.FullLibraryButton = new button(this.full_library_off, this.full_library_hover, this.full_library_off,"fulllibrary");
 		} else {
 			this.FullLibraryButton.img[0] = this.full_library_off;
 			this.FullLibraryButton.img[1] = this.full_library_hover;
@@ -2334,7 +2346,7 @@ oHeaderBar = function(name) {
 		this.settings_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.SettingsButton) == "undefined") {
-			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off);
+			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off,"settings_bt");
 		} else {
 			this.SettingsButton.img[0] = this.settings_off;
 			this.SettingsButton.img[1] = this.settings_hover;
@@ -3351,7 +3363,7 @@ oScrollbar = function(parentObjectName) {
         this.cursorImage_down.ReleaseGraphics(gb);
 		
         // create/refresh cursor Button in buttons array
-        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
     }
     
     this.setButtons = function() {
@@ -3424,13 +3436,13 @@ oScrollbar = function(parentObjectName) {
         for(i = 1; i < this.buttons.length; i++) {
             switch(i) {
             case cScrollBar.ButtonType.cursor:
-                this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+                this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
                 break;
             case cScrollBar.ButtonType.up:
-                this.buttons[cScrollBar.ButtonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down);
+                this.buttons[cScrollBar.ButtonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down,"scrollbarup");
                 break;
             case cScrollBar.ButtonType.down:
-                this.buttons[cScrollBar.ButtonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down);
+                this.buttons[cScrollBar.ButtonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down,"scrollbardown");
                 break;
             };
         };
@@ -3823,7 +3835,8 @@ oBrowser = function(name) {
 					this.groups[i].album = arr[1];
 					this.groups[i].genre = groupinfos[0];					
 					this.groups[i].date = groupinfos[1];	
-					this.groups[i].cachekey = process_cachekey(this.list[k],'',groupinfos[2]);					
+					this.groups[i].discnb = groupinfos[2];						
+					this.groups[i].cachekey = process_cachekey(this.list[k],'',groupinfos[3]);					
 				}
 				if(this.groups[i].album=="?") this.groups[i].album="Single(s)";	
 				if(this.groups[i].artist=="?") this.groups[i].artist="Unknown artist(s)";
@@ -4146,7 +4159,12 @@ oBrowser = function(name) {
 				gb.SetSmoothingMode(0);
 				gb.DrawImage(img, 0, 0, this.coverRealWith, this.coverRealWith, 0, 0, img.Width, img.Height);
 				gb.DrawRect(0, 0, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_rectline);
-				if(properties.showdateOverCover && this.groups_draw[idx].date!="?") {
+				if(properties.showDiscNbOverCover && this.groups_draw[idx].discnb!="?"){
+					var dateWidth = gb.CalcTextWidth(this.groups_draw[idx].discnb, this.fontDate) + 10;
+					if(dateWidth > this.coverRealWith) dateWidth = this.coverRealWith;					
+					gb.FillSolidRect(0, 0, dateWidth, 15, colors.cover_date_bg_fast);
+					gb.GdiDrawText(this.groups_draw[idx].discnb, this.fontDate, colors.cover_date_txt_fast, 0, 0, dateWidth, 15, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+				} else if(properties.showdateOverCover && this.groups_draw[idx].date!="?") {
 					var dateWidth = gb.CalcTextWidth(this.groups_draw[idx].date, this.fontDate) + 10;
 					if(dateWidth > this.coverRealWith) dateWidth = this.coverRealWith;					
 					gb.FillSolidRect(0, 0, dateWidth, 15, colors.cover_date_bg_fast);
@@ -4319,22 +4337,27 @@ oBrowser = function(name) {
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, colors.cover_rectline);
 
 						//date drawing black
-						if(properties.showdateOverCover && this.groups_draw[i].date!="?"){
+						var overlayTxt = "";
+						if(properties.showDiscNbOverCover && this.groups_draw[i].discnb!="?") {
+							if(this.groups_draw[i].discnb!="?") overlayTxt = this.groups_draw[i].discnb;
+						} 
+						if(properties.showdateOverCover && this.groups_draw[i].date!="?") overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups_draw[i].date;
+						if(overlayTxt!=""){
 							if(properties.circleMode) {
 								if(!this.dateCircleBG) this.DefineCircleMask(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
-									gr.GdiDrawText(this.groups_draw[i].date, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, 18, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, 18, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 								}
 							}
 							else {
 								try{
 									if(typeof this.groups_draw[i].dateWidth == 'undefined') {
-										this.groups_draw[i].dateWidth=gr.CalcTextWidth(this.groups_draw[i].date, this.fontDate)+10;
+										this.groups_draw[i].dateWidth=gr.CalcTextWidth(overlayTxt, this.fontDate)+10;
 										if(this.groups_draw[i].dateWidth>this.coverRealWith) this.groups_draw[i].dateWidth=this.coverRealWith;
 									}
 								} catch(e){}								
 								gr.FillSolidRect(ax, coverTop, this.groups_draw[i].dateWidth, 15, colors.cover_date_bg);
-								gr.GdiDrawText(this.groups_draw[i].date, this.fontDate, colors.cover_date_txt, ax, coverTop, this.groups_draw[i].dateWidth, 15, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop, this.groups_draw[i].dateWidth, 15, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							}
 						}		
 
@@ -4855,7 +4878,7 @@ oBrowser = function(name) {
         this.ResizeButton_hover.ReleaseGraphics(gb);
                 
         if(typeof(this.resize_bt) == "undefined") {
-            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover);
+            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover,"resize_bt");
         } else {
             this.resize_bt.img[0] = this.ResizeButton_off;
             this.resize_bt.img[1] = this.ResizeButton_hover;
@@ -4965,9 +4988,13 @@ oBrowser = function(name) {
 				g_avoid_on_playlist_switch = true;
 				brw.populate(29, false, false, plman.PlayingPlaylist);
 			} else {
-				plman.ClearPlaylist(this.getSourcePlaylist());
-				plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
-				//brw.populate(29, false, false);					
+				if(!nowplayinglib_state.isActive()){
+					plman.ClearPlaylist(this.getSourcePlaylist());
+					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
+					//brw.populate(29, false, false);		
+				} else {
+					quickSearch(track,properties.leftFilterState);		
+				}					
 			}									
 		} else {					
 			var isFound = brw.seek_track(track);
@@ -5075,7 +5102,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         var old_state = this.state;
         this.state = state;
 		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
-			g_cursor.setCursor(IDC_HAND);	
+			g_cursor.setCursor(IDC_HAND,this.text);	
 			this.cursor = IDC_HAND;
 		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover){
 			g_cursor.setCursor(IDC_ARROW);	
@@ -5676,11 +5703,12 @@ function on_mouse_lbtn_up(x, y, m) {
 	if(g_dragA || g_dragR){
 		on_mouse_lbtn_up_delayed(x, y);
 	} else {
-		timers.delayForDoubleClick = setTimeout(function() {
+		/*timers.delayForDoubleClick = setTimeout(function() {
 			clearTimeout(timers.delayForDoubleClick);
 			timers.delayForDoubleClick = false;	
 			on_mouse_lbtn_up_delayed(x, y);
-		},delay_time);
+		},delay_time);*/
+		on_mouse_lbtn_up_delayed(x, y);
 	}	
 	
 	// check g_showlist button to execute action
@@ -6749,6 +6777,10 @@ function on_notify_data(name, info) {
 			globalProperties.enable_screensaver = info;
 			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	
 		break;			
+		case "left_filter_state":		
+			properties.leftFilterState = info;
+			window.SetProperty("MAINPANEL Left filter state", properties.leftFilterState);	
+		break;				
 		case "titlebar_search":
 			//brw.forceActivePlaylist = true;
 			//g_filterbox.inputbox.text = info;
@@ -6848,21 +6880,35 @@ function on_notify_data(name, info) {
 			if(window.IsVisible) brw.refresh_browser_images();
 			else set_update_function('brw.refresh_browser_images();');
 		break; 		
+		/*case "seek_nowplaying_in_current":
+			brw.seek_track(info);
+			console.log("seek");
+		break;*/
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
 			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
-				avoidShowNowPlaying = true;				
-				if(info!=null) {
-					brw.focus_on_now_playing(info);
-				} else {
+				avoidShowNowPlaying = true;		
+				/*if(properties.leftFilterState=="library_tree" && libraryfilter_state.isActive() && nowplayinglib_state.isActive()){
 					FocusOnNowPlaying = true;
 					clearTimeout(timers.showItem);
 					timers.showItem = setTimeout(function(){
 						FocusOnNowPlaying = false;
 						clearTimeout(timers.showItem);
 						timers.showItem = false;
-					}, 2000);                    		
-				}	
+					}, 1000);   
+				} else { */
+					if(info!=null) {
+						brw.focus_on_now_playing(info);
+					} else {
+						FocusOnNowPlaying = true;
+						clearTimeout(timers.showItem);
+						timers.showItem = setTimeout(function(){
+							FocusOnNowPlaying = false;
+							clearTimeout(timers.showItem);
+							timers.showItem = false;
+						}, 2000);                    		
+					}	
+				//}		
 				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
 				timers.avoidShowNowPlaying = setTimeout(function() {
 					avoidShowNowPlaying = false;
