@@ -5033,7 +5033,7 @@ oBrowser = function(name) {
 	}
 	this.focus_on_now_playing = function (track){		
 		FocusOnNowPlaying = true;
-		if(this.getSourcePlaylist()!=plman.PlayingPlaylist){
+		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !(!this.followActivePlaylist && !nowplayinglib_state.isActive() && this.isPlayingIdx>-1)){
 			if(this.followActivePlaylist){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
@@ -5043,7 +5043,7 @@ oBrowser = function(name) {
 					plman.ClearPlaylist(this.getSourcePlaylist());
 					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
 					//brw.populate(29, false, false);		
-				} else {
+				} else {		
 					quickSearch(track,properties.leftFilterState);		
 				}					
 			}									
@@ -6955,7 +6955,7 @@ function on_notify_data(name, info) {
 						timers.showItem = false;
 					}, 1000);   
 				} else { */
-					if(info!=null) {
+					if(info!=null) { 
 						brw.focus_on_now_playing(info);
 					} else {
 						FocusOnNowPlaying = true;
