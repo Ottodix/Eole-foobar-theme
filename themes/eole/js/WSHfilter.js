@@ -3967,7 +3967,7 @@ oBrowser = function(name) {
 					}
 					break;						
 				case (idx == 2996):
-					if(properties.savedFilterState>0 && properties.savedFilterState < number_of_filters_state-1 && !properties.displayToggleBtns) toggleFilterState(properties.savedFilterState);
+					if(properties.savedFilterState>0 && properties.savedFilterState < filters_panel_state.getNumberOfState()-1 && !properties.displayToggleBtns) toggleFilterState(properties.savedFilterState);
 					else toggleFilterState(1);
 					break;	
 				case (idx == 2997):

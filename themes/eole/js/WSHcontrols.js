@@ -768,6 +768,8 @@ function on_paint(gr) {
 			var artist_length = g_panel.get_artist_length(gr);
 			showTitleTooltip = (title_length+artist_length > ww_progress - timeInfo_length);
 			
+			g_panel.set_fullTitle_length(gr);
+			
 			if(!is_over_panel || layout_state.isEqual(0)) gr.GdiDrawText(text_length+" ", font_adjusted_italic , colors.normal_txt, progress_margin_left, progress_margin_top + time_margin_top, ww_progress+3, 10, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX); 		
 			
 		} else if(!is_over_panel || layout_state.isEqual(0)) {
@@ -822,7 +824,7 @@ function is_hover_progress(x,y){
     return progress_vars.hover_slider;    
 }
 function is_hover_title(x,y){
-    if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<window.Width-progress_margin_right && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
+    if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+g_panel.get_fullTitle_length() && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
     else {
 		g_tooltip.Deactivate();
 		return false;    
@@ -956,12 +958,25 @@ function on_mouse_move(x,y,m){
 		volume = 100 * (Math.pow(volume,1/2) - 1);
 		fb.Volume = volume;
 	}
-
-	if(is_hover_title(x,y) && showTitleTooltip && g_tooltip.activeZone != 'track_title' && !progress_vars.drag){
-		new_tooltip_text=scheduler_string+g_text_title+" - "+g_text_artist;	
-		g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, 'track_title');
+	if(is_hover_time_elapsed(x,y)){
+		if(g_cursor.getCursor!=IDC_HAND){
+			g_cursor.setCursor(IDC_HAND,"time");
+		}		
+	} else if(g_cursor.getActiveZone()=='time'){
+		g_cursor.setCursor(IDC_ARROW);
 	}
 	
+	if(is_hover_title(x,y)){
+		if(g_cursor.getCursor!=IDC_HAND){
+			g_cursor.setCursor(IDC_HAND,"title");
+		}
+		if(showTitleTooltip && g_tooltip.activeZone != 'track_title' && !progress_vars.drag){
+			new_tooltip_text=scheduler_string+g_text_title+" - "+g_text_artist;	
+			g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, 'track_title');
+		}
+	} else if(g_cursor.getActiveZone()=='title'){
+		g_cursor.setCursor(IDC_ARROW);
+	}
 	//Progress
 	m_pos_progress = clamp(x-progress_margin_left, 0, ww_progress);	
 	if(is_hover_progress(x,y)){
@@ -1219,6 +1234,7 @@ function oPanel(){
 	this.title_length = -1;
 	this.artist_length = -1;
 	this.time_length = -1;
+	this.fullTitle_length = -1;	
 	this.title_txt = '';
 	this.artist_txt = '';
 	this.time_txt = '';
@@ -1234,6 +1250,12 @@ function oPanel(){
 		}			
 		return this.title_length;		
 	}
+	this.set_fullTitle_length = function(gr){		
+		this.fullTitle_length =  this.get_title_length(gr)+this.get_artist_length(gr);		
+	}	
+	this.get_fullTitle_length = function(){		
+		return this.fullTitle_length;		
+	}		
 	this.set_artist_text = function(artist_txt){
 		this.artist_txt = artist_txt;		
 		this.artist_length = -1;

@@ -42,7 +42,10 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 			settings_file_not_found = true;	
 		}
 		return this.value;
-    };	
+    };
+	this.getNumberOfState = function () {
+		return (this.max_value-this.min_value);
+	}	
 	this.setValue = function (new_value) {	
 		if(new_value==this.value) return;
 		if(new_value>this.max_value) new_value = this.max_value;
