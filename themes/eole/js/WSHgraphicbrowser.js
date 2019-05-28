@@ -90,6 +90,7 @@ var properties = {
     leftFilterState: window.GetProperty("MAINPANEL Left filter state", "genre"),	
 	circleMode: window.GetProperty("COVER Circle artwork", false),	
 	centerText: window.GetProperty("COVER Center text", true),	
+	animateShowNowPlaying: window.GetProperty("COVER animate on show now playing", false),		
     DragToPlaylist: window.GetProperty("MAINPANEL Enable dragging to a playlist", true), 	
     showscrollbar: window.GetProperty("MAINPANEL Scrollbar - Visible", true),
     showheaderbar: window.GetProperty("MAINPANEL Show Header Bar", true),	
@@ -1825,11 +1826,9 @@ oShowList = function(parentPanelName) {
 		
 		else {		
 			for(var i = 0; i < this.totaltracks; i++) {
-				console.log("CheckIfPlaying")
 				if(fb.IsPlaying && fb.GetNowPlaying()!=null && this.pl[i].Compare(fb.GetNowPlaying())) {
 					this.isPlaying = true; 
 					brw.groups_draw[this.idx].isPlaying = true; 
-					console.log('brw.groups_draw[this.idx].isPlaying'+this.idx)
 				}
 			}
 		}		
@@ -1968,7 +1967,7 @@ oShowList = function(parentPanelName) {
 			if(!this.isPlaying && playing_track!=null && this.pl[i].Compare(playing_track)) {
 				this.isPlaying = true;
 				brw.groups_draw[idx].isPlaying = true; 
-				console.log('brw.groups_draw[this.idx].isPlaying'+idx)
+				brw.isPlayingIdx = idx;
 			}
         }
 
@@ -2803,6 +2802,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuGroupDisplay.CheckMenuItem(25, properties.showdateOverCover);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 26, "Show disc number over album art");
 	_menuGroupDisplay.CheckMenuItem(26, properties.showDiscNbOverCover);	
+	_menuGroupDisplay.AppendMenuItem(MF_STRING, 46, "Animate while showing now playing");
+	_menuGroupDisplay.CheckMenuItem(46, properties.animateShowNowPlaying);		
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 37, "Circle Artwork");
 	_menuGroupDisplay.CheckMenuItem(37, properties.circleMode);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 38, "Center text");
@@ -2922,7 +2923,11 @@ function draw_settings_menu(x,y,right_align,sort_group){
 				g_showlist.idx = -1;
 				g_showlist.h = 0;}
 			brw.repaint();
-			break;			
+			break;		
+		case (idx == 46):
+			properties.animateShowNowPlaying = !properties.animateShowNowPlaying;
+			window.SetProperty("COVER animate on show now playing", properties.animateShowNowPlaying);
+			break;					
 		case (idx == 12):
 			enableCoversAtStartupGlobaly();
 			break;	
@@ -3636,6 +3641,8 @@ oBrowser = function(name) {
 	this.external_dragging = false;
 	this.cover_shadow = null;
 	this.cover_shadow_hover = null;
+	this.isPlayingIdx = -1;
+	
 	if(properties.showheaderbar)	
 		this.headerBarHeight = 43;
 	else
@@ -3754,6 +3761,7 @@ oBrowser = function(name) {
 			this.totalTime = 0;
 			this.finishLoading = false;
 			this.found_albumIdx = -1;
+			this.isPlayingIdx = -1;
 			if(this.showFilterBox) g_filterbox.clearInputbox();
 			if(properties.TFgrouping!=""){
 					this.custom_firstRow = true;
@@ -4282,7 +4290,22 @@ oBrowser = function(name) {
 				this.get_metrics(gr);
 			            
             g_end = end_;
-
+			
+			//Show now playing animation
+			if(properties.animateShowNowPlaying && cNowPlaying.flashEnable && this.isPlayingIdx>-1) {
+				if(this.ellipse_size==0){
+					this.ellipse_size = this.coverRealWith;
+				} else this.ellipse_size+=3*(cNowPlaying.flashCover?-1:1);
+				var row = Math.floor(this.isPlayingIdx/this.totalColumns);
+				var column = ((this.isPlayingIdx % this.totalColumns)) * this.thumbnailWidth;
+		
+				ax = firstalbum_x + column;
+				ay = firstalbum_y + (row * this.rowHeight);
+				coverTop = ay + this.CoverMarginTop;
+				
+				gr.FillEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
+			}
+						
             for(var i = start_;i < end_;i++){
 				row = Math.floor(i/this.totalColumns);
 
@@ -4308,6 +4331,10 @@ oBrowser = function(name) {
 					if(this.groups_draw[i].cover_img!=null && typeof this.groups_draw[i].cover_img != "string") {
 						
 						//Show now playing animation
+						/*if(this.groups_draw[i].isPlaying){
+							var animation_x = ax+1-(this.ellipse_size-this.coverRealWith)/2;
+							var animation_y = coverTop+1-(this.ellipse_size-this.coverRealWith)/2;
+						}
 						if(cNowPlaying.flashEnable && this.groups_draw[i].isPlaying) {
 							console.log("is playing !"+this.groups_draw[i].isPlaying+this.ellipse_size)
 							if(this.ellipse_size==0){
@@ -4315,7 +4342,7 @@ oBrowser = function(name) {
 							} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
 							gr.FillEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);							
 							//gr.DrawEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, 1.0, colors.nowplaying_animation_line);
-						}							
+						}	*/					
 						
 						//Shadow
 						if(properties.CoverShadowOpacity>0 && !properties.circleMode) {
@@ -4432,6 +4459,18 @@ oBrowser = function(name) {
 				}
                 
             }
+			
+			//Show now playing animation
+			/*if(cNowPlaying.flashEnable && this.isPlayingIdx>-1) {
+				console.log("is playing !"+this.isPlayingIdx+this.ellipse_size)
+				if(this.ellipse_size==0){
+					this.ellipse_size = this.coverRealWith;
+				} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
+				
+				gr.FillEllipse(animation_x, animation_y, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);							
+				//gr.DrawEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, 1.0, colors.nowplaying_animation_line);
+			}	*/
+			
             // draw tracks of expanded album
             g_showlist.draw(gr);
 
@@ -4769,10 +4808,10 @@ oBrowser = function(name) {
             cNowPlaying.flashescounter++;
             if(cNowPlaying.flashescounter%5 == 0 && cNowPlaying.flashescounter <= cNowPlaying.flashescountermax && cNowPlaying.flashescounter>0) {
                 cNowPlaying.flash = !cNowPlaying.flash;
-				if(cNowPlaying.flashescounter%(cNowPlaying.flashescountermax/2) == 0) cNowPlaying.flashCover = !cNowPlaying.flashCover;
+				if(cNowPlaying.flashescounter%(cNowPlaying.flashescountermax/4) == 0) cNowPlaying.flashCover = !cNowPlaying.flashCover;
             }
             if(cNowPlaying.flashescounter > cNowPlaying.flashescountermax) {
-                this.stopFlashNowPlaying();console.log("stopFlashNowPlaying")
+                this.stopFlashNowPlaying();
             }
             repaint_1 = true;
         }		
@@ -5020,7 +5059,7 @@ oBrowser = function(name) {
 					}
 				} else {	
 					timers.showItem = setTimeout(function(){
-						brw.populate(27);g_showlist.CheckIfPlaying();
+						brw.populate(27);
 						clearTimeout(timers.showItem);
 						timers.showItem=false;
 					}, 30);                    
@@ -6337,7 +6376,7 @@ function get_colors() {
 		colors.cover_ellipse_nowplaying = GetGrey(0,150);
 		colors.cover_ellipse_hover = GetGrey(0,220);	
 
-		colors.nowplaying_animation_circle = GetGrey(255,30);
+		colors.nowplaying_animation_circle = GetGrey(255,50);
 		colors.nowplaying_animation_line = GetGrey(255,35);
 		
 		properties.CoverShadowOpacity = (255-properties.default_CoverShadowOpacity)*0.2+properties.default_CoverShadowOpacity;	
@@ -6476,6 +6515,7 @@ function on_script_unload() {
 
 function on_playback_stop(reason) {
 	g_seconds = 0;
+	g_showlist.CheckIfPlaying();	
 	if(window.IsVisible) {
 		if(g_showlist.idx > -1) {
 			if(g_showlist.y > 0 - g_showlist.h && g_showlist.y < wh) {
