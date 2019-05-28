@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
-    theme_version: '1.0.2',	
+	theme_version: '1.0.4b',
     thumbnailWidthMax: 300,
     coverCacheWidthMax: 400,
 	TextRendering: 4,
@@ -144,13 +144,18 @@ var oCursor = function () {
 			break;			
 		}
     }
-	this.setCursor = function(cursor_code){
+	this.setCursor = function(cursor_code,active_zone){
+		var active_zone = typeof active_zone !== 'undefined' ? active_zone : "";
 		this.cursor = cursor_code;
+		this.active_zone = active_zone;
 		window.SetCursor(cursor_code);
 	}
 	this.getCursor = function(){
 		return this.cursor;
 	}
+	this.getActiveZone = function(){
+		return this.active_zone;
+	}	
 }
 // HTML dialogs ---------------------------------------------------------------------
 function get_windows_version() {
@@ -1939,7 +1944,7 @@ function TrackType(trkpath) {
 //}}
 
 //=================================================// Buttons objects
-button = function (normal, hover, down) {
+button = function (normal, hover, down, name) {
     this.img = Array(normal, hover, down, down);
     this.w = this.img[0].Width;
     this.h = this.img[0].Height;
@@ -1947,6 +1952,7 @@ button = function (normal, hover, down) {
     this.hide = false;	
 	this.active = true;
 	this.cursor = IDC_ARROW;
+	this.name = name
     this.update = function (normal, hover, down) {
         this.img = Array(normal, hover, down, down);
         this.w = this.img[0].Width;
@@ -1999,10 +2005,10 @@ button = function (normal, hover, down) {
 		if(this.state==ButtonStates.hover && !this.ishover) this.state = ButtonStates.normal;
         if(this.state!=this.old) this.repaint();
 
-		if(this.cursor!=IDC_HAND && (this.state==ButtonStates.hover || this.state==ButtonStates.down)) {
-			g_cursor.setCursor(IDC_HAND);	
+		if(g_cursor.getActiveZone()!=this.name && (this.state==ButtonStates.hover || this.state==ButtonStates.down)) {
+			g_cursor.setCursor(IDC_HAND,this.name);	
 			this.cursor = IDC_HAND;
-		} else if((this.old==ButtonStates.hover || this.old==ButtonStates.down) && this.state!=ButtonStates.hover && this.state!=ButtonStates.down && this.cursor!=IDC_ARROW) {
+		} else if((this.old==ButtonStates.hover || this.old==ButtonStates.down) && this.state!=ButtonStates.hover && this.state!=ButtonStates.down && this.cursor!=IDC_ARROW && g_cursor.getActiveZone()==this.name) {
 			g_cursor.setCursor(IDC_ARROW);
 			this.cursor = IDC_ARROW;			
 		} 

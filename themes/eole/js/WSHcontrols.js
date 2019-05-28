@@ -931,7 +931,7 @@ function on_mouse_move(x,y,m){
 		if(timers.hideVolume!==false) {clearTimeout(timers.hideVolume);timers.hideVolume=false;}
         hoovervolume=true; 		
         if(is_hover_volume_slider(x,y)) {		
-			g_cursor.setCursor(IDC_HAND);		
+			g_cursor.setCursor(IDC_HAND,"volume");		
 			if(!repaint_volume) {
 				repaint_volume = true;
 				calculate_volume_ellipse_vars(true);
@@ -965,7 +965,7 @@ function on_mouse_move(x,y,m){
 	//Progress
 	m_pos_progress = clamp(x-progress_margin_left, 0, ww_progress);	
 	if(is_hover_progress(x,y)){
-		g_cursor.setCursor(IDC_HAND);
+		g_cursor.setCursor(IDC_HAND,"progress");
 		hooverprogress=true;        
 		if(!repaint_progress) {
 			repaint_progress = true;            
@@ -1016,12 +1016,10 @@ function on_mouse_move(x,y,m){
         return;
     } else {        
         if(old){
-			old.changeState(ButtonStates.normal);
-			//g_cursor.setCursor(IDC_ARROW);			
+			old.changeState(ButtonStates.normal);		
 		}
         if(cur_btn){
 			cur_btn.changeState(ButtonStates.hover);		
-			//g_cursor.setCursor(IDC_HAND);
 		}
         repaint = true;			
     }
@@ -2765,7 +2763,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND,this.text);	
 		else g_cursor.setCursor(IDC_ARROW);					
         return old_state;
     }    
@@ -3012,7 +3010,7 @@ oSlider = function(parentObjectName, min, max) {
         this.cursorImage_down.ReleaseGraphics(gb);
 		
         // create/refresh cursor Button in buttons array
-        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down, "sliderCursor");
     }
     
     this.setSize = function(x, y, whover, h, wnormal) {

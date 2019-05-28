@@ -248,7 +248,7 @@ oFilterBox = function() {
 		} else {
 			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\search_icon.png");			
 		}
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon);
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -274,7 +274,7 @@ oFilterBox = function() {
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
+        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
 	};
 	this.getImages();
     
@@ -510,13 +510,13 @@ oScrollbar = function(themed) {
         for(i = 1; i < this.buttons.length; i++) {
             switch(i) {
             case this.buttonType.cursor:
-                this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+                this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
                 break;
             case this.buttonType.up:
-                this.buttons[this.buttonType.up] = new button(this.upImage_normal.Resize(this.w,this.w,2), this.upImage_hover.Resize(this.w,this.w,2), this.upImage_down.Resize(this.w,this.w,2));
+                this.buttons[this.buttonType.up] = new button(this.upImage_normal.Resize(this.w,this.w,2), this.upImage_hover.Resize(this.w,this.w,2), this.upImage_down.Resize(this.w,this.w,2),"scrollbarup");
                 break;
             case this.buttonType.down:
-                this.buttons[this.buttonType.down] = new button(this.downImage_normal.Resize(this.w,this.w,2), this.downImage_hover.Resize(this.w,this.w,2), this.downImage_down.Resize(this.w,this.w,2));
+                this.buttons[this.buttonType.down] = new button(this.downImage_normal.Resize(this.w,this.w,2), this.downImage_hover.Resize(this.w,this.w,2), this.downImage_down.Resize(this.w,this.w,2),"scrollbardown");
                 break;
             };
         };
@@ -576,7 +576,7 @@ oScrollbar = function(themed) {
         this.cursorImage_down.ReleaseGraphics(gb);
 		
         // create/refresh cursor Button in buttons array
-        this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+        this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
         this.buttons[this.buttonType.cursor].x = this.x;
         this.buttons[this.buttonType.cursor].y = this.cursory;
     };

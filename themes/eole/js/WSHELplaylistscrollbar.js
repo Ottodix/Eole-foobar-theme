@@ -44,7 +44,7 @@ function on_paint(gr) {
 			gr.FillSolidRect(ww-cScrollBar.normalWidth-1,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
 		}
 		else {          
-			if(g_cursor.getCursor()!=IDC_HAND) g_cursor.setCursor(IDC_HAND);			
+			if(g_cursor.getCursor()!=IDC_HAND) g_cursor.setCursor(IDC_HAND, "scrollbar");			
 			gr.FillSolidRect(0,scrollbar_top, ww,scrollbar_size,colors.scrollbar_hover_cursor);
 		}
 	}

@@ -915,7 +915,7 @@ oFilterBox = function() {
 			gb.DrawEllipse(w-8, 2.8, 7, 7.2, 1, colors.full_txt);
 			gb.SetSmoothingMode(0);
 		this.images.search_icon.ReleaseGraphics(gb);*/
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon);
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -941,7 +941,7 @@ oFilterBox = function() {
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
+        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
 	};
 	//this.getImages();
     
@@ -1047,12 +1047,14 @@ oTagSwitcherBar = function() {
 	this.items_functions = new Array(
 		function() {
 			librarytree.toggleValue();
+			window.NotifyOthers("left_filter_state","library_tree");		
 		}
 	, 
 		function() {
 			g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 			properties.tagMode = 1;
 			window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
+			window.NotifyOthers("left_filter_state","album");			
 			switch(properties.tagMode) {
 				case 1:
 					properties.albumArtId = 0;
@@ -1072,6 +1074,7 @@ oTagSwitcherBar = function() {
 			g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 			properties.tagMode = 2;
 			window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
+			window.NotifyOthers("left_filter_state","artist");			
 			switch(properties.tagMode) {
 				case 1:
 					properties.albumArtId = 0;
@@ -1091,6 +1094,7 @@ oTagSwitcherBar = function() {
 			g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 			properties.tagMode = 3;
 			window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
+			window.NotifyOthers("left_filter_state","genre");			
 			switch(properties.tagMode) {
 				case 1:
 					properties.albumArtId = 0;
@@ -1176,8 +1180,8 @@ oTagSwitcherBar = function() {
 			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
 		}
 		if(prev_hover_item!=this.hoverItem){
-			if(this.hoverItem==-1)g_cursor.setCursor(IDC_ARROW);			
-			else g_cursor.setCursor(IDC_HAND);
+			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW);			
+			else g_cursor.setCursor(IDC_HAND,this.items_txt[this.hoverItem]);
 		}
 		return (prev_hover_item!=this.hoverItem);
 	}
@@ -1207,7 +1211,7 @@ oTagSwitcherBar = function() {
 				}
                 break;
             case "leave":
-				changed_state = this.setHoverStates(x,y);
+				changed_state = this.setHoverStates(-1,-1);
 				if(changed_state) {
 					brw.repaint();	
 				}					
@@ -1279,13 +1283,13 @@ oScrollbar = function(themed) {
         for(i = 1; i < tot; i++) {
             switch(i) {
             case this.buttonType.cursor:
-                this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+                this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
                 break;
             case this.buttonType.up:
-                this.buttons[this.buttonType.up] = new button(this.upImage_normal.Resize(this.w,this.w,2), this.upImage_hover.Resize(this.w,this.w,2), this.upImage_down.Resize(this.w,this.w,2));
+                this.buttons[this.buttonType.up] = new button(this.upImage_normal.Resize(this.w,this.w,2), this.upImage_hover.Resize(this.w,this.w,2), this.upImage_down.Resize(this.w,this.w,2),"scrollbarup");
                 break;
             case this.buttonType.down:
-                this.buttons[this.buttonType.down] = new button(this.downImage_normal.Resize(this.w,this.w,2), this.downImage_hover.Resize(this.w,this.w,2), this.downImage_down.Resize(this.w,this.w,2));
+                this.buttons[this.buttonType.down] = new button(this.downImage_normal.Resize(this.w,this.w,2), this.downImage_hover.Resize(this.w,this.w,2), this.downImage_down.Resize(this.w,this.w,2),"scrollbardown");
                 break;
             };
         };
@@ -1317,7 +1321,7 @@ oScrollbar = function(themed) {
         this.cursorImage_down.ReleaseGraphics(gb);
 		
         // create/refresh cursor Button in buttons array
-        this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+        this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
         this.buttons[this.buttonType.cursor].x = this.x;
         this.buttons[this.buttonType.cursor].y = this.cursory;
     };
@@ -5477,7 +5481,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND);	
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);	
 		else g_cursor.setCursor(IDC_ARROW);					
         return old_state;
     }    

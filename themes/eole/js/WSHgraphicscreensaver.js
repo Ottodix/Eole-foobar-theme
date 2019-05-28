@@ -315,7 +315,7 @@ oFilterBox = function() {
         this.images.resetIcon_dn.ReleaseGraphics(gb);
                 
         if(typeof(this.reset_bt) == "undefined") {
-            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
+            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
         } else {
             this.reset_bt.img[0] = this.images.resetIcon_off;
             this.reset_bt.img[1] = this.images.resetIcon_ov;
@@ -1240,7 +1240,7 @@ oShowList = function(parentPanelName) {
 			this.closeTracklist_ov.ReleaseGraphics(gb);
 					
 			if(typeof(this.close_bt) == "undefined") {
-				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov);
+				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov,"showlist_close");
 			} else {
 				this.close_bt.img[0] = this.closeTracklist_off;
 				this.close_bt.img[1] = this.closeTracklist_ov;
@@ -1302,7 +1302,7 @@ oShowList = function(parentPanelName) {
 			this.prevColumn_ov.ReleaseGraphics(gb);
 
 			if(typeof(this.prev_bt) == "undefined") {
-				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov);
+				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov,"showlist_prev");
 			} else {
 				this.prev_bt.img[0] = this.prevColumn_off;
 				this.prev_bt.img[1] = this.prevColumn_ov;
@@ -1310,7 +1310,7 @@ oShowList = function(parentPanelName) {
 			}
 
 			if(typeof(this.next_bt) == "undefined") {
-				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov);
+				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov,"showlist_next");
 			} else {
 				this.next_bt.img[0] = this.nextColumn_off;
 				this.next_bt.img[1] = this.nextColumn_ov;
@@ -1960,7 +1960,7 @@ oHeaderbar = function(name) {
 		this.settings_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.SettingsButton) == "undefined") {
-			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off);
+			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off,"settings_bt");
 		} else {
 			this.SettingsButton.img[0] = this.settings_off;
 			this.SettingsButton.img[1] = this.settings_hover;
@@ -2745,7 +2745,7 @@ oScrollbar = function(parentObjectName) {
         this.cursorImage_down.ReleaseGraphics(gb);
 		
         // create/refresh cursor Button in buttons array
-        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+        this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
     }
     
     this.setButtons = function() {
@@ -2818,13 +2818,13 @@ oScrollbar = function(parentObjectName) {
         for(i = 1; i < this.buttons.length; i++) {
             switch(i) {
             case cScrollBar.ButtonType.cursor:
-                this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+                this.buttons[cScrollBar.ButtonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
                 break;
             case cScrollBar.ButtonType.up:
-                this.buttons[cScrollBar.ButtonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down);
+                this.buttons[cScrollBar.ButtonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down,"scrollbarup");
                 break;
             case cScrollBar.ButtonType.down:
-                this.buttons[cScrollBar.ButtonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down);
+                this.buttons[cScrollBar.ButtonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down,"scrollbardown");
                 break;
             };
         };
@@ -4325,7 +4325,7 @@ oBrowser = function(name) {
         this.ResizeButton_hover.ReleaseGraphics(gb);
                 
         if(typeof(this.resize_bt) == "undefined") {
-            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover);
+            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover,"resize_bt");
         } else {
             this.resize_bt.img[0] = this.ResizeButton_off;
             this.resize_bt.img[1] = this.ResizeButton_hover;

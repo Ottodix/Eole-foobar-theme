@@ -78,17 +78,20 @@ oTagSwitcherBar = function() {
 	, 
 		function() {
 			window.NotifyOthers("libraryFilter_tagMode",1);
-			librarytree.setValue(0);		
+			librarytree.setValue(0);	
+			window.NotifyOthers("left_filter_state","album");				
 		}
 	, 
 		function() {
 			window.NotifyOthers("libraryFilter_tagMode",2);
-			librarytree.setValue(0);				
+			librarytree.setValue(0);	
+			window.NotifyOthers("left_filter_state","artist");				
 		}
 	, 
 		function() {
 			window.NotifyOthers("libraryFilter_tagMode",3);
-			librarytree.setValue(0);			
+			librarytree.setValue(0);		
+			window.NotifyOthers("left_filter_state","genre");				
 		}
 	);
 	
@@ -163,7 +166,7 @@ oTagSwitcherBar = function() {
 		}
 		if(prev_hover_item!=this.hoverItem){
 			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW);			
-			else g_cursor.setCursor(IDC_HAND);
+			else g_cursor.setCursor(IDC_HAND,this.items_txt[this.hoverItem]);
 		}
 		return (prev_hover_item!=this.hoverItem);
 	}
@@ -186,7 +189,7 @@ oTagSwitcherBar = function() {
 				if(changed_state) window.Repaint();
                 break;
             case "leave":
-				changed_state = this.setHoverStates(x,y);
+				changed_state = this.setHoverStates(-1,-1);
 				if(changed_state) window.Repaint();			
                 break;				
         };
@@ -912,6 +915,7 @@ function scrollbar() {
         if (this.b_is_dragging) return;
         this.hover = false;
         this.hover_o = false;
+		console.log("leave");
         window.RepaintRect(Math.round(this.x), Math.round(this.y), this.w, this.h);
     }
     this.nearest = function(y) {
@@ -974,7 +978,10 @@ function scrollbar() {
             this.timer_but = false;
         };
         this.count = -1;
-		
+		if(this.cursorSet && !this.hover) {
+			g_cursor.setCursor(IDC_ARROW);
+			this.cursorSet = false;
+		}
     }
 
     this.lbtn_dn = function(p_x, p_y) {
@@ -1000,8 +1007,19 @@ function scrollbar() {
         if (x < 0 || x > this.w || y > this.bar_y + this.bar_ht || y < this.bar_y) this.hover = false;
         else this.hover = true;
         if (this.hover != this.hover_o) {
+			console.log("hover:"+this.hover+" hover_o:"+this.hover_o)
+			if(!this.hover){
+				g_cursor.setCursor(IDC_ARROW);
+				this.cursorSet = false;
+				pop.cursor = IDC_ARROW;				
+			}
 			if (g_tooltip.activated && this.hover) pop.deactivate_tooltip();
 			p.tree_paint();
+		}
+		if((this.b_is_dragging || this.hover) && pop.cursor!=IDC_HAND){
+			g_cursor.setCursor(IDC_HAND, "scrollbar");
+			this.cursorSet = true;
+			pop.cursor = IDC_HAND;
 		}
         this.hover_o = this.hover;
         if (!this.b_is_dragging || this.row_count <= this.rows_drawn) return;
@@ -1777,7 +1795,7 @@ function populate() {
 		y = Math.round(y);
 		if(hover) {
 			if(g_cursor.getCursor()!=IDC_HAND) {
-				g_cursor.setCursor(IDC_HAND);
+				g_cursor.setCursor(IDC_HAND, "node");
 				pop.cursor = IDC_HAND;
 				pop.setCursor = IDC_HAND;	
 			}
@@ -2146,7 +2164,8 @@ function populate() {
 		var now_playing = fb.GetNowPlaying();
 		var np_item = np_node = -1;
 		var dont_scroll = false;
-        if (fb.IsPlaying && now_playing) {
+		var first_node_loaded = false
+        if (fb.IsPlaying && now_playing){
 			var items = p.items();
 			for (var i = 0; i < lib.list.Count; i++) items.Add(lib.list[i]);
             for (i = 0; i < items.Count; i++) {
@@ -2155,24 +2174,34 @@ function populate() {
                     break;
                 }
 			}
-			if(np_item>=0) {	
-				for (var i = 0; i < this.tree.length; i++){
+			if(np_item>=0){	
+				var start = (this.show_aggregate_item)?1:0;
+				for (var i = start; i < this.tree.length; i++){
 					var v = this.tree[i];
 					if (v.item.includes(np_item)) {
-							np_node = i;
-							if(pop.tree[np_node].child.length < 1 && (!pop.show_aggregate_item || np_node>0)) {
-								pop.branch(pop.tree[np_node]);
-							}							
+						np_node = i;
+						if(!this.show_aggregate_item || np_node>0) {
+							if(!first_node_loaded && nowplayinglib_state.isActive()) {
+								pop.load(v.item, true, false, false, pop.gen_pl, false);first_node_loaded=true;
+								//window.NotifyOthers("seek_nowplaying_in_current",now_playing);
+							}
+							//if(this.tree[np_node].child.length < 1) {
+								//this.branch(pop.tree[np_node]);
+							//}
+							if(this.tree[np_node].child.length==0) break;								
+						}
+					
 					}	
 				};			
 				if(np_node>=0) {
-					pop.clearSelectedItem();	
-					pop.tree[np_node].sel = true;
+					this.clearSelectedItem();	
+					this.tree[np_node].sel = true;
 					ui.force_SelectedDraw = true;
 					sbar.middle_scroll(np_node * ui.row_h);
 				}
 			}
 		}
+		p.tree_paint();
 	}
     this.load = function(list, type, add, send, def_pl, insert) {
         var i = 0,
@@ -2508,8 +2537,7 @@ function populate() {
 		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !(sbar.hover || sbar.b_is_dragging) && !p.s_search && m_i>=0) {
 			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6) {
 				ui.drag_moving = true;
-				//window.SetCursor(IDC_HELP);
-				g_cursor.setCursor(IDC_HELP);
+				g_cursor.setCursor(IDC_HELP,"pman");
 				pop.deactivate_tooltip();
 				pman.state = 1;
 				if(timers.hidePlaylistManager) {
@@ -2830,7 +2858,6 @@ function searchLibrary() {
 	}
     this.leave = function() {
 		if(this.cursorSet) {
-			//window.SetCursor(IDC_ARROW);
 			if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);
 			this.cursorSet = false;
 		}
@@ -2838,13 +2865,11 @@ function searchLibrary() {
     this.move = function(x, y) {
 		this.hover = (y < p.s_h && y > this.y && x > ui.margin + ui.row_h * 0.6 && x < p.s_x + p.s_w2);
 		if(this.hover && !ui.drag_moving) {
-			//window.SetCursor(IDC_IBEAM);	
-			g_cursor.setCursor(IDC_IBEAM);
+			g_cursor.setCursor(IDC_IBEAM, "searchbox");
 			this.cursorSet = true;
 		}
         if (!this.hover || !this.lbtn_down) {
 			if(!this.hover && this.cursorSet) {
-				//window.SetCursor(IDC_ARROW);
 				if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);				
 				this.cursorSet = false;
 			}
@@ -3388,7 +3413,7 @@ function button_manager() {
             if (state == "hover") {
                 this.img = this.img_hover;
 				if(g_cursor.getCursor()!=IDC_HAND) {
-					g_cursor.setCursor(IDC_HAND);
+					g_cursor.setCursor(IDC_HAND, this.tooltext);
 					this.cursor = IDC_HAND;
 				}				
             } else {
@@ -4604,7 +4629,7 @@ function get_images() {
 		gb.SetSmoothingMode(0);
 	images.resetIcon_dn.ReleaseGraphics(gb);
 
-	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn);
+	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn,"reset_bt");
 };
 function on_notify_data(name, info) {
     switch(name) {

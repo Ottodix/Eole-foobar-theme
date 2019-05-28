@@ -1974,7 +1974,7 @@ oSearch = function() {
 		var gb;
         var button_size = 18;
 		this.images.search_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_icon.png");
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon);
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
 		
 		this.images.search_history_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history.png");
 		this.images.search_history_hover_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history_hover.png");
@@ -2006,7 +2006,7 @@ oSearch = function() {
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
+        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
 	};
 	this.getImages();    
     this.reset_colors = function() {
