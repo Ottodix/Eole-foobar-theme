@@ -2817,8 +2817,12 @@ function GdiBitmap(arg) {
 }
 
 /**
+ * Constructor may fail if font is not present.
+ * 
  * @constructor
- * @hideconstructor
+ * @param {string} name
+ * @param {number} size_px See Helper.js > Point2Pixel function for conversions
+ * @param {number=} [style=0] See Flags.js > FontStyle
  */
 function GdiFont() {
     /**

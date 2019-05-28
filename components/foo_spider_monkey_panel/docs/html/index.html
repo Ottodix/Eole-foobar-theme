@@ -55,7 +55,8 @@
 
 
     <section>
-        <article class="readme"><h1>Spider Monkey Panel</h1><p>All SMP panels are defined with JavaScript, which is:</p>
+        <article class="readme"><h1>Spider Monkey Panel</h1>
+<p>All SMP panels are defined with JavaScript, which is:</p>
 <ul>
 <li>Implemented via Mozilla SpiderMonkey engine (ESR60).</li>
 <li>Conformant with ECMAScript 2018 (with the exception of modules and some RegExp features).</li>
@@ -64,8 +65,10 @@
 <li>Has no built-in web browser-specific objects: e.g. XMLHttpRequest, Web Workers API and etc.</li>
 </ul>
 <hr>
-<h4>Table of Contents</h4><ul>
-<li><a href="#api-description">API description</a><ul>
+<h4>Table of Contents</h4>
+<ul>
+<li><a href="#api-description">API description</a>
+<ul>
 <li><a href="#foobar2000-events">Handling foobar2000 events</a></li>
 <li><a href="#controlling-foobar2000">Controlling foobar2000 and accessing WinAPI</a></li>
 <li><a href="#web-and-file-system-access">Web access and file system access</a></li>
@@ -76,14 +79,17 @@
 <li><a href="#credits">Credits</a></li>
 </ul>
 <hr>
-<h2>API description<a name="api-description"></a></h2><h3>Handling foobar2000 events<a name="foobar2000-events"></a></h3><p>Foobar2000 and panel events are translated to callback invocations (see <a href="module-callbacks.html">callbacks section</a> for the full list), for example: </p>
+<h2>API description<a name="api-description"></a></h2>
+<h3>Handling foobar2000 events<a name="foobar2000-events"></a></h3>
+<p>Foobar2000 and panel events are translated to callback invocations (see <a href="module-callbacks.html">callbacks section</a> for the full list), for example:</p>
 <ul>
 <li><code>new track being played</code> event from fb2k will invoke <a href="module-callbacks.html#~on_playback_new_track">on_playback_new_track(new_track_handle)</a> function from user script, if such function was defined.</li>
-<li><code>panel's size has changed</code> &gt; <a href="module-callbacks.html#~on_size">on_size(width, height)</a>; </li>
+<li><code>panel's size has changed</code> &gt; <a href="module-callbacks.html#~on_size">on_size(width, height)</a>;</li>
 <li><code>mouse moved</code> &gt; <a href="module-callbacks.html#~on_mouse_move">on_mouse_move(x, y, mask)</a></li>
 </ul>
 <p>Note: for performance reasons it's advised to define only those callbacks that you actually need.</p>
-<h3>Controlling foobar2000 and accessing WinAPI<a name="controlling-foobar2000"></a></h3><p>SMP provides a lot of JavaScript extensions to simplify the work with foobar2000, which are divided in the following namespaces:</p>
+<h3>Controlling foobar2000 and accessing WinAPI<a name="controlling-foobar2000"></a></h3>
+<p>SMP provides a lot of JavaScript extensions to simplify the work with foobar2000, which are divided in the following namespaces:</p>
 <ul>
 <li><a href="fb.html"><code>fb</code></a>: functions for controlling foobar2000 and accessing it's data.</li>
 <li><a href="gdi.html"><code>gdi</code></a>: functions for working with graphics. Most of them are wrappers for Gdi and GdiPlus methods.</li>
@@ -92,23 +98,33 @@
 <li><a href="utils.html"><code>utils</code></a>: various utility functions.</li>
 <li><a href="window.html"><code>window</code></a>: functions for working with the current SMP panel and accessing it's properties.</li>
 </ul>
-<h3>Web and file-system access<a name="web-and-file-system-access"></a></h3><p>Built-in <a href="ActiveXObject.html"><code>ActiveX</code></a> support further expands the range of available features and allows for easy file-system and web access:</p>
+<h3>Web and file-system access<a name="web-and-file-system-access"></a></h3>
+<p>Built-in <a href="ActiveXObject.html"><code>ActiveX</code></a> support further expands the range of available features and allows for easy file-system and web access:</p>
 <ul>
 <li><code>Microsoft.XMLHTTP</code>: this object can be used in place of <code>XMLHttpRequest</code> for web access.</li>
-<li><code>FileSystemObject</code>: used for file-system access (see <a href="https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/6kxy1a51(v%3dvs.84">MSDN documentation</a>)).</li>
+<li><code>FileSystemObject</code>: used for file-system access (see <a href="https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/6kxy1a51(v%3dvs.84)">MSDN documentation</a>).</li>
 </ul>
 <p>Example:</p>
-<pre class="prettyprint source lang-javascript"><code>var xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');</code></pre><h2>Samples<a name="samples"></a></h2><p>SMP includes some samples which demonstrate it's API usage (see <a href="../../samples">samples</a> sub-folder of your <code>foo_spider_monkey_panel</code> installation):</p>
+<pre class="prettyprint source lang-javascript"><code>var xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+</code></pre>
+<h2>Samples<a name="samples"></a></h2>
+<p>SMP includes some samples which demonstrate it's API usage (see <a href="../../samples">samples</a> sub-folder of your <code>foo_spider_monkey_panel</code> installation):</p>
 <ul>
 <li><a href="../../samples/basic">samples/basic</a>: basic short examples.</li>
 <li><a href="../../samples/complete">samples/complete</a>: feature complete and feature rich samples created by <a href="https://github.com/marc2k3/smp_2003">marc2003</a>.</li>
 </ul>
 <p>See <a href="../../samples/readme.md">samples/readme.md</a> for more info.</p>
-<h2>Links<a name="links"></a></h2><p><a href="https://hydrogenaud.io/index.php/topic,116669.new.html">Support thread</a><br><a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/blob/master/CHANGELOG.md">Changelog</a><br><a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/wiki/API-Changes">Detailed list of API Changes</a><br><a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/wiki">Wiki</a></p>
-<h2>Credits<a name="credits"></a></h2><ul>
+<h2>Links<a name="links"></a></h2>
+<p><a href="https://hydrogenaud.io/index.php/topic,116669.new.html">Support thread</a><br>
+<a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/blob/master/CHANGELOG.md">Changelog</a><br>
+<a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/wiki/API-Changes">Detailed list of API Changes</a><br>
+<a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/wiki">Wiki</a></p>
+<h2>Credits<a name="credits"></a></h2>
+<ul>
 <li><a href="https://github.com/marc2k3">marc2003</a>: original <a href="https://github.com/marc2k3/foo_jscript_panel">foo_jscript_panel</a>, <a href="https://github.com/marc2k3/smp_2003">sample scripts</a> and multiple contributions to this project.</li>
 <li><a href="https://hydrogenaud.io/index.php?action=profile;u=44175">T.P. Wang</a>: original <a href="https://code.google.com/archive/p/foo-wsh-panel-mod">WSH Panel Mod</a>.</li>
-<li><a href="https://wiki.mozilla.org/IRC">#jsapi IRC channel</a>: wouldn't make it through without them, love you guys!<br>Especially huge thanks to sfink and jonco, who spent literally tens of hours helping me!</li>
+<li><a href="https://wiki.mozilla.org/IRC">#jsapi IRC channel</a>: wouldn't make it through without them, love you guys!<br>
+Especially huge thanks to sfink and jonco, who spent literally tens of hours helping me!</li>
 <li><a href="https://github.com/TheQwertiest/foo_spider_monkey_panel/blob/master/THIRD_PARTY_NOTICES.md">Respective authors</a> of the code being used in this project.</li>
 </ul></article>
     </section>
