@@ -84,6 +84,7 @@ var properties = {
     thumbnailWidthMax: 300,	
     thumbnailWidth: window.GetProperty("COVER Width", 100),	
 	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
+	showCoverShadow: window.GetProperty("COVER show shadow", false),
     default_CoverShadowOpacity: window.GetProperty("COVER Shadow Opacity", 0),		
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
     showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),	
@@ -2224,7 +2225,7 @@ oShowList = function(parentPanelName) {
 				
 				//draw album cover								
 				if(properties.showlistShowCover && this.idx > -1 && isImage(this.cover_img) && (this.h-this.delta_)<40){
-					if(properties.CoverShadowOpacity>0) {
+					if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 						if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealSize, this.coverRealSize, colors.cover_shadow,10);
 						gr.DrawImage(this.cover_shadow, this.x+this.w-this.CoverSize+this.marginCover-8, this.y+this.marginTop+this.marginCover-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
 					}
@@ -2761,6 +2762,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	var _menu2 = window.CreatePopupMenu();
 	var _menu2A = window.CreatePopupMenu();	 
 	var _menuGroupDisplay = window.CreatePopupMenu();	
+	var _menuCoverShadow = window.CreatePopupMenu();	
 	var _menuFilters = window.CreatePopupMenu();		
 	var _menuTracklist = window.CreatePopupMenu();	 
 	var _menuProgressBar = window.CreatePopupMenu();	
@@ -2808,6 +2810,10 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuGroupDisplay.CheckMenuItem(37, properties.circleMode);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 38, "Center text");
 	_menuGroupDisplay.CheckMenuItem(38, properties.centerText);	
+	_menuCoverShadow.AppendMenuItem(MF_STRING, 47, "Show a shadow under artwork");
+	_menuCoverShadow.CheckMenuItem(47, properties.showCoverShadow);	
+	_menuCoverShadow.AppendMenuItem(MF_STRING, 48, "Set shadow opacity (current:"+properties.default_CoverShadowOpacity+")");	
+	_menuCoverShadow.AppendTo(_menuGroupDisplay,MF_STRING, "Covers shadow");
 	
 	_menuGroupDisplay.AppendTo(_menu,MF_STRING, "Covers style");
 		
@@ -3126,6 +3132,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 				properties.centerText = false;
 				window.SetProperty("COVER Center text", properties.centerText);				
 			}
+			brw.refresh_shadows();
 			brw.refresh_browser_thumbnails();
 			brw.repaint();
 			break;		
@@ -3156,6 +3163,24 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_headerbar.setDisplayedInfo();
 			positionButtons();
 			brw.repaint();
+			break;			
+		case (idx == 47):		
+			properties.showCoverShadow = !properties.showCoverShadow;
+			window.SetProperty("COVER show shadow", properties.showCoverShadow);
+			brw.repaint();
+			break;				
+		case (idx == 48):		
+			try {
+				new_value = utils.InputBox(window.ID, "Enter the desired opacity, between 0 (full transparency) to 255 (full opacity).", "Covers shadow opacity", properties.default_CoverShadowOpacity, true);
+				if (!(new_value == "" || typeof new_value == 'undefined')) {
+					properties.default_CoverShadowOpacity = Math.min(255,Math.max(0,Number(new_value)));
+					window.SetProperty("COVER Shadow Opacity", properties.default_CoverShadowOpacity);
+					get_colors();
+					brw.refresh_shadows();		
+					brw.repaint();					
+				}			   
+			} catch(e) {
+			}			
 			break;			
 		case (idx == 200):
 			toggleWallpaper();
@@ -4133,6 +4158,11 @@ oBrowser = function(name) {
 			this.groups[i].tid=-1;
 		}
 	}	
+    this.refresh_shadows = function () {	
+		g_showlist.cover_shadow = null;
+		this.cover_shadow = null;		
+		this.cover_shadow_hover = null;
+	}
     this.refresh_one_image = function (albumIndex) {
 		this.groups[albumIndex].cover_img_full=null;
 		if(g_showlist.idx == albumIndex) g_showlist.cover_img=null;	
@@ -4345,13 +4375,14 @@ oBrowser = function(name) {
 						}	*/					
 						
 						//Shadow
-						if(properties.CoverShadowOpacity>0 && !properties.circleMode) {
-							if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow,10);
-							if(!this.cover_shadow_hover || this.cover_shadow_hover==null) this.cover_shadow_hover = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow_hover,10);	
+						if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 
+							if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow,10, properties.circleMode);
+							if(!this.cover_shadow_hover || this.cover_shadow_hover==null) this.cover_shadow_hover = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow_hover,10, properties.circleMode);	
 							if(i == this.activeIndex && this.activeRow>-1) var drawn_cover_shadow = this.cover_shadow_hover;
 							else var drawn_cover_shadow = this.cover_shadow;
 							gr.DrawImage(drawn_cover_shadow, ax-8, coverTop-8, this.coverRealWith+20, this.coverRealWith+20, 0, 0, drawn_cover_shadow.Width, drawn_cover_shadow.Height);
+	
 						}
 						
 						if(!this.groups_draw[i].mask_applied && properties.circleMode){
@@ -4418,7 +4449,7 @@ oBrowser = function(name) {
 								//gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, GetGrey(0,0), this.groups_draw[i].CoverMainColor, 1);
 							} else {
 								gr.SetSmoothingMode(2);
-								gr.FillEllipse(ax, coverTop, this.coverRealWith, this.coverRealWith, colors.cover_hoverOverlay);
+								gr.FillEllipse(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, colors.cover_hoverOverlay);
 								//gr.FillEllipse(ax, coverTop, this.coverRealWith, this.coverRealWith, setAlpha(this.groups_draw[i].CoverMainColor,150));
 								gr.SetSmoothingMode(0);
 							}
@@ -5459,16 +5490,19 @@ function ClearCoversTimers(){
 };
 
 
-function createCoverShadowStack(cover_width, cover_height, color, radius){
+function createCoverShadowStack(cover_width, cover_height, color, radius, circleMode){
 	var shadow = gdi.CreateImage(cover_width, cover_height);
     var gb = shadow.GetGraphics();
 	var radius = Math.floor(Math.min(cover_width/2,cover_height/2,radius));
-    gb.FillSolidRect(radius, radius, cover_width-radius*2, cover_height-radius*2, color);
+	
+	if(circleMode) gb.FillEllipse(radius, radius, cover_width-radius*2, cover_height-radius*2, color);
+    else gb.FillSolidRect(radius, radius, cover_width-radius*2, cover_height-radius*2, color);
+	
 	shadow.ReleaseGraphics(gb);
 	shadow.StackBlur(radius);
 	return shadow;
 };
-function createCoverShadow(cover_width, cover_height, color){
+function createCoverShadow(cover_width, cover_height, color, circleMode){
 	var shadow = gdi.CreateImage(cover_width, cover_height);
     var gb = shadow.GetGraphics();
     gb.FillSolidRect(10, 10, cover_width-20, cover_height-20, color);
