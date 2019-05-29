@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
-	theme_version: '1.0.4',
+	theme_version: '1.0.5',
     thumbnailWidthMax: 300,
     coverCacheWidthMax: 400,
 	TextRendering: 4,
@@ -230,6 +230,7 @@ function get_colors_global(){
 		colors.lightgrey_bg = GetGrey(17);		
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);	
+		colors.superfaded_txt = GetGrey(60);		
 		colors.full_txt = GetGrey(255);			
 		
 		colors.selected_bg = RGBA(015,177,255,160);
@@ -288,6 +289,7 @@ function get_colors_global(){
 		
 		colors.normal_txt = GetGrey(0);		
 		colors.faded_txt = GetGrey(140);
+		colors.superfaded_txt = GetGrey(200);		
         colors.full_txt = GetGrey(0);		
 		colors.selected_bg = RGBA(015,177,255,100);
 		colors.highlight = RGB(255,175,050);

@@ -4479,10 +4479,25 @@ oBrowser = function(name) {
 					try{
 						this.groups_draw[i].text_y = coverTop + this.coverRealWith + 6;
 						var space_between_lines = 2;
-						this.groups_draw[i].showToolTip = ( (this.groups_draw[i].firstRowLength > this.coverRealWith) || (this.groups_draw[i].secondRowLength > this.coverRealWith) )						
-						if(this.groups_draw[i].text_y+this.firstRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h) gr.GdiDrawText(this.groups_draw[i].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups_draw[i].text_y, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						this.groups_draw[i].showToolTip = ( (this.groups_draw[i].firstRowLength > this.coverRealWith) || (this.groups_draw[i].secondRowLength > this.coverRealWith) )
+						
+						/*if(this.groups_draw[i].text_y+this.firstRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h) 
+							firstRow_color = colors.normal_txt;
+						else
+							firstRow_color = colors.superfaded_txt;	
+						gr.GdiDrawText(this.groups_draw[i].firstRow, g_font.plus2, firstRow_color, ax, this.groups_draw[i].text_y, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
-						if(this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h)  gr.GdiDrawText(this.groups_draw[i].secondRow, g_font.italic, colors.faded_txt, ax, this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						if(this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h)
+							secondRow_color = colors.faded_txt;
+						else
+							secondRow_color = colors.superfaded_txt;
+						gr.GdiDrawText(this.groups_draw[i].secondRow, g_font.italic, secondRow_color, ax, this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);*/
+						
+						if(this.groups_draw[i].text_y+this.firstRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h) 
+							gr.GdiDrawText(this.groups_draw[i].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups_draw[i].text_y, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+
+						if(this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h)  
+							gr.GdiDrawText(this.groups_draw[i].secondRow, g_font.italic, colors.faded_txt, ax, this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						
 						if(typeof this.groups_draw[i].firstRowLength == 'undefined') this.groups_draw[i].firstRowLength = gr.CalcTextWidth(this.groups_draw[i].firstRow,g_font.plus2);
 						if(typeof this.groups_draw[i].secondRowLength == 'undefined') this.groups_draw[i].secondRowLength = gr.CalcTextWidth(this.groups_draw[i].secondRow,g_font.normal);	
