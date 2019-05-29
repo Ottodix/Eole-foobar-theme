@@ -915,7 +915,6 @@ function scrollbar() {
         if (this.b_is_dragging) return;
         this.hover = false;
         this.hover_o = false;
-		console.log("leave");
         window.RepaintRect(Math.round(this.x), Math.round(this.y), this.w, this.h);
     }
     this.nearest = function(y) {
@@ -1007,7 +1006,6 @@ function scrollbar() {
         if (x < 0 || x > this.w || y > this.bar_y + this.bar_ht || y < this.bar_y) this.hover = false;
         else this.hover = true;
         if (this.hover != this.hover_o) {
-			console.log("hover:"+this.hover+" hover_o:"+this.hover_o)
 			if(!this.hover){
 				g_cursor.setCursor(IDC_ARROW);
 				this.cursorSet = false;

@@ -820,10 +820,12 @@ function is_hover_volume_slider(x,y){
     return  volume_vars.hover_slider;
 }
 function is_hover_progress(x,y){
+	if(!fb.IsPlaying) return false;	
     progress_vars.hover_slider = (y>=progress_margin_top-10 && y<=progress_margin_top+progress_vars.height+10 && x>progress_margin_left && x<window.Width-progress_margin_right && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive));
     return progress_vars.hover_slider;    
 }
 function is_hover_title(x,y){
+	if(!fb.IsPlaying) return false;
     if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+g_panel.get_fullTitle_length() && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
     else {
 		g_tooltip.Deactivate();
@@ -1350,7 +1352,7 @@ function evalTimeDisplayed(time,first_eval){
 		TimeRemaining = time_r.Eval();	
 	}
 	
-	if(TimeRemaining == "") TimeRemaining="0.00";
+	if(TimeRemaining == "") TimeRemaining="-0.00";
 	if(TimeElapsed== "") TimeElapsed="0.00";	
 	if(TimeTotal=="") TimeTotal = TimeElapsed
 	

@@ -299,25 +299,25 @@ function on_paint(gr) {
 	dont_resize = false;
 	if(!fb.IsPlaying){
 		if(layout_state.isEqual(0) && mini_controlbar.isActive() && showtrackinfo_big.isActive()) {
-			g_cover.setArtwork(images.nothing_played_compact,false);
+			g_cover.setArtwork(images.nothing_played_compact,false,true);
 			nowPlaying_cachekey = null;	
 		} else if(layout_state.isEqual(0) && mini_controlbar.isActive()){
-			g_cover.setArtwork(images.nothing_played_supercompact,false);
+			g_cover.setArtwork(images.nothing_played_supercompact,false,true);
 			nowPlaying_cachekey = null;	
 		} else if(layout_state.isEqual(0)) {
-			g_cover.setArtwork(images.nothing_played,false);
+			g_cover.setArtwork(images.nothing_played,false,true);
 			nowPlaying_cachekey = null;			
 		} else {
-			g_cover.setArtwork(images.nothing_played_mini,false);
+			g_cover.setArtwork(images.nothing_played_mini,false,true);
 			nowPlaying_cachekey = null;			
 		} 
 	}
 	if(!g_cover.isSetArtwork()) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying().RawPath.substring(0, 4));
-			if(tracktype == 3) g_cover.setArtwork(images.stream_img,true)
-			else g_cover.setArtwork(images.no_cover,true);
-		} catch (e){g_cover.setArtwork(images.no_cover,true)}	
+			if(tracktype == 3) g_cover.setArtwork(images.stream_img,true,true)
+			else g_cover.setArtwork(images.no_cover,true,true);
+		} catch (e){g_cover.setArtwork(images.no_cover,true,true)}	
 	}
 	
 	g_cover.draw(gr,0,0);
@@ -396,7 +396,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 				showNowPlaying(true); 
 			break;
 			case (properties.dble_click_action==2):
-				showNowPlayingCover();
+				if(!g_cover.isFiller()) showNowPlayingCover();
 			break;				
 			
 		}
@@ -514,6 +514,7 @@ oCover = function() {
 	this.resized = false;
 	this.artwork = null;
 	this.tintDrawed = false;
+	this.filler = false;	
 	this.repaint = function() {window.Repaint()}  
 	this.reset = function() {
 		this.artwork = null;
@@ -523,8 +524,13 @@ oCover = function() {
 	this.isSetArtwork = function() {
 		return !(typeof(this.artwork) != "object" || !this.artwork || this.artwork==null)
 	}
-	this.setArtwork = function(image, resize) {
+	this.isFiller = function() {
+		return this.filler;
+	}	
+	this.setArtwork = function(image, resize, filler) {
 		if(typeof(image) != "object" || !image || image==null) return;		
+		this.filler = typeof filler !== 'undefined' ? filler : false;	
+		
 		this.resized = false;
 		this.artwork = image;
 		if(resize && this.w>0 && this.h>0) {
@@ -534,7 +540,7 @@ oCover = function() {
 	this.getArtwork = function(metadb) {
 		var img = g_image_cache.hit(metadb);
 		if(typeof(image) == "object" && image!=null && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();		
-		this.setArtwork(img,true);	
+		this.setArtwork(img,true,false);	
 	}		
 	this.resize = function(w,h) {
 		var w = typeof w !== 'undefined' ? w : this.w;	
@@ -616,7 +622,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 	if(image){
 		cachekey = process_cachekey(metadb);
 		save_image_to_cache(image, -1, cachekey);	
-		g_cover.setArtwork(image,true);
+		g_cover.setArtwork(image,true,false);
 		g_image_cache.cachelist[cachekey] = image;
 		g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);				
 	}
