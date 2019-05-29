@@ -1146,8 +1146,8 @@ oTagSwitcherBar = function() {
 		var prev_text_width=0;
 
 		// draw background part above playlist (headerbar)
-		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bgcolor);
-		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line_maincolor);
+		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
+		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
 		
 		//Calculate text size
 		total_txt_size = 0
@@ -3088,8 +3088,8 @@ oBrowser = function(name) {
 				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.lightgrey_bg);
 				height_top_fix1 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight-1 : 0;
 				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;				
-                gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bgcolor);
-                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line_maincolor);
+                gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bg);
+                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
                 
 				if(g_filterbox.inputbox.text.length==0) {
 					var text_width = gr.CalcTextWidth(boxText,g_font.min1)
@@ -4633,7 +4633,7 @@ function get_colors() {
 	if(properties.darklayout){		
 
 		colors.grid_txt = GetGrey(255)	
-		colors.grid_bg = GetGrey(0,190)		
+		colors.grid_bg = GetGrey(200,190)		
 		colors.gridselected_txt = GetGrey(0)	
 		colors.gridselected_bg = GetGrey(255,155)	
 
@@ -4644,12 +4644,6 @@ function get_colors() {
 		colors.grad_bottom_color_library_panel = GetGrey(0,70);		
 		colors.grad_bottom_color2 = GetGrey(0,0);		
 		colors.fading_bottom_height = 50;
-		
-		colors.selected_item_bg = GetGrey(0,150);	
-		colors.selected_item_line = GetGrey(255,30);	
-		
-		colors.headerbar_bgcolor = GetGrey(15,200);	
-		colors.headerbar_line_maincolor = GetGrey(255,38);	
 	} else {		
 
 		colors.grid_txt = GetGrey(255)	
@@ -4664,16 +4658,11 @@ function get_colors() {
 		colors.grad_bottom_color_library_panel = GetGrey(0,10);		
 		colors.grad_bottom_color2 = GetGrey(0,0);		
 		colors.fading_bottom_height = 30;
-
-		colors.selected_item_bg = GetGrey(0,17);	
-		colors.selected_item_line = GetGrey(0,16);	
 		
-		colors.headerbar_bgcolor = GetGrey(255,240);
+		colors.headerbar_bg = GetGrey(255,240);
 		if(properties.showwallpaper) {
-			colors.headerbar_line_maincolor = GetGrey(0,40);
-		} else {	
-			colors.headerbar_line_maincolor = GetGrey(215);			
-		}	
+			colors.headerbar_line = GetGrey(0,40);
+		}
 	}
 	colors.selected_txt = colors.normal_txt;	
 	get_images();

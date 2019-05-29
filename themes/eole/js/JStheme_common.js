@@ -226,8 +226,9 @@ function get_colors_global(){
 		colors.wallpaper_overlay = GetGrey(25,230);
 		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
 		
-		colors.normal_bg = GetGrey(17);
-		colors.lightgrey_bg = GetGrey(17);		
+		colors.normal_bg = GetGrey(30);
+		colors.lightgrey_bg = GetGrey(27);	
+		
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);	
 		colors.superfaded_txt = GetGrey(60);		
@@ -236,6 +237,9 @@ function get_colors_global(){
 		colors.selected_bg = RGBA(015,177,255,160);
 		colors.highlight = RGB(255,175,050);
 		colors.alternate_row = GetGrey(0,30);
+		
+		colors.headerbar_bg = GetGrey(30,220);	
+		colors.headerbar_line = GetGrey(255,38);	
 		
 		colors.scrollbar_normal_cursor = GetGrey(255,60);
 		colors.scrollbar_hover_cursor = GetGrey(225);
@@ -278,8 +282,11 @@ function get_colors_global(){
 		colors.border_0 = GetGrey(255,50);
 		
 		colors.marker_hover_item = GetGrey(255);
-		colors.width_marker_hover_item = 1;		
+		colors.width_marker_hover_item = 2;		
 		colors.dragdrop_marker_line = GetGrey(255,205);		
+		
+		colors.selected_item_bg = GetGrey(255,15);	
+		colors.selected_item_line = GetGrey(255,18);		
 	} else {
 		colors.wallpaper_overlay = GetGrey(255,235);
 		colors.wallpaper_overlay_blurred = GetGrey(255,235);	
@@ -294,6 +301,9 @@ function get_colors_global(){
 		colors.selected_bg = RGBA(015,177,255,100);
 		colors.highlight = RGB(255,175,050);
 		colors.alternate_row = GetGrey(0,5);
+		
+		colors.headerbar_bg = GetGrey(255,240);		
+		colors.headerbar_line = GetGrey(215);
 		
 		colors.scrollbar_normal_cursor = GetGrey(0,120);
 		colors.scrollbar_hover_cursor = GetGrey(0);
@@ -340,6 +350,8 @@ function get_colors_global(){
 		colors.width_marker_hover_item = 2;		
 		colors.dragdrop_marker_line = GetGrey(20);
 		
+		colors.selected_item_bg = GetGrey(0,17);	
+		colors.selected_item_line = GetGrey(0,16);	
 	}
 }
 //Files, Folders, FileSystemObject ----------------------------------------------------

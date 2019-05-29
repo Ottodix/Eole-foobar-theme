@@ -74,8 +74,7 @@ function get_colors() {
 		colors.settings_hover_bg = GetGrey(255,40);	
 		colors.headerbar_line = GetGrey(51);	
 	} else {
-		colors.settings_hover_bg = GetGrey(230);		
-		colors.headerbar_line = GetGrey(215);			
+		colors.settings_hover_bg = GetGrey(230);				
 	}
 	setSettingsBtn();
 } get_colors();

@@ -5196,9 +5196,6 @@ function get_colors() {
 		colors.grad_bottom_1 = GetGrey(0,70);
 		colors.grad_bottom_2 = GetGrey(0,0);	
 		colors.fading_bottom_height = 39;
-			
-		colors.headerbar_bg = GetGrey(15,200);	
-		colors.headerbar_line = GetGrey(255,38);	
 		
 		colors.progressbar = GetGrey(255,45);
 		colors.progressbar_bg_off = GetGrey(0,0);
@@ -5222,8 +5219,6 @@ function get_colors() {
 		colors.flash_bg = GetGrey(0,10);		
 		colors.flash_rectline = GetGrey(0,41);		
 		
-		colors.headerbar_bg = GetGrey(255,240);		
-		colors.headerbar_line = GetGrey(215);
 		if(properties.showwallpaper) {
 			colors.fadedsmall_txt = GetGrey(125);			
 		} else {	

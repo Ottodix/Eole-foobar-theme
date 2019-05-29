@@ -4525,12 +4525,6 @@ function get_colors() {
         colors.grad_bottom_2 = GetGrey(0, 0);
         colors.fading_bottom_height = 50;
 
-		colors.selected_item_bg = GetGrey(0,150);	
-		colors.selected_item_line = GetGrey(255,30);	
-
-		colors.headerbar_bg = GetGrey(17,200);	
-		colors.headerbar_line = GetGrey(255,38);	
-
 		colors.settings_hover_bg = GetGrey(255,40);	
     } else {
 		colors.btn_inactive_opacity = 110;
@@ -4550,16 +4544,10 @@ function get_colors() {
         colors.grad_bottom_2 = GetGrey(0, 0);
         colors.fading_bottom_height = 30;
 
-		colors.selected_item_bg = GetGrey(0,17);	
-		colors.selected_item_line = GetGrey(0,16);	
-
         if (properties.showwallpaper) {
-            colors.headerbar_bg = GetGrey(255, 240);
             colors.headerbar_line = GetGrey(0, 40);
-        } else {
-            colors.headerbar_bg = GetGrey(255, 240);
-            colors.headerbar_line = GetGrey(215);
-        }
+        } 
+		
 		colors.settings_hover_bg = GetGrey(230);			
     }
 };
