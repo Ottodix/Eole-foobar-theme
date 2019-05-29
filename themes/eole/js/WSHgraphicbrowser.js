@@ -4410,6 +4410,9 @@ oBrowser = function(name) {
 							}
 						}							
 						else if(((i == this.activeIndex && this.activeRow>-1) || i==this.album_Rclicked_index)) {
+							if(!(g_cursor.getActiveZone()=="cover"+i)){
+								g_cursor.setCursor(IDC_HAND,"cover"+i);
+							} 
 							if(!properties.circleMode){
 								gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, colors.covergrad_hoverOverlay, GetGrey(0,0), 0);
 								//gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, GetGrey(0,0), this.groups_draw[i].CoverMainColor, 1);
@@ -4424,8 +4427,10 @@ oBrowser = function(name) {
 								gr.DrawImage(cover.retract_img, ax + awhalf-11, coverTop+awhalf-11, 22, 22, 0, 0, 22, 22);
 							else
 								gr.DrawImage(cover.extend_img, ax + awhalf-11, coverTop+awhalf-11, 22, 22, 0, 0, 22, 22);								
-						} 
-
+						} else if(this.activeIndex<0 && g_cursor.getActiveZone()=="cover"+i) {
+							g_cursor.setCursor(IDC_ARROW);
+						}
+		
 					} else if (this.groups_draw[i].cover_img=="no_cover") {
 						gr.DrawImage(cover.nocover_img, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height);		
 						if(!properties.circleMode)
@@ -4744,7 +4749,7 @@ oBrowser = function(name) {
 					if((y + scroll_ - this.y - this.CoverMarginTop-1 - ((y > g_showlist.y)?g_showlist.h:0))%this.rowHeight>this.coverRealWith){
 						this.activeColumn = 0;
 						this.activeIndex = -1;						
-					} else if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					} else if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
 						this.activeColumn = 0;
 						this.activeIndex = -1;	
 					} else {
@@ -5033,7 +5038,7 @@ oBrowser = function(name) {
 	}
 	this.focus_on_now_playing = function (track){		
 		FocusOnNowPlaying = true;
-		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !(!this.followActivePlaylist && !nowplayinglib_state.isActive() && this.isPlayingIdx>-1)){
+		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !(!this.followActivePlaylist && nowplayinglib_state.isActive() && this.isPlayingIdx>-1)){
 			if(this.followActivePlaylist){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
