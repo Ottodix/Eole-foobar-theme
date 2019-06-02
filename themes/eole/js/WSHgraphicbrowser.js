@@ -4623,10 +4623,10 @@ oBrowser = function(name) {
 							plman.ActivePlaylist = this.SourcePlaylistIdx;
 							plman.PlayingPlaylist = this.SourcePlaylistIdx;						
 						}
-						plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups_draw[this.activeIndex].pl[0]);
+						plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups[this.groups_draw[this.activeIndex]].pl[0]);
 						if(fb.IsPaused) fb.Stop();
 						plman.FlushPlaybackQueue();	
-						fb.RunContextCommandWithMetadb("Add to playback queue", this.groups_draw[this.activeIndex].pl[0]);
+						fb.RunContextCommandWithMetadb("Add to playback queue", this.groups[this.groups_draw[this.activeIndex]].pl[0]);
 						fb.Play();
 					}						
                 }
@@ -4685,7 +4685,7 @@ oBrowser = function(name) {
                 break;
             case "mbtn_down":
                 if(this.activeIndex > -1){
-					fb.RunContextCommandWithMetadb("Properties",this.groups_draw[this.activeIndex].pl);
+					fb.RunContextCommandWithMetadb("Properties",this.groups[this.groups_draw[this.activeIndex]].pl);
                 }
                 break;				
             case "move":                
@@ -4699,13 +4699,13 @@ oBrowser = function(name) {
                     return;
                 }
 				if(properties.showToolTip && !(g_dragA || g_dragR || g_scrollbar.cursorDrag)){
-					if((this.TooltipAlbum!=this.activeIndex || (this.activeIndex>-1 && this.groups_draw[this.activeIndex].text_y > y)) && this.TooltipAlbum > -1) {
+					if((this.TooltipAlbum!=this.activeIndex || (this.activeIndex>-1 && this.groups[this.groups_draw[this.activeIndex]].text_y > y)) && this.TooltipAlbum > -1) {
 						this.TooltipAlbum = -1;
 						g_tooltip.Deactivate();	
 					}						
-					if(this.activeIndex>-1 && this.TooltipAlbum!=this.activeIndex && this.groups_draw[this.activeIndex].showToolTip && this.groups_draw[this.activeIndex].text_y < y){
+					if(this.activeIndex>-1 && this.TooltipAlbum!=this.activeIndex && this.groups[this.groups_draw[this.activeIndex]].showToolTip && this.groups[this.groups_draw[this.activeIndex]].text_y < y){
 							this.TooltipAlbum=this.activeIndex;	
-							new_tooltip_text=this.groups_draw[this.activeIndex].firstRow+'\n'+this.groups_draw[this.activeIndex].secondRow;
+							new_tooltip_text=this.groups[this.groups_draw[this.activeIndex]].firstRow+'\n'+this.groups[this.groups_draw[this.activeIndex]].secondRow;
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay,1000);		
 					}
 				}				
