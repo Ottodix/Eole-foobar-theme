@@ -844,10 +844,19 @@ function is_hover_track_info(x,y){
     if(y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+ww_progress-timeInfo_length) return true;
     return false;    
 }
+function setVolume(val){
+	var volume = (val-volume_vars.margin_left) / volume_vars.width;
+	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
+	volume = 100 * (Math.pow(volume,1/2) - 1);
+	fb.Volume = volume;
+}
 function on_mouse_lbtn_down(x,y,m){	
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);
 	//Volume
-    if(is_hover_volume_slider(x,y) && !is_hover_volume_btn(x,y)) {volume_vars.drag = true;}
+    if(is_hover_volume_slider(x,y) && !is_hover_volume_btn(x,y)) {
+		volume_vars.drag = true;
+		setVolume(x);
+	}
 	
 	g_resizing.on_mouse("lbtn_down", x, y, m);
 
@@ -955,10 +964,7 @@ function on_mouse_move(x,y,m){
 	if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {showVolumeSlider(true);repaint = true;}
 
 	if(volume_vars.drag){
-		var volume = (x-volume_vars.margin_left) / volume_vars.width;
-		volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
-		volume = 100 * (Math.pow(volume,1/2) - 1);
-		fb.Volume = volume;
+		setVolume(x);
 	}
 	if(is_hover_time_elapsed(x,y)){
 		if(g_cursor.getCursor!=IDC_HAND){
