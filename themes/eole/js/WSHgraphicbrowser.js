@@ -208,13 +208,21 @@ black_images = {
 	filter_off_icon : gdi.Image(theme_img_path + "\\icons\\library_filter_off.png"),   
 	filter_off_hover_icon : gdi.Image(theme_img_path + "\\icons\\library_filter_off_hover.png"),  
 	filter_on_icon : gdi.Image(theme_img_path + "\\icons\\library_filter_on.png"),
-	filter_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\library_filter_on_hover.png")
+	filter_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\library_filter_on_hover.png"),
+	nowplaying_off_icon : gdi.Image(theme_img_path + "\\icons\\nowplaying_off.png"),
+	nowplaying_off_hover_icon : gdi.Image(theme_img_path + "\\icons\\nowplaying_off_hover.png"),  
+	nowplaying_on_icon : gdi.Image(theme_img_path + "\\icons\\nowplaying_on.png"),
+	nowplaying_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\nowplaying_on_hover.png"),	
 } 
 white_images = {
 	filter_off_icon : gdi.Image(theme_img_path + "\\icons\\white\\library_filter_off.png"),   
 	filter_off_hover_icon : gdi.Image(theme_img_path + "\\icons\\white\\library_filter_off_hover.png"),  
 	filter_on_icon : gdi.Image(theme_img_path + "\\icons\\white\\library_filter_on.png"),
-	filter_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\white\\library_filter_on_hover.png")
+	filter_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\white\\library_filter_on_hover.png"),
+	nowplaying_off_icon : gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_off.png"),
+	nowplaying_off_hover_icon : gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_off_hover.png"),  
+	nowplaying_on_icon : gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on.png"),
+	nowplaying_on_hover_icon : gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on_hover.png"),
 }  
 
 cFilterBox = {
@@ -2405,7 +2413,7 @@ oHeaderBar = function(name) {
 		if(covers_loading_progress<101 && properties.show_covers_progress)
 			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww + 39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX);
 		else 
-			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX);				
+			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX);				
 	}	
 	this.isHover_Settings = function(x,y){
 		if(x>this.MarginLeft-7 && x<this.MarginLeft+23 && y>this.padding_top && y<this.padding_top+23) return true;
@@ -5118,24 +5126,24 @@ function drawAllButtons(gr) {
     }
 }
 function positionButtons(){
-	buttons.filterToggle.x = ww-92;
+	buttons.filterToggle.x = ww-88;
 	buttons.filterToggle.y = 7;
 	
 	if(properties.darklayout){
 		if(!libraryfilter_state.isActive()){
-			buttons.filterToggle.N_img = white_images.filter_on_icon
-			buttons.filterToggle.H_img = white_images.filter_on_hover_icon
+			buttons.filterToggle.N_img = white_images.nowplaying_on_icon
+			buttons.filterToggle.H_img = white_images.nowplaying_on_hover_icon
 		} else {
-			buttons.filterToggle.N_img = white_images.filter_off_icon
-			buttons.filterToggle.H_img = white_images.filter_off_hover_icon			
+			buttons.filterToggle.N_img = white_images.nowplaying_off_icon
+			buttons.filterToggle.H_img = white_images.nowplaying_off_hover_icon			
 		}			
 	} else {
 		if(!libraryfilter_state.isActive()){
-			buttons.filterToggle.N_img = black_images.filter_on_icon
-			buttons.filterToggle.H_img = black_images.filter_on_hover_icon
+			buttons.filterToggle.N_img = black_images.nowplaying_on_icon
+			buttons.filterToggle.H_img = black_images.nowplaying_on_hover_icon
 		} else {
-			buttons.filterToggle.N_img = black_images.filter_off_icon
-			buttons.filterToggle.H_img = black_images.filter_off_hover_icon			
+			buttons.filterToggle.N_img = black_images.nowplaying_off_icon
+			buttons.filterToggle.H_img = black_images.nowplaying_off_hover_icon			
 		}				
 	}	
 	if(properties.displayToggleBtns){
