@@ -65,7 +65,8 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
         // adjust offset to always see the cursor
         if(!this.drag && !this.select) {
             this.Cx = cInputbox.temp_gr.CalcTextWidth(this.text.substr(this.offset, this.Cpos - this.offset), this.font_search);
-            while(this.Cx >= this.w - this.right_margin) {
+			var text_length = this.text.length
+            while(this.Cx >= this.w - this.right_margin && this.offset <= text_length) {
                 this.offset++;
                 this.Cx = cInputbox.temp_gr.CalcTextWidth(this.text.substr(this.offset, this.Cpos - this.offset), this.font_search);
             }
