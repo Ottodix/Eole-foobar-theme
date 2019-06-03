@@ -4,7 +4,6 @@ var properties = {
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
     rowHeight: window.GetProperty("PROPERTY: Row Height", 42),
     rowScrollStep: 3,
-    thumbnailWidthMax: 300,		
     drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", true), 		
     scrollSmoothness: 3.0,
     refreshRate: 40,

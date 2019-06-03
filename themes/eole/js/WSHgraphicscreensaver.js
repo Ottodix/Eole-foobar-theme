@@ -79,7 +79,6 @@ var properties = {
 	panelName: 'WSHgraphicbrowser',		
     load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),		
     thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 50),
-    thumbnailWidthMax: 300,	
     thumbnailWidth: window.GetProperty("COVER Width", 100),			
     default_CoverShadowOpacity: window.GetProperty("COVER Shadow Opacity", 0),		
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),		

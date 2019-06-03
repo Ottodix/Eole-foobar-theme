@@ -81,7 +81,6 @@ var already_saved=false;
 var properties = {
 	panelName: 'WSHgraphicbrowser',		
     thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 50),
-    thumbnailWidthMax: 300,	
     thumbnailWidth: window.GetProperty("COVER Width", 100),	
 	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
 	showCoverShadow: window.GetProperty("COVER show shadow", false),
@@ -4981,10 +4980,7 @@ oBrowser = function(name) {
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
-		if(properties.CoverShadowOpacity>0 && this.cover_shadow != null){
-			this.cover_shadow = undefined;
-			this.cover_shadow = null;	
-		}				
+		this.refresh_shadows();				
 		on_size();		
 	}
     this.setResizeButton(65,14);
