@@ -2314,6 +2314,24 @@ function FormatCover(image, w, h, rawBitmap, callID) {
 function isImage(variable){
 	return (typeof variable == 'object' && variable!=null)
 }
+function process_cachekey(metadb, titleformat, str){
+	var titleformat = typeof titleformat !== 'undefined' ? titleformat : globalProperties.tf_crc;
+	try{
+		var str = typeof str !== 'undefined' ? str : titleformat.EvalWithMetadb(metadb);
+	} catch(e){var str = "";}
+	
+    var str_return = "";
+    str = str.toLowerCase();
+    var len = str.length;
+    for(var i  = 0;i < len; i++){
+        var charcode = str.charCodeAt(i);
+        if(charcode > 96 && charcode < 123)
+            str_return += str.charAt(i);
+        else if(charcode > 47 && charcode < 58)
+            str_return += str.charAt(i);
+    };
+    return str;
+};
 function check_cache(metadb, albumIndex, crc){
 	//if(crc=='undefined') return false;	
 
@@ -2422,20 +2440,24 @@ function get_albumArt(metadb,cachekey){
 	var cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
 	try{var artwork_img = g_image_cache.cachelist[cachekey];}catch(e){}
 	if ((typeof(artwork_img) == "undefined" || artwork_img == null) && globalProperties.enableDiskCache) {			
-		var cache_exist = check_cache(metadb, 0, cachekey);	
+		var cache_filename = check_cacheV2(metadb, 0, cachekey);	
 		// load img from cache				
-		if(cache_exist) {	
-			artwork_img = load_image_from_cache_direct(metadb, cache_exist);
+		if(cache_filename) {	
+			artwork_img = load_image_from_cache_directV2(cache_filename);
 		} else artwork_img = utils.GetAlbumArtV2(metadb, AlbumArtId.front);
 	}	
 	return artwork_img;
 }
-const get_albumArt_async = async(metadb, albumIndex, need_stub, only_embed, no_load) =>
+const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_embed, no_load) =>
 {
+	need_stub = true;
+	only_embed = false;
+	no_load = false;
     if (!metadb) {
         return;
     }	
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
+	save_image_to_cache(result.image, 0,cachekey); 
 	on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };
 
@@ -2451,6 +2473,7 @@ function save_image_to_cache(image, albumIndex, cachekey){
 		}		
 		image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);	
 	}
+	//return image;
 }
 function createDragText(line1, line2, cover_size){
 	var drag_img = gdi.CreateImage(cover_size, cover_size);
@@ -2495,25 +2518,340 @@ function createDragImg(img, cover_size, count){
 	//drag_img = drag_img.Resize(cover_size, cover_size, 2);
 	return drag_img;
 };
-function process_cachekey(metadb, titleformat, str){
-	var titleformat = typeof titleformat !== 'undefined' ? titleformat : globalProperties.tf_crc;
-	try{
-		var str = typeof str !== 'undefined' ? str : titleformat.EvalWithMetadb(metadb);
-	} catch(e){var str = "";}
-	
-    var str_return = "";
-    str = str.toLowerCase();
-    var len = str.length;
-    for(var i  = 0;i < len; i++){
-        var charcode = str.charCodeAt(i);
-        if(charcode > 96 && charcode < 123)
-            str_return += str.charAt(i);
-        if(charcode > 47 && charcode < 58)
-            str_return += str.charAt(i);
+
+
+oImageCache = function () {
+    this.cachelist = Array();
+	this.cover_load_timer = [];
+    this.hit = function (metadb, albumIndex, direct_return, cachekey, resize) {	
+		var cachekey = typeof cachekey !== 'undefined' ? cachekey : brw.groups[albumIndex].cachekey;
+		var resize = typeof resize !== 'undefined' ? resize : true;		
+		var img = this.cachelist[cachekey];
+        if (typeof img == "undefined" || img==null) { // if image not in cache, we load it asynchronously
+			if(globalProperties.enableDiskCache && albumIndex>-1) brw.groups[albumIndex].cover_filename = check_cacheV2(metadb, albumIndex, cachekey);
+			if(globalProperties.enableDiskCache && albumIndex>-1 && brw.groups[albumIndex].cover_filename && brw.groups[albumIndex].load_requested == 0) {
+					//Dont save as its already in the cache
+					brw.groups[albumIndex].save_requested=true;
+					// load img from cache
+					if(!isScrolling){
+						var img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename);
+						brw.groups[albumIndex].load_requested = 2;
+						brw.repaint();
+						this.cover_load_timer = Array();
+					} else if(!direct_return){
+						if(this.cover_load_timer.length<10) {
+							this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
+								if(brw.groups[albumIndex].load_requested == 0){
+									try {
+										brw.groups[albumIndex].load_requested = (properties.load_image_from_cache_direct)?2:1;									
+										if(properties.load_image_from_cache_direct) {
+											img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename);
+											g_image_cache.cachelist[cachekey] = img;
+											brw.groups[albumIndex].load_requested = 0;
+										} else {
+											brw.groups[albumIndex].tid = load_image_from_cacheV2(brw.groups[albumIndex].cover_filename);
+											brw.groups[albumIndex].load_requested = 1;
+										}										
+									} catch(e) {console.log("timers.coverLoad line 5133 failed")};
+									g_image_cache.cover_load_timer.pop();
+									brw.repaint();	
+								}
+							}, 5);
+						}	
+
+						
+					} else {
+						img = load_image_from_cache_directV2(brw.groups[albumIndex].cover_filename)
+						if(img) {
+							this.cachelist[cachekey] = img
+						} else this.cachelist[cachekey] = cover.nocover_img;						
+						brw.groups[albumIndex].load_requested = 1;
+					}		
+			} else {
+				if(!isScrolling) this.cover_load_timer = Array();
+				if(!direct_return){	
+					if(albumIndex<0) {
+						var art_id = -1;
+						try{
+							get_albumArt_async(metadb,art_id, cachekey);
+						} catch(e){console.log("timers.coverLoad line 5151 failed")}			
+					} else { //if(this.cover_load_timer.length<20){
+						//this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
+							var art_id = albumIndex + 5;
+							try{
+								get_albumArt_async(metadb,art_id, cachekey);
+							} catch(e){console.log("timers.coverLoad line 5157 failed")}								
+							//clearTimeout(g_image_cache.cover_load_timer[g_image_cache.cover_load_timer.length-1]);
+							//g_image_cache.cover_load_timer.pop();
+						//}, 5);
+					}					
+				} else {
+					img = utils.GetAlbumArtV2(metadb, 0, false);
+					if(img) {
+						if(!timers.saveCover && globalProperties.enableDiskCache) {
+							save_image_to_cache(img, 0,cachekey); 
+							timers.saveCover = setTimeout(function() {
+								clearTimeout(timers.saveCover);
+								timers.saveCover = false;
+							}, 100);
+						}; 
+						//if(img.Width>globalProperties.thumbnailWidthMax || img.Height>globalProperties.thumbnailWidthMax) {
+							//this.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
+						//}
+					} else this.cachelist[cachekey] = cover.nocover_img
+				}		
+			}
+        };
+        return img;		
     };
-    return str_return;
+    this.hit_smoothplaylist = function (metadb, albumIndex) {
+        try{var img = this.cachelist[brw.groups[albumIndex].cachekey];}catch(e){}
+        if (typeof(img) == "undefined" || img == null) { // if image not in cache, we load it asynchronously	
+                brw.groups[albumIndex].crc = check_cache(metadb, albumIndex);
+                if(globalProperties.enableDiskCache && brw.groups[albumIndex].crc && brw.groups[albumIndex].crc!='undefined' && brw.groups[albumIndex].load_requested == 0) {
+					//Dont save as its already in the cache
+					brw.groups[albumIndex].save_requested=true;
+					
+                    // load img from cache
+					if(!isScrolling  && !cScrollBar.timerID){
+						var image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
+						img = this.getit(metadb, albumIndex, image);
+						brw.groups[albumIndex].cover_img = img;
+						brw.groups[albumIndex].load_requested = 2;
+						//brw.cover_repaint();	
+					} else if(!timers.coverLoad) {
+                        timers.coverLoad = setTimeout(function() {
+                            try {							
+								if(properties.load_image_from_cache_direct) {
+									image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
+									brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, image);
+									brw.groups[albumIndex].load_requested = 2;
+								} else {
+									brw.groups[albumIndex].tid = load_image_from_cache(metadb, brw.groups[albumIndex].crc);
+									brw.groups[albumIndex].load_requested = 1;											
+								}								
+                            } catch(e) {};
+                            timers.coverLoad && clearTimeout(timers.coverLoad);
+                            timers.coverLoad = false;
+                        }, 5);
+                    };
+                } else if(brw.groups[albumIndex].load_requested == 0) {               
+                    // load img default method
+                    if(!timers.coverLoad) {
+                        timers.coverLoad = setTimeout(function() {
+                            this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
+							try{
+								brw.groups[albumIndex].load_requested = 1;						
+								//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+								get_albumArt_async(metadb,this.albumArtId, true, false, false);
+							} catch(e){}
+                            timers.coverLoad && clearTimeout(timers.coverLoad);
+                            timers.coverLoad = false;
+                        }, (!isScrolling  && !cScrollBar.timerID ? 5 : 20));
+                    };
+                };
+        }
+        return img;
+    };	
+    this.hit_filter = function (metadb, albumIndex, direct_return, cachekey) {
+		var cachekey = typeof cachekey !== 'undefined' ? cachekey : brw.groups[albumIndex].cachekey;
+		var img = this.cachelist[cachekey];
+        if (typeof(img) == "undefined" || img == null) { // if image not in cache, we load it asynchronously
+				brw.groups[albumIndex].crc = check_cache(metadb, albumIndex, cachekey);				
+                if(globalProperties.enableDiskCache && brw.groups[albumIndex].crc && brw.groups[albumIndex].crc!='undefined' && brw.groups[albumIndex].load_requested == 0) { 	
+					//Dont save as its already in the cache
+					brw.groups[albumIndex].save_requested=true;
+					// load img from cache direct
+					if(!isScrolling  && !cScrollBar.timerID){
+						var image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
+						img = this.getit(metadb, albumIndex, image);
+						brw.groups[albumIndex].cover_img = img;
+						brw.groups[albumIndex].load_requested = 2;
+						//brw.repaint();	
+					} else if(!timers.coverLoad) {											
+						timers.coverLoad = setTimeout(function() {
+							try {
+								if(properties.load_image_from_cache_direct) {
+									image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
+									brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, image);
+									brw.groups[albumIndex].load_requested = 2;
+								} else {
+									brw.groups[albumIndex].tid = load_image_from_cache(metadb, brw.groups[albumIndex].crc);
+									brw.groups[albumIndex].load_requested = 1;											
+								}
+							} catch(e) {console.log(e)};
+							timers.coverLoad && clearTimeout(timers.coverLoad);
+							timers.coverLoad = false;								
+						}, 5);								
+					};
+                } else if(brw.groups[albumIndex].load_requested == 0) {               
+					// load img default method
+					if(!timers.coverLoad) {
+						timers.coverLoad = setTimeout(function() {
+							if(properties.albumArtId==5) { // genre
+								brw.groups[albumIndex].save_requested = true;
+								if(!properties.AlbumArtFallback){
+									var arr = brw.groups[albumIndex].groupkey.split(" ^^ ");
+									if(g_files.FileExists(images.path + "genres\\" + arr[0] + ".jpg")){
+										var genre_img = gdi.Image(images.path + "genres\\" + arr[0] + ".jpg");
+									} else {
+										var genre_img = gdi.Image(images.path + "genres\\default_" + (albumIndex%20) + ".jpg");
+									}
+									brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img);										
+									brw.repaint();
+								} else {
+									this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
+									//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+									get_albumArt_async(metadb,this.albumArtId, true, false, false);
+								}									
+							} else if(properties.albumArtId==4) {	
+								this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
+								//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);	
+								get_albumArt_async(metadb,this.albumArtId, true, false, false);
+							} else {
+								this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
+								//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+								get_albumArt_async(metadb,this.albumArtId, true, false, false);
+							};
+							timers.coverLoad && clearTimeout(timers.coverLoad);
+							timers.coverLoad = false;
+						}, (!isScrolling  && !cScrollBar.timerID ? 5 : 20));
+					};
+                };
+            //};
+        };
+        return img;
+    };
+    this.reset = function(key) {
+        this.cachelist[key] = null;
+    };	
+	this.resetAll = function(){
+		this.cachelist = Array();
+	};
+    this.getit = function (metadb, albumId, image) {
+        var cw = globalProperties.thumbnailWidthMax;
+        var ch = cw;
+        var img = null;
+        var cover_type = null;
+        
+        if(!image) {
+            if(brw.groups[albumId].tracktype != 3) {
+                cover_type = 0;
+            } else {
+                cover_type = 3;
+            };
+        } else {
+            if(cover.keepaspectratio) {
+                if(image.Height>=image.Width) {
+                    var ratio = image.Width / image.Height;
+                    var pw = cw * ratio;
+                    var ph = ch;
+                } else {
+                    var ratio = image.Height / image.Width;
+                    var pw = cw;
+                    var ph = ch * ratio;
+                };
+            } else {
+                var pw = cw;
+                var ph = ch;
+            };
+            
+            // cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
+            if(brw.groups[albumId].tracktype != 3) {
+                if(metadb) {
+                    img = FormatCover(image, pw, ph, false);
+                    cover_type = 1;
+                };
+            } else {
+                cover_type = 3;
+            };
+            
+            try{this.cachelist[brw.groups[albumId].cachekey] = img;}catch(e){}
+            // save img to cache
+			
+            /*if(globalProperties.enableDiskCache) {
+                if(cover_type == 1 && !brw.groups[albumId].save_requested && image) {
+                    if(!timers.saveCover) {
+                        brw.groups[albumId].save_requested = true;
+                        save_image_to_cache(image, albumId); 
+                        timers.saveCover = setTimeout(function() {
+                            clearTimeout(timers.saveCover);
+                            timers.saveCover = false;
+                        }, 100);
+                    };
+                };
+            };*/
+        };
+        
+        brw.groups[albumId].cover_type = cover_type;
+        return img;
+    };
+    this.getit_smoothplaylist = function (metadb, albumId, image) {
+        var cw = globalProperties.thumbnailWidthMax;
+        var ch = cw;
+        var img = null;
+        var cover_type = null;
+
+        if(cover.keepaspectratio) {
+            if(!image) {
+                var pw = cw - cover.margin * 2;
+                var ph = ch - cover.margin * 2;
+            } else {
+                if(image.Height>=image.Width) {
+                    var ratio = image.Width / image.Height;
+                    var pw = (cw - cover.margin * 2) * ratio;
+                    var ph = ch - cover.margin * 2;
+                } else {
+                    var ratio = image.Height / image.Width;
+                    var pw = cw - cover.margin * 2;
+                    var ph = (ch - cover.margin * 2) * ratio;
+                };
+            };
+        } else {
+            var pw = cw - cover.margin * 2;
+            var ph = ch - cover.margin * 2;
+        };
+        // cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
+        if(brw.groups[albumId].tracktype != 3) {
+            if(metadb) {
+                if(image) {
+                    img = FormatCover(image, pw, ph, false);
+                    cover_type = 1;
+                } else {
+                    //img = FormatCover(images.noart, pw, ph, false);
+                    cover_type = 0;
+                };
+            };
+        } else {
+            cover_type = 3;
+        };
+        if(cover_type == 1) {
+			try {
+				this.cachelist[brw.groups[albumId].cachekey] = img;
+			}
+			catch (e) {
+				
+			}
+        };
+        // save img to cache
+        if(globalProperties.enableDiskCache && cover_type == 1 && !brw.groups[albumId].save_requested && image) {
+            if(!timers.saveCover) {
+                brw.groups[albumId].save_requested = true;
+                save_image_to_cache(image, albumId); 
+                timers.saveCover = setTimeout(function() {
+                    clearTimeout(timers.saveCover);
+                    timers.saveCover = false;
+                }, 100);
+            };
+        };
+        
+        brw.groups[albumId].cover_type = cover_type;
+        
+        return img;
+    };	
 };
 
+//=========================================================================
 function Utf8Encode(string) {
     string = string.replace(/\r\n/g,"\n");
     var utftext = "";

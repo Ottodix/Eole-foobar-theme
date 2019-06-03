@@ -483,18 +483,13 @@ oImageCache = function () {
 		nowPlaying_cachekey = process_cachekey(metadb);				
 		if(nowPlaying_cachekey==old_cachekey) return null;	
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
-
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
-			cache_exist = check_cache(metadb, 0, nowPlaying_cachekey);	
+			cache_filename = check_cacheV2(metadb, 0, nowPlaying_cachekey);	
 			// load img from cache	
-			
-			if(cache_exist) {	
-				img = load_image_from_cache_direct(metadb, cache_exist);
-				cover_path = cover_img_cache+"\\"+cache_exist+"."+globalProperties.ImageCacheExt;
-			} else {
-				get_albumArt_async(metadb,AlbumArtId.front);
-				//utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
-			}
+			if(cache_filename) {	
+				img = load_image_from_cache_directV2(cache_filename);
+				cover_path = cache_filename;
+			} else get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey);
 		} 
 		return img;
     };	
@@ -805,10 +800,10 @@ function on_notify_data(name, info) {
 }
 function showNowPlayingCover(){
 	if (globalProperties.enableDiskCache) {	
-		cache_exist = check_cache(fb.GetNowPlaying(), 0, nowPlaying_cachekey);	
+		cache_filename = check_cacheV2(fb.GetNowPlaying(), 0, nowPlaying_cachekey);	
 		// load img from cache				
-		if(cache_exist) {	
-			cover_path = cover_img_cache+"\\"+cache_exist+"."+globalProperties.ImageCacheExt;
+		if(cache_filename) {	
+			cover_path = cache_filename;
 		} else cover_path = "sfsfsf##";
 	} else if(fb.GetNowPlaying().path == cover_path) cover_path = cover_path.substring(0, cover_path.lastIndexOf("\\")) + "\\folder.jpg";
 	var WshShell = new ActiveXObject("WScript.Shell");		
@@ -1089,6 +1084,5 @@ function on_init(){
 	setButtons();
 	on_layout_change();		
 	if(fb.IsPlaying) g_cover.getArtwork(fb.GetNowPlaying());
-	console.log(window.Width+" "+window.Height)
 }
 on_init();

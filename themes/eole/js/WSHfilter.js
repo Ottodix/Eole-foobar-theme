@@ -333,144 +333,6 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
     };
 };
 
-//=================================================// Cover Tools
-oImageCache = function () {
-    this.cachelist = Array();
-    this.hit = function (metadb, albumIndex, cachekey) {
-		var cachekey = typeof cachekey !== 'undefined' ? cachekey : brw.groups[albumIndex].cachekey;
-        try{var img = this.cachelist[cachekey];}catch(e){}
-        if (typeof(img) == "undefined" || img == null) { // if image not in cache, we load it asynchronously
-				brw.groups[albumIndex].crc = check_cache(metadb, albumIndex, cachekey);				
-                if(globalProperties.enableDiskCache && brw.groups[albumIndex].crc && brw.groups[albumIndex].crc!='undefined' && brw.groups[albumIndex].load_requested == 0) { 	
-						//Dont save as its already in the cache
-						brw.groups[albumIndex].save_requested=true;
-                        // load img from cache direct
-						if(!isScrolling  && !cScrollBar.timerID){
-							var image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
-							img = this.getit(metadb, albumIndex, image);
-							brw.groups[albumIndex].cover_img = img;
-							brw.groups[albumIndex].load_requested = 2;
-							//brw.repaint();	
-						} else if(!timers.coverLoad) {											
-							timers.coverLoad = setTimeout(function() {
-								try {
-									if(properties.load_image_from_cache_direct) {
-										image = load_image_from_cache_direct(metadb, brw.groups[albumIndex].crc);
-										brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, image);
-										brw.groups[albumIndex].load_requested = 2;
-									} else {
-										brw.groups[albumIndex].tid = load_image_from_cache(metadb, brw.groups[albumIndex].crc);
-										brw.groups[albumIndex].load_requested = 1;											
-									}
-								} catch(e) {console.log(e)};
-								timers.coverLoad && clearTimeout(timers.coverLoad);
-								timers.coverLoad = false;								
-							}, 5);								
-                        };
-                } else if(brw.groups[albumIndex].load_requested == 0) {               
-					// load img default method
-					if(!timers.coverLoad) {
-						timers.coverLoad = setTimeout(function() {
-							if(properties.albumArtId==5) { // genre
-								brw.groups[albumIndex].save_requested = true;
-								if(!properties.AlbumArtFallback){
-									var arr = brw.groups[albumIndex].groupkey.split(" ^^ ");
-									if(g_files.FileExists(images.path + "genres\\" + arr[0] + ".jpg")){
-										var genre_img = gdi.Image(images.path + "genres\\" + arr[0] + ".jpg");
-									} else {
-										var genre_img = gdi.Image(images.path + "genres\\default_" + (albumIndex%20) + ".jpg");
-									}
-									brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img);										
-									brw.repaint();
-								} else {
-									this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
-									//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
-									get_albumArt_async(metadb,this.albumArtId, true, false, false);
-								}									
-							} else if(properties.albumArtId==4) {	
-								this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
-								//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);	
-								get_albumArt_async(metadb,this.albumArtId, true, false, false);
-							} else {
-								this.albumArtId = properties.albumArtId == 0 ? albumIndex + 5 : properties.albumArtId;
-								//utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
-								get_albumArt_async(metadb,this.albumArtId, true, false, false);
-							};
-							timers.coverLoad && clearTimeout(timers.coverLoad);
-							timers.coverLoad = false;
-						}, (!isScrolling  && !cScrollBar.timerID ? 5 : 20));
-					};
-                };
-            //};
-        };
-        return img;
-    };
-    this.reset = function(key) {
-        this.cachelist[key] = null;
-    };
-	this.resetAll = function(){
-		this.cachelist = Array();
-	};	
-    this.getit = function (metadb, albumId, image) {
-        var cw = globalProperties.thumbnailWidthMax;
-        var ch = cw;
-        var img = null;
-        var cover_type = null;
-        
-        if(!image) {
-            if(brw.groups[albumId].tracktype != 3) {
-                cover_type = 0;
-            } else {
-                cover_type = 3;
-            };
-        } else {
-            if(cover.keepaspectratio) {
-                if(image.Height>=image.Width) {
-                    var ratio = image.Width / image.Height;
-                    var pw = cw * ratio;
-                    var ph = ch;
-                } else {
-                    var ratio = image.Height / image.Width;
-                    var pw = cw;
-                    var ph = ch * ratio;
-                };
-            } else {
-                var pw = cw;
-                var ph = ch;
-            };
-            
-            // cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
-            if(brw.groups[albumId].tracktype != 3) {
-                if(metadb) {
-                    img = FormatCover(image, pw, ph, false);
-                    cover_type = 1;
-                };
-            } else {
-                cover_type = 3;
-            };
-            
-            try{this.cachelist[brw.groups[albumId].cachekey] = img;}catch(e){}
-            // save img to cache
-			
-            if(globalProperties.enableDiskCache) {
-                if(cover_type == 1 && !brw.groups[albumId].save_requested && image) {
-                    if(!timers.saveCover) {
-                        brw.groups[albumId].save_requested = true;
-                        save_image_to_cache(image, albumId); 
-                        timers.saveCover = setTimeout(function() {
-                            clearTimeout(timers.saveCover);
-                            timers.saveCover = false;
-                        }, 100);
-                    };
-                };
-            };
-        };
-        
-        brw.groups[albumId].cover_type = cover_type;
-        return img;
-    };
-};
-
 /* 
 ===================================================================================================
     Objects
@@ -559,6 +421,7 @@ oPlaylistManager = function(name) {
     };
     
     this.populate = function(exclude_active, reset_scroll) {
+		reset_scroll = typeof reset_scroll !== 'undefined' ? reset_scroll : true;
         this.playlists.splice(0, this.playlists.length);
         this.total_playlists = plman.PlaylistCount;
         var rowId = 0;
@@ -2059,6 +1922,7 @@ oBrowser = function(name) {
         if(this.list) this.list = undefined;
         if(this.list_unsorted) this.list_unsorted = undefined;
 		if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();
+		scroll = scroll_ = 0;
 		
         // define sort order
         switch(properties.tagMode) {
@@ -2446,14 +2310,16 @@ oBrowser = function(name) {
 						} else {					
 							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
-									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i);
+									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false);
 									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 										this.groups[i].cover_type = 1;
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);										
 									} else if(properties.AlbumArtFallback && properties.albumArtId != 4){
 										this.groups[i].save_requested = true;
-										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i,this.groups[i].cachekey_album);
+										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);							
 										}
 									}
 								} 
@@ -2476,9 +2342,10 @@ oBrowser = function(name) {
 										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey);
 									} else {
 										this.groups[i].save_requested = true;
-										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i,this.groups[i].cachekey_album);
+										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);							
 										} else this.groups[i].cover_img = images.noartist;
 									}
 									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);

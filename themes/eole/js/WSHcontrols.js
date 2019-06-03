@@ -48,12 +48,12 @@ oImageCache = function () {
 		cachekey = process_cachekey(metadb);				
 		try{img = this.cachelist[cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
-			cache_exist = check_cache(metadb, 0, cachekey);	
+			cache_filename = check_cacheV2(metadb, 0, cachekey);	
 			// load img from cache				
-			if(cache_exist) {	
-				img = load_image_from_cache_direct(metadb, cache_exist);
-				cover_path = cover_img_cache+"\\"+cache_exist+"."+globalProperties.ImageCacheExt;
-			} else get_albumArt_async(metadb,AlbumArtId.front); //utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
+			if(cache_filename) {	
+				img = load_image_from_cache_directV2(cache_filename);
+				cover_path = cache_filename;
+			} else get_albumArt_async(metadb,AlbumArtId.front, cachekey); 
 		}
 		return img;
     };	
