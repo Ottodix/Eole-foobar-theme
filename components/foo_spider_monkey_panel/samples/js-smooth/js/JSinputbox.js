@@ -339,7 +339,6 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 				this.CalcText();
 
 				this.repaint();
-				gfunc();
 			}
 			break;
 		case 3:
@@ -370,7 +369,6 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 					this.CalcText();
 					this.repaint();
 				}
-				gfunc();
 			};
 			break;
 		case 20:

@@ -1042,16 +1042,15 @@ oItem = function (playlist, row_index, type, handle, track_index, group_index, t
 								// Rate to database statistics brought by foo_playcount.dll
 								if (this.l_rating != this.rating) {
 									if (this.metadb) {
-										var bool = fb.RunContextCommandWithMetadb("Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
+										fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
 										this.rating = this.l_rating;
 									};
 								} else {
-									var bool = fb.RunContextCommandWithMetadb("Rating/<not set>", this.metadb);
+									fb.RunContextCommandWithMetadb("Playback Statistics/Rating/<not set>", this.metadb);
 									this.rating = 0;
 								};
 							} else {
-								var handles = fb.CreateHandleList();
-								handles.Add(this.metadb);
+								var handles = new FbMetadbHandleList(this.metadb);
 								if (this.l_rating != this.rating) {
 									handles.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : this.l_rating}));
 									this.rating = this.l_rating;
@@ -1064,8 +1063,7 @@ oItem = function (playlist, row_index, type, handle, track_index, group_index, t
 					} else if (this.mood_hover) {
 						// Mood
 						if (this.tracktype < 2) {
-							var handles = fb.CreateHandleList();
-							handles.Add(this.metadb);
+							var handles = new FbMetadbHandleList(this.metadb);
 							if (this.l_mood != this.mood) {
 								handles.UpdateFileInfoFromJSON(JSON.stringify({"MOOD" : getTimestamp()}));
 								this.mood = this.l_mood;
@@ -1655,6 +1653,7 @@ oList = function (object_name, playlist) {
 
 	this.init_groups = function (iscollapsed) {
 		var handle;
+		var length;
 		var current;
 		var previous;
 		var count = 0;
@@ -1664,7 +1663,6 @@ oList = function (object_name, playlist) {
 		var arr_pl,
 		fin,
 		fin2;
-		var t1 = fb.CreateProfiler("Init Groups");
 
 		// update group key TF pattern
 		if (properties.showgroupheaders) {
@@ -1712,52 +1710,33 @@ oList = function (object_name, playlist) {
 		this.groups.splice(0, this.groups.length);
 		for (var i = 0; i < this.count; i++) {
 			handle = this.handleList[i];
-			current = properties.showgroupheaders ? tf_group_key.EvalWithMetadb(handle) : handle.Path;
-			if (i == 0) {
-				if (this.count == 1) {
-					count++;
-					total_time_length += handle.Length;
-					global_time += handle.Length;
-					this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
-				} else {
-					previous = current;
-				};
+			length = fb2k_length(handle);
+ 			current = properties.showgroupheaders ? tf_group_key.EvalWithMetadb(handle) : handle.Path;
+			
+			if (previous != current) {
+				if (i > 0) {
+					this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed))
+				}
+				previous = current;
+				start = i;
+				count = 1;
+				total_time_length = length;
 			} else {
-				if (current != previous || i == this.count - 1) {
-					if (current != previous) {
-						if (i == this.count - 1) {
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
-							start = i;
-							count = 1;
-							total_time_length = handle.Length;
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
-						} else {
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
-						};
-					} else {
-						total_time_length += handle.Length;
-						count++;
-						this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
-					};
-					count = 0;
-					total_time_length = 0;
-					start = i;
-					previous = current;
-				};
-			};
-			if (this.count > 1) {
 				count++;
-				total_time_length += handle.Length;
-				global_time += handle.Length;
-			};
+				total_time_length += length;
+			}
+			
+			if (i == this.count - 1) {
+				this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed));
+			}
+			
+			global_time += length;
 		};
 		// calc total rows for this total handles + groups
 		this.totalRows = this.getTotalRows();
 
 		// total seconds playlist for playlist header panel
 		g_total_duration_text = utils.FormatDuration(global_time);
-
-		t1 = null;
 	};
 
 	this.updateHandleList = function (playlist, iscollapsed) {

@@ -88,7 +88,7 @@ oTopBar = function () {
 		var gb = this.close_off.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(209), gdi_font("Wingdings 2", g_font_wd2.Size - g_z6, 0), blendColors(color_bg, color_txt, 0.75), 0, 0, bt_w, bt_h, cc_stringformat);
+		gb.DrawString(String.fromCharCode(209), gdi_font(g_font_wd2.name, g_font_wd2.Size - g_z6, 0), blendColors(color_bg, color_txt, 0.75), 0, 0, bt_w, bt_h, cc_stringformat);
 		gb.SetSmoothingMode(0);
 		this.close_off.ReleaseGraphics(gb);
 
@@ -97,7 +97,7 @@ oTopBar = function () {
 		var gb = this.close_ov.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(209), gdi_font("Wingdings 2", g_font_wd2.Size - g_z2, 0), color_txt, 0, 0, bt_w, bt_h, cc_stringformat);
+		gb.DrawString(String.fromCharCode(209), gdi_font(g_font_wd2.name, g_font_wd2.Size - g_z2, 0), color_txt, 0, 0, bt_w, bt_h, cc_stringformat);
 		gb.SetSmoothingMode(0);
 		this.close_ov.ReleaseGraphics(gb);
 

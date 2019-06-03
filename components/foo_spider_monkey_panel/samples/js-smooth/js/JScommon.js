@@ -1,3 +1,40 @@
+function drawImage(gr, img, src_x, src_y, src_w, src_h, auto_fill, border, alpha) {
+	if (!img || !src_w || !src_h) {
+		return;
+	}
+	gr.SetInterpolationMode(7);
+	if (auto_fill) {
+		if (img.Width / img.Height < src_w / src_h) {
+			var dst_w = img.Width;
+			var dst_h = Math.round(src_h * img.Width / src_w);
+			var dst_x = 0;
+			var dst_y = Math.round((img.Height - dst_h) / 4);
+		} else {
+			var dst_w = Math.round(src_w * img.Height / src_h);
+			var dst_h = img.Height;
+			var dst_x = Math.round((img.Width - dst_w) / 2);
+			var dst_y = 0;
+		}
+		gr.DrawImage(img, src_x, src_y, src_w, src_h, dst_x + 3, dst_y + 3, dst_w - 6, dst_h - 6, 0, alpha || 255);
+	} else {
+		var s = Math.min(src_w / img.Width, src_h / img.Height);
+		var w = Math.floor(img.Width * s);
+		var h = Math.floor(img.Height * s);
+		src_x += Math.round((src_w - w) / 2);
+		src_y += src_h - h;
+		src_w = w;
+		src_h = h;
+		var dst_x = 0;
+		var dst_y = 0;
+		var dst_w = img.Width;
+		var dst_h = img.Height;
+		gr.DrawImage(img, src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h, 0, alpha || 255);
+	}
+	if (border) {
+		gr.DrawRect(src_x, src_y, src_w - 1, src_h - 1, 1, border);
+	}
+}
+
 var CACHE_FOLDER = fb.ProfilePath + "smp_smooth_cache\\";
 
 // *****************************************************************************************************************************************
@@ -358,6 +395,7 @@ function drawBlurbox(w, h, bgcolor, boxcolor, radius, iteration) {
 };
 
 function num(strg, nb) {
+	if (!strg) return "";
 	var i;
 	var str = strg.toString();
 	var k = nb - str.length;
@@ -751,44 +789,6 @@ function Syscolor(color_n) {
 	return (0xff000000 | (tempc[0] << 16) | (tempc[1] << 8) | (tempc[2]));
 };
 
-function get_system_dpi_percent() {
-	// get windows version
-	var wbemFlagReturnImmediately = 0x10;
-	var wbemFlagForwardOnly = 0x20;
-	var objWMIService = GetObject("winmgmts:\\\\.\\root\\CIMV2");
-	var colItems = objWMIService.ExecQuery("SELECT * FROM Win32_OperatingSystem", "WQL",
-			wbemFlagReturnImmediately | wbemFlagForwardOnly);
-	var enumItems = new Enumerator(colItems);
-	var objItem = enumItems.item();
-	var version_number = 0;
-	if (objItem.Caption.toUpperCase().indexOf("XP") != -1)
-		version_number = 5;
-	if (objItem.Caption.toUpperCase().indexOf("VISTA") != -1)
-		version_number = 6;
-	if (objItem.Caption.toUpperCase().indexOf("7") != -1)
-		version_number = 7;
-	if (objItem.Caption.toUpperCase().indexOf("8") != -1)
-		version_number = 8;
-
-	if (version_number == 8) {
-		var Shell = new ActiveXObject("WScript.Shell");
-		var tmp;
-		tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\Win8DpiScaling");
-		if (tmp == 1) {
-			tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");
-		} else {
-			//tmp = 100;
-			tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");
-			if (tmp < 100)
-				tmp = 100;
-		};
-	} else {
-		tmp = 100;
-	};
-	//tmp = Math.ceil(tmp/10)*10;
-	return tmp;
-};
-
 function get_system_scrollbar_width() {
 	var tmp = utils.GetSystemMetrics(SM_CXVSCROLL);
 	return tmp;
@@ -855,63 +855,6 @@ function getTimestamp() {
 	return timestamp;
 };
 
-function formatPlaylistTotalDurationText(seconds) {
-	DURATION = {
-		weeks: 0,
-		days: 0,
-		hours: 0,
-		minutes: 0,
-		seconds: seconds,
-		text: ""
-	};
-	if (DURATION.seconds > 0) {
-		if (Math.floor(DURATION.seconds / 604800) > 0) {
-			DURATION.weeks = Math.floor(DURATION.seconds / 604800);
-			DURATION.seconds = DURATION.seconds - (DURATION.weeks * 604800);
-			DURATION.text = DURATION.weeks + (DURATION.weeks > 1 ? " weeks" : " week");
-		};
-		if (Math.floor(DURATION.seconds / 86400) > 0) {
-			DURATION.days = Math.floor(DURATION.seconds / 86400);
-			DURATION.seconds = DURATION.seconds - (DURATION.days * 86400);
-			if (DURATION.text.length > 0) {
-				DURATION.text = DURATION.text + " " + DURATION.days + (DURATION.days > 1 ? " days" : " day");
-			} else {
-				DURATION.text = DURATION.days + (DURATION.days > 1 ? " days" : " day");
-			};
-		};
-		if (Math.floor(DURATION.seconds / 3600) > 0) {
-			DURATION.hours = Math.floor(DURATION.seconds / 3600);
-			DURATION.seconds = DURATION.seconds - (DURATION.hours * 3600);
-			if (DURATION.text.length > 0) {
-				DURATION.text = DURATION.text + " " + DURATION.hours + (DURATION.hours > 1 ? " hours" : " hour");
-			} else {
-				DURATION.text = DURATION.hours + (DURATION.hours > 1 ? " hours" : " hour");
-			};
-		};
-		if (Math.floor(DURATION.seconds / 60) > 0) {
-			DURATION.minutes = Math.floor(DURATION.seconds / 60);
-			DURATION.seconds = DURATION.seconds - (DURATION.minutes * 60);
-			if (Math.ceil(DURATION.seconds) == 60) {
-				DURATION.minutes += 1;
-				DURATION.seconds = 0;
-			};
-			if (DURATION.text.length > 0) {
-				DURATION.text = DURATION.text + " " + DURATION.minutes + (DURATION.minutes > 1 ? " minutes" : " minute");
-			} else {
-				DURATION.text = DURATION.minutes + (DURATION.minutes > 1 ? " minutes" : " minute");
-			};
-		};
-		if (DURATION.text.length > 0) {
-			if (Math.ceil(DURATION.seconds) > 0) {
-				DURATION.text = DURATION.text + " " + Math.ceil(DURATION.seconds) + (Math.ceil(DURATION.seconds) > 1 ? " seconds" : " second");
-			};
-		} else {
-			DURATION.text = Math.ceil(DURATION.seconds) + (Math.ceil(DURATION.seconds) > 1 ? " seconds" : " second");
-		};
-	};
-	return DURATION.text;
-};
-
 function Utf8Encode(string) {
 	string = string.replace(/\r\n/g, "\n");
 	var utftext = "";
@@ -955,16 +898,6 @@ function crc32(str) {
 	};
 
 	return crc ^ (-1);
-};
-
-function RefreshBG() {
-	if (fb.IsPlaying || fb.IsPaused) {
-		fb.RunMainMenuCommand("Playback/Play or Pause");
-		fb.RunMainMenuCommand("Playback/Play or Pause");
-	} else {
-		fb.RunMainMenuCommand("Playback/Play");
-		fb.RunMainMenuCommand("Playback/Stop");
-	};
 };
 
 // --- UIHacks
@@ -1066,36 +999,43 @@ function process_cachekey(str) {
 };
 
 // ===================================================== // Wallpaper
-function setWallpaperImg(path, metadb) {
+function setWallpaperImg() {
+	if (!fb.IsPlaying || !ppt.showwallpaper) return null;
 
-	var fmt_path = fb.TitleFormat(path).Eval(true);
-	var fmt_path_arr = utils.Glob(fmt_path);
-	if (fmt_path_arr.length > 0) {
-		var final_path = fmt_path_arr[0];
+	var tmp = null
+
+	if (ppt.wallpapermode == 0) {
+		tmp = utils.GetAlbumArtV2(fb.GetNowPlaying(), 0);
 	} else {
-		var final_path = null;
+		var arr = utils.Glob(fb.TitleFormat(ppt.wallpaperpath).Eval());
+		if (arr.length) {
+			tmp = gdi.Image(arr[0]);
+		}
+	}
+
+	if (tmp) {
+		return FormatWallpaper(tmp);
+	}
+	return tmp;
+};
+
+function FormatWallpaper(img) {
+	if (!img || !ww || !wh)
+		return img;
+
+	var tmp_img = gdi.CreateImage(ww, wh);
+	var gp = tmp_img.GetGraphics();
+	gp.SetInterpolationMode(7);
+	drawImage(gp, img, 0, 0, ww, wh, 1);
+	tmp_img.ReleaseGraphics(gp);
+
+	// blur it!
+	if (ppt.wallpaperblurred) {
+		var blur_factor = ppt.wallpaperblurvalue; // [1-90]
+		tmp_img = draw_blurred_image(tmp_img, 0, 0, tmp_img.Width, tmp_img.Height, 0, 0, tmp_img.Width, tmp_img.Height, blur_factor, 0x00ffffff);
 	};
 
-	if (metadb && ppt.wallpapermode == 0) {
-		var tmp_img = utils.GetAlbumArtV2(metadb, ppt.wallpapermode);
-	} else {
-		if (final_path) {
-			tmp_img = gdi.Image(final_path);
-		} else {
-			tmp_img = null;
-		};
-	};
-	if (!tmp_img) {
-		if (final_path) {
-			tmp_img = gdi.Image(final_path);
-		} else {
-			tmp_img = null;
-		};
-	};
-
-	g_wallpaperImg = null;
-	var img = FormatWallpaper(tmp_img, ww, wh, 2, 0, 0, "", true);
-	return img;
+	return tmp_img.CreateRawBitmap();
 };
 
 function draw_blurred_image(image, ix, iy, iw, ih, bx, by, bw, bh, blur_value, overlay_color) {
@@ -1138,100 +1078,6 @@ function draw_blurred_image(image, ix, iy, iw, ih, bx, by, bw, bh, blur_value, o
 	return newImg;
 };
 
-function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle, txt, rawBitmap) {
-	if (!image || !iw || !ih)
-		return image;
-	var i,
-	j;
-
-	var panel_ratio = iw / ih;
-	wpp_img_info.ratio = image.Width / image.Height;
-	wpp_img_info.orient = 0;
-
-	if (wpp_img_info.ratio > panel_ratio) {
-		wpp_img_info.orient = 1;
-		// 1/3 : default image is in landscape mode
-		switch (display_mode) {
-		case 0: // Filling
-			//wpp_img_info.w = iw * wpp_img_info.ratio / panel_ratio;
-			wpp_img_info.w = ih * wpp_img_info.ratio;
-			wpp_img_info.h = ih;
-			wpp_img_info.cut = wpp_img_info.w - iw;
-			wpp_img_info.x = 0 - (wpp_img_info.cut / 2);
-			wpp_img_info.y = 0;
-			break;
-		case 1: // Adjust
-			wpp_img_info.w = iw;
-			wpp_img_info.h = ih / wpp_img_info.ratio * panel_ratio;
-			wpp_img_info.cut = ih - wpp_img_info.h;
-			wpp_img_info.x = 0;
-			wpp_img_info.y = wpp_img_info.cut / 2;
-			break;
-		case 2: // Stretch
-			wpp_img_info.w = iw;
-			wpp_img_info.h = ih;
-			wpp_img_info.cut = 0;
-			wpp_img_info.x = 0;
-			wpp_img_info.y = 0;
-			break;
-		};
-	} else if (wpp_img_info.ratio < panel_ratio) {
-		wpp_img_info.orient = 2;
-		// 2/3 : default image is in portrait mode
-		switch (display_mode) {
-		case 0: // Filling
-			wpp_img_info.w = iw;
-			//wpp_img_info.h = ih / wpp_img_info.ratio * panel_ratio;
-			wpp_img_info.h = iw / wpp_img_info.ratio;
-			wpp_img_info.cut = wpp_img_info.h - ih;
-			wpp_img_info.x = 0;
-			wpp_img_info.y = 0 - (wpp_img_info.cut / 4);
-			break;
-		case 1: // Adjust
-			wpp_img_info.h = ih;
-			wpp_img_info.w = iw * wpp_img_info.ratio / panel_ratio;
-			wpp_img_info.cut = iw - wpp_img_info.w;
-			wpp_img_info.y = 0;
-			wpp_img_info.x = wpp_img_info.cut / 2;
-			break;
-		case 2: // Stretch
-			wpp_img_info.w = iw;
-			wpp_img_info.h = ih;
-			wpp_img_info.cut = 0;
-			wpp_img_info.x = 0;
-			wpp_img_info.y = 0;
-			break;
-		};
-	} else {
-		// 3/3 : default image is a square picture, ratio = 1
-		wpp_img_info.w = iw;
-		wpp_img_info.h = ih;
-		wpp_img_info.cut = 0;
-		wpp_img_info.x = 0;
-		wpp_img_info.y = 0;
-	};
-
-	var tmp_img = gdi.CreateImage(iw, ih);
-	var gp = tmp_img.GetGraphics();
-	gp.SetInterpolationMode(interpolation_mode);
-	gp.DrawImage(image, wpp_img_info.x, wpp_img_info.y, wpp_img_info.w, wpp_img_info.h, 0, 0, image.Width, image.Height, angle, 255);
-	tmp_img.ReleaseGraphics(gp);
-
-	// blur it!
-	if (ppt.wallpaperblurred) {
-		var blur_factor = ppt.wallpaperblurvalue; // [1-90]
-		tmp_img = draw_blurred_image(tmp_img, 0, 0, tmp_img.Width, tmp_img.Height, 0, 0, tmp_img.Width, tmp_img.Height, blur_factor, 0x00ffffff);
-	};
-
-	if (!tmp_img) {
-		return null;
-	} else if (rawBitmap) {
-		return tmp_img.CreateRawBitmap();
-	} else {
-		return tmp_img;
-	};
-};
-
 //=================================================// Custom functions
 function match(input, str) {
 	var temp = "";
@@ -1241,19 +1087,6 @@ function match(input, str) {
 			return false;
 	};
 	return true;
-};
-
-function check_playlist(name) {
-	var pl_name = "",
-	pl_idx = -1;
-	for (var i = 0; i < plman.PlaylistCount; i++) {
-		pl_name = plman.GetPlaylistName(i);
-		if (pl_name == name) {
-			pl_idx = i;
-			break;
-		};
-	};
-	return pl_idx;
 };
 
 function process_string(str) {

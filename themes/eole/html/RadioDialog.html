@@ -41,7 +41,7 @@
         <div id="radio_container" class="container"></div>				
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
-        <button class="button_ok" id="btn_ok">Ok</button>		
+        <button class="button_ok" id="btn_ok" onkeydown="if(event.keyCode == 13) this.click()">Ok</button>		
         <script>   
             // helpers
             function close_window() {

@@ -835,16 +835,6 @@ function getTimestamp() {
 	return timestamp;
 };
 
-function RefreshBG() {
-	if (fb.IsPlaying || fb.IsPaused) {
-		fb.RunMainMenuCommand("Playback/Play or Pause");
-		fb.RunMainMenuCommand("Playback/Play or Pause");
-	} else {
-		fb.RunMainMenuCommand("Playback/Play");
-		fb.RunMainMenuCommand("Playback/Stop");
-	};
-};
-
 // --- UIHacks
 
 MainMenuState = {
@@ -887,4 +877,8 @@ function gdi_font(name, size, style) {
 		fonts[id] = gdi.Font(name, size, style || 0);
 	}
 	return fonts[id];
+}
+
+function fb2k_length(h) {
+	return Math.max(h.Length, 0);
 }

@@ -1,9 +1,11 @@
+var need_repaint = false;
+
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
 	rowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
 	rowScrollStep: 3,
 	scrollSmoothness: 3.0,
-	refreshRate: 20,
+	refreshRate: 40,
 	showHeaderBar: window.GetProperty("_DISPLAY: Show Top Bar", true),
 	defaultHeaderBarHeight: 25,
 	headerBarHeight: 25,
@@ -538,7 +540,8 @@ oScrollbar = function (themed) {
 		};
 		// set cursor y pos
 		this.setCursorY();
-		if (this.cursorh != prev_cursorh)
+
+		if (this.cursorw && this.cursorh && this.cursorh != prev_cursorh)
 			this.setCursorButton();
 	};
 
@@ -760,7 +763,7 @@ oBrowser = function (name) {
 	this.rows = [];
 	this.SHIFT_start_id = null;
 	this.SHIFT_count = 0;
-	this.scrollbar = new oScrollbar(themed = cScrollBar.themed);
+	this.scrollbar = new oScrollbar(cScrollBar.themed);
 	this.keypressed = false;
 	this.inputbox = null;
 	this.inputboxID = -1;
@@ -768,16 +771,14 @@ oBrowser = function (name) {
 
 	this.launch_populate = function () {
 		var launch_timer = window.SetTimeout(function () {
-				brw.populate(is_first_populate = true, reset_scroll = true);
+				brw.populate(true, true);
 				launch_timer && window.ClearTimeout(launch_timer);
 				launch_timer = false;
 			}, 5);
 	};
 
 	this.repaint = function () {
-		if (!window.IsVisible)
-			return;
-		repaint_main1 = repaint_main2;
+		need_repaint = true;
 	};
 
 	this.setSize = function (x, y, w, h) {
@@ -913,10 +914,6 @@ oBrowser = function (name) {
 			window.SetCursor(IDC_ARROW);
 			cPlaylistManager.playlist_switch_pending = false;
 		};
-
-		if (repaint_main || !repaintforced) {
-			repaint_main = false;
-			repaintforced = false;
 
 			if (this.rows.length > 0) {
 
@@ -1090,7 +1087,6 @@ oBrowser = function (name) {
 					console.log(">> debug: cScrollBar.width=" + cScrollBar.width + " /boxText=" + boxText + " /ppt.headerBarHeight=" + ppt.headerBarHeight + " /g_fsize=" + g_fsize);
 				};
 			};
-		};
 	};
 
 	this._isHover = function (x, y) {
@@ -1308,20 +1304,10 @@ oBrowser = function (name) {
 		};
 	};
 
-	if (this.g_time) {
-		window.ClearInterval(this.g_time);
-		this.g_time = false;
-	};
 	this.g_time = window.SetInterval(function () {
 			if (!window.IsVisible) {
-				window_visible = false;
+				need_repaint = true;
 				return;
-			};
-
-			var repaint_1 = false;
-
-			if (!window_visible) {
-				window_visible = true;
 			};
 
 			if (!g_first_populate_launched) {
@@ -1338,15 +1324,10 @@ oBrowser = function (name) {
 				brw.activeRow = -1;
 			};
 
-			if (repaint_main1 == repaint_main2) {
-				repaint_main2 = !repaint_main1;
-				repaint_1 = true;
-			};
-
 			scroll = check_scroll(scroll);
 			if (Math.abs(scroll - scroll_) >= 1) {
 				scroll_ += (scroll - scroll_) / ppt.scrollSmoothness;
-				repaint_1 = true;
+				need_repaint  = true;
 				isScrolling = true;
 				//
 				if (scroll_prev != scroll)
@@ -1356,15 +1337,14 @@ oBrowser = function (name) {
 					if (scroll_ < 1)
 						scroll_ = 0;
 					isScrolling = false;
-					repaint_1 = true;
+					need_repaint  = true;
 				};
 			};
 
-			if (repaint_1) {
+			if (need_repaint) {
 				if (brw.rows.length > 0)
 					brw.getlimits();
-				repaintforced = true;
-				repaint_main = true;
+				need_repaint = false;
 				window.Repaint();
 			};
 
@@ -1412,8 +1392,6 @@ oBrowser = function (name) {
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 2, "Load a Playlist");
 		if (!add_mode) {
-			_menu.AppendMenuItem(MF_STRING, 4, "Save this Playlist");
-			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 			_menu.AppendMenuItem(MF_STRING, 5, "Duplicate this playlist");
 
 			_menu.AppendMenuItem(MF_STRING, 3, "Rename this playlist");
@@ -1487,7 +1465,7 @@ oBrowser = function (name) {
 			this.repaint();
 			break;
 		case (idx == 2):
-			fb.RunMainMenuCommand("File/Load Playlist...");
+			fb.LoadPlaylist();
 			break;
 		case (idx == 3):
 			// set rename it
@@ -1512,9 +1490,6 @@ oBrowser = function (name) {
 			this.inputbox.text_selected = this.inputbox.text;
 			this.inputbox.select = true;
 			this.repaint();
-			break;
-		case (idx == 4):
-			fb.RunMainMenuCommand("File/Save Playlist...");
 			break;
 		case (idx == 5):
 			plman.DuplicatePlaylist(pl_idx, "Copy of " + plman.GetPlaylistName(pl_idx));
@@ -1621,9 +1596,9 @@ oBrowser = function (name) {
 		_menu2.AppendMenuItem(MF_STRING, 220, "Blur");
 		_menu2.CheckMenuItem(220, ppt.wallpaperblurred);
 		_menu2.AppendMenuSeparator();
-		_menu2.AppendMenuItem(MF_STRING, 210, "Default");
-		_menu2.AppendMenuItem(MF_STRING, 211, "Playing Album Cover");
-		_menu2.CheckMenuRadioItem(210, 211, ppt.wallpapermode == 0 ? 211 : 210);
+		_menu2.AppendMenuItem(MF_STRING, 210, "Playing Album Cover");
+		_menu2.AppendMenuItem(MF_STRING, 211, "Default");
+		_menu2.CheckMenuRadioItem(210, 211, ppt.wallpapermode + 210);
 
 		_menu2.AppendTo(_menu, MF_STRING, "Background Wallpaper");
 
@@ -1637,30 +1612,20 @@ oBrowser = function (name) {
 		case (idx == 200):
 			ppt.showwallpaper = !ppt.showwallpaper;
 			window.SetProperty("_DISPLAY: Show Wallpaper", ppt.showwallpaper);
-			if (ppt.showwallpaper) {
-				g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, fb.IsPlaying ? fb.GetNowPlaying() : null);
-			};
+			g_wallpaperImg = setWallpaperImg();
 			brw.repaint();
 			break;
 		case (idx == 210):
-			ppt.wallpapermode = 99;
-			window.SetProperty("_SYSTEM: Wallpaper Mode", ppt.wallpapermode);
-			if (fb.IsPlaying)
-				g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, fb.GetNowPlaying());
-			brw.repaint();
-			break;
 		case (idx == 211):
-			ppt.wallpapermode = 0;
+			ppt.wallpapermode = idx - 210;
 			window.SetProperty("_SYSTEM: Wallpaper Mode", ppt.wallpapermode);
-			if (fb.IsPlaying)
-				g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, fb.GetNowPlaying());
+			g_wallpaperImg = setWallpaperImg();
 			brw.repaint();
 			break;
 		case (idx == 220):
 			ppt.wallpaperblurred = !ppt.wallpaperblurred;
 			window.SetProperty("_DISPLAY: Wallpaper Blurred", ppt.wallpaperblurred);
-			if (fb.IsPlaying)
-				g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, fb.GetNowPlaying());
+			g_wallpaperImg = setWallpaperImg();
 			brw.repaint();
 			break;
 		case (idx == 910):
@@ -1714,20 +1679,8 @@ var g_dragndrop_targetPlaylistId = -1;
 //
 var ww = 0, wh = 0;
 var g_metadb = null;
-var foo_playcount = utils.CheckComponent("foo_playcount", true);
 clipboard = {
 	selection: null
-};
-// wallpaper infos
-var wpp_img_info = {
-	orient: 0,
-	cut: 0,
-	cut_offset: 0,
-	ratio: 0,
-	x: 0,
-	y: 0,
-	w: 0,
-	h: 0
 };
 
 var m_x = 0, m_y = 0;
@@ -1758,12 +1711,7 @@ var g_avoid_on_playlist_items_reordered = false;
 var g_first_populate_done = false;
 var g_first_populate_launched = false;
 //
-var repaintforced = false;
-var form_text = "";
-var repaint_main = true, repaint_main1 = true, repaint_main2 = true;
-var window_visible = false;
 var scroll_ = 0, scroll = 0, scroll_prev = 0;
-var time222;
 var g_start_ = 0, g_end_ = 0;
 var g_wallpaperImg = null;
 
@@ -1789,22 +1737,9 @@ function on_size() {
 
 	ww = window.Width;
 	wh = window.Height;
+	if (!ww || !wh) return;
 
-	if (!ww || !wh) {
-		ww = 1;
-		wh = 1;
-	};
-
-	window.MinWidth = 1;
-	window.MinHeight = 1;
-
-	// set wallpaper
-	if (fb.IsPlaying) {
-		g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, fb.GetNowPlaying());
-	} else {
-		//g_wallpaperImg = null;
-		g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, null);
-	};
+	g_wallpaperImg = setWallpaperImg();
 
 	get_images();
 
@@ -1817,7 +1752,6 @@ function on_size() {
 };
 
 function on_paint(gr) {
-
 	if (!ww)
 		return;
 
@@ -2488,9 +2422,7 @@ function on_playback_stop(reason) {
 	case 0: // user stop
 	case 1: // eof (e.g. end of playlist)
 		// update wallpaper
-		if (ppt.showwallpaper) {
-			g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, null);
-		};
+		g_wallpaperImg = setWallpaperImg();
 		brw.repaint();
 		break;
 	case 2: // starting_another (only called on user action, i.e. click on next button)
@@ -2500,9 +2432,7 @@ function on_playback_stop(reason) {
 
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
-	if (ppt.showwallpaper) {
-		g_wallpaperImg = setWallpaperImg(ppt.wallpaperpath, g_metadb);
-	};
+	g_wallpaperImg = setWallpaperImg();
 	brw.repaint();
 };
 
@@ -2520,7 +2450,7 @@ function on_playlists_changed() {
 			g_filterbox.clearInputbox();
 	};
 
-	brw.populate(is_first_populate = false, reset_scroll = false);
+	brw.populate(false, false);
 
 	if (brw.selectedRow > brw.rowsCount)
 		brw.selectedRow = plman.ActivePlaylist;

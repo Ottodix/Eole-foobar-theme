@@ -33,10 +33,11 @@
     <body>
         <div id="div_text" class="container"></div>
 		<div id="btn_container"> 
-			<button id="btn_ok" class="button">Yes</button>	
-			<button id="btn_cancel" class="button">No</button>
+			<button id="btn_ok" class="button" onkeydown="if(event.keyCode == 13) this.click()">Yes</button>	
+			<button id="btn_cancel" class="button" onkeydown="if(event.keyCode == 13) this.click()">No</button>
 		</div>		
         <script>   
+
             // helpers
             function close_window() {
                 window.open('', '_self', '');

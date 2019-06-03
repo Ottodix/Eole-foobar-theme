@@ -10,10 +10,7 @@ var g_selHolder = fb.AcquireUiSelectionHolder();
 g_selHolder.SetPlaylistSelectionTracking();
 var g_repaint = 0;
 var g_seconds = 0;
-var g_1x1 = false;
-var repaint_main = true, repaint_main1 = true, repaint_main2 = true, g_timer1 = false, g_timer2 = false;
-var repaint_cover1 = true, repaint_cover2 = false;
-var window_visible = false;
+var g_timer1 = false, need_repaint = false;
 var g_mouse_wheel_timer = false;
 // drag'n drop from windows system
 var g_dragndrop_status = false;
@@ -54,7 +51,7 @@ var g_first_launch = true;
 var g_instancetype = window.InstanceType;
 
 var g_dpi_percent = 0;
-var g_forced_percent = 0; //window.GetProperty("SYSTEM.dpi (0 = Default)", 0);
+var g_forced_percent = 0;
 var g_dpi = (g_forced_percent == 0 ? g_dpi_percent : g_forced_percent);
 var g_z2 = 0;
 var g_z3 = 0;
@@ -119,8 +116,6 @@ properties = {
 	oddevenrowshighlight: window.GetProperty("CUSTOM Highlight Odd/Even Rows", true),
 	settingspanel: false,
 	smoothscrolling: window.GetProperty("CUSTOM Enable Smooth Scrolling", true),
-	repaint_rate1: 20,
-	repaint_rate2: 60,
 	max_columns: 24,
 	max_patterns: 25,
 	focus_rect_alpha: window.GetProperty("CUSTOM Focus box ALPHA", 75),
@@ -400,8 +395,7 @@ function addToHistoricPlaylist(handle) {
 
 	g_avoid_on_playlists_changed = true;
 	var historicIndex = plman.FindOrCreatePlaylist("Historic", true);
-	var handles = fb.CreateHandleList();
-	handles.Add(handle);
+	var handles = new FbMetadbHandleList(handle);
 	plman.InsertPlaylistItems(historicIndex, plman.PlaylistItemCount(historicIndex), handles, false);
 	g_avoid_on_playlists_changed = false;
 
@@ -506,10 +500,6 @@ function adjustMetrics(origin) {
 
 //=================================================// Images cache
 function on_get_album_art_done(metadb, art_id, image, image_path) {
-
-	if (g_image_cache.counter > 0)
-		g_image_cache.counter--;
-
 	var cover_metadb = null;
 	var fin = p.list.items.length;
 	for (var i = 0; i < fin; i++) {
@@ -520,32 +510,16 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 				cover_metadb = p.list.items[i].metadb;
 			};
 			if (cover_metadb.Compare(metadb)) {
-				p.list.items[i].cover_img = g_image_cache.getit(metadb, p.list.items[i].tracktype, image);
-				var cx = p.list.items[i].x;
-				var cy = p.list.items[i].y;
-				
-				if (!cx)
-					cx = 2;
-				else if (cx < 2)
-					cx = 2;
-				if (!cy)
-					cy = 2;
-				else if (cy < 2)
-					cy = 2;
-				var cw = cover.column ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
+				p.list.items[i].cover_img = g_image_cache.getit(metadb, image);
 				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
 					if (!cover.repaint_timer) {
 						cover.repaint_timer = window.SetTimeout(function () {
-								g_1x1 = false;
-								if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer)
-									cover_repaint(); //window.RepaintRect(p.list.x, p.list.y, cw, p.list.h);
-								cover.repaint_timer && window.ClearTimeout(cover.repaint_timer);
-								cover.repaint_timer = false;
-							}, 75);
+							if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer)
+								full_repaint();
+							cover.repaint_timer && window.ClearTimeout(cover.repaint_timer);
+							cover.repaint_timer = false;
+						}, 75);
 					};
-					g_1x1 = true;
-					window.RepaintRect(0, 0, 1, 1);
-					g_1x1 = false;
 				};
 				break;
 			};
@@ -554,7 +528,6 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 };
 
 image_cache = function () {
-	this.counter = 0;
 	this._cachelist = {};
 	this.hit = function (metadb) {
 		var d = (properties.showgroupheaders ? metadb.Path : fb.TitleFormat("$replace(%path%,%filename_ext%,)").EvalWithMetadb(metadb));
@@ -562,19 +535,7 @@ image_cache = function () {
 		if (typeof img == "undefined") { // if image not in cache, we load it asynchronously
 			if (!cover.load_timer) {
 				cover.load_timer = window.SetTimeout(function () {
-						switch (cGroup.type) {
-						case 0:
-							var art_id = AlbumArtId.front;
-							break;
-						case 1:
-							var art_id = AlbumArtId.artist;
-							break;
-						case 2:
-							var art_id = AlbumArtId.front;
-							break;
-						};
-						g_image_cache.counter++;
-						utils.GetAlbumArtAsync(window.ID, metadb, art_id, true, false, false);
+						utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
 						cover.load_timer && window.ClearTimeout(cover.load_timer);
 						cover.load_timer = false;
 					}, (g_mouse_wheel_timer || cScrollBar.timerID2 ? 20 : 10));
@@ -582,50 +543,38 @@ image_cache = function () {
 		};
 		return img;
 	};
-	this.getit = function (metadb, track_type, image) {
-		var cw = cover.column ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
+	this.getit = function (metadb, image) {
+ 		var cw = cover.column ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
 		var ch = cw;
 		var img;
-		if (cover.keepaspectratio) {
-			if (!image) {
-				var pw = cw + cover.margin * 2;
+		if (image) {
+			if (image.Height >= image.Width) {
+				var ratio = image.Width / image.Height;
+				var pw = (cw + cover.margin * 2) * ratio;
 				var ph = ch + cover.margin * 2;
 			} else {
-				if (image.Height >= image.Width) {
-					var ratio = image.Width / image.Height;
-					var pw = (cw + cover.margin * 2) * ratio;
-					var ph = ch + cover.margin * 2;
-				} else {
-					var ratio = image.Height / image.Width;
-					var pw = cw + cover.margin * 2;
-					var ph = (ch + cover.margin * 2) * ratio;
-				};
-			};
+				var ratio = image.Height / image.Width;
+				var pw = cw + cover.margin * 2;
+				var ph = (ch + cover.margin * 2) * ratio;
+			}
 		} else {
 			var pw = cw + cover.margin * 2;
 			var ph = ch + cover.margin * 2;
 		};
-		// cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
-		if (track_type != 3) {
-			if (metadb) {
-				img = FormatCover(image, pw, ph, cover.draw_glass_reflect, false);
-				if (!img) {
-					//img = (cGroup.type == 1) ? images.noartist : images.nocover;
-					img = null;
-					cover.type = 0;
-				} else {
-					cover.type = 1;
-				};
-			};
-		} else {
-			img = images.stream;
-			cover.type = 3;
-		};
+		if (metadb) {
+			img = FormatCover(image, pw, ph, cover.draw_glass_reflect, false);
+			if (!img) {
+				img = null;
+				cover.type = 0;
+			} else {
+				cover.type = 1;
+			}
+		}
 		var d = (properties.showgroupheaders ? metadb.Path : fb.TitleFormat("$replace(%path%,%filename_ext%,)").EvalWithMetadb(metadb));
 		this._cachelist[d] = img;
 		return img;
-	};
-};
+	}
+}
 var g_image_cache = new image_cache;
 
 //=================================================// Cover tools
@@ -663,7 +612,6 @@ function reset_cover_timers() {
 
 //=================================================// WSH Statistics update function
 function update_statistics() {
-	var foo_playcount = utils.CheckComponent("foo_playcount", true);
 	if (opt_stats && !foo_playcount && cStats.waiting_for_writing && cStats.handle) {
 		var d;
 		var timestamp;
@@ -701,8 +649,7 @@ function update_statistics() {
 
 		var firstplayed_ts = first_played.EvalWithMetadb(cStats.handle);
 
-		var handles = fb.CreateHandleList();
-		handles.Add(cStats.handle);
+		var handles = new FbMetadbHandleList(cStats.handle);
 		
 		var obj = {
 			"LAST_PLAYED" : timestamp,
@@ -724,11 +671,7 @@ function update_statistics() {
 // ================================================================================================== //
 
 function full_repaint() {
-	repaint_main1 = repaint_main2;
-};
-
-function cover_repaint() {
-	repaint_cover1 = repaint_cover2;
+	need_repaint = true;
 };
 
 function resize_panels() {
@@ -831,77 +774,22 @@ function on_init() {
 	if (cPlaylistManager.mediaLibraryPlaylist)
 		checkMediaLibrayPlaylist();
 
-	p.playlistManager = new oPlaylistManager("p.playlistManager");
+ 	p.playlistManager = new oPlaylistManager("p.playlistManager");
 	p.settings = new oSettings();
 
-	if (g_timer1) {
-		window.KillTimer(g_timer1);
-		g_timer1 = false;
-	};
 	g_timer1 = window.SetInterval(function () {
-			if (!window.IsVisible) {
-				window_visible = false;
-				return;
-			};
+		images.loading_angle = (images.loading_angle < 360 ? images.loading_angle + 36 : 36);
 
-			var repaint_1 = false;
+		if (!window.IsVisible) {
+			need_repaint = true;
+			return;
+		};
 
-			if (!window_visible) {
-				window_visible = true;
-			};
-
-			if (repaint_main1 == repaint_main2) {
-				repaint_main2 = !repaint_main1;
-				repaint_1 = true;
-			};
-
-			if (repaint_1) {
-				window.Repaint();
-			};
-
-		}, properties.repaint_rate1);
-
-	if (g_timer2) {
-		window.KillTimer(g_timer2);
-		g_timer2 = false;
-	};
-	g_timer2 = window.SetInterval(function () {
-
-			if (repaint_main1 == repaint_main2) {
-				return;
-			};
-
-			if (!window.IsVisible) {
-				window_visible = false;
-				return;
-			};
-
-			var repaint_2 = false;
-
-			if (!window_visible) {
-				window_visible = true;
-			};
-
-			images.loading_angle = (images.loading_angle < 360 ? images.loading_angle + 36 : 36);
-
-			if (repaint_cover1 == repaint_cover2) {
-				repaint_cover2 = !repaint_cover1;
-				if (!cScrollBar.timerID2 && !g_mouse_wheel_timer)
-					repaint_2 = true;
-			};
-
-			if (repaint_2 || g_image_cache.counter > 0) {
-				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
-					var bigger_grp_height = (cGroup.default_expanded_height > cGroup.default_collapsed_height ? cGroup.default_expanded_height : cGroup.default_collapsed_height);
-					if (p.headerBar.columns[0].percent > 0) {
-						var cw = cover.margin + p.headerBar.columns[0].w;
-					} else if (cover.show) {
-						var cw = cover.margin + (cTrack.height * bigger_grp_height);
-					};
-					window.RepaintRect(p.list.x, p.list.y, cw, p.list.h);
-				};
-			};
-		}, properties.repaint_rate2);
+		if (need_repaint) {
+			need_repaint = false;
+			window.Repaint();
+		};
+	}, 40);
 };
 on_init();
 
@@ -966,153 +854,150 @@ function on_paint(gr) {
 	if (!ww)
 		return true;
 
-	if (!g_1x1) {
+ 	if (!cSettings.visible) {
 
-		if (!cSettings.visible) {
-
-			// draw background under playlist
-			if (fb.IsPlaying && p.wallpaperImg && properties.showwallpaper) {
-				gr.GdiDrawBitmap(p.wallpaperImg, 0, p.list.y, ww, wh - p.list.y, 0, p.list.y, p.wallpaperImg.Width, p.wallpaperImg.Height - p.list.y);
-				gr.FillSolidRect(0, p.list.y, ww, wh - p.list.y, g_color_normal_bg & RGBA(255, 255, 255, properties.wallpaperalpha));
-			} else {
-				gr.FillSolidRect(0, p.list.y, ww, wh - p.list.y, g_color_normal_bg);
-			};
-
-			// List
-			if (p.list) {
-				if (p.list.count > 0) {
-					// calculate columns metrics before drawing row contents!
-					p.headerBar.calculateColumns();
-
-					// scrollbar
-					if (properties.showscrollbar && p.scrollbar && p.list.totalRows > 0 && (p.list.totalRows > p.list.totalRowVisible)) {
-						p.scrollbar.visible = true;
-						p.scrollbar.draw(gr);
-					} else {
-						p.scrollbar.visible = false;
-					};
-
-					// draw rows of the playlist
-					p.list && p.list.draw(gr);
-
-					// draw flashing beam if scroll max reached on mouse wheel! (android like effect)
-					if (p.list.beam > 0) {
-						var r = getRed(g_color_highlight);
-						var g = getGreen(g_color_highlight);
-						var b = getBlue(g_color_highlight);
-						var a = Math.floor((p.list.beam_alpha <= 250 ? p.list.beam_alpha : 250) / 12);
-						var beam_h = Math.floor(cTrack.height * 7 / 4);
-						var alpha = (p.list.beam_alpha <= 255 ? p.list.beam_alpha : 255);
-						switch (p.list.beam) {
-						case 1: // top beam
-							gr.DrawImage(images.beam, p.list.x, p.list.y - cHeaderBar.borderWidth * 10, p.list.w, beam_h - cHeaderBar.borderWidth, 0, 0, images.beam.Width, images.beam.Height, 180, alpha);
-							break;
-						case 2: // bot beam
-							gr.DrawImage(images.beam, p.list.x, p.list.y + p.list.h - beam_h + cHeaderBar.borderWidth * 10, p.list.w, beam_h, 0, 0, images.beam.Width, images.beam.Height, 0, alpha);
-							break;
-						};
-					};
-
-				} else {
-
-					if (plman.PlaylistCount > 0) {
-						var text_top = plman.GetPlaylistName(plman.ActivePlaylist);
-						var text_bot = "This playlist is empty";
-					} else {
-						var text_top = "JSPlaylist " + g_script_version + " coded by Br3tt - 2015";
-						var text_bot = "Create a playlist to start!";
-					};
-					// if Search Playlist, draw image "No Result"
-					if (text_top.substr(0, 8) == "Search [") {
-						gr.SetTextRenderingHint(3);
-						var search_text = text_top.substr(8, text_top.length - 9);
-						gr.DrawString("No Result for \"" + search_text + "\"", gdi_font(g_fname, g_fsize + 7, 0), g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, g_dpi), ww, wh, cc_stringformat);
-						gr.DrawString(text_bot, gdi_font(g_fname, g_fsize + 2, 0), g_color_normal_txt & 0x40ffffff, 0, 0 + zoom(20, g_dpi), ww, wh, cc_stringformat);
-						gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, Math.floor(zoom(1, g_dpi)), 0, 0, g_color_normal_txt & 0x40ffffff, 0.5);
-					} else {
-						// if empty playlist, display text info
-						gr.SetTextRenderingHint(3);
-						gr.DrawString(text_top, gdi_font(g_fname, g_fsize + 7, 0), g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, g_dpi), ww, wh, cc_stringformat);
-						gr.DrawString(text_bot, gdi_font(g_fname, g_fsize + 2, 0), g_color_normal_txt & 0x40ffffff, 0, 0 + zoom(20, g_dpi), ww, wh, cc_stringformat);
-						gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, Math.floor(zoom(1, g_dpi)), 0, 0, g_color_normal_txt & 0x40ffffff, 0.5);
-					};
-				};
-			};
-
-			// draw background part above playlist (topbar + headerbar)
-			if (cTopBar.visible || p.headerBar.visible) {
-				if (fb.IsPlaying && p.wallpaperImg && properties.showwallpaper) {
-					gr.GdiDrawBitmap(p.wallpaperImg, 0, 0, ww, p.list.y, 0, 0, p.wallpaperImg.Width, p.list.y);
-					gr.FillSolidRect(0, 0, ww, p.list.y, g_color_normal_bg & RGBA(255, 255, 255, properties.wallpaperalpha));
-				} else {
-					gr.FillSolidRect(0, 0, ww, p.list.y, g_color_normal_bg);
-				};
-			};
-
-			// TopBar
-			if (cTopBar.visible) {
-				p.topBar && p.topBar.draw(gr);
-			}
-
-			// HeaderBar
-			if (p.headerBar.visible) {
-				p.headerBar && p.headerBar.drawColumns(gr);
-				if (p.headerBar.borderDragged && p.headerBar.borderDraggedId >= 0) {
-					// all borders
-					var fin = p.headerBar.borders.length;
-					for (var b = 0; b < fin; b++) {
-						var lg_x = p.headerBar.borders[b].x - 2;
-						var lg_w = p.headerBar.borders[b].w;
-						var segment_h = zoom(5, g_dpi);
-						var gap_h = zoom(5, g_dpi);
-						if (b == p.headerBar.borderDraggedId) {
-							var d = ((mouse_x / zoom(10, g_dpi)) - Math.floor(mouse_x / zoom(10, g_dpi))) * zoom(10, g_dpi); // give a value between [0;9]
-						} else {
-							d = 5;
-						};
-						var ty = 0;
-						for (var lg_y = p.list.y; lg_y < p.list.y + p.list.h + segment_h; lg_y += segment_h + gap_h) {
-							ty = lg_y - segment_h + d;
-							th = segment_h;
-							if (ty < p.list.y) {
-								th = th - Math.abs(p.list.y - ty);
-								ty = p.list.y;
-							}
-							if (b == p.headerBar.borderDraggedId) {
-								gr.FillSolidRect(lg_x, ty, lg_w, th, g_color_normal_txt & 0x32ffffff);
-							} else {
-								gr.FillSolidRect(lg_x, ty, lg_w, th, g_color_normal_txt & 0x16ffffff);
-							};
-						};
-					};
-				};
-			} else {
-				p.headerBar && p.headerBar.drawHiddenPanel(gr);
-			};
-
-			// PlaylistManager
-			p.playlistManager && p.playlistManager.draw(gr);
-
-			// Incremental Search Display
-			if (cList.search_string.length > 0) {
-				gr.SetSmoothingMode(2);
-				p.list.tt_x = Math.floor(((p.list.w) / 2) - (((cList.search_string.length * zoom(13, g_dpi)) + (zoom(10, g_dpi) * 2)) / 2));
-				p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - zoom(30, g_dpi));
-				p.list.tt_w = Math.round((cList.search_string.length * zoom(13, g_dpi)) + (zoom(10, g_dpi) * 2));
-				p.list.tt_h = zoom(60, g_dpi);
-				gr.FillRoundRect(p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, 5, 5, RGBA(0, 0, 0, 150));
-				gr.DrawRoundRect(p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, 5, 5, 1.0, RGBA(0, 0, 0, 100));
-				gr.DrawRoundRect(p.list.tt_x + 1, p.list.tt_y + 1, p.list.tt_w - 2, p.list.tt_h - 2, 4, 4, 1.0, RGBA(255, 255, 255, 050));
-				try {
-					gr.GdiDrawText(cList.search_string, cList.incsearch_font_big, RGB(0, 0, 0), p.list.tt_x + 1, p.list.tt_y + 1, p.list.tt_w, p.list.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
-					gr.GdiDrawText(cList.search_string, cList.incsearch_font_big, cList.inc_search_noresult ? RGB(255, 70, 70) : RGB(250, 250, 250), p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
-				} catch (e) {};
-			};
-
+		// draw background under playlist
+		if (fb.IsPlaying && p.wallpaperImg && properties.showwallpaper) {
+			gr.GdiDrawBitmap(p.wallpaperImg, 0, p.list.y, ww, wh - p.list.y, 0, p.list.y, p.wallpaperImg.Width, p.wallpaperImg.Height - p.list.y);
+			gr.FillSolidRect(0, p.list.y, ww, wh - p.list.y, g_color_normal_bg & RGBA(255, 255, 255, properties.wallpaperalpha));
 		} else {
-			// Settings...
-			p.settings && p.settings.draw(gr);
+			gr.FillSolidRect(0, p.list.y, ww, wh - p.list.y, g_color_normal_bg);
 		};
+
+		// List
+		if (p.list) {
+			if (p.list.count > 0) {
+				// calculate columns metrics before drawing row contents!
+				p.headerBar.calculateColumns();
+
+				// scrollbar
+				if (properties.showscrollbar && p.scrollbar && p.list.totalRows > 0 && (p.list.totalRows > p.list.totalRowVisible)) {
+					p.scrollbar.visible = true;
+					p.scrollbar.draw(gr);
+				} else {
+					p.scrollbar.visible = false;
+				};
+
+				// draw rows of the playlist
+				p.list && p.list.draw(gr);
+
+				// draw flashing beam if scroll max reached on mouse wheel! (android like effect)
+				if (p.list.beam > 0) {
+					var r = getRed(g_color_highlight);
+					var g = getGreen(g_color_highlight);
+					var b = getBlue(g_color_highlight);
+					var a = Math.floor((p.list.beam_alpha <= 250 ? p.list.beam_alpha : 250) / 12);
+					var beam_h = Math.floor(cTrack.height * 7 / 4);
+					var alpha = (p.list.beam_alpha <= 255 ? p.list.beam_alpha : 255);
+					switch (p.list.beam) {
+					case 1: // top beam
+						gr.DrawImage(images.beam, p.list.x, p.list.y - cHeaderBar.borderWidth * 10, p.list.w, beam_h - cHeaderBar.borderWidth, 0, 0, images.beam.Width, images.beam.Height, 180, alpha);
+						break;
+					case 2: // bot beam
+						gr.DrawImage(images.beam, p.list.x, p.list.y + p.list.h - beam_h + cHeaderBar.borderWidth * 10, p.list.w, beam_h, 0, 0, images.beam.Width, images.beam.Height, 0, alpha);
+						break;
+					};
+				};
+
+			} else {
+
+				if (plman.PlaylistCount > 0) {
+					var text_top = plman.GetPlaylistName(plman.ActivePlaylist);
+					var text_bot = "This playlist is empty";
+				} else {
+					var text_top = "JSPlaylist " + g_script_version + " coded by Br3tt - 2015";
+					var text_bot = "Create a playlist to start!";
+				};
+				// if Search Playlist, draw image "No Result"
+				if (text_top.substr(0, 8) == "Search [") {
+					gr.SetTextRenderingHint(3);
+					var search_text = text_top.substr(8, text_top.length - 9);
+					gr.DrawString("No Result for \"" + search_text + "\"", gdi_font(g_fname, g_fsize + 7, 0), g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, g_dpi), ww, wh, cc_stringformat);
+					gr.DrawString(text_bot, gdi_font(g_fname, g_fsize + 2, 0), g_color_normal_txt & 0x40ffffff, 0, 0 + zoom(20, g_dpi), ww, wh, cc_stringformat);
+					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, Math.floor(zoom(1, g_dpi)), 0, 0, g_color_normal_txt & 0x40ffffff, 0.5);
+				} else {
+					// if empty playlist, display text info
+					gr.SetTextRenderingHint(3);
+					gr.DrawString(text_top, gdi_font(g_fname, g_fsize + 7, 0), g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, g_dpi), ww, wh, cc_stringformat);
+					gr.DrawString(text_bot, gdi_font(g_fname, g_fsize + 2, 0), g_color_normal_txt & 0x40ffffff, 0, 0 + zoom(20, g_dpi), ww, wh, cc_stringformat);
+					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, Math.floor(zoom(1, g_dpi)), 0, 0, g_color_normal_txt & 0x40ffffff, 0.5);
+				};
+			};
+		};
+
+		// draw background part above playlist (topbar + headerbar)
+		if (cTopBar.visible || p.headerBar.visible) {
+			if (fb.IsPlaying && p.wallpaperImg && properties.showwallpaper) {
+				gr.GdiDrawBitmap(p.wallpaperImg, 0, 0, ww, p.list.y, 0, 0, p.wallpaperImg.Width, p.list.y);
+				gr.FillSolidRect(0, 0, ww, p.list.y, g_color_normal_bg & RGBA(255, 255, 255, properties.wallpaperalpha));
+			} else {
+				gr.FillSolidRect(0, 0, ww, p.list.y, g_color_normal_bg);
+			};
+		};
+
+		// TopBar
+		if (cTopBar.visible) {
+			p.topBar && p.topBar.draw(gr);
+		}
+
+		// HeaderBar
+		if (p.headerBar.visible) {
+			p.headerBar && p.headerBar.drawColumns(gr);
+			if (p.headerBar.borderDragged && p.headerBar.borderDraggedId >= 0) {
+				// all borders
+				var fin = p.headerBar.borders.length;
+				for (var b = 0; b < fin; b++) {
+					var lg_x = p.headerBar.borders[b].x - 2;
+					var lg_w = p.headerBar.borders[b].w;
+					var segment_h = zoom(5, g_dpi);
+					var gap_h = zoom(5, g_dpi);
+					if (b == p.headerBar.borderDraggedId) {
+						var d = ((mouse_x / zoom(10, g_dpi)) - Math.floor(mouse_x / zoom(10, g_dpi))) * zoom(10, g_dpi); // give a value between [0;9]
+					} else {
+						d = 5;
+					};
+					var ty = 0;
+					for (var lg_y = p.list.y; lg_y < p.list.y + p.list.h + segment_h; lg_y += segment_h + gap_h) {
+						ty = lg_y - segment_h + d;
+						th = segment_h;
+						if (ty < p.list.y) {
+							th = th - Math.abs(p.list.y - ty);
+							ty = p.list.y;
+						}
+						if (b == p.headerBar.borderDraggedId) {
+							gr.FillSolidRect(lg_x, ty, lg_w, th, g_color_normal_txt & 0x32ffffff);
+						} else {
+							gr.FillSolidRect(lg_x, ty, lg_w, th, g_color_normal_txt & 0x16ffffff);
+						};
+					};
+				};
+			};
+		} else {
+			p.headerBar && p.headerBar.drawHiddenPanel(gr);
+		};
+
+		// PlaylistManager
+		p.playlistManager && p.playlistManager.draw(gr);
+
+		// Incremental Search Display
+		if (cList.search_string.length > 0) {
+			gr.SetSmoothingMode(2);
+			p.list.tt_x = Math.floor(((p.list.w) / 2) - (((cList.search_string.length * zoom(13, g_dpi)) + (zoom(10, g_dpi) * 2)) / 2));
+			p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - zoom(30, g_dpi));
+			p.list.tt_w = Math.round((cList.search_string.length * zoom(13, g_dpi)) + (zoom(10, g_dpi) * 2));
+			p.list.tt_h = zoom(60, g_dpi);
+			gr.FillRoundRect(p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, 5, 5, RGBA(0, 0, 0, 150));
+			gr.DrawRoundRect(p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, 5, 5, 1.0, RGBA(0, 0, 0, 100));
+			gr.DrawRoundRect(p.list.tt_x + 1, p.list.tt_y + 1, p.list.tt_w - 2, p.list.tt_h - 2, 4, 4, 1.0, RGBA(255, 255, 255, 050));
+			try {
+				gr.GdiDrawText(cList.search_string, cList.incsearch_font_big, RGB(0, 0, 0), p.list.tt_x + 1, p.list.tt_y + 1, p.list.tt_w, p.list.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
+				gr.GdiDrawText(cList.search_string, cList.incsearch_font_big, cList.inc_search_noresult ? RGB(255, 70, 70) : RGB(250, 250, 250), p.list.tt_x, p.list.tt_y, p.list.tt_w, p.list.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
+			} catch (e) {};
+		};
+
+	} else {
+		// Settings...
+		p.settings && p.settings.draw(gr);
 	};
 
 	if (properties.showDPI) {
@@ -2975,6 +2860,7 @@ function on_drag_drop(action, x, y, mask) {
 			action.ToSelect = true;
 			action.Effect = 1;
 		}
+		
 	}
 	g_dragndrop_hover_playlistManager = false;
 	g_dragndrop_targetPlaylistId = -1;
@@ -2987,7 +2873,5 @@ function on_drag_drop(action, x, y, mask) {
 function on_script_unload() {
 	g_timer1 && window.ClearInterval(g_timer1);
 	g_timer1 = false;
-	g_timer2 && window.ClearInterval(g_timer2);
-	g_timer2 = false;
 	update_statistics();
 };
