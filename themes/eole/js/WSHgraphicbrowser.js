@@ -1173,7 +1173,7 @@ oRow = function(metadb,itemIndex) {
             case "move":
                 if(this.ishover_rating && !g_dragR) {
                     if(!this.cursorHand) {
-						window.SetCursor(IDC_HAND);
+						g_cursor.setCursor(IDC_HAND,"rating");
 						this.cursorHand = true;
 					}
 					if(brw.TooltipRow==this.itemIndex) {
@@ -1187,7 +1187,7 @@ oRow = function(metadb,itemIndex) {
 					if(this.hover_rating_old != this.hover_rating) this.repaint();
                 } else if(!g_dragR){
                     if(this.cursorHand) {
-						window.SetCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW);
 						this.cursorHand = false;
 						this.hover_rating = -1;
 						this.repaint();
@@ -3157,7 +3157,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 39):		
 			properties.displayToggleBtns = !properties.displayToggleBtns;
 			window.SetProperty("_DISPLAY: Toggle buttons", properties.displayToggleBtns);
-			positionButtons();
+			if(properties.displayToggleBtns) buttons.filterToggle.changeState(ButtonStates.normal);		
+			positionButtons();			
 			brw.repaint();
 			break;			
 		case (idx == 40):		
@@ -3811,9 +3812,9 @@ oBrowser = function(name) {
 			this.get_metrics_called	= false;
 			this.totalTracks = this.list.Count;
 			this.ellipse_size = 0;
-			gTime_covers = fb.CreateProfiler();			
-			gTime_covers.Reset();
-			console.log("get albums started time:"+gTime_covers.Time);		
+			//gTime_covers = fb.CreateProfiler();			
+			//gTime_covers.Reset();
+			//console.log("get albums started time:"+gTime_covers.Time);		
         }
 		
         var i = this.groups.length, k = start, temp = "", string_compare = str_comp;
@@ -3961,7 +3962,7 @@ oBrowser = function(name) {
 			this.firstInitialisation=false; 
 			if(properties.showheaderbar) g_headerbar.setDisplayedInfo(); 
 			this.list = undefined;
-			console.log("get albums finished time:"+gTime_covers.Time);			
+			//console.log("get albums finished time:"+gTime_covers.Time);			
 		}
         this.rowsCount = Math.ceil(this.groups.length / this.totalColumns);
         g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
@@ -4111,10 +4112,6 @@ oBrowser = function(name) {
 			scroll = scroll_ = 0;
 		} 
 		g_showlist.close();
-		/*if(g_showlist.cursor!=IDC_ARROW) {
-			window.SetCursor(IDC_ARROW);
-			g_showlist.cursor = IDC_ARROW;
-		}					*/
 
 		g_history.saveCurrent();			
 	
@@ -4350,7 +4347,6 @@ oBrowser = function(name) {
 							var animation_y = coverTop+1-(this.ellipse_size-this.coverRealWith)/2;
 						}
 						if(cNowPlaying.flashEnable && this.groups[this.groups_draw[i]].isPlaying) {
-							console.log("is playing !"+this.groups[this.groups_draw[i]].isPlaying+this.ellipse_size)
 							if(this.ellipse_size==0){
 								this.ellipse_size = this.coverRealWith;
 							} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
@@ -4497,7 +4493,6 @@ oBrowser = function(name) {
 			
 			//Show now playing animation
 			/*if(cNowPlaying.flashEnable && this.isPlayingIdx>-1) {
-				console.log("is playing !"+this.isPlayingIdx+this.ellipse_size)
 				if(this.ellipse_size==0){
 					this.ellipse_size = this.coverRealWith;
 				} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
@@ -5145,9 +5140,7 @@ function positionButtons(){
 			buttons.filterToggle.H_img = black_images.nowplaying_off_hover_icon			
 		}				
 	}	
-	if(properties.displayToggleBtns){
-		buttons.filterToggle.changeState(ButtonStates.normal);		
-	} else {
+	if(!properties.displayToggleBtns){
 		buttons.filterToggle.changeState(ButtonStates.hide);
 	}
 } 
@@ -5187,10 +5180,10 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
-			g_cursor.setCursor(IDC_HAND,this.text);	
+		if(this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
+			g_cursor.setCursor(IDC_HAND,this.text);
 			this.cursor = IDC_HAND;
-		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover){
+		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
 			g_cursor.setCursor(IDC_ARROW);	
 			this.cursor = IDC_ARROW;
 		}			
@@ -5535,6 +5528,10 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
+	
+	g_resizing.on_mouse("lbtn_down", x, y, m);
+	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
+	
     cur_btn_down = chooseButton(x, y);
     if (cur_btn_down) {
 		btn_down = true;	
@@ -5542,11 +5539,7 @@ function on_mouse_lbtn_down(x, y, m) {
         window.Repaint();
 		return;
     }	
-	
-	g_resizing.on_mouse("lbtn_down", x, y, m);
-	
-	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);
-	
+
 	doubleClick=false;
 	brw.click_down = true;
     brw.on_mouse("lbtn_down", x, y);
@@ -5670,15 +5663,18 @@ function on_mouse_lbtn_up(x, y, m) {
 	brw.click_down = false;	
 	g_showlist.click_down_scrollbar = false;	
     cur_btn = chooseButton(x, y);
+	var quit_function = false
     if (cur_btn_down != null && typeof cur_btn_down === 'object') {
         cur_btn_down.onClick();
 		cur_btn_down = null;
-		return;
-    } if (cur_btn != null && typeof cur_btn === 'object') {        
+		quit_function = true; 
+    }
+	if (cur_btn != null && typeof cur_btn === 'object') {        
         cur_btn.changeState(ButtonStates.hover);
         window.Repaint();
     }	
-	
+	if(quit_function) return;
+
 	g_resizing.on_mouse("lbtn_up", x, y, m);
 
 	if(!already_saved){
@@ -6075,7 +6071,7 @@ function on_mouse_move(x, y, m) {
 	g_resizing.on_mouse("move", x, y, m);
 	
     var old = cur_btn;
-    if(!brw.resize_click)cur_btn = chooseButton(x, y);	
+    if(!brw.resize_click) cur_btn = chooseButton(x, y);	
     if (old == cur_btn && cur_btn) {
         return;
     } else if(cur_btn){
@@ -6884,7 +6880,6 @@ function on_notify_data(name, info) {
 		break; 		
 		/*case "seek_nowplaying_in_current":
 			brw.seek_track(info);
-			console.log("seek");
 		break;*/
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
