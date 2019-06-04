@@ -8,7 +8,7 @@
 				padding:0;margin:0;
 			}
             .container { font:caption; padding: 10px 25px; word-wrap: break-word; white-space: pre-wrap; } 
-			#div_text{ padding-top:10px; padding-bottom:20px; 
+			#div_text{ padding-top:0px; padding-bottom:20px; 
 				background: #ffffff; /* Old browsers */
 				background: -moz-linear-gradient(top,  #ffffff 0%, #f0f0f0 100%); /* FF3.6-15 */
 				background: -webkit-linear-gradient(top,  #ffffff 0%,#f0f0f0 100%); /* Chrome10-25,Safari5.1-6 */
@@ -26,13 +26,14 @@
             .radio_label { float:left; padding-top: 1px;  margin:5px 0;  margin-left:5px;} 			
             .button_ok { position: absolute; right: 100px; bottom: 8px; } 
             .button_cancel { width: 70px; position: absolute; right: 15px; bottom: 8px; } 
+			.button_ok_and_reset_cache, .button_ok_and_reset_cache:hover { position: absolute; left: 15px; bottom: 8px; width: auto; padding-left:10px; padding-right:10px; } 
 			.titleBig {
 				font-size:130%;
 				font-style: italic;
 				text-align:center;
-				padding-bottom:5px;
+				padding-bottom:0px;
 			}
-			.separator{width:50px; background:#000; height: 1px; margin: 15px auto 5px; }
+			.separator{width:50px; background:#000; height: 1px; margin: 15px auto 2px; }
         </style>
         <title></title>
     </head>
@@ -41,7 +42,8 @@
         <div id="radio_container" class="container"></div>				
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
-        <button class="button_ok" id="btn_ok" onkeydown="if(event.keyCode == 13) this.click()">Ok</button>		
+        <button class="button_ok" id="btn_ok" onkeydown="if(event.keyCode == 13) this.click()">Validate</button>		
+        <!--<button class="button_ok_and_reset_cache" id="btn_ok_and_reset_cache" onkeydown="if(event.keyCode == 13) this.click()">Validate and reset image cache</button>	-->		
         <script>   
             // helpers
             function close_window() {
@@ -95,6 +97,17 @@
                 callback_fn && callback_fn("ok", radio_value);
                 close_window();
             };
+            /*window.btn_ok_and_reset_cache.onclick = function () {
+				var radio_check = document.getElementsByName('radio_btns');
+				var radio_value;
+				for(var i = 0; i < radio_check.length; i++){
+					if(radio_check[i].checked){
+						radio_value = radio_check[i].value;
+					}
+				}
+                callback_fn && callback_fn("reset", radio_value);
+                close_window();
+            };	*/		
             window.btn_cancel.onclick = function () {
 				callback_fn && callback_fn("cancel", false);
                 close_window();

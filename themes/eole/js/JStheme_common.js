@@ -209,13 +209,14 @@ function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],            
 	});
 }
-function chooseMemorySettings(title,top_msg,bottom_msg){
+function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
 	function ok_callback(status, mem_solicitation) {
-		if(mem_solicitation==globalProperties.mem_solicitation) return;
-		else if(mem_solicitation>=0 && mem_solicitation<=3) setMemoryUsageGlobaly(Number(mem_solicitation));
+		if(mem_solicitation>=0 && mem_solicitation<=3 && mem_solicitation!=globalProperties.mem_solicitation && status!="cancel") setMemoryUsageGlobaly(Number(mem_solicitation));
+		
+		if(status=="reset") delete_full_cache();		
 		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
 	}
-	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","RadioDialog.html"), {
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html",dialog_name+".html"), {
 		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg],  
 	});
 }
@@ -2473,6 +2474,7 @@ function save_image_to_cache(image, albumIndex, cachekey){
 		}		
 		image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);	
 	}
+	if (typeof brw == "object") brw.repaint();
 	//return image;
 }
 function createDragText(line1, line2, cover_size){

@@ -2297,13 +2297,13 @@ oBrowser = function(name) {
 										console.log("DrawImage: invalid image ");
 									}
 								}									
-									if(!properties.circleMode)
-										gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);
-									else {
-										gr.SetSmoothingMode(2);
-										gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
-										gr.SetSmoothingMode(0);
-									}														
+								if(!properties.circleMode)
+									gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);
+								else {
+									gr.SetSmoothingMode(2);
+									gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
+									gr.SetSmoothingMode(0);
+								}														
                                 /*} else {
 									if(!images.loading_cover_group_resized) {
 										images.loading_cover_group = FormatCover(images.loading_cover_group, cv_w, cv_h, false);

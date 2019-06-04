@@ -5301,7 +5301,7 @@ function on_load_image_done(tid, image){
 				if(k <= g_end) {
 					if(!timers.coverDone) {
 						timers.coverDone = setTimeout(function() {
-							brw.repaint();
+							window.Repaint();
 							timers.coverDone && clearTimeout(timers.coverDone);
 							timers.coverDone = false;
 						}, 5);
@@ -5337,7 +5337,7 @@ function populate_with_library_covers(start_items, str_comp_items){
 			if(globalProperties.enableDiskCache) {
 				if(globalProperties.load_covers_at_startup && cachekey_album!='undefined') {
 					current_item_filename_album = check_cacheV2(covers_FullLibraryList[covers_current_item], 0, cachekey_album);
-					if(current_item_crc_album) {				
+					if(current_item_filename_album) {				
 						g_image_cache.cachelist[cachekey_album] = load_image_from_cache_directV2(current_item_filename_album);		
 					}	
 				}	

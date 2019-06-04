@@ -1358,7 +1358,7 @@ function draw_main_menu(x,y){
 	appearance_menu.CheckMenuItem(4024, globalProperties.load_artist_img_at_startup);	*/		
 		
 	skin_settings_menu.AppendMenuSeparator(); 
-	mem_solicitation = window.CreatePopupMenu();
+	/*mem_solicitation = window.CreatePopupMenu();
 	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "0 - Minimum");	
 	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "1 - Keep loaded covers in memory");	
 	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "2 - Load all covers at startup");
@@ -1366,9 +1366,10 @@ function draw_main_menu(x,y){
 	mem_solicitation.AppendMenuSeparator();	
 	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
 	mem_solicitation.AppendMenuItem(MF_STRING, 4026, "Reset images cache");
-	mem_solicitation.AppendTo(skin_settings_menu, MF_STRING, "Covers && Memory usage");
+	mem_solicitation.AppendTo(skin_settings_menu, MF_STRING, "Covers && Memory usage");*/
 
-	//skin_settings_menu.AppendMenuItem(MF_STRING, 4029, "Covers && Memory usage");	
+	skin_settings_menu.AppendMenuItem(MF_STRING, 4029, "Covers && Memory usage");	
+	skin_settings_menu.AppendMenuItem(MF_STRING, 4026, "Reset images cache");
 	skin_settings_menu.AppendMenuSeparator(); 
 
 	var schedulerMenu = window.CreatePopupMenu();
@@ -1623,7 +1624,7 @@ function draw_main_menu(x,y){
 		delete_full_cache();
 		break;
 	case (idx == 4029):
-		chooseMemorySettings(" ", "<div class='titleBig'>Covers  &  Memory usage</div><div class='separator'></div><br/>In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later if you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>');
+		chooseMemorySettings(" ", "<div class='titleBig'>Covers  &  Memory usage</div><div class='separator'></div><br/>In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later if you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','MemoryDialog');
 		break;
 	case (idx == 4027):
 		toggleNowPlayingState();
@@ -2387,7 +2388,7 @@ function on_init(){
 	if(fb.IsPlaying) caption_title = fb.TitleFormat("[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]").Eval();
 	if(settings_file_not_found){
 		var welcome_msg_timer = setTimeout(function(){
-			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>');
+			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','RadioDialog');
 			clearTimeout(welcome_msg_timer);
 			welcome_msg_timer=false;
 		}, 200); 	
