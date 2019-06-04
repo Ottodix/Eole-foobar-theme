@@ -240,7 +240,7 @@ images = {
     path: theme_img_path + "\\",
     glass_reflect: null,
     loading_angle: 0,
-    loading_draw: null,
+    loading_cover: null,
     noart: null,
     stream: null,
 	now_playing_1: gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png"),
@@ -2295,7 +2295,8 @@ oBrowser = function(name) {
 										gr.DrawImage(this.groups[g].cover_img, cv_x+8, cv_y, cv_w, cv_h, 0, 0, this.groups[g].cover_img.Width, this.groups[g].cover_img.Height,0,255);
 									} catch (e) {
 										console.log("DrawImage: invalid image ");
-									}									
+									}
+								}									
 									if(!properties.circleMode)
 										gr.DrawRect(cv_x+8, cv_y, cv_w-1, cv_h-1, 1.0, colors.cover_rectline);
 									else {
@@ -2303,13 +2304,13 @@ oBrowser = function(name) {
 										gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
 										gr.SetSmoothingMode(0);
 									}														
-                                } else {
-									if(!images.loading_draw_group_resized) {
-										images.loading_draw_group = FormatCover(images.loading_draw_group, cv_w, cv_h, false);
-										images.loading_draw_group_resized = true;
+                                /*} else {
+									if(!images.loading_cover_group_resized) {
+										images.loading_cover_group = FormatCover(images.loading_cover_group, cv_w, cv_h, false);
+										images.loading_cover_group_resized = true;
 									}
-                                    gr.DrawImage(images.loading_draw_group, cv_x+8, cv_y, cv_w, cv_h, 0, 0, images.loading_draw_group.Width, images.loading_draw_group.Height, images.loading_angle, 230);
-                                };
+                                    gr.DrawImage(images.loading_cover_group, cv_x+8, cv_y, cv_w, cv_h, 0, 0, images.loading_cover_group.Width, images.loading_cover_group.Height, images.loading_angle, 230);
+                                };*/
                                 var text_left_margin = cover.max_w+cv_x+((properties.doubleRowText)?16:0);
                             } else {
                                 var text_left_margin = 0;
@@ -3659,7 +3660,7 @@ oBrowser = function(name) {
 			if(isScrolling && brw.rows.length > 0) brw.gettags(false);
 			repaintforced = true;
 			repaint_main = true;
-			images.loading_angle = (images.loading_angle+30) % 360;
+			//images.loading_angle = (images.loading_angle+30) % 360;
 			window.Repaint();
 		};        	
 
@@ -5042,10 +5043,10 @@ function get_images() {
     
     var img_loading = gdi.Image(images.path+"load.png");
     var iw = properties.groupHeaderRowsNumber * properties.rowHeight;
-    images.loading_draw = img_loading;
-    images.loading_draw_group = img_loading;
-    images.loading_draw_resized = false;
-    images.loading_draw_group_resized = false;
+    images.loading_cover = img_loading;
+    images.loading_cover_group = img_loading;
+    images.loading_cover_resized = false;
+    images.loading_cover_group_resized = false;
 	
     images.noart = cover.nocover_img;
 	
