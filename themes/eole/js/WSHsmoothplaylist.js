@@ -1596,9 +1596,9 @@ oBrowser = function(name) {
         var end = this.groups.length;
         for(i = 0; i < end; i++) {
             
-            this.groups[i].load_requested = 0;
-            this.groups[i].cover_formated = false;	
-			this.groups[i].mask_applied = false;
+            //this.groups[i].load_requested = 0;
+            //this.groups[i].cover_formated = false;	
+			//this.groups[i].mask_applied = false;
 
             // update total rows present before this group
             //this.groups[i].totalPreviousRows = r;
@@ -1889,7 +1889,10 @@ oBrowser = function(name) {
                         tr.push(arr[1].split(" ^^ "));
                         t++;
                         this.groups.push(new oGroup(g, i, handle, arr[0]));
-						this.groups[g].TotalTime+=handle.Length;						
+						this.groups[g].TotalTime+=handle.Length;
+						this.groups[g].load_requested = 0;
+						this.groups[g].cover_formated = false;	
+						this.groups[g].mask_applied = false;						
                         g++;
                         previous = current;
                     };
@@ -2260,34 +2263,34 @@ oBrowser = function(name) {
 									this.groups[g].mask_applied = false;
 									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 };															
-                                if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
+                                if(isImage(this.groups[g].cover_img) && properties.circleMode && !this.groups[g].mask_applied) {
+									if(!this.coverMask) this.DefineCircleMask(GroupCover_w);
+									width = this.groups[g].cover_img.Width;
+									height = this.groups[g].cover_img.Height;
+									coverMask = this.coverMask.Resize(width, height, 7);
+									this.groups[g].cover_img.ApplyMask(coverMask);
+									this.groups[g].mask_applied = true;
+								};
+								if(properties.doubleRowText){
+									var cv_w = coverWidth-2;
+									var cv_h = coverWidth-2;	
+									var dx = (cover.max_w - cv_w) / 2;
+									var dy = (cover.max_h - cv_h) / 2;
+									var cv_x = Math.floor(ax + dx + 1)+6;
+									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-1;										
+								} else {
+									var cv_w = coverWidth - cover.margin * 2-cover.padding;
+									var cv_h = coverWidth - cover.margin * 2-cover.padding;		
+									var dx = (cover.max_w - cv_w) / 2;
+									var dy = (cover.max_h - cv_h) / 2;
+									var cv_x = Math.floor(ax + dx + 1)-2;
+									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-2;										
+								}
+								if(isImage(this.groups[g].cover_img)) {
 									if(!this.groups[g].cover_formated){
-										this.groups[g].cover_img = FormatCover(this.groups[g].cover_img, GroupCover_w, GroupCover_h, false);
+										this.groups[g].cover_img = FormatCover(this.groups[g].cover_img, cv_w, cv_h, false);
 										this.groups[g].cover_formated = true;
-									}									
-									if(properties.circleMode && !this.groups[g].mask_applied){
-										if(!this.coverMask) this.DefineCircleMask(GroupCover_w);
-										width = this.groups[g].cover_img.Width;
-										height = this.groups[g].cover_img.Height;
-										coverMask = this.coverMask.Resize(width, height, 7);
-										this.groups[g].cover_img.ApplyMask(coverMask);
-										this.groups[g].mask_applied = true;
-									}									
-									if(properties.doubleRowText){
-										var cv_w = coverWidth-2;
-										var cv_h = coverWidth-2;	
-										var dx = (cover.max_w - cv_w) / 2;
-										var dy = (cover.max_h - cv_h) / 2;
-										var cv_x = Math.floor(ax + dx + 1)+6;
-										var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-1;										
-									}else {
-										var cv_w = coverWidth - cover.margin * 2-cover.padding;
-										var cv_h = coverWidth - cover.margin * 2-cover.padding;		
-										var dx = (cover.max_w - cv_w) / 2;
-										var dy = (cover.max_h - cv_h) / 2;
-										var cv_x = Math.floor(ax + dx + 1)-2;
-										var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-2;										
-									}
+									}										
 									try{
 										gr.DrawImage(this.groups[g].cover_img, cv_x+8, cv_y, cv_w, cv_h, 0, 0, this.groups[g].cover_img.Width, this.groups[g].cover_img.Height,0,255);
 									} catch (e) {
@@ -2301,9 +2304,11 @@ oBrowser = function(name) {
 										gr.SetSmoothingMode(0);
 									}														
                                 } else {
-                                    var cv_x = Math.floor(ax + cover.margin + 1);
-                                    var cv_y = Math.floor(ay - ((ghrh - 1) * ah) + cover.margin)+group_height_fix;
-                                    gr.DrawImage(images.loading_draw, cv_x-cover.margin, cv_y-cover.margin, images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 230);
+									if(!images.loading_draw_group_resized) {
+										images.loading_draw_group = FormatCover(images.loading_draw_group, cv_w, cv_h, false);
+										images.loading_draw_group_resized = true;
+									}
+                                    gr.DrawImage(images.loading_draw_group, cv_x+8, cv_y, cv_w, cv_h, 0, 0, images.loading_draw_group.Width, images.loading_draw_group.Height, images.loading_angle, 230);
                                 };
                                 var text_left_margin = cover.max_w+cv_x+((properties.doubleRowText)?16:0);
                             } else {
@@ -2586,8 +2591,8 @@ oBrowser = function(name) {
 												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};									
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
-												if(!this.groups[g].cover_formated){
-													this.groups[g].cover_img = FormatCover(this.groups[g].cover_img, GroupCover_w, GroupCover_h, false);
+												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
+													this.groups[g].cover_img = FormatCover(this.groups[g].cover_img, TrackCover_w, TrackCover_h, false);
 													this.groups[g].cover_formated = true;
 												}									
 												if(!this.groups[g].mask_applied && properties.circleMode){
@@ -2655,7 +2660,7 @@ oBrowser = function(name) {
 												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};										
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
-												if(!this.groups[g].cover_formated){
+												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
 													this.groups[g].cover_img = FormatCover(this.groups[g].cover_img, TrackCover_w, TrackCover_h, false);
 													this.groups[g].cover_formated = true;
 												}									
@@ -5037,8 +5042,11 @@ function get_images() {
     
     var img_loading = gdi.Image(images.path+"load.png");
     var iw = properties.groupHeaderRowsNumber * properties.rowHeight;
-    images.loading_draw = img_loading.Resize(iw, iw, 7);
-
+    images.loading_draw = img_loading;
+    images.loading_draw_group = img_loading;
+    images.loading_draw_resized = false;
+    images.loading_draw_group_resized = false;
+	
     images.noart = cover.nocover_img;
 	
 	

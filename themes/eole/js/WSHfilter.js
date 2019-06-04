@@ -2313,13 +2313,13 @@ oBrowser = function(name) {
 									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false);
 									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 										this.groups[i].cover_type = 1;
-										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);										
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);										
 									} else if(properties.AlbumArtFallback && properties.albumArtId != 4){
 										this.groups[i].save_requested = true;
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);							
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);							
 										}
 									}
 								} 
@@ -2345,7 +2345,7 @@ oBrowser = function(name) {
 										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img);							
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);							
 										} else this.groups[i].cover_img = images.noartist;
 									}
 									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);

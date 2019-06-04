@@ -21,7 +21,7 @@ var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
 	theme_version: '1.0.5',
-    thumbnailWidthMax: 300,
+    thumbnailWidthMax: 200,
     coverCacheWidthMax: 400,
 	TextRendering: 4,
     ImageCacheExt: "jpg",	
@@ -2458,7 +2458,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     }	
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	save_image_to_cache(result.image, 0,cachekey); 
-	on_get_album_art_done(metadb, albumIndex, result.image, result.path);
+	//on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };
 
 function save_image_to_cache(image, albumIndex, cachekey){
@@ -2529,7 +2529,7 @@ oImageCache = function () {
 		var img = this.cachelist[cachekey];
         if (typeof img == "undefined" || img==null) { // if image not in cache, we load it asynchronously
 			if(globalProperties.enableDiskCache && albumIndex>-1) brw.groups[albumIndex].cover_filename = check_cacheV2(metadb, albumIndex, cachekey);
-			if(globalProperties.enableDiskCache && albumIndex>-1 && brw.groups[albumIndex].cover_filename && brw.groups[albumIndex].load_requested == 0) {
+			if(brw.groups[albumIndex].cover_filename && brw.groups[albumIndex].load_requested == 0) {
 					//Dont save as its already in the cache
 					brw.groups[albumIndex].save_requested=true;
 					// load img from cache
@@ -2607,8 +2607,8 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};
-    this.getit = function (metadb, albumId, image) {
-        var cw = globalProperties.coverCacheWidthMax;
+    this.getit = function (metadb, albumId, image, cw) {
+		var cw = typeof cw !== 'undefined' ? cw : globalProperties.coverCacheWidthMax;
         var ch = cw;
         var img = null;
         var cover_type = null;
@@ -2645,7 +2645,7 @@ oImageCache = function () {
                 cover_type = 3;
             };
             
-            try{this.cachelist[brw.groups[albumId].cachekey] = img;}catch(e){}
+            //try{this.cachelist[brw.groups[albumId].cachekey] = img;}catch(e){}
         };
         
         brw.groups[albumId].cover_type = cover_type;

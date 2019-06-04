@@ -1368,6 +1368,7 @@ function draw_main_menu(x,y){
 	mem_solicitation.AppendMenuItem(MF_STRING, 4026, "Reset images cache");
 	mem_solicitation.AppendTo(skin_settings_menu, MF_STRING, "Covers && Memory usage");
 
+	//skin_settings_menu.AppendMenuItem(MF_STRING, 4029, "Covers && Memory usage");	
 	skin_settings_menu.AppendMenuSeparator(); 
 
 	var schedulerMenu = window.CreatePopupMenu();
@@ -1620,6 +1621,9 @@ function draw_main_menu(x,y){
 		break;	
 	case (idx == 4026):
 		delete_full_cache();
+		break;
+	case (idx == 4029):
+		chooseMemorySettings(" ", "<div class='titleBig'>Covers  &  Memory usage</div><div class='separator'></div><br/>In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later if you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>');
 		break;
 	case (idx == 4027):
 		toggleNowPlayingState();

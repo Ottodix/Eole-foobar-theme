@@ -5251,16 +5251,16 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
     } else if(i < brw.groups.length && i>=0) {
         if(brw.groups[i].metadb) {
 				if(image) {							
-					g_image_cache.cachelist[brw.groups[i].cachekey] = image;
 					if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-						g_image_cache.cachelist[brw.groups[i].cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-					}									
+						g_image_cache.cachelist[brw.groups[i].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
+					} else g_image_cache.cachelist[brw.groups[i].cachekey] = image;									
 				} else {
 					if(brw.groups[i].tracktype == 3 ) {
 						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.stream_img;
 					} else {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.nocover_img	
-					}						
+						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.nocover_img;					
+					}		
+					brw.groups[i].save_requested = true;					
 				}						
 				// save img to cache
 				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img != "string" && image) {					
@@ -5277,7 +5277,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 					if (!timers.coverDone) {				
 						timers.coverDone = true;
 						timers.coverDone = setTimeout(function () {
-								window.Repaint();
+								brw.repaint();
 								clearTimeout(timers.coverDone);
 								timers.coverDone = false;
 						}, 100);
@@ -5293,16 +5293,15 @@ function on_load_image_done(tid, image){
 			if(brw.groups[k].tid == tid && brw.groups[k].load_requested == 1) {
 				
 				brw.groups[k].load_requested = 2;
-		
-				g_image_cache.cachelist[brw.groups[k].cachekey] = image;
-				//if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					//g_image_cache.cachelist[brw.groups[k].cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-				//}				
-				//brw.groups[k].cover_img = g_image_cache.cachelist[brw.groups[k].cachekey];
+
+				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
+					g_image_cache.cachelist[brw.groups[k].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
+				} else g_image_cache.cachelist[brw.groups[k].cachekey] = image;	
+				
 				if(k <= g_end) {
 					if(!timers.coverDone) {
 						timers.coverDone = setTimeout(function() {
-							window.Repaint();
+							brw.repaint();
 							timers.coverDone && clearTimeout(timers.coverDone);
 							timers.coverDone = false;
 						}, 5);
