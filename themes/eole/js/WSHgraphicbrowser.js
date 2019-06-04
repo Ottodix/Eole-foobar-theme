@@ -6479,7 +6479,7 @@ function on_playback_new_track(metadb) {
 		playing_track_playcount = TF.play_count.Eval();
 	} catch(e){}	
 	if(window.IsVisible){		
-		if(properties.followNowPlaying || g_showlist.isPlaying || FocusOnNowPlaying && !brw.firstInitialisation) {
+		if((properties.followNowPlaying && !nowplayinglib_state.isActive()) || g_showlist.isPlaying || FocusOnNowPlaying && !brw.firstInitialisation) {
 			FocusOnNowPlaying = true;					
 			if(plman.ActivePlaylist!=plman.PlayingPlaylist) {
 				plman.ActivePlaylist = plman.PlayingPlaylist;
@@ -6847,12 +6847,14 @@ function on_notify_data(name, info) {
 			if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 			brw.repaint();
 		break; 		
+		case "wallpaperVisibilityGlobal":		
 		case "wallpaperVisibility":
-			if(window.IsVisible) toggleWallpaper(info);
-		break; 	
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
+		break; 			
+		case "wallpaperBlurGlobal":		
 		case "wallpaperBlur":
-			if(window.IsVisible) toggleBlurWallpaper(info);
-		break; 	
+			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
+		break; 		
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);			

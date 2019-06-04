@@ -5,7 +5,7 @@ var padding_right = 35;
 var header_height = 35;
 var ww = 0;
 var wh = 0;	
-var esl = new ActiveXObject("ESLyric");
+//var esl = new ActiveXObject("ESLyric");
 var properties = {
 	panelName: 'WSHlyrics_title',		
     globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
@@ -37,11 +37,11 @@ function get_colors() {
 	} else {	         
 		colors.highlight_txt = RGB(215,155,0);		
 	}	
-	esl.SetPanelTextNormalColor(colors.normal_txt);
+	/*esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);	
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);	
 	esl.ShowDesktopLyric = false;	
-	esl.DesktopLyricAlwaysOnTop = false;	
+	esl.DesktopLyricAlwaysOnTop = false;*/	
 };
 
 function on_mouse_rbtn_up(x, y){

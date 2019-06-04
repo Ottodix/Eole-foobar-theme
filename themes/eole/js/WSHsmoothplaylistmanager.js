@@ -3010,12 +3010,14 @@ function on_notify_data(name, info) {
 			layout_state.value = info;
 			if(layout_state.isEqual(1)) window.NotifyOthers("pmanager_height",window.Height);
 			break;		
+		case "wallpaperVisibilityGlobal":		
 		case "wallpaperVisibility":
-			if(window.IsVisible) toggleWallpaper(info);
-		break; 	
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
+		break; 			
+		case "wallpaperBlurGlobal":		
 		case "wallpaperBlur":
-			if(window.IsVisible) toggleBlurWallpaper(info);
-		break; 				
+			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
+		break; 					
 		case"playlists_dark_theme":			
 			properties.darklayout = info;
 			window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);

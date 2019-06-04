@@ -1347,9 +1347,21 @@ function draw_main_menu(x,y){
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4031, "Decrease width");	
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Custom width...");		
 	nowplayinglobal.AppendTo(appearance_menu,MF_STRING, "Right playlist");	
+	
+	appearance_menu.AppendMenuSeparator(); 
 	appearance_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");		
 
+	wallpaper_visibility_global = window.CreatePopupMenu();
+	wallpaper_visibility_global.AppendMenuItem(MF_STRING, 40051, "Enable");	
+	wallpaper_visibility_global.AppendMenuItem(MF_STRING, 40061, "Disable");	
+	wallpaper_blur_global = window.CreatePopupMenu();
+	wallpaper_blur_global.AppendMenuItem(MF_STRING, 40071, "Enable");	
+	wallpaper_blur_global.AppendMenuItem(MF_STRING, 40081, "Disable");	
+	appearance_menu.AppendMenuSeparator(); 
+	wallpaper_visibility_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers visibility");			
+	wallpaper_blur_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers blur");
+		
 	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4023, "Load all covers at startup");
@@ -1547,6 +1559,22 @@ function draw_main_menu(x,y){
         window.NotifyOthers("wallpaperBlur",false);
 		on_notify_data("wallpaperBlur",false);		
         break;	
+   case (idx == 40051):  
+        window.NotifyOthers("wallpaperVisibilityGlobal",true);
+		//on_notify_data("wallpaperVisibility",true);
+        break;		
+   case (idx == 40061):  
+        window.NotifyOthers("wallpaperVisibilityGlobal",false);
+		//on_notify_data("wallpaperVisibility",false);		
+        break;		
+   case (idx == 40071):  
+        window.NotifyOthers("wallpaperBlurGlobal",true);
+		on_notify_data("wallpaperBlur",true);		
+        break;		
+   case (idx == 40081):  
+        window.NotifyOthers("wallpaperBlurGlobal",false);
+		on_notify_data("wallpaperBlur",false);		
+        break;		
 	case (idx == 4009):
 		g_uihacks.toggleFullscreen();
 		break;		

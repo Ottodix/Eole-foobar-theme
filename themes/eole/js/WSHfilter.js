@@ -5226,12 +5226,14 @@ function on_notify_data(name, info) {
 				brw.repaint();
 			}
 		break; 	
+		case "wallpaperVisibilityGlobal":		
 		case "wallpaperVisibility":
-			if(window.IsVisible) toggleWallpaper(info);
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
 		break; 			
+		case "wallpaperBlurGlobal":		
 		case "wallpaperBlur":
-			if(window.IsVisible) toggleBlurWallpaper(info);
-		break; 				
+			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
+		break; 					
         case "WSH_panels_reload":
 			window.Reload();
             break;

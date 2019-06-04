@@ -4678,11 +4678,13 @@ function on_notify_data(name, info) {
 		case "librarytree": 
 			librarytree.value=info;
 		break;		
+		case "wallpaperVisibilityGlobal":		
 		case "wallpaperVisibility":
-			if(window.IsVisible) toggleWallpaper(info);
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
 		break; 			
+		case "wallpaperBlurGlobal":		
 		case "wallpaperBlur":
-			if(window.IsVisible) toggleBlurWallpaper(info);
+			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
 		break; 		
     };
 };

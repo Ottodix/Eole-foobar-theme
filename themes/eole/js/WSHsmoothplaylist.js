@@ -1592,7 +1592,7 @@ oBrowser = function(name) {
 		var d1 = new Date();
 		var t1 = d1.getSeconds()*1000 + d1.getMilliseconds();
         */
-        
+
         var end = this.groups.length;
         for(i = 0; i < end; i++) {
             
@@ -6306,11 +6306,13 @@ function on_notify_data(name, info) {
 			on_colours_changed();
 			window.Repaint();		
 		break;			
+		case "wallpaperVisibilityGlobal":		
 		case "wallpaperVisibility":
-			if(window.IsVisible) toggleWallpaper(info);
-		break; 	
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
+		break; 			
+		case "wallpaperBlurGlobal":		
 		case "wallpaperBlur":
-			if(window.IsVisible) toggleBlurWallpaper(info);
+			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
 		break; 		
 		case "wallpaperVisibility2":
 			if(window.IsVisible) {
