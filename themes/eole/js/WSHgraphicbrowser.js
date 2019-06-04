@@ -4473,10 +4473,10 @@ oBrowser = function(name) {
 						gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, secondRow_color, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);*/
 						
 						if(this.groups[this.groups_draw[i]].text_y+this.firstRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h) 
-							gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+							gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 						if(this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)  
-							gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+							gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 						
 						if(typeof this.groups[this.groups_draw[i]].firstRowLength == 'undefined') this.groups[this.groups_draw[i]].firstRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].firstRow,g_font.plus2);
 						if(typeof this.groups[this.groups_draw[i]].secondRowLength == 'undefined') this.groups[this.groups_draw[i]].secondRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].secondRow,g_font.normal);	
