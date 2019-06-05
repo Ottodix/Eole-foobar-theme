@@ -940,31 +940,33 @@ function on_mouse_move(x,y,m){
 		is_over_panel = true;
 		if(layout_state.isEqual(1)) repaint = true;
 	}
-    if((is_hover_volume(x,y))&& !progress_vars.drag){
-		if(timers.hideVolume!==false) {clearTimeout(timers.hideVolume);timers.hideVolume=false;}
-        hoovervolume=true; 		
-        if(is_hover_volume_slider(x,y)) {		
-			g_cursor.setCursor(IDC_HAND,"volume");		
-			if(!repaint_volume) {
-				repaint_volume = true;
-				calculate_volume_ellipse_vars(true);
-				volume_vars.height=volume_vars.height_hover;
-				repaint = true;
-			}			
+	if(!progress_vars.drag){
+		if((is_hover_volume(x,y))){
+			if(timers.hideVolume!==false) {clearTimeout(timers.hideVolume);timers.hideVolume=false;}
+			hoovervolume=true; 		
+			if(is_hover_volume_slider(x,y)) {		
+				g_cursor.setCursor(IDC_HAND,"volume");		
+				if(!repaint_volume) {
+					repaint_volume = true;
+					calculate_volume_ellipse_vars(true);
+					volume_vars.height=volume_vars.height_hover;
+					repaint = true;
+				}			
+			}
+			else if(!volume_vars.drag){ResetVolume();}
+		} else if(hoovervolume && !volume_vars.drag){
+			ResetVolume();
+			g_cursor.setCursor(IDC_ARROW);		
+			if(!timers.hideVolume) showVolumeSlider(false);
+		} else if(!timers.hideVolume && !volume_vars.drag && VolumeSliderActive) {
+			showVolumeSlider(false);
 		}
-		else if(!volume_vars.drag){ResetVolume();}
-    } else if(hoovervolume && !volume_vars.drag){
-		ResetVolume();
-		g_cursor.setCursor(IDC_ARROW);		
-		if(!timers.hideVolume) showVolumeSlider(false);
-	} else if(!timers.hideVolume && !volume_vars.drag && VolumeSliderActive) {
-		showVolumeSlider(false);
-	}
-	
-	if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {showVolumeSlider(true);repaint = true;}
-
-	if(volume_vars.drag){
-		setVolume(x);
+		
+		if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {showVolumeSlider(true);repaint = true;}
+		
+		if(volume_vars.drag){
+			setVolume(x);
+		}
 	}
 	if(is_hover_time_elapsed(x,y)){
 		if(g_cursor.getCursor!=IDC_HAND){
@@ -1015,7 +1017,7 @@ function on_mouse_move(x,y,m){
 					m = Math.floor((t -= h * 3600) / 60);
 					s = Math.floor(t -= m * 60);
 					new_text = (h > 0 ? h + ":" + (m < 10 ? "0" + m : m) : m) + ":" + (s < 10 ? "0" + s : s);            
-					g_tooltip.Activate(new_text, x-17, progress_margin_top-35, 0, false, 'progress');          
+					g_tooltip.Activate(new_text, Math.min(Math.max(x-17,progress_margin_left),progress_margin_left+ww_progress), progress_margin_top-35, 0, false, 'progress');          
 				} 				
 				
 				repaint = true;
@@ -1028,24 +1030,26 @@ function on_mouse_move(x,y,m){
 	g_tooltip.onMouse("move", x, y, m);
 	
 	//Buttons
-    var old = cur_btn;
-    cur_btn = chooseButton(x, y);
-    
-    if (old == cur_btn) {
-       // if (btn_down) return;
-    } else if (btn_down && cur_btn && cur_btn.state != ButtonStates.down) {
-        cur_btn.changeState(ButtonStates.down);
-        repaint = true;
-        return;
-    } else {        
-        if(old){
-			old.changeState(ButtonStates.normal);		
+	if(!progress_vars.drag && !volume_vars.drag){
+		var old = cur_btn;
+		cur_btn = chooseButton(x, y);
+		
+		if (old == cur_btn) {
+		   // if (btn_down) return;
+		} else if (btn_down && cur_btn && cur_btn.state != ButtonStates.down) {
+			cur_btn.changeState(ButtonStates.down);
+			repaint = true;
+			return;
+		} else {        
+			if(old){
+				old.changeState(ButtonStates.normal);		
+			}
+			if(cur_btn){
+				cur_btn.changeState(ButtonStates.hover);		
+			}
+			repaint = true;			
 		}
-        if(cur_btn){
-			cur_btn.changeState(ButtonStates.hover);		
-		}
-        repaint = true;			
-    }
+	}
 	if(repaint) window.Repaint();
 }
 

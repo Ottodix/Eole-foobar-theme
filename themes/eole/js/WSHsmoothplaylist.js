@@ -2626,9 +2626,9 @@ oBrowser = function(name) {
 											if(properties.circleMode) var y_adjust = 1;
 											else var y_adjust = 0;
 											if(g_elapsed_seconds == 0 || g_elapsed_seconds / 2 == Math.floor(g_elapsed_seconds / 2)) {
-												gr.DrawImage(images.now_playing_0, ax+TrackCover_x+((properties.showGroupHeaders)?4:9), ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_0.Width, images.now_playing_0.Height, 0, 0, images.now_playing_0.Width, images.now_playing_0.Height, 0, 255);
+												gr.DrawImage(images.now_playing_0, TrackCover_x+8+Math.round(TrackCover_w/2-images.now_playing_0.Width/2), ay+cover.trackMargin+TrackCover_y+Math.round(TrackCover_h/2-images.now_playing_0.Height/2)-1, images.now_playing_0.Width, images.now_playing_0.Height, 0, 0, images.now_playing_0.Width, images.now_playing_0.Height, 0, 255);
 											} else {
-												gr.DrawImage(images.now_playing_1, ax+TrackCover_x+((properties.showGroupHeaders)?4:9),  ay+cover.trackMargin+1+TrackCover_y+Math.round(TrackCover_w/2-images.now_playing_0.Height/2)-1, images.now_playing_1.Width, images.now_playing_1.Height, 0, 0, images.now_playing_1.Width, images.now_playing_1.Height, 0, 255);
+												gr.DrawImage(images.now_playing_1, TrackCover_x+8+Math.round(TrackCover_w/2-images.now_playing_0.Width/2),  ay+cover.trackMargin+TrackCover_y+Math.round(TrackCover_h/2-images.now_playing_0.Height/2)-1, images.now_playing_1.Width, images.now_playing_1.Height, 0, 0, images.now_playing_1.Width, images.now_playing_1.Height, 0, 255);
 											};		
 																						
 										} else {

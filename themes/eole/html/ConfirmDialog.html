@@ -33,8 +33,8 @@
     <body>
         <div id="div_text" class="container"></div>
 		<div id="btn_container"> 
-			<button id="btn_ok" class="button" onkeydown="if(event.keyCode == 13) this.click()">Yes</button>	
-			<button id="btn_cancel" class="button" onkeydown="if(event.keyCode == 13) this.click()">No</button>
+			<button id="btn_ok" class="button">Yes</button>	
+			<button id="btn_cancel" class="button">No</button>
 		</div>		
         <script>   
 
@@ -72,7 +72,11 @@
 				//alert(window.div_text.offsetHeight+' - '+window.btn_container.offsetHeight+' - '+window_h);
             }
 			resize();
-			
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
+				}
+			};
             window.btn_ok.onclick = function () {
                 callback_fn && callback_fn("ok", true);
                 close_window();

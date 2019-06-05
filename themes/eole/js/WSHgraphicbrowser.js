@@ -4314,6 +4314,7 @@ oBrowser = function(name) {
 				coverTop = ay + this.CoverMarginTop;
 				
 				gr.FillEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
+				//else gr.FillSolidRect(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
 			}
 						
             for(var i = start_;i < end_;i++){
@@ -5081,7 +5082,11 @@ oBrowser = function(name) {
 						plman.ActivePlaylist = plman.PlayingPlaylist;
 						//brw.populate(28);
 					} else {
-						brw.populate(26);
+						if(!nowplayinglib_state.isActive()){
+							brw.populate(26);
+						} else {		
+							quickSearch(track,properties.leftFilterState);		
+						}				
 					}
 				} else {	
 					timers.showItem = setTimeout(function(){
