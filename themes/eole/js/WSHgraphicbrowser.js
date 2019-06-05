@@ -5348,7 +5348,7 @@ function populate_with_library_covers(start_items, str_comp_items){
 				}	
 				if(globalProperties.load_artist_img_at_startup && cachekey_artist!='undefined') {				
 					current_item_filename_artist = check_cacheV2(covers_FullLibraryList[covers_current_item], 0, cachekey_artist);
-					if(current_item_crc_artist) {				
+					if(current_item_filename_artist) {				
 						g_image_cache.cachelist[cachekey_artist] = load_image_from_cache_directV2(current_item_filename_artist);		
 					}
 				}
