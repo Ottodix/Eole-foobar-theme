@@ -24,17 +24,18 @@
             input[type="radio"] { float:left; display: inline; position: relative; width: 15px; border: 0; padding: 2px 1px; margin:5px 0; } 
             input[type="radio"]:hover { border:1px solid #000000; padding: 1px 0; } 
 			#size_container {
-				padding: 10px 25px;
+				padding: 15px 25px 5px;
 				background:#e0e0e0;
-				padding-top:15px; padding-bottom:15px;
-				border-bottom:1px solid #d0d0d0;			
+				border:1px solid #d0d0d0;			
 			}
-			#size_container .col{display:inline-block; width:42%; padding: 0; font:caption; }
+			#inter_text{padding: 20px 25px;}
+			#size_container .col{display:inline-block; width:32%; padding: 0; font:caption; }
 			#size_container .col1{padding-right:4%;float:left}
-			#size_container .col2{padding-right:4%;float:right}
+			#size_container .col2{padding-right:4%;width:100px;float:left}
 			#size_container .label{margin:0 0 10px;padding:0;}			
 			#size_container .label span{font-size:90%; color:#555}
-
+            #size_container input { float:left; display: inline; position: relative; width: 25px; padding: 2px 5px; margin:5px 0; } 
+			
             .radio_label { float:left; padding-top: 1px;  margin:5px 0;  margin-left:5px;} 			
             .button_ok { position: absolute; right: 100px; bottom: 8px; } 
             .button_cancel { width: 70px; position: absolute; right: 15px; bottom: 8px; } 
@@ -51,21 +52,21 @@
     </head>
     <body>
         <div id="div_text" class="container"></div>
-        <div id="radio_container" class="container"></div>				
-        <!--<div id="size_container">
+        <div id="radio_container" class="container"></div>
+        <div id="inter_text" class="container">You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much. Changing this value will reset the cover cache.</div>
+        <div id="size_container">
 			<div class="col col1">
-				<div class="label">Thumbnail max width<br/><span>for filters & playlist</span></div>
-				<input id="thumbnailWidthMax" name="thumbnailWidthMax"></input>
-			</div>
-			<div class="col col2">
-				<div class="label">Cover cache max width<br/><span>for all panels</span></div>
-				<input id="coverCacheWidthMax" name="coverCacheWidthMax"></input>	
-			</div>			
-		</div>		-->		
+				<div class="label">Cover cache max width:<br/><span>for all panels, in pixels</span></div>
+			</div>	
+			<div class="col col2">			
+				<input id="coverCacheWidthMax" name="coverCacheWidthMax"></input>
+				<span class="radio_label">px</span>
+			</div>				
+		</div>			
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
         <button class="button_ok" id="btn_ok">Validate</button>		
-        <!--<button class="button_ok_and_reset_cache" id="btn_ok_and_reset_cache" onkeydown="if(event.keyCode == 13) this.click()">Validate and reset image cache</button>	-->		
+        <!--<button class="button_ok_and_reset_cache" id="btn_ok_and_reset_cache" onkeydown="if(event.keyCode == 13) this.click()">Validate and reset image cache</button>-->
         <script>   
             // helpers
             function close_window() {
@@ -98,15 +99,16 @@
 				  radio_btns_counter++;
 				}		
 				window.bottom_msg.insertAdjacentHTML('beforeend',parsed_args[6]);
+				window.coverCacheWidthMax.value = parsed_args[7];
             }
 			
-			var window_w = 458;
+			var window_w = 558;
 			var window_h = 425;
-			window_h = 83 + window.div_text.offsetHeight + window.radio_container.offsetHeight + window.btn_ok.offsetHeight + window.bottom_msg.offsetHeight;
+			window_h = 83 + window.div_text.offsetHeight + window.radio_container.offsetHeight + window.btn_ok.offsetHeight + window.bottom_msg.offsetHeight + window.size_container.offsetHeight + window.inter_text.offsetHeight;
 			if (window_w < window_h + 50) {
 				window_w += 50;
 				window.resizeTo(window_w, window_h);
-				window_h = 83 + window.div_text.offsetHeight + window.radio_container.offsetHeight + window.btn_ok.offsetHeight + window.bottom_msg.offsetHeight;
+				window_h = 83 + window.div_text.offsetHeight + window.radio_container.offsetHeight + window.btn_ok.offsetHeight + window.bottom_msg.offsetHeight + window.size_container.offsetHeight + window.inter_text.offsetHeight;
 			}
 			window.resizeTo(window_w, window_h);
 			
@@ -123,9 +125,14 @@
 						radio_value = radio_check[i].value;
 					}
 				}
-                callback_fn && callback_fn("ok", radio_value);
+                callback_fn && callback_fn("ok", radio_value, window.coverCacheWidthMax.value);
                 close_window();
             };
+            window.coverCacheWidthMax.onkeydown = function () {
+				if (window.event.keyCode == 13) {
+					window.btn_ok.onclick();
+				}
+            };			
             /*window.btn_ok_and_reset_cache.onclick = function () {
 				var radio_check = document.getElementsByName('radio_btns');
 				var radio_value;
@@ -136,7 +143,7 @@
 				}
                 callback_fn && callback_fn("reset", radio_value);
                 close_window();
-            };	*/		
+            };*/
             window.btn_cancel.onclick = function () {
 				callback_fn && callback_fn("cancel", false);
                 close_window();

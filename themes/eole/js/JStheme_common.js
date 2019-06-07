@@ -21,8 +21,8 @@ var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
 	theme_version: '1.1.0',
-    thumbnailWidthMax: 200,
-    coverCacheWidthMax: 400,
+    thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
+    coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
     ImageCacheExt: "jpg",	
     ImageCacheFileType: "image/jpeg",
@@ -49,7 +49,8 @@ var globalProperties = {
 	ResizeQLY: 2,	
 }	
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
-
+globalProperties.thumbnailWidthMax = Math.max(100,globalProperties.coverCacheWidthMax);
+  
 function setMemoryParameters(){
 	switch(true) {
 		case (globalProperties.mem_solicitation==0):
@@ -210,17 +211,25 @@ function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm
 	});
 }
 function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
-	function ok_callback(status, mem_solicitation) {
-		if(mem_solicitation>=0 && mem_solicitation<=3 && mem_solicitation!=globalProperties.mem_solicitation && status!="cancel") setMemoryUsageGlobaly(Number(mem_solicitation));
-		
-		if(status=="reset") {
-			globalProperties.deleteDiskCache = true;
-			delete_full_cache();	
-		}			
+	function ok_callback(status, mem_solicitation, covercache_max_mwith) {
+		panels_reload = false;
+		if(status!="cancel"){
+			if(covercache_max_mwith!=globalProperties.coverCacheWidthMax){			
+				setCoverCacheMaxWidthGlobally(Number(covercache_max_mwith));
+				panels_reload = true;
+				globalProperties.deleteDiskCache = true;
+				delete_full_cache();					
+			}		
+			if(mem_solicitation>=0 && mem_solicitation<=3 && mem_solicitation!=globalProperties.mem_solicitation && status!="cancel") {
+				setMemoryUsageGlobally(Number(mem_solicitation));
+			} else if(panels_reload){
+				window.NotifyOthers("WSH_panels_reload",true);
+			}
+		}		
 		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html",dialog_name+".html"), {
-		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg],  
+		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax],  
 	});
 }
 //Colors ------------------------------------------------------------------------------
@@ -884,26 +893,36 @@ function findSelectionPlaylist(){
 	};	
 	return pidx_selection;
 }
-function setMemoryUsageGlobaly(mem_solicitation){
+function setMemoryUsageGlobally(mem_solicitation){
 	globalProperties.mem_solicitation = mem_solicitation;
 	window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
 	window.NotifyOthers("MemSolicitation",globalProperties.mem_solicitation);	
-	//window.NotifyOthers("WSH_panels_reload",true);
+	window.NotifyOthers("WSH_panels_reload",true);
 }
-function enableDiskCacheGlobaly(){
+function setThumbnailMaxWidthGlobally(thumbnail_max_width){
+	globalProperties.thumbnailWidthMax = Number(thumbnail_max_width);			
+	window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);
+	window.NotifyOthers("thumbnailWidthMax",globalProperties.thumbnailWidthMax);	
+}
+function setCoverCacheMaxWidthGlobally(covercache_max_mwith){
+	globalProperties.coverCacheWidthMax = Number(covercache_max_mwith);				
+	window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);	
+	window.NotifyOthers("coverCacheWidthMax",globalProperties.coverCacheWidthMax);	
+}
+function enableDiskCacheGlobally(){
 	globalProperties.enableDiskCache = !globalProperties.enableDiskCache;
 	window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
 	window.NotifyOthers("DiskCacheState",globalProperties.enableDiskCache);
 	if(globalProperties.enableDiskCache) HtmlMsg("Explanation on the disk image cache", "The disk image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nAfter updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.", "Ok")			
 	else  HtmlMsg("Explanation on the disk image cache", "Warning: foobar may be slower without the disk image cache enabled.\n\nRestart foobar to fully disable it.", "Ok");		
 }
-function enableCoversAtStartupGlobaly(){
+function enableCoversAtStartupGlobally(){
 	globalProperties.load_covers_at_startup = !globalProperties.load_covers_at_startup;
 	window.SetProperty("COVER Load all at startup", globalProperties.load_covers_at_startup);
 	window.NotifyOthers("LoadAllCoversState",globalProperties.load_covers_at_startup);					
 	if(globalProperties.load_covers_at_startup) HtmlMsg("Explanation on the disk image cache", ((!globalProperties.enableDiskCache)?"This option will work better if the disk image cache is enabled and already built (check the option just below).\n\n":"")+"Foobar memory usage is higher when this option is enabled , because all the covers are loaded into the memory, but if your library isn't outsized, it should be okey.\n\nIf you want to update a cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.\n\nThe disk image cache is based on the %album artist% & %album% tags.\n\nRestart foobar to start loading all the covers.", "Ok")			
 }
-function enableArtistImgAtStartupGlobaly(){
+function enableArtistImgAtStartupGlobally(){
 	globalProperties.load_artist_img_at_startup = !globalProperties.load_artist_img_at_startup;
 	window.SetProperty("ARTIST IMG Load all at startup", globalProperties.load_artist_img_at_startup);
 	window.NotifyOthers("LoadAllArtistImgState",globalProperties.load_artist_img_at_startup);	
@@ -2617,11 +2636,11 @@ oImageCache = function () {
 		this.cachelist = Array();
 	};
     this.getit = function (metadb, albumId, image, cw) {
-		var cw = typeof cw !== 'undefined' ? cw : globalProperties.coverCacheWidthMax;
+		var cw = typeof cw !== 'undefined' ? cw : globalProperties.thumbnailWidthMax;
         var ch = cw;
         var img = null;
         var cover_type = null;
-        
+		
         if(!image) {
             if(brw.groups[albumId].tracktype != 3) {
                 cover_type = 0;
@@ -2643,7 +2662,6 @@ oImageCache = function () {
                 var pw = cw;
                 var ph = ch;
             };
-            
             // cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
             if(brw.groups[albumId].tracktype != 3) {
                 if(metadb) {

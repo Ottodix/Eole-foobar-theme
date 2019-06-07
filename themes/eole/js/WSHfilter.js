@@ -3795,14 +3795,14 @@ oBrowser = function(name) {
                     get_metrics();
                     break;	
                 case (idx == 914):
-					enableDiskCacheGlobaly();
+					enableDiskCacheGlobally();
 					brw.repaint();
                     break;	
                 case (idx == 915):
-					enableCoversAtStartupGlobaly();
+					enableCoversAtStartupGlobally();
 					break;		
                 case (idx == 917):
-					enableArtistImgAtStartupGlobaly();
+					enableArtistImgAtStartupGlobally();
 					break;			
                 case (idx == 918):
                     properties.AlbumArtFallback = !properties.AlbumArtFallback;
@@ -5139,6 +5139,14 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);		
 			window.Reload();			
 		break; 	
+		case "thumbnailWidthMax":
+			globalProperties.thumbnailWidthMax = Number(info);			
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
+		break; 		
+		case "coverCacheWidthMax":
+			globalProperties.coverCacheWidthMax = Number(info);				
+			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
+		break; 			
         case "FocusOnNowPlayingForce":
 			g_avoid_on_playlist_switch_callbacks = true;
 			if(window.IsVisible) brw.showNowPlaying();

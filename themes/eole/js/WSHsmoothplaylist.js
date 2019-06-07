@@ -4196,11 +4196,11 @@ oBrowser = function(name) {
                     brw.repaint();					
                     break;		
                 case (idx == 902):
-					enableDiskCacheGlobaly()				
+					enableDiskCacheGlobally()				
 					brw.repaint();				
                     break;
                 case (idx == 903):
-					enableCoversAtStartupGlobaly()
+					enableCoversAtStartupGlobally()
 					break;		
                 case (idx == 905):
                     properties.showToolTip = !properties.showToolTip;
@@ -6193,6 +6193,14 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
 			window.Reload();			
 		break; 		
+		case "thumbnailWidthMax":
+			globalProperties.thumbnailWidthMax = Number(info);			
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
+		break; 		
+		case "coverCacheWidthMax":
+			globalProperties.coverCacheWidthMax = Number(info);				
+			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
+		break; 			
 		case "set_font":
 			properties.globalFontAdjustement = info;
 			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),

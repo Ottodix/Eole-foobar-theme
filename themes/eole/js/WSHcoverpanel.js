@@ -620,6 +620,14 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
 			window.Reload();			
 		break; 		
+		case "thumbnailWidthMax":
+			globalProperties.thumbnailWidthMax = Number(info);			
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
+		break; 		
+		case "coverCacheWidthMax":
+			globalProperties.coverCacheWidthMax = Number(info);				
+			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
+		break; 			
 		case "mouse_move":
 			last_mouse_move_notified = info;
 		break;	

@@ -2395,14 +2395,14 @@ function draw_settings_menu(x,y){
 			brw.repaint();
 			break;
 		case (idx == 12):
-			enableCoversAtStartupGlobaly();
+			enableCoversAtStartupGlobally();
 			break;	
 		case (idx == 13):
 			properties.smooth_expand_value = properties.smooth_expand_value > 0 ? 0 : properties.smooth_expand_default_value;
 			window.SetProperty("TRACKLIST Smooth Expand value (0 to disable)", properties.smooth_expand_value);
 			break;
 		case (idx == 14):
-			enableDiskCacheGlobaly();
+			enableDiskCacheGlobally();
 			brw.populate(0);			
 			break;			
 		case (idx == 15):
@@ -5971,6 +5971,14 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
 			window.Reload();			
 		break; 		
+		case "thumbnailWidthMax":
+			globalProperties.thumbnailWidthMax = Number(info);			
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
+		break; 		
+		case "coverCacheWidthMax":
+			globalProperties.coverCacheWidthMax = Number(info);				
+			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
+		break; 			
 		case "Randomsetfocus":
 			randomStartTime = Date.now();
 		break;  	

@@ -1640,13 +1640,13 @@ function draw_main_menu(x,y){
 		Lightswitch(true,false);
 		break;		
 	case (idx == 4023):
-		enableCoversAtStartupGlobaly();			
+		enableCoversAtStartupGlobally();			
 		break;	
 	case (idx == 4024):
-		enableArtistImgAtStartupGlobaly();			
+		enableArtistImgAtStartupGlobally();			
 		break;	
 	case (idx == 4025):
-		enableDiskCacheGlobaly();			
+		enableDiskCacheGlobally();			
 		break;	
 	case (idx == 4026):
 		delete_full_cache();
@@ -1690,16 +1690,16 @@ function draw_main_menu(x,y){
 		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 		break;			
 	case (idx == 4040):	
-		setMemoryUsageGlobaly(0);
+		setMemoryUsageGlobally(0);
 		break;	
 	case (idx == 4041):	
-		setMemoryUsageGlobaly(1);
+		setMemoryUsageGlobally(1);
 		break;	
 	case (idx == 4042):	
-		setMemoryUsageGlobaly(2);
+		setMemoryUsageGlobally(2);
 		break;	
 	case (idx == 4043):	
-		setMemoryUsageGlobaly(3);	
+		setMemoryUsageGlobally(3);	
 		break;			
     case (idx == 4988):
 		if(properties.savedFilterState>=0 && !properties.displayToggleBtns) filters_panel_state.setValue(properties.savedFilterState);
@@ -1816,6 +1816,14 @@ function on_notify_data(name, info) {
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);			
 		break; 	
+		case "thumbnailWidthMax":
+			globalProperties.thumbnailWidthMax = Number(info);			
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
+		break; 		
+		case "coverCacheWidthMax":
+			globalProperties.coverCacheWidthMax = Number(info);				
+			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
+		break; 				
 		case "history_previous":
 			g_searchbox.clearInputbox(false);
 			window.Repaint();
