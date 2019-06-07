@@ -1820,12 +1820,16 @@ oBrowser = function(name) {
         var tr_all = [];
         var pl_all = new FbMetadbHandleList();
         var flag = [];
-
+		var default_grouping = false;
 		this.groups.splice(0, this.groups.length);
 				
         switch(properties.tagMode) {
             case 1: // album
-                var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos);
+				if(properties.tf_groupkey_album==properties.tf_groupkey_album_default){
+					default_grouping = true;
+					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos);
+				} else
+					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos+" ## "+properties.tf_groupkey_album_default);					
                 break;
             case 2: // artist
                 var tf = fb.TitleFormat(properties.tf_groupkey_artist);
@@ -1874,6 +1878,15 @@ oBrowser = function(name) {
                         this.groups.push(new oGroup(g+1, i, handle, arr[0]));
                         g++;
 						this.groups[g-1].date = arr[2];
+						if(properties.tagMode==1){
+							if(default_grouping){
+								var artist_album = arr[0].split(" ^^ ");
+							} else {
+								var artist_album = arr[3].split(" ^^ ");								
+							}
+							this.groups[g-1].artist_name = artist_album[0];  
+							this.groups[g-1].album = artist_album[1];						
+						}
                         previous = current;
                     };
                 } else {
@@ -1892,7 +1905,19 @@ oBrowser = function(name) {
         if(g > 0) {
             // update last group properties
             this.groups[g-1].finalize(t, tr, pl);
-			this.groups[g-1].date = arr[2];            
+			this.groups[g-1].date = arr[2];   
+
+			if(properties.tagMode==1){
+				if(default_grouping){
+					var artist_album = arr[0].split(" ^^ ");
+				} else {
+					var artist_album = arr[3].split(" ^^ ");								
+				}
+				this.groups[g-1].artist_name = artist_album[0];  
+				this.groups[g-1].album = artist_album[1];						
+			}
+			
+			//this.groups[g-1].artist_name = arr[4];  			
             // add 1st group ("ALL" item)
             if(properties.showAllItem && g > 1) {
                 this.groups.unshift(new oGroup(0, 0, null, null));
@@ -2096,11 +2121,11 @@ oBrowser = function(name) {
         if(this.groups.length == 0) return;
         
         // parse stored tags
-        if(properties.showAllItem && index == 0 && this.groups.length > 1) {
+        /*if(properties.showAllItem && index == 0 && this.groups.length > 1) {
             var arr = null;
         } else {
             var arr = this.groups[index].groupkey.split(" ^^ ");
-        };
+        };*/
         // ======================================
         // Send item tracks to JSBrowser playlist
         // ======================================
@@ -2326,8 +2351,8 @@ oBrowser = function(name) {
 								} 
 							} else if(this.groups[i].cover_type == 0 && !this.groups[i].cover_img) {
 								if(properties.albumArtId == 4){
-									var arr = this.groups[i].groupkey.split(" ^^ ");
-									var artist_name = arr[0].sanitise();
+									//var arr = this.groups[i].groupkey.split(" ^^ ");
+									var artist_name = this.groups[i].artist_name.sanitise();
 									var path = ProfilePath+"\wsh-data\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 									var filepath = '';
 									var all_files = utils.Glob(path + "\\*");
@@ -2370,11 +2395,11 @@ oBrowser = function(name) {
 					if(ay >= (0 - this.rowHeight) && ay < this.y + this.h) { // if stamp visible, we have to draw it
 
 						// parse stored tags
-						if(!(properties.showAllItem && i == 0 && total > 1)) {
+						/*if(!(properties.showAllItem && i == 0 && total > 1)) {
 							if(this.groups[i].groupkey.length > 0) {
 								var arr = this.groups[i].groupkey.split(" ^^ ");
 							};
-						};
+						};*/
 						
 
 											
@@ -2579,7 +2604,7 @@ oBrowser = function(name) {
 											};
 										} catch(e) {console.log(e)}
 									} else {
-										if(arr[1] == "?") {
+										if(this.groups[i].album == "?") {
 											if(this.groups[i].count > 1) {
 												var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Web Radios)");
 											} else {
@@ -2587,26 +2612,26 @@ oBrowser = function(name) {
 												var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[0];
 											};
 										} else {
-											var album_name = arr[1];
+											var album_name = this.groups[i].album;
 										};
 										try{
 											if(properties.tagMode == 1) {
-												this.groups[i].tooltipText = album_name+'\n'+arr[0];
+												this.groups[i].tooltipText = album_name+'\n'+this.groups[i].artist_name;
 												font1 = g_font.normal;
 												font2 = g_font.italicmin1;											
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(album_name, font1);
-												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(arr[0], font2);											
+												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);											
 												this.groups[i].showToolTip = (this.groups[i].text1Length > coverWidth || this.groups[i].text2Length > coverWidth);
 												gr.GdiDrawText(album_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(arr[0], font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
-											  this.groups[i].tooltipText = arr[0];
+											  this.groups[i].tooltipText = this.groups[i].artist_name;
 											  font1 = g_font.normal;
 											  font2 = g_font.italicmin1;												  
 											  font = g_font.normal;
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > coverWidth);
-											  gr.GdiDrawText(arr[0], font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											  gr.GdiDrawText(this.groups[i].artist_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
 											};
 										} catch(e) {}
@@ -2616,7 +2641,7 @@ oBrowser = function(name) {
 									if(properties.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
 										// nothing
 									} else {
-										if(arr[1] == "?") {
+										if(this.groups[i].album == "?") {
 											if(this.groups[i].count > 1) {
 												var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Web Radios)");
 											} else {
@@ -2624,26 +2649,26 @@ oBrowser = function(name) {
 												var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[0];
 											};
 										} else {
-											var album_name = arr[1];
+											var album_name = this.groups[i].album;
 										};
 										try{
 											if(properties.tagMode == 1) {
-												this.groups[i].tooltipText = album_name+'\n'+arr[0];
+												this.groups[i].tooltipText = album_name+'\n'+this.groups[i].artist_name;
 												font1 = g_font.bold;
 												font2 = g_font.min1;											
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(album_name, font1);
-												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(arr[0], font2);											
+												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);											
 												this.groups[i].showToolTip = (this.groups[i].text1Length > aw-20 || this.groups[i].text2Length > aw-20);
 												
 												gr.GdiDrawText(album_name, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(arr[0], font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
-											  this.groups[i].tooltipText = arr[0];
+											  this.groups[i].tooltipText = this.groups[i].artist_name;
 											  font = (i == this.selectedIndex ? g_font.bold : g_font.normal);
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > aw-20);
 											  
-											   gr.GdiDrawText(arr[0], font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											   gr.GdiDrawText(this.groups[i].artist_name, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											};
 										} catch(e) {}
 									};
@@ -2752,7 +2777,7 @@ oBrowser = function(name) {
 									
 									switch(properties.tagMode) {
 										case 1: // album
-											if(arr[1] == "?") {
+											if(this.groups[i].album == "?") {
 												if(this.groups[i].count > 1) {
 													var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Web Radios)");
 												} else {
@@ -2760,13 +2785,13 @@ oBrowser = function(name) {
 													var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[2];
 												};
 											} else {
-												var album_name = arr[1];
+												var album_name = this.groups[i].album;
 											};
 											var date = this.groups[i].date;
 											if(date=="?") date = "";
 											else date = " ("+date+")";
 											try{
-												this.groups[i].tooltipText = album_name+date+'\n'+arr[0];
+												this.groups[i].tooltipText = album_name+date+'\n'+this.groups[i].artist_name;
 												
 												font1 = g_font.normal;
 												font2 = g_font.min1;	
@@ -2774,13 +2799,13 @@ oBrowser = function(name) {
 												available_width2 = aw - coverWidth - this.marginCover*3-this.textMarginRight;
 												
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(album_name+date, font1);
-												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(arr[0], font2);	
+												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);	
 
 												this.groups[i].showToolTip = (this.groups[i].text1Length > available_width1 || this.groups[i].text2Length > available_width2);
 											  
 												gr.GdiDrawText(album_name+date, font1, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, available_width1, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(arr[0], font2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, available_width2, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, available_width2, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {console.log(e)}
 											break;
 										case 2: // artist
