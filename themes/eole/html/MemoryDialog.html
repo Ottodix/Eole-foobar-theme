@@ -23,8 +23,18 @@
 			}
             input[type="radio"] { float:left; display: inline; position: relative; width: 15px; border: 0; padding: 2px 1px; margin:5px 0; } 
             input[type="radio"]:hover { border:1px solid #000000; padding: 1px 0; } 
-			#size_container .col{display:inline-block; width:40%; padding: 0 5%;}
-			#size_container .label{margin:0;padding:0;}
+			#size_container {
+				padding: 10px 25px;
+				background:#e0e0e0;
+				padding-top:15px; padding-bottom:15px;
+				border-bottom:1px solid #d0d0d0;			
+			}
+			#size_container .col{display:inline-block; width:42%; padding: 0; font:caption; }
+			#size_container .col1{padding-right:4%;float:left}
+			#size_container .col2{padding-right:4%;float:right}
+			#size_container .label{margin:0 0 10px;padding:0;}			
+			#size_container .label span{font-size:90%; color:#555}
+
             .radio_label { float:left; padding-top: 1px;  margin:5px 0;  margin-left:5px;} 			
             .button_ok { position: absolute; right: 100px; bottom: 8px; } 
             .button_cancel { width: 70px; position: absolute; right: 15px; bottom: 8px; } 
@@ -42,15 +52,16 @@
     <body>
         <div id="div_text" class="container"></div>
         <div id="radio_container" class="container"></div>				
-        <div id="size_container" class="container">
-			<div class="col">
-				<div class="label">Thumbnail max width, for filters & playlist</div>
+        <!--<div id="size_container">
+			<div class="col col1">
+				<div class="label">Thumbnail max width<br/><span>for filters & playlist</span></div>
 				<input id="thumbnailWidthMax" name="thumbnailWidthMax"></input>
-			</div><div class="col">
-				<div class="label">Cover cache max width, for all panels</p>
+			</div>
+			<div class="col col2">
+				<div class="label">Cover cache max width<br/><span>for all panels</span></div>
 				<input id="coverCacheWidthMax" name="coverCacheWidthMax"></input>	
 			</div>			
-		</div>			
+		</div>		-->		
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
         <button class="button_ok" id="btn_ok">Validate</button>		
