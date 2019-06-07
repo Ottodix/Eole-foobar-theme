@@ -1860,7 +1860,6 @@ oBrowser = function(name) {
                     if(g > 0) {
                         // update current group
                         this.groups[g-1].finalize(t, tr, pl);
-						//this.groups[g-1].date = arr[2];
                         tr.splice(0, t);
                         pl.RemoveAll();
                         t = 0;
@@ -2631,7 +2630,7 @@ oBrowser = function(name) {
 											  font = g_font.normal;
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > coverWidth);
-											  gr.GdiDrawText(this.groups[i].artist_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											  gr.GdiDrawText(this.groups[i].groupkey, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
 											};
 										} catch(e) {}
@@ -2668,7 +2667,7 @@ oBrowser = function(name) {
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > aw-20);
 											  
-											   gr.GdiDrawText(this.groups[i].artist_name, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											  gr.GdiDrawText(this.groups[i].groupkey, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											};
 										} catch(e) {}
 									};
@@ -2810,27 +2809,27 @@ oBrowser = function(name) {
 											break;
 										case 2: // artist
 											try{
-												this.groups[i].tooltipText = arr[0];
+												this.groups[i].tooltipText = this.groups[i].groupkey;
 												
 												font = g_font.normal;
 												available_width = aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width;
 												if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);						
 												
-												gr.GdiDrawText(arr[0], font, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(this.groups[i].groupkey, font, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {console.log(e)}
 											break;
 										case 3: // genre
 											try{			
-												this.groups[i].tooltipText = arr[0];
+												this.groups[i].tooltipText = this.groups[i].groupkey;
 												
 												font = g_font.normal;
 												available_width = aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width;
 												if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);		
 												
-												gr.GdiDrawText(arr[0], font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(this.groups[i].groupkey, font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
 											} catch(e) {console.log(e)}
 											break;
