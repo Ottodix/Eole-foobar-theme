@@ -49,7 +49,9 @@ var globalProperties = {
 	ResizeQLY: 2,	
 }	
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
-globalProperties.thumbnailWidthMax = Math.max(100,globalProperties.coverCacheWidthMax);
+globalProperties.coverCacheWidthMax = Math.max(50,Math.min(2000,Number(globalProperties.coverCacheWidthMax)));
+if(isNaN(globalProperties.coverCacheWidthMax)) globalProperties.coverCacheWidthMax = 200;
+globalProperties.thumbnailWidthMax = Math.max(50,globalProperties.coverCacheWidthMax);
   
 function setMemoryParameters(){
 	switch(true) {
