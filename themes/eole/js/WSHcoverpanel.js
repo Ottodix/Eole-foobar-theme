@@ -75,42 +75,6 @@ function setButtons(){
 		},function () {
 			fb.Pause();
 		},images.pause_img,images.pause_img),
-		/*Rating: new SimpleButton(ww/2-images.rating0_img.Width/2, wh/2-images.rating0_img.Height/2+global_vertical_fix, 32, 32, "rating", function () {
-			if(fb.IsPlaying) {
-				current_played_track = fb.GetNowPlaying();
-				g_rating = Number(g_rating);
-				old_g_rating = g_rating;
-				if(g_rating<5) {
-					g_rating = g_rating+1;
-				} else {
-					g_rating = 0;
-				}
-				setRatingBtn(current_played_track, g_rating);
-				clearTimeout(timers.SetRating);
-				timers.SetRating = setTimeout(function() {
-					g_rating = rateSong(g_rating, old_g_rating, current_played_track);
-					clearTimeout(timers.SetRating);
-					timers.SetRating = false;
-				}, 300);
-			}
-		},function () {
-			if(fb.IsPlaying) {
-				g_rating = Number(g_rating);
-				old_g_rating = g_rating;
-				if(g_rating<5) {
-					g_rating = g_rating+1;
-				} else {
-					g_rating = 0;
-				}
-				setRatingBtn(current_played_track, g_rating);
-				clearTimeout(timers.SetRating);
-				timers.SetRating = setTimeout(function() {
-					g_rating = rateSong(g_rating, old_g_rating, current_played_track);
-					clearTimeout(timers.SetRating);
-					timers.SetRating = false;
-				}, 300);					
-			}
-		},images.rating0_img,images.rating0_img_hover),	*/
 		Random: new SimpleButton( ww/2-images.pause_img.Width/2, wh/2-images.pause_img.Height/2+global_vertical_fix, 74, 74, "Random", function () {
 			play_random(true,properties.random_function);
 		},null,images.random_img,images.random_img)         
@@ -388,6 +352,7 @@ function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
 	if(fb.IsPlaying) {
 		switch(true){
+			
 			case (properties.dble_click_action==0):
 				fb.Pause();
 				window.NotifyOthers("stopFlashNowPlaying",true);		
@@ -398,7 +363,9 @@ function on_mouse_lbtn_dblclk(x, y) {
 			case (properties.dble_click_action==2):
 				if(!g_cover.isFiller()) showNowPlayingCover();
 			break;				
-			
+			case (properties.dble_click_action==3):
+				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
+			break;				
 		}
 	} 
 }
@@ -822,6 +789,7 @@ function on_mouse_rbtn_up(x, y){
 	if(fb.IsPlaying){
 		var now_playing_track = fb.GetNowPlaying();
 		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");	
+		main_menu.AppendMenuItem(MF_STRING, 9, "Show on all panels");			
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");	
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");					
 		var quickSearchMenu = window.CreatePopupMenu();	
@@ -925,7 +893,10 @@ function on_mouse_rbtn_up(x, y){
 		case (idx == 8):
 			g_cover.refresh(now_playing_track);
 			window.NotifyOthers("RefreshImageCover",now_playing_track);
-			break;					
+			break;		
+		case (idx == 9):
+			showNowPlaying(true); 
+			break;				
 		case (idx == 30):
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
@@ -976,9 +947,10 @@ function draw_settings_menu(x,y){
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");		
-		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Show now playing artwork");			
-		_dble_click_menu.CheckMenuRadioItem(3, 5, 3+properties.dble_click_action);		
-		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double  click action");     
+		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");			
+		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");	
+		_dble_click_menu.CheckMenuRadioItem(3, 6, 3+properties.dble_click_action);				
+		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");    
 		_menu.AppendMenuSeparator();
 		
 		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");		
@@ -1010,7 +982,11 @@ function draw_settings_menu(x,y){
             case (idx == 5):
 				properties.dble_click_action = 2;
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;					
+                break;		
+            case (idx == 6):
+				properties.dble_click_action = 3;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+                break;						
             default:
 				return true;
         }

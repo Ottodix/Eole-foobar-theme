@@ -77,8 +77,9 @@ var properties = {
     tf_groupkey_genre_default: "$if2($meta(genre,0),?)",			
     tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta(artist,0),?)"),
     tf_groupkey_artist_default: "$if2($meta(artist,0),?)",		
-    tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album% ## %title% ## %date%"),	
-    tf_groupkey_album_default: "%album artist% ^^ %album% ## %title% ## %date%",			
+    tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album%"),	
+    tf_groupkey_album_default: "%album artist% ^^ %album%",	
+    tf_groupkey_album_addinfos: " ## %title% ## %date%",	
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
     tf_path_artist: fb.TitleFormat(window.GetProperty("_PROPERTY: Artist Images Folder (for disk cache)", "X:\\XPS2720\\MP3\\artists\\$meta(artist,0).jpg")),
     tf_path_genre: fb.TitleFormat(images.path+"genres\\$meta(genre,0).jpg"),
@@ -1824,7 +1825,7 @@ oBrowser = function(name) {
 				
         switch(properties.tagMode) {
             case 1: // album
-                var tf = fb.TitleFormat(properties.tf_groupkey_album);
+                var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos);
                 break;
             case 2: // artist
                 var tf = fb.TitleFormat(properties.tf_groupkey_artist);
@@ -3639,11 +3640,14 @@ oBrowser = function(name) {
                         case 1:
 							try {
 								new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Album grouping", properties.tf_groupkey_album, true);
-								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
+								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined' || properties.tf_groupkey_album==new_TFgrouping)) {
 									properties.tf_groupkey_album = new_TFgrouping;
 									window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);	
 								}		
-								properties.albumArtId = 0;								
+								properties.albumArtId = 0;
+								g_tagswitcherbar.on_init();
+								g_filterbox.reset_layout();
+								brw.populate(true,1);								
 							} catch(e) {
 							}								
                             break;
@@ -3654,7 +3658,10 @@ oBrowser = function(name) {
 									properties.tf_groupkey_artist = new_TFgrouping;
 									window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);	
 								}							
-								properties.albumArtId = 4;							
+								properties.albumArtId = 4;	
+								g_tagswitcherbar.on_init();
+								g_filterbox.reset_layout();
+								brw.populate(true,1);								
 							} catch(e) {
 							}									
                             break;
@@ -3665,14 +3672,15 @@ oBrowser = function(name) {
 									properties.tf_groupkey_genre = new_TFgrouping;
 									window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);	
 								}						
-								properties.albumArtId = 5;						
+								properties.albumArtId = 5;		
+								g_tagswitcherbar.on_init();
+								g_filterbox.reset_layout();
+								brw.populate(true,1);								
 							} catch(e) {
 							}								
                             break;
                     };
-					g_tagswitcherbar.on_init();
-					g_filterbox.reset_layout();
-                    brw.populate(true,1);
+
                     break;					
                 case (idx == 200):
                     toggleWallpaper();

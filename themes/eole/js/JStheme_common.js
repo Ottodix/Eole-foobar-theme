@@ -213,7 +213,10 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
 	function ok_callback(status, mem_solicitation) {
 		if(mem_solicitation>=0 && mem_solicitation<=3 && mem_solicitation!=globalProperties.mem_solicitation && status!="cancel") setMemoryUsageGlobaly(Number(mem_solicitation));
 		
-		if(status=="reset") delete_full_cache();		
+		if(status=="reset") {
+			globalProperties.deleteDiskCache = true;
+			delete_full_cache();	
+		}			
 		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html",dialog_name+".html"), {

@@ -2609,7 +2609,7 @@ oHeaderBar = function(name) {
 					if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
 						properties.TFsorting = new_TFsorting;
 						window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);	
-					g_showlist.close();
+						g_showlist.close();
 						brw.populate(5,true);	
 					}			   
 				} catch(e) {
