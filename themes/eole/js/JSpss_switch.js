@@ -50,7 +50,6 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		if(new_value==this.value) return;
 		if(new_value>this.max_value) new_value = this.max_value;
 		else if(new_value<this.min_value) new_value = this.min_value;		
-		//console.log("eho1"+(new Date()).getTime());		
 		if(g_files.FileExists(SettingsPath+this.file_prefix+new_value)) g_files.DeleteFile(SettingsPath+this.file_prefix+new_value);
 		if(!g_files.FileExists(SettingsPath+this.file_prefix+this.value)) g_files.CreateTextFile(SettingsPath+this.file_prefix+this.value, true).Close();	
 		g_files.MoveFile(SettingsPath + this.file_prefix + this.value,SettingsPath + this.file_prefix + new_value);

@@ -5229,6 +5229,8 @@ function on_notify_data(name, info) {
 				brw.groups[i].cover_img = null;
 				brw.groups[i].cover_type = null;
 			};
+			var metadb = new FbMetadbHandleList(info);
+			g_image_cache.resetMetadb(metadb[0])
 			brw.repaint();
 		}
 		break; 			

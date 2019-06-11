@@ -1,9 +1,106 @@
-﻿var properties = {
+﻿var properties_big = {
+    ParentName:  window.GetProperty("BIG:ParentName", "MainPanel"),	
+    lockOnNowPlaying: window.GetProperty("BIG:lockOnNowPlaying", true),
+    lockOnPlaylistNamed: window.GetProperty("BIG:lockOnPlaylistNamed", ""),		
+    defaultRowHeight: window.GetProperty("BIG:defaultRowHeight", 30),
+    drawAlternateBG: window.GetProperty("BIG:drawAlternateBG", false),	
+    extraRowsNumber: window.GetProperty("BIG:extraRowsNumber", 1),
+    minimumRowsNumberPerGroup: window.GetProperty("BIG:minimumRowsNumberPerGroup", 0),
+    groupHeaderRowsNumber: window.GetProperty("BIG:groupHeaderRowsNumber", 2),
+    groupHeaderRowsNumberDouble: window.GetProperty("BIG:groupHeaderRowsNumberDouble", 1),	
+    showHeaderBar: window.GetProperty("showHeaderBar", true),
+	showToolTip: window.GetProperty("BIG:showToolTip", true),
+    expandBySingleClick: window.GetProperty("BIG:expandBySingleClick", true),	
+	darklayout: window.GetProperty("BIG:darklayout", false),		
+    minimode_dark_theme: window.GetProperty("BIG:minimode_dark_theme", true),	
+    library_dark_theme: window.GetProperty("BIG:library_dark_theme", false),
+    screensaver_dark_theme: window.GetProperty("BIG:screensaver_dark_theme", false),		
+    playlists_dark_theme: window.GetProperty("BIG:playlists_dark_theme", false),
+    bio_dark_theme: window.GetProperty("BIG:bio_dark_theme", false),	
+	bio_stick2darklayout: window.GetProperty("BIG:bio_stick2darklayout",true),
+    visualization_dark_theme: window.GetProperty("BIG:visualization_dark_theme", false),	
+    showwallpaper: window.GetProperty("BIG:showwallpaper", false),	
+    wallpaperblurred: window.GetProperty("BIG:wallpaperblurred", true),
+    wallpaperblurvalue: window.GetProperty("BIG:wallpaperblurvalue", 1.05),
+    wallpapermode: window.GetProperty("BIG:wallpapermode", 0),
+    wallpaperdisplay: window.GetProperty("BIG:wallpaperdisplay", 0),		
+    defaultPlaylistItemAction: window.GetProperty("BIG:defaultPlaylistItemAction", "Play"), //"Add to playback queue"
+    globalFontAdjustement: window.GetProperty("BIG:globalFontAdjustement", -1),
+    showFilterBox: window.GetProperty("BIG:showFilterBox", true),
+    doubleRowText: window.GetProperty("BIG:doubleRowText", true),	
+    doubleRowShowCover: window.GetProperty("BIG:doubleRowShowCover", true),	
+    showArtistAlways: window.GetProperty("BIG:showArtistAlways", true),
+    showRating: window.GetProperty("BIG:showRating", true),
+    showRatingSelected: window.GetProperty("BIG:showRatingSelected", true),	
+    showRatingRated: window.GetProperty("BIG:showRatingRated", true),			
+    drawUpAndDownScrollbar: window.GetProperty("BIG:drawUpAndDownScrollbar", false),	
+    showMood: window.GetProperty("BIG:showMood", false),
+    drawProgressBar: window.GetProperty("BIG:drawProgressBar", true),		
+    AlbumArtProgressbar: window.GetProperty("BIG:AlbumArtProgressbar", true),			
+    enableTouchControl: window.GetProperty("BIG:enableTouchControl", false),
+    DropInplaylist: window.GetProperty("BIG:DropInplaylist", false),
+    thumbnailWidthMin: window.GetProperty("BIG:thumbnailWidthMin", 50),
+    thumbnailWidth: window.GetProperty("BIG:thumbnailWidth", 75),
+	circleMode: window.GetProperty("BIG:circleMode", false),		
+	showSettingsMenu: window.GetProperty("BIG:showSettingsMenu", true),
+	enableAutoSwitchPlaylistMode: window.GetProperty("BIG:enableAutoSwitchPlaylistMode", true),
+    showGroupHeaders: window.GetProperty("BIG:showGroupHeaders", true),
+    autocollapse: window.GetProperty("BIG:autocollapse", false),
+    addedRows_end_default: window.GetProperty("BIG:addedRows_end_default", 1),
+};
+var properties_mini = {
+    ParentName:  window.GetProperty("MINI:ParentName", "MiniPanel"),	
+    lockOnNowPlaying: window.GetProperty("MINI:lockOnNowPlaying", false),
+    lockOnPlaylistNamed: window.GetProperty("MINI:lockOnPlaylistNamed", ""),		
+    defaultRowHeight: window.GetProperty("MINI:defaultRowHeight", 26),
+    drawAlternateBG: window.GetProperty("MINI:drawAlternateBG", false),	
+    extraRowsNumber: window.GetProperty("MINI:extraRowsNumber", 1),
+    minimumRowsNumberPerGroup: window.GetProperty("MINI:minimumRowsNumberPerGroup", 0),
+    groupHeaderRowsNumber: window.GetProperty("MINI:groupHeaderRowsNumber", 2),
+    groupHeaderRowsNumberDouble: window.GetProperty("MINI:groupHeaderRowsNumberDouble", 1),	
+    showHeaderBar: window.GetProperty("MINI:showHeaderBar", false),
+	showToolTip: window.GetProperty("MINI:showToolTip", true),
+    expandBySingleClick: window.GetProperty("MINI:expandBySingleClick", true),	
+	darklayout: window.GetProperty("MINI:darklayout", true),		
+    minimode_dark_theme: window.GetProperty("MINI:minimode_dark_theme", true),	
+    library_dark_theme: window.GetProperty("MINI:library_dark_theme", false),
+    screensaver_dark_theme: window.GetProperty("MINI:screensaver_dark_theme", false),		
+    playlists_dark_theme: window.GetProperty("MINI:playlists_dark_theme", false),
+    bio_dark_theme: window.GetProperty("MINI:bio_dark_theme", false),	
+	bio_stick2darklayout: window.GetProperty("MINI:bio_stick2darklayout",false),
+    visualization_dark_theme: window.GetProperty("MINI:visualization_dark_theme", false),	
+    showwallpaper: window.GetProperty("MINI:showwallpaper", false),	
+    wallpaperblurred: window.GetProperty("MINI:wallpaperblurred", true),
+    wallpaperblurvalue: window.GetProperty("MINI:wallpaperblurvalue", 1.05),
+    wallpapermode: window.GetProperty("MINI:wallpapermode", 0),
+    wallpaperdisplay: window.GetProperty("MINI:wallpaperdisplay", 0),		
+    defaultPlaylistItemAction: window.GetProperty("MINI:defaultPlaylistItemAction", "Play"), //"Add to playback queue"
+    globalFontAdjustement: window.GetProperty("MINI:globalFontAdjustement", -1),
+    showFilterBox: window.GetProperty("MINI:showFilterBox", true),
+    doubleRowText: window.GetProperty("MINI:doubleRowText", true),	
+    doubleRowShowCover: window.GetProperty("MINI:doubleRowShowCover", true),	
+    showArtistAlways: window.GetProperty("MINI:showArtistAlways", true),
+    showRating: window.GetProperty("MINI:showRating", true),
+    showRatingSelected: window.GetProperty("MINI:showRatingSelected", true),	
+    showRatingRated: window.GetProperty("MINI:showRatingRated", true),			
+    drawUpAndDownScrollbar: window.GetProperty("MINI:drawUpAndDownScrollbar", false),	
+    showMood: window.GetProperty("MINI:showMood", false),
+    drawProgressBar: window.GetProperty("MINI:drawProgressBar", true),		
+    AlbumArtProgressbar: window.GetProperty("MINI:AlbumArtProgressbar", true),			
+    enableTouchControl: window.GetProperty("MINI:enableTouchControl", false),
+    DropInplaylist: window.GetProperty("MINI:DropInplaylist", true),
+    thumbnailWidthMin: window.GetProperty("MINI:thumbnailWidthMin", 50),
+    thumbnailWidth: window.GetProperty("MINI:thumbnailWidth", 75),
+	circleMode: window.GetProperty("MINI:circleMode", false),		
+	showSettingsMenu: window.GetProperty("MINI:showSettingsMenu", true),
+	enableAutoSwitchPlaylistMode: window.GetProperty("MINI:enableAutoSwitchPlaylistMode", false),
+    showGroupHeaders: window.GetProperty("MINI:showGroupHeaders", false),
+    autocollapse: window.GetProperty("MINI:autocollapse", false),
+    addedRows_end_default: window.GetProperty("MINI:addedRows_end_default", 2),	
+};
+var properties_common = {
 	panelName: 'WSHsmoothplaylist',		
-    ParentName:  window.GetProperty("_PROPERTY: Parent Panel", ""),	
     tf_artist: fb.TitleFormat("%artist%"),
-    lockOnNowPlaying: window.GetProperty("lock on now playing playlist", true),
-    lockOnPlaylistNamed: window.GetProperty("lock on specific playlist name", ""),	
     tf_albumartist: fb.TitleFormat("%album artist%"),
     tf_groupkey: fb.TitleFormat("$if2(%album%[' - Disc '%discnumber%],$if(%length%,'?',%path%)) ^^ $if2(%album artist%,$if(%length%,'Unknown artist(s)',%title%)) ^^ %discnumber% ## $if2(%artist%,$if(%length%,'Unknown artist',%path%)) ^^ %title% ^^ [%genre%] ^^ [%date%]"),
     tf_track: fb.TitleFormat("%tracknumber% ^^ $if(%length%,%length%,ON AIR) ^^ $if2(%rating%,0) ^^ %mood%"),
@@ -11,9 +108,7 @@
     tf_time_remaining: fb.TitleFormat("$if(%length%,-%playback_time_remaining%,'ON AIR')"),
     tf_elapsed_seconds: fb.TitleFormat("$if(%length%,%playback_time_seconds%,'ON AIR')"),	
     tf_total_seconds: fb.TitleFormat("$if2(%length_seconds%,'ON AIR')"),		
-    defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 25),
     doubleRowPixelAdds: 13,
-    drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", false),	
     rowScrollStep: 3,
     scrollSmoothness: 2.5,
 	track_gradient_margin: 13,	
@@ -21,65 +116,46 @@
     refreshRate: 35,
     refreshRateCover: 5,
 	drag_scroll_speed_ms: 100,
-    extraRowsNumber: window.GetProperty("_PROPERTY: Number of Extra Rows per Group", 1),
-    minimumRowsNumberPerGroup: window.GetProperty("_PROPERTY: Number minimum of Rows per Group", 0),
-    groupHeaderRowsNumber: window.GetProperty("_PROPERTY: Number of Rows for Group Header", 2),
-    groupHeaderRowsNumberDouble: window.GetProperty("_PROPERTY: Number of Rows for Group Header, when double line is enabled", 1),	
     albumArtId: 0,
-    showHeaderBar: window.GetProperty("_DISPLAY: Show Top Bar", true),
-	showToolTip: window.GetProperty("_DISPLAY: display a tooltip", true),
     defaultHeaderBarHeight: 40,
     libraryHeaderBarHeight: 40,	
     headerBarHeight: 40,
     headerBarPaddingTop: 2,	
-    expandBySingleClick: window.GetProperty("_PROPERTY: Expand Group By Single Click", true),	
     enableFullScrollEffectOnFocusChange: false,
-    enableCustomColors: window.GetProperty("_PROPERTY: Custom Colors", true),
-	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),		
-    minimode_dark_theme: window.GetProperty("MINIMODE dark theme", false),	
-    library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),		
-    playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
-    bio_dark_theme: window.GetProperty("BIO dark theme", false),	
-	bio_stick2darklayout: window.GetProperty("BIO stick to Dark layout",false),
-    visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", false),	
-    showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),	
-    wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
-    wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
-    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
-    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),		
-    defaultPlaylistItemAction: window.GetProperty("_PROPERTY: Default Playlist Action", "Play"), //"Add to playback queue"
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
-    showFilterBox: window.GetProperty("_PROPERTY: Enable Playlist Filterbox in Top Bar", true),
-    doubleRowText: window.GetProperty("_PROPERTY: Double Row Text Info", false),
-    doubleRowShowCover: window.GetProperty("_PROPERTY: Double Row Show Cover", true),	
-    showArtistAlways: window.GetProperty("_DISPLAY: Show Artist in Track Row", true),
-    showRating: window.GetProperty("_DISPLAY: Show Rating in Track Row", false),
-    showRatingSelected: window.GetProperty("_DISPLAY: Show Rating in Selected Track Row", false),	
-    showRatingRated: window.GetProperty("_DISPLAY: Show Rating in Rated Track Row", false),			
-    drawUpAndDownScrollbar: window.GetProperty("PROPERTY: Draw Up and Down Scrollbar Buttons", false),	
-    showMood: window.GetProperty("_DISPLAY: Show Mood in Track Row", false),
-    drawProgressBar: window.GetProperty("_DISPLAY Draw a progress bar under song title", true),		
-    AlbumArtProgressbar: window.GetProperty("_DISPLAY Album art progress bar", true),			
-    enableTouchControl: window.GetProperty("_PROPERTY: Touch control", false),
-    DropInplaylist: window.GetProperty("_SYSTEM: Allow to drag items into a playlist", false),
-    thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 50),
-    thumbnailWidth: window.GetProperty("COVER Width", 75),
-	circleMode: window.GetProperty("COVER Circle artwork", false),		
-	showSettingsMenu: window.GetProperty("_DISPLAY Show Settings context menu", true),
-	enableAutoSwitchPlaylistMode: window.GetProperty("Automatically change displayed playlist", true),
-    showGroupHeaders: window.GetProperty("_DISPLAY: Show Group Headers", true),
-    autocollapse: window.GetProperty("_PROPERTY: Autocollapse groups", false),
-    addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
-    load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),		
-    enableDiskCache: window.GetProperty("COVER Disk Cache", true),	
 	margin_bottom:0,
 	panelFontAdjustement: 0,
-	load_image_from_cache_direct:true
+	load_image_from_cache_direct:true,
 };
-properties.rowHeight = properties.defaultRowHeight;
-properties.groupHeaderRowsNumberSimple = properties.groupHeaderRowsNumber;
+var properties = {}
+function setAllProperties(){
+	if(layout_state.isEqual(1)) properties = Object.assign({}, properties_common, properties_mini); 
+	else properties = Object.assign({}, properties_common, properties_big); 
+	properties.rowHeight = properties.defaultRowHeight;
+	properties.groupHeaderRowsNumberSimple = properties.groupHeaderRowsNumber;	
+}
+setAllProperties();
 
+function setOneProperty(properties_name,value,update_both) {
+	var update_both = typeof update_both !== 'undefined' ? update_both : false;	
+	console.log("setOneProperty properties_name"+properties_name+" "+update_both)	
+	if(update_both || layout_state.isEqual(1)){
+        properties[properties_name] = value;
+        properties_mini[properties_name] = value;
+		window.SetProperty("MINI:"+properties_name, value);
+	}
+	if(update_both || layout_state.isEqual(0)){
+        properties[properties_name] = value;
+        properties_big[properties_name] = value;	
+		window.SetProperty("BIG:"+properties_name, value);		
+	}
+}
+function getProperty(properties_name, value) {
+	if(layout_state.isEqual(1)){
+		return window.GetProperty("MINI:"+properties_name, value);
+	} else {
+		return window.GetProperty("BIG:"+properties_name, value);	
+	}
+}
 var TF = {
 	genre: fb.TitleFormat('%genre%'),		
 	albumartist: fb.TitleFormat("%album artist%"),	
@@ -92,54 +168,6 @@ var TF = {
 	radio_artist: fb.TitleFormat("$if2(%artist%,%bitrate%'K')"),
 }
 
-
-function set_display_properties(properties_name,value) {
-	if(layout_state.isEqual(1)){
-        switch(properties_name) {
-            case "showGroupHeaders":
-				MiniMode_properties.showGroupHeaders = value;
-				window.SetProperty("_DISPLAY_MiniMode: Show Group Headers", value)
-                break;
-            case "autocollapse":
-				MiniMode_DisplayProperties.autocollapse = value;
-				window.SetProperty("_PROPERTY_MiniMode: Autocollapse groups", value)
-                break;
-        };
-	} else {
-        switch(properties_name) {
-            case "showGroupHeaders":
-				properties.showGroupHeaders = value;
-				window.SetProperty("_DISPLAY: Show Group Headers", value)
-                break;
-            case "autocollapse":
-				DisplayProperties.autocollapse = value;
-				window.SetProperty("_PROPERTY: Autocollapse groups", value)
-                break;
-        };		
-	}
-}
-
-function get_display_properties(properties_name) {
-	if(layout_state.isEqual(1)){
-        switch(properties_name) {
-            case "showGroupHeaders":
-				return MiniMode_properties.showGroupHeaders
-                break;
-            case "autocollapse":
-				return MiniMode_DisplayProperties.autocollapse
-                break;
-        };
-	} else {
-        switch(properties_name) {
-            case "showGroupHeaders":
-				return properties.showGroupHeaders
-                break;
-            case "autocollapse":
-				return DisplayProperties.autocollapse
-                break;
-        };		
-	}
-}
 var gradient_w = 31;
 var gradient_m = 15;
 var draw_right_line = false;
@@ -172,7 +200,6 @@ cSettings = {
 };
 
 cFilterBox = {
-    enabled: window.GetProperty("_PROPERTY: Enable Filter Box", true),
     default_w: 120,
     default_h: 20,
     x: 5,
@@ -205,7 +232,7 @@ cPlaylistManager = {
     blink_id: null,
     blink_row: null,
     blink_totaltracks: 0,
-    showTotalItems: window.GetProperty("_PROPERTY.PlaylistManager.ShowTotalItems", true)
+    showTotalItems: true
 };
 cNowPlaying = {
     flashEnable: false,
@@ -215,8 +242,8 @@ cNowPlaying = {
 }
 
 cover = {
-    masks: window.GetProperty("_PROPERTY: Cover art masks (used for the cache)","*front*.*;*cover*.*;*folder*.*;*.*"),
-    show: window.GetProperty("_DISPLAY: Show Cover Art", true),
+    masks: "*front*.*;*cover*.*;*folder*.*;*.*",
+    show: true,
 	column: false,
     draw_glass_reflect: false,
     glass_reflect: null,
@@ -1423,6 +1450,7 @@ oGroup = function(index, start, handle, groupkey) {
     this.cachekey = process_cachekey(handle);
     //
     this.cover_img = null;
+	this.isPlaying = false;
     this.cover_type = null;
     this.tracktype = TrackType(handle.RawPath.substring(0, 4));
     this.tra = [];
@@ -1471,7 +1499,6 @@ oGroup = function(index, start, handle, groupkey) {
             this.rowsToAdd = 0;
         };
         this.rowsToAdd += properties.extraRowsNumber;
-		
 		this.TimeString = this.FormatTime(this.TotalTime);	
         if(this.collapsed) {
             if(brw.focusedTrackId >= this.start && brw.focusedTrackId < this.start + count) { // focused track is in this group!
@@ -1567,9 +1594,11 @@ oBrowser = function(name) {
     this.collapseAll = function(bool) { // bool = true to collapse all groups otherwise expand them all
         var end = this.groups.length;
         for(i = 0; i < end; i++) {
-            this.groups[i].collapsed = bool;
+			if(this.groups[i].isPlaying) {
+				this.groups[i].collapsed = false;
+			} else this.groups[i].collapsed = bool;
         };
-        this.setList(true);
+        this.setList();
         g_focus_row = this.getOffsetFocusItem(g_focus_id);
         // if focused track not totally visible, we scroll to show it centered in the panel
         if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + brw.totalRowsVis - 1) {
@@ -1582,7 +1611,8 @@ oBrowser = function(name) {
         this.repaint();
     };
            
-    this.setList = function() {
+    this.setList = function(finalize_groups) {
+		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;			
         this.rows.splice(0, this.rows.length);
         var r = 0, i = 0, j = 0, m = 0, n = 0, s = 0, p = 0;
         var grptags = "";
@@ -1594,6 +1624,7 @@ oBrowser = function(name) {
         */
 
         var end = this.groups.length;
+			
         for(i = 0; i < end; i++) {
             
             //this.groups[i].load_requested = 0;
@@ -1602,12 +1633,16 @@ oBrowser = function(name) {
 
             // update total rows present before this group
             //this.groups[i].totalPreviousRows = r;
-
+			
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tra);
+			
             grptags = this.groups[i].groupkey;
             
             s = this.groups[i].start;
+			
 
-            if(this.groups[i].collapsed) {
+			
+            if(this.groups[i].collapsed && properties.showGroupHeaders) {
                 this.groups[i].rowId = r;				
                 if(properties.showGroupHeaders) {
                     for(k=0; k < headerTotalRows; k++) {
@@ -1625,6 +1660,7 @@ oBrowser = function(name) {
                 };
                 // empty extra rows when collapsed
                 p = this.groups[i].rowsToAdd;
+				
                 for(n = 0; n < p; n++) {
                     this.rows[r] = new Object();
 					this.rows[r].selected = false;
@@ -1676,7 +1712,6 @@ oBrowser = function(name) {
             };
         };
         this.rowsCount = r;
-
     };
     this.set_selected_items = function() {
 		var tot = this.rows.length;
@@ -2178,12 +2213,6 @@ oBrowser = function(name) {
                             };	
 							group_header_row_1 = album_name;
 							group_header_row_2 = album_artist_name;
-                            // Now Playing Group ?
-                            if(this.nowplaying && this.nowplaying.PlaylistItemIndex >= this.groups[this.rows[i].albumId].start && this.nowplaying.PlaylistItemIndex < this.groups[this.rows[i].albumId].start + this.groups[this.rows[i].albumId].count) {
-                                var nowplaying_group = true;
-                            } else {
-                                var nowplaying_group = false;
-                            };
                             
                             // group id
                             g = this.rows[i].albumId;
@@ -2255,6 +2284,7 @@ oBrowser = function(name) {
 										}
                                     }
                                 } else if(this.groups[g].cover_type == 0) {
+									console.log("")
                                     this.groups[g].cover_img = images.noart;
 									this.groups[g].mask_applied = false;
 									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
@@ -2363,10 +2393,12 @@ oBrowser = function(name) {
 							
 							if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
 								var color_selected = colors.grad_line_selected;
-								var color_selected_off = colors.grad_line_bg_selected;								
+								var color_selected_off = colors.grad_line_bg_selected;	
+								this.groups[this.rows[i].albumId].isPlaying = true;
+								this.isPlayingIdx = this.rows[i].albumId;
 							} else {
 								var color_selected = colors.grad_line;
-								var color_selected_off = colors.grad_line_bg;									
+								var color_selected_off = colors.grad_line_bg;										
 							}
                             if(t_selected) {
 								//top
@@ -2444,6 +2476,9 @@ oBrowser = function(name) {
                                     var ah_2 = ah - Math.floor(ah /2);
 
                                     if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) { // now playing track
+									
+										this.groups[this.rows[i].albumId].isPlaying = true;
+										this.isPlayingIdx = this.rows[i].albumId;
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
 											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, colors.flash_bg);
 										}		
@@ -2642,7 +2677,7 @@ oBrowser = function(name) {
 												};
 											}
 										}											
-                                    } else { //default track
+                                    } else { //default track						
 										if(properties.doubleRowShowCover){
 											g = this.rows[i].albumId;											
 											if(this.groups[g].cover_type == null) {
@@ -2741,6 +2776,8 @@ oBrowser = function(name) {
 
                                     // calc text part width + dtaw text
                                     if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) { // now playing track
+										this.groups[this.rows[i].albumId].isPlaying = true;		
+										this.isPlayingIdx = this.rows[i].albumId;										
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
 											gr.FillSolidRect(-1, ay+1, ww+2, ah-2, colors.flash_bg);
 										}	
@@ -2909,7 +2946,6 @@ oBrowser = function(name) {
 											};
 										}										
                                     } else { // default track
-			
 
 										if(!g_var_cache.isdefined("track_num_part")) g_var_cache.set("track_num_part",gr.CalcTextWidth("000", g_font.normal));
                                         cColumns.track_num_part = g_var_cache.get("track_num_part") + 11;	
@@ -3274,7 +3310,7 @@ oBrowser = function(name) {
                         case (rowType > 0 && rowType < 99): // group header
                             if(!properties.expandBySingleClick || !this.groups[this.rows[this.activeRow].albumId].collapsed) {
 								this.groups[this.rows[this.activeRow].albumId].collapsed = !this.groups[this.rows[this.activeRow].albumId].collapsed;
-								this.setList(true);
+								this.setList();
 
 								///*
 								g_focus_row = this.getOffsetFocusItem(g_focus_id);
@@ -3681,14 +3717,14 @@ oBrowser = function(name) {
             if(previous != properties.groupHeaderRowsNumber) {
                 timers.mouseWheel = setTimeout(function() {
 					
-					if(properties.doubleRowText) {
-						properties.groupHeaderRowsNumberDouble = properties.groupHeaderRowsNumber;
-						window.SetProperty("_PROPERTY: Number of Rows for Group Header, when double line is enabled", properties.groupHeaderRowsNumberDouble)
-					} else {
-						properties.groupHeaderRowsNumberSimple = properties.groupHeaderRowsNumber;		
-					}
 					
-                    window.SetProperty("_PROPERTY: Number of Rows for Group Header", properties.groupHeaderRowsNumber);
+					if(properties.doubleRowText) {
+						setOneProperty("groupHeaderRowsNumberDouble", properties.groupHeaderRowsNumber);
+					} else {
+						setOneProperty("groupHeaderRowsNumberSimple", properties.groupHeaderRowsNumber);							
+					}
+					setOneProperty("groupHeaderRowsNumber", properties.groupHeaderRowsNumber);
+					
                     get_font();
 					g_var_cache.resetAll();
                     get_metrics();
@@ -3718,8 +3754,7 @@ oBrowser = function(name) {
             };
             if(previous != properties.defaultRowHeight) {
                 timers.mouseWheel = setTimeout(function() {
-					
-					window.SetProperty("_PROPERTY: Row Height", properties.defaultRowHeight)
+					setOneProperty("defaultRowHeight",properties.defaultRowHeight);
                     get_font();
 					g_var_cache.resetAll();
                     get_metrics();
@@ -3845,19 +3880,13 @@ oBrowser = function(name) {
 		} else {
 			switch (ret) {
 			case 1010:
-                if(g_files.FileExists(cover_img_cache + "\\" + crc)) {
-                    try {
-                        g_files.DeleteFile(cover_img_cache + "\\" + crc);
-                    } catch(e) {
-                        console.log("WSH Panel Error: Image cache ["+crc+"] can't be deleted on disk, file in use, try later or reload panel.");
-                    };
-                };
+				delete_file_cache(this.groups[albumIndex].metadb, albumIndex);
                 this.groups[albumIndex].tid = -1;
                 this.groups[albumIndex].load_requested = 0;
                 this.groups[albumIndex].cover_formated = false;
 				this.groups[albumIndex].mask_applied = false;
                 this.groups[albumIndex].save_requested = false;
-                g_image_cache.reset(crc);
+                g_image_cache.resetMetadb(this.groups[albumIndex].metadb);
                 this.groups[albumIndex].cover_img = null;
                 this.groups[albumIndex].cover_type = null;
                 this.repaint();
@@ -3971,13 +4000,6 @@ oBrowser = function(name) {
             _menu.AppendMenuItem(MF_STRING, 901, "Enable Drag'n'Drop to a playlist");		
 			_menu.CheckMenuItem(901, properties.DropInplaylist);
 			
-			/*_menu.AppendMenuSeparator();	
-            _menu.AppendMenuItem(MF_STRING, 902, "Enable Disk Image Cache");
-            _menu.CheckMenuItem(902, globalProperties.enableDiskCache);					
-            _menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 903, "Load all covers at startup");
-            _menu.CheckMenuItem(903, globalProperties.load_covers_at_startup);	*/		
-
-			
             _menu.AppendMenuSeparator();			
             _menu.AppendMenuItem(MF_STRING, 117, "Circle Artwork");
             _menu.CheckMenuItem(117, properties.circleMode);
@@ -4062,60 +4084,45 @@ oBrowser = function(name) {
             
             switch(true) {
                 case (idx == 111):
-                    properties.showArtistAlways = !properties.showArtistAlways;
-                    window.SetProperty("_DISPLAY: Show Artist in Track Row", properties.showArtistAlways);
+					setOneProperty("showArtistAlways",!properties.showArtistAlways);
                     get_metrics();
                     brw.repaint();
                     break;
                 case (idx == 112):
-                    properties.showMood = !properties.showMood;
-                    window.SetProperty("_DISPLAY: Show Mood in Track Row", properties.showMood);
+					setOneProperty("showMood",!properties.showMood);
                     get_metrics();
                     brw.repaint();
                     break;
                 case (idx == 113):
-                    properties.showRating = true;
-                    properties.showRatingSelected = false;		
-                    properties.showRatingRated = false;						
-                    window.SetProperty("_DISPLAY: Show Rating in Track Row", properties.showRating);
-                    window.SetProperty("_DISPLAY: Show Rating in Selected Track Row", properties.showRatingSelected);
-                    window.SetProperty("_DISPLAY: Show Rating in Rated Track Row", properties.showRatingRated);						
+					setOneProperty("showRating",true);	
+					setOneProperty("showRatingSelected",false);				
+					setOneProperty("showRatingRated",false);									
                     get_metrics();
                     brw.repaint();
                     break;
                 case (idx == 114):
-                    properties.showRating = true;
-                    properties.showRatingSelected = true;				
-                    properties.showRatingRated = false;						
-                    window.SetProperty("_DISPLAY: Show Rating in Track Row", properties.showRating);
-                    window.SetProperty("_DISPLAY: Show Rating in Selected Track Row", properties.showRatingSelected);					
-                    window.SetProperty("_DISPLAY: Show Rating in Rated Track Row", properties.showRatingRated);						
+					setOneProperty("showRating",true);	
+					setOneProperty("showRatingSelected",true);				
+					setOneProperty("showRatingRated",false);					
                     get_metrics();
                     brw.repaint();
                     break;
                 case (idx == 115):
-                    properties.showRating = true;
-                    properties.showRatingSelected = true;				
-                    properties.showRatingRated = true;						
-                    window.SetProperty("_DISPLAY: Show Rating in Track Row", properties.showRating);
-                    window.SetProperty("_DISPLAY: Show Rating in Selected Track Row", properties.showRatingSelected);					
-                    window.SetProperty("_DISPLAY: Show Rating in Rated Track Row", properties.showRatingRated);						
+					setOneProperty("showRating",true);	
+					setOneProperty("showRatingSelected",true);				
+					setOneProperty("showRatingRated",true);				
                     get_metrics();
                     brw.repaint();
                     break;					
                 case (idx == 116):
-                    properties.showRating = false;
-                    properties.showRatingSelected = false;	
-                    properties.showRatingRated = false;						
-                    window.SetProperty("_DISPLAY: Show Rating in Track Row", properties.showRating);
-                    window.SetProperty("_DISPLAY: Show Rating in Selected Track Row", properties.showRatingSelected);	
-                    window.SetProperty("_DISPLAY: Show Rating in Rated Track Row", properties.showRatingRated);						
+					setOneProperty("showRating",false);	
+					setOneProperty("showRatingSelected",false);				
+					setOneProperty("showRatingRated",false);						
                     get_metrics();
                     brw.repaint();
                     break;	
 				case (idx == 117):		
-					properties.circleMode = !properties.circleMode;
-					window.SetProperty("COVER Circle artwork", properties.circleMode);
+					setOneProperty("circleMode",!properties.circleMode);	
 					brw.refreshThumbnails();
 					brw.repaint();
 					break;						
@@ -4123,57 +4130,51 @@ oBrowser = function(name) {
                     toggleWallpaper();
                     break;
                 case (idx == 210):
-                    properties.wallpapermode = 99;on_colours_changed();		
-                    window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
+					setOneProperty("wallpapermode",99);				
+					on_colours_changed();		
                     if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;
                 case (idx == 211):
-                    properties.wallpapermode = 0;on_colours_changed();		
-                    window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
+					setOneProperty("wallpapermode",0);				
+					on_colours_changed();		
                     if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;
                 case (idx == 220):
-                    properties.wallpaperblurred = !properties.wallpaperblurred;on_colours_changed();		
-                    window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
+					setOneProperty("wallpaperblurred",!properties.wallpaperblurred);					
+                    on_colours_changed();		
                     g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;
                 case (idx == 221):
-                    properties.wallpaperdisplay = 0;
-                    window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
+					setOneProperty("wallpaperdisplay",0);					
                     g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;	
                 case (idx == 222):
-                    properties.wallpaperdisplay = 1;
-                    window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
+					setOneProperty("wallpaperdisplay",1);	
                     g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;		
                 case (idx == 223):
-                    properties.wallpaperdisplay = 2;
-                    window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
+					setOneProperty("wallpaperdisplay",2);	
                     g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
                     brw.repaint();
                     break;						
                 case (idx == 300):
-                    properties.showGroupHeaders = !properties.showGroupHeaders;
-                    window.SetProperty("_DISPLAY: Show Group Headers", properties.showGroupHeaders);
+					setOneProperty("showGroupHeaders",!properties.showGroupHeaders);					
 					get_metrics();
 					on_colours_changed();
                     if(properties.autocollapse) {
-						properties.autocollapse = false;
-						window.SetProperty("_PROPERTY: Autocollapse groups", properties.autocollapse);
+						setOneProperty("autocollapse",false);
 					}						
                     if(!properties.showGroupHeaders) brw.collapseAll(false);
 					brw.populate(is_first_populate = false,3, false);
                     brw.repaint();
                     break;
                 case (idx == 310):
-                    properties.autocollapse = !properties.autocollapse;
-                    window.SetProperty("_PROPERTY: Autocollapse groups", properties.autocollapse);
+					setOneProperty("autocollapse",!properties.autocollapse);
                     brw.populate(false,4, false);
                     brw.showFocusedItem();
                     break;
@@ -4189,8 +4190,7 @@ oBrowser = function(name) {
                     brw.showNowPlaying();
                     break;
                 case (idx == 901):
-                    properties.DropInplaylist = !properties.DropInplaylist
-                    window.SetProperty("_SYSTEM: Allow to drag items into a playlist", properties.DropInplaylist);
+                    setOneProperty("DropInplaylist",!properties.DropInplaylist);
 					pman.populate(exclude_active = false, reset_scroll = true);
                     get_metrics();
                     brw.repaint();					
@@ -4203,20 +4203,17 @@ oBrowser = function(name) {
 					enableCoversAtStartupGlobally()
 					break;		
                 case (idx == 905):
-                    properties.showToolTip = !properties.showToolTip;
-                    window.SetProperty("_DISPLAY: display a tooltip", properties.showToolTip);
+                    setOneProperty("showToolTip",!properties.showToolTip);
                     brw.repaint();
                     break;									
                 case (idx == 910):
-                    properties.showHeaderBar = !properties.showHeaderBar;
-                    window.SetProperty("_DISPLAY: Show Top Bar", properties.showHeaderBar);
+                    setOneProperty("showHeaderBar",!properties.showHeaderBar);
                     get_metrics();
                     brw.repaint();
                     break;
                 case (idx == 911):
 					if(properties.doubleRowText) {
-						properties.doubleRowText = false;
-						window.SetProperty("_PROPERTY: Double Row Text Info", properties.doubleRowText);
+						setOneProperty("doubleRowText",false);
 						get_metrics();
 						get_images();
 						brw.ratingImages = false;
@@ -4225,10 +4222,8 @@ oBrowser = function(name) {
                     break;					
                 case (idx == 912):
 					if(!properties.doubleRowText || (properties.doubleRowText && properties.doubleRowShowCover)) {
-						properties.doubleRowText = true;
-						window.SetProperty("_PROPERTY: Double Row Text Info", properties.doubleRowText);
-						properties.doubleRowShowCover = false;
-						window.SetProperty("_PROPERTY: Double Row Show Cover", properties.doubleRowShowCover);						
+						setOneProperty("doubleRowText",true);
+						setOneProperty("doubleRowShowCover",false);					
 						get_metrics();
 						get_images();
 						brw.ratingImages = false;
@@ -4237,10 +4232,8 @@ oBrowser = function(name) {
                     break;
                 case (idx == 913):
 					if(!properties.doubleRowText || !properties.doubleRowShowCover) {
-						properties.doubleRowText = true;
-						window.SetProperty("_PROPERTY: Double Row Text Info", properties.doubleRowText);				
-						properties.doubleRowShowCover = true;
-						window.SetProperty("_PROPERTY: Double Row Show Cover", properties.doubleRowShowCover);
+						setOneProperty("doubleRowText",true);
+						setOneProperty("doubleRowShowCover",true);		
 						on_colours_changed();
 						get_metrics();
 						get_images();
@@ -4249,26 +4242,20 @@ oBrowser = function(name) {
 					}
                     break;	
 				case (idx == 914):
-					properties.drawProgressBar = false;
-					properties.AlbumArtProgressbar = false;
-					window.SetProperty("_DISPLAY Draw a progress bar under song title", properties.drawProgressBar);						
-					window.SetProperty("_DISPLAY Album art progress bar", properties.AlbumArtProgressbar);	
+					setOneProperty("drawProgressBar",false);
+					setOneProperty("AlbumArtProgressbar",false);					
 					get_images();					
 					brw.repaint();
 					break;			
 				case (idx == 915):
-					properties.AlbumArtProgressbar = true;		
-					properties.drawProgressBar = true;								
-					window.SetProperty("_DISPLAY Draw a progress bar under song title", properties.drawProgressBar);						
-					window.SetProperty("_DISPLAY Album art progress bar", properties.AlbumArtProgressbar);	
+					setOneProperty("drawProgressBar",true);
+					setOneProperty("AlbumArtProgressbar",true);		
 					get_images();					
 					brw.repaint();
 					break;				
 				case (idx == 916):
-					properties.AlbumArtProgressbar = false;		
-					properties.drawProgressBar = true;				
-					window.SetProperty("_DISPLAY Draw a progress bar under song title", properties.drawProgressBar);						
-					window.SetProperty("_DISPLAY Album art progress bar", properties.AlbumArtProgressbar);	
+					setOneProperty("drawProgressBar",true);
+					setOneProperty("AlbumArtProgressbar",false);	
 					get_images();
 					brw.repaint();
 					break;						
@@ -4288,34 +4275,25 @@ oBrowser = function(name) {
                     this.setRowHeight(2);
                     break;						
 				case (idx == 3298):	
-					properties.enableAutoSwitchPlaylistMode=!properties.enableAutoSwitchPlaylistMode;
-					window.SetProperty("Automatically change displayed playlist", properties.enableAutoSwitchPlaylistMode);	
-					if(filters_panel_state.isMaximumValue()) properties.lockOnNowPlaying=false;
-					else properties.lockOnNowPlaying=true;
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);	
-					properties.lockOnPlaylistNamed="";
-					window.SetProperty("lock on specific playlist name", "");				
+					setOneProperty("enableAutoSwitchPlaylistMode",!properties.enableAutoSwitchPlaylistMode);
+					if(filters_panel_state.isMaximumValue()) setOneProperty("lockOnNowPlaying",false);
+					else setOneProperty("lockOnNowPlaying",true);
+					setOneProperty("lockOnPlaylistNamed","");				
 					brw.populate(true,4);	
 					break;		
 				case (idx == 3299):	
-					properties.lockOnNowPlaying=false;
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);	
-					properties.lockOnPlaylistNamed="";
-					window.SetProperty("lock on specific playlist name", "");
+					setOneProperty("lockOnNowPlaying",false);	
+					setOneProperty("lockOnPlaylistNamed","");
 					brw.populate(true,4);
 					break;
 				case (idx == 3300):	
-					properties.lockOnNowPlaying=true;
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);	
-					properties.lockOnPlaylistNamed="";
-					window.SetProperty("lock on specific playlist name", "");
+					setOneProperty("lockOnNowPlaying",true);	
+					setOneProperty("lockOnPlaylistNamed","");
 					brw.populate(true,4);
 					break;		
 				case (idx > 3300):	
-					properties.lockOnPlaylistNamed=plman.GetPlaylistName(idx-3301);
-					properties.lockOnNowPlaying=false;
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);			
-					window.SetProperty("lock on specific playlist name", properties.lockOnPlaylistNamed);	
+					setOneProperty("lockOnNowPlaying",false);	
+					setOneProperty("lockOnPlaylistNamed",plman.GetPlaylistName(idx-3301));				
 					brw.populate(true,4);
 					break;						
             };
@@ -4542,8 +4520,7 @@ function setActivePlaylist(){
 	if(properties.lockOnPlaylistNamed!="") {
 		g_active_playlist_new = check_playlist(properties.lockOnPlaylistNamed);
 		if(g_active_playlist_new==-1) {
-			window.SetProperty("lock on specific playlist name", "");
-			properties.lockOnPlaylistNamed="";
+			setOneProperty("lockOnPlaylistNamed",'');	
 			g_active_playlist_new = plman.ActivePlaylist;
 		}
 	}
@@ -4902,7 +4879,7 @@ function on_mouse_wheel(step, stepstrait, delta){
             };
             if(previous != properties.globalFontAdjustement) {
                 timers.mouseWheel = setTimeout(function() {
-                    window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement)
+					setOneProperty("globalFontAdjustement",properties.globalFontAdjustement);	
                     get_font();
 					g_var_cache.resetAll();
                     get_metrics();
@@ -4943,14 +4920,15 @@ function on_mouse_leave() {
 };
 
 //=================================================// Metrics & Fonts & Colors & Images
-function get_metrics() {
+function get_metrics(finalize_groups) {
+	var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;		
+	
 	g_zoom_percent = Math.floor(g_fsize / 12 * 100);
 	
 	if(properties.doubleRowText) properties.groupHeaderRowsNumber = properties.groupHeaderRowsNumberDouble;
 	else properties.groupHeaderRowsNumber = properties.groupHeaderRowsNumberSimple;
     if(!properties.showGroupHeaders) properties.extraRowsNumber=0;
-	else properties.extraRowsNumber = window.GetProperty("_PROPERTY: Number of Extra Rows per Group", 0);
-	
+	else properties.extraRowsNumber = getProperty("extraRowsNumber", 0);
 	
     cPlaylistManager.width = Math.floor(cPlaylistManager.default_width * g_zoom_percent / 100);
     cPlaylistManager.topbarHeight = Math.floor(cPlaylistManager.default_topbarHeight * g_zoom_percent / 100);
@@ -4989,7 +4967,7 @@ function get_metrics() {
 	else 
 		properties.addedRows_end = properties.addedRows_end_default-((properties.showGroupHeaders)?properties.extraRowsNumber:0);
 	if(properties.addedRows_end<0) properties.addedRows_end = 0;
-	
+
     if(brw) {
         if(cScrollBar.enabled)  {
             //brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww - cScrollBar.width, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
@@ -4997,7 +4975,7 @@ function get_metrics() {
         } else {
             brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
         };
-        brw.setList();
+        brw.setList(finalize_groups);
         //
         g_focus_row = brw.getOffsetFocusItem(g_focus_id);
         // if focused track not totally visible, we scroll to show it centered in the panel
@@ -5152,11 +5130,10 @@ function setDarkLayout(){
 	}
 	return new_darklayout_state;
 }
-function on_colours_changed() {
+function on_colours_changed(force) {
 	new_darklayout_state = setDarkLayout();
-	if(properties.darklayout!=new_darklayout_state){
-		properties.darklayout = new_darklayout_state;
-		window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);		
+	if(properties.darklayout!=new_darklayout_state || force){
+		setOneProperty("darklayout",new_darklayout_state);		
 		get_colors();
 		get_images();
 		get_font();
@@ -5648,7 +5625,6 @@ function on_key_down(vkey) {
                     };
                     if(vkey==66) { // CTRL+B
                         cScrollBar.enabled = !cScrollBar.enabled;
-                        window.SetProperty("_DISPLAY: Show Scrollbar", cScrollBar.enabled);
                         get_metrics();
                         brw.repaint();
                     };
@@ -5698,8 +5674,7 @@ function on_key_down(vkey) {
                         fb.RunMainMenuCommand("File/Save playlist...");
                     };
                     if(vkey==84) { // CTRL+T
-                        properties.showHeaderBar = !properties.showHeaderBar;
-                        window.SetProperty("_DISPLAY: Show Top Bar", properties.showHeaderBar);
+						setOneProperty("showHeaderBar",!properties.showHeaderBar);		
                         get_metrics();
                         brw.scrollbar.updateScrollbar();
                         brw.repaint();
@@ -5710,7 +5685,7 @@ function on_key_down(vkey) {
                             properties.globalFontAdjustement = 0;
                             if(previous != properties.globalFontAdjustement) {
                                 timers.mouseWheel = setTimeout(function() {
-                                    window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement);
+									setOneProperty("globalFontAdjustement",properties.globalFontAdjustement);		
                                     get_font();
 									g_var_cache.resetAll();
                                     get_metrics();
@@ -5806,6 +5781,7 @@ function on_playback_stop(reason) {
 };
 
 function on_playback_new_track(metadb) {
+	if(brw.isPlayingIdx>=0) try{brw.groups[brw.isPlayingIdx].isPlaying = false;} catch(e){}
 	try{
 		playing_track_playcount = TF.play_count.Eval();
 	} catch(e){}
@@ -6202,8 +6178,7 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
 		break; 			
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			setOneProperty("globalFontAdjustement",info,true);		
 			on_font_changed();
 		break; 	
 		case "enable_screensaver":		
@@ -6241,23 +6216,16 @@ function on_notify_data(name, info) {
 				} else set_update_function("brw.setList();brw.gettags(true);brw.repaint();");
 			}
 		break;		
-		case"DiskCacheState":
+		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
 			brw.repaint();
 		break;  	
-		case"RefreshImageCover":
+		case "RefreshImageCover":
+			g_image_cache.resetMetadb(info);
 			brw.refreshThumbnails();
 			brw.repaint();
 		break; 			
-		case"LoadAllCoversState":
-			globalProperties.load_covers_at_startup = info;
-			window.SetProperty("COVER Load all at startup", globalProperties.load_covers_at_startup);	
-		break; 
-		case"LoadAllArtistImgState":
-			globalProperties.load_artist_img_at_startup = info;
-			window.SetProperty("ARTIST IMG Load all at startup", globalProperties.load_artist_img_at_startup);	
-		break; 		
 		case "avoid_on_playlists_changed":  
 			g_avoid_on_playlists_changed=info;
 		break;			
@@ -6268,8 +6236,7 @@ function on_notify_data(name, info) {
 		break;		
 		case "playlists_dark_theme":
 			if(properties.ParentName=="MainPanel"){
-				properties.playlists_dark_theme=info;
-				window.SetProperty("PLAYLISTS dark theme", properties.playlists_dark_theme);
+				setOneProperty("playlists_dark_theme",info);
 				on_colours_changed();				
 				//if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 				window.Repaint();
@@ -6277,8 +6244,7 @@ function on_notify_data(name, info) {
 		break; 			
 		case "minimode_dark_theme":
 			if(properties.ParentName=="MiniPanel") {
-				properties.minimode_dark_theme = info;
-				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+				setOneProperty("minimode_dark_theme",info);
 				on_colours_changed();				
 				//if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 				window.Repaint();
@@ -6286,31 +6252,27 @@ function on_notify_data(name, info) {
 		break; 
 		case "bio_dark_theme":
 			if(properties.ParentName=="MainPanel") {
-				properties.bio_dark_theme=info;
-				window.SetProperty("BIO dark theme", properties.bio_dark_theme);
+				setOneProperty("bio_dark_theme",info);
 				on_colours_changed();
 				window.Repaint();	
 			}			
 		break;	    
 		case "visualization_dark_theme":
-			if(properties.ParentName=="MainPanel") {		
-				properties.visualization_dark_theme=info;
-				window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
+			if(properties.ParentName=="MainPanel") {	
+				setOneProperty("visualization_dark_theme",info);
 				on_colours_changed();
 				window.Repaint();		
 			}
 		break;	
 		case "library_dark_theme":
-			if(properties.ParentName=="MainPanel") {		
-				properties.library_dark_theme=info;
-				window.SetProperty("LIBRARY dark theme", properties.library_dark_theme);
+			if(properties.ParentName=="MainPanel") {
+				setOneProperty("library_dark_theme",info);
 				on_colours_changed();
 				window.Repaint();
 			}	
 		break;	
 		case "bio_stick_to_dark_theme":
-			properties.bio_stick2darklayout=info;
-			window.SetProperty("BIO stick to Dark layout", properties.bio_stick2darklayout);
+			setOneProperty("bio_stick2darklayout",info);
 			on_colours_changed();
 			window.Repaint();		
 		break;			
@@ -6324,8 +6286,7 @@ function on_notify_data(name, info) {
 		break; 		
 		case "wallpaperVisibility2":
 			if(window.IsVisible) {
-				properties.showwallpaper = info;
-				window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
+				setOneProperty("showwallpaper",info);
 				on_colours_changed();					
 				if(properties.showwallpaper) {
 					g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
@@ -6336,18 +6297,24 @@ function on_notify_data(name, info) {
 		break; 		
 		case "wallpaperBlur2":
 			if(window.IsVisible) {	
-				properties.wallpaperblurred = info;
+				setOneProperty("wallpaperblurred",info);
 				on_colours_changed();		
-				window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 				if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				window.Repaint();			
 			}
 		break; 		
 		case "layout_state":  
 			layout_state.value=info;
+			setAllProperties();
+			get_metrics(true);
+			if(properties.autocollapse && properties.showGroupHeaders) {
+				brw.collapseAll(true);
+			}						
+			on_colours_changed(true);
+			brw.refreshThumbnails();
 			if(layout_state.isEqual(0) && window.IsVisible) window.NotifyOthers("playlist_height",window.Height);		
 			if(layout_state.isEqual(1) && g_active_playlist==plman.PlayingPlaylist){
-				if(g_active_playlist==plman.PlayingPlaylist) brw.showNowPlaying_trigger = true;
+				//if(g_active_playlist==plman.PlayingPlaylist) brw.showNowPlaying_trigger = true;
 				brw.showNowPlaying(false);
 			}
 		break;
@@ -6364,8 +6331,8 @@ function on_notify_data(name, info) {
 					properties.lockOnPlaylistNamed="";									
 				}		
 				if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying){
-					window.SetProperty("lock on specific playlist name", "");
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);
+					setOneProperty("lockOnPlaylistNamed","");
+					setOneProperty("lockOnNowPlaying",properties.lockOnNowPlaying);
 					brw.populate(true,17);					
 				}					
 			}			
@@ -6393,46 +6360,39 @@ function on_notify_data(name, info) {
 				else properties.lockOnNowPlaying=true;	
 				properties.lockOnPlaylistNamed="";	
 				if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying){
-					window.SetProperty("lock on specific playlist name", "");
-					window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);
+					setOneProperty("lockOnPlaylistNamed","");
+					setOneProperty("lockOnNowPlaying",properties.lockOnNowPlaying);
 					brw.populate(true,17);
 				}				
 			}		
 		break;			
 		case "lockOnNowPlaying":  
-			properties.lockOnNowPlaying=info;
-			window.SetProperty("lock on now playing playlist", properties.lockOnNowPlaying);	
-			properties.lockOnPlaylistNamed="";
-			window.SetProperty("lock on specific playlist name", "");				
+			setOneProperty("lockOnNowPlaying",info);
+			setOneProperty("lockOnPlaylistNamed","");				
 			brw.populate(true,17);
 		break;	
 		case "lockOnSpecificPlaylist":  
-			properties.lockOnPlaylistNamed=info;
-			window.SetProperty("lock on specific playlist name", properties.lockOnPlaylistNamed);	
+			setOneProperty("lockOnPlaylistNamed",info);
 			brw.populate(true,17);
 		break;			
 		case "showGroupHeaders":
-			properties.showGroupHeaders = !properties.showGroupHeaders;
-			window.SetProperty("_DISPLAY: Show Group Headers", properties.showGroupHeaders);
+			setOneProperty("showGroupHeaders",!properties.showGroupHeaders)
 			get_metrics();
 			if(properties.autocollapse) {
-				properties.autocollapse = false;
-				window.SetProperty("_PROPERTY: Autocollapse groups", properties.autocollapse);
+				setOneProperty("autocollapse",false);
 			}				
 			if(!properties.showGroupHeaders) brw.collapseAll(false);
 			brw.populate(is_first_populate = false,18);
 			window.Repaint();
 			break;
 		case "doubletrackline":
-			properties.doubleRowText = !properties.doubleRowText;
-			window.SetProperty("_PROPERTY: Double Row Text Info", properties.doubleRowText);
+			setOneProperty("doubleRowText",!properties.doubleRowText);
 			get_metrics();
 			window.Repaint();
 			break;					
 		case "autocollapse":
 			if(properties.showGroupHeaders) {
-				properties.autocollapse = !properties.autocollapse;
-				window.SetProperty("_PROPERTY: Autocollapse groups", properties.autocollapse);
+				setOneProperty("autocollapse",!properties.autocollapse);
 				brw.populate(false,19);
 				brw.showFocusedItem();
 			}
@@ -6703,19 +6663,17 @@ function on_drag_drop(action, x, y, mask) {
 
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
-	properties.showwallpaper = wallpaper_state;
-	window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
+	setOneProperty("showwallpaper",wallpaper_state);
 	on_colours_changed();					
 	if(properties.showwallpaper) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-		//if(properties.darklayout) window.NotifyOthers("minimode_dark_theme", true);
-	} //else window.NotifyOthers("minimode_dark_theme", false);
+	}
 	window.Repaint();
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
-	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;	
-	properties.wallpaperblurred = wallpaper_blur_state; on_colours_changed();		
-	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
+	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;
+	setOneProperty("wallpaperblurred",wallpaper_blur_state);
+	on_colours_changed();		
 	if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	window.Repaint();
 }

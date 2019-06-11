@@ -448,7 +448,7 @@ oImageCache = function () {
 		var img;
 		old_cachekey = nowPlaying_cachekey;
 		nowPlaying_cachekey = process_cachekey(metadb);				
-		if(nowPlaying_cachekey==old_cachekey) return null;	
+		if(nowPlaying_cachekey==old_cachekey) return "unchanged";	
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
 			cache_filename = check_cacheV2(metadb, 0, nowPlaying_cachekey);	
@@ -466,6 +466,9 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};	
+    this.resetMetadb = function(metadb) {
+        this.cachelist[process_cachekey(metadb)] = null;
+    };		
 };
 
 oCover = function() {
@@ -484,24 +487,24 @@ oCover = function() {
 		this.resized = false;
 	}  	
 	this.isSetArtwork = function() {
-		return !(typeof(this.artwork) != "object" || !this.artwork || this.artwork==null)
+		return isImage(this.artwork);
 	}
 	this.isFiller = function() {
 		return this.filler;
 	}	
 	this.setArtwork = function(image, resize, filler) {
-		if(typeof(image) != "object" || !image || image==null) return;		
 		this.filler = typeof filler !== 'undefined' ? filler : false;	
-		
 		this.resized = false;
 		this.artwork = image;
+		if(!isImage(image)) return;				
 		if(resize && this.w>0 && this.h>0) {
 			this.resize();
 		} 
 	}	
 	this.getArtwork = function(metadb) {
 		var img = g_image_cache.hit(metadb);
-		if(typeof(image) == "object" && image!=null && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();		
+		if(img=="unchanged") return;	
+		if(isImage(img) && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();
 		this.setArtwork(img,true,false);	
 	}		
 	this.resize = function(w,h) {
@@ -527,11 +530,12 @@ oCover = function() {
 			this.tintDrawed = true;
 		}
     };
-    this.refresh = function (metadb, cachekey) {
+    this.refresh = function (metadb, delete_file_cache, cachekey) {
 		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
-		if(globalProperties.enableDiskCache) delete_file_cache(metadb,0, cachekey);
+		delete_file_cache = typeof delete_file_cache !== 'undefined' ? delete_file_cache : false;		
+		if(globalProperties.enableDiskCache && delete_file_cache) delete_file_cache(metadb,0, cachekey);
 		this.reset();
-		g_image_cache.reset();
+		g_image_cache.resetMetadb(metadb);
 		nowPlaying_cachekey = "";
 		this.getArtwork(metadb);
 		window.Repaint();
@@ -665,7 +669,7 @@ function on_notify_data(name, info) {
 		break;			
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
-			if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
+			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
 				g_cover.refresh(fb.GetNowPlaying());
 		break;  					
 		case "cover_cache_finalized": 
@@ -899,7 +903,7 @@ function on_mouse_rbtn_up(x, y){
 			fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
 			break;	
 		case (idx == 8):
-			g_cover.refresh(now_playing_track);
+			g_cover.refresh(now_playing_track, true);
 			window.NotifyOthers("RefreshImageCover",now_playing_track);
 			break;		
 		case (idx == 9):

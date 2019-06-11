@@ -63,6 +63,9 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};	
+    this.resetMetadb = function(metadb) {
+        this.cachelist[process_cachekey(metadb)] = null;
+    };		
 };
 
 if(layout_state.isEqual(0)) properties.showTrackInfo = showtrackinfo_big.isActive();
@@ -1431,7 +1434,16 @@ function on_notify_data(name, info) {
 			properties.screensaver_dark_theme=info;
 			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
 			window.Repaint();	
-		break;			
+		break;		
+		case "RefreshImageCover":
+			var metadb = new FbMetadbHandleList(info);
+			if(properties.showwallpaper && properties.wallpapermode == 0) {
+				g_image_cache.resetMetadb(metadb[0]);
+				g_wallpaperImg = null;
+				window.Repaint();				
+			};
+				
+		break;  		
 		case "rating_updated": 
 			if(current_played_track && info.Compare(current_played_track)){
 				setRatingBtn(info);

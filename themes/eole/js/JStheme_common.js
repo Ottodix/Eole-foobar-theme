@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
-	theme_version: '1.1.1',
+	theme_version: '1.1.2',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -936,7 +936,6 @@ function hibernate_computer(){
 	WshShell.Run("shutdown.exe /h", 0);
 }
 function shutdown_computer(){
-	console.log("shutdown_computer")
 	//WshShell.Run("%windir%\\System32\\rundll32.exe powrprof.dll, SetSuspendState 0,1,0", 0);
 	var WshShell = new ActiveXObject("WScript.Shell");
 	WshShell.Run("shutdown.exe /s /t 00", 0);
@@ -1385,7 +1384,6 @@ function sortNumber(a,b) {
     if(a[0] > b[0]) return 1;
     return 0;	
 }
-var tf_genre = fb.TitleFormat("$if(%length%,%Genre%,'Stream')");
 function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 	var checked_item = typeof checked_item !== 'undefined' ? checked_item : -1;
 	var genrePopupMenu = typeof genrePopupMenu !== 'undefined' ? genrePopupMenu : window.CreatePopupMenu();
@@ -1397,7 +1395,7 @@ function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 	//var firstFile=g_browser.groups_draw[check__].pl[0]; 
 
 	if(firstFile){
-		var firstFileGenre = tf_genre.EvalWithMetadb(firstFile);
+		var firstFileGenre = g_genre_cache.tf_genre.EvalWithMetadb(firstFile);
 		//var firstFilePath=firstFile.Path.replace("D:\\Musique\\Tout\\","");
 		var firstFilePath = firstFile.Path.substring(0,firstFile.Path.lastIndexOf("\\")+1)
 		//var firstFilePathGenre=firstFilePath.substring(0, firstFilePath.indexOf('\\'));	
@@ -2326,6 +2324,10 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
+cover = {
+    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
+    stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),	
+};
 function FormatCover(image, w, h, rawBitmap, callID) {
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
@@ -2482,7 +2484,26 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
         return;
     }	
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
-	save_image_to_cache(result.image, 0,cachekey); 
+	if(isImage(result.image)) {
+		save_image_to_cache(result.image, albumIndex, cachekey);
+		if (typeof g_cover == "object") {
+			g_cover.setArtwork(result.image,true,false);
+			window.Repaint();     	
+		}		
+	} else if (typeof brw == "object" && albumIndex>=0) {
+		if(brw.groups[albumIndex].tracktype<0) brw.groups[albumIndex].tracktype = TrackType(handle.RawPath.substring(0, 4));	
+		if(brw.groups[albumIndex].tracktype < 2) {
+			brw.groups[albumIndex].cover_img = cover.nocover_img;
+			brw.groups[albumIndex].cover_img_full = cover.nocover_img;
+			g_image_cache.cachelist[cachekey] = cover.nocover_img;
+		} else {
+			brw.groups[albumIndex].cover_img = cover.stream_img;
+			brw.groups[albumIndex].cover_img_full = cover.stream_img;
+			g_image_cache.cachelist[cachekey] = cover.stream_img;
+		}
+		brw.groups[albumIndex].load_requested = 2;	
+		brw.repaint();
+	}
 	//on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };
 
@@ -2599,7 +2620,7 @@ oImageCache = function () {
 					}		
 			} else {
 				if(!isScrolling) this.cover_load_timer = Array();
-				if(!direct_return){	
+				if(!direct_return){				
 					if(albumIndex<0) {
 						var art_id = -1;
 						try{
@@ -2607,9 +2628,8 @@ oImageCache = function () {
 						} catch(e){console.log("timers.coverLoad line 5151 failed")}			
 					} else { //if(this.cover_load_timer.length<20){
 						//this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
-							var art_id = albumIndex + 5;
 							try{
-								get_albumArt_async(metadb,art_id, cachekey);
+								get_albumArt_async(metadb,albumIndex, cachekey);
 							} catch(e){console.log("timers.coverLoad line 5157 failed")}								
 							//clearTimeout(g_image_cache.cover_load_timer[g_image_cache.cover_load_timer.length-1]);
 							//g_image_cache.cover_load_timer.pop();
@@ -2634,6 +2654,9 @@ oImageCache = function () {
     this.reset = function(key) {
         this.cachelist[key] = null;
     };	
+    this.resetMetadb = function(metadb) {
+        this.cachelist[process_cachekey(metadb)] = null;
+    };		
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};

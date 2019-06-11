@@ -700,20 +700,20 @@ oRow = function(metadb,itemIndex) {
 	this.getTags = function(){
 		var TagsString = TF.title.EvalWithMetadb(metadb);
 		Tags = TagsString.split(" ^^ ");
-		this.tf_artist = Tags[0];
-		if(this.tf_artist=="?") this.tf_artist="Unknown artist";
-		this.tf_discnumber = Tags[1];
-		this.tf_tracknumber = Tags[2];
-		this.tf_tracknumber = parseInt(this.tf_tracknumber, 10);
-		if(isNaN(this.tf_tracknumber)) this.tf_tracknumber="?";
-		this.tf_title = Tags[3];
-		this.tf_rating = Tags[4];	
-		if(this.tf_rating < 0 || this.tf_rating > 5) {
-			this.tf_rating = 0;
+		this.artist = Tags[0];
+		if(this.artist=="?") this.artist="Unknown artist";
+		this.discnumber = Tags[1];
+		this.tracknumber = Tags[2];
+		this.tracknumber = parseInt(this.tracknumber, 10);
+		if(isNaN(this.tracknumber)) this.tracknumber="?";
+		this.title = Tags[3];
+		this.rating = Tags[4];	
+		if(this.rating < 0 || this.rating > 5) {
+			this.rating = 0;
 		};
-		this.tf_length_seconds = Tags[5];		
-		this.tf_length = Tags[5].toHHMMSS();
-		this.tf_playcount = Tags[6];
+		this.length_seconds = Tags[5];		
+		this.length = Tags[5].toHHMMSS();
+		this.playcount = Tags[6];
 	} 
 	this.getTags();
 	this.repaint = function() {
@@ -730,20 +730,20 @@ oRow = function(metadb,itemIndex) {
         var tracknumber_w = 28;
         var length_w = 55;
 		
-		if(this.tf_tracknumber>9) var select_start=4;
+		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
         
-		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1)) this.title_text = this.tf_title+" - "+this.tf_artist;
-		else this.title_text = this.tf_title;		
+		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1)) this.title_text = this.title+" - "+this.artist;
+		else this.title_text = this.title;		
 		
-        var duration = this.tf_length;
+        var duration = this.length;
         var isPlaying = false;
 				
 		if(fb.IsPlaying && fb.GetNowPlaying()!=null && this.metadb.Compare(fb.GetNowPlaying()) && (brw.SourcePlaylistIdx==plman.PlayingPlaylist)) {
 			isPlaying = true;
 			
 			TimeElapsed = g_seconds.toHHMMSS();
-			TimeRemaining = this.tf_length_seconds - g_seconds; 
+			TimeRemaining = this.length_seconds - g_seconds; 
 			TimeRemaining = "-"+TimeRemaining.toHHMMSS();	
 			duration = TimeRemaining;
 			
@@ -754,7 +754,7 @@ oRow = function(metadb,itemIndex) {
 			
 			var total_size=this.w-3+select_start-track_gradient_size;
 			var elapsed_seconds = g_seconds;
-			var ratio = elapsed_seconds/this.tf_length_seconds;
+			var ratio = elapsed_seconds/this.length_seconds;
 			if(duration=="ON AIR") var current_size = track_gradient_size+total_size;
 			else var current_size = track_gradient_size+Math.round(total_size*ratio);
 		}		
@@ -805,7 +805,7 @@ oRow = function(metadb,itemIndex) {
 				gr.DrawImage(image1, this.x+12,  this.y+Math.ceil((this.h-image1.Height)/2)-1, image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);	
 		}
 		
-		if(properties.showRating && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.tf_rating>0))) {
+		if(properties.showRating && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0))) {
 			rating_vpadding = 4;
 
 			if(typeof this.rating_length == 'undefined' || this.rating_length==0) this.rating_length = gr.CalcTextWidth("HHHHH", g_font.plus6);
@@ -818,17 +818,17 @@ oRow = function(metadb,itemIndex) {
 			this.rating_length = 0;
 		};			
 		
-		if(this.tf_tracknumber=="NaN") this.tf_tracknumber="?";
+		if(this.tracknumber=="NaN") this.tracknumber="?";
 
-		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.tf_discnumber+this.tf_tracknumber, g_font.normal)+22;
-		if(!isPlaying)  gr.GdiDrawText(this.tf_discnumber+this.tf_tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
+		if(!isPlaying)  gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 				
         gr.GdiDrawText(this.title_text, g_font.normal, g_showlist.colorSchemeText, (this.x + this.tracknumber_w + 10), this.y, this.w - this.tracknumber_w - length_w - 10-this.rating_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title_text, g_font.normal);
 		
 
 		if(properties.showPlaycount){
-			this.playcount_text = "  ("+this.tf_playcount+")";
+			this.playcount_text = "  ("+this.playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
 			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, this.w - this.tracknumber_w - length_w - 10 - this.title_length-this.rating_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);		
 		}
@@ -839,12 +839,12 @@ oRow = function(metadb,itemIndex) {
 		}
 		
 		// rating Stars
-		if(properties.showRating && g_showlist.ratingImages && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.tf_rating>0))) {
+		if(properties.showRating && g_showlist.ratingImages && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0))) {
 			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
 			if(this.ishover_rating && this.hover_rating>-1) {
 				var rating = this.hover_rating;
 			} else
-				var rating = this.tf_rating;
+				var rating = this.rating;
 
 			gr.DrawImage(g_showlist.ratingImages[rating], this.rating_x, this.y+rating_vpadding, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 0, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 255);
 		};
@@ -866,7 +866,7 @@ oRow = function(metadb,itemIndex) {
 					else
 						pt.DrawImage(now_playing_progress1, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress1.Width, now_playing_progress1.Height, 0, 0, now_playing_progress1.Width, now_playing_progress1.Height,0,255);						
 					if(properties.showPlaycount){		
-						pt.DrawString("  ("+this.tf_playcount+")", g_font.min2, colors.albumartprogressbar_txt, (this.tracknumber_w + 10) + this.title_length -1 , 2, this.w - this.tracknumber_w - length_w - 10 - this.title_length, this.textHeight, 17825792);
+						pt.DrawString("  ("+this.playcount+")", g_font.min2, colors.albumartprogressbar_txt, (this.tracknumber_w + 10) + this.title_length -1 , 2, this.w - this.tracknumber_w - length_w - 10 - this.title_length, this.textHeight, 17825792);
 					}					
 					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, 1, length_w, this.textHeight, 554696704);
 				playingText.ReleaseGraphics(pt);
@@ -879,7 +879,7 @@ oRow = function(metadb,itemIndex) {
     this.check = function(event, x, y) {
         this.ishover = (x > this.x+10 && x < this.x + 10 + this.w - 5 && y >= this.y && y < this.y + this.h - 1);
 		
-        this.ishover_rating = properties.showRating && this.ishover && (x > this.rating_x-this.rating_length/5 && x < this.rating_x + this.rating_length) && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.tf_rating>0));
+        this.ishover_rating = properties.showRating && this.ishover && (x > this.rating_x-this.rating_length/5 && x < this.rating_x + this.rating_length) && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0));
 		
         switch(event) {
             case "down":
@@ -935,7 +935,7 @@ oRow = function(metadb,itemIndex) {
 							g_rating_updated = true;
 							brw.dragEnable = false;
 							g_rating_rowId = this.itemIndex;
-							if(l_rating!=this.tf_rating) this.tf_rating = rateSong(l_rating,this.tf_rating, this.metadb);
+							if(l_rating!=this.rating) this.rating = rateSong(l_rating,this.rating, this.metadb);
 							g_showlist.track_rated = true;
 						};							
 					}
@@ -1020,7 +1020,7 @@ oRow = function(metadb,itemIndex) {
 					if(properties.showToolTip && this.showToolTip && !(g_dragA || g_dragR)){					
 						if(this.ishover && brw.TooltipRow!=this.itemIndex && !this.ishover_rating) {
 							brw.TooltipRow=this.itemIndex;	
-							new_tooltip_text=this.ToolTipText;//+"\n"+this.tf_artist;
+							new_tooltip_text=this.ToolTipText;//+"\n"+this.artist;
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay);		
 						}
 						if(brw.TooltipRow==this.itemIndex && !this.ishover) {
@@ -1363,26 +1363,26 @@ oShowList = function(parentPanelName) {
 		if(EvalWithMetadb){
 			TagsString = TF.showlist.EvalWithMetadb(this.pl[0]);
 			Tags = TagsString.split(" ^^ ");
-			this.tf_artist = Tags[0];
-			this.tf_album = Tags[1];
-			this.tf_discnumber = Tags[2];
-			this.tf_date = Tags[3];
-			this.tf_genre = Tags[4];
+			this.artist = Tags[0];
+			this.album = Tags[1];
+			this.discnumber = Tags[2];
+			this.date = Tags[3];
+			this.genre = Tags[4];
 			this.total_tracks = this.pl.Count+(this.pl.Count>1?" tracks":" track");					
 		} else {
 			TagsString = TF.showlistReduced.EvalWithMetadb(this.pl[0]);
 			Tags = TagsString.split(" ^^ ");			
-			this.tf_artist = brw.groups_draw[this.idx].artist;
-			this.tf_album = brw.groups_draw[this.idx].album;
-			this.tf_discnumber = (Tags[0]=='')?'':' - Disc '+Tags[0];
-			this.tf_date = ' ('+brw.groups_draw[this.idx].date+')';
-			this.tf_genre = brw.groups_draw[this.idx].genre;
+			this.artist = brw.groups_draw[this.idx].artist;
+			this.album = brw.groups_draw[this.idx].album;
+			this.discnumber = (Tags[0]=='')?'':' - Disc '+Tags[0];
+			this.date = ' ('+brw.groups_draw[this.idx].date+')';
+			this.genre = brw.groups_draw[this.idx].genre;
 			this.total_tracks = this.pl.Count+(this.pl.Count>1?" tracks":" track");		
 		}
 
 		
-		this.firstRowInfo = this.tf_album+this.tf_discnumber+this.tf_date;
-		this.secondRowInfo = this.tf_artist;
+		this.firstRowInfo = this.album+this.discnumber+this.date;
+		this.secondRowInfo = this.artist;
 		
 		if(properties.TFgrouping!=""){
 			if(properties.TFgrouping.indexOf("%album%")==-1) this.firstRowInfo = TF.grouping.EvalWithMetadb(this.pl[0]);
@@ -1859,7 +1859,7 @@ oShowList = function(parentPanelName) {
 						}
 					}
 
-					var genreText = this.tf_genre.replace(/\s+/g, " ");
+					var genreText = this.genre.replace(/\s+/g, " ");
 					if(this.genreTextLenght==0) this.genreTextLenght = gr.CalcTextWidth(genreText,g_font.normal);
 					if(this.timeTextLenght==0) this.timeTextLenght = gr.CalcTextWidth(this.length+',  '+this.total_tracks,g_font.normal);
 					
