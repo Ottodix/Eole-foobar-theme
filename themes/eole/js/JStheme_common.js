@@ -1590,6 +1590,11 @@ function removeItems(plist_items, plist_Idx, ask_for_confirmation){
 String.prototype.sanitise = function() {
     return this.replace(/[\/\\|:]/g, "-").replace(/\*/g, "x").replace(/"/g, "''").replace(/[<>]/g, "_").replace(/\?/g, "").replace(/^\./, "_").replace(/\.+$/, "").replace(/^\s+|[\n\s]+$/g, "");
 }
+String.prototype.extract_year = function() {
+	var year = this.match(/[0-9]{4}/);
+	if(year) return year[0];
+	return this;
+}
 function trim1(str) {
     return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 }
