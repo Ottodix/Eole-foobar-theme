@@ -2823,7 +2823,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	
 	_filterMenu.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 30, "Show")
 	_filterMenu.CheckMenuItem(30, properties.showFilterBox);	
-	_filterMenu.AppendMenuItem(MF_STRING, 50, "Filter also the tracks");
+	_filterMenu.AppendMenuItem(MF_STRING, 50, "Filter also the tracks (slow down a little bit the search)");
 	_filterMenu.CheckMenuItem(50, properties.filterBox_filter_tracks);
 	_filterMenu.AppendTo(_menuHeaderBar,MF_STRING, "Filter field");
 	
