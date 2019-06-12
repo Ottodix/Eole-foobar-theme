@@ -2088,11 +2088,11 @@ var g_start_ = 0, g_end_ = 0;
 var g_last = 0;
 var g_seconds = 0;
 // START
-function on_size() {
+function on_size(w, h) {   
     window.DlgCode = 0x0004;
     
-    ww = window.Width;
-    wh = window.Height;
+    ww = w;
+    wh = h;
     
     if(!ww || !wh) {
         ww = 1;
@@ -2129,7 +2129,7 @@ function get_update_function(){
 	return to_return;
 }
 function on_paint(gr) {
-	if(update_size) on_size();	
+	if(update_size) on_size(window.Width, window.Height);	
 	if(Update_Required_function!="") {
 		eval(get_update_function());
 	}      

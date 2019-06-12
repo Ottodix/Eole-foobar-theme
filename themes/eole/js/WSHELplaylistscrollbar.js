@@ -119,9 +119,9 @@ function on_playlist_switch(){
        plman.SetPlaylistFocusItem(plman.ActivePlaylist,-1);    
     }
 }
-function on_size(){
-	wh = window.Height;
-	ww = window.Width;
+function on_size(w, h) {   
+	wh = w;
+	ww = h;
     initialize_scrollbar()
 }
 function on_playlist_items_added(){

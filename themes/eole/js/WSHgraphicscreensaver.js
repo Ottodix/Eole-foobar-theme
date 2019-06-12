@@ -15,6 +15,7 @@ var g_genre_cache = null;
 var g_seconds = 0;
 var update_size = true;
 var first_on_size_done = false;
+var force_on_size=false;
 var g_avoid_on_playlists_changed = false;
 var g_avoid_on_playlist_switch = false;
 var g_avoid_on_mouse_leave=false;
@@ -4352,7 +4353,7 @@ oBrowser = function(name) {
 			cover_shadow = undefined;
 			cover_shadow = null;	
 		}				
-		on_size();		
+		on_size(window.Width, window.Height);		
 	}
     this.setResizeButton(properties.resize_btn_width,properties.resize_btn_height);
 	this.stopFlashNowPlaying = function (){
@@ -4416,7 +4417,10 @@ oBrowser = function(name) {
 			}
 		} else {a=albumIdx;found=true;}
 		if(found) { // scroll to album and open showlist
-			if(!first_on_size_done) on_size(true);
+			if(!first_on_size_done) {
+				force_on_size=true;
+				on_size(window.Width, window.Height);
+			}
 			FocusOnNowPlaying=false;
 			if(typeof this.groups_draw[a] !== "undefined" && this.groups_draw[a].pl) {
 				// set size of new showList of the selected album
@@ -4722,9 +4726,9 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 
 
 // ============================================= JScript Callbacks ===========================================================
-function on_size(force_on_size) {   
-    ww = Math.max(window.Width,globalProperties.fullMode_minwidth);
-    wh = Math.max(window.Height,globalProperties.fullMode_minheight);  
+function on_size(w, h) {   
+    ww = Math.max(w,globalProperties.fullMode_minwidth);
+    wh = Math.max(h,globalProperties.fullMode_minheight);  
 	if(window.IsVisible || force_on_size===true){
 		// set wallpaper
 		if(properties.showwallpaper){
@@ -4747,6 +4751,7 @@ function on_size(force_on_size) {
 		positionButtons();
 		update_size = false;
 		first_on_size_done = true;
+		force_on_size=false;
 	} else {
 		update_size = true;
 		/*brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);
@@ -4755,7 +4760,7 @@ function on_size(force_on_size) {
 		scroll = g_scrollbar.check_scroll(scroll);
 		positionButtons();
 		update_wallpaper = true;
-		set_update_function("on_size()");*/
+		set_update_function("on_size(window.Width, window.Height)");*/
 	}
 }
 
@@ -4766,7 +4771,10 @@ function set_update_function(string){
 }
 
 function on_paint(gr) {
-	if(update_size || !first_on_size_done) on_size(true);	
+	if(update_size || !first_on_size_done) {
+		force_on_size=true;
+		on_size(window.Width, window.Height);	
+	}
 	if(Update_Required_function!="") {
 		eval(Update_Required_function);
 		Update_Required_function = "";
@@ -5420,7 +5428,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			cover_shadow = undefined;
 			cover_shadow = null;	
 		}				
-        on_size();
+        on_size(window.Width, window.Height);
         return;
     }
     if(!g_dragA) {
@@ -5703,7 +5711,7 @@ function on_font_changed() {
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
 	brw.get_metrics_called = false;
-	on_size();
+	on_size(window.Width, window.Height);
 }
 
 function on_colours_changed() {

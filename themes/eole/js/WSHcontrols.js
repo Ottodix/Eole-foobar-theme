@@ -679,9 +679,9 @@ function showVolumeSliderTemp(){
 	}, 1000);    	
 }
 
-function on_size(){  
-    ww = Math.max(window.Width,globalProperties.miniMode_minwidth-50);
-    wh = window.Height;
+function on_size(w, h) {   
+    ww = Math.max(w,globalProperties.miniMode_minwidth-50);
+    wh = h;
 	
     // set wallpaper
     if(fb.IsPlaying && properties.showwallpaper) {
@@ -1476,7 +1476,7 @@ function on_notify_data(name, info) {
 				properties.showTrackInfo = showtrackinfo_big.isActive();		
 			}				
 			get_colors();	
-			on_size();				
+			on_size(window.Width, window.Height);				
 			window.Repaint(); 
 		break;	 
 		case "nowplayinglib_state":
@@ -2696,7 +2696,7 @@ function draw_settings_menu(x,y){
 				}
 				build_buttons();				
 				get_colors();	
-				on_size();				
+				on_size(window.Width, window.Height);				
 				window.Repaint(); 
                 break; 	
             case (idx == 3016):
@@ -2707,7 +2707,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY equalizer", properties.displayEqualizer);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;			
             case (idx == 3018):
@@ -2715,7 +2715,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY rating", properties.displayRating);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;		
             case (idx == 3019):
@@ -2723,7 +2723,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY scheduler", properties.displayScheduler);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;	  
             case (idx == 3020):
@@ -2731,7 +2731,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY play random btn", properties.displayPlayRandom);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;	
             case (idx == 3021):
@@ -2739,7 +2739,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY shuffle btn", properties.displayShuffle);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;			
             case (idx == 3022):
@@ -2747,7 +2747,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY repeat btn", properties.displayRepeat);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;			
             case (idx == 3023):
@@ -2755,7 +2755,7 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY open btn", properties.displayOpen);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;	
             case (idx == 3024):
@@ -2780,7 +2780,7 @@ function draw_settings_menu(x,y){
 				mini_controlbar.toggleValue(1);
 				build_buttons();
 				adapt_display_to_layout();
-				on_size();					
+				on_size(window.Width, window.Height);					
 				window.Repaint();			
                 break;								
             default: 

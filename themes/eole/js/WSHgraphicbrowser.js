@@ -2405,6 +2405,7 @@ oHeaderBar = function(name) {
 			this.rightpadding=105;			
 		}
 		
+
 		this.SettingsButton.x = ww-47;
 		this.SettingsButton.draw(gr,this.SettingsButton.x,this.SettingsButton.y,255);
 		
@@ -3768,7 +3769,7 @@ oBrowser = function(name) {
 			this.headerBarHeight = 4;
 		g_headerbar.setDisplayedInfo();
 		g_headerbar.setSize(0,0,this.w,this.headerBarHeight)
-		on_size();
+		on_size(window.Width, window.Height);
 		//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);			
 	}
     this.setSize = function(x, y, w, h) {	
@@ -5054,7 +5055,7 @@ oBrowser = function(name) {
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
 		this.refresh_shadows();				
-		on_size();		
+		on_size(window.Width, window.Height);		
 	}
     this.setResizeButton(65,14);
 	this.stopFlashNowPlaying = function (){
@@ -5510,9 +5511,9 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 
 
 // ============================================= JScript Callbacks ===========================================================
-function on_size() {   
-    ww = Math.max(window.Width,globalProperties.fullMode_minwidth);
-    wh = Math.max(window.Height,globalProperties.fullMode_minheight);  
+function on_size(w, h) {   
+    ww = Math.max(w,globalProperties.fullMode_minwidth);
+    wh = Math.max(h,globalProperties.fullMode_minheight);  
 	if(window.IsVisible || first_on_size){
 		// set wallpaper
 		if(properties.showwallpaper){
@@ -5544,7 +5545,7 @@ function on_size() {
 		scroll = g_scrollbar.check_scroll(scroll);
 		positionButtons();
 		update_wallpaper = true;
-		set_update_function("on_size()");*/
+		set_update_function("on_size(window.Width, window.Height)");*/
 	}
 }
 
@@ -5555,7 +5556,7 @@ function set_update_function(string){
 }
 
 function on_paint(gr) {
-	if(update_size) on_size();	
+	if(update_size) on_size(window.Width, window.Height);	
 	if(Update_Required_function!="") {
 		eval(Update_Required_function);
 		Update_Required_function = "";
@@ -6236,7 +6237,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			this.cover_shadow = undefined;
 			this.cover_shadow = null;	
 		}				
-        on_size();
+        on_size(window.Width, window.Height);
         return;
     }
     if(!g_dragA && !g_dragR) {
@@ -6498,7 +6499,7 @@ function on_font_changed() {
 	g_showlist.ratingImgsDark = false;
 	brw.get_metrics_called = false;
 	g_filterbox.on_init();
-	on_size();
+	on_size(window.Width, window.Height);
 }
 
 function on_colours_changed() {

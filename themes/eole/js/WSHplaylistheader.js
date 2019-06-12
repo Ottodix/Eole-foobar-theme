@@ -730,9 +730,9 @@ playlistInfo = function(){
 	}		
 }
 
-function on_size() {
-    ww = window.Width;
-    wh = window.Height;  
+function on_size(w, h) {   
+    ww = w;
+    wh = h;  
 	positionButtons();
 }
 

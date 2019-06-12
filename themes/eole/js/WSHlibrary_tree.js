@@ -720,7 +720,7 @@ function userinterface() {
 		if(new_padding<ui.row_p_min) new_padding=ui.row_p_min;
 		this.row_p = new_padding;
 		window.SetProperty(" Row Vertical Item Padding", this.row_p);	
-		on_size();
+		on_size(window.Width, window.Height);
 		window.Repaint();		
 	}
     this.get_textselcol = function(c) {
@@ -2728,9 +2728,9 @@ function populate() {
 }
 
 
-function on_size() {
-	ui.w = window.Width;
-	ui.h = window.Height;
+function on_size(w, h) {   
+	ui.w = w;
+	ui.h = h;
 	ww = ui.w;
 	wh = ui.h;	
 	if (!ui.w || !ui.h) return;
@@ -3242,7 +3242,7 @@ function set_update_function(string){
 }
 
 function on_paint(gr) {
-	if(update_size) on_size();    	
+	if(update_size) on_size(window.Width, window.Height);    	
 	if(Update_Required_function!="") {
 		eval(Update_Required_function);
 		Update_Required_function = "";

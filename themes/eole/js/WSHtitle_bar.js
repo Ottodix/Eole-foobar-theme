@@ -741,9 +741,9 @@ function set_main_btns_visibility(){
 	buttons.Library.setVisibility(true);
 }
 // -------------------------------- WSH Callbacks -------------------------------------------
-function on_size(){  
-    ww = Math.max(window.Width,globalProperties.miniMode_minwidth);
-    wh = window.Height;
+function on_size(w, h) {   
+    ww = Math.max(w,globalProperties.miniMode_minwidth);
+    wh = h;
 	var fullscreen =  g_uihacks.getFullscreenState();
 	var mainWindowState =  g_uihacks.getMainWindowState();	
 	if(layout_state.isEqual(0)){

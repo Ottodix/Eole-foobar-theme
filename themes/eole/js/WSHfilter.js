@@ -4020,14 +4020,14 @@ var g_rightClickedIndex = -1;
 
 var PanelToggleButtons_height=0;
 // START
-function on_size() {
+function on_size(w, h) {   
     window.DlgCode = 0x0004;
     
-    ww = Math.max(window.Width,50);
+    ww = Math.max(w,50);
 	
 	if(properties.showPanelToggleButtons && filters_panel_state.isActive())
-		wh = window.Height-PanelToggleButtons_height;
-    else wh = window.Height
+		wh = h-PanelToggleButtons_height;
+    else wh = h;
     if(!ww || !wh) {
         ww = 1;
         wh = 1;
@@ -4061,7 +4061,7 @@ function set_update_function(string){
 
 function on_paint(gr) {
     if(!ww || !wh || ww < 10 || wh < 10) return;
-	if(update_size) on_size();    
+	if(update_size) on_size(window.Width, window.Height);    
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	}	

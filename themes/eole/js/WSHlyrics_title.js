@@ -21,9 +21,9 @@ function on_mouse_move(x,y,m){
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);	
 }
-function on_size() {
-    ww = window.Width;
-    wh = window.Height;	
+function on_size(w, h) {   
+    ww = w;
+    wh = h;	
 }
 function on_paint(gr) {
 	gr.SetTextRenderingHint(globalProperties.TextRendering);	

@@ -1,8 +1,7 @@
-﻿'use strict';
-const requiredVersionStr = '1.2.1'; function is_compatible(requiredVersionStr) {const requiredVersion = requiredVersionStr.split('.'), currentVersion = utils.Version.split('.'); if (currentVersion.length > 3) currentVersion.length = 3; for (let i = 0; i < currentVersion.length; ++i) if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i]; return true;} if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`Biography requires v${requiredVersionStr}. Current component version is v${utils.Version}.`);
+﻿const requiredVersionStr = '1.1.5'; function is_compatible(requiredVersionStr) {const requiredVersion = requiredVersionStr.split('.'), currentVersion = utils.Version.split('.'); if (currentVersion.length > 3) currentVersion.length = 3; for (let i = 0; i < currentVersion.length; ++i) if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i]; return true;} if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`Biography requires v${requiredVersionStr}. Current component version is v${utils.Version}.`);
 
 const $ = {
-	getDpi : () => {let dpi = 120; try {dpi = $.WshShell.RegRead("HKCU\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");} catch (e) {} return Math.max(dpi / 120, 1);},
+	getDpi : () => {let dpi = 120; try {dpi = $.WshShell.RegRead("HKCU\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");} catch (e) {} return dpi < 121 ? 1 : dpi / 120;},
     isArray : arr => Array.isArray(arr),
     shuffle : arr => {for (let i = arr.length - 1; i >= 0; i--) {const randomIndex = Math.floor(Math.random() * (i + 1)), itemAtIndex = arr[randomIndex]; arr[randomIndex] = arr[i]; arr[i] = itemAtIndex;} return arr;},
     take : (arr, ln) => {if (ln >= arr.length) return arr; else arr.length = ln > 0 ? ln : 0; return arr;},
@@ -29,24 +28,21 @@ const s = {
     },
     jsonParse : (n, defaultVal, type, keys, isValid) => {
         switch (type) {
-            case 'file': try {return JSON.parse(s.open(n));} catch (e) {return defaultVal;} break;
-            case 'get': if (isValid) {isValid = isValid.split("|"); if (!isValid.every(v => n.includes(v))) return false;} let data; try {data = JSON.parse(n);} catch (e) {return defaultVal;} if (keys) return s.get(data, keys, defaultVal); return data;
-            default: try {return JSON.parse(n);} catch (e) {return defaultVal;} break;
+            case 'file': try {return JSON_parse(s.open(n));} catch (e) {return defaultVal;} break;
+            case 'get': if (isValid) {isValid = isValid.split("|"); if (!isValid.every(v => n.includes(v))) return false;} let data; try {data = JSON_parse(n);} catch (e) {return defaultVal;} if (keys) return s.get(data, keys, defaultVal); return data;
+            default: try {return JSON_parse(n);} catch (e) {return defaultVal;} break;
         }
     },
-	lastModified : file => {try {return Date.parse(s.fs.GetFile(file).DateLastModified);} catch (e) {}}, // added try catch for rare cases where fso.FileExists true yet errors here [SMP 1.2.1 not handling some special characters; JSP OK]
+    lastModified : file => Date.parse(s.fs.GetFile(file).DateLastModified),
     open : f => s.file(f) ? utils.ReadTextFile(f) : '',
     padNumber : (num, len, base) => {if (!base) base = 10; return ('000000' + num.toString(base)).substr(-len);},
     query : (h, q) => {let l = FbMetadbHandleList(); try {l = fb.GetQueryItems(h, q);} catch (e) {} return l;},
     removeDiacritics : str => {const defaultDiacriticsRemovalMap = [{'base':'A', 'letters':/[\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F]/g}, {'base':'AA','letters':/[\uA732]/g}, {'base':'AE','letters':/[\u00C6\u01FC\u01E2]/g}, {'base':'AO','letters':/[\uA734]/g}, {'base':'AU','letters':/[\uA736]/g}, {'base':'AV','letters':/[\uA738\uA73A]/g}, {'base':'AY','letters':/[\uA73C]/g}, {'base':'B', 'letters':/[\u0042\u24B7\uFF22\u1E02\u1E04\u1E06\u0243\u0182\u0181]/g}, {'base':'C', 'letters':/[\u0043\u24B8\uFF23\u0106\u0108\u010A\u010C\u00C7\u1E08\u0187\u023B\uA73E]/g}, {'base':'D', 'letters':/[\u0044\u24B9\uFF24\u1E0A\u010E\u1E0C\u1E10\u1E12\u1E0E\u0110\u018B\u018A\u0189\uA779]/g}, {'base':'DZ','letters':/[\u01F1\u01C4]/g}, {'base':'Dz','letters':/[\u01F2\u01C5]/g}, {'base':'E', 'letters':/[\u0045\u24BA\uFF25\u00C8\u00C9\u00CA\u1EC0\u1EBE\u1EC4\u1EC2\u1EBC\u0112\u1E14\u1E16\u0114\u0116\u00CB\u1EBA\u011A\u0204\u0206\u1EB8\u1EC6\u0228\u1E1C\u0118\u1E18\u1E1A\u0190\u018E]/g}, {'base':'F', 'letters':/[\u0046\u24BB\uFF26\u1E1E\u0191\uA77B]/g}, {'base':'G', 'letters':/[\u0047\u24BC\uFF27\u01F4\u011C\u1E20\u011E\u0120\u01E6\u0122\u01E4\u0193\uA7A0\uA77D\uA77E]/g}, {'base':'H', 'letters':/[\u0048\u24BD\uFF28\u0124\u1E22\u1E26\u021E\u1E24\u1E28\u1E2A\u0126\u2C67\u2C75\uA78D]/g}, {'base':'I', 'letters':/[\u0049\u24BE\uFF29\u00CC\u00CD\u00CE\u0128\u012A\u012C\u0130\u00CF\u1E2E\u1EC8\u01CF\u0208\u020A\u1ECA\u012E\u1E2C\u0197]/g}, {'base':'J', 'letters':/[\u004A\u24BF\uFF2A\u0134\u0248]/g}, {'base':'K', 'letters':/[\u004B\u24C0\uFF2B\u1E30\u01E8\u1E32\u0136\u1E34\u0198\u2C69\uA740\uA742\uA744\uA7A2]/g}, {'base':'L', 'letters':/[\u004C\u24C1\uFF2C\u013F\u0139\u013D\u1E36\u1E38\u013B\u1E3C\u1E3A\u0141\u023D\u2C62\u2C60\uA748\uA746\uA780]/g}, {'base':'LJ','letters':/[\u01C7]/g}, {'base':'Lj','letters':/[\u01C8]/g}, {'base':'M', 'letters':/[\u004D\u24C2\uFF2D\u1E3E\u1E40\u1E42\u2C6E\u019C]/g}, {'base':'N', 'letters':/[\u004E\u24C3\uFF2E\u01F8\u0143\u00D1\u1E44\u0147\u1E46\u0145\u1E4A\u1E48\u0220\u019D\uA790\uA7A4]/g}, {'base':'NJ','letters':/[\u01CA]/g}, {'base':'Nj','letters':/[\u01CB]/g}, {'base':'O', 'letters':/[\u004F\u24C4\uFF2F\u00D2\u00D3\u00D4\u1ED2\u1ED0\u1ED6\u1ED4\u00D5\u1E4C\u022C\u1E4E\u014C\u1E50\u1E52\u014E\u022E\u0230\u00D6\u022A\u1ECE\u0150\u01D1\u020C\u020E\u01A0\u1EDC\u1EDA\u1EE0\u1EDE\u1EE2\u1ECC\u1ED8\u01EA\u01EC\u00D8\u01FE\u0186\u019F\uA74A\uA74C]/g}, {'base':'OI','letters':/[\u01A2]/g}, {'base':'OO','letters':/[\uA74E]/g}, {'base':'OU','letters':/[\u0222]/g}, {'base':'P', 'letters':/[\u0050\u24C5\uFF30\u1E54\u1E56\u01A4\u2C63\uA750\uA752\uA754]/g}, {'base':'Q', 'letters':/[\u0051\u24C6\uFF31\uA756\uA758\u024A]/g}, {'base':'R', 'letters':/[\u0052\u24C7\uFF32\u0154\u1E58\u0158\u0210\u0212\u1E5A\u1E5C\u0156\u1E5E\u024C\u2C64\uA75A\uA7A6\uA782]/g}, {'base':'S', 'letters':/[\u0053\u24C8\uFF33\u1E9E\u015A\u1E64\u015C\u1E60\u0160\u1E66\u1E62\u1E68\u0218\u015E\u2C7E\uA7A8\uA784]/g}, {'base':'T', 'letters':/[\u0054\u24C9\uFF34\u1E6A\u0164\u1E6C\u021A\u0162\u1E70\u1E6E\u0166\u01AC\u01AE\u023E\uA786]/g}, {'base':'TZ','letters':/[\uA728]/g}, {'base':'U', 'letters':/[\u0055\u24CA\uFF35\u00D9\u00DA\u00DB\u0168\u1E78\u016A\u1E7A\u016C\u00DC\u01DB\u01D7\u01D5\u01D9\u1EE6\u016E\u0170\u01D3\u0214\u0216\u01AF\u1EEA\u1EE8\u1EEE\u1EEC\u1EF0\u1EE4\u1E72\u0172\u1E76\u1E74\u0244]/g}, {'base':'V', 'letters':/[\u0056\u24CB\uFF36\u1E7C\u1E7E\u01B2\uA75E\u0245]/g}, {'base':'VY','letters':/[\uA760]/g}, {'base':'W', 'letters':/[\u0057\u24CC\uFF37\u1E80\u1E82\u0174\u1E86\u1E84\u1E88\u2C72]/g}, {'base':'X', 'letters':/[\u0058\u24CD\uFF38\u1E8A\u1E8C]/g}, {'base':'Y', 'letters':/[\u0059\u24CE\uFF39\u1EF2\u00DD\u0176\u1EF8\u0232\u1E8E\u0178\u1EF6\u1EF4\u01B3\u024E\u1EFE]/g}, {'base':'Z', 'letters':/[\u005A\u24CF\uFF3A\u0179\u1E90\u017B\u017D\u1E92\u1E94\u01B5\u0224\u2C7F\u2C6B\uA762]/g}, {'base':'a', 'letters':/[\u0061\u24D0\uFF41\u1E9A\u00E0\u00E1\u00E2\u1EA7\u1EA5\u1EAB\u1EA9\u00E3\u0101\u0103\u1EB1\u1EAF\u1EB5\u1EB3\u0227\u01E1\u00E4\u01DF\u1EA3\u00E5\u01FB\u01CE\u0201\u0203\u1EA1\u1EAD\u1EB7\u1E01\u0105\u2C65\u0250]/g}, {'base':'aa','letters':/[\uA733]/g}, {'base':'ae','letters':/[\u00E6\u01FD\u01E3]/g}, {'base':'ao','letters':/[\uA735]/g}, {'base':'au','letters':/[\uA737]/g}, {'base':'av','letters':/[\uA739\uA73B]/g}, {'base':'ay','letters':/[\uA73D]/g}, {'base':'b', 'letters':/[\u0062\u24D1\uFF42\u1E03\u1E05\u1E07\u0180\u0183\u0253]/g}, {'base':'c', 'letters':/[\u0063\u24D2\uFF43\u0107\u0109\u010B\u010D\u00E7\u1E09\u0188\u023C\uA73F\u2184]/g}, {'base':'d', 'letters':/[\u0064\u24D3\uFF44\u1E0B\u010F\u1E0D\u1E11\u1E13\u1E0F\u0111\u018C\u0256\u0257\uA77A]/g}, {'base':'dz','letters':/[\u01F3\u01C6]/g}, {'base':'e', 'letters':/[\u0065\u24D4\uFF45\u00E8\u00E9\u00EA\u1EC1\u1EBF\u1EC5\u1EC3\u1EBD\u0113\u1E15\u1E17\u0115\u0117\u00EB\u1EBB\u011B\u0205\u0207\u1EB9\u1EC7\u0229\u1E1D\u0119\u1E19\u1E1B\u0247\u025B\u01DD]/g}, {'base':'f', 'letters':/[\u0066\u24D5\uFF46\u1E1F\u0192\uA77C]/g}, {'base':'g', 'letters':/[\u0067\u24D6\uFF47\u01F5\u011D\u1E21\u011F\u0121\u01E7\u0123\u01E5\u0260\uA7A1\u1D79\uA77F]/g}, {'base':'h', 'letters':/[\u0068\u24D7\uFF48\u0125\u1E23\u1E27\u021F\u1E25\u1E29\u1E2B\u1E96\u0127\u2C68\u2C76\u0265]/g}, {'base':'hv','letters':/[\u0195]/g}, {'base':'i', 'letters':/[\u0069\u24D8\uFF49\u00EC\u00ED\u00EE\u0129\u012B\u012D\u00EF\u1E2F\u1EC9\u01D0\u0209\u020B\u1ECB\u012F\u1E2D\u0268\u0131]/g}, {'base':'j', 'letters':/[\u006A\u24D9\uFF4A\u0135\u01F0\u0249]/g}, {'base':'k', 'letters':/[\u006B\u24DA\uFF4B\u1E31\u01E9\u1E33\u0137\u1E35\u0199\u2C6A\uA741\uA743\uA745\uA7A3]/g}, {'base':'l', 'letters':/[\u006C\u24DB\uFF4C\u0140\u013A\u013E\u1E37\u1E39\u013C\u1E3D\u1E3B\u017F\u0142\u019A\u026B\u2C61\uA749\uA781\uA747]/g}, {'base':'lj','letters':/[\u01C9]/g}, {'base':'m', 'letters':/[\u006D\u24DC\uFF4D\u1E3F\u1E41\u1E43\u0271\u026F]/g}, {'base':'n', 'letters':/[\u006E\u24DD\uFF4E\u01F9\u0144\u00F1\u1E45\u0148\u1E47\u0146\u1E4B\u1E49\u019E\u0272\u0149\uA791\uA7A5]/g}, {'base':'nj','letters':/[\u01CC]/g}, {'base':'o', 'letters':/[\u006F\u24DE\uFF4F\u00F2\u00F3\u00F4\u1ED3\u1ED1\u1ED7\u1ED5\u00F5\u1E4D\u022D\u1E4F\u014D\u1E51\u1E53\u014F\u022F\u0231\u00F6\u022B\u1ECF\u0151\u01D2\u020D\u020F\u01A1\u1EDD\u1EDB\u1EE1\u1EDF\u1EE3\u1ECD\u1ED9\u01EB\u01ED\u00F8\u01FF\u0254\uA74B\uA74D\u0275]/g}, {'base':'oi','letters':/[\u01A3]/g}, {'base':'ou','letters':/[\u0223]/g}, {'base':'oo','letters':/[\uA74F]/g}, {'base':'p','letters':/[\u0070\u24DF\uFF50\u1E55\u1E57\u01A5\u1D7D\uA751\uA753\uA755]/g}, {'base':'q','letters':/[\u0071\u24E0\uFF51\u024B\uA757\uA759]/g}, {'base':'r','letters':/[\u0072\u24E1\uFF52\u0155\u1E59\u0159\u0211\u0213\u1E5B\u1E5D\u0157\u1E5F\u024D\u027D\uA75B\uA7A7\uA783]/g}, {'base':'s','letters':/[\u0073\u24E2\uFF53\u00DF\u015B\u1E65\u015D\u1E61\u0161\u1E67\u1E63\u1E69\u0219\u015F\u023F\uA7A9\uA785\u1E9B]/g}, {'base':'t','letters':/[\u0074\u24E3\uFF54\u1E6B\u1E97\u0165\u1E6D\u021B\u0163\u1E71\u1E6F\u0167\u01AD\u0288\u2C66\uA787]/g}, {'base':'tz','letters':/[\uA729]/g}, {'base':'u','letters':/[\u0075\u24E4\uFF55\u00F9\u00FA\u00FB\u0169\u1E79\u016B\u1E7B\u016D\u00FC\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289]/g}, {'base':'v','letters':/[\u0076\u24E5\uFF56\u1E7D\u1E7F\u028B\uA75F\u028C]/g}, {'base':'vy','letters':/[\uA761]/g}, {'base':'w','letters':/[\u0077\u24E6\uFF57\u1E81\u1E83\u0175\u1E87\u1E85\u1E98\u1E89\u2C73]/g}, {'base':'x','letters':/[\u0078\u24E7\uFF58\u1E8B\u1E8D]/g}, {'base':'y','letters':/[\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF]/g}, {'base':'z','letters':/[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]/g}]; defaultDiacriticsRemovalMap.forEach(v => {str = str.replace(v.letters, v.base);});return str;},
-	removeNulls : o => {const isArray = $.isArray(o); Object.keys(o).forEach(v => {if (o[v].length == 0) isArray ? o.splice(v, 1) : delete o[v]; else if (typeof o[v] == "object") s.removeNulls(o[v]);});},
     replaceAt : (str, pos, chr) => str.substring(0, pos) + chr + str.substring(pos + 1),
     run : (c, w) => {try {typeof w === 'undefined' ? $.WshShell.Run(c) : $.WshShell.Run(c, w); return true;} catch (e) {return false;}},
     save : (fn, txt, bom) => {try {utils.WriteTextFile(fn, txt, bom)} catch (e) {s.trace("Error saving: " + fn);}},
 	scale : $.getDpi(),
-	sortKeys : o => Object.keys(o).sort().reduce((a, c) => (a[c] = o[c], a), {}),
     throttle : (e,i,t) => {var n=!0,r=!0;if("function"!=typeof e)throw new TypeError(FUNC_ERROR_TEXT);return s.isObject(t)&&(n="leading"in t?!!t.leading:n,r="trailing"in t?!!t.trailing:r),s.debounce(e,i,{leading:n,maxWait:i,trailing:r})},
-	toRGB : c => [c >> 16 & 0xff, c >> 8 & 0xff, c & 0xff],
     trace : (message, n) => console.log("Biography" + (n ? " Server" : "") + ": " + message),
     value : (num, def, type) => {num = parseFloat(num); if (isNaN(num)) return def; switch (type) {case 0: return num; case 1: if (num !== 1 && num !== 0) return def; break; case 2: if (num > 2 || num < 0) return def; break;} return num;}
 }
@@ -116,7 +112,7 @@ let properties = [
 	[" Heading  Title Format  Album Review [Last.fm]", "$if2(%BIO_ALBUMARTIST%,Artist Unknown) - $if2(%BIO_ALBUM% - Album Review,Album Unknown)", "lfmRevHeading"],
 	[" Heading  Title Format  Biography [AllMusic]", "$if2(%BIO_ARTIST% - Biography,Artist Unknown)", "amBioHeading"],
 	[" Heading  Title Format  Biography [Last.fm]", "$if2(%BIO_ARTIST% - Biography,Artist Unknown)", "lfmBioHeading"],
-	[" Heading  Title Format  Track Review [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)", "lfmTrackHeading"],
+	[" Heading  Title Format  Track Review [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - %title% - Track Review", "lfmTrackHeading"],
 	[" Heading Items 0 or 1", "BtnBg,1,BtnName,1,BtnRedLastfm,0,Text,1", "show"],
 	[" Heading Metrics +/-", "Gap,0,BottomLinePad,0,BtnSize,0,BtnPad,0", "headerConfig"],
 	[" Highlight Colour 0 or 1", "Btn,0,Heading,1,Line,1,Rim,1,Stars,1,Subheadings,1,Text,0", "hl"],
@@ -143,7 +139,6 @@ let properties = [
 	[" Scrollbar Arrow Custom: Icon // Examples", " // ▲  ⮝    ⯅ ⏫ ⏶ ⤊   ", "arrowSymbol"],
 	[" Scrollbar Arrow Custom: Icon: Vertical Offset %", -24, "sbarButPad"],
 	[" Scrollbar Colour Grey-0 Blend-1", 1, "sbarCol"],
-	[" Scrollbar Narrow Bar Width 2-10 (0 = Default)", 0, "narrowSbarWidth"],
 	[" Scrollbar Size", "Bar," + Math.round(11 * s.scale) + ",Arrow," + Math.round(11 * s.scale) + ",Gap(+/-),0,GripMinHeight," + Math.round(20 * s.scale), "sbarMetrics"],
 	[" Scrollbar Type Default-0 Styled-1 Themed-2", "0", "sbarType"],
 	[" Statistics Show Last.fm Metacritic Score", true, "score"],
@@ -152,8 +147,9 @@ let properties = [
 	[" Subheading  [Source]  Text  Biography [Last.fm]: Heading|No Heading", "Last.fm|Last.fm Biography", "lfmBioSubHead"],
 	[" Subheading  [Source]  Text  Review [AllMusic]: Heading|No Heading", "AllMusic|AllMusic Review", "amRevSubHead"],
 	[" Subheading  [Source]  Text  Review [Last.fm]: Heading|No Heading", "Last.fm|Last.fm Review", "lfmRevSubHead"],
-	[" Subheading  [Track Review]  Title Format  [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)", "lfmTrackSubHeading"],
+	[" Subheading  [Track Review]  Title Format  [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - %title% - Track Review", "lfmTrackSubHeading"],
 	[" Text Align Always Top", false, "topAlign"],
+	[" Text Spacing Pad", 0, "textPad"],
 	[" Touch Step 1-10", 1, "touchStep"],
 	[" Zoom Button Size (%)", 100, "zoomBut"],
 	[" Zoom Font Size (%)", 100, "zoomFont"],
@@ -175,7 +171,6 @@ let properties = [
 	["ADV.Touch Flick Distance 0-10", 0.8, "flickDistance"],
 	["SYSTEM.Allmusic Alb", true, "allmusic_alb"],
 	["SYSTEM.Allmusic Bio", false, "allmusic_bio"],
-	["SYSTEM.Artist History", JSON.stringify([]), "artistHistory"],
 	["SYSTEM.Artist View", false, "artistView"],
 	["SYSTEM.Bio & Rev Same Style", true, "sameStyle"],
 	["SYSTEM.Blur Blend Theme", false, "blurBlend"],
@@ -196,7 +191,7 @@ let properties = [
 	["SYSTEM.Cycle Time Item", 45, "cycTimeItem"],
 	["SYSTEM.Cycle Time Picture", 15, "cycTimePic"],
 	["SYSTEM.Font Size", 16, "baseFontSize"],
-	["SYSTEM.Freestyle Custom", JSON.stringify([]), "styles"],
+	["SYSTEM.Freestyle Custom", JSON_stringify([]), "styles"],
 	["SYSTEM.Heading Button Hide-0 Left-1 Right-2", 2, "src"],
 	["SYSTEM.Heading Center", false, "hdCenter"],
 	["SYSTEM.Heading Line Hide-0 Bottom-1 Center-2", 1, "hdLine"],
@@ -221,23 +216,17 @@ let properties = [
 	["SYSTEM.Layout Rev Mode", 0, "revMode"],
 	["SYSTEM.Layout Rev", 0, "revStyle"],
 	["SYSTEM.Layout", 0, "style"],
-	["SYSTEM.Line Padding", 0, "textPad"],
 	["SYSTEM.Lock Bio", false, "lockBio"],
 	["SYSTEM.Lock Rev", false, "lockRev"],
 	["SYSTEM.Overlay Type", 0, "overlayStyle"],
-	["SYSTEM.Overlay", JSON.stringify({"name":"Overlay", "imL":0, "imR":0, "imT":0, "imB":0, "txL":0, "txR":0, "txT":0.632, "txB":0}), "overlay"],
+	["SYSTEM.Overlay", JSON_stringify({"name":"Overlay", "imL":0, "imR":0, "imT":0, "imB":0, "txL":0, "txR":0, "txT":0.632, "txB":0}), "overlay"],
 	["SYSTEM.Photo Crop [Dual Mode]", false, "artCropDual"],
 	["SYSTEM.Photo Crop [Image Only]", false, "artCropImgOnly"],
 	["SYSTEM.Prefer Focus", false, "focus"],
 	["SYSTEM.Scroll: Smooth Scroll", true, "smooth"],
-	["SYSTEM.Scrollbar Button Type", 0, "sbarButType"],
-	["SYSTEM.Scrollbar Show", 1, "sbarShow"],
+	["SYSTEM.Scrollbar Show", true, "sbarShow"],
 	["SYSTEM.Scrollbar Width Bar", 11, "sbarBase_w"],
-	["SYSTEM.Scrollbar Windows Metrics", false, "sbarWinMetrics"],
-	["SYSTEM.Show Similar Artists", true, "showSimilarArtists"],
-	["SYSTEM.Show More Tags", true, "showMoreTags"],
-	["SYSTEM.Show Artist History", false, "showArtistHistory"],
-	["SYSTEM.Summary First", true, "summaryFirst"],
+	["SYSTEM.Summary First", false, "summaryFirst"],
 	["SYSTEM.Subheading Source Hide-0 Auto-1 Show-2", 1, "sourceHeading"],
 	["SYSTEM.Subheading Source Style", 1, "sourceStyle"],
 	["SYSTEM.Subheading Track Hide-0 Auto-1 Show-2", 1, "trackHeading"],
@@ -246,18 +235,8 @@ let properties = [
 	["SYSTEM.Touch Control", false, "touchControl"],
 	["SYSTEM.Track Review", 0, "inclTrackRev"],
 ];
-const ppt = new PanelProperties;
-ppt.init('auto', properties); properties = undefined;
-
-if (!ppt.get("SYSTEM.Properties Updated", false)) {
-	ppt.lfmTrackHeading = "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)";
-	ppt.lfmTrackSubHeading = "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)";
-	ppt.set(" Scrollbar Arrow Custom", null);
-	ppt.set(" Text Spacing Pad", null);
-	
-	
-	ppt.set("SYSTEM.Properties Updated", true);
-}
+const ppt = new PanelProperties();
+ppt.init('auto', properties);  properties = undefined;
 
 String.prototype.clean = function() {return this.replace(/[\/\\|:]/g, "-").replace(/\*/g, "x").replace(/"/g, "''").replace(/[<>]/g, "_").replace(/\?/g, "").replace(/^\./, "_").replace(/\.+$/, "").replace(/^\s+|[\n\s]+$/g, "");}
 String.prototype.regex_escape = function() {return this.replace(/([*+\-?^!:&"~${}()|\[\]\/\\])/g, "\\$1");}
@@ -272,7 +251,7 @@ String.prototype.titlecase = function() {
   });
 }
 
-const ui = new UserInterface, p = new Panel, name = new Names, alb_scrollbar = new Scrollbar, art_scrollbar = new Scrollbar, but = new Buttons, men = new MenuItems, t = new Text, tag = new Tagger, tb = new TextBox, lib = new Library, img = new Images, timer = new Timers, serv = new Server; window.DlgCode = 0x004;
+const ui = new UserInterface(), p = new Panel(), name = new Names(), alb_scrollbar = new Scrollbar(), art_scrollbar = new Scrollbar(), but = new Buttons(), men = new MenuItems(), t = new Text(), tag = new Tagger(), tb = new TextBox(), lib = new Library(), img = new Images(), timer = new Timers(), serv = new Server(); window.DlgCode = 0x004;
 
 function UserInterface() {
     const pptCol = [["_Custom.Colour Background", "", "bg", 1], ["_Custom.Colour Overlay Rect & RoundRect", "", "rectOv", 0], ["_Custom.Colour Overlay Rect & RoundRect Rim", "", "rectOvBor", 0], ["_Custom.Colour Text", "", "text", 0], ["_Custom.Colour Text Highlight", "", "text_h", 0], ["_Custom.Colour Transparent Fill", "", "bgTrans", 1]];
@@ -280,20 +259,21 @@ function UserInterface() {
 	if (fadeSetup.length> 2 && fadeSetup[2] == "FadeGradient") {fadeSetup[2] = "Gradient"; ppt.fadeSetup = fadeSetup.toString();}
 	if ([0, 1, 2, 3, 16, 18].every(v => v !== ppt.headFontStyle)) ppt.headFontStyle =  2; if (ppt.overlayStyle > 4 || ppt.overlayStyle < 0) ppt.overlayStyle = 0;
     let baseHeadFontSize = 16, headerGapAdjust = s.value(headerConfig[1], 0, 0), headerLnAdjust = s.value(headerConfig[3], 0, 0), tcol = "", tcol_h = "", sbarMetrics = ppt.sbarMetrics.splt(0), style = 1, zoomFontSize = 16, zoomBold = 1;
-    this.arc_w = ppt.overlayStyle != 2 && ppt.overlayStyle != 4 ? 0 : s.clamp(s.value(fadeSetup[5], 1, 0), 1, 10); this.arrow_pad = s.value(sbarMetrics[5], 0, 0); this.bg = false; this.blurAlpha = s.clamp(ppt.blurAlpha, 0, 100) / 30; this.blurLevel = ppt.blurBlend ? 91.05 - s.clamp(ppt.blurTemp, 1.05, 90) : s.clamp(ppt.blurTemp * 2, 0, 254); this.BtnBg = s.value(show[1], 1, 1); this.BtnName = s.value(show[3], 1, 1); this.local = typeof conf === 'undefined' ? false : true; this.c_c = this.local && typeof opt_c_c !== 'undefined'; this.col = {}; this.custHeadFont = false; this.dui = window.InstanceType; this.fadeAlpha = s.clamp(255 * (100 - s.value(fadeSetup[1], 14.5, 0)) / 100, 0, 255); this.fadeSlope = s.clamp(s.value(fadeSetup[3], 10, 0) / 10 - 1, -1, 9); this.font = ""; this.font_h = 37; this.grip_h = s.value(sbarMetrics[7], 12, 0); this.headFont = ""; this.headFont_h = 37; this.heading_h = 56; ppt.hdLine = s.value(ppt.hdLine, 1, 2); this.head_ln_h = 46; this.headText = s.value(show[7], 0, 1); this.l_h = Math.round(1 * s.scale); this.lfmTheme = s.value(show[5], 0, 1); this.messageFont = ""; if (ppt.narrowSbarWidth != 0) ppt.narrowSbarWidth = s.clamp(ppt.narrowSbarWidth, 2, 10); this.narrowSbarWidth = 2; ppt.sbarCol = s.clamp(ppt.sbarCol, 0, 1); this.sbarCol = ppt.sbarCol; this.src_pad = s.value(headerConfig[7], 0, 0); ppt.src = s.value(ppt.src, 2, 2); this.srcSizeAdjust = s.value(headerConfig[5], 0, 0); this.sourceFont = ""; this.trans = false;
+    this.arc_w = ppt.overlayStyle != 2 && ppt.overlayStyle != 4 ? 0 : s.clamp(s.value(fadeSetup[5], 1, 0), 1, 10); this.arrow_pad = s.value(sbarMetrics[5], 0, 0); this.bg = false; this.blurAlpha = s.clamp(ppt.blurAlpha, 0, 100) / 30; this.blurLevel = ppt.blurBlend ? 91.05 - s.clamp(ppt.blurTemp, 1.05, 90) : s.clamp(ppt.blurTemp * 2, 0, 254); this.BtnBg = s.value(show[1], 1, 1); this.BtnName = s.value(show[3], 1, 1); this.local = typeof conf === 'undefined' ? false : true; this.c_c = this.local && typeof opt_c_c !== 'undefined'; this.col = {}; this.custHeadFont = false; this.dui = window.InstanceType; this.fadeAlpha = s.clamp(255 * (100 - s.value(fadeSetup[1], 14.5, 0)) / 100, 0, 255); this.fadeSlope = s.clamp(s.value(fadeSetup[3], 10, 0) / 10 - 1, -1, 9); this.font = ""; this.font_h = 37; this.grip_h = s.value(sbarMetrics[7], 12, 0); this.headFont = ""; this.headFont_h = 37; this.heading_h = 56; ppt.hdLine = s.value(ppt.hdLine, 1, 2); this.head_ln_h = 46; this.headText = s.value(show[7], 0, 1); this.l_h = Math.round(1 * s.scale); this.lfmTheme = s.value(show[5], 0, 1); this.messageFont = ""; ppt.sbarCol = s.clamp(ppt.sbarCol, 0, 1); this.src_pad = s.value(headerConfig[7], 0, 0); ppt.src = s.value(ppt.src, 2, 2); this.srcSizeAdjust = s.value(headerConfig[5], 0, 0); this.sourceFont = ""; this.trans = false;
 
-    const chgBrightness = (c, percent) => {c = s.toRGB(c); return RGB(s.clamp(c[0] + (256 - c[0]) * percent / 100, 0, 255), s.clamp(c[1] + (256 - c[1]) * percent / 100, 0, 255), s.clamp(c[2] + (256 - c[2]) * percent / 100, 0, 255));}
-    const dim = (c, bg, alpha) => {c = s.toRGB(c); bg = s.toRGB(bg); const r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, a = alpha / 255, bgr = bg[0] / 255, bgg = bg[1] / 255, bgb = bg[2] / 255; let nR = ((1 - a) * bgr) + (a * r), nG = ((1 - a) * bgg) + (a * g), nB = ((1 - a) * bgb) + (a * b); nR = s.clamp(Math.round(nR * 255), 0, 255); nG = s.clamp(Math.round(nG * 255), 0, 255); nB = s.clamp(Math.round(nB * 255), 0, 255); return RGB(nR, nG, nB);}
+    const chgBrightness = (c, percent) => {c = toRGB(c); return RGB(s.clamp(c[0] + (256 - c[0]) * percent / 100, 0, 255), s.clamp(c[1] + (256 - c[1]) * percent / 100, 0, 255), s.clamp(c[2] + (256 - c[2]) * percent / 100, 0, 255));}
+    const dim = (c, bg, alpha) => {c = toRGB(c); bg = toRGB(bg); const r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, a = alpha / 255, bgr = bg[0] / 255, bgg = bg[1] / 255, bgb = bg[2] / 255; let nR = ((1 - a) * bgr) + (a * r), nG = ((1 - a) * bgg) + (a * g), nB = ((1 - a) * bgb) + (a * b); nR = s.clamp(Math.round(nR * 255), 0, 255); nG = s.clamp(Math.round(nG * 255), 0, 255); nB = s.clamp(Math.round(nB * 255), 0, 255); return RGB(nR, nG, nB);}
 	const pptColour = () => {pptCol.forEach(v => this.col[v[2]] = set_custom_col(ppt.get(v[0], v[1]), v[3]));}
     const RGBtoRGBA = (rgb, a) => a << 24 | rgb & 0x00FFFFFF;
     const set_custom_col = (c, t) => {if (!ppt.customCol) return ""; c = c.split("-"); let cc = ""; if (c.length != 3 && c.length != 4) return ""; switch (t) {case 0: cc = RGB(c[0], c[1], c[2]); break; case 1: switch (c.length) {case 3: cc = RGB(c[0], c[1], c[2]); break; case 4: cc = RGBA(c[0], c[1], c[2], c[3]); break;} break;} return cc;}
-	const getLineCol = type => this.get_blend(ppt.blurDark ? RGB(0, 0, 0) : ppt.blurLight ? RGB(255, 255, 255) : this.col.bg == 0 ? 0xff000000 : this.col.bg, line_h ? tcol_h : tcol, type == 'bottom' || this.blur ? 0.25 : 0.5, false);
+	const getLineCol = type => {return this.get_blend(this.col.bg == 0 ? 0xff000000 : this.col.bg, line_h ? tcol_h : tcol, type == 'bottom' || this.blur ? 0.25 : 0.5, false);}
+    const toRGB = c => [c >> 16 & 0xff, c >> 8 & 0xff, c & 0xff];
     const toRGBA = c => [c >> 16 & 0xff, c >> 8 & 0xff, c & 0xff, c >> 24 & 0xff];
 
     this.chgBlur = n => {ppt.blurDark = false; ppt.blurBlend = false; ppt.blurLight = false; switch (n) {case 1: ppt.blurDark = true; break; case 2: ppt.blurBlend = true; break; case 3: ppt.blurLight = true; break;} this.blurLevel = ppt.blurBlend ? 91.05 - s.clamp(ppt.blurTemp, 1.05, 90) : s.clamp(ppt.blurTemp * 2, 0, 254); on_colours_changed(true);}
     this.draw = gr => {if (this.bg) gr.FillSolidRect(0, 0, p.w, p.h, this.col.bg)}
-    this.get_blend = (c1, c2, f, alpha) => {const nf = 1 - f; let r, g, b, a; switch (true) {case !alpha: c1 = s.toRGB(c1); c2 = s.toRGB(c2); r = c1[0] * f + c2[0] * nf; g = c1[1] * f + c2[1] * nf; b = c1[2] * f + c2[2] * nf; return RGB(r, g, b); case alpha: c1 = toRGBA(c1); c2 = toRGBA(c2); r = c1[0] * f + c2[0] * nf; g = c1[1] * f + c2[1] * nf; b = c1[2] * f + c2[2] * nf; a = c1[3] * f + c2[3] * nf; return RGBA(r, g, b, a);}}
-    this.get_selcol = (c, n, bypass) => {if (!bypass) c = s.toRGB(c); const cc = c.map(v => {v /= 255; return v <= 0.03928 ? v /= 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4);}); const L = 0.2126 * cc[0] + 0.7152 * cc[1] + 0.0722 * cc[2]; if (L > 0.31) return n ? 50 : RGB(0, 0, 0); else return n ? 200 : RGB(255, 255, 255);}
+    this.get_blend = (c1, c2, f, alpha) => {const nf = 1 - f; let r, g, b, a; switch (true) {case !alpha: c1 = toRGB(c1); c2 = toRGB(c2); r = c1[0] * f + c2[0] * nf; g = c1[1] * f + c2[1] * nf; b = c1[2] * f + c2[2] * nf; return RGB(r, g, b); case alpha: c1 = toRGBA(c1); c2 = toRGBA(c2); r = c1[0] * f + c2[0] * nf; g = c1[1] * f + c2[1] * nf; b = c1[2] * f + c2[2] * nf; a = c1[3] * f + c2[3] * nf; return RGBA(r, g, b, a);}}
+    this.get_textselcol = (c, n) => {c = toRGB(c); const cc = c.map(v => {v /= 255; return v <= 0.03928 ? v /= 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4);}); const L = 0.2126 * cc[0] + 0.7152 * cc[1] + 0.0722 * cc[2]; if (L > 0.31) return n ? 50 : RGB(0, 0, 0); else return n ? 200 : RGB(255, 255, 255);}
     this.lines = gr => {if (!this.c_c) return; if (ppt.artistView && !ppt.img_only || !ppt.artistView && !ppt.img_only && t.text) {gr.DrawRect(0, 0, p.w - 1, p.h - 1, 1, RGB(155, 155, 155)); gr.DrawRect(1, 1, p.w - 3, p.h - 3, 1, RGB(0, 0, 0));}}
     this.reset_colors = () => {pptCol.forEach(v => this.col[v[2]] = ""); tcol = ""; tcol_h = ""; this.trans = false;}
 
@@ -311,22 +291,22 @@ function UserInterface() {
             if (this.col.bg === "") this.col.bg = window.GetColourCUI(3);
 			tcol = window.GetColourCUI(0); tcol_h = window.GetColourCUI(2);
         }
-        const lightBg = this.get_selcol(this.col.bg == 0 ? 0xff000000 : this.col.bg, true) == 50;
+        const lightBg = this.get_textselcol(this.col.bg == 0 ? 0xff000000 : this.col.bg, true) == 50;
 		if (this.col.text === "") tcol = ppt.blurBlend ? chgBrightness(tcol, lightBg ? -10 : 10) : ppt.blurDark ? RGB(255, 255, 255) : ppt.blurLight ? RGB(0, 0, 0) : tcol; else tcol = this.col.text;
 		if (this.col.text_h === "") tcol_h = ppt.blurBlend ? chgBrightness(tcol_h, lightBg ? -10 : 10) : ppt.blurDark ? RGB(255, 255, 255) : ppt.blurLight ? RGB(71, 129, 183) : tcol_h; else tcol_h = this.col.text_h;
         if (window.IsTransparent && this.col.bgTrans) {this.bg = true; this.col.bg = this.col.bgTrans}
-        if (!window.IsTransparent || this.dui) this.bg = true; if (this.local) {this.trans = c_trans; this.col.bg = c_backcol; tcol = ppt.blurBlend ? chgBrightness(c_textcol, this.get_selcol(c_backcol == 0 ? 0xff000000 : c_backcol, true) == 50 ? -10 : 10) : ppt.blurDark ? RGB(255, 255, 255) : ppt.blurLight ? RGB(0, 0, 0) : c_textcol; tcol_h = ppt.blurBlend ? chgBrightness(c_textcol_h, this.get_selcol(c_backcol == 0 ? 0xff000000 : c_backcol, true) == 50 ? -10 : 10) : ppt.blurDark || !this.bg && this.trans && !ppt.blurLight ? RGB(255, 255, 255) : ppt.blurLight ? RGB(71, 129, 183) : c_textcol_h;}
+        if (!window.IsTransparent || this.dui) this.bg = true; if (this.local) {this.trans = c_trans; this.col.bg = c_backcol; tcol = ppt.blurBlend ? chgBrightness(c_textcol, this.get_textselcol(c_backcol == 0 ? 0xff000000 : c_backcol, true) == 50 ? -10 : 10) : ppt.blurDark ? RGB(255, 255, 255) : ppt.blurLight ? RGB(0, 0, 0) : c_textcol; tcol_h = ppt.blurBlend ? chgBrightness(c_textcol_h, this.get_textselcol(c_backcol == 0 ? 0xff000000 : c_backcol, true) == 50 ? -10 : 10) : ppt.blurDark || !this.bg && this.trans && !ppt.blurLight ? RGB(255, 255, 255) : ppt.blurLight ? RGB(71, 129, 183) : c_textcol_h;}
 		if (ppt.swapCol) {const colH = tcol_h; tcol_h = tcol; tcol = colH;}
 
 		this.col.text = !text_h ? tcol : tcol_h;
 		this.col.text_h = !text_h ? tcol_h : tcol;
         this.col.btn = btn_h ? tcol_h : tcol; 
-		this.col.shadow = this.get_selcol(this.col.text_h, false); this.col.t = this.bg ? this.get_selcol(this.col.bg, true) : 200;
+		this.col.shadow = this.get_textselcol(this.col.text_h, false); this.col.t = this.bg ? this.get_textselcol(this.col.bg, true) : 200;
         if (this.stars) {["starOn", "starOff", "starBor"].forEach((v, i) => {
             this.col[v] = i < 2 ? (this.stars == 2 ? RGBtoRGBA(star_h ? tcol : tcol_h, !i ? 232 : 60) : 
 			this.bg || !this.bg && !this.trans || ppt.blurDark || ppt.blurLight ? RGBtoRGBA(star_h ? tcol_h : tcol, !i ? 232 : 60) : RGBA(255, 255, 255, !i ? 232 : 60)) : RGBA(0, 0, 0, 0);
         });}
-		this.col.bottomLine = getLineCol('bottom');
+		this.col.botttomLine = getLineCol('bottom');
 		this.col.centerLine = getLineCol('center');
 		this.col.source = ppt.blurDark ? RGB(240, 240, 240) : !ppt.blurLight && (ppt.sourceStyle == 1 || ppt.sourceStyle == 3) && (ppt.headFontStyle != 1 && ppt.headFontStyle != 3) ? 
 		dim(subhead_h ? tcol_h : tcol, !window.IsTransparent ? this.col.bg : 0xff000000, 240) : subhead_h ? tcol_h : tcol;
@@ -335,7 +315,6 @@ function UserInterface() {
         if (this.col.rectOv === "") this.col.rectOv = this.col.bg; this.col.rectOv = RGBtoRGBA(this.col.rectOv, 255 - this.fadeAlpha);
         if (this.col.rectOvBor === "") {this.col.rectOvBor = rim_h ? tcol_h : tcol; this.col.rectOvBor = RGBtoRGBA(this.col.rectOvBor, 228);}
         this.col.edBg = (ppt.blurDark ? RGB(0, 0, 0) : ppt.blurLight ? RGB(255, 255, 255) : this.col.bg) & 0x99ffffff;
-		this.sbarCol = ppt.blurDark || ppt.blurLight ? 1 : ppt.sbarCol;
         if (!ppt.heading) return;
         this.col.head = head_h ? tcol_h : tcol; ["blend1", "blend2", "blend3"].forEach((v, i) => {
             this.col[v] = ppt.blurBlend ? this.col.btn & RGBA(255, 255, 255, i == 2 ? 40 : 12) : ppt.blurDark || !this.bg && this.trans && !ppt.blurLight ? (i == 2 ? RGBA(255, 255, 255, 50) : RGBA(0, 0, 0, 40)) : ppt.blurLight ? RGBA(0, 0, 0, i == 2 ? 40 : 15) : this.get_blend(this.col.bg == 0 ? 0xff000000 : this.col.bg, this.col.btn, !i ? 0.9 : i == 2 ? 0.87 : (this.blur ? 0.75 : 0.82), false);
@@ -362,7 +341,6 @@ function UserInterface() {
         this.sourceFont = gdi.Font(!setSegoeUI ? this.font.Name : ppt.sourceStyle < 16 ? "Segoe UI" : "Segoe UI Semibold", this.font.Size, ppt.sourceStyle);
 		this.trackFont = gdi.Font(!setSegoeUI ? this.font.Name : ppt.trackStyle < 16 ? "Segoe UI" : "Segoe UI Semibold", this.font.Size, ppt.trackStyle);
 		this.messageFont = gdi.Font(this.font.Name, this.font.Size * 1.5, 1);
-		this.narrowSbarWidth = ppt.narrowSbarWidth == 0 ? s.clamp(Math.floor(this.font.Size / 7), 2, 10) : ppt.narrowSbarWidth;
         if (this.local) {this.font = c_font; this.sourceFont = gdi.Font(this.font.Name, this.font.Size, ppt.sourceStyle); this.trackFont = gdi.Font(this.font.Name, this.font.Size, ppt.trackStyle); this.messageFont = gdi.Font(this.font.Name, this.font.Size * 1.5, 1); if (ppt.sbarShow) {this.sbarType = 0; this.sbar_w = c_scr_w; this.scr_but_w = this.sbar_w + 1; this.but_h = this.sbar_w + 1; this.sbar_sp = this.sbar_w + 1;}}
         this.calc_text(); p.sizes(); but.create_stars(); t.get_widths(); t.art_calc(); t.alb_calc();
     }
@@ -389,7 +367,6 @@ function UserInterface() {
                 this.sourceFont = gdi.Font(this.sourceFont.Name, zoomFontSize, ppt.sourceStyle);
 				this.trackFont = gdi.Font(this.trackFont.Name, zoomFontSize, ppt.trackStyle);
                 this.messageFont = gdi.Font(this.font.Name, zoomFontSize * 1.5, 1);
-				this.narrowSbarWidth = ppt.narrowSbarWidth == 0 ? s.clamp(Math.floor(zoomFontSize / 7), 2, 10) : ppt.narrowSbarWidth;
             }
             this.calc_text(); but.create_stars(); t.get_widths(); window.Repaint(); ppt.zoomFont = Math.round(zoomFontSize / ppt.baseFontSize * 100); t.toggle(13);
         }
@@ -400,55 +377,28 @@ function UserInterface() {
         }
     }
 
+	this.sbarType = s.value(ppt.sbarType.replace(/\s+/g, "").charAt(), 0, 2); if (this.sbarType == 2)  ppt.sbarType = "2 // Scrollbar Settings N/A For Themed"; else ppt.sbarType = "" + this.sbarType + "";
+    if (this.sbarType == 2) {this.theme = window.CreateThemeManager("scrollbar"); s.gr(21, 21, false, g => {try {this.theme.SetPartAndStateID(6, 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 50); for (let k = 0; k < 3; k++) {this.theme.SetPartAndStateID(3, k + 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 50);} for (let k = 0; k < 3; k++) {this.theme.SetPartAndStateID(1, k + 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 21);}} catch(e) {this.sbarType = 1; ppt.sbarType = "" + 1 + "";}});}
+	
 	this.sbarSet = () => {
-		this.sbarType = s.value(ppt.sbarType.replace(/\s+/g, "").charAt(), 0, 2); if (this.sbarType == 2)  ppt.sbarType = "2 // Scrollbar Arrow Settings N/A For Themed"; else ppt.sbarType = "" + this.sbarType + "";
-		if (this.sbarType == 2) {this.theme = window.CreateThemeManager("scrollbar"); s.gr(21, 21, false, g => {try {this.theme.SetPartAndStateID(6, 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 50); for (let k = 0; k < 3; k++) {this.theme.SetPartAndStateID(3, k + 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 50);} for (let k = 0; k < 3; k++) {this.theme.SetPartAndStateID(1, k + 1); this.theme.DrawThemeBackground(g, 0, 0, 21, 21);}} catch (e) {this.sbarType = 1; ppt.sbarType = "" + 1 + "";}});}
-		this.arrow_pad = s.value(sbarMetrics[5], 0, 0);
 		this.sbar_w = s.clamp(s.value(sbarMetrics[1], 11, 0), 0, 400); ppt.sbarBase_w = s.clamp(ppt.sbarBase_w, 0, 400);
 		if (this.sbar_w != ppt.sbarBase_w) {this.scr_but_w = Math.min(s.value(sbarMetrics[3], 11, 0), this.sbar_w, 400); ppt.sbarMetrics = "Bar," + this.sbar_w +",Arrow," + this.scr_but_w + ",Gap(+/-)," + this.arrow_pad + ",GripMinHeight," + this.grip_h;} else {this.scr_but_w = s.clamp(s.value(sbarMetrics[3], 11, 0), 0, 400); this.sbar_w = s.clamp(this.sbar_w, this.scr_but_w, 400); ppt.sbarMetrics = "Bar," + this.sbar_w +",Arrow," + this.scr_but_w + ",Gap(+/-)," + this.arrow_pad + ",GripMinHeight," + this.grip_h;}
 		ppt.sbarBase_w = this.sbar_w;
-			let themed_w = 21; try {themed_w = utils.GetSystemMetrics(2);} catch (e) {};
-			if (ppt.sbarWinMetrics) {
-				this.sbar_w = themed_w;
-				this.scr_but_w = this.sbar_w;
-			}
-			if (!ppt.sbarWinMetrics && this.sbarType == 2) this.sbar_w = Math.max(this.sbar_w, 12);
-			if (!ppt.sbarShow) this.sbar_w = 0; this.but_h = this.sbar_w + (this.sbarType != 2 ? 1 : 0);
-			if (this.sbarType != 2) {
-				if (ppt.sbarButType || !this.sbarType && this.scr_but_w < Math.round(15 * s.scale)) this.scr_but_w += 1;
-				else if (this.sbarType == 1 && this.scr_but_w < Math.round(14 * s.scale)) this.arrow_pad += 1;
-			}
-			const sp = this.sbar_w - this.scr_but_w < 5 || this.sbarType == 2 ? Math.round(1 * s.scale) : 0;
-			this.sbar_sp = this.sbar_w ? this.sbar_w + sp : 0;
-			this.arrow_pad = s.clamp(-this.but_h / 5, this.arrow_pad, this.but_h / 5);
+		if (this.sbarType == 2) {let themed_w = 21; try {themed_w = utils.GetSystemMetrics(2);} catch (e) {}; this.sbar_w = themed_w;} if (!ppt.sbarShow) this.sbar_w = 0; this.but_h = this.sbar_w + (this.sbarType != 2 ? 1 : 0);
+		if (this.sbarType != 2) this.scr_but_w += 1; this.sbar_sp = this.sbar_w ? this.sbar_w + (this.sbar_w - this.scr_but_w < 5 || this.sbarType == 2 ? 1 : 0) : 0; this.arrow_pad = s.clamp(-this.but_h / 5, this.arrow_pad, this.but_h / 5);
 	}; this.sbarSet();
-	
-	this.updSbar = () => {
-		if (ppt.sameStyle) {this.sbarSet(); but.setSbarIcon(); alb_scrollbar.active = true; art_scrollbar.active = true; ui.get_font(); 
-		alb_scrollbar.setCol(); art_scrollbar.setCol(); but.create_images(); but.create_mt(); but.refresh(true); alb_scrollbar.resetAuto(); art_scrollbar.resetAuto(); t.toggle(12);} else window.Reload();
-	}
-	
-	this.set = (n, i) => {
-		switch (n) {
-			case 'lineSpacing': const ns = utils.InputBox(window.ID, "Enter number to pad line height\n\n0 or higher", "Line Spacing", ppt.textPad); if (!ns || ns == ppt.textPad) return false; ppt.textPad = Math.round(ns); if (isNaN(ppt.textPad)) ppt.textPad = 0; ppt.textPad = s.clamp(ppt.textPad, 0, 100); this.updSbar(); break;
-			case 'sbarButType': ppt.sbarButType = i; this.updSbar(); break;
-			case 'sbarMetrics': ppt.sbarWinMetrics = !ppt.sbarWinMetrics; this.updSbar(); break;
-			case 'sbarType': this.sbarType = i; if (this.sbarType == 2)  ppt.sbarType = "2 // Scrollbar Arrow Settings N/A For Themed"; else ppt.sbarType = ppt.sbarType = "" + i + "";  this.updSbar(); break;
-			case 'scrollbar': ppt.sbarShow = i; this.updSbar(); break;
-		}
-	}
 }
 
-function Bezier(){const i=4,c=.001,o=1e-7,v=10,l=11,s=1/(l-1),n=typeof Float32Array==="function";function e(r,n){return 1-3*n+3*r}function u(r,n){return 3*n-6*r}function a(r){return 3*r}function w(r,n,t){return((e(n,t)*r+u(n,t))*r+a(n))*r}function y(r,n,t){return 3*e(n,t)*r*r+2*u(n,t)*r+a(n)}function h(r,n,t,e,u){let a,f,i=0;do{f=n+(t-n)/2;a=w(f,e,u)-r;if(a>0){t=f}else{n=f}}while(Math.abs(a)>o&&++i<v);return f}function A(r,n,t,e){for(let u=0;u<i;++u){const a=y(n,t,e);if(a===0){return n}const f=w(n,t,e)-r;n-=f/a}return n}function f(r){return r}function bezier(i,t,o,e){if(!(0<=i&&i<=1&&0<=o&&o<=1)){throw new Error("Bezier x values must be in [0, 1] range")}if(i===t&&o===e){return f}const v=n?new Float32Array(l):new Array(l);for(let r=0;r<l;++r){v[r]=w(r*s,i,o)}function u(r){const e=l-1;let n=0,t=1;for(;t!==e&&v[t]<=r;++t){n+=s}--t;const u=(r-v[t])/(v[t+1]-v[t]),a=n+u*s,f=y(a,i,o);if(f>=c){return A(r,a,i,o)}else if(f===0){return a}else{return h(r,n,n+s,i,o)}}return function r(n){if(n===0){return 0}if(n===1){return 1}return w(u(n),t,e)}} this.scroll = bezier(0.25, 0.1, 0.25, 1); this.full = this.scroll; this.step = this.scroll; this.bar = bezier(0.165,0.84,0.44,1); this.barFast = bezier(0.19, 1, 0.22, 1); this.inertia = bezier(0.23, 1, 0.32, 1);}; const ease = new Bezier;
-function on_colours_changed(clear) {ui.reset_colors(); ui.get_colors(); alb_scrollbar.setCol(); art_scrollbar.setCol(); img.create_images(); but.create_images(); but.create_mt(); but.refresh(true); alb_scrollbar.resetAuto(); art_scrollbar.resetAuto(); if (ui.headFont && ui.headFont.Size) but.create_stars(); if (ppt.blurBlend || clear) {img.clear_rs_cache(); img.get_images();} t.paint();}
-function on_font_changed() {ui.get_font(); alb_scrollbar.reset(); art_scrollbar.reset(); alb_scrollbar.resetAuto(); art_scrollbar.resetAuto(); t.on_size(); img.on_size(); window.Repaint();}
+function Bezier(){const i=4,c=.001,o=1e-7,v=10,l=11,s=1/(l-1),n=typeof Float32Array==="function";function e(r,n){return 1-3*n+3*r}function u(r,n){return 3*n-6*r}function a(r){return 3*r}function w(r,n,t){return((e(n,t)*r+u(n,t))*r+a(n))*r}function y(r,n,t){return 3*e(n,t)*r*r+2*u(n,t)*r+a(n)}function h(r,n,t,e,u){let a,f,i=0;do{f=n+(t-n)/2;a=w(f,e,u)-r;if(a>0){t=f}else{n=f}}while(Math.abs(a)>o&&++i<v);return f}function A(r,n,t,e){for(let u=0;u<i;++u){const a=y(n,t,e);if(a===0){return n}const f=w(n,t,e)-r;n-=f/a}return n}function f(r){return r}function bezier(i,t,o,e){if(!(0<=i&&i<=1&&0<=o&&o<=1)){throw new Error("Bezier x values must be in [0, 1] range")}if(i===t&&o===e){return f}const v=n?new Float32Array(l):new Array(l);for(let r=0;r<l;++r){v[r]=w(r*s,i,o)}function u(r){const e=l-1;let n=0,t=1;for(;t!==e&&v[t]<=r;++t){n+=s}--t;const u=(r-v[t])/(v[t+1]-v[t]),a=n+u*s,f=y(a,i,o);if(f>=c){return A(r,a,i,o)}else if(f===0){return a}else{return h(r,n,n+s,i,o)}}return function r(n){if(n===0){return 0}if(n===1){return 1}return w(u(n),t,e)}} this.scroll = bezier(0.25, 0.1, 0.25, 1); this.bar = bezier(0.165,0.84,0.44,1); this.barFast = bezier(0.19, 1, 0.22, 1); this.inertia = bezier(0.23, 1, 0.32, 1);}; const ease = new Bezier();
+function on_colours_changed(clear) {ui.reset_colors(); ui.get_colors(); img.create_images(); but.create_images(); but.create_mt(); but.refresh(true); if (ui.headFont && ui.headFont.Size) but.create_stars(); if (ppt.blurBlend || clear) {img.clear_rs_cache(); img.get_images();} t.paint();}
+function on_font_changed() {ui.get_font(); alb_scrollbar.reset(); art_scrollbar.reset(); t.on_size(); img.on_size(); window.Repaint();}
 
 function Panel() {
     const bio_sim = [], id = {alb: "", alb_o: "", artist: "", artist_o: "", lockAlb: "", lockArt: "",   tr: "", tr_o: ""}, inBio = [false, false, true, true, true, false, false], inRev = [true, true, false, false, false, true, true], q = n => n.split("").reverse().join(""), sbarStyle = !ppt.sbarStyle ? 2 : 0, t_l = ppt.textL + ui.arc_w, t_t = ppt.textT + ui.arc_w;
     let alb_top = [], artFieldsArr = [], calc = true, enabled = 0, enlarged_img = false, init_albums = [], init_artists = [], i = 0, j = 0, langSetOK = false, nn = 0, t_r = ppt.textR + ui.arc_w, t_b = ppt.textB + ui.arc_w, txt_sp = 0;
-    this.alb_ix = 0; this.albums = []; this.albumsUniq = []; this.arc = 10; this.art_ix = 0; this.artistHistory = s.jsonParse(ppt.artistHistory, []); this.artists = []; this.artistsUniq = []; this.bor_l = ppt.borL; this.bor_r = ppt.borR; this.bor_t = ppt.borT; this.bor_b = ppt.borB; this.calcText = false; this.clicked = false; this.covView = 1; this.cycTimeItem = Math.max(ppt.cycTimeItem, 30); this.h = 0; this.iBoxL = 0; this.iBoxT = 0; this.iBoxH = 100; this.iBoxW = 100; this.im_l = 0; this.im_r = 100; this.im_t = 0; this.im_b = 100; this.img_l = 20; this.img_r = 20; this.img_t = 0; this.img_b = 0; this.imgs = 0; this.imgText = !ppt.imgText; this.langArr = ["EN", "DE", "ES", "FR", "IT", "JA", "PL", "PT", "RU", "SV", "TR", "ZH"]; this.last_pressed_coord = {x: -1, y: -1}; this.lfmLang_ix = 0; this.local = s.file("C:\\check_local\\1450343922.txt"); this.lock = 0; this.m_x = 0; this.m_y = 0; this.max_y = 0; this.minH = 50; this.mul = {}; this.newStyle = false; this.overlay = s.jsonParse(ppt.overlay, false); this.pth = {}; this.rp_x = 0; this.rp_y = 0; this.rp_w = 0; this.rp_h = 0; this.top_corr = 0; this.sbar_o = 0; this.sbar_x = 0; this.sbar_y = 0; this.sbar_h = 0; this.style_arr = []; this.styles = s.jsonParse(ppt.styles, false); this.sup = {}; this.tag = []; this.tBoxL = 0; this.tBoxT = 0; this.tBoxH = 100; this.tBoxW = 100; this.text_trace = false; this.text_w = 0; this.tx_l = 0; this.tx_r = 100; this.tx_t = 0; this.tx_b = 100; this.tf = {}; this.w = 0; let txt_h = this.h; if (ppt.overlayStyle == 2 || ppt.overlayStyle == 4) {t_r += 1; t_b += 1;};
+    this.alb_ix = 0; this.albums = []; this.albumsUniq = []; this.arc = 10; this.art_ix = 0; this.artists = []; this.artistsUniq = []; this.bor_l = ppt.borL; this.bor_r = ppt.borR; this.bor_t = ppt.borT; this.bor_b = ppt.borB; this.clicked = false; this.covView = 1; this.cycTimeItem = Math.max(ppt.cycTimeItem, 30); this.h = 0; this.iBoxL = 0; this.iBoxT = 0; this.iBoxH = 100; this.iBoxW = 100; this.im_l = 0; this.im_r = 100; this.im_t = 0; this.im_b = 100; this.img_l = 20; this.img_r = 20; this.img_t = 0; this.img_b = 0; this.imgs = 0; this.imgText = !ppt.imgText; this.langArr = ["EN", "DE", "ES", "FR", "IT", "JA", "PL", "PT", "RU", "SV", "TR", "ZH"]; this.last_pressed_coord = {x: -1, y: -1}; this.lfmLang_ix = 0; this.local = s.file("C:\\check_local\\1450343922.txt"); this.lock = 0; this.m_x = 0; this.m_y = 0; this.max_y = 0; this.minH = 50; this.mul = {}; this.newStyle = false; this.overlay = s.jsonParse(ppt.overlay, false); this.pth = {}; this.rp_x = 0; this.rp_y = 0; this.rp_w = 0; this.rp_h = 0; this.top_corr = 0; this.sbar_o = 0; this.sbar_x = 0; this.sbar_y = 0; this.sbar_h = 0; this.style_arr = []; this.styles = s.jsonParse(ppt.styles, false); this.sup = {}; this.tag = []; this.tBoxL = 0; this.tBoxT = 0; this.tBoxH = 100; this.tBoxW = 100; this.text_trace = false; this.text_w = 0; this.tx_l = 0; this.tx_r = 100; this.tx_t = 0; this.tx_b = 100; this.tf = {}; this.w = 0; let txt_h = this.h; if (ppt.overlayStyle == 2 || ppt.overlayStyle == 4) {t_r += 1; t_b += 1;};
 
-    const albumsSame = () => {if (ppt.mul_item && this.alb_ix && this.albums.length && JSON.stringify(init_albums) === JSON.stringify(this.albums)) return true; return false;}
+    const albumsSame = () => {if (ppt.mul_item && this.alb_ix && this.albums.length && JSON_stringify(init_albums) === JSON_stringify(this.albums)) return true; return false;}
     const box = n => n != null ? 'Unescape("' + encodeURIComponent(n + "") + '")' : "Empty";
     const buIni = (name, o, b, bu, f) => {const ln = !f ? o.length : 3; for (let i = b; ln; i++) bu[i] = utils.ReadINI(this.bio_ini, name, o[i].name);}
     const getLangIndex = n => {
@@ -468,16 +418,8 @@ function Panel() {
         });
         return result = result.filter(v => v.type != "label");
     }
-    const uniqHistory = a => {
-        const flags = []; let result = [];
-        a.forEach(v => {
-            if (flags[v.name]) return;
-            result.push(v); flags[v.name] = true;
-        });
-		return result;
-    }
 
-    this.artistsSame = () => {if (ppt.mul_item && this.art_ix && this.artists.length && JSON.stringify(init_artists) === JSON.stringify(this.artists)) return true; return false;}
+    this.artistsSame = () => {if (ppt.mul_item && this.art_ix && this.artists.length && JSON_stringify(init_artists) === JSON_stringify(this.artists)) return true; return false;}
     this.changed = () => {if (ppt.focus) this.getData(false, ppt.focus, "multi_tag_bio", 0); else if (this.server) this.getData(false, ppt.focus, "", 1);}
     this.cleanPth = (pth, item, type, a, l, bio) => {
         pth = pth.trim().replace(/\//g, "\\"); if (pth.toLowerCase().includes("%profile%")) {let fbPth = fb.ProfilePath.replace(/'/g, "''").replace(/(\(|\)|\[|\]|%|,)/g, "'$1'"); if (fbPth.includes("$")) {const fbPthSplit = fbPth.split("$"); fbPth = fbPthSplit.join("'$$'");} pth = pth.replace(/%profile%(\\|)/gi, fbPth);}
@@ -495,9 +437,10 @@ function Panel() {
 			this.mode(0); 
 			this.move(x,y,false);
 		} else {
+			// Previous this.click code
 			if (this.zoom() || x < 0 || y < 0 || x > this.w || y > this.h || but.Dn) return;  if (ppt.touchControl && !p.dblClick && Math.sqrt((Math.pow(this.last_pressed_coord.x - x, 2) + Math.pow(this.last_pressed_coord.y - y, 2))) > 3 * s.scale) return; if (t.text && (!ppt.img_only || ppt.text_only) && t.scrollbar_type().onSbar || ppt.heading && t.head && !ppt.img_only && (but.btns["src"] && but.btns["src"].trace(x, y) || but.btns["mt"] && but.btns["mt"].trace(x, y))) return; this.clicked = true; t.logScrollPos(); ppt.artistView = !ppt.artistView; if (ppt.cycPic) {ppt.artistView ? img.photoTimestamp = Date.now() : img.covTimestamp = Date.now();} if (!ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) this.sizes(); t.na = ""; timer.clear(timer.source); ppt.sameStyle || (ppt.bioMode == ppt.revMode && ppt.bioStyle == ppt.revStyle) ? but.check() : but.refresh(true); if (calc) calc = ppt.artistView ? 1 : 2; if (!this.lock && this.multi_new()) {this.get_multi(true); if (!ppt.artistView) t.album_reset();} if (!this.art_ix && ppt.artistView || !this.alb_ix && !ppt.artistView) {t.getText(calc); img.get_images();} else {t.get_multi(calc, this.art_ix, this.alb_ix); img.get_multi(this.art_ix, this.alb_ix);} if (ppt.img_only) img.setCrop(true); if (!ppt.artistView) img.set_chk_arr(null); this.move(x, y, true); t.getScrollPos(); calc = false;
 		}
-	}	
+	};
     this.d = parseFloat(q("0000029142")); this.lfm = q("f50a8f9d80158a0fa0c673faec4584be=yek_ipa&");
     this.moveIni = n => {
         const d = new Date, timestamp = [d.getFullYear(), s.padNumber((d.getMonth()+1), 2), s.padNumber(d.getDate(), 2)].join("-") + "_" + [s.padNumber(d.getHours(), 2), s.padNumber(d.getMinutes(), 2), s.padNumber(d.getSeconds(), 2)].join("-");
@@ -539,11 +482,10 @@ function Panel() {
     const ini = (name, o, prop, b, space, f) => {const ln = !f ? o.length : 3; for (let i = b; i < ln; i++) utils.WriteINI(this.bio_ini, name, o[i].name, o[i][prop] + (space ? (!f ? (i == o.length - 1 ? "\r\n" : "") : (i == 2 ? "\r\n" : "")) : ""));}
     const ir_focus = () => {const fid = plman.ActivePlaylist.toString() + plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist).toString(), np = plman.GetPlayingItemLocation(); let pid = -2; if (np.IsValid) pid = plman.PlayingPlaylist.toString() + np.PlaylistItemIndex.toString(); return fid == pid;}
     const std = (a, b) => !a || a + 1 > b.length;
-    const tfBio = (n, a, focus) => {n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, "$&#@!%path%#@!").replace(/%bio_artist%/gi, a.tf_escape()).replace(/%bio_album%/gi, this.tf.l).replace(/%bio_title%/gi, this.tf.t); n = this.eval(n, focus); n = n.replace(/#@!.*?#@!/g, ""); return n;}
-    const tfRev = (n, aa, l, focus) => {n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*(%bio_albumartist%|%bio_album%)/gi, "$&#@!%path%#@!").replace(/%bio_albumartist%/gi, aa.tf_escape()).replace(/%bio_album%/gi, l.tf_escape()).replace(/%bio_title%/gi, this.tf.t); n = this.eval(n, focus); n = n.replace(/#@!.*?#@!/g, ""); return n;}
+    const tfBio = (n, a, focus) => {n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, "$&#@!%path%#@!").replace(/%bio_artist%/gi, a.tf_escape()).replace(/%bio_album%/gi, this.tf.l); n = this.eval(n, focus); n = n.replace(/#@!.*?#@!/g, ""); return n;}
+    const tfRev = (n, aa, l, focus) => {n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*(%bio_albumartist%|%bio_album%)/gi, "$&#@!%path%#@!").replace(/%bio_albumartist%/gi, aa.tf_escape()).replace(/%bio_album%/gi, l.tf_escape()); n = this.eval(n, focus); n = n.replace(/#@!.*?#@!/g, ""); return n;}
     this.ir = focus => fb.IsPlaying && fb.PlaybackLength <= 0 && (!focus || ir_focus());
     this.leave = () => {if (!ppt.autoEnlarge || men.right_up) return; if (ppt.img_only) {this.mode(0); enlarged_img = false;}}
-	this.logArtistHistory = a => {if (a != "Artist Unknown") this.artistHistory.unshift({name: a, field: "", type: "history"}); this.artistHistory = uniqHistory(this.artistHistory); ppt.artistHistory = JSON.stringify(this.artistHistory);}
 	this.mbtn_up = (x, y) => {if (x < 0 || y < 0 || x > this.w || y > this.h) return; if (ppt.mul_item && but.btns["mt"].trace(x, y)) {if (!this.lock) {id.lockArt = this.eval(artFieldsArr, ppt.focus); id.lockAlb = name.albID(ppt.focus, 'full') + (ppt.inclTrackRev ? name.trackID(ppt.focus) : "");} this.lock = this.lock == 0 ? 1 : 0; t.curHeadingID = this.lock ? t.headingID() : ""; if (!this.lock && (ppt.artistView && id.lockArt != this.eval(artFieldsArr, ppt.focus) || !ppt.artistView && id.lockAlb != name.albID(ppt.focus, 'full') + (ppt.inclTrackRev ? name.trackID(ppt.focus) : ""))) {t.on_playback_new_track(true); img.on_playback_new_track(true);} but.check(); t.paint(); return;} switch (true) {case (ppt.img_only || ppt.text_only): this.mode(0); break; case !this.text_trace && img.trace(x, y): this.mode(1); break; case this.text_trace: this.mode(2); break;} this.move(x, y, true);}
     this.metadb_serv = s.debounce(() => {this.changed();}, 500);
     this.multi_new = () => {switch (true) {case ppt.artistView: id.artist_o = id.artist; id.artist = this.eval(artFieldsArr, ppt.focus); if (!ppt.mul_item) return true; else return id.artist != id.artist_o || !this.artists.length || !this.art_ix; break; case !ppt.artistView: id.alb_o = id.alb; id.alb = name.albID(ppt.focus, 'simple'); if (ppt.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus);} else id.tr_o = id.tr = ""; if (!ppt.mul_item) return true; else return id.alb != id.alb_o || id.tr != id.tr_o || !this.albums.length || !this.alb_ix; break;}}
@@ -555,7 +497,7 @@ function Panel() {
     this.setCycItem = n => {const ns = utils.InputBox(window.ID, "Enter time in seconds\n\nMinimum = 30 seconds", "Item: Cycle Time", this.cycTimeItem); if (!ns || ns == this.cycTimeItem) return false; this.cycTimeItem = Math.round(ns); if (!this.cycTimeItem || isNaN(this.cycTimeItem)) this.cycTimeItem = 30; this.cycTimeItem = Math.max(this.cycTimeItem, 30); ppt.cycTimeItem = this.cycTimeItem;}
     this.setCycPic = () => {const ns = utils.InputBox(window.ID, "\n\nEnter time in seconds", "Photo: Cycle Time", ppt.cycTimePic); if (!ns || ns == ppt.cycTimePic) return false; ppt.cycTimePic = Math.round(ns); if (!ppt.cycTimePic || isNaN(ppt.cycTimePic)) ppt.cycTimePic = 15; img.delay = Math.min(ppt.cycTimePic, 7) * 1000;}
     this.setSimTagNo = () => {const ns = utils.InputBox(window.ID, "Enter number 0-100 (0 Disables writing the tag)\n\nUp to 4 are read from the biography\nUsing 5+ requires saved lists\n\nSaving auto-enables while 5+\nLists save on playing tracks etc\n", "Set Number of Similar Artists to Write to Tag ", this.tag[8].enabled); if (!ns || ns == this.tag[8].enabled) return false; this.tag[8].enabled = parseFloat(ns); this.updIniTag(8);}
-	this.updIniClickAction = n => {utils.WriteINI(this.bio_ini, "MISCELLANEOUS", this.def_tf[9].name, n); window.NotifyOthers("refresh_bio", "refresh_bio");}
+	this.updIniClickAction = n => {utils.WriteINI(this.bio_ini, "MISCELLANEOUS", this.def_tf[8].name, n); window.NotifyOthers("refresh_bio", "refresh_bio");}
     this.updIniLang = n => utils.WriteINI(this.bio_ini, "LASTFM LANGUAGE", this.lang[0].name, n);
     this.updIniTag = n => {enabled = this.tag[n].enabled; if (n < 8) {if (enabled !== 1 && enabled !== 0) enabled = advTag[n].tag;} else {enabled = s.clamp(enabled, 0, 100);} this.tag[n].enabled = enabled; utils.WriteINI(this.bio_ini, "ADVANCED: TAG WRITER", advTag[n].name, enabled); window.NotifyOthers("refresh_bio", "refresh_bio");}
     this.valueIni = (section, key, def, type) => {let n = ""; switch (type) {case 0: n = utils.ReadINI(this.bio_ini, section, key); if (!n) return def; break; case 1: n = parseFloat(utils.ReadINI(this.bio_ini, section, key)); if (n !== 1 && n !== 0) return def; break; case 2: n = parseFloat(utils.ReadINI(this.bio_ini, section, key)); if (isNaN(n)) return def; break;} return n;}
@@ -588,7 +530,6 @@ function Panel() {
         {name:"%BIO_ALBUMARTIST%", tf:"$if3($meta(album artist,0),$meta(artist,0),$meta(composer,0),$meta(performer,0))"},
         {name:"%BIO_ARTIST%", tf:"$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"},
         {name:"%BIO_ALBUM%", tf:"$meta(album,0)"},
-		{name:"%BIO_TITLE%", tf:"$meta(title,0)"},
         {name:"Album Name Auto-Clean", tf:0},
         {name:"Cache Expiry (days: minimum 28)", tf:28},
         {name:"Image [Artist] Initial Fetch Number (1-20)", tf:5},
@@ -650,7 +591,7 @@ function Panel() {
         + "MISCELLANEOUS:\r\nImage [Artist] Cache Limit: limits number of images stored to value set. If used with \"Auto-Add New\", newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\n"
         + "ADVANCED:\r\nCustom cover paths. Most users shouldn't need this feature as covers are auto-loaded via foobar2000 album art reader or from save locations. Enable if required.\r\nSimilar Artists (\"Tagger\" & \"More Menu\"). Up to 4 are read from the biography. Using 5+ requires a saved list. Saving auto-enables by default while either set to 5+.\r\nWrite Tag: sets which tags are available to be written. Enter 0 or 1 or as indicated. Change tag names as required.\r\n***See documentation for full info on advanced items.***"
 
-    let bio_ini = s.open(this.bio_ini); if (s.file(this.bio_ini) && !bio_ini.includes("Version A0001") && !bio_ini.includes("Version A0002")) this.moveIni(); // Check correct ini. Remove & back-up any can't auto-update. Back compatibility: number as A0002.x to avoid old bios resetting; use A0003 etc to force reset
+    let bio_ini = s.open(this.bio_ini); if (s.file(this.bio_ini) && !bio_ini.includes("Version A0001") && !bio_ini.includes("Version A0002")) this.moveIni(); // Check correct ini. Remove & back-up any can't auto-update
 
     if (!s.file(this.bio_ini)) { // No ini: fresh install, reset or unable to auto-update. Create new ini
         utils.WriteINI(this.bio_ini, helpText, "", "=======================================\r\n");
@@ -659,15 +600,14 @@ function Panel() {
         ini("SAVE", def_paths, 'path', 0, 1);
         ini("COVERS: MUSIC FILES", this.cov, 'path', 0, 1);
         ini("LASTFM LANGUAGE", this.lang, 'tf', 0, 1);
-        ini("MISCELLANEOUS", this.def_tf, 'tf', 4, 1);
+        ini("MISCELLANEOUS", this.def_tf, 'tf', 3, 1);
         ini("ADVANCED: CUSTOM COVER PATHS", advCov, 'path', 0, 1);
         ini("ADVANCED: MORE MENU ITEMS", advMore, 'path', 0, 1);
         ini("ADVANCED: SIMILAR ARTISTS", advSimilar, 'tag', 0, 1);
         ini("ADVANCED: TAG WRITER", advTag, 'tag', 0, 0);
     }
 
-    bio_ini = s.open(this.bio_ini);
-	if (!bio_ini.includes("Version A0002")) { // Update A0001 to A0002
+    bio_ini = s.open(this.bio_ini); if (!bio_ini.includes("Version A0002")) { // Update A0001 to A0002
         bio_ini = bio_ini
             .replace("Version A0001", "Version A0002")
             .replace("%path% here -", "%path% in save paths -")
@@ -677,22 +617,12 @@ function Panel() {
             .replace("written. Enter 0 or 1 or as indicated", "written. Enter 0 or 1 or as indicated, or use \"Write Tags... Menu\"")
             .replace("Write Tag: Similar Artists Last.fm", "Write Tag: Locale Last.fm=1\r\nWrite Tag: Similar Artists Last.fm")
             .replace("Tag Name: Similar Artists Last.fm", "Tag Name: Locale Last.fm=Locale Last.fm\r\nTag Name: Similar Artists Last.fm");
-    }
-	
-	if (!bio_ini.includes("Version A0002.1")) { // Update A0002 to A0002.1
-		bio_ini = bio_ini
-			.replace("Version A0002", "Version A0002.1")
-			.replace(" and %BIO_ALBUM%", ", %BIO_ALBUM% and %BIO_TITLE%")
-			.replace("artist and album", "artist, album and title")
-			.replace(" or %BIO_ALBUM%", ", %BIO_ALBUM% or %BIO_TITLE")
-			.replace(", %BIO_ALBUM%,", ", %BIO_ALBUM%, %BIO_TITLE,")
-			.replace("\r\n\r\n[SAVE]", "\r\n" + this.def_tf[3].name + "=" + this.def_tf[3].tf + "\r\n\r\n[SAVE]")
-			this.moveIni();
-		s.save(this.bio_ini, bio_ini, true);
-	} advTag.splice(7, 0, {name:"Write Tag: Locale Last.fm", tag:1}); advTag.splice(16, 0, {name:"Tag Name: Locale Last.fm", tag:"Locale Last.fm"}); // finalise advTag
+        this.moveIni();
+        s.save(this.bio_ini, bio_ini, true);
+    } advTag.splice(7, 0, {name:"Write Tag: Locale Last.fm", tag:1}); advTag.splice(16, 0, {name:"Tag Name: Locale Last.fm", tag:"Locale Last.fm"}); // finalise advTag
 
-    let pthArr = ["amRev", "lfmRev", "amBio", "lfmBio", "imgArt", "imgCov", "imgCovFn", "lfmSim"]; const tfArr = ["aa", "a", "l", "t"]; tfArr.forEach((v, i) => this.tf[v] = this.valueIni("NAMES", this.def_tf[i].name, this.def_tf[i].tf, 0).replace(RegExp(this.def_tf[i].name, "gi"), "")); // replace self
-    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) this.tf[tfArr[i]] = this.tf[tfArr[i]].replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]); // substitute titleformat
+    let pthArr = ["amRev", "lfmRev", "amBio", "lfmBio", "imgArt", "imgCov", "imgCovFn", "lfmSim"]; const tfArr = ["aa", "a", "l"]; tfArr.forEach((v, i) => this.tf[v] = this.valueIni("NAMES", this.def_tf[i].name, this.def_tf[i].tf, 0).replace(RegExp(this.def_tf[i].name, "gi"), "")); // replace self
+    for (i = 0; i < 3; i++) for (j = 0; j < 3; j++) this.tf[tfArr[i]] = this.tf[tfArr[i]].replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]); // substitute titleformat
 
     pthArr.forEach((v, i) => { // standard
         if (i < 5) this.pth[v] = this.valueIni("SAVE", def_paths[i].name, def_paths[i].path, 0);
@@ -703,15 +633,15 @@ function Panel() {
     }); this.pth[pthArr[7]] = this.valueIni("ADVANCED: SIMILAR ARTISTS", advSimilar[1].name, advSimilar[1].tag, 0);
 
     pthArr.forEach(v => { // substitute titleformat
-        for (j = 0; j < 4; j++) this.pth[v] = this.pth[v].replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]);
+        for (j = 0; j < 3; j++) this.pth[v] = this.pth[v].replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]);
     });
 
-    this.dblClick = this.valueIni("MISCELLANEOUS", this.def_tf[9].name, this.def_tf[9].tf, 1);
+    this.dblClick = this.valueIni("MISCELLANEOUS", this.def_tf[8].name, this.def_tf[8].tf, 1);
     this.extra = this.valueIni("ADVANCED: CUSTOM COVER PATHS", advCov[0].name, advCov[0].path, 1);
     this.lfmLang = utils.ReadINI(this.bio_ini, "LASTFM LANGUAGE", this.lang[0].name).toLowerCase(); getLangIndex(); if (!langSetOK) this.lfmLang = "en";
     this.rev_img = this.valueIni("AUTO-FETCH", this.def_dn[5].name, this.def_dn[5].dn, 1);
     let similarNo = parseFloat(utils.ReadINI(this.bio_ini, "ADVANCED: MORE MENU ITEMS", advMore[3].name)); similarNo = s.clamp(similarNo, 0, 10);
-    this.va = this.valueIni("MISCELLANEOUS", this.def_tf[11].name, this.def_tf[11].tf, 0); this.va = this.va.toLowerCase();
+    this.va = this.valueIni("MISCELLANEOUS", this.def_tf[10].name, this.def_tf[10].tf, 0); this.va = this.va.toLowerCase();
 
     pthArr = ["amRev", "lfmRev", "amBio", "lfmBio", "imgArt", "imgRev"]; pthArr.forEach((v, i) => { // look up
         this.mul[v] = this.valueIni("SAVE", def_paths[i].name, def_paths[i].path, 0);
@@ -753,69 +683,57 @@ function Panel() {
     this.albFields = this.albFields.filter(v => v.trim());
 
 	this.albCovFolder = this.valueIni("COVERS: LOAD FOLDER FOR IMAGE CYCLING", covFolder.name, covFolder.path, 0);
-	for (j = 0; j < 4; j++) this.albCovFolder = this.albCovFolder.replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]);
+	for (j = 0; j < 3; j++) this.albCovFolder = this.albCovFolder.replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]);
 
     if (this.extra) { // extra covers
         this.extraPaths = []; for (i = 1; i < advCov.length; i++) {
             let ep = utils.ReadINI(this.bio_ini, "ADVANCED: CUSTOM COVER PATHS", advCov[i].name).replace(/%profile%\\/i, fb.ProfilePath);
-            for (j = 0; j < 4; j++) ep = ep.replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]); if (ep) this.extraPaths.push(ep);
+            for (j = 0; j < 3; j++) ep = ep.replace(RegExp(this.def_tf[j].name, "gi"), this.tf[tfArr[j]]); if (ep) this.extraPaths.push(ep);
         }
     }
 
     this.get_multi = p_clear => {
         if (!ppt.mul_item || this.lock) return; let a = name.artist(ppt.focus), aa = name.alb_artist(ppt.focus), l = name.album(ppt.focus); if (!a) a = "Artist Unknown"; if (!aa) aa = "Artist Unknown"; if (!l) l = "Album Unknown"; let ix = -1, k = 0, kw = ""; const lfmBio = this.cleanPth(this.pth.lfmBio, ppt.focus) + a.clean() + ".txt", lfm_a = s.open(lfmBio), lfmSim = this.cleanPth(this.pth.lfmSim, ppt.focus) + a.clean() + " And Similar Artists.json", mult_arr = []; let mn = "", nm = "", sa = "", ta = ""; init_albums = this.albums.slice(0); this.albums = []; init_artists = this.artists.slice(0); this.artists = []; this.artists.push({name: a, field: "", type: "Artist"});
-		if (ppt.showSimilarArtists) {
-			if (s.file(lfmSim)) { // artists
-				const lfm_s = s.jsonParse(lfmSim, false, 'file'); let newStyle = false;
-				if (lfm_s) {
-					if (lfm_s[0].hasOwnProperty('name')) newStyle = true; lfm_s.shift();
-					$.take(lfm_s, similarNo);
-					if (lfm_s.length) {
-						this.artists.push({name: "Similar Artists:", field: "", type: "label"});
-						lfm_s.forEach((v, i, arr) => this.artists.push({name: newStyle ? v.name : v, field: "", type: i != arr.length - 1 ? "similar" : "similarend"}));
-					}
-				}
-			} else {
-				if (s.file(lfmBio)) {
-					kw = "Similar Artists: |Ähnliche Künstler: |Artistas Similares: |Artistes Similaires: |Artisti Simili: |似ているアーティスト: |Podobni Wykonawcy: |Artistas Parecidos: |Похожие исполнители: |Liknande Artister: |Benzer Sanatçılar: |相似艺术家: "
-					let found = false, sim = lfm_a.match(RegExp(kw)); if (sim) {sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {sa = lfm_a.substring(ix + sim.length); sa = sa.split('\n')[0].trim().split(", ");}}
-					if (sa.length < 5 && sa) {$.take(sa, similarNo); found = true;}
-					if (!found) {
-						bio_sim.some(v => {
-							if (v.name == a) {sa = $.take(v.similar, similarNo); return found = true;}
-						});
-						if (!found) {const getSimilar = new Lfm_similar_artists(() => getSimilar.on_state_change(), getSimilar_search_done); getSimilar.Search(a, "", "", 4);}
-					}
-					if (found && $.isArray(sa) && sa.length) {
-						this.artists.push({name: "Similar Artists:", field: "", type: "label"});
-						sa.forEach((v, i) => this.artists.push({name: v, field: "", type: i != sa.length - 1 ? "similar" : "similarend"}));
-					}
-				}
-			}
-		}
-		if (ppt.showMoreTags) {
-			artFieldsArr.forEach(v => {
-				nm = v.replace(/%/g, "");
-				for (let h = 0; h < this.eval("$meta_num(" + nm + ")", ppt.focus); h++) {
-					mn = "$trim($meta(" + nm + "," + h + "))";
-					const name = this.eval(mn, ppt.focus);
-					if (this.artists.every(v => v.name !== name) && name.toLowerCase() != this.va) mult_arr.push({name: name, field: " ~ " + nm.titlecase(), type: "tag"});
-				}
-			});
-			if (mult_arr.length > 1) {sort(mult_arr, "name"); k = mult_arr.length; while (k--) if (k != 0 && mult_arr[k].name.toLowerCase() == mult_arr[k - 1].name.toLowerCase()) {
-				if (!mult_arr[k - 1].field.toLowerCase().includes(mult_arr[k].field.toLowerCase())) mult_arr[k - 1].field += mult_arr[k].field;
-				mult_arr.splice(k, 1);
-			}}
-			if (mult_arr.length) {this.artists.push({name: "More Tags:", field: "", type: "label"}); this.artists = this.artists.concat(mult_arr); this.artists[this.artists.length - 1].type = "tagend";}
-		}
-		this.logArtistHistory(a);
-		if (this.artistHistory.length > 21) this.artistHistory.length = 21;
-		if (this.artistHistory.length > 1 && ppt.showArtistHistory) {
-			this.artists.push({name: "History:", field: "", type: "label"}); 
-			for (let h = 1; h < this.artistHistory.length; h++) this.artists.push(this.artistHistory[h]);
-			this.artists[this.artists.length - 1].type = "historyend";
-		}
-
+        if (s.file(lfmSim)) { // artists
+            const lfm_s = s.jsonParse(lfmSim, false, 'file'); let newStyle = false;
+            if (lfm_s) {
+                if (lfm_s[0].hasOwnProperty('name')) newStyle = true; lfm_s.shift();
+                $.take(lfm_s, similarNo);
+                if (lfm_s.length) {
+                    this.artists.push({name: "Similar Artists: ", field: "", type: "label"});
+                    lfm_s.forEach((v, i, arr) => this.artists.push({name: newStyle ? v.name : v, field: "", type: i != arr.length - 1 ? "similar" : "similarend"}));
+                }
+            }
+        } else {
+            if (s.file(lfmBio)) {
+                kw = "Similar Artists: |Ähnliche Künstler: |Artistas Similares: |Artistes Similaires: |Artisti Simili: |似ているアーティスト: |Podobni Wykonawcy: |Artistas Parecidos: |Похожие исполнители: |Liknande Artister: |Benzer Sanatçılar: |相似艺术家: "
+                let found = false, sim = lfm_a.match(RegExp(kw)); if (sim) {sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {sa = lfm_a.substring(ix + sim.length); sa = sa.split('\n')[0].trim().split(", ");}}
+				if (sa.length < 5 && sa) {$.take(sa, similarNo); found = true;}
+				if (!found) {
+                    bio_sim.some(v => {
+                        if (v.name == a) {sa = $.take(v.similar, similarNo); return found = true;}
+                    });
+                    if (!found) {const getSimilar = new Lfm_similar_artists(() => getSimilar.on_state_change(), getSimilar_search_done); getSimilar.Search(a, "", "", 4);}
+                }
+                if (found && $.isArray(sa) && sa.length) {
+                    this.artists.push({name: "Similar Artists: ", field: "", type: "label"});
+                    sa.forEach((v, i) => this.artists.push({name: v, field: "", type: i != sa.length - 1 ? "similar" : "similarend"}));
+                }
+            }
+        }
+        artFieldsArr.forEach(v => {
+            nm = v.replace(/%/g, "");
+            for (let h = 0; h < this.eval("$meta_num(" + nm + ")", ppt.focus); h++) {
+                mn = "$trim($meta(" + nm + "," + h + "))";
+                const name = this.eval(mn, ppt.focus);
+                if (this.artists.every(v => v.name !== name) && name.toLowerCase() != this.va) mult_arr.push({name: name, field: " ~ " + nm.titlecase(), type: "tag"});
+            }
+        });
+        if (mult_arr.length > 1) {sort(mult_arr, "name"); k = mult_arr.length; while (k--) if (k != 0 && mult_arr[k].name.toLowerCase() == mult_arr[k - 1].name.toLowerCase()) {
+            if (!mult_arr[k - 1].field.toLowerCase().includes(mult_arr[k].field.toLowerCase())) mult_arr[k - 1].field += mult_arr[k].field;
+            mult_arr.splice(k, 1);
+        }}
+        if (mult_arr.length) {this.artists.push({name: "More Tags:", field: "", type: "label"}); this.artists = this.artists.concat(mult_arr); this.artists[this.artists.length - 1].type = "tagend";}
         this.artists.forEach((v, i) => v.ix = i);
         this.artistsUniq = this.artists.filter(v => v.type != "label");
 
@@ -841,9 +759,9 @@ function Panel() {
         if (!this.artistsSame() && p_clear) this.art_ix = 0; if (!albumsSame() && p_clear) this.alb_ix = 0;
     }
 
-    if (!this.styles || !$.isArray(this.styles)) {ppt.set("SYSTEM.Freestyle Custom BackUp", ppt.styles); this.styles = []; ppt.styles = JSON.stringify(this.styles); fb.ShowPopupMessage("Unable to load custom styles.\n\nThe save location was corrupt. Custom styles have been reset.\n\nThe original should be backed up to \"SYSTEM.Freestyle Custom BackUp\" in panel properties.", "Biography");}
-    else {let valid = true; this.styles.forEach(v => {if (!v.hasOwnProperty('name') || isNaN(v.imL) || isNaN(v.imR) || isNaN(v.imT) || isNaN(v.imB) || isNaN(v.txL) || isNaN(v.txR) || isNaN(v.txT) || isNaN(v.txB)) valid = false;}); if (!valid) {ppt.set("SYSTEM.Freestyle Custom BackUp", ppt.styles); this.styles = []; ppt.styles = JSON.stringify(this.styles); fb.ShowPopupMessage("Unable to load custom styles.\n\nThe save location was corrupt. Custom styles have been reset.\n\nThe original should be backed up to \"SYSTEM.Freestyle Custom BackUp\" in panel properties.", "Biography");}}
-    if (!this.overlay || !this.overlay.hasOwnProperty('name') || isNaN(this.overlay.imL) || isNaN(this.overlay.imR) || isNaN(this.overlay.imT) || isNaN(this.overlay.imB) || isNaN(this.overlay.txL) || isNaN(this.overlay.txR) || isNaN(this.overlay.txT) || isNaN(this.overlay.txB)) {ppt.set("SYSTEM.Overlay BackUp", ppt.overlay); this.overlay = {"name":"Overlay", "imL":0, "imR":0, "imT":0, "imB":0, "txL":0, "txR":0, "txT":0.632, "txB":0}; ppt.overlay = JSON.stringify(this.overlay); fb.ShowPopupMessage("Unable to load \"SYSTEM.Overlay\".\n\nThe save location was corrupt. The overlay style has been reset to default.\n\nThe original should be backed up to \"SYSTEM.Overlay BackUp\" in panel properties.", "Biography");}
+    if (!this.styles || !$.isArray(this.styles)) {ppt.set("SYSTEM.Freestyle Custom BackUp", ppt.styles); this.styles = []; ppt.styles = JSON_stringify(this.styles); fb.ShowPopupMessage("Unable to load custom styles.\n\nThe save location was corrupt. Custom styles have been reset.\n\nThe original should be backed up to \"SYSTEM.Freestyle Custom BackUp\" in panel properties.", "Biography");}
+    else {let valid = true; this.styles.forEach(v => {if (!v.hasOwnProperty('name') || isNaN(v.imL) || isNaN(v.imR) || isNaN(v.imT) || isNaN(v.imB) || isNaN(v.txL) || isNaN(v.txR) || isNaN(v.txT) || isNaN(v.txB)) valid = false;}); if (!valid) {ppt.set("SYSTEM.Freestyle Custom BackUp", ppt.styles); this.styles = []; ppt.styles = JSON_stringify(this.styles); fb.ShowPopupMessage("Unable to load custom styles.\n\nThe save location was corrupt. Custom styles have been reset.\n\nThe original should be backed up to \"SYSTEM.Freestyle Custom BackUp\" in panel properties.", "Biography");}}
+    if (!this.overlay || !this.overlay.hasOwnProperty('name') || isNaN(this.overlay.imL) || isNaN(this.overlay.imR) || isNaN(this.overlay.imT) || isNaN(this.overlay.imB) || isNaN(this.overlay.txL) || isNaN(this.overlay.txR) || isNaN(this.overlay.txT) || isNaN(this.overlay.txB)) {ppt.set("SYSTEM.Overlay BackUp", ppt.overlay); this.overlay = {"name":"Overlay", "imL":0, "imR":0, "imT":0, "imB":0, "txL":0, "txR":0, "txT":0.632, "txB":0}; ppt.overlay = JSON_stringify(this.overlay); fb.ShowPopupMessage("Unable to load \"SYSTEM.Overlay\".\n\nThe save location was corrupt. The overlay style has been reset to default.\n\nThe original should be backed up to \"SYSTEM.Overlay BackUp\" in panel properties.", "Biography");}
     const styleArr = () => {
         this.style_arr = ["Top", "Right", "Bottom", "Left", "Overlay"];
         this.styles.forEach(v => this.style_arr.push(v.name));
@@ -852,7 +770,7 @@ function Panel() {
 
     this.sizes = bypass => {
         if (ppt.get("SYSTEM.Bottom Size Correction", false)) {this.w = ppt.img_only ? window.Width : window.Width - window.Width * 18 / 1018; this.h = ppt.img_only ? window.Height : window.Height - window.Height * 18 / 1018;} // size correction can be set to true for optimal text positioning where panel size is increased to compensate for shadow effect
-        this.sbar_o = [2 + ui.arrow_pad, Math.max(Math.floor(ui.scr_but_w * 0.2), 2) + ui.arrow_pad * 2, 0][ui.sbarType]; this.top_corr = [this.sbar_o - (ui.but_h - ui.scr_but_w) / 2, this.sbar_o, 0][ui.sbarType]; const bot_corr = [(ui.but_h - ui.scr_but_w) / 2 - this.sbar_o, -this.sbar_o, 0][ui.sbarType]
+        this.sbar_o = [2 + ui.arrow_pad, Math.max(Math.floor(ui.scr_but_w * 0.2), 3) + ui.arrow_pad * 2, 0][ui.sbarType]; this.top_corr = [this.sbar_o - (ui.but_h - ui.scr_but_w) / 2, this.sbar_o, 0][ui.sbarType]; const bot_corr = [(ui.but_h - ui.scr_but_w) / 2 - this.sbar_o, -this.sbar_o, 0][ui.sbarType]
         if (!ppt.sameStyle) {
             switch (true) {
                 case ppt.artistView:
@@ -978,7 +896,7 @@ function Panel() {
         if (!ppt.sameStyle) ppt.artistView ? ppt.bioMode = n : ppt.revMode = n; let calcText = true;
         switch (n) {
             case 0:
-                calcText = this.calcText || ppt.text_only; ppt.img_only = false; ppt.text_only = false; this.sizes(); img.clear_rs_cache();
+                calcText = ppt.text_only; ppt.img_only = false; ppt.text_only = false; this.sizes(); img.clear_rs_cache();
 				if (calcText && !ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) calcText = ppt.artistView ? 1 : 2;
 				if (!this.art_ix && ppt.artistView && !t.mulArtist || !this.alb_ix && !ppt.artistView && !t.mulAlbum) {t.album_reset(); t.artist_reset(); t.getText(calcText); img.get_images();} else {t.get_multi(calcText, this.art_ix, this.alb_ix); img.get_multi(this.art_ix, this.alb_ix);}
                 break;
@@ -994,7 +912,6 @@ function Panel() {
                 if (ui.blur) img.get_multi(this.art_ix, this.alb_ix); img.set_chk_arr(null);}
                 break;
         }
-		this.calcText = false;
         but.refresh();
     }
 
@@ -1010,7 +927,7 @@ function Panel() {
         }
         this.styles.forEach(v => {if (v.name == ns) ns = ns + " New";});
         this.styles.push({"name":ns, "imL":this.im_l, "imR":this.im_r, "imT":this.im_t, "imB":this.im_b, "txL":this.tx_l, "txR":this.tx_r, "txT":this.tx_t, "txB":this.tx_b})
-        sort(this.styles, "name"); ppt.styles = JSON.stringify(this.styles);
+        sort(this.styles, "name"); ppt.styles = JSON_stringify(this.styles);
         this.styles.some((v, i) => {
             if (v.name == ns) {
                 if (ppt.sameStyle) ppt.style = i + 5;
@@ -1024,11 +941,11 @@ function Panel() {
 
     const getStyleFallback = () => {ppt.style = 4; if (!ppt.sameStyle) {if (ppt.artistView) ppt.bioStyle = 4; else ppt.revStyle = 4;} fb.ShowPopupMessage("Unable to locate style. Using overlay layout instead.", "Biography");}
 
-    this.deleteStyle = n => {const ns = $.WshShell.Popup("Delete: " + this.style_arr[n] + "\n\nStyle will be set to top", 0, "Delete Current Style", 1); if (ns != 1) return false; this.styles.splice(n - 5, 1); ppt.styles = JSON.stringify(this.styles); ppt.style = 0; if (!ppt.sameStyle) {if (ppt.artistView) ppt.bioStyle = 0; else ppt.revStyle = 0;} styleArr(); t.toggle(8);}
-    this.exportStyle = n => {const ns = $.WshShell.Popup("Export: " + this.style_arr[n], 0, "Export Current Style To Other Biography Panels", 1); if (ns != 1) return false; window.NotifyOthers("custom_style_bio", JSON.stringify(this.styles[n - 5]));}
-    this.on_notify = info => {const rec = s.jsonParse(info, false); this.styles.forEach(v => {if (v.name == rec.name) rec.name = rec.name + " New";}); this.styles.push(rec); sort(this.styles, "name"); ppt.styles = JSON.stringify(this.styles); styleArr();}
-    this.renameStyle = n => {const ns = utils.InputBox(window.ID, "Rename style: " + this.style_arr[n] + "\n\nEnter new name\n\nProceed?", "Rename Current Style", this.style_arr[n]); if (!ns || ns == this.style_arr[n]) return false; this.styles.forEach(v => {if (v.name == ns) ns = ns + " New";}); this.styles[n - 5].name = ns; sort(this.styles, "name"); ppt.styles = JSON.stringify(this.styles); this.styles.some((v, i) => {if (v.name == ns) {ppt.style = i + 5; return true;}}); styleArr(); window.Repaint();}
-    this.resetStyle = n => {const ns = $.WshShell.Popup("Reset to Default " + (ppt.style < 4 ? this.style_arr[n] : "Overlay") + " Style", 0, "Reset Current Style", 1); if (ns != 1) return false; if (ppt.style < 4) ppt.rel_imgs = 0.7; else {const obj = ppt.style == 4 ? this.overlay : this.styles[ppt.style - 5]; obj.name = this.style_arr[n]; obj.imL = 0; obj.imR = 0; obj.imT = 0; obj.imB = 0; obj.txL = 0; obj.txR = 0; obj.txT = 0.632; obj.txB = 0; ppt.style == 4 ? ppt.overlay = JSON.stringify(this.overlay) : ppt.styles = JSON.stringify(this.styles);} t.toggle(13);}
+    this.deleteStyle = n => {const ns = $.WshShell.Popup("Delete: " + this.style_arr[n] + "\n\nStyle will be set to top", 0, "Delete Current Style", 1); if (ns != 1) return false; this.styles.splice(n - 5, 1); ppt.styles = JSON_stringify(this.styles); ppt.style = 0; if (!ppt.sameStyle) {if (ppt.artistView) ppt.bioStyle = 0; else ppt.revStyle = 0;} styleArr(); t.toggle(8);}
+    this.exportStyle = n => {const ns = $.WshShell.Popup("Export: " + this.style_arr[n], 0, "Export Current Style To Other Biography Panels", 1); if (ns != 1) return false; window.NotifyOthers("custom_style_bio", JSON_stringify(this.styles[n - 5]));}
+    this.on_notify = info => {const rec = s.jsonParse(info, false); this.styles.forEach(v => {if (v.name == rec.name) rec.name = rec.name + " New";}); this.styles.push(rec); sort(this.styles, "name"); ppt.styles = JSON_stringify(this.styles); styleArr();}
+    this.renameStyle = n => {const ns = utils.InputBox(window.ID, "Rename style: " + this.style_arr[n] + "\n\nEnter new name\n\nProceed?", "Rename Current Style", this.style_arr[n]); if (!ns || ns == this.style_arr[n]) return false; this.styles.forEach(v => {if (v.name == ns) ns = ns + " New";}); this.styles[n - 5].name = ns; sort(this.styles, "name"); ppt.styles = JSON_stringify(this.styles); this.styles.some((v, i) => {if (v.name == ns) {ppt.style = i + 5; return true;}}); styleArr(); window.Repaint();}
+    this.resetStyle = n => {const ns = $.WshShell.Popup("Reset to Default " + (ppt.style < 4 ? this.style_arr[n] : "Overlay") + " Style", 0, "Reset Current Style", 1); if (ns != 1) return false; if (ppt.style < 4) ppt.rel_imgs = 0.7; else {const obj = ppt.style == 4 ? this.overlay : this.styles[ppt.style - 5]; obj.name = this.style_arr[n]; obj.imL = 0; obj.imR = 0; obj.imT = 0; obj.imB = 0; obj.txL = 0; obj.txR = 0; obj.txT = 0.632; obj.txB = 0; ppt.style == 4 ? ppt.overlay = JSON_stringify(this.overlay) : ppt.styles = JSON_stringify(this.styles);} t.toggle(13);}
 }
 
 function Lfm_similar_artists(state_callback, on_search_done_callback) {
@@ -1049,7 +966,7 @@ function Lfm_similar_artists(state_callback, on_search_done_callback) {
             if (data || retry) this.on_search_done_callback(artist, list, done, handles); break;
             case lmt > 99: if (data) {
                     list = data.map(v => ({name: v.name, score: Math.round(v.match * 100)}));
-                    list.unshift({name:artist, score:100}); s.buildPth(pth_sim); s.save(fn_sim, JSON.stringify(list), true); if (p.lfm_sim) {p.get_multi(false); window.NotifyOthers("get_multi_bio", "get_multi_bio");}
+                    list.unshift({name:artist, score:100}); s.buildPth(pth_sim); s.save(fn_sim, JSON_stringify(list), true); if (p.lfm_sim) {p.get_multi(false); window.NotifyOthers("get_multi_bio", "get_multi_bio");}
                 } break;
         }
     }
@@ -1084,87 +1001,32 @@ function Names() {
 	}
     this.albm = focus => p.eval("[" + p.tf.l + "]", focus).replace(/CD(\s*\d|\.0\d)|CD\s*(One|Two|Three)|Disc\s*\d|Disc\s*(III|II|I|One|Two|Three)\b/gi,"").replace(/\(\s*\)|\[\s*\]/g, " ").replace(/\s\s+/g, " ").replace(/-\s*$/g, " ").trim();
     this.album = focus => {if (!this.alb_strip) return this.albm(focus); return p.eval("[" + p.tf.l + "]", focus).replace(/CD(\s*\d|\.0\d)|CD\s*(One|Two|Three)|Disc\s*\d|Disc\s*(III|II|I|One|Two|Three)\b|(Bonus\s*Track|Collector's|(Digital\s*|Super\s*|)Deluxe|Digital|Expanded|Limited|Platinum|Reissue|Special)\s*(Edition|Version)|(Bonus\s*(CD|Disc))|\d\d\w\w\s*Anniversary\s*(Expanded\s*|Re(-|)master\s*|)(Edition|Re(-|)master|Version)|((19|20)\d\d(\s*|\s*-\s*)|)(Digital(ly|)\s*|)(Re(-|)master(ed|)|Re(-|)recorded)(\s*Edition|\s*Version|)|\(Deluxe\)|\(Mono\)|\(Reissue\)|\(Revisited\)|\(Stereo\)|\(Web\)|\[Deluxe\]|\[Mono\]|\[Reissue\]|\[Revisited\]|\[Stereo\]|\[Web\]/gi,"").replace(/\(\s*\)|\[\s*\]/g, " ").replace(/\s\s+/g, " ").replace(/-\s*$/g, " ").trim();}
-	this.title = focus => {let n = p.eval("[$trim(" + p.tf.t + ")]", focus); if (p.local && p.ir(focus)) {const kw = "(-\\s*|\\s+)\\d\\d\\d\\d"; let ix = -1, yr = n.match(RegExp(kw)); if (yr) {yr = yr[0].toString(); ix = n.indexOf(yr);} if (ix != -1) n = n.slice(0, ix).trim();} return n;}
-	this.trackID = focus => p.eval(p.tf.a + p.tf.t, focus);
+    this.title = focus => {let n = p.eval("[$trim($meta(title,0))]", focus); if (p.local && p.ir(focus)) {const kw = "(-\\s*|\\s+)\\d\\d\\d\\d"; let ix = -1, yr = n.match(RegExp(kw)); if (yr) {yr = yr[0].toString(); ix = n.indexOf(yr);} if (ix != -1) n = n.slice(0, ix).trim();} return n;}
+	this.trackID = focus => p.eval(p.tf.a + "%title%", focus);
 }
 
 function Scrollbar() {
-	let duration = ppt.duration.splt(0); duration = {drag : 200, inertia : s.clamp(s.value(duration[3], 3000, 0), 0, 5000), full : s.clamp(s.value(duration[1], 500, 0), 0, 5000)}; duration.scroll = Math.round(duration.full * 0.8); duration.step = Math.round(duration.full * 2 / 3); duration.bar = duration.full; duration.barFast = duration.step;
-	let active_o = true, alpha = 255, alpha1 = alpha, alpha2 = 255, amplitude, b_is_dragging = false, bar_ht = 0, bar_timer = null, bar_y = 0, but_h = 0, clock = Date.now(), counter = 0, drag_distance_per_row = 0, elap = 0, event = 'scroll', frame, hover = false, hover_o = false, init = true, initial_drag_y = 0, initial_scr = 1, initial_y = -1, ix = -1, inStep = 18, lastTouchDn = Date.now(), narrowSbar_x = 0, offset = 0, ratio = 1, reference = -1, rows = 0, sbarZone = false, sbarZone_o = false, scrollbar_height = 0, scrollbar_travel = 0, start = 0, startTime = 0, ticker, timestamp, ts, velocity;
-    const col = {}, min = 10 * s.scale, mv = 2 * s.scale;
-    this.active = true; this.count = -1; this.delta = 0; ppt.flickDistance = s.clamp(ppt.flickDistance, 0, 10); this.draw_timer = null; this.item_y = 0; this.max_scroll = 0; this.narrow = ppt.sbarShow == 1 ? true : false; this.onSbar = false; this.row_count = 0; this.rows_drawn = 0; this.row_h = 0; this.scroll = 0; this.scrollable_lines = 0; ppt.scrollStep = s.clamp(ppt.scrollStep, 0, 10); ppt.touchStep = s.clamp(ppt.touchStep, 1, 10); this.timer_but = null; this.touch = {dn: false, end: 0, start: 0}; this.x = 0; this.y = 0; this.w = 0; this.h = 0;
-
-	this.setCol = () => {
-		let opaque = false;
-		alpha = !ui.sbarCol ? 75 : (!ui.sbarType ? 68 : 51);
-		alpha1 = alpha; alpha2 = !ui.sbarCol ? 128 : (!ui.sbarType ? 119 : 85);
-		inStep = ui.sbarType && ui.sbarCol ? 12 : 18;
-		switch (ui.sbarType) {
-			case 0:
-				switch (ui.sbarCol) {
-					case 0:
-						for (let i = 0; i < alpha2 - alpha + 1; i++) col[alpha + i] = opaque ? s.RGBAtoRGB(RGBA(ui.col.t, ui.col.t, ui.col.t, alpha + i), ui.col.bg) : RGBA(ui.col.t, ui.col.t, ui.col.t, alpha + i);
-						col.max = opaque ? s.RGBAtoRGB(RGBA(ui.col.t, ui.col.t, ui.col.t, 192), ui.col.bg) : RGBA(ui.col.t, ui.col.t, ui.col.t, 192); break;
-					case 1:
-						for (let i = 0; i < alpha2 - alpha + 1; i++) col[alpha + i] = opaque ? s.RGBAtoRGB(ui.col.text & RGBA(255, 255, 255, alpha + i), ui.col.bg) : ui.col.text & RGBA(255, 255, 255, alpha + i);
-						col.max = opaque ? s.RGBAtoRGB(ui.col.text & 0x99ffffff, ui.col.bg) : ui.col.text & 0x99ffffff; break;
-				}
-				break;
-			case 1:
-				switch (ui.sbarCol) {
-					case 0:
-						col.bg = opaque ? s.RGBAtoRGB(RGBA(ui.col.t, ui.col.t, ui.col.t, 15), ui.col.bg) : RGBA(ui.col.t, ui.col.t, ui.col.t, 15);
-						for (let i = 0; i < alpha2 - alpha + 1; i++) col[alpha + i] = opaque ? s.RGBAtoRGB(RGBA(ui.col.t, ui.col.t, ui.col.t, alpha + i), ui.col.bg) : RGBA(ui.col.t, ui.col.t, ui.col.t, alpha + i);
-						col.max = opaque ? s.RGBAtoRGB(RGBA(ui.col.t, ui.col.t, ui.col.t, 192), ui.col.bg) : RGBA(ui.col.t, ui.col.t, ui.col.t, 192); break;
-					case 1:
-						col.bg = opaque ? s.RGBAtoRGB(ui.col.text & 0x15ffffff, ui.col.bg) : ui.col.text & 0x15ffffff;
-						for (let i = 0; i < alpha2 - alpha + 1; i++) col[alpha + i] = opaque ? s.RGBAtoRGB(ui.col.text & RGBA(255, 255, 255, alpha + i), ui.col.bg) : ui.col.text & RGBA(255, 255, 255, alpha + i);
-						col.max = opaque ? s.RGBAtoRGB(ui.col.text & 0x99ffffff, ui.col.bg) : ui.col.text & 0x99ffffff; break;
-				}
-				break;
-		}
-	}; this.setCol();
-
-	const minimise_debounce = s.debounce(() => {
-		if (sbarZone) return t.paint();
-		this.narrow = true;
-		if (ppt.sbarShow == 1) but.set_scroll_btns_hide(true, this.type);
-		sbarZone_o = sbarZone;
-		hover = false; hover_o = false;
-		alpha = alpha1;
-		t.paint();
-	}, 1000);
-	
-	const hide_debounce = s.debounce(() => {
-		if (sbarZone) return;
-		this.active = false;
-		active_o = this.active;
-		hover = false; hover_o = false;
-		alpha = alpha1;
-		t.paint()
-	}, 5000);
-	
-	this.resetAuto = () => {
-		minimise_debounce.cancel(); hide_debounce.cancel();
-		if (!ppt.sbarShow) but.set_scroll_btns_hide(true); if (ppt.sbarShow == 1) {but.set_scroll_btns_hide(true, "both"); this.narrow = true;}
-	}
+	let period = ppt.duration.splt(0); period = {drag : 200, inertia : s.clamp(s.value(period[3], 3000, 0), 0, 5000), scroll : s.clamp(s.value(period[1], 500, 0), 0, 5000)}; period.step = period.scroll * 2 / 3;
+    let alpha = !ppt.sbarCol ? 75 : (!ui.sbarType ? 68 : 51), amplitude, b_is_dragging = false, bar_ht = 0, bar_timer = null, bar_y = 0, but_h = 0, clock = Date.now(), counter = 0, drag_distance_per_row = 0, duration = period.scroll, elap = 0, event = "", fast = false, frame, hover = false, hover_o = false, init = true, initial_drag_y = 0, initial_scr = 1, initial_y = -1, ix = -1, lastTouchDn = Date.now(), offset = 0, ratio = 1, reference = -1, rows = 0, scrollbar_height = 0, scrollbar_travel = 0, start = 0, startTime = 0, ticker, timestamp, ts, velocity;
+    const alpha1 = alpha, alpha2 = !ppt.sbarCol ? 128 : (!ui.sbarType ? 119 : 85), inStep = ui.sbarType && ppt.sbarCol ? 12 : 18, ln_sp = p.s_show && !ui.local ? Math.floor(ui.row_h * 0.1) : 0, min = 10 * s.scale, mv = 2 * s.scale;
+    this.count = -1; this.delta = 0; ppt.flickDistance = s.clamp(ppt.flickDistance, 0, 10); this.draw_timer = null; this.item_y = p.s_show ? ui.row_h + (!ui.local ? ln_sp * 2 : 0) : ui.margin; this.max_scroll = 0; this.onSbar = false; this.row_count = 0; this.rows_drawn = 0; this.row_h = 0; this.scroll = 0; this.scrollable_lines = 0; ppt.scrollStep = s.clamp(ppt.scrollStep, 0, 10); ppt.touchStep = s.clamp(ppt.touchStep, 1, 10); this.timer_but = null; this.touch = {dn: false, end: 0, start: 0}; this.x = 0; this.y = 0; this.w = 0; this.h = 0;
 
     const nearest = y => {y = (y - but_h) / scrollbar_height * this.max_scroll; y = y / this.row_h; y = Math.round(y) * this.row_h; return y;}
     const scroll_throttle = s.throttle(() => {this.delta = this.scroll; scroll_to();}, 16);
     const scroll_timer = () => {this.draw_timer = setInterval(() => {if (p.w < 1 || !window.IsVisible) return; smooth_scroll();}, 16);}
 
-	this.leave = () => {if (this.touch.dn) this.touch.dn = false; if (!men.right_up) sbarZone = false; if (b_is_dragging || ppt.sbarShow == 1) return; hover = !hover; this.paint(); hover = false; hover_o = false;}
-    this.page_throttle = s.throttle(dir => this.check_scroll(Math.round((this.scroll + dir * -this.rows_drawn * this.row_h) / this.row_h) * this.row_h, 'full'), 100);
+    this.leave = () => {if (this.touch.dn) this.touch.dn = false; if (b_is_dragging) return; hover = !hover; this.paint(); hover = false; hover_o = false;}
+    this.page_throttle = s.throttle(dir => {this.check_scroll(Math.round((this.scroll + dir * -this.rows_drawn * this.row_h) / this.row_h) * this.row_h);}, 100);
     this.reset = () => {this.delta = this.scroll = 0; this.item_y = 0; this.metrics(this.x, this.y, this.w, this.h, this.rows_drawn, this.row_h);}
     this.set_rows = row_count => {if (!row_count) this.item_y = 0; this.row_count = row_count; this.metrics(this.x, this.y, this.w, this.h, this.rows_drawn, this.row_h);}
     this.set_scroll = new_scroll => {clock = 0; const b = Math.max(0, Math.min(new_scroll, this.max_scroll)); if (b == this.scroll) return; this.scroll = b; this.delta = this.scroll; bar_y = but_h + scrollbar_travel * (this.delta * ratio) / (this.row_count * this.row_h); p.paint();}
-    this.wheel = step => this.check_scroll(Math.round((this.scroll + step * -(!ppt.scrollStep ? this.rows_drawn : ppt.scrollStep) * this.row_h) / this.row_h) * this.row_h, ppt.scrollStep ? 'step' : 'full');
+    this.wheel = step => this.check_scroll(Math.round((this.scroll + step * -(!ppt.scrollStep ? this.rows_drawn : ppt.scrollStep) * this.row_h) / this.row_h) * this.row_h, ppt.scrollStep ? 'step' : "");
 
     this.metrics = (x, y, w, h, rows_drawn, row_h) => {
         this.x = x; this.y = Math.round(y); this.w = w; this.h = h; this.rows_drawn = rows_drawn; this.row_h = row_h; but_h = ui.but_h;
         // draw info
         scrollbar_height = Math.round(this.h - but_h * 2);
-        bar_ht = Math.max(Math.round(scrollbar_height * this.rows_drawn / this.row_count), s.clamp(scrollbar_height / 2, 5, ppt.sbarShow == 2 ? ui.grip_h : ui.grip_h * 2));
+        bar_ht = Math.max(Math.round(scrollbar_height * this.rows_drawn / this.row_count), s.clamp(scrollbar_height / 2, 5, ui.grip_h));
         scrollbar_travel = scrollbar_height - bar_ht;
         // scrolling info
         if (this.rows_drawn > 0) this.scrollable_lines = this.row_count - this.rows_drawn;
@@ -1172,31 +1034,30 @@ function Scrollbar() {
         bar_y = but_h + scrollbar_travel * (this.delta * ratio) / (this.row_count * this.row_h);
         drag_distance_per_row = scrollbar_travel / this.scrollable_lines;
         // panel info
-		narrowSbar_x = this.x + this.w - s.clamp(ui.narrowSbarWidth, Math.round(5 * s.scale), this.w);
         this.max_scroll = this.scrollable_lines * this.row_h;
-        if (ppt.sbarShow != 1) but.set_scroll_btns_hide();
+        but.set_scroll_btns_hide();
     }
 
-    this.draw = gr => {
-        if (this.scrollable_lines > 0 && this.active) {
-			let sbar_x = this.x, sbar_w = this.w;
-			if (ppt.sbarShow == 1) {sbar_x = !this.narrow ? this.x : narrowSbar_x; sbar_w = !this.narrow ? this.w : ui.narrowSbarWidth;}
+    this.draw = (gr) => {
+        if (this.scrollable_lines > 0) {
             switch (ui.sbarType) {
                 case 0:
-					gr.FillSolidRect(sbar_x, this.y + bar_y, sbar_w, bar_ht, this.narrow ? col[alpha2] : !b_is_dragging ? col[alpha] : col['max']); break;
+                    switch (ppt.sbarCol) {
+                        case 0: gr.FillSolidRect(this.x, this.y + bar_y, this.w, bar_ht, RGBA(ui.col.t, ui.col.t, ui.col.t, !hover && !b_is_dragging ? alpha : hover && !b_is_dragging ? alpha : 192)); break;
+                        case 1: gr.FillSolidRect(this.x, this.y + bar_y, this.w, bar_ht, ui.col.text & (!hover && !b_is_dragging ? RGBA(255, 255, 255, alpha) : hover && !b_is_dragging ? RGBA(255, 255, 255, alpha) : 0x99ffffff)); break;
+                    } break;
                 case 1:
-					if (!this.narrow || ppt.sbarShow != 1) gr.FillSolidRect(sbar_x, this.y - p.sbar_o, this.w, this.h + p.sbar_o * 2, col['bg']); 
-					gr.FillSolidRect(sbar_x, this.y + bar_y, sbar_w, bar_ht, this.narrow ? col[alpha2] : !b_is_dragging ? col[alpha] : col['max']); break;
-                case 2:
-					ui.theme.SetPartAndStateID(6, 1); if (!this.narrow || ppt.sbarShow != 1) ui.theme.DrawThemeBackground(gr, sbar_x, this.y, sbar_w, this.h); 
-					ui.theme.SetPartAndStateID(3, this.narrow ? 2 : !hover && !b_is_dragging ? 1 : hover && !b_is_dragging ? 2 : 3); 
-					ui.theme.DrawThemeBackground(gr, sbar_x, this.y + bar_y, sbar_w, bar_ht); break; 
+                    switch (ppt.sbarCol) {
+                        case 0: gr.FillSolidRect(this.x, this.y - p.sbar_o, this.w, this.h + p.sbar_o * 2, RGBA(ui.col.t, ui.col.t, ui.col.t, 15)); gr.FillSolidRect(this.x, this.y + bar_y, this.w, bar_ht, RGBA(ui.col.t, ui.col.t, ui.col.t, !hover && !b_is_dragging ? alpha : hover && !b_is_dragging ? alpha : 192)); break;
+                        case 1: gr.FillSolidRect(this.x, this.y - p.sbar_o, this.w, this.h + p.sbar_o * 2, ui.col.text & 0x15ffffff); gr.FillSolidRect(this.x, this.y + bar_y, this.w, bar_ht, ui.col.text & (!hover && !b_is_dragging ? RGBA(255, 255, 255, alpha) : hover && !b_is_dragging ? RGBA(255, 255, 255, alpha) : 0x99ffffff)); break;
+                    } break;
+                case 2: ui.theme.SetPartAndStateID(6, 1); ui.theme.DrawThemeBackground(gr, this.x, this.y, this.w, this.h); ui.theme.SetPartAndStateID(3, !hover && !b_is_dragging ? 1 : hover && !b_is_dragging ? 2 : 3); ui.theme.DrawThemeBackground(gr, this.x, this.y + bar_y, this.w, bar_ht); break;
             }
         }
     }
 
     this.paint = () => {
-		if (init) return; alpha = hover ? alpha1 : alpha2;
+        if (hover) init = false; if (init) return; alpha = hover ? alpha1 : alpha2;
         clearTimeout(bar_timer); bar_timer = null;
         bar_timer = setInterval(() => {alpha = hover ? Math.min(alpha += inStep, alpha2) : Math.max(alpha -= 3, alpha1); window.RepaintRect(this.x, this.y, this.w, this.h);
         if (hover && alpha == alpha2 || !hover && alpha == alpha1) {hover_o = hover; clearTimeout(bar_timer); bar_timer = null;}}, 25);
@@ -1229,13 +1090,6 @@ function Scrollbar() {
     }
 
     this.move = (p_x, p_y) => {
-		this.active = true;
-		if (p_x > p.w - this.w) {
-			sbarZone = true;
-			this.narrow = false;
-			if (ppt.sbarShow == 1 && sbarZone != sbarZone_o) {but.set_scroll_btns_hide(!sbarZone || this.scrollable_lines < 1, this.type); sbarZone_o = sbarZone;}
-		} else sbarZone = false;
-		if (ppt.sbarShow == 1) {minimise_debounce(); hide_debounce();}
         if (ppt.touchControl) {
             const delta = reference - p_y;
             if (delta > mv || delta < -mv) {
@@ -1243,12 +1097,12 @@ function Scrollbar() {
                 if (ppt.flickDistance) offset = s.clamp(offset + delta, 0, this.max_scroll);
             }
         }
-        if (this.touch.dn) {if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y) || !p.text_trace) return; ts = Date.now(); if (ts - startTime > 300) startTime = ts; lastTouchDn = ts; this.check_scroll(initial_scr + (initial_y - p_y) * ppt.touchStep, ppt.touchStep == 1 ? 'drag' : 'scroll'); return;}
+        if (this.touch.dn) {if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y) || !p.text_trace) return; ts = Date.now(); if (ts - startTime > 300) startTime = ts; lastTouchDn = ts; this.check_scroll(initial_scr + (initial_y - p_y) * ppt.touchStep, 'drag'); return;}
         const x = p_x - this.x, y = p_y - this.y;
         if (x < 0 || x > this.w || y > bar_y + bar_ht || y < bar_y || but.Dn) hover = false; else hover = true;
-        if (!bar_timer && (hover != hover_o || this.active != active_o)) {init = false; this.paint(); active_o = this.active;}
+        if (hover != hover_o && !bar_timer) this.paint();
         if (!b_is_dragging || this.row_count <= this.rows_drawn) return;
-        this.check_scroll(Math.round((y - initial_drag_y) / drag_distance_per_row) * this.row_h, 'bar');
+        this.check_scroll(Math.round((y - initial_drag_y) / drag_distance_per_row) * this.row_h);
     }
 
     this.lbtn_drag_up = (p_x, p_y) => {
@@ -1265,9 +1119,7 @@ function Scrollbar() {
     }
 
     this.lbtn_up = (p_x, p_y) => {
-		if (p.clicked) {if (ppt.sbarShow == 1 && this.narrow) but.set_scroll_btns_hide(true, this.type); return;}
-		if (but.Dn == "src") return;
-		const x = p_x - this.x, y = p_y - this.y;
+        if (but.Dn == "src" || p.clicked) return; const x = p_x - this.x, y = p_y - this.y;
         if (!hover && b_is_dragging) this.paint(); else window.RepaintRect(this.x, this.y, this.w, this.h); if (b_is_dragging) {b_is_dragging = false; but.Dn = false;} initial_drag_y = 0;
         if (this.timer_but) {clearTimeout(this.timer_but); this.timer_but = null;}; this.count = -1;
     }
@@ -1301,60 +1153,40 @@ function Scrollbar() {
         const b = s.clamp(new_scroll, 0, this.max_scroll);
         if (b == this.scroll) return; this.scroll = b;
         if (ppt.smooth) {
-            elap = 16; event = type || 'scroll'; this.item_y = 0; start = this.delta;
-            if (event != 'drag') {
-				if (b_is_dragging && Math.abs(this.delta - this.scroll) > scrollbar_height) event = 'barFast';
+            elap = 16; event = type; this.item_y = 0; start = this.delta;
+            if (event != 'drag' || ppt.touchStep > 1) {
+                duration = !event ? period.scroll : period[event];
+                if (b_is_dragging) {if (Math.abs(this.delta - this.scroll) < scrollbar_height) fast = false; else {fast = true; duration = period.step;}}
                 clock = Date.now(); if (!this.draw_timer) {scroll_timer(); smooth_scroll();}
             } else scroll_drag();
         } else scroll_throttle();
     }
 
     const calc_item_y = () => {ix = Math.round(this.delta / ui.font_h + 0.4); this.item_y = Math.round(ui.font_h * ix + p.text_t - this.delta);}
-	const position = (Start, End, Elapsed, Duration, Event) => {if (Elapsed > Duration) return End; if (Event == 'drag') return; const n = Elapsed / Duration; return Start + (End - Start) * ease[Event](n);}
+    const position = (Start, End, Elapsed, Duration, Event) => {if (Elapsed > Duration) return End; const n = Elapsed / Duration; Event = b_is_dragging ? !fast ? ease.bar(n) : ease.barFast(n) : Event != 'inertia' ? ease.scroll(n) : ease.inertia(n); return Start + (End - Start) * Event;}
     const scroll_drag = () => {this.delta = this.scroll; scroll_to(); calc_item_y();}
     const scroll_finish = () => {if (!this.draw_timer) return; this.delta = this.scroll; scroll_to(); calc_item_y(); clearTimeout(this.draw_timer); this.draw_timer = null;}
     const scroll_to = () => {bar_y = but_h + scrollbar_travel * (this.delta * ratio) / (this.row_count * this.row_h); p.paint();}
     const shift = (dir, nearest_y) => {let target = Math.round((this.scroll + dir * -this.rows_drawn * this.row_h) / this.row_h) * this.row_h; if (dir == 1) target = Math.max(target, nearest_y); else target = Math.min(target, nearest_y); return target;}
-    const shift_page = (dir, nearest_y) => {this.check_scroll(shift(dir, nearest_y), 'full'); if (!this.timer_but) {this.timer_but = setInterval(() => {if (this.count > 1) {this.check_scroll(shift(dir, nearest_y), 'full');} else this.count++;}, 100);}}
+    const shift_page = (dir, nearest_y) => {this.check_scroll(shift(dir, nearest_y)); if (!this.timer_but) {this.timer_but = setInterval(() => {if (this.count > 1) {this.check_scroll(shift(dir, nearest_y));} else this.count++;}, 100);}}
     const smooth_scroll = () => {
-        this.delta = position(start, this.scroll, Date.now() - clock + elap, duration[event], event);
+        this.delta = position(start, this.scroll, Date.now() - clock + elap, duration, event);
         if (Math.abs(this.scroll - this.delta) > 0.5) scroll_to(); else scroll_finish();
     }
 
-    this.but = dir => {this.check_scroll(Math.round((this.scroll + dir * -this.row_h) / this.row_h) * this.row_h, 'step'); if (!this.timer_but) {this.timer_but = setInterval(() => {if (this.count > 6) {this.check_scroll(this.scroll + dir * -this.row_h, 'step');} else this.count++;}, 40);}}
-    this.scroll_to_end = () => this.check_scroll(this.max_scroll, 'full');
+    this.but = dir => {this.check_scroll(Math.round((this.scroll + dir * -this.row_h) / this.row_h) * this.row_h); if (!this.timer_but) {this.timer_but = setInterval(() => {if (this.count > 6) {this.check_scroll(this.scroll + dir * -this.row_h);} else this.count++;}, 40);}}
+    this.scroll_to_end = () => this.check_scroll(this.max_scroll);
 }
-alb_scrollbar.type = "alb"; art_scrollbar.type = "art";
 
 function Buttons() {
     let amBioBtn = ppt.amBioBtn, amRevBtn = ppt.amRevBtn, lfmBioBtn = ppt.lfmBioBtn, lfmRevBtn = ppt.lfmRevBtn, amlfmBioBtn = "", amlfmRevBtn = "", lfmamBioBtn = "", lfmamRevBtn = "";
     if (!ui.BtnName) {amBioBtn = ""; amRevBtn = ""; lfmBioBtn = ""; lfmRevBtn = "";} else {amlfmBioBtn = amBioBtn + " | " + lfmBioBtn; amlfmRevBtn = amRevBtn + " | " + lfmRevBtn; lfmamBioBtn = lfmBioBtn + " | " + amBioBtn; lfmamRevBtn = lfmRevBtn + " | " + amRevBtn;}
-    const albScrBtns = ["alb_scrollDn", "alb_scrollUp"], artScrBtns = ["art_scrollDn", "art_scrollUp"], fontAwesomeInstalled = utils.CheckFont("FontAwesome"), orig_mt_sz = 15 * s.scale, scc = 2, rc = StringFormat(2, 1, 3), scrBtns = albScrBtns.concat(artScrBtns);
-    let arrow_symb = 0, b_x, btnTxt = false, btnVisible = false, byDn, byUp, cur_btn = null, drawTxt = "", hoverCol = ui.col.text & RGBA(255, 255, 255, 51), iconFontName = "Segoe UI Symbol", iconFontStyle = 0, init = true, l = false, m = false, mt = false, mtL = false, name_w = 0, r = false, sAlpha = 255, sbarButPad = s.clamp(ppt.sbarButPad / 100, -0.5, 0.3), scrollBtn = false, scrollBtn_x, scrollDn_y, scrollUp_y, sp_w = [], src_fs = 12, src_h = 19, src_im = false, src_w = 50, src_font = gdi.Font("Segoe UI", src_fs, 1), tooltip, transition, tt_start = Date.now() - 2000, zoom_mt_sz = Math.max(Math.round(orig_mt_sz * ppt.zoomBut / 100), 7), scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); ppt.zoomBut = scale;
-	let mt_w = 12, mtCol = s.toRGB(ui.col.text), mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0), mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
+    const albScrBtns = ["alb_scrollDn", "alb_scrollUp"], artScrBtns = ["art_scrollDn", "art_scrollUp"], sbarButPad = s.clamp(ppt.sbarButPad / 100, -0.5, 0.3), orig_mt_sz = 15 * s.scale, scc = 2, rc = StringFormat(2, 1, 3), sAlpha = ppt.sbarCol ? [68, 153, 255] : [75, 192, 228], scrBtns = albScrBtns.concat(artScrBtns);
+    let arrow_symb = 0, b_x, btnTxt = false, btnVisible = false, byDn, byUp, cur_btn = null, drawTxt = "", iconFontName = "Segoe UI", iconFontStyle = 0, l = false, m = false, mt = false, mtL = false, name_w = 0, r = false, scrollBtn = false, scrollBtn_x, scrollDn_y, scrollUp_y, sp_w = [], src_fs = 12, src_h = 19, src_im = false, src_w = 50, src_font = gdi.Font("Segoe UI", src_fs, 1), tooltip, transition, tt_start = Date.now() - 2000, zoom_mt_sz = Math.max(Math.round(orig_mt_sz * ppt.zoomBut / 100), 7), scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); ppt.zoomBut = scale;
     this.btns = {}; this.Dn = false; this.r_h1 = 0; this.r_h2 = 0; this.r_w1 = 0; this.r_w2 = 0; this.ratingImages = []; if (ui.stars == 1 && ui.lfmTheme) this.ratingImagesLfm = []; this.show_tt = true;
 
-	this.setSbarIcon = () => {
-		switch (ppt.sbarButType) {
-			case 0:
-				iconFontName = "Segoe UI Symbol"; iconFontStyle = 0;
-				if (!ui.sbarType) {
-					arrow_symb = ui.scr_but_w < Math.round(14 * s.scale) ? "\uE018" : "\uE0A0"; sbarButPad = ui.scr_but_w < Math.round(15 * s.scale) ? -0.3 : -0.22;
-				} else {
-					arrow_symb = ui.scr_but_w < Math.round(14 * s.scale) ? "\uE018" : "\uE0A0"; sbarButPad = ui.scr_but_w < Math.round(14 * s.scale) ? -0.26 : -0.22;
-				}
-				break;
-			case 1: arrow_symb = 0; break;
-			case 2:
-				arrow_symb = ppt.arrowSymbol.replace(/\s+/g, "").charAt(); if (!arrow_symb.length) arrow_symb = 0;
-				if (ppt.customCol && ppt.butCustIconFont.length) { 
-					const butCustIconFont = ppt.butCustIconFont.splt(1);
-					iconFontName = butCustIconFont[0];
-					iconFontStyle = Math.round(s.value(butCustIconFont[1], 0, 0));
-				}				
-				break;
-			}
-	}; this.setSbarIcon();
+    if (ppt.get(" Scrollbar Arrow Custom", false)) arrow_symb = ppt.arrowSymbol.replace(/\s+/g, "").charAt(); if (!arrow_symb.length) arrow_symb = 0;
+    if (ppt.customCol && ppt.butCustIconFont.length) {const butCustIconFont = ppt.butCustIconFont.splt(1); iconFontName = butCustIconFont[0]; iconFontStyle = Math.round(s.value(butCustIconFont[1], 0, 0));}
 
     const clear = () => {this.Dn = false; Object.values(this.btns).forEach(v => v.down = false);}
     const scroll = () => ppt.sbarShow && alb.show;
@@ -1364,56 +1196,21 @@ function Buttons() {
     const tt = (n, force) => {if (tooltip.Text !== n || force) {tooltip.Text = n; tooltip.SetMaxWidth(800); tooltip.Activate();}}
 
 	this.clear_tooltip = () => {if (!tooltip.Text || !this.btns["mt"].tt) return; this.btns["mt"].tt.stop();}
-    this.create_images = () => {
-		const sz = arrow_symb == 0 ? Math.max(Math.round(ui.but_h * 1.666667), 1) : 100, sc = sz / 100, iconFont = gdi.Font(iconFontName, sz, iconFontStyle);
-		sAlpha = !ui.sbarCol ? [75, 192, 228] : [68, 153, 255];
-		const hovAlpha = (!ui.sbarCol ? 75 : (!ui.sbarType ? 68 : 51)) * 0.4;
-		hoverCol = !ui.sbarCol ? RGBA(ui.col.t, ui.col.t, ui.col.t, hovAlpha) : ui.col.text & RGBA(255, 255, 255, hovAlpha);
-		scrollBtn = s.gr(sz, sz, true, g => {g.SetTextRenderingHint(3); g.SetSmoothingMode(2); if (ppt.sbarCol) {arrow_symb == 0 ? g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(arrow_symb, iconFont, ui.col.text, 0, sz * sbarButPad, sz, sz, StringFormat(1, 1));} else {arrow_symb == 0 ? g.FillPolygon(RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(arrow_symb, iconFont, RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 0, sz * sbarButPad, sz, sz, StringFormat(1, 1));} g.SetSmoothingMode(0);});}; this.create_images();
-    this.create_mt = () => {
-		switch (fontAwesomeInstalled) {
-			case true: 
-				mtCol = s.toRGB(ui.col.text); 
-				s.gr(1, 1, true, g => {
-					mt_w = Math.max(g.CalcTextWidth("\uF078", mtFont), g.CalcTextWidth("\uF023", mtFontL), g.CalcTextHeight("\uF078", mtFont), g.CalcTextHeight("\uF023", mtFontL));});
-				break;
-			case false:
-				const sz = Math.max(Math.round(20 * scale / 100), 20), sc = sz / 100;
-				mt = s.gr(sz, sz, true, g => {g.SetSmoothingMode(2); 
-				g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]); 
-				g.SetSmoothingMode(0);}); 
-				mtL = s.gr(sz, sz, true, g => {g.SetSmoothingMode(2); 
-				g.FillSolidRect(0, 0, sz, sz, ui.col.text); 
-				g.SetSmoothingMode(0);});
-				break;
-		}
-	}; this.create_mt();
+    this.create_images = () => {const sz = arrow_symb == 0 ? Math.max(Math.round(ui.but_h * 1.666667), 1) : 100, sc = sz / 100, iconFont = gdi.Font(iconFontName, sz, iconFontStyle); scrollBtn = s.gr(sz, sz, true, g => {g.SetTextRenderingHint(3); g.SetSmoothingMode(2); if (ppt.sbarCol) {arrow_symb == 0 ? g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(arrow_symb, iconFont, ui.col.text, 0, sz * sbarButPad, sz, sz, StringFormat(1, 1));} else {arrow_symb == 0 ? g.FillPolygon(RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(arrow_symb, iconFont, RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 0, sz * sbarButPad, sz, sz, StringFormat(1, 1));} g.SetSmoothingMode(0);});}; this.create_images();
+    this.create_mt = () => {const sz = Math.max(Math.round(20 * scale / 100), 20), sc = sz / 100; mt = s.gr(sz, sz, true, g => {g.SetTextRenderingHint(3); g.SetSmoothingMode(2); g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]); g.SetSmoothingMode(0);}); mtL = s.gr(sz, sz, true, g => {g.SetTextRenderingHint(3); g.SetSmoothingMode(2); g.FillSolidRect(0, 0, sz, sz, ui.col.text); g.SetSmoothingMode(0);});}; this.create_mt();
     this.lbtn_dn = (x, y) => {this.move(x, y); if (!cur_btn || cur_btn.hide) {this.Dn = false; return false} else this.Dn = cur_btn.name; cur_btn.down = true; cur_btn.cs("down"); cur_btn.lbtn_dn(x, y); return true;}
 	this.create_tooltip = () => tooltip = window.CreateTooltip("Segoe UI", 15 * s.scale * ppt.get(" Zoom Tooltip (%)", 100) / 100, 0); this.create_tooltip();
     this.leave = () => {if (cur_btn) {cur_btn.cs("normal"); if (!cur_btn.hide) transition.start();} cur_btn = null;}
     this.on_script_unload = () => tt("");
     this.draw = gr => Object.values(this.btns).forEach(v => {if (!v.hide) v.draw(gr);});
     this.reset = () => transition.stop();
-
 	this.resetZoom = () => {
 		ppt.zoomFont = 100; ppt.zoomHead = 115;
 		zoom_mt_sz = orig_mt_sz;
 		scale = ppt.zoomBut = 100;
-		mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0);
-		mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
 		ppt.set(" Zoom Tooltip (%)", 100); ui.get_font(); this.create_mt(); this.create_tooltip(); this.refresh(true); t.toggle(12);
 	}
-
-    this.set_scroll_btns_hide = (set, autoHide) => {
-		if (autoHide) {
-			const arr = autoHide == "both" ? scrBtns : autoHide == "alb" ? albScrBtns : artScrBtns;
-			arr.forEach((v, i) => {if (this.btns[v]) this.btns[v].hide = set;}); t.paint();
-		} else {
-			if (!ppt.sbarShow && !set) return;
-			scrBtns.forEach((v, i) => {if (this.btns[v]) this.btns[v].hide = i < 2 ? !scroll_alb() : !scroll_art();});
-		}
-	}
-
+    this.set_scroll_btns_hide = (force) => {if (!ppt.sbarShow && !force) return; scrBtns.forEach((v, i) => {if (this.btns[v]) this.btns[v].hide = i < 2 ? !scroll_alb() : !scroll_art();});}
     this.set_src_btn_hide = () => {if (this.btns.src) this.btns.src.hide = !ppt.heading || !t.head || ppt.img_only;}
 
     const drawPolyStar = (gr, x, y, out_radius, in_radius, points, line_thickness, line_color, fill_color) => {
@@ -1479,7 +1276,7 @@ function Buttons() {
             let dh, dx1, dx2;
             if (!ppt.hdCenter) {if (ppt.src < 2) {dh = ppt.src ? (r || btnTxt ? (!ppt.hdRight && ui.BtnBg ? "" :  (ppt.hdLine != 2 ? "  " : " ")) : "") + t.heading + t.na : t.heading + t.na; dx1 = this.x + src_w; dx2 = this.x;} else {dh = t.heading + t.na; dx1 = this.x; dx2 = this.x + this.w - src_w;}} else dh = t.heading + t.na;
             switch (true) {
-                case ppt.hdLine == 1: gr.DrawLine(this.x, this.y + ui.head_ln_h, this.x + this.w, this.y + ui.head_ln_h, ui.l_h, ui.col.bottomLine); break;
+                case ppt.hdLine == 1: gr.DrawLine(this.x, this.y + ui.head_ln_h, this.x + this.w, this.y + ui.head_ln_h, ui.l_h, ui.col.botttomLine); break;
                 case ppt.hdLine == 2:
                     if (!ppt.hdCenter) {
                         let dh_w = gr.CalcTextWidth(dh, ui.headFont) + sp_w[0] * (!ppt.hdRight || !btnVisible ? 2 : 0);
@@ -1511,23 +1308,12 @@ function Buttons() {
         }
 
         const drawMT = gr => {
-			switch (fontAwesomeInstalled) {
-				case true:
-					const col = this.state !== "down" ? ui.get_blend(im.hover, im.normal, this.transition_factor, true) : im.hover;
-				    gr.SetTextRenderingHint(5);
-					!p.lock ? gr.DrawString("\uF078", mtFont, col, this.x, this.y, ft, txt, StringFormat(1, 1)) :
-					gr.DrawString("\uF023", mtFontL, col, this.x, this.y + 3 * s.scale, ft, txt, StringFormat(1, 1));
-					break;
-				case false:
-					const a = this.state !== "down" ? Math.min(sAlpha[0] + (sAlpha[1] - sAlpha[0]) * this.transition_factor, sAlpha[1]) : sAlpha[2];
-					if (im[p.lock]) gr.DrawImage(im[p.lock], this.x, this.y, this.w / 1.5, this.h / 1.5, 0, 0, im[p.lock].Width, im[p.lock].Height, 180, a);
-					break;
-				}
+                const a = this.state !== "down" ? Math.min(sAlpha[0] + (sAlpha[1] - sAlpha[0]) * this.transition_factor, sAlpha[1]) : sAlpha[2];
+                if (im[p.lock]) gr.DrawImage(im[p.lock], this.x, this.y, this.w / 1.5, this.h / 1.5, 0, 0, im[p.lock].Width, im[p.lock].Height, 180, a);
         }
 
         const drawScrollBtn = gr => {
             const a = this.state !== "down" ? Math.min(sAlpha[0] + (sAlpha[1] - sAlpha[0]) * this.transition_factor, sAlpha[1]) : sAlpha[2];
-			if (this.state !== "normal" && ui.sbarType == 1) gr.FillSolidRect(p.sbar_x, this.y, ui.sbar_w, this.h, hoverCol);
             if (scrollBtn) gr.DrawImage(scrollBtn, this.x + ft, txt, stat, stat, 0, 0, scrollBtn.Width, scrollBtn.Height, this.type == 1 || this.type == 3 ? 0 : 180, a);
         }
     }
@@ -1536,7 +1322,7 @@ function Buttons() {
         const hover_btn = Object.values(this.btns).find(v => {
              if (!v.hide && (!this.Dn || this.Dn == v.name)) return v.trace(x, y);
         });
-        let hand = false; init = false;
+        let hand = false;
         check_scrollBtns(x, y, hover_btn); if (hover_btn) hand = hover_btn.hand; if (!tb.down) {
 			if(!hand && this.hand) {
 				window.SetCursor(32512);
@@ -1566,14 +1352,11 @@ function Buttons() {
         if (!ppt.mul_item || !this.btns["mt"] || !this.btns["mt"].trace(p.m_x, p.m_y)) return;
         zoom_mt_sz += step; zoom_mt_sz = s.clamp(zoom_mt_sz, 7, 100);
         window.RepaintRect(this.btns["mt"].x, this.btns["mt"].y, this.btns["mt"].w, this.btns["mt"].h);
-        scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); 
-		mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0);
-		mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
-		this.create_mt(); this.refresh(true); ppt.zoomBut = scale;
+        scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); this.create_mt(); this.refresh(true); ppt.zoomBut = scale;
     }
 
     this.check = refresh => {
-        if (!refresh) {this.set_scroll_btns_hide(); if (ppt.sbarShow == 1 && init) but.set_scroll_btns_hide(true, "both"); this.set_src_btn_hide();}
+        if (!refresh) {this.set_scroll_btns_hide(); this.set_src_btn_hide();}
         if (!this.btns.src || !ppt.heading) return;
         l = ppt.artistView && t.bio_allmusic || !ppt.artistView && t.alb_allmusic ? 1 : 0; r = ui.stars == 1 && !ppt.artistView && (t.alb_allmusic && (!t.btnRevBoth ? t.amRating != -1 : t.avgRating != -1) || !t.alb_allmusic && (!t.btnRevBoth ? t.lfmRating != -1 : t.avgRating != -1));
         drawTxt = l ? (ui.BtnBg ? " " : "") + (!ppt.artistView ? (!t.btnRevBoth ? amRevBtn : amlfmRevBtn) : (!t.btnBioBoth ? amBioBtn : amlfmBioBtn)) + (ui.BtnBg || r ? " " : "") : (ui.BtnBg ? " " : "") + (!ppt.artistView ? (!t.btnRevBoth ? lfmRevBtn : lfmamRevBtn) : (!t.btnBioBoth ? lfmBioBtn : lfmamBioBtn)) + (ui.BtnBg || r ? " " : "");
@@ -1593,29 +1376,20 @@ function Buttons() {
             this.btns.src = new Btn(p.text_l, p.text_t - ui.heading_h, p.text_w, ui.headFont_h, 6, s.clamp(Math.round(p.text_t - ui.heading_h + (ui.headFont_h - src_h) / 2 + ui.src_pad), p.text_t - ui.heading_h, p.text_t - ui.heading_h + ui.headFont_h - src_h), "", "", "", !ppt.heading || !t.head || ppt.img_only, "", () => {t.toggle(ppt.artistView ? (!ppt.bothBio ? 0 : 6) : (!ppt.bothRev ? 1 : 7)); but.check(true); if (ui.blur) window.Repaint();}, () => src_tiptext(), true, "src");
         }
         src_im = {normal: l || (!ui.lfmTheme || ui.lfmTheme && !ui.BtnBg) ? ui.bg || !ui.bg && !ui.trans || ppt.blurDark || ppt.blurLight ? ui.col.btn : RGB(255, 255, 255) : RGB(225, 225, 245), hover: l || (!ui.lfmTheme || ui.lfmTheme && !ui.BtnBg) ?  ui.bg || !ui.bg && !ui.trans || ppt.blurDark || ppt.blurLight ? ui.col.text_h : RGB(255, 255, 255) : RGB(225, 225, 245)};
-        if (ppt.mul_item) {
-			switch (fontAwesomeInstalled) {
-				case true:
-					this.btns.mt = new Btn(2 * s.scale, 0, mt_w * 1.5, mt_w * 1.5, 7, mt_w, mt_w, "", {normal: RGBA(mtCol[0], mtCol[1], mtCol[2], sAlpha[0]), hover: RGBA(mtCol[0], mtCol[1], mtCol[2], sAlpha[1])}, !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");
-					break;
-				case false:
-					this.btns.mt = new Btn(0, 0, 12 * scale / 100 * 1.5, 12 * scale / 100 * 1.5, 7, "", "", "", [mt, mtL], !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");
-					break;
-			}
-		} else delete this.btns.mt;
+        if (ppt.mul_item) {this.btns.mt = new Btn(0, 0, 12 * scale / 100 * 1.5, 12 * scale / 100 * 1.5, 7, "", "", "", [mt, mtL], !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");} else delete this.btns.mt;
         if (ppt.sbarShow) {
             switch (ui.sbarType) {
                 case 2:
-                    this.btns.alb_scrollUp = new Btn(b_x, byUp, ui.but_h, ui.but_h, 5, "", "", "", {normal: 1, hover: 2, down: 3}, ppt.sbarShow == 1 && alb_scrollbar.narrow || !scroll_alb(), () => alb_scrollbar.but(1), "", "", false, "alb_scrollUp");
-                    this.btns.alb_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h, 5, "", "", "", {normal: 5, hover: 6, down: 7}, ppt.sbarShow == 1 && alb_scrollbar.narrow || !scroll_alb(), () => alb_scrollbar.but(-1), "", "", false, "alb_scrollDn");
-                    this.btns.art_scrollUp = new Btn(b_x, byUp, ui.but_h, ui.but_h, 5, "", "", "", {normal: 1, hover: 2, down: 3}, ppt.sbarShow == 1 && art_scrollbar.narrow || !scroll_art(), () => art_scrollbar.but(1), "", "", false, "art_scrollUp");
-                    this.btns.art_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h, 5, "", "", "", {normal: 5, hover: 6, down: 7}, ppt.sbarShow == 1 && art_scrollbar.narrow || !scroll_art(), () => art_scrollbar.but(-1), "", "", false, "art_scrollDn");
+                    this.btns.alb_scrollUp = new Btn(b_x, byUp, ui.but_h, ui.but_h, 5, "", "", "", {normal: 1, hover: 2, down: 3}, !scroll_alb(), () => alb_scrollbar.but(1), "", "", false, "alb_scrollUp");
+                    this.btns.alb_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h, 5, "", "", "", {normal: 5, hover: 6, down: 7}, !scroll_alb(), () => alb_scrollbar.but(-1), "", "", false, "alb_scrollDn");
+                    this.btns.art_scrollUp = new Btn(b_x, byUp, ui.but_h, ui.but_h, 5, "", "", "", {normal: 1, hover: 2, down: 3}, !scroll_art(), () => art_scrollbar.but(1), "", "", false, "art_scrollUp");
+                    this.btns.art_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h, 5, "", "", "", {normal: 5, hover: 6, down: 7}, !scroll_art(), () => art_scrollbar.but(-1), "", "", false, "art_scrollDn");
                     break;
                 default:
-                    this.btns.alb_scrollUp = new Btn(b_x, byUp - p.top_corr, ui.but_h, ui.but_h + p.top_corr, 1, scrollBtn_x, scrollUp_y, ui.scr_but_w, "", ppt.sbarShow == 1 && alb_scrollbar.narrow || !scroll_alb(), () => alb_scrollbar.but(1), "", "", false, "alb_scrollUp");
-                    this.btns.alb_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h + p.top_corr, 2, scrollBtn_x, scrollDn_y, ui.scr_but_w, "", ppt.sbarShow == 1 && alb_scrollbar.narrow || !scroll_alb(), () => alb_scrollbar.but(-1), "", "", false, "alb_scrollDn");
-                    this.btns.art_scrollUp = new Btn(b_x, byUp - p.top_corr, ui.but_h, ui.but_h + p.top_corr, 3, scrollBtn_x, scrollUp_y, ui.scr_but_w, "", ppt.sbarShow == 1 && art_scrollbar.narrow || !scroll_art(), () => art_scrollbar.but(1), "", "", false, "art_scrollUp");
-                    this.btns.art_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h + p.top_corr, 4, scrollBtn_x, scrollDn_y, ui.scr_but_w, "", ppt.sbarShow == 1 && art_scrollbar.narrow || !scroll_art(), () => art_scrollbar.but(-1), "", "", false, "art_scrollDn");
+                    this.btns.alb_scrollUp = new Btn(b_x, byUp - p.top_corr, ui.but_h, ui.but_h + p.top_corr, 1, scrollBtn_x, scrollUp_y, ui.scr_but_w, "", !scroll_alb(), () => alb_scrollbar.but(1), "", "", false, "alb_scrollUp");
+                    this.btns.alb_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h + p.top_corr, 2, scrollBtn_x, scrollDn_y, ui.scr_but_w, "", !scroll_alb(), () => alb_scrollbar.but(-1), "", "", false, "alb_scrollDn");
+                    this.btns.art_scrollUp = new Btn(b_x, byUp - p.top_corr, ui.but_h, ui.but_h + p.top_corr, 3, scrollBtn_x, scrollUp_y, ui.scr_but_w, "", !scroll_art(), () => art_scrollbar.but(1), "", "", false, "art_scrollUp");
+                    this.btns.art_scrollDn = new Btn(b_x, byDn, ui.but_h, ui.but_h + p.top_corr, 4, scrollBtn_x, scrollDn_y, ui.scr_but_w, "", !scroll_art(), () => art_scrollbar.but(-1), "", "", false, "art_scrollDn");
                     break;
             }
         }
@@ -1699,7 +1473,7 @@ function Buttons() {
 
 function MenuItems() {
     const cov_type_arr = ["Front", "Back", "Disc", "Icon", "Artist", "Cycle Above", "Cycle From Folder"], items = ppt.menu_items.splt(0), ln = p.tag.length, MenuMap = [], MF_GRAYED = 0x00000001, MF_SEPARATOR = 0x00000800, MF_STRING = 0x00000000, pl_show = s.value(items[3], 0, 2), tags_show = s.value(items[5], 1, 2);
-    let amPth = [], b_n = "", bn, imgArtist = "", imgBlk = true, imgName = "", imgPth = false, lfmPth = [], imgList, paste_show = s.value(items[1], 1, 2), OrigIndex = 0, pl_menu = [], pths = [], shift = false, style_arr = [], tracksPth = [], undoFo = "", undoPth = "", undoTxt = "#!#";
+    let amPth = [], imgPth = false, lfmPth = [], paste_show = s.value(items[1], 1, 2), OrigIndex = 0, pl_menu = [], pths = [], shift = false, style_arr = [], tracksPth = [], undoFo = "", undoPth = "", undoTxt = "#!#";
 	this.bioCounter = 0; this.revCounter = 0; this.right_up = false;
 
     const newMenuItem = (index, type, value) => {MenuMap[index] = {}; MenuMap[index].type = type; MenuMap[index].value = value;}
@@ -1714,27 +1488,23 @@ function MenuItems() {
     const cropTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.artCropImgOnly, ppt.artCropDual, ppt.covCropImgOnly, ppt.covCropDual], n = ["Photo [Image Only]", "Photo [Dual Mode]", "Cover [Image Only]", "Cover [Dual Mode]"]; n.forEach((v, i) => {newMenuItem(Index, "Crop", i); Menu.AppendMenuItem(MF_STRING, Index, v); Menu.CheckMenuItem(Index++, c[i]); if (i == 1) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const defaultTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Panel Properties", "Configure..."]; Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); n.forEach((v, i) => {newMenuItem(Index, "Default", i); if (!i || i && shift) Menu.AppendMenuItem(MF_STRING, Index++, v);}); return Index;}
     const headingTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.heading, !ppt.hdRight && !ppt.hdCenter, ppt.hdRight && !ppt.hdCenter, ppt.hdCenter, ppt.src, ppt.hdLine == 1, ppt.hdLine == 2, !ui.custHeadFont ? ppt.headFontStyle == 1 : false, !ui.custHeadFont ? ppt.headFontStyle == 2 : false, ppt.headFontStyle == 3, ppt.headFontStyle == 16, ppt.headFontStyle == 18], n = !ui.custHeadFont ? ["Show", "Left", "Right", "Center", "Button", "Line Bottom", "Line Center", "Bold", "Italic", "Bold Italic", "SemiBold [Segoe UI]", "SemiBold Italic [Segoe UI]", "Heading Title Format..."] : ["Show", "Left", "Right", "Center", "Button", "Line Bottom", "Line Center", "Font: Custom...", "Heading Title Format..."]; n.forEach((v, i) => {newMenuItem(Index, "Heading", i); Menu.AppendMenuItem(!i || ppt.heading && !(i == 4 && ppt.hdCenter) ? MF_STRING : MF_GRAYED, Index, v); if (i > 0 && i < 4 ) {Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);} else {Menu.CheckMenuItem(Index++, c[i]);} if (!i || i == 3 || i == 4 || i == 6 || i == 9 || i == n.length - 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-    const imageTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.autoEnlarge, ppt.imgSmoothTrans], n = ["Enlarge on Hover", "Smooth Transition"]; n.forEach((v, i) => {newMenuItem(Index, "Image", i); Menu.AppendMenuItem(MF_STRING, Index, v); Menu.CheckMenuItem(Index++, c[i]); if (i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
+    const imageTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.autoEnlarge, ppt.imgSmoothTrans], n = ["Enlarge on Mouse Over", "Smooth Transition"]; n.forEach((v, i) => {newMenuItem(Index, "Image", i); Menu.AppendMenuItem(MF_STRING, Index, v); Menu.CheckMenuItem(Index++, c[i]); if (i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const langTypeMenu= (Menu, StartIndex) => {let Index = StartIndex; const n = p.langArr; n.forEach((v, i) => {newMenuItem(Index, "Language", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + n.length - 1, StartIndex + p.lfmLang_ix); return Index;}
     const lfmRevTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Album", "Album + Track", "Track"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 9); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.inclTrackRev); return Index;}
     const modeTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = [!p.imgText ? "Auto Display" : "Image+Text", "Image Only", "Text Only"]; n.forEach((v, i) => {newMenuItem(Index, "Mode", i); Menu.AppendMenuItem(i != 1 || !ppt.autoEnlarge ? MF_STRING : MF_GRAYED, Index, v); Index++; if (i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + (ppt.sameStyle ? (!ppt.img_only && !ppt.text_only ? 0 : ppt.img_only ? 1 : 2) : ppt.artistView ? ppt.bioMode : ppt.revMode)); return Index;}
     const moreAlbMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.albums.forEach((v, i) => {newMenuItem(Index, "More-Album", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, !i ? v.artist.replace(/&/g, "&&") + " - " + v.album.replace(/&/g, "&&") : v.album.replace(/&/g, "&&")); Index++; if (!i || v.type == "albumend" || v.type == "label") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.albums.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.albums.length, StartIndex + p.alb_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Album", p.albums.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-	const moreArtMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.artists.forEach((v, i) => {newMenuItem(Index, "More-Artist", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, v.name.replace(/&/g, "&&") + v.field.replace(/&/g, "&&")); Index++; if (!i || v.type == "similarend" || v.type == "label" || v.type == "tagend" || v.type == "historyend") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.artists.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.artists.length, StartIndex + p.art_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Artist", p.artists.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
+    const moreArtMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.artists.forEach((v, i) => {newMenuItem(Index, "More-Artist", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, v.name.replace(/&/g, "&&") + v.field.replace(/&/g, "&&")); Index++; if (!i || v.type == "similarend" || v.type == "label"|| v.type == "tagend") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.artists.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.artists.length, StartIndex + p.art_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Artist", p.artists.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const openTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const fo = [imgPth, amPth[3], lfmPth[3], tracksPth[3]], n = ["Image", ppt.artistView ? "Biography [AllMusic]" : "Review [AllMusic]", ppt.artistView ? "Biography [Last.fm]" : "Review [Last.fm]", ppt.artistView ? "" : "Tracks [Last.fm]"]; let i = n.length; while (i--) if (!fo[i]) {n.splice(i, 1); fo.splice(i, 1); pths.splice(i, 1);} n.forEach((v, i) => {newMenuItem(Index, "Open", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++; if (!i && n.length > 1 && imgPth) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-	
-	
-	const optionsTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.sameStyle, !p.imgText, ppt.smooth, ppt.touchControl, p.dblClick,,], n = ["Use Same Style for Artist && Album", "Dual Style Auto", "Smooth Scroll", "Touch Control", "Click Action: Use Double Click", "Fallback Text...", "Line Spacing...", "Reset Zoom", "Reload"]; n.forEach((v, i) => {newMenuItem(Index, "Options", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 2 || i > 2 && i < 6) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Menu.CheckMenuItem(Index++, c[i]);}); return Index;}
+	const optionsTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.sameStyle, !p.imgText, ppt.sbarShow, ppt.smooth, ppt.touchControl, p.dblClick,,], n = ["Use Same Style for Artist && Album", "Dual Style Auto", "Show Scrollbar", "Smooth Scroll", "Touch Control", "Click Action: Use Double Click", "Fallback Text...", "Reset Zoom", "Reload"]; n.forEach((v, i) => {newMenuItem(Index, "Options", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 3 || i > 3 && i < 7) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Menu.CheckMenuItem(Index++, c[i]);}); return Index;}
     const overlayTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Gradient", "Standard", "Standard + Rim", "Rounded", "Rounded + Rim"]; n.forEach((v, i) => {newMenuItem(Index, "Overlay", i); Menu.AppendMenuItem(MF_STRING, Index, v); Menu.CheckMenuItem(Index++, i == ppt.overlayStyle); if (!i || i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const pasteTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = [ppt.artistView ? "Biography [AllMusic Location]" : "Review [AllMusic Location]", ppt.artistView ? "Biography [Last.fm Location]" : "Review [Last.fm Location]", "Open Last Edited", "Undo"]; n.forEach((v, i) => {newMenuItem(Index, "Paste", i); Menu.AppendMenuItem(!i && !amPth[2] || i == 1 && !lfmPth[2] || i == 2 && !undoPth || i == 3 && undoTxt == "#!#" ? MF_GRAYED : MF_STRING, Index, v); Index++; if (i == 1 || i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const photoTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.cycPhoto, !ppt.cycPhoto], n = ["Cycle From Folder", "Artist"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 12); Menu.AppendMenuItem(MF_STRING, Index, v); Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);}); return Index;}
     const playlistTypeMenu = (i, Menu, StartIndex) => {let Index = StartIndex; for (let j = i * 30; j < Math.min(pl_menu.length, 30 + i * 30); j++) {newMenuItem(Index, "Playlists", j); Menu.AppendMenuItem(MF_STRING, Index, pl_menu[j].name); Index++;} if (OrigIndex + plman.ActivePlaylist >= StartIndex && OrigIndex + plman.ActivePlaylist <= StartIndex + 29) Menu.CheckMenuRadioItem(StartIndex, StartIndex + 29, OrigIndex + plman.ActivePlaylist); return Index;}
     const reflTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Show", "Auto Position", "Top", "Left", "Bottom", "Right"]; n.forEach((v, i) => {newMenuItem(Index, "Reflection", i); Menu.AppendMenuItem(!i || ppt.imgReflection ? MF_STRING : MF_GRAYED, Index, v); if (!i) Menu.CheckMenuItem(Index++, ppt.imgReflection); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex + 1, StartIndex + 5, StartIndex + ppt.imgReflType + 1); return Index;}
     const revTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.allmusic_alb && !ppt.bothRev, !ppt.allmusic_alb && !ppt.bothRev, ppt.bothRev, ppt.lockRev], n = [(!ppt.lockRev ? "Prefer " : "") + "AllMusic", (!ppt.lockRev ? "Prefer " : "") + "Last.fm", "Prefer Both", "Lock To Single Source"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 5); Menu.AppendMenuItem((i < 2 || i == 3) && ppt.bothRev ? MF_GRAYED : MF_STRING, Index, v); if (i > 1) Menu.CheckMenuItem(Index++, c[i]); else {Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);} if (i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-	const sbarTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Hide", "Auto", "Show", "Default", "Styled", "Themed", "Use Theme Metrics", "Arrows", "Triangles", "Custom Arrows", "Set Custom Arrows..."]; n.forEach((v, i) => {newMenuItem(Index, "Scrollbar", i); Menu.AppendMenuItem(ui.sbarType != 2 || i < 7 ? MF_STRING : MF_GRAYED, Index, v); if (i == 2 || i == 5 || i == 6 || i == 9) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); if ( i == 6) Menu.CheckMenuItem(Index++, ppt.sbarWinMetrics); else Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.sbarShow); Menu.CheckMenuRadioItem(StartIndex + 3, StartIndex + 5, StartIndex + 3 + ui.sbarType); Menu.CheckMenuRadioItem(StartIndex + 7, StartIndex + 9, StartIndex + 7 + ppt.sbarButType); return Index;}
     const selectionTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Prefer Now Playing", "Follow Selected Track (Playlist)"]; n.forEach((v, i) => {newMenuItem(Index, "Selection", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 1, StartIndex + ppt.focus); return Index;}
     const serverTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; newMenuItem(Index, "Server", 0); if (shift && utils.IsKeyPressed(0x11)) {Menu.AppendMenuItem(MF_GRAYED, Index, "Biography Server"); Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index++;} return Index;}
     const servTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Configure...", "Reset To Default"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 25); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); return Index;}
-	const sort = data => data.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
 	const sourceHeadTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [, , , ppt.sourceStyle == 1, ppt.sourceStyle == 2, ppt.sourceStyle == 3, ppt.sourceStyle == 16, ppt.sourceStyle == 18, false], n = ["Hide", "Auto", "Show", "Bold", "Italic", "Bold Italic", "SemiBold [Segoe UI]", "SemiBold Italic [Segoe UI]", "Subheading Text..."]; n.forEach((v, i) => {newMenuItem(Index, "SourceHead", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 3) Index++; else Menu.CheckMenuItem(Index++, c[i]); if (i == 2 || i == 5 || i == 7) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.sourceHeading); return Index;}
     const stylesEditorTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Press CTRL to Alter Existing Styles", "Create New Style...", "Rename Custom Style...", "Delete Custom Style...", "Export Custom Style...", "Reset Style..."]; n.forEach((v, i) => {newMenuItem(Index, "Styles", i); Menu.AppendMenuItem(!i ? MF_GRAYED : i == 1 || ppt.style > 4 || i == 5 ? MF_STRING : MF_GRAYED, Index, v); Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const styleTypeMenu = (Menu, StartIndex) => {style_arr = p.style_arr.slice(); let Index = StartIndex; style_arr.forEach((v, i) => {newMenuItem(Index, "Style", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++; if (i == 4) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); if (style_arr.length > 5 && i == style_arr.length - 1) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + style_arr.length - 1, StartIndex + (ppt.sameStyle ? ppt.style : ppt.artistView ? ppt.bioStyle : ppt.revStyle)); return Index;}
@@ -1742,16 +1512,7 @@ function MenuItems() {
     const themeTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [!ppt.blurDark && !ppt.blurBlend && !ppt.blurLight, ppt.blurDark, ppt.blurBlend, ppt.blurLight, ppt.covBlur, ppt.swapCol, ppt.summaryFirst], n = ["None", "Dark", "Blend", "Light", "Always Cover-Based", "Swap Colours", "Text: Summary First"]; n.forEach((v, i) 	=> {newMenuItem(Index, "Theme", i); Menu.AppendMenuItem(!ui.blur && i == 4 ? MF_GRAYED : MF_STRING, Index, v); if (i < 4) {Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);} else Menu.CheckMenuItem(Index++, c[i]); if (!i || i == 3  || i == 4 || i == 5) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const toggleTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ppt.artistView ? "Biography: Switch To " + (!ppt.allmusic_bio ? (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "AllMusic" + (ppt.bothBio ? " First" : "") : (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "Last.fm" + (ppt.bothBio ? " First" : "")) : "Review: Switch To " + (!ppt.allmusic_alb ? (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "AllMusic" + (ppt.bothRev ? " First" : "") : (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "Last.fm" + (ppt.bothRev ? " First" : "")); newMenuItem(Index, "Toggle", 0); Menu.AppendMenuItem(MF_STRING, Index, n); Index++; Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); return Index;}
 	const trackHeadTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [, , , ppt.trackStyle == 1, ppt.trackStyle == 2, ppt.trackStyle == 3, ppt.trackStyle == 16, ppt.trackStyle == 18, false], n = ["Hide", "Auto", "Show", "Bold", "Italic", "Bold Italic", "SemiBold [Segoe UI]", "SemiBold Italic [Segoe UI]", "Subheading Title Format..."]; n.forEach((v, i) => {newMenuItem(Index, "TrackHead", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 3) Index++; else Menu.CheckMenuItem(Index++, c[i]); if (i == 2 || i == 5 || i == 7) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.trackHeading); return Index;}
-    const webTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), c = [ppt.showSimilarArtists, ppt.showMoreTags, ppt.showArtistHistory], n = ["Show Similar Artists", "Show More Tags", "Show Artist History", "Reset Artist History...", "Last.fm: " + artist + "...", "Last.fm: " + artist + ": Similar Artists...", "Last.fm: " + artist + ": Top Albums...", "AllMusic: " + artist + "..."]; n.forEach((v, i) => {newMenuItem(Index, "Web", i); Menu.AppendMenuItem(i != 3 || ppt.showArtistHistory ? MF_STRING : MF_GRAYED, Index, v); if (i < 3) Menu.CheckMenuItem(Index++, c[i]); else Index++; if (i == 2 || i == 3 || i == 6) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-
-    const blacklistImageMenu = (Menu, StartIndex) => {
-        let blacklist = [], Index = StartIndex; bn = fb.ProfilePath + "yttm\\" + "blacklist_image.json";
-		if (!s.file(bn)) s.save(bn, JSON.stringify({"blacklist":{}}), true); if (s.file(bn)) {b_n = imgArtist.clean().toLowerCase(); imgList = s.jsonParse(bn, false, 'file'); blacklist = imgList.blacklist[b_n] || [];}
-		const n = [imgBlk ? "+ Add to Black List: " + imgArtist + "_" + imgName : "+ Add to Black List: " + (imgName ? "N/A - Requires Last.fm Artist Image. Selected Image : " + imgName : "N/A - No Image"), blacklist.length ? " - Remove from Black List (Click Name): " : "No Black Listed Images For Current Artist", "Undo"];
-        for (let i = 0; i < 3; i++) {newMenuItem(Index, "ImageBlacklist", i); if (i < 2 || img.undo[0] == b_n) Menu.AppendMenuItem(!i && imgBlk || i == 2 ? MF_STRING : MF_GRAYED, Index, n[i]); if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index++;}
-        blacklist.forEach((v, i) => {newMenuItem(Index, "ImageBlacklist", i + (img.undo[0] == b_n ? 3 : 2)); Menu.AppendMenuItem(MF_STRING, Index, (imgArtist + "_" + v).replace(/&/g, "&&")); Index++;});
-        return Index;
-    }
+    const webTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), n = ["Last.fm: " + artist + "...", "Last.fm: " + artist + ": Similar Artists...", "Last.fm: " + artist + ": Top Albums...", "AllMusic: " + artist + "..."]; n.forEach((v, i) => {newMenuItem(Index, "Web", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++; if (i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
 
     this.fresh = () => {
 		if (t.block() || !ppt.cycItem || p.zoom()) return;
@@ -1768,9 +1529,9 @@ function MenuItems() {
     this.playlists_changed = () => {if (!pl_show) return; pl_menu = []; for (let i = 0; i < plman.PlaylistCount; i++) pl_menu.push({name:plman.GetPlaylistName(i).replace(/&/g, "&&"), ix:i});}; this.playlists_changed();
 
     this.rbtn_up = (x, y) => {
-        shift = utils.IsKeyPressed(0x10); this.right_up = true; const popupMenu = ["alignMenu", "alignHMenu", "alignVMenu", "bioMenu", "biographyMenu", "blackImageMenu", "covMenu", "cropMenu", "headingMenu", "imageMenu", "langMenu", "lfmRevMenu", "menu", "openMenu", "optionsMenu", "overlayMenu", "pasteMenu", "photoMenu", "reflMenu", "revMenu", "sbarMenu", "selectionMenu", "servMenu", "styleMenu", "stylesEditorMenu", "sourceHeadMenu", "tagsMenu", "themeMenu", "trackHeadMenu"]; let handles, imgInfo = img.pth();
+        shift = utils.IsKeyPressed(0x10); this.right_up = true; const popupMenu = ["alignMenu", "alignHMenu", "alignVMenu", "bioMenu", "biographyMenu", "covMenu", "cropMenu", "headingMenu", "imageMenu", "langMenu", "lfmRevMenu", "menu", "openMenu", "optionsMenu", "overlayMenu", "pasteMenu", "photoMenu", "reflMenu", "revMenu", "selectionMenu", "servMenu", "styleMenu", "stylesEditorMenu", "sourceHeadMenu", "tagsMenu", "themeMenu", "trackHeadMenu"]; let handles;
         popupMenu.forEach(v => this[v] = window.CreatePopupMenu()); let PlaylistsMenu; if (pl_show) PlaylistsMenu = window.CreatePopupMenu();
-        amPth = ppt.artistView ? t.amBioPth() : t.amRevPth(); imgArtist = imgInfo.artist; imgPth = imgInfo.imgPth; imgBlk = imgInfo.blk && imgPth; imgName = imgBlk ? imgPth.slice(imgPth.lastIndexOf("_") + 1) : imgPth.slice(imgPth.lastIndexOf("\\") + 1); lfmPth = ppt.artistView ? t.lfmBioPth() : t.lfmRevPth(); tracksPth = t.lfmTrackPth(); pths = [imgPth, amPth[1], lfmPth[1], tracksPth[1]];
+        amPth = ppt.artistView ? t.amBioPth() : t.amRevPth(); imgPth = img.pth(); lfmPth = ppt.artistView ? t.lfmBioPth() : t.lfmRevPth(); tracksPth = t.lfmTrackPth(); pths = [imgPth, amPth[1], lfmPth[1], tracksPth[1]];
         const doc = new ActiveXObject('htmlfile'), docTxt = doc.parentWindow.clipboardData.getData('text'); let idx, Index = 1;
         if (p.server) Index = serverTypeMenu(this.menu, Index);
         if (!ppt.img_only) Index = toggleTypeMenu(this.menu, Index);
@@ -1792,12 +1553,10 @@ function MenuItems() {
         Index = headingTypeMenu(this.headingMenu, Index); this.headingMenu.AppendTo(this.styleMenu, MF_STRING, "Heading"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
         Index = sourceHeadTypeMenu(this.sourceHeadMenu, Index); this.sourceHeadMenu.AppendTo(this.styleMenu, MF_STRING, "Subheading [Source]"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
 		Index = trackHeadTypeMenu(this.trackHeadMenu, Index); this.trackHeadMenu.AppendTo(this.styleMenu, ppt.inclTrackRev ? MF_STRING : MF_GRAYED, "Subheading [Track Review]"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
-		Index = sbarTypeMenu(this.sbarMenu, Index); this.sbarMenu.AppendTo(this.styleMenu, MF_STRING, "Scrollbar"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
-		Index = themeTypeMenu(this.themeMenu, Index); this.themeMenu.AppendTo(this.styleMenu, MF_STRING, "Theme");
+        Index = themeTypeMenu(this.themeMenu, Index); this.themeMenu.AppendTo(this.styleMenu, MF_STRING, "Theme"); this.themeMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
 		Index = overlayTypeMenu(this.overlayMenu, Index); this.overlayMenu.AppendTo(this.themeMenu, ppt.style < 4 ? MF_GRAYED : MF_STRING, "Overlay Type"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
-		Index = optionsTypeMenu(this.optionsMenu, Index); this.optionsMenu.AppendTo(this.styleMenu, MF_STRING, "Mode");
+		Index = optionsTypeMenu(this.optionsMenu, Index); this.optionsMenu.AppendTo(this.styleMenu, MF_STRING, "Options");
         Index = imageTypeMenu(this.imageMenu, Index); this.imageMenu.AppendTo(this.menu, MF_STRING, "Image");
-		Index = blacklistImageMenu(this.blackImageMenu, Index); this.blackImageMenu.AppendTo(this.imageMenu, MF_STRING, "Black List"); this.imageMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
         Index = cropTypeMenu(this.cropMenu, Index); this.cropMenu.AppendTo(this.imageMenu, MF_STRING, "Auto-Fill");
         if (ppt.style < 4) {Index = alignTypeMenu(this.alignMenu, Index); this.alignMenu.AppendTo(this.imageMenu, !ppt.img_only && t.text && !ppt.text_only ? MF_STRING : MF_GRAYED, "Alignment");}
         else {Index = alignHTypeMenu(this.alignHMenu, Index); this.alignHMenu.AppendTo(this.imageMenu, !ppt.img_only && t.text && !ppt.text_only ? MF_STRING : MF_GRAYED, "Alignment Horizontal"); Index = alignVTypeMenu(this.alignVMenu, Index); this.alignVMenu.AppendTo(this.imageMenu, !ppt.img_only && t.text && !ppt.text_only ? MF_STRING : MF_GRAYED, "Alignment Vertical");}
@@ -1861,7 +1620,7 @@ function MenuItems() {
                         case 12: window.ShowProperties(); break;
                     }
                     break;
-                case "SourceHead": switch (i) {case 3: ppt.sourceStyle = ppt.sourceStyle == 1 ? 0 : 1; t.toggle(12); break; case 4: ppt.sourceStyle = ppt.sourceStyle == 2 ? 0 : 2; t.toggle(12); break; case 5: ppt.sourceStyle = ppt.sourceStyle == 3 ? 0 : 3; t.toggle(12); break; case 6: ppt.sourceStyle = ppt.sourceStyle == 16 ? 0 : 16; t.toggle(12); break; case 7: ppt.sourceStyle = ppt.sourceStyle == 18 ? 0 : 18; t.toggle(12); break; case 8: window.ShowProperties(); break; default: ppt.sourceHeading = i; t.toggle(11); break;} break;
+                case "SourceHead": switch (i) {case 3: ppt.sourceStyle = ppt.sourceStyle == 1 ? 0 : 1; t.toggle(12); break; case 4: ppt.sourceStyle = ppt.sourceStyle == 2 ? 0 : 2; t.toggle(12); break; case 5: ppt.sourceStyle = ppt.sourceStyle == 3 ? 0 : 3; t.toggle(12); break; case 6: ppt.sourceStyle = ppt.sourceStyle == 16 ? 0 : 16; t.toggle(12); break; case 7: ppt.sourceStyle = ppt.sourceStyle == 18 ? 0 : 18; t.toggle(12); break; case 8: window.ShowProperties(); default: ppt.sourceHeading = i; t.toggle(11); break;} break;
 				case "TrackHead": switch (i) {case 3: ppt.trackStyle = ppt.trackStyle == 1 ? 0 : 1; t.toggle(12); break; case 4: ppt.trackStyle = ppt.trackStyle == 2 ? 0 : 2; t.toggle(12); break; case 5: ppt.trackStyle = ppt.trackStyle == 3 ? 0 : 3; t.toggle(12); break; case 6: ppt.trackStyle = ppt.trackStyle == 16 ? 0 : 16; t.toggle(12); break; case 7: ppt.trackStyle = ppt.trackStyle == 18 ? 0 : 18; t.toggle(12); break; case 8: window.ShowProperties(); break; default: ppt.trackHeading = i; t.toggle(11); break;} break;
                 case "Theme":
 					switch (true) {
@@ -1871,43 +1630,21 @@ function MenuItems() {
 						default: {ppt.summaryFirst = !ppt.summaryFirst; t.toggle(9); break;}
 					}
                     break;
-				case "Scrollbar":
-                    switch (i) {
-						case 0: case 1: case 2: ui.set('scrollbar', i); break;
-						case 3: case 4: case 5: ui.set('sbarType', i - 3); break;
-						case 6: ui.set('sbarMetrics'); break;
-						case 7: case 8: case 9: ui.set('sbarButType', i - 7); break;
-						case 10: window.ShowProperties(); break;
-                    }
-                    break;
 				case "Options":
 					switch (i) {
 						case 0: ppt.sameStyle = !ppt.sameStyle; t.toggle(8); break;
                         case 1: p.imgText = !p.imgText; ppt.imgText = !p.imgText; t.toggle(8); break;
-						case 2: ppt.smooth = !ppt.smooth; break;
-						case 3: ppt.touchControl = !ppt.touchControl; break;
-						case 4: p.dblClick = !p.dblClick ? 1 : 0; p.updIniClickAction(p.dblClick); break;
-						case 5: window.ShowProperties(); break;
-						case 6: ui.set('lineSpacing'); break;
+						case 2: ppt.sbarShow = !ppt.sbarShow; if (ppt.sameStyle) {ui.sbarSet(); ui.get_font(); but.create_images(); but.create_mt(); but.refresh(true); but.set_scroll_btns_hide(true); t.toggle(12);} else window.Reload(); break;
+						case 3: ppt.smooth = !ppt.smooth; break;
+						case 4: ppt.touchControl = !ppt.touchControl; break;
+						case 5: p.dblClick = !p.dblClick ? 1 : 0; p.updIniClickAction(p.dblClick); break;
+						case 6: window.ShowProperties(); break;
 						case 7: but.resetZoom(); break;
 						case 8: window.Reload(); break;
 						
 					}
 				break;
-                case "ImageBlacklist":
-                    if (!i) {
-						if (!imgList.blacklist[b_n]) imgList.blacklist[b_n] = []; imgList.blacklist[b_n].push(imgName);
-					}
-					else if (img.undo[0] == b_n && i == 2) {
-						if (!imgList.blacklist[img.undo[0]]) imgList.blacklist[b_n] = []; if (img.undo[1].length) imgList.blacklist[img.undo[0]].push(img.undo[1]); img.undo = [];
-					}
-					else {
-						const bl_ind = i - (img.undo[0] == b_n ? 3 : 2); img.undo = [b_n, imgList.blacklist[b_n][bl_ind]]; imgList.blacklist[b_n].splice(bl_ind, 1); s.removeNulls(imgList);
-					}
-					let bl = imgList.blacklist[b_n]; if (bl) imgList.blacklist[b_n] = sort([...new Set(bl)]); img.blkArtist = ""; s.save(bn, JSON.stringify({"blacklist": s.sortKeys(imgList.blacklist)}, null, 3), true);
-					img.chkArtImg(); window.NotifyOthers("blacklist_bio", "blacklist_bio");
-                    break;
-				case "Image": switch (i) {case 0: ppt.autoEnlarge = !ppt.autoEnlarge; break; case 1: ppt.imgSmoothTrans = !ppt.imgSmoothTrans; if (ui.blur) {img.clear_rs_cache(); img.get_images();} break;} break;
+                case "Image": switch (i) {case 0: ppt.autoEnlarge = !ppt.autoEnlarge; break; case 1: ppt.imgSmoothTrans = !ppt.imgSmoothTrans; if (ui.blur) {img.clear_rs_cache(); img.get_images();} break;} break;
                 case "Crop":
                     switch (i) {
                         case 0: ppt.artCropImgOnly = !ppt.artCropImgOnly; img.setCrop(true); img.clear_rs_cache(); img.get_images(); break;
@@ -1929,20 +1666,14 @@ function MenuItems() {
 
     this.button = (x, y) => {
         const menu = window.CreatePopupMenu(), WebMenu = window.CreatePopupMenu(); let idx, Index = 1; Index = ppt.artistView ? moreArtMenu(menu, Index) : moreAlbMenu(menu, Index); menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index = webTypeMenu(WebMenu, Index); WebMenu.AppendTo(menu, MF_STRING, "More...");
-        const origArr = JSON.stringify(p.artists), origArrl = JSON.stringify(p.albums);
+        const origArr = JSON_stringify(p.artists), origArrl = JSON_stringify(p.albums);
         idx = menu.TrackPopupMenu(x, y);
         if (idx >= 1 && idx <= Index) {
             const i = MenuMap[idx].value;
             switch (MenuMap[idx].type) {
                 case "More-Artist":
                     switch (true) {
-                        case i < p.artists.length: if (origArr != JSON.stringify(p.artists) || !i && !p.art_ix || p.art_ix == i) break;
-							t.logScrollPos(); p.art_ix = i; img.get = false; t.get = 0; 
-							t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0);
-							if (p.artists[p.art_ix].type.includes("history")) break;
-							p.logArtistHistory(p.artists[p.art_ix].name);
-							p.get_multi();
-							break;
+                        case i < p.artists.length: if (origArr != JSON_stringify(p.artists) || !i && !p.art_ix || p.art_ix == i) break; t.logScrollPos(); p.art_ix = i; img.get = false; t.get = 0; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0); break;
                         case i == p.artists.length + 1: ppt.cycItem = !ppt.cycItem; break;
                         case i == p.artists.length + 2: p.setCycItem(); break;
                     }
@@ -1950,20 +1681,13 @@ function MenuItems() {
                     break;
                 case "More-Album":
                     switch (true) {
-                        case i < p.albums.length: if (origArrl != JSON.stringify(p.albums) || !i && !p.alb_ix || p.alb_ix == i) break; t.logScrollPos(); p.alb_ix = i; img.get = false; t.get = 0; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0); break;
+                        case i < p.albums.length: if (origArrl != JSON_stringify(p.albums) || !i && !p.alb_ix || p.alb_ix == i) break; t.logScrollPos(); p.alb_ix = i; img.get = false; t.get = 0; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0); break;
                         case i == p.albums.length + 1: ppt.cycItem = !ppt.cycItem; break;
                         case i == p.albums.length + 2: p.setCycItem(); break;
                     }
 					this.revCounter = 0;
                     break;
-                case "Web":
-				switch (i) {
-					case 0: ppt.showSimilarArtists = !ppt.showSimilarArtists; p.get_multi(!ppt.showSimilarArtists ? true : false); break;
-					case 1: ppt.showMoreTags = !ppt.showMoreTags; p.get_multi(!ppt.showMoreTags ? true : false); break;
-					case 2: ppt.showArtistHistory = !ppt.showArtistHistory; p.get_multi(!ppt.showArtistHistory ? true : false); break;
-					case 3: p.artistHistory = []; ppt.artistHistory = JSON.stringify([]); p.get_multi(true); break;
-					default: const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), brArr = ["", "/+similar", "/+albums"]; if (i < 7) s.browser("https://" + "www.last.fm/" + (p.lfmLang == "en" ? "" : p.lfmLang + "/") + "music/" + encodeURIComponent(artist) + brArr[i - 4], true); else s.browser("https://www.allmusic.com/search/artists/" + encodeURIComponent(artist), true); break;
-				}
+                case "Web": const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), brArr = ["", "/+similar", "/+albums"]; if (i < 3) s.browser("https://" + "www.last.fm/" + (p.lfmLang == "en" ? "" : p.lfmLang + "/") + "music/" + encodeURIComponent(artist) + brArr[i], true); else s.browser("https://www.allmusic.com/search/artists/" + encodeURIComponent(artist), true); break;
             }
         }
     }
@@ -1971,7 +1695,7 @@ function MenuItems() {
     this.wheel = (step, resetCounters) => {
         let i = 0; but.clear_tooltip();
         switch (true) {
-            case ppt.artistView: if (!p.artistsUniq.length) break; for (i = 0; i < p.artistsUniq.length; i++) if (!p.art_ix && name.artist(ppt.focus) == p.artistsUniq[i].name || p.art_ix == p.artistsUniq[i].ix) break; i += step; if (i < 0) i = p.artistsUniq.length - 1; else if (i >= p.artistsUniq.length) i = 0; t.logScrollPos(); p.art_ix = p.artistsUniq[i].ix; if (p.artists[p.art_ix].type.includes("history")) break; p.logArtistHistory(p.artists[p.art_ix].name); p.get_multi(); break;
+            case ppt.artistView: if (!p.artistsUniq.length) break; for (i = 0; i < p.artistsUniq.length; i++) if (!p.art_ix && name.artist(ppt.focus) == p.artistsUniq[i].name || p.art_ix == p.artistsUniq[i].ix) break; i += step; if (i < 0) i = p.artistsUniq.length - 1; else if (i >= p.artistsUniq.length) i = 0; t.logScrollPos(); p.art_ix = p.artistsUniq[i].ix; break;
             case !ppt.artistView: if (!p.albumsUniq.length) break; for (i = 0; i < p.albumsUniq.length; i++) if (!p.alb_ix && name.alb_artist(ppt.focus) + " - " +  name.album(ppt.focus) == p.albumsUniq[i].artist + " - " + p.albumsUniq[i].album || p.alb_ix == p.albumsUniq[i].ix) break; i += step; if (i < 0) i = p.albumsUniq.length - 1; else if (i >= p.albumsUniq.length) i = 0; t.logScrollPos(); p.alb_ix = p.albumsUniq[i].ix; break;
         } img.get = false; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.multi_serv(); if (resetCounters) ppt.artistView ? this.bioCounter = 0 : this.revCounter = 0;
     }
@@ -1999,7 +1723,7 @@ function Text() {
 	this.albumFlush = () => {this.text = false; mod.amRev = amRev = lfmRev = mod.lfmRev = ""; mod.amRev_o = mod.lfmRev_o = "1"; checkedTrackSubHead = done.amRev = done.lfmRev = false; this.alb_txt = ""; this.head = false; but.set_scroll_btns_hide(); but.set_src_btn_hide();}
     this.amBioPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('bio', ppt.focus, artist, "", "", p.sup.Cache, artist.clean(), "", "", 'amBio', false);}
     this.amRevPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('rev', ppt.focus, artist, album, "", p.sup.Cache, artist.clean(), albumartist.clean(), album.clean(), 'amRev', false);}
-    this.artistFlush = () => {this.text = false; done.amBio = done.lfmBio = false; mod.amBio = amBio = mod.lfmBio = lfmBio = ""; mod.amBio_o = mod.lfmBio_o = "1"; this.art_txt = ""; this.head = false; but.set_scroll_btns_hide(); but.set_src_btn_hide();}
+    this.artistFlush = () => {this.text = false; done.amBio = done.lfmBio = false; mod.amBio = amBio = mod.lfmBio = lfmBio = ""; mod.amBio_o = mod.lfmBio_o = "1"; this.art_txt = ""; this.head = false; but.set_scroll_btns_hide();  but.set_src_btn_hide();}
     this.album_reset = upd => {if (p.lock) return; id.album_o = id.album; id.album = name.albID(ppt.focus, 'simple'); const new_album = id.album != id.album_o; if (new_album || upd) {album = name.album(ppt.focus); albumartist = name.alb_artist(ppt.focus); this.albumFlush(); this.mulAlbum = false;} if (ppt.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus); const new_track = id.tr != id.tr_o; if (new_track) {checkedTrackSubHead = done.amRev = done.lfmRev = false; if (ppt.inclTrackRev == 1) this.logScrollPos('rev');}}}
     this.artist_reset = upd => {if (p.artistsSame() || p.lock) return; artist_o = artist; artist = name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist || upd) {this.mulArtist = false; this.artistFlush();}}
     this.get_multi = (p_calc, art_ix, alb_ix) => {if (ppt.img_only) return; switch (true) {case ppt.artistView: artist_o = artist; artist = art_ix < p.artists.length ? p.artists[art_ix].name : name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist) {this.artistFlush(); p.art_ix = art_ix; this.mulArtist = true;} this.getText(p_calc); this.get = 0; break; case !ppt.artistView: id.alb_o = id.alb; artist = alb_ix < p.albums.length ? p.albums[alb_ix].artist : name.alb_artist(ppt.focus); const alb = alb_ix < p.albums.length ? p.albums[alb_ix].album : name.album(ppt.focus); id.alb = artist + alb; const new_album = id.alb != id.alb_o; if (new_album) {album = alb; albumartist = artist; this.albumFlush(); this.mulAlbum = true;} this.getText(p_calc); this.get = 0; break;}}
@@ -2100,9 +1824,9 @@ function Text() {
 
     const tf = (n, trackreview) => {
         if (p.lock) n = n.replace(/%artist%|\$meta\(artist,0\)/g, "#¦#¦#%artist%#¦#¦#").replace(/%title%|\$meta\(title,0\)/g, "#!#!#%title%#!#!#");
-		let a = (ppt.artistView ? artist : (!trackreview ? (p.alb_ix ? albumartist : artist) : trackartist)).tf_escape(), aa = (ppt.artistView ? (p.art_ix ? artist : albumartist) : (!trackreview ? albumartist : trackartist)).tf_escape(), l = album.replace("Album Unknown", "").tf_escape(), tr = track.tf_escape();
+		let a = (ppt.artistView ? artist : (!trackreview ? (p.alb_ix ? albumartist : artist) : trackartist)).tf_escape(), aa = (ppt.artistView ? (p.art_ix ? artist : albumartist) : (!trackreview ? albumartist : trackartist)).tf_escape(), l = album.replace("Album Unknown", "").tf_escape();
         const stnd = ppt.artistView && !p.art_ix || !ppt.artistView && !p.alb_ix; n = n.replace(/%more_item%/gi, !stnd ? "$&#@!%path%#@!" : "$&");
-        n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, a ? "$&#@!%path%#@!" : "$&").replace(/%bio_artist%/gi, a).replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_albumartist%/gi, aa ? "$&#@!%path%#@!" : "$&").replace(/%bio_albumartist%/gi, aa).replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_album%/gi, l ? "$&#@!%path%#@!" : "$&").replace(/%bio_album%/gi, l).replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_title%/gi, tr ? "$&#@!%path%#@!" : "$&").replace(/%bio_title%/gi, tr);
+        n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, a ? "$&#@!%path%#@!" : "$&").replace(/%bio_artist%/gi, a).replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_albumartist%/gi, aa ? "$&#@!%path%#@!" : "$&").replace(/%bio_albumartist%/gi, aa).replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_album%/gi, l ? "$&#@!%path%#@!" : "$&").replace(/%bio_album%/gi, l);
         n = p.eval(n, ppt.focus);
         if (p.lock) n = n.replace(/#¦#¦#.*?#¦#¦#/g, trackartist).replace(/#!#!#.*?#!#!#/g, track); n = n.replace(/#@!.*?#@!/g, "") || "No Selection";
         return n;
@@ -2479,7 +2203,7 @@ function Tagger() {
             } else rem.push(i);
         }
         let i = rem.length; while (i--)  handles.RemoveById(rem[i]);
-        if (handles.Count) handles.UpdateFileInfoFromJSON(JSON.stringify(tags));
+        if (handles.Count) handles.UpdateFileInfoFromJSON(JSON_stringify(tags));
     }
 }
 
@@ -2500,7 +2224,7 @@ function TextBox() {
             let sv = false;
             if (p.h > txB + txT + 30 && p.w > txR + txL + 30) {obj.txL = p.tx_l; obj.txR = p.tx_r; obj.txT = p.tx_t; obj.txB = p.tx_b; sv = true;}
             if (p.h > imB + imT + 30 && p.w > imR + imL + 30) {obj.imL = p.im_l; obj.imR = p.im_r; obj.imT = p.im_t; obj.imB = p.im_b; sv = true;}
-            if (sv) {ppt.style == 4 ? ppt.overlay = JSON.stringify(p.overlay) : ppt.styles = JSON.stringify(p.styles);}
+            if (sv) {ppt.style == 4 ? ppt.overlay = JSON_stringify(p.overlay) : ppt.styles = JSON_stringify(p.styles);}
             else {p.im_l = s.clamp(obj.imL, 0, 1); p.im_r = s.clamp(obj.imR, 0, 1); p.im_t = s.clamp(obj.imT, 0, 1); p.im_b = s.clamp(obj.imB, 0, 1); p.tx_l = s.clamp(obj.txL, 0, 1); p.tx_r = s.clamp(obj.txR, 0, 1); p.tx_t = s.clamp(obj.txT, 0, 1); p.tx_b = s.clamp(obj.txB, 0, 1);}
         } t.toggle(13);
     }
@@ -2614,45 +2338,41 @@ function Library() {
 }}
 
 function Images() {
-    this.blkArtist = ""; this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; this.covTimestamp = Date.now(); this.crop = false; this.delay = Math.min(ppt.cycTimePic, 7) * 1000; this.displayed_other_panel = null; this.get = true; this.handle = null; this.photoTimestamp = Date.now(); this.resetFade = false; this.adjustMode = false; this.touch = {dn: false, end: 0, start: 0}; this.undo = [];
-    const aPth = fb.ProfilePath + "yttm\\artist_stub_user", art_img = {}, artImgFolder = p.albCovFolder.toUpperCase() == p.pth.imgArt.toUpperCase(), cov_img = {}, cPth = fb.ProfilePath + "yttm\\front_cover_stub_user", exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 35875, 37235, 47700, 68626, 86884, 92172], ext = [".jpg", ".png", ".gif", ".bmp", ".jpeg"], blacklist_img = fb.ProfilePath + "yttm\\" + "blacklist_image.json", noimg = [], reflSetup = ppt.reflSetup.splt(0), reflSlope = s.clamp(s.value(reflSetup[5], 10, 0) / 10 - 1, -1, 9), reflSz = s.clamp(s.value(reflSetup[3], 100, 0) / 100, 0.1, 1), transLevel = s.clamp(100 - ppt.transLevel, 0.1, 100), transIncr = Math.pow(284.2171 / transLevel, 0.0625), userArtStubFile = fb.ProfilePath + "yttm\\artist_stub_user.png", userCovStubFile = fb.ProfilePath + "yttm\\front_cover_stub_user.png";
+    this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; this.covTimestamp = Date.now(); this.crop = false; this.delay = Math.min(ppt.cycTimePic, 7) * 1000; this.displayed_other_panel = null; this.get = true; this.handle = null; this.photoTimestamp = Date.now(); this.resetFade = false; this.adjustMode = false; this.touch = {dn: false, end: 0, start: 0};
+    const aPth = fb.ProfilePath + "yttm\\artist_stub_user", art_img = {}, artImgFolder = p.albCovFolder.toUpperCase() == p.pth.imgArt.toUpperCase(), cov_img = {}, cPth = fb.ProfilePath + "yttm\\front_cover_stub_user", exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 35875, 37235, 47700, 68626, 86884, 92172], ext = [".jpg", ".png", ".gif", ".bmp", ".jpeg"], reflSetup = ppt.reflSetup.splt(0), reflSlope = s.clamp(s.value(reflSetup[5], 10, 0) / 10 - 1, -1, 9), reflSz = s.clamp(s.value(reflSetup[3], 100, 0) / 100, 0.1, 1), transLevel = s.clamp(100 - ppt.transLevel, 0.1, 100), transIncr = Math.pow(284.2171 / transLevel, 0.0625), userArtStubFile = fb.ProfilePath + "yttm\\artist_stub_user.png", userCovStubFile = fb.ProfilePath + "yttm\\front_cover_stub_user.png";
     const id = {albCounter: "", albCounter_o: "", albCyc: "", albCyc_o: "", album: "", album_o: "", artCache: "", artCounter: "", artCounter_o: "", blur: "", blur_o: "", covCache: "", img: "", img_o: "", w1: 0, w2: 0}
-    let a_run = true, all_files_o_length = 0, alpha = 255, ap = "", artImages = [], artist = "", artist_o = "", blkArtist = "", blacklist = [], bor_w1 = 0, bor_w2 = 0, chk_arr = [], counter = 0, covCycle_ix = 1, covers = [{id: 0, pth: ""}], covImages = [], cp = "", cur_blur = null, cur_handle = null, cur_img = null, cur_imgPth = "", f_blur = null, fade_mask = null, fe_done = "", folder = "", folderSup = "", i_x = 0, ix = 0, imgb = 0, imgx = 0, imgy = 0, imgw = 100, imgh = 100, init = true, new_BlurAlb = false, nh = 10, nw = 10, refl_mask = null, reflAlpha = s.clamp(255 * s.value(reflSetup[1], 14.5, 0) / 100, 0, 255), s1 = 1, s2 = 1, sc = 1, sh_img = null, tw = 0, th = 0, userArtStub = null, userCovStub = null, validate = [], x_l = 0, x_r = 0, xa = 0, y_b = 0, y_t = 0, ya = 0;
+    let a_run = true, all_files_o_length = 0, alpha = 255, ap = "", artImages = [], artist = "", artist_o = "", bor_w1 = 0, bor_w2 = 0, chk_arr = [], counter = 0, covCycle_ix = 1, covers = [{id: 0, pth: ""}], cp = "", cur_blur = null, cur_handle = null, cur_img = null, cur_imgPth = "", f_blur = null, fade_mask = null, fe_done = "", folder = "", folderSup = "", i_x = 0, ix = 0, imgb = 0, imgx = 0, imgy = 0, imgw = 100, imgh = 100, init = true, new_BlurAlb = false, nh = 0, nw = 0, refl_mask = null, reflAlpha = s.clamp(255 * s.value(reflSetup[1], 14.5, 0) / 100, 0, 255), s1 = 1, s2 = 1, sc = 1, sh_img = null, tw = 0, th = 0, userArtStub = null, userCovStub = null, validate = [], x_l = 0, x_r = 0, xa = 0, y_b = 0, y_t = 0, ya = 0;
 
     if (transLevel == 100) transLevel = 255;
     ext.some(v => {ap = aPth + v; if (s.file(ap)) {userArtStub = gdi.Image(ap); return true;}});
     ext.some(v => {cp = cPth + v; if (s.file(cp)) {userCovStub = gdi.Image(cp); return true;}});
 
-	const blackListed = v => {blkArtist = this.blkArtist; this.blkArtist = artist || name.artist(ppt.focus); if (this.blkArtist && this.blkArtist != blkArtist) {blacklist = this.blacklist(this.blkArtist.clean().toLowerCase());} return blacklist.includes(v.slice(v.lastIndexOf("_") + 1));}
     const blurCheck = () => {if (!ppt.covBlur && !ppt.imgSmoothTrans) return; id.blur_o = id.blur; id.blur = name.albID(ppt.focus, 'stnd'); id.blur += ppt.covType; if (id.blur != id.blur_o) {new_BlurAlb = true; t.mulAlbum = false;}}
 	const changeCov = incr => {covCycle_ix += incr; if (covCycle_ix < 1) covCycle_ix = covers.length - 1; else if (covCycle_ix >= covers.length) covCycle_ix = 1; i_x = covCycle_ix; if (cov.cacheHit(i_x, covers[i_x].pth)) return; cov_img.i_x = i_x; cov_img.id = gdi.LoadImageAsync(window.ID, covers[i_x].pth);}
     const changePhoto = incr => {ix += incr; if (ix < 0) ix = artImages.length - 1; else if (ix >= artImages.length) ix = 0; let i = 0; while (this.displayed_other_panel == artImages[ix] && i < artImages.length) {ix += incr; if (ix < 0) ix = artImages.length - 1; else if (ix >= artImages.length) ix = 0; i++;} this.set_chk_arr(artImages[ix]); loadArtImage();}
 	const check_cache = () => {if (p.lock) return; let new_id = name.albID(ppt.focus, 'stnd'); if (id.covCache && id.covCache != new_id) {this.clear_c_rs_cache; id.covCache = new_id;} new_id = name.artist(ppt.focus); if (id.artCache && id.artCache != new_id) {this.clear_a_rs_cache; id.artCache = new_id;}}
     const clear = (a, type) => {a.forEach((v, i) => {if (!v) return; if (type == 0 && i == 0 || type == 1 && i) {if (v.img) v.img = null; v.time = 0; if (v.blur) v.blur = null;}});}
 	const clear_cov_cache = () => cov.cache = [];
-    const defStub = () => {if (fb.IsPlaying || fb.GetFocusItem()) {const n = ppt.artistView ? 1 : 0; return noimg[n].Clone(0, 0, noimg[n].Width, noimg[n].Height);} else {return noimg[2].Clone(0, 0, noimg[2].Width, noimg[2].Height);}}
-    const getImgFallback = () => {if (t.scrollbar_type().draw_timer) return; if (!p.multi_new()) {paint(); this.get = false; return;} this.get_images(); this.get = false;}
+    const defStub = () => {if (fb.IsPlaying || fb.GetFocusItem()) {const n = ppt.artistView ? 1 : 0; return this.noimg[n].Clone(0, 0, this.noimg[n].Width, this.noimg[n].Height);} else {return this.noimg[2].Clone(0, 0, this.noimg[2].Width, this.noimg[2].Height);}}
+    const getImgFallback = () => {if (t.scrollbar_type().draw_timer) return; if (!p.multi_new()) return; if (!this.get) return; this.get_images(); this.get = false;}
     const paint = () => {if (!ppt.imgSmoothTrans) {alpha = 255; t.paint(); return;} id.img_o = id.img; id.img = cur_imgPth; if (id.img_o != id.img) alpha = transLevel; else alpha = 255; timer.clear(timer.transition); timer.transition.id = setInterval(() => {alpha = Math.min(alpha *= transIncr, 255); t.paint(); if (alpha == 255) timer.clear(timer.transition);}, 12);}
     const incl_lge = 0; // incl_lge 0 & 1 - exclude & include artist images > 8 MB
-    const images = v => {if (!s.file(v)) return false; const fileSize = utils.FileTest(v, "s"); return (incl_lge || fileSize <= 8388608) && ((/_([a-z0-9]){32}\.jpg$/).test(s.fs.GetFileName(v)) || (/(?:jpe?g|gif|png|bmp)$/i).test(s.fs.GetExtensionName(v)) && !(/ - /).test(s.fs.GetBaseName(v))) && !exclArr.includes(fileSize) && !blackListed(v);}
-	const cycImages = artImgFolder ? images : v => {if (!s.file(v)) return false; const fileSize = utils.FileTest(v, "s"); return (incl_lge || fileSize <= 8388608) && (/(?:jpe?g|gif|png|bmp)$/i).test(s.fs.GetExtensionName(v));}
+    const images = v => (incl_lge || s.fs.GetFile(v).Size <= 8388608) && ((/_([a-z0-9]){32}\.jpg$/).test(s.fs.GetFileName(v)) || (/(?:jpe?g|gif|png|bmp)$/i).test(s.fs.GetExtensionName(v)) && !(/ - /).test(s.fs.GetBaseName(v))) && !exclArr.includes(s.fs.GetFile(v).Size);
+	const cycImages = artImgFolder ? images : v => (incl_lge || s.fs.GetFile(v).Size <= 8388608) && (/(?:jpe?g|gif|png|bmp)$/i).test(s.fs.GetExtensionName(v));
     const memoryLimit = () => window.PanelMemoryUsage / window.MemoryLimit > 0.4 || window.TotalMemoryUsage / window.MemoryLimit > 0.5;
 	const resetCounters = () => {if (p.lock) return; id.albCounter_o = id.albCounter; id.albCounter = name.albID(ppt.focus, 'full'); if (id.albCounter != id.albCounter_o || !id.albCounter) {counter = 0; men.revCounter = 0;} id.artCounter_o = id.artCounter; id.artCounter = name.artist(ppt.focus); if (id.artCounter && id.artCounter != id.artCounter_o || !id.artCounter) {counter = 0; men.bioCounter = 0;}}
     const setReflStrength = n => {reflAlpha += n; reflAlpha = s.clamp(reflAlpha, 0, 255); ppt.reflSetup = "Strength," + Math.round(reflAlpha / 2.55) + ",Size," + reflSetup[3] + ",Gradient," + reflSetup[5]; refl_mask = false; this.adjustMode = true; if (ppt.artistView && ppt.cycPhoto) this.clear_a_rs_cache(); if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) this.get_images(); else this.get_multi(p.art_ix, p.alb_ix);}
 	const sort = (data, prop) => {data.sort((a, b) => a[prop] - b[prop]); return data;}
-	const uniq = a => [...new Set(a)];
+    const uniq = a => {const out = [], seen = {}; let j = 0; a.forEach(v => {if (seen[v] !== 1) {seen[v] = 1; out[j++] = v;}}); return out;}
 	const uniqPth = a => {const flags = []; let result = []; a.forEach(v => {if (flags[v.pth]) return; result.push(v); flags[v.pth] = true;}); return result;}
 
     this.artist_reset = force => {if (p.lock) return; blurCheck(); artist_o = artist; artist = name.artist(ppt.focus); const new_artist = artist && artist != artist_o || !artist || ppt.covBlur && id.blur != id.blur_o || force; if (new_artist) {folderSup = ""; folder = p.cleanPth(p.pth.imgArt, ppt.focus); this.clear_art_cache(); if (ppt.cycPhoto) a_run = true; if (!artImages.length) {all_files_o_length = 0; ix = 0;}}}
-	this.blacklist = clean_artist => {let black_list = []; if (!s.file(blacklist_img)) return black_list; const list = s.jsonParse(blacklist_img, false, 'file'); 
-	return list.blacklist[clean_artist] || black_list;}
-    this.chk_arr = info => {if (t.block()) return; if (artImages.length < 2 || !ppt.artistView || ppt.text_only || !ppt.cycPhoto) return; if (!validate.includes(info[0])) validate.push(info[0]); this.displayed_other_panel = info[1]; if (!id.w1) id.w1 = info[0]; id.w2 = (id.w1== info[0]) ? 0 : info[0]; if (artImages[ix] != info[2] && !id.w2) {chk_arr = [window.ID, artImages[ix], this.displayed_other_panel]; window.NotifyOthers("chk_arr_bio", chk_arr);} if (window.ID > info[0]) return; if (artImages[ix] == this.displayed_other_panel && validate.length < 2) changePhoto(1);}
-	this.chkArtImg = () => {id.albCyc = ""; id.albCyc_o = ""; this.clear_art_cache(); clear_cov_cache(); if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) {a_run = true; if (!artImages.length) {all_files_o_length = 0; ix = 0;} if (ppt.artistView && ppt.cycPhoto) this.getArtImg(); else this.getFbImg();} else this.get_multi(p.art_ix, p.alb_ix, true);}
+    this.chk_arr = info => {if (t.block()) return; if (artImages.length < 2 || !ppt.artistView || ppt.text_only || !ppt.cycPhoto) return; if (!validate.includes(info[0])) validate.push(info[0]); this.displayed_other_panel = info[1]; if (!id.w1) id.w1 = info[0]; id.w2 = (id.w1== info[0]) ? 0 : info[0]; if (artImages[ix] != info[2] && !id.w2) {chk_arr = [window.ID, artImages[ix], this.displayed_other_panel]; window.NotifyOthers("chk_arr_bio", chk_arr); } if (window.ID > info[0]) return; if (artImages[ix] == this.displayed_other_panel && validate.length < 2) changePhoto(1);}
     this.clear_a_rs_cache = () => {art.cache = []; clear(cov.cache, 0);}
 	this.clear_c_rs_cache = () => clear(cov.cache, 1);
     this.clear_art_cache = () => {artImages = []; validate = []; this.clear_a_rs_cache();}
     this.clear_rs_cache = () => {this.clear_c_rs_cache(); this.clear_a_rs_cache();}	
-    this.create_images = () => {const cc = StringFormat(1, 1), font1 = gdi.Font("Segoe UI", 270, 1), font2 = gdi.Font("Segoe UI", 120, 1), font3 = gdi.Font("Segoe UI", 200, 1), font4 = gdi.Font("Segoe UI", 90, 1), tcol = !ppt.blurDark && !ppt.blurLight || (ppt.imgBorder != 1 && ppt.imgBorder != 3) ? ui.col.text : ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0); for (let i = 0; i < 3; i++) {noimg[i] = s.gr(500, 500, true, g => {g.SetSmoothingMode(2); if (!ppt.blurDark && !ppt.blurLight || ppt.imgBorder == 1 || ppt.imgBorder == 3) {g.FillSolidRect(0, 0, 500, 500, tcol); g.FillGradRect(-1, 0, 505, 500, 90, ui.col.bg & 0xbbffffff, ui.col.bg, 1.0);} g.SetTextRenderingHint(3); g.DrawString("NO", i == 2 ? font3 : font1, tcol & 0x25ffffff, 0, 0, 500, 275, cc); g.DrawString(["COVER", "PHOTO", "SELECTION"][i], i == 2 ? font4 : font2, tcol & 0x20ffffff, 2.5, 175, 500, 275, cc); g.FillSolidRect(60, 388, 380, 50, tcol & 0x15ffffff);});} this.get = true;}; this.create_images();
+    this.create_images = () => {const cc = StringFormat(1, 1), font1 = gdi.Font("Segoe UI", 270, 1), font2 = gdi.Font("Segoe UI", 120, 1), font3 = gdi.Font("Segoe UI", 200, 1), font4 = gdi.Font("Segoe UI", 90, 1), tcol = !ppt.blurDark && !ppt.blurLight || (ppt.imgBorder != 1 && ppt.imgBorder != 3) ? ui.col.text : ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0); this.noimg = ["COVER", "PHOTO", "SELECTION"]; for (let i = 0; i < this.noimg.length; i++) {let n = this.noimg[i]; this.noimg[i] = s.gr(500, 500, true, g => {g.SetSmoothingMode(2); if (!ppt.blurDark && !ppt.blurLight || ppt.imgBorder == 1 || ppt.imgBorder == 3) {g.FillSolidRect(0, 0, 500, 500, tcol); g.FillGradRect(-1, 0, 505, 500, 90, ui.col.bg & 0xbbffffff, ui.col.bg, 1.0);} g.SetTextRenderingHint(3); g.DrawString("NO", i == 2 ? font3 : font1, tcol & 0x25ffffff, 0, 0, 500, 275, cc); g.DrawString(n, i == 2 ? font4 : font2, tcol & 0x20ffffff, 2.5, 175, 500, 275, cc); g.FillSolidRect(60, 388, 380, 50, tcol & 0x15ffffff);});} this.get = true;}; this.create_images();
     this.fresh = () => {
 		counter++; if (counter < ppt.cycTimePic) return; counter = 0;
 		if (t.block() || !ppt.cycPic || ppt.text_only || p.zoom()) return;
@@ -2670,13 +2390,10 @@ function Images() {
     this.leave = () => {if (this.touch.dn) {this.touch.dn = false; this.touch.start = 0;}}
 	this.on_playback_new_track = force => {check_cache(); resetCounters(); if (!p.multi_new() && !force) return; if (t.block()) {this.get = true; this.artist_reset();} else {if (ppt.artistView && ppt.cycPhoto) {this.artist_reset(); this.getArtImg();} else this.getFbImg(); this.get = false;}}
     this.on_size = () => {if (ppt.text_only) {this.clear_c_rs_cache(); this.getFbImg();} if (ppt.text_only && !ui.blur) return init = false; this.clear_a_rs_cache(); this.clear_c_rs_cache(); if (ppt.artistView) {if (init) this.artist_reset(); this.getArtImg();} else this.getFbImg(); init = false; if (ppt.img_only) p.get_multi(true); but.refresh(true);}
-	this.pth = () => ({imgPth: ppt.text_only || !s.file(cur_imgPth) ? "" : cur_imgPth, artist: artist || name.artist(ppt.focus), blk: (/_([a-z0-9]){32}\.jpg$/).test(s.fs.GetFileName(cur_imgPth))});
+	this.pth = () => {if (ppt.text_only) return false; if (s.file(cur_imgPth)) return cur_imgPth; return false;}
     this.set_chk_arr = arr_ix => {chk_arr = [window.ID, arr_ix, this.displayed_other_panel]; window.NotifyOthers("chk_arr_bio", chk_arr);}
     this.setCrop = sz => {const imgRefresh = ppt.img_only || !ppt.text_only && !t.text; this.crop = ppt.artistView && (ppt.artCropImgOnly && imgRefresh || ppt.artCropDual && !ppt.img_only) || !ppt.artistView && (ppt.covCropImgOnly && imgRefresh || ppt.covCropDual && !ppt.img_only); p.setBorder(imgRefresh && this.crop, ppt.imgBorder, ppt.imgReflection, imgRefresh); if (sz) {p.sizes(); if (ppt.heading && !ppt.img_only) but.check();}}; if (ppt.img_only) this.setCrop(true);
-	this.trace = (x, y) => {
-		// if (!ppt.autoEnlarge) return true;
-		let arr = [], ex; if (ppt.artistView && ppt.cycPhoto && artImages.length) {arr = art.cache; ex = ix;} else {arr = cov.cache; ex = i_x;} if (ex >= arr.length || !arr[ex]) return false; return x > arr[ex].x && x < arr[ex].x + arr[ex].w && y > arr[ex].y && y < arr[ex].y + arr[ex].h;
-	}	
+    this.trace = (x, y) => {let arr = [], ex; if (ppt.artistView && ppt.cycPhoto && artImages.length) {arr = art.cache; ex = ix;} else {arr = cov.cache; ex = i_x;} if (ex >= arr.length || !arr[ex]) return false; return x > arr[ex].x && x < arr[ex].x + arr[ex].w && y > arr[ex].y && y < arr[ex].y + arr[ex].h;}
     this.wheel = step => {switch (utils.IsKeyPressed(0x10)) {case false: if (artImages.length > 1 && ppt.artistView && !ppt.text_only && ppt.cycPhoto) {changePhoto(-step); if (ppt.cycPic) this.photoTimestamp = Date.now();} if (this.cycCov && covers.length > 1 && !ppt.artistView && !ppt.text_only && !p.alb_ix) {changeCov(-step); if (this.cycCov) this.covTimestamp = Date.now();} break; case true: if (!p || (ppt.mul_item && but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) || p.text_trace || !ppt.imgReflection) break; setReflStrength(-step * 5); break;}}
 
     this.chkPths = (pths, fn, type, extraPaths) => {
@@ -2766,13 +2483,13 @@ function Images() {
 			i_x = covCycle_ix;
 			if (ppt.loadCovFolder) {
 					const albFolder = p.cleanPth(p.albCovFolder, ppt.focus);
-					covImages = albFolder ? utils.Glob(albFolder + "*") : [];
-					covImages = covImages.filter(cycImages);
-					if (artImgFolder) covImages = $.shuffle(covImages);
-				for (let i = 0; i < covImages.length; i++) {
+					let all_cov_files = albFolder ? utils.Glob(albFolder + "*") : [];
+					all_cov_files = all_cov_files.filter(cycImages);
+					if (artImgFolder) all_cov_files = $.shuffle(all_cov_files);
+				for (let i = 0; i < all_cov_files.length; i++) {
 	                covers[i + 10] = {}
                     covers[i + 10].id = i + 10;
-                    covers[i + 10].pth = covImages[i];
+                    covers[i + 10].pth = all_cov_files[i];
 				}
 			covers = covers.filter(Boolean);
 			covers.unshift({id: 0, pth: ""});
@@ -2794,7 +2511,6 @@ function Images() {
 
 	const loadCycCov = (art_id, image_path) => { // stndAlb
         if (!this.cycCov) return false;
-		if (blackListed(image_path)) image_path = "";
 		if (ppt.loadCovAllFb) {
             if (covers.every(v => v.id !== art_id + 1)) {
                 if (!art_id) {
@@ -2846,7 +2562,6 @@ function Images() {
     }
 
     const loadStndCov = (handle, art_id, image, image_path) => { // stndAlb load fbImg else stub
-		if (blackListed(image_path)) {image = null; image_path = "";}
         if (!image && ppt.artistView) {
             if (cov.cacheHit(i_x, ap)) return;
             let cpp = "";
@@ -2913,7 +2628,7 @@ function Images() {
         if (ppt.imgBorder == 1 || ppt.imgBorder == 3) {const i_sz = s.clamp(nh, 0, nw); bor_w1 = !i_sz ? 5 * s.scale : i_sz > 250 ? 5 * s.scale : Math.ceil(5 * s.scale * i_sz / 250);} else bor_w1 = 0; bor_w2 = bor_w1 * 2;
         nw = Math.max(nw - bor_w2, ppt.style < 4 ? 10 : 0); nh = Math.max(nh - bor_w2, ppt.style < 4 ? 10 : 0);
 		switch (true) {
-			case !this.crop:
+			case !img.crop:
 				if (ppt.style < 4 || !ppt.alignAuto || !t.text || ppt.img_only) {sc = Math.min(nh / image.Height, nw / image.Width); tw = Math.round(image.Width * sc); th = Math.round(image.Height * sc);}
 				else {
 					s1 = image.Width / image.Height; s2 = nh > 0 ? nw / nh : Infinity;
@@ -2921,7 +2636,7 @@ function Images() {
 					else {y_t = p.img_t; nh = p.h - p.img_t - p.img_b - bor_w2; sc = Math.min(nh / image.Height, nw / image.Width); tw = Math.round(image.Width * sc); th = Math.round(image.Height * sc);}
 				}
 				break;
-			case this.crop:
+			case img.crop:
 				if (ppt.style > 3) nh = p.h - p.img_t - p.img_b - bor_w2;
 				s1 = image.Width / nw; s2 = image.Height / nh;
 				if (n && Math.abs(s1 / s2 - 1) < 0.05) {imgx = 0; imgy = 0; imgw = image.Width; imgh = image.Height; tw = Math.round(nw); th = Math.round(nh);}
@@ -2945,7 +2660,7 @@ function Images() {
                 const a = name.alb_artist(ppt.focus), l = name.album(ppt.focus), pth_cov = [p.getPth('cov', ppt.focus).pth, p.getPth('img', ppt.focus, a, l).pth];
                 this.chkPths(pth_cov, "", 1);
             }
-            if (!f_blur && !ppt.covType) if (handle) f_blur = utils.GetAlbumArtV2(handle, 0); if (!f_blur) f_blur = noimg[0].Clone(0, 0, noimg[0].Width, noimg[0].Height); new_BlurAlb = false; if (f_blur && !ppt.blurAutofill) f_blur = f_blur.Resize(p.w, p.h);
+            if (!f_blur && !ppt.covType) if (handle) f_blur = utils.GetAlbumArtV2(handle, 0); if (!f_blur) f_blur = this.noimg[0].Clone(0, 0, this.noimg[0].Width, this.noimg[0].Height); new_BlurAlb = false; if (f_blur && !ppt.blurAutofill) f_blur = f_blur.Resize(p.w, p.h);
         }
         if (ppt.covBlur && (ppt.artistView || this.cycCov || ppt.text_only || p.alb_ix) && f_blur) image = f_blur;
         if (ppt.blurAutofill) {const s1 = image.Width / p.w, s2 = image.Height / p.h; let imgw, imgh, imgx, imgy; if (s1 > s2) {imgw = Math.round(p.w * s2); imgh = image.Height; imgx = Math.round((image.Width - imgw) / 2); imgy = 0;} else {imgw = image.Width; imgh = Math.round(p.h * s1); imgx = 0; imgy = Math.round((image.Height - imgh) / 8);} image = image.Clone(imgx, imgy, imgw, imgh);}
@@ -2956,18 +2671,12 @@ function Images() {
                     g.DrawImage(iFull, 0 - offset, 0 - offset, p.w + offset * 2, p.h + offset * 2, 0, 0, iFull.Width, iFull.Height, 0, 63 * ui.blurAlpha);
                 } else {
                     g.DrawImage(image, 0, 0, p.w, p.h, 0, 0, image.Width, image.Height); if (ui.blurLevel > 1) gi.StackBlur(ui.blurLevel);
-					g.FillSolidRect(0, 0, p.w, p.h, darkImage(gi) ? ui.col.bg_light : ui.col.bg_dark);
+                    const colorScheme_array = gi.GetColourScheme(1), light_cover = ui.get_textselcol(colorScheme_array[0], true) == 50 ? true : false;
+                    g.FillSolidRect(0, 0, p.w, p.h, light_cover ? ui.col.bg_light : ui.col.bg_dark);
                 }
             });        
         return i;
     }
-	
-	const darkImage = image => {
-		const colorSchemeArray = JSON.parse(image.GetColourSchemeJSON(15)); let rTot = 0, gTot = 0, bTot = 0, freqTot = 0;
-		colorSchemeArray.forEach(v => {const col = s.toRGB(v.col); rTot += col[0] ** 2 * v.freq; gTot += col[1] ** 2 * v.freq; bTot += col[2] ** 2 * v.freq; freqTot += v.freq;});
-		const avgCol = [s.clamp(Math.round(Math.sqrt(rTot / freqTot)), 0 , 255), s.clamp(Math.round(Math.sqrt(gTot / freqTot)), 0 , 255), s.clamp(Math.round(Math.sqrt(gTot / freqTot)), 0 , 255)];
-		return ui.get_selcol(avgCol, true, true) == 50 ? true : false;
-	}
 
     const fade_img = (image, x, y, w, h) => {
         const xl = Math.max(0, p.tBoxL - x); let f = Math.min(w, p.tBoxL - x + p.tBoxW); this.adjustMode = false; if (xl >= f) return image; const wl = f - xl, yl = Math.max(0, p.tBoxT - y); f = Math.min(h, p.tBoxT - y + p.tBoxH); if (yl >= f) return image; const hl = f - yl;
@@ -3011,7 +2720,7 @@ function Images() {
 		}
 
 		this.cacheIt = (i, image, image_path, n) => {
-            if (!image || ppt.cycPhoto && !ppt.sameStyle && n != p.covView && artImages.length) return paint();
+            if (!image || ppt.cycPhoto && !ppt.sameStyle && n != p.covView) return;
 			if (memoryLimit()) this.trimCache(n);
 			n && i ? id.covCache = name.albID(ppt.focus, 'stnd') : id.artCache = name.artist(ppt.focus);
 			const start = Date.now();
@@ -3057,12 +2766,11 @@ function Images() {
 			paint(); return true;
 		}
 	}
-	const art = new ImageCache, cov = new ImageCache;
+	const art = new ImageCache(), cov = new ImageCache();
 
     this.draw = gr => {
-        if (ppt.text_only && !ui.blur) return;
+        if (ppt.text_only && !ui.blur) return; getImgFallback();
         if (ui.blur && cur_blur) gr.DrawImage(cur_blur, 0, 0, cur_blur.Width, cur_blur.Height, 0, 0, cur_blur.Width, cur_blur.Height);
-		if (this.get) return getImgFallback();
         if (!ppt.text_only && cur_img) gr.DrawImage(cur_img, xa, ya, cur_img.Width, cur_img.Height, 0, 0, cur_img.Width, cur_img.Height, 0, alpha);
     }
 
@@ -3081,11 +2789,11 @@ function Images() {
             case 'loadCovAllFb':
 				ppt.loadCovAllFb = !ppt.loadCovAllFb; this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; covCycle_ix = 1;
 				id.albCyc = ""; id.albCyc_o = ""; if (ppt.artistView) break;
-				if (this.cycCov) getCovImages(); else this.get_images(); break;
+				if (this.cycCov) getCovImages(true); else this.get_images(); break;
             case 'loadCovFolder':
 				ppt.loadCovFolder = !ppt.loadCovFolder; this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; covCycle_ix = 1;
 				id.albCyc = ""; id.albCyc_o = ""; if (ppt.artistView) break;
-				if (this.cycCov) getCovImages(); else this.get_images();
+				if (this.cycCov) getCovImages(true); else this.get_images();
 				if (ppt.loadCovFolder && !ppt.get("SYSTEM.Cover Folder Checked", false)) {fb.ShowPopupMessage("Enter folder in \"Server Settings\": [COVERS: LOAD FOLDER FOR IMAGE CYCLING].\n\nDefault: artist image folder.\n\nThis is a static load: images arriving after choosing the current album aren't included.", "Biography: load folder for cover cycling"); ppt.set("SYSTEM.Cover Folder Checked", true);} break;
         }	
     }
@@ -3109,15 +2817,23 @@ timer.image();
 function on_focus(is_focused) {tb.focus = is_focused;}
 function on_get_album_art_done(handle, art_id, image, image_path) {img.get_album_art_done(handle, art_id, image, image_path);}
 function on_item_focus_change() {if (fb.IsPlaying && !ppt.focus) return; if (ppt.mul_item) p.get_multi(true); else if (!p.multi_new()) return; if (!ppt.mul_item) p.get_multi(true); p.get_multi(true); if (t.block() && !p.server) {img.get = true; t.get = ppt.focus ? 2 : 1; img.artist_reset(); t.album_reset(); t.artist_reset();} else {if (t.block() && p.server) {img.get = true; t.get = 1; img.artist_reset(); t.album_reset(); t.artist_reset();} else {img.get = false; t.get = 0;} p.focus_load(); p.focus_serv();}}
-function on_key_down(vkey) {switch(vkey) {case 0x10: case 0x11: case 0x12: t.paint(); break; case 0x21: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(1); break; case 0x22: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(-1); break; case 35: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().scroll_to_end(); break; case 36:if (!ppt.img_only && !p.zoom()) t.scrollbar_type().check_scroll(0, 'full'); break; case 37: img.wheel(1); break; case 39: img.wheel(-1); break;}}
+function on_key_down(vkey) {switch(vkey) {case 0x10: case 0x11: case 0x12: t.paint(); break; case 0x21: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(1); break; case 0x22: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(-1); break; case 35: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().scroll_to_end(); break; case 36:if (!ppt.img_only && !p.zoom()) t.scrollbar_type().check_scroll(0); break; case 37: img.wheel(1); break; case 39: img.wheel(-1); break;}}
 function on_key_up(vkey) {if (vkey == 0x10 || vkey == 0x11 || vkey == 0x12) t.paint();}
 function on_library_items_added() {if (!lib) return; lib.update = true;}; function on_library_items_removed() {if (!lib) return; lib.update = true;}; function on_library_items_changed() {if (!lib) return; lib.update = true;}
 function on_load_image_done(id, image, image_path) {img.load_image_done(id, image, image_path);}
 function on_metadb_changed() {if (p.ir(ppt.focus) || t.block() && !p.server || !p.multi_new()) return; p.get_multi(true); if (!ppt.img_only) t.on_playback_new_track(); if (!ppt.text_only || ui.blur) img.on_playback_new_track(); p.metadb_serv();}
+function on_notify_data(name, info) {if (ui.local) on_cui_notify(name, info); switch(name) {case "chkTrackRev_bio": if (!p.server && ppt.inclTrackRev) {const copy = Object.assign({}, info); copy.inclTrackRev = true; window.NotifyOthers("isTrackRev_bio", copy);} break; case "isTrackRev_bio": if (p.server && info.inclTrackRev == true) serv.get_track(info); break; case "img_chg_bio": img.fresh(); men.fresh(); break; case "chk_arr_bio": img.chk_arr(info); break; case "custom_style_bio": p.on_notify(info); break; case "lyrics_state": lyrics_state.value = info; positionButtons(); break; case "force_update_bio": if (p.server) serv.fetch(1, info[0], info[1]); break; case "get_multi_bio": p.get_multi(false); break; case "get_rev_img_bio": if (p.server) serv.get_rev_img(info[0], info[1], info[2], info[3], false); break; case "get_img_bio": img.grab(info); break; case "get_txt_bio": t.grab(); break; case "multi_tag_bio": if (p.server) serv.fetch(false, info[0], info[1]); break; case "not_server_bio": p.server = false; timer.clear(timer.img); timer.clear(timer.zSearch); break; case "script_unload_bio": p.server = true; window.NotifyOthers("not_server_bio", 0); break; case "refresh_bio": window.Reload(); break; case "reload_bio": if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) window.Reload(); else {t.artistFlush(); t.albumFlush(); t.grab(); if (ppt.text_only) t.paint();} break;}}
+function on_paint(gr) {if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;} ui.draw(gr); img.draw(gr); t.draw(gr); t.messageDraw(gr); but.draw(gr); tb.drawEd(gr); ui.lines(gr);  btns_manager.draw(gr);}
+function on_playback_new_track() {if (p.server) serv.fetch(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]}); if (ppt.focus) return; t.on_playback_new_track(); img.on_playback_new_track();}
+function on_playback_dynamic_info_track() {if (p.server) serv.fetch_dynamic(); t.on_playback_new_track(); img.on_playback_new_track();}
+function on_playback_stop(reason) {if (reason == 2) return; on_item_focus_change();}
+function on_playlists_changed() {men.playlists_changed();}
+function on_playlist_items_added() {on_item_focus_change();}
+function on_playlist_items_removed() {on_item_focus_change();}
+function on_playlist_switch() {on_item_focus_change();}
 function on_mouse_lbtn_dblclk(x, y) {but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dblclk(x, y); if (!p.dblClick) return; if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; p.click(x, y);}
-
 function on_mouse_lbtn_down(x, y) {
-	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);		
+	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 	var hover_btn = btns_manager.on_mouse("lbtn_down",x, y);
 	if(!hover_btn){
 		if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; tb.lbtn_dn(x, y); but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dn(x, y); img.lbtn_dn(x, y);
@@ -3129,45 +2845,33 @@ function on_mouse_lbtn_up(x, y) {
 		t.scrollbar_type().lbtn_drag_up(x, y); if (!p.dblClick && !but.Dn) p.click(x, y); t.scrollbar_type().lbtn_up(x, y); p.clicked = false; tb.lbtn_up(x, y); but.lbtn_up(x, y); img.lbtn_up(x, y);
 	}
 }
-function on_mouse_leave() {
-	p.leave(); but.leave(); t.scrollbar_type().leave(); img.leave(); p.m_y = -1;
-	btns_manager.on_mouse("leave");
+function on_mouse_leave() {p.leave(); but.leave(); t.scrollbar_type().leave(); img.leave(); p.m_y = -1;btns_manager.on_mouse("leave");
 	g_cursor.x = 0;
-    g_cursor.y = 0;	
+    g_cursor.y = 0;
 }
-
+function on_mouse_mbtn_up(x, y) {p.mbtn_up(x, y);}
 function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
-	g_cursor.onMouse("move", x, y, m);	  		
-	p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;
-	btns_manager.on_mouse("move",x, y);
+	g_cursor.onMouse("move", x, y, m);	  	
+	p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;btns_manager.on_mouse("move",x, y);
 }
-
-function on_mouse_mbtn_up(x, y) {p.mbtn_up(x, y);}
 function on_mouse_rbtn_up(x, y) {men.rbtn_up(x, y); return true;}
 function on_mouse_wheel(step) {switch (p.zoom()) {case false: if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true); else if (p.text_trace) {if (!ppt.img_only) t.scrollbar_type().wheel(step, false);} else img.wheel(step); break; case true: ui.wheel(step); if (utils.IsKeyPressed(0x11)) but.wheel(step); if (utils.IsKeyPressed(0x10)) {if (!p.text_trace) img.wheel(step); if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true);} break;}}
-function on_notify_data(name, info) {if (ui.local) on_cui_notify(name, info); switch(name) {case "lyrics_state": lyrics_state.value = info; positionButtons(); break; case "chkTrackRev_bio": if (!p.server && ppt.inclTrackRev) {const copy = Object.assign({}, info); copy.inclTrackRev = true; window.NotifyOthers("isTrackRev_bio", copy);} break; case "isTrackRev_bio": if (p.server && info.inclTrackRev == true) serv.get_track(info); break; case "img_chg_bio": img.fresh(); men.fresh(); break; case "chk_arr_bio": img.chk_arr(JSON.parse(JSON.stringify(info))); ; break; case "custom_style_bio": p.on_notify(info); break; case "force_update_bio": if (p.server) serv.fetch(1, info[0], info[1]); break; case "get_multi_bio": p.get_multi(false); break; case "get_rev_img_bio": if (p.server) serv.get_rev_img(info[0], info[1], info[2], info[3], false); break; case "get_img_bio": img.grab(info); break; case "get_txt_bio": t.grab(); break; case "multi_tag_bio": if (p.server) serv.fetch(false, info[0], info[1]); break; case "not_server_bio": p.server = false; timer.clear(timer.img); timer.clear(timer.zSearch); break; case "blacklist_bio": img.blkArtist = ""; img.chkArtImg(); break; case "script_unload_bio": p.server = true; window.NotifyOthers("not_server_bio", 0); break; case "refresh_bio": window.Reload(); break; case "reload_bio": if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) window.Reload(); else {t.artistFlush(); t.albumFlush(); t.grab(); if (ppt.text_only) t.paint();} break;}}
-function on_paint(gr) {if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}ui.draw(gr); img.draw(gr); t.draw(gr); t.messageDraw(gr); but.draw(gr); tb.drawEd(gr); ui.lines(gr);btns_manager.draw(gr);}
-function on_playback_dynamic_info_track() {if (p.server) serv.fetch_dynamic(); t.on_playback_new_track(); img.on_playback_new_track();}
-function on_playback_new_track() {if (p.server) serv.fetch(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]}); if (ppt.focus) return; t.on_playback_new_track(); img.on_playback_new_track();}
-function on_playback_stop(reason) {if (reason == 2) return; on_item_focus_change();}
-function on_playlist_items_added() {on_item_focus_change();}
-function on_playlist_items_removed() {on_item_focus_change();}
-function on_playlist_switch() {on_item_focus_change();}
-function on_playlists_changed() {men.playlists_changed();}
 function on_script_unload() {if (p.server) {window.NotifyOthers("script_unload_bio", 0); timer.clear(timer.img);} but.on_script_unload();}
-function on_size(w, h) {t.rp = false; p.w = w; p.h = h; if (!p.w || !p.h) return; if(!window.IsVisible) {on_size_2Call = true;return;} ui.get_font(); p.calcText = true; t.on_size(); img.on_size(); t.rp = true; img.displayed_other_panel = null;}
+function on_size(w, h) {
+	t.rp = false; p.w = w; p.h = h; if (!p.w || !p.h) return; if(!window.IsVisible) {on_size_2Call = true;return;} ui.get_font(); t.on_size(); img.on_size(); t.rp = true; img.displayed_other_panel = null;
+}
 function RGB(r, g, b) {return 0xff000000 | r << 16 | g << 8 | b;}
 function RGBA(r, g, b, a) {return a << 24 | r << 16 | g << 8 | b;}
 function StringFormat() {const a = arguments, flags = 0; let h_align = 0, v_align = 0, trimming = 0; switch (a.length) {case 3: trimming = a[2]; case 2: v_align = a[1]; case 1: h_align = a[0]; break; default: return 0;} return (h_align << 28 | v_align << 24 | trimming << 20 | flags);}
 
 function Server() {
     if (!p.server) return;
-    String.prototype.format = function() {return this.replace(/<P><\/P>/gi, "").replace(/<p[^>]*>/gi, "").replace(/\r/g, "").replace(/\n/g, "").replace(/<\/p>/gi, "\r\n\r\n").replace(/<br>/gi, "\r\n").replace(/(<([^>]+)>)/ig, '').replace(/&amp(;|)/g,"&").replace(/&quot(;|)/g,'"').replace(/&#39(;|)/g,"'").replace(/&gt(;|)/g, ">").replace(/&nbsp(;|)/g, "").replace(/^ +/gm, "").replace(/^\s+|\s+$/g, "");}
-    String.prototype.tidy = function() {return this.replace(/&amp(;|)/g,"&").replace(/&quot(;|)/g,'"').replace(/&#39(;|)/g,"'").replace(/&gt(;|)/g, ">").replace(/&nbsp(;|)/g, "").replace(/\band\b|\//gi, "&").replace(/[\.,\!\?\:;'\u2019"\-_\(\)\[\]\u2010\s+]/g, "").replace(/\$/g, "s").toLowerCase();}
+    String.prototype.format = function() {return this.replace(/<P><\/P>/gi, "").replace(/<p[^>]*>/gi, "").replace(/\r/g, "").replace(/\n/g, "").replace(/<\/p>/gi, "\r\n\r\n").replace(/<br>/gi, "\r\n").replace(/(<([^>]+)>)/ig, '').replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&quot/g, '"').replace(/&nbsp;/g, "").replace(/^ +/gm, "").replace(/^\s+|\s+$/g, "");}
+    String.prototype.tidy = function() {return this.replace(/\band\b|\//gi, "&").replace(/[\.,\!\?\:;'\u2019"\-_\(\)\[\]\u2010\s+]/g, "").replace(/\$/g, "s").toLowerCase();}
     const ext = [".jpg", ".png", ".gif", ".bmp", ".jpeg"];
     let albm = "", album = "", alb_artist = "", alb_id = "", album_id = "", artist = "", auto_corr = 1, trackID1 = "", trackID2 = "";
-    const bioCacheSave = n => {if (!$.isArray(imgToDelete)) {imgToDelete = []; n = true;} if (n) s.save(bioCache, JSON.stringify(imgToDelete, null, 3), true);}
+    const bioCacheSave = n => {if (!$.isArray(imgToDelete)) {imgToDelete = []; n = true;} if (n) s.save(bioCache, JSON_stringify(imgToDelete, null, 3), true);}
     const bioCache = fb.ProfilePath + "yttm\\" + "cache_bio.json"; let imgToDelete = []; if (s.file(bioCache)) imgToDelete = s.jsonParse(bioCache, false, 'file'); bioCacheSave();
     if (p.server) {
         const dn_arr = ["am_bio", "lfm_bio", "am_rev", "lfm_rev", "dl_art_img", "lfm_cov"];
@@ -3176,13 +2880,13 @@ function Server() {
             else this[v] = p.valueIni("COVERS: MUSIC FILES", p.cov[0].name, p.cov[0].path, 1);
         });
     }
-    const auto_add = p.valueIni("MISCELLANEOUS", p.def_tf[7].name, p.def_tf[7].tf, 1); let exp = Math.max(p.d * utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[5].name) / 28, p.d), upd = p.d / 28, url = {lfm: "https://ws.audioscrobbler.com/2.0/?format=json" + p.lfm, lfm_sf: "https://www.songfacts.com/"}; if (!exp || isNaN(exp)) exp = p.d;
-    const imgNo = s.clamp(p.valueIni("MISCELLANEOUS", p.def_tf[6].name, p.def_tf[6].tf, 2), 0, 20);
-    let artLimit = parseFloat(utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[8].name)); artLimit = artLimit ? Math.max(artLimit, imgNo) : 0; if (artLimit && !ppt.get("SYSTEM.Cache Limit Advisory", false)) {let f_pth = p.cleanPth(p.pth.imgArt, ppt.focus); f_pth = f_pth ? f_pth : "N/A"; fb.ShowPopupMessage("Artist image cache limit: now enabled. This is a BETA feature.\r\n\r\nLimits number of images stored per artist to the value set. If used with auto-add, newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\nOnly considers images ending in \"_32-alphanumeric-string.jpg\", e.g. Coldplay_421cac7d8e42662f069c4b69e7934d7b.jpg.\r\n\r\nIf a custom save location is used, ensure images are saving where expected & there aren't other matching images.\r\n\r\nCurrent save folder: " + f_pth + "\r\n\r\nThe cache limit is applied following image update and when images are no longer in use.", "Biography"); ppt.set("SYSTEM.Cache Limit Advisory", true);}
-    const bio_json = fb.ProfilePath + "yttm\\" + "update_bio.json"; if (!s.file(bio_json)) s.save(bio_json, JSON.stringify([{"name":"update", "time":Date.now()}], null, 3), true); let m = s.jsonParse(bio_json, false, 'file'); if (!$.isArray(m)) {m = [{"name":"update", "time":Date.now()}]; s.save(bio_json, JSON.stringify(m, null, 3), true);} if (m[0].name != "update") {m.unshift({"name":"update", "time":Date.now()}); s.save(bio_json, JSON.stringify(m, null, 3), true)}
+    const auto_add = p.valueIni("MISCELLANEOUS", p.def_tf[6].name, p.def_tf[6].tf, 1); let exp = Math.max(p.d * utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[4].name) / 28, p.d), upd = p.d / 28, url = {lfm: "https://ws.audioscrobbler.com/2.0/?format=json" + p.lfm, lfm_sf: "https://www.songfacts.com/"}; if (!exp || isNaN(exp)) exp = p.d;
+    const imgNo = s.clamp(p.valueIni("MISCELLANEOUS", p.def_tf[5].name, p.def_tf[5].tf, 2), 0, 20);
+    let artLimit = parseFloat(utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[7].name)); artLimit = artLimit ? Math.max(artLimit, imgNo) : 0; if (artLimit && !ppt.get("SYSTEM.Cache Limit Advisory", false)) {let f_pth = p.cleanPth(p.pth.imgArt, ppt.focus); f_pth = f_pth ? f_pth : "N/A"; fb.ShowPopupMessage("Artist image cache limit: now enabled. This is a BETA feature.\r\n\r\nLimits number of images stored per artist to the value set. If used with auto-add, newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\nOnly considers images ending in \"_32-alphanumeric-string.jpg\", e.g. Coldplay_421cac7d8e42662f069c4b69e7934d7b.jpg.\r\n\r\nIf a custom save location is used, ensure images are saving where expected & there aren't other matching images.\r\n\r\nCurrent save folder: " + f_pth + "\r\n\r\nThe cache limit is applied following image update and when images are no longer in use.", "Biography"); ppt.set("SYSTEM.Cache Limit Advisory", true);}
+    const bio_json = fb.ProfilePath + "yttm\\" + "update_bio.json"; if (!s.file(bio_json)) s.save(bio_json, JSON_stringify([{"name":"update", "time":Date.now()}], null, 3), true); let m = s.jsonParse(bio_json, false, 'file'); if (!$.isArray(m)) {m = [{"name":"update", "time":Date.now()}]; s.save(bio_json, JSON_stringify(m, null, 3), true);} if (m[0].name != "update") {m.unshift({"name":"update", "time":Date.now()}); s.save(bio_json, JSON_stringify(m, null, 3), true)}
 
-    const done = (f, exp) => {if (!s.file(bio_json)) return false; const m = s.jsonParse(bio_json, false, 'file'); const n = Date.now(), r = n - exp, u = n - upd; let k = m.length; if (m.length && m[0].time < u) {while (k--) if (m[k].time < r && k) m.splice(k, 1); m[0].time = n; s.save(bio_json, JSON.stringify(m, null, 3), true);} for (k = 0; k < m.length; k++) if (m[k].name == f) return true; return false;}
-    const update = f => {if (!s.file(bio_json)) return; const m = s.jsonParse(bio_json, false, 'file'), n = Date.now(); let k = m.length; for (k = 0; k < m.length; k++) if (m[k].name == f) return; m.push({"name":f, "time":n}); s.save(bio_json, JSON.stringify(m, null, 3), true);}
+    const done = (f, exp) => {if (!s.file(bio_json)) return false; const m = s.jsonParse(bio_json, false, 'file'); const n = Date.now(), r = n - exp, u = n - upd; let k = m.length; if (m.length && m[0].time < u) {while (k--) if (m[k].time < r && k) m.splice(k, 1); m[0].time = n; s.save(bio_json, JSON_stringify(m, null, 3), true);} for (k = 0; k < m.length; k++) if (m[k].name == f) return true; return false;}
+    const update = f => {if (!s.file(bio_json)) return; const m = s.jsonParse(bio_json, false, 'file'), n = Date.now(); let k = m.length; for (k = 0; k < m.length; k++) if (m[k].name == f) return; m.push({"name":f, "time":n}); s.save(bio_json, JSON_stringify(m, null, 3), true);}
     const expired = (f, exp, f_done, langCheck, type) => {if (langCheck) {let i = 0; switch (type) {case 0: for (i = 0; i < similar.length; i++) if (langCheck.includes(similar[i]) && i != p.lfmLang_ix) return true; for (i = 0; i < listeners.length; i++) if (langCheck.includes(listeners[i]) && i != p.lfmLang_ix) return true; break; case 1: for (i = 0; i < releaseDate.length; i++) if (langCheck.includes(releaseDate[i]) && i != p.lfmLang_ix) return true; for (i = 0; i < listeners.length; i++) if (langCheck.includes(listeners[i]) && i != p.lfmLang_ix) return true; break;}} if (f_done && done(f_done, exp)) return false; if (!s.file(f)) return true; return Date.now() - s.lastModified(f) > exp;}
     const cov_loc = handle => {return !handle.RawPath.startsWith('fy+') && !handle.RawPath.startsWith('3dydfy:') && !handle.RawPath.startsWith('http');}
     const check_match = (n, l) => {return 1 - levenshtein(n, l) / (n.length > l.length ? n.length : l.length) > 0.8;} // 0.8 sets fuzzy match level
@@ -3192,14 +2896,15 @@ function Server() {
     let lfm_server = p.lfmLang, def_server_EN = lfm_server == "www.last.fm", serverFallback = fallback && !def_server_EN;
     this.setLfm = lang => {if (lang) lfm_server = lang; lfm_server = lfm_server == "en" ? "www.last.fm" : "www.last.fm/" + lfm_server; def_server_EN = lfm_server == "www.last.fm"; serverFallback = fallback && !def_server_EN;}; this.setLfm();
     const listeners = ["Listeners", "Hörer", "Oyentes", "Auditeurs", "Ascoltatori", "リスナー", "Słuchaczy", "Ouvintes", "Слушатели", "Lyssnare", "Dinleyiciler", "听众"];
+    const match = (p_aa, p_l, list) => {try {const aa = s.removeDiacritics(p_aa.replace(/^The /i, "").tidy()), l = s.removeDiacritics(p_l.tidy()), alb = [], art_m = []; let i = 0; for (i = 0; i < list.length; i++) {alb[i] = s.removeDiacritics(list[i].nextSibling.innerText.tidy()); art_m[i] = s.removeDiacritics(list[i].nextSibling.nextSibling.innerText.replace(/^The /i, "").tidy()); if (l == alb[i] && art_m[i] == aa) return i;} if (!partial_match) return -1; for (i = 0; i < list.length; i++) if (alb[i].includes(l) && art_m[i].includes(aa)) return i; for (i = 0; i < list.length; i++) if (check_match(l, alb[i]) && art_m[i].includes(aa)) return i; return -1;} catch (e) {return -1;}}
     const noWiki = n => (/wiki|vikimiz|\u0412\u0438\u043A\u0438|\u7EF4\u57FA/i).test(n);
-    const partial_match = p.valueIni("MISCELLANEOUS", p.def_tf[10].name, p.def_tf[10].tf, 1);
+    const partial_match = p.valueIni("MISCELLANEOUS", p.def_tf[9].name, p.def_tf[9].tf, 1);
     const releaseDate = ["Release Date: ", "Veröffentlichungsdatum: ", "Fecha De Lanzamiento: ", "Date De Sortie: ", "Data Di Pubblicazione: ", "リリース日: ", "Data Wydania: ", "Data De Lançamento: ", "Дата релиза: ", "Utgivningsdatum: ", "Yayınlanma Tarihi: ", "发布日期: "];
     const res = () => {window.NotifyOthers("get_txt_bio", "get_txt_bio"); t.grab();}
     const similar = ["Similar Artists: ", "Ähnliche Künstler: ", "Artistas Similares: ", "Artistes Similaires: ", "Artisti Simili: ", "似ているアーティスト: ", "Podobni Wykonawcy: ", "Artistas Parecidos: ", "Похожие исполнители: ", "Liknande Artister: ", "Benzer Sanatçılar: ", "相似艺术家: "];
     const sort = data => data.sort((a, b) => a.m - b.m);
-    this.fetch = (force, art, alb) => {get_bio(force, art, alb, force == 2 ? true : false); get_rev(force, art, alb, force == 2 ? true : false);}
-    this.fetch_dynamic = () => {get_bio(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]}); amBio(false, {ix:0, focus:false, arr:[]})}
+    this.fetch = (force, art, alb) => {get_bio(force, art, alb, force == 2 ? true : false); this.get_rev(force, alb, force == 2 ? true : false);}
+    this.fetch_dynamic = () => {get_bio(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]});}
     function create_dl_file() {const n = fb.ProfilePath + "yttm\\foo_lastfm_img.vbs"; if (!s.file(n) || s.fs.GetFile(n).Size == "696") {const dl_im = "If (WScript.Arguments.Count <> 2) Then\r\nWScript.Quit\r\nEnd If\r\n\r\nurl = WScript.Arguments(0)\r\nfile = WScript.Arguments(1)\r\n\r\nSet objFSO = Createobject(\"Scripting.FileSystemObject\")\r\nIf objFSO.Fileexists(file) Then\r\nSet objFSO = Nothing\r\nWScript.Quit\r\nEnd If\r\n\r\nSet objXMLHTTP = CreateObject(\"MSXML2.XMLHTTP\")\r\nobjXMLHTTP.open \"GET\", url, false\r\nobjXMLHTTP.send()\r\n\r\nIf objXMLHTTP.Status = 200 Then\r\nSet objADOStream = CreateObject(\"ADODB.Stream\")\r\nobjADOStream.Open\r\nobjADOStream.Type = 1\r\nobjADOStream.Write objXMLHTTP.ResponseBody\r\nobjADOStream.Position = 0\r\nobjADOStream.SaveToFile file\r\nobjADOStream.Close\r\nSet objADOStream = Nothing\r\nEnd If\r\n\r\nSet objFSO = Nothing\r\nSet objXMLHTTP = Nothing"; s.save(n, dl_im, false);}}; if (p.server) create_dl_file();
 
     const img_exp = (p_dl_ar, imgFolder, ex) => {
@@ -3221,27 +2926,6 @@ function Server() {
                     bioCacheSave(true);}} return [0, auto_add, allFiles];} else return [5, auto_add, allFiles, imgExisting];
     }
 
-	const match = (p_a, p_release, list, type) => {
-		const a = s.removeDiacritics(p_a.replace(/^The /i, "").tidy()), rel = s.removeDiacritics(p_release.tidy()), rel_m = [], art_m = []; let i = 0;
-		for (i = 0; i < list.length; i++) {
-			rel_m[i] = list[i].nextSibling ? s.removeDiacritics(list[i].nextSibling.innerText.tidy()) : "N/A";
-			art_m[i] = list[i].nextSibling && list[i].nextSibling.nextSibling ? s.removeDiacritics(list[i].nextSibling.nextSibling.innerText.replace(/^The /i, "").tidy()) : "N/A"; 
-			if (rel == rel_m[i] && art_m[i] == a) return i;
-		} 
-		if (!partial_match) return -1;
-		switch (true) {
-			case type == 'rev':
-				for (i = 0; i < list.length; i++) if (rel_m[i].includes(rel) && art_m[i].includes(a)) return i;
-				for (i = 0; i < list.length; i++) if (check_match(rel, rel_m[i]) && art_m[i].includes(a)) return i;
-				break;
-			case type == 'title':
-				for (i = 0; i < list.length; i++) if (rel_m[i].includes(rel) && art_m[i] == a) return i;
-				for (i = 0; i < list.length; i++) {if (check_match(rel, rel_m[i]) && art_m[i] == a) return i;}
-				break;
-		}
-		return -1;
-	}
-
     const get_bio = (force, art, alb, onlyForceLfm) => {
         const stndBio = !art.ix || art.ix + 1 > art.arr.length;
         let artist_done = false, new_artist = stndBio ? name.artist(art.focus) : art.arr[art.ix].name, supCache = false;
@@ -3253,7 +2937,7 @@ function Server() {
         }
         this.chk_track({force: force, artist: stndBio ? artist : name.artist(art.focus), title: name.title(art.focus)});
         if (!artist_done) {
-            if (this.dl_art_img) {const dl_art = new Dl_art_images; dl_art.run(artist, force, art, stndBio, supCache);} else timer.decelerating();
+            if (this.dl_art_img) {const dl_art = new Dl_art_images(); dl_art.run(artist, force, art, stndBio, supCache);} else timer.decelerating();
             if (p.lfm_sim && stndBio) {
                 const fo_sim = p.cleanPth(p.pth.lfmSim, ppt.focus), pth_sim = fo_sim + artist.clean() + " And Similar Artists.json";
                 let len = 0, valid = false;
@@ -3270,6 +2954,18 @@ function Server() {
                 bioCacheSave(true);
             }
         }
+        if (!stndBio || onlyForceLfm) return;
+        if (this.am_bio && !this.am_rev) {
+            const stndAlb = !alb.ix || alb.ix + 1 > alb.arr.length, new_alb_id = stndAlb ? p.eval(p.tf.aa + p.tf.l, alb.focus) : alb.arr[alb.ix].artist + alb.arr[alb.ix].album;
+            if (new_alb_id == alb_id && !force) return;
+            alb_id = new_alb_id;
+            album = stndAlb ? name.album(alb.focus) : alb.arr[alb.ix].album;
+            alb_artist = name.alb_artist(art.focus);
+            if (!album || !alb_artist) return;
+            const fn_rev = p.cleanPth(p.pth.amRev, art.focus) + alb_artist.clean() + " - " + album.clean() + ".txt";
+            const pth_bio = p.cleanPth(p.pth.amBio, art.focus), fn_bio = pth_bio + artist.clean() + ".txt";
+            if (force || expired(fn_bio, exp, "Bio " + partial_match + " " + fn_rev, false) && !s.open(fn_bio).includes("Custom Biography")) {const dl_am_bio = new Dl_allmusic_bio(() => dl_am_bio.on_state_change()); dl_am_bio.Search(0, "https://www.allmusic.com/search/albums/" + encodeURIComponent(!compilation(album) ? album : alb_artist + " " + album.replace(/^The /i, "")), album, alb_artist, artist, "bio", "", fn_rev, pth_bio, fn_bio, force);}
+        }
     }
 
     this.chk_track = tr => {
@@ -3282,38 +2978,26 @@ function Server() {
         const lfm_tracks = p.getPth('track', ppt.focus, tr.artist, "Track Reviews", "", "", tr.artist.clean(), "", "Track Reviews", 'lfmRev', true, true), text = s.jsonParse(lfm_tracks.pth, false, 'file'), trk = tr.title.toLowerCase();
         if (!text || !text[trk] || text[trk].update < Date.now() - exp || text[trk].lang != p.lfmLang || tr.force) {const dl_lfm_track = new Lfm_track(() => dl_lfm_track.on_state_change()); dl_lfm_track.Search(tr.artist, trk, lfm_tracks.fo, lfm_tracks.pth, tr.force);}
     }
-	
-	const amBio = (force, art) => {
-		const stndBio = !art.ix || art.ix + 1 > art.arr.length;
-		if (!stndBio || !this.am_bio) return; const title = name.title(art.focus);
-		if (!artist || !title) return;
-		const am_bio = p.getPth('bio', art.focus, artist, "", stndBio, false, artist.clean(), "", "", 'amBio', true, true);
-		if (!title) fb.ShowPopupMessage("NO TITLE artist",artist,"title",title,"am_bio.pth",am_bio.pth)
-		if (force || expired(am_bio.pth, exp, "Bio " + partial_match + " " + artist + " - " + title, false) && !s.open(am_bio.pth).includes("Custom Biography")) {
-		const dl_am_bio = new Dl_allmusic_bio(() => dl_am_bio.on_state_change()); dl_am_bio.Search(0, "https://www.allmusic.com/search/songs/" + encodeURIComponent(title), title, artist, am_bio.fo, am_bio.pth, force);
-		}
-	}
 
-    const get_rev = (force, art, alb, onlyForceLfm) => {
+    this.get_rev = (force, alb, onlyForceLfm) => {
         const stndAlb = !alb.ix || alb.ix + 1 > alb.arr.length, new_album_id = stndAlb ? p.eval(p.tf.aa + p.tf.l, alb.focus) : alb.arr[alb.ix].artist + alb.arr[alb.ix].album;
         let supCache = false;
-        if (new_album_id == album_id && !force) return amBio(force, art);
+        if (new_album_id == album_id && !force) return;
         album_id = new_album_id; album = stndAlb ? name.album(alb.focus) : alb.arr[alb.ix].album; albm = stndAlb ? name.albm(alb.focus) : alb.arr[alb.ix].album;
         alb_artist = stndAlb ? name.alb_artist(alb.focus) : alb.arr[alb.ix].artist;
-        if (!album || !alb_artist) return amBio(force, art);
+        if (!album || !alb_artist) return;
         if (!stndAlb) supCache = p.sup.Cache && !lib.in_library(1, alb_artist, album);
 		if (stndAlb) {if (albm) get_cover(force, alb);} else if (force && p.rev_img) this.get_rev_img(alb_artist, album, "", "", force);
         if (this.am_rev && !onlyForceLfm) {
             const am_rev = p.getPth('rev', alb.focus, alb_artist, album, stndAlb, supCache, alb_artist.clean(), alb_artist.clean(), album.clean(), 'amRev', true, true);
             const artiste = stndAlb ? name.artist(alb.focus) : alb_artist;
             const am_bio = p.getPth('bio', alb.focus, artiste, "", stndAlb, p.sup.Cache && !lib.in_library(0, artiste), artiste.clean(), "", "", 'amBio', true, true);
-            const art_upd = expired(am_bio.pth, exp, "Bio " + partial_match + " " + am_rev.pth, false) && !s.open(am_bio.pth).includes("Custom Biography"), 
-			rev_upd = !done("Rev " + partial_match + " " + am_rev.pth, exp) && (!s.file(am_rev.pth) || !s.open(am_rev.pth).includes("Genre: ") && !s.open(am_rev.pth).includes("Custom Review"));
+            const art_upd = expired(am_bio.pth, exp, "Bio " + partial_match + " " + am_rev.pth, false) && !s.open(am_bio.pth).includes("Custom Biography"), rev_upd = !done("Rev " + partial_match + " " + am_rev.pth, exp) && (!s.file(am_rev.pth) || !s.open(am_rev.pth).includes("Genre: ") && !s.open(am_rev.pth).includes("Custom Review"));
             let dn_type = "";
             if (rev_upd || art_upd || force) {
                 if ((this.am_rev && rev_upd) && (this.am_bio && art_upd) || force) dn_type = "both"; else if (this.am_rev && rev_upd || force) dn_type = "review"; else if (this.am_bio && art_upd || force) dn_type = "bio";
-                const dl_am_rev = new Dl_allmusic_rev(() => dl_am_rev.on_state_change()); dl_am_rev.Search(0, "https://www.allmusic.com/search/albums/" + encodeURIComponent(!compilation(album) ? album : alb_artist + " " + album.replace(/^The /i, "")), album, alb_artist, artiste, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
-            } else amBio(force, art);
+                const dl_am_bio = new Dl_allmusic_bio(() => dl_am_bio.on_state_change()); dl_am_bio.Search(0, "https://www.allmusic.com/search/albums/" + encodeURIComponent(!compilation(album) ? album : alb_artist + " " + album.replace(/^The /i, "")), album, alb_artist, artiste, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, force);
+            }
         }
         if (!this.lfm_rev) return;
         const lfm_rev = p.getPth('rev', alb.focus, alb_artist, album, stndAlb, supCache, alb_artist.clean(), alb_artist.clean(), album.clean(), 'lfmRev', true, true), text = s.open(lfm_rev.pth), custRev = text.includes("Custom Review");
@@ -3357,57 +3041,11 @@ function Server() {
     }
 
     function Dl_allmusic_bio(state_callback) {
-        let artist = "", artistLink = "", fo_bio, pth_bio, sw = 0, title = ""; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
+        let alb_artist, album, artist = "", artistLink = "", dn_type = "", fo_bio, fo_rev, pth_bio, pth_rev, sw = 0; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
         this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {clearTimeout(this.ie_timer); this.ie_timer = null; if (this.xmlhttp.status == 200) this.func(); else {s.trace("allmusic album review / biography: " + album + " / " + alb_artist + ": not found" + " Status error: " + this.xmlhttp.status, true);}}}
 
-        this.Search = (p_sw, URL, p_title, p_artist, p_fo_bio, p_pth_bio, force) => {
-            sw = p_sw; if (!sw) {fo_bio = p_fo_bio; pth_bio = p_pth_bio; title = p_title; artist = p_artist;}
-            this.func = null; this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            this.func = this.Analyse; this.xmlhttp.open("GET", URL); this.xmlhttp.onreadystatechange = this.ready_callback; if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.ie_timer) {const a = this.xmlhttp; this.ie_timer = setTimeout(() => {a.abort(); this.ie_timer = null;}, 30000);}
-			this.xmlhttp.send();
-        }
-
-        this.Analyse = () => {
-            const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); let i = 0, list;
-			switch (sw) {
-				case 0:
-					try {div.innerHTML = this.xmlhttp.responseText.replace(/by\s*<a href/gi, "<a href");
-					list = div.getElementsByTagName('h4'); i = match(artist, title, list, 'title');
-					if (i != -1) {
-						artistLink = list[i].nextSibling.nextSibling.firstChild.getAttribute('href'); doc.close();
-						if (artistLink) {sw = 1; return this.Search(sw, artistLink + "/biography");}
-						update("Bio " + partial_match + " " + artist + " - " + title); s.trace("allmusic biography: " + artist + ": not found", true);
-					} update("Bio " + partial_match + " " + artist + " - " + title); s.trace("allmusic biography: " + artist + ": not found", true);
-					} catch (e) {update("Bio " + partial_match + " " + artist + " - " + title); s.trace("allmusic biography: " + artist + ": not found", true); doc.close();}
-					break;
-				case 1:
-					processAmBio(this.xmlhttp.responseText, artist, title, fo_bio, pth_bio, "", 'title');
-					break;
-			}
-        }
-    }
-	
-	const processAmBio = (responseText, artist, title, fo_bio, pth_bio, pth_rev, type) => {
-		const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div');
-		try {div.innerHTML = responseText; const list = div.getElementsByTagName('p')[2].parentNode; let active = "", biography = list.innerHTML.format(), biographyGenre = [], tg = "";
-		s.htmlParse(div.getElementsByTagName('div'), 'className', 'active-dates', v => active = (v.childNodes[0].innerText + ": " + v.childNodes[1].innerText).trim());
-		s.htmlParse(div.getElementsByTagName('a'), false, false, v => {const str = v.toString(); if (str.includes("www.allmusic.com/genre") || str.includes("www.allmusic.com/style")) {tg = v.innerText.trim(); if (tg) biographyGenre.push(tg);}});
-		if (active.length) active = "\r\n\r\n" + active;
-		if (biographyGenre.length) biographyGenre = "\r\n\r\n" + "Genre: " + biographyGenre.join(", ");
-		let biographyAuthor = list.previousSibling.innerText.trim(); if (biographyAuthor) biographyAuthor = "\r\n\r\n" + biographyAuthor; doc.close();
-		biography = biography + biographyGenre + active + biographyAuthor;
-		if (biography.length > 19) {s.buildPth(fo_bio); s.save(pth_bio, biography, true); res();}
-		else {type == 'rev' ? update("Bio " + partial_match + " " + pth_rev) : update("Bio " + partial_match + " " + artist + " - " + title); s.trace("allmusic biography: " + artist + ": not found", true);}
-		} catch (e) {type == 'rev' ? update("Bio " + partial_match + " " + pth_rev) : update("Bio " + partial_match + " " + artist + " - " + title); s.trace("allmusic biography: " + artist + ": not found", true); doc.close();}
-	}
-
-    function Dl_allmusic_rev(state_callback) {
-        let alb_artist, album, art, artist = "", artistLink = "", dn_type = "", fo_bio, fo_rev, force, pth_bio, pth_rev, sw = 0; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
-        this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {clearTimeout(this.ie_timer); this.ie_timer = null; if (this.xmlhttp.status == 200) this.func(); else {s.trace("allmusic album review / biography: " + album + " / " + alb_artist + ": not found" + " Status error: " + this.xmlhttp.status, true);}}}
-
-        this.Search = (p_sw, URL, p_album, p_alb_artist, p_artist, p_dn_type, p_fo_rev, p_pth_rev, p_fo_bio, p_pth_bio, p_art, p_force) => {
-            sw = p_sw; if (!sw) {dn_type = p_dn_type; fo_rev = p_fo_rev; pth_rev = p_pth_rev; fo_bio = p_fo_bio; pth_bio = p_pth_bio; album = p_album; alb_artist = p_alb_artist; artist = p_artist; art = p_art; force = p_force;}
+        this.Search = (p_sw, URL, p_album, p_alb_artist, p_artist, p_dn_type, p_fo_rev, p_pth_rev, p_fo_bio, p_pth_bio, force) => {
+            sw = p_sw; if (!sw) {dn_type = p_dn_type; fo_rev = p_fo_rev; pth_rev = p_pth_rev; fo_bio = p_fo_bio; pth_bio = p_pth_bio; album = p_album; alb_artist = p_alb_artist; artist = p_artist;}
             this.func = null; this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
             this.func = this.Analyse; this.xmlhttp.open("GET", URL); this.xmlhttp.onreadystatechange = this.ready_callback; if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
 			if (!this.ie_timer) {const a = this.xmlhttp; this.ie_timer = setTimeout(() => {a.abort(); this.ie_timer = null;}, 30000);}
@@ -3419,13 +3057,13 @@ function Server() {
                 switch (sw) {
                     case 0:
                         try {div.innerHTML = this.xmlhttp.responseText;
-                        list = div.getElementsByTagName('h4');  let va = alb_artist.toLowerCase() == p.va || alb_artist.toLowerCase() != artist.toLowerCase(); i = match(alb_artist, album, list, 'rev');
+                        list = div.getElementsByTagName('h4');  let va = alb_artist.toLowerCase() == p.va || alb_artist.toLowerCase() != artist.toLowerCase(); i = match(alb_artist, album, list);
                         if (i != -1) {
                             if (!va) artistLink = list[i].nextSibling.nextSibling.firstChild.getAttribute('href'); doc.close();
                             if (dn_type == "both" || dn_type == "review") {sw = 1; return this.Search(sw, list[i].nextSibling.firstChild.getAttribute('href'));}
                             else if (dn_type == "bio" && !va) {sw = 2; return this.Search(sw, artistLink + "/biography");}
-                        } amBio(force, art); update("Bio " + partial_match + " " + pth_rev); update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review: " + album + " / " + alb_artist + ": not found", true);
-                        } catch (e) {amBio(force, art); update("Bio " + partial_match + " " + pth_rev); update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review: " + album + " / " + alb_artist + ": not found", true); doc.close();}
+                        } update("Bio " + partial_match + " " + pth_rev); update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review / biography: " + album + " / " + alb_artist + ": not found", true);
+                        } catch (e) {update("Bio " + partial_match + " " + pth_rev); update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review / biography: " + album + " / " + alb_artist + ": not found", true);}
                         break;
                     case 1:
                         try {div.innerHTML = this.xmlhttp.responseText;
@@ -3444,19 +3082,27 @@ function Server() {
                         doc.close();
                         review = ">> Album rating: " + rating + " <<  " + review;
                         if (review.length > 22) {s.buildPth(fo_rev); s.save(pth_rev, review, true); res();} else {update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review: " + album + " / " + alb_artist + ": not found", true);}
-                        } catch (e) {update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review: " + album + " / " + alb_artist + ": not found", true); doc.close();}
+                        } catch (e) {update("Rev " + partial_match + " " + pth_rev); s.trace("allmusic album review: " + album + " / " + alb_artist + ": not found", true);}
                         if (dn_type != "both") return;
-                        if (artistLink) {sw = 2; return this.Search(sw, artistLink + "/biography");} amBio(force, art);
+                        if (artistLink) {sw = 2; return this.Search(sw, artistLink + "/biography");} s.trace("allmusic biography: " + artist + ": not found", true);
                         break;
                     case 2:
-						processAmBio(this.xmlhttp.responseText, artist, "", fo_bio, pth_bio, pth_rev, 'rev');
+                        try {div.innerHTML = this.xmlhttp.responseText; list = div.getElementsByTagName('p')[2].parentNode; let active = "", biography = list.innerHTML.format(), biographyGenre = [];
+                        s.htmlParse(div.getElementsByTagName('div'), 'className', 'active-dates', v => active = (v.childNodes[0].innerText + ": " + v.childNodes[1].innerText).trim());
+                        s.htmlParse(div.getElementsByTagName('a'), false, false, v => {str = v.toString(); if (str.includes("www.allmusic.com/genre") || str.includes("www.allmusic.com/style")) {tg = v.innerText.trim(); if (tg) biographyGenre.push(tg);}})
+                        if (active.length) active = "\r\n\r\n" + active;
+                        if (biographyGenre.length) biographyGenre = "\r\n\r\n" + "Genre: " + biographyGenre.join(", ");
+                        let biographyAuthor = list.previousSibling.innerText.trim(); if (biographyAuthor) biographyAuthor = "\r\n\r\n" + biographyAuthor; doc.close();
+                        biography = biography + biographyGenre + active + biographyAuthor;
+                        if (biography.length > 19) {s.buildPth(fo_bio); s.save(pth_bio, biography, true); res();} else {update("Bio " + partial_match + " " + pth_rev); s.trace("allmusic biography: " + artist + ": not found", true);}
+                        } catch (e) {update("Bio " + partial_match + " " + pth_rev); s.trace("allmusic biography: " + artist + ": not found", true);}
                         break;
                 }
         }
     }
 
     function Dl_lastfm_bio(state_callback) {
-        const scrobbles = ["", ""]; let artist, counts = ["", ""], fo_bio, itemName = ["", ""], itemTracks = ["", ""], itemValue = ["", ""], pop = "", pth_bio, retry = false, searchBio = 0, simArtists = [], tags = [], topAlbums = []; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
+        const scrobbles = ["", ""]; let artist, counts = ["", ""], fo_bio, itemName = ["", ""], itemValue = ["", ""], pop = "", pth_bio, retry = false, searchBio = 0, simArtists = [], tags = [], topAlbums = []; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
         const r1 = ["Popular this week", "Beliebt diese Woche", "Popular esta semana", "Populaire cette semaine", "Popolare questa settimana", "今週の人気音楽", "Popularne w tym tygodniu", "Mais ouvida na semana", "Популярно на этой неделе", "Populärt denna vecka", "Bu hafta popüler olanlar", "本周热门"];
         const r2 = ["Popular Now", "Beliebt Jetzt", "Popular Ahora", "Populaire Maintenant", "Popolare Ora", "今人気", "Popularne Teraz", "Popular Agora", "Популярные сейчас", "Populär Nu", "Şimdi Popüler", "热门 现在"];
         this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {clearTimeout(this.ie_timer); this.ie_timer = null; if (this.xmlhttp.status == 200) this.func(); else {s.trace("last.fm biography: " + artist +  ": not found" + " Status error: " + this.xmlhttp.status, true);}}}
@@ -3474,14 +3120,13 @@ function Server() {
             const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText; let con = "", i = 0;
             switch (searchBio) {
                 case 0:
-                    const a = div.getElementsByTagName('a'), p_d = div.getElementsByTagName('p'); let an = "", an_done = 0, j = 0, sa = "";
+                    const a = div.getElementsByTagName('a'); let an = "", an_done = 0, j = 0, sa = "";
                     s.htmlParse(div.getElementsByTagName("li"), 'className', 'tag', v => tags.push(v.innerText.trim().titlecase().replace(/\bAor\b/g, "AOR").replace(/\bDj\b/g, "DJ").replace(/\bFc\b/g, "FC").replace(/\bIdm\b/g, "IDM").replace(/\bNwobhm\b/g, "NWOBHM").replace(/\bR&b\b/g, "R&B").replace(/\bRnb\b/g, "RnB").replace(/\bUsa\b/g, "USA").replace(/\bUs\b/g, "US").replace(/\bUk\b/g, "UK")));
                     s.htmlParse(a, false, false, v => {if (v.href.includes("+similar")) {sa = v.innerText.trim().titlecase(); return true;}})
                     s.htmlParse(a, false, false, v => {if (v.href.includes("+albums")) {an_done++; if (an_done == 2) {an = v.innerText.trim().titlecase(); return true;}}})
                     s.htmlParse(div.getElementsByTagName('h2'), 'className', 'featured-item-heading', v => {itemName[j] = v.innerText.trim(); j++;}); j = 0;
                     s.htmlParse(div.getElementsByTagName('h3'), 'className', 'featured-item-name', v => {itemValue[j] = v.innerText.trim(); j++;}); j = 0;
-					s.htmlParse(p_d, 'className', 'featured-item-stats', v => {itemTracks[j] = v.innerText.trim(); j++;}); j = 0;
-                    s.htmlParse(p_d, 'className', 'grid-items-item-aux-text', v => {if (v.innerText == "") simArtists.push(v.previousSibling.parentNode.innerText.trim()); else topAlbums.push(v.previousSibling.innerText.trim());});
+                    s.htmlParse(div.getElementsByTagName('p'), 'className', 'grid-items-item-aux-text', v => {if (v.innerText == "") simArtists.push(v.previousSibling.parentNode.innerText.trim()); else topAlbums.push(v.previousSibling.innerText.trim());});
                     s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++;}); j = 0;
                     s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr', v => {counts[j] = v.innerText.trim().titlecase(); j++;});
                     if (tags.length) tags = "\r\n\r\n" + "Top Tags: " + tags.join(", "); else tags = "";
@@ -3490,10 +3135,7 @@ function Server() {
                         r1.forEach((v, i) => itemName[0] = itemName[0].replace(RegExp(v, "i"), r2[i]));
                         pop = "\r\n\r\n" + itemName[0] + ": " + itemValue[0];
                     }
-                    if (itemValue[1].length) {
-						pop += "; " + itemName[1].titlecase() + ": " + itemValue[1];
-						if (itemTracks[1].length) pop += " (" + itemTracks[1] + ")";
-					}
+                    if (itemValue[1].length) pop += "; " + itemName[1].titlecase() + ": " + itemValue[1];
                     if (simArtists.length) simArtists = "\r\n\r\n" + sa + ": " + simArtists.join(", "); else simArtists = ""; doc.close();
                     searchBio = 1; return this.Search(artist, fo_bio, pth_bio)
                 case 1:
@@ -3506,7 +3148,7 @@ function Server() {
             if ((!con.length || con.length < 45 && noWiki(con)) && serverFallback && !retry) {retry = true; searchBio = 1; return this.Search(artist, fo_bio, pth_bio);}
             if (con.length < 45 && noWiki(con)) con = "";
             con += tags; con += topAlbums; con += pop; con += simArtists; if (scrobbles[0].length && counts[0].length || scrobbles[1].length && counts[1].length) con += ("\r\n\r\nLast.fm: " + (counts[0].length ? scrobbles[0] + " " + counts[0] + "; " : "") + (counts[1].length ? scrobbles[1] + " " + counts[1] : "")); con = con.trim();
-            if (!con.length) {s.trace("last.fm biography: " + artist +  ": not found", true); return;}
+            if (!con.length) {update(lfm_server + (serverFallback ? " www.last.fm" : "") + " " + pth_bio); s.trace("last.fm biography: " + artist +  ": not found", true); return;}
             s.buildPth(fo_bio); s.save(pth_bio, con, true); res(); p.get_multi(false); window.NotifyOthers("get_multi_bio", "get_multi_bio");
         }
     }
@@ -3526,7 +3168,7 @@ function Server() {
         this.Search = (p_dl_ar, p_img_folder, p_getNo, p_autoAdd, p_allFiles, p_imgExisting, force) => {
             dl_ar = p_dl_ar; img_folder = p_img_folder; getNo = p_getNo; autoAdd = p_autoAdd; allFiles = p_allFiles; imgExisting = p_imgExisting;
             this.func = null; this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            const URL = "https://" + (!retry ? lfm_server : "www.last.fm") + "/music/" + encodeURIComponent(dl_ar) + "/+images";
+            const URL = "https://" + (!retry ? lfm_server : "www.last.fm") +"/music/" + encodeURIComponent(dl_ar) + "/+images";
             this.func = this.Analyse; this.xmlhttp.open("GET", URL); this.xmlhttp.onreadystatechange = this.ready_callback; if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
 			if (!this.ie_timer) {const a = this.xmlhttp; this.ie_timer = setTimeout(() => {a.abort(); this.ie_timer = null;}, 30000);}
 			this.xmlhttp.send();
@@ -3535,10 +3177,8 @@ function Server() {
         this.Analyse = () => {
             const a = dl_ar.clean(), doc = new ActiveXObject("htmlfile"); doc.open();
             const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText;
-            const list = div.getElementsByTagName('img'); let links = []; if (!list) {if (serverFallback && !retry) {retry = true; return this.Search(dl_ar, img_folder);} return s.trace("last.fm artist images: " + dl_ar + ": none found", true);}
+            const list = div.getElementsByTagName('img'), links = []; if (!list) {if (serverFallback && !retry) {retry = true; return this.Search(dl_ar, img_folder);} return s.trace("last.fm artist images: " + dl_ar + ": none found", true);}
             s.htmlParse(list, 'className', 'image-list-image', v => links.push(v.src.replace("avatar170s/", "")));
-			const blacklist = img.blacklist(a.toLowerCase());
-			links = links.filter(v => !blacklist.includes(v.substring(v.lastIndexOf("/") + 1) + ".jpg"));
             if (links.length) {
                 s.buildPth(img_folder); if (s.folder(img_folder)) {
                     if (autoAdd && artLimit) {
@@ -3693,7 +3333,7 @@ function Server() {
                 if (!wiki) {wiki = text[track].wiki; if (wiki) src = text[track].s;}
                 if (!stats) stats = text[track].stats;
             }
-            text[track] = {releases: releases, wiki: wiki || "", stats: stats, s: src, lang: p.lfmLang, update: Date.now()}; s.buildPth(fo); s.save(pth, JSON.stringify(text, null, 3), true); if (ret) return s.trace("last.fm track review: " + track + " / " + artist + ": not found", true); res();
+            text[track] = {releases: releases, wiki: wiki || "", stats: stats, s: src, lang: p.lfmLang, update: Date.now()}; s.buildPth(fo); s.save(pth, JSON_stringify(text, null, 3), true); if (ret) return s.trace("last.fm track review: " + track + " / " + artist + ": not found", true); res();
         }
     }
 }
@@ -3701,12 +3341,10 @@ timer.clear(timer.zSearch); timer.zSearch.id = setTimeout(() => {if (p.server) s
 
 if (!ppt.get("SYSTEM.Software Notice Checked", false)) fb.ShowPopupMessage("THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", "Biography"); ppt.set("SYSTEM.Software Notice Checked", true);
 
-
 // ================================================== // Lyrics Buttons 
 // Update on_mouse_lbtn_down, on_mouse_lbtn_up, on_mouse_leave, on_mouse_move {
 /*
 function on_mouse_lbtn_down(x, y) {
-	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);		
 	var hover_btn = btns_manager.on_mouse("lbtn_down",x, y);
 	if(!hover_btn){
 		// previous code
@@ -3721,13 +3359,9 @@ function on_mouse_lbtn_up(x, y) {
 function on_mouse_leave() {
 	// previous code
 	btns_manager.on_mouse("leave");
-	g_cursor.x = 0;
-    g_cursor.y = 0;	
 }
 
-function on_mouse_move(x, y, m) {
-    if(x == g_cursor.x && y == g_cursor.y) return;
-	g_cursor.onMouse("move", x, y, m);	  	
+function on_mouse_move(x, y) {
 	// previous code
 	btns_manager.on_mouse("move",x, y);
 }
@@ -3766,21 +3400,6 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 		// if (!ppt.autoEnlarge) return true;
 		// previous code
 	}
-*/
-// In this.move function of Buttons object
-/*
-    this.move = (x, y) => {
-        //before check_scrollBtns code
-        check_scrollBtns(x, y, hover_btn); if (hover_btn) hand = hover_btn.hand; if (!tb.down) {
-			if(!hand && this.hand) {
-				window.SetCursor(32512);
-				this.hand = false;
-			} else if(hover_btn){
-				window.SetCursor(32649);
-				this.hand = true;
-			}
-		}
-        //after check_scrollBtns code		
 */
 
 // Add to on_notify_data
@@ -3876,13 +3495,8 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
-			g_cursor.setCursor(IDC_HAND,this.text);
-			this.cursor = IDC_HAND;
-		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
-			g_cursor.setCursor(IDC_ARROW);	
-			this.cursor = IDC_ARROW;
-		}			
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND,this.text);	
+		else g_cursor.setCursor(IDC_ARROW);					
         return old_state;
     }    
     this.draw = function (gr) {

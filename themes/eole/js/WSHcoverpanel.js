@@ -313,9 +313,9 @@ function on_paint(gr) {
 	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, colors.border_dark);
 	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);		
 }
-function on_size() {
-    ww = window.Width;
-    wh = window.Height;
+function on_size(w, h) {
+    ww = w;
+    wh = h;
 	calculate_visu_margin_left();
 	text_height=wh-8;	
 	if(properties.showVisualization || globalProperties.enable_screensaver) startAnimation();

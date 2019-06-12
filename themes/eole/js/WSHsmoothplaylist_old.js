@@ -1,4 +1,4 @@
-var properties_big = {
+﻿var properties_big = {
     ParentName:  window.GetProperty("BIG:ParentName", "MainPanel"),	
     lockOnNowPlaying: window.GetProperty("BIG:lockOnNowPlaying", true),
     lockOnPlaylistNamed: window.GetProperty("BIG:lockOnPlaylistNamed", ""),		
@@ -1455,7 +1455,7 @@ oGroup = function(index, start, handle, groupkey) {
 	this.isPlaying = false;
     this.cover_type = null;
     this.tracktype = TrackType(handle.RawPath.substring(0, 4));
-    this.tracks = [];
+    this.tra = [];
     this.load_requested = 0;
 	this.cover_formated = false;
 	this.mask_applied = false;		
@@ -1492,7 +1492,7 @@ oGroup = function(index, start, handle, groupkey) {
 	}
 
     this.finalize = function(count, tracks) {
-        this.tracks = tracks.slice(0);
+        this.tra = tracks.slice(0);
         this.tooltip = Array();		
         this.count = count;
         if(count < properties.minimumRowsNumberPerGroup) {
@@ -1505,6 +1505,7 @@ oGroup = function(index, start, handle, groupkey) {
         if(this.collapsed) {
             if(brw.focusedTrackId >= this.start && brw.focusedTrackId < this.start + count) { // focused track is in this group!
                 this.collapsed = false;
+                g_group_id_focused = this.index;
             }
         };
     };
@@ -1783,7 +1784,7 @@ oBrowser = function(name) {
 		var handle = null;
 		var current = "";
 		var previous = "";
-        var g = 0, t = 0, r = 0, j = 0;
+        var g = 0, t = 0;
         var arr = [];
         var tr = [];
 		
@@ -1796,8 +1797,7 @@ oBrowser = function(name) {
 		};
 
 		this.groups.splice(0, this.groups.length);
-		this.rows.splice(0, this.rows.length);
-		console.log("init_groups")
+
         var tf = properties.tf_groupkey;
         var str_filter = process_string(filter_text);
         
@@ -1816,14 +1816,6 @@ oBrowser = function(name) {
                     if(g > 0) {
                         // finalize current group
                         this.groups[g-1].finalize(t, tr);
-						p = this.groups[g-1].rowsToAdd;
-						
-						for(n = 0; n < p; n++) {
-							this.rows[r] = new Object();
-							this.rows[r].selected = false;
-							this.rows[r].type = 99; // extra row at bottom of the album/group
-							r++;
-						};							
                         tr.splice(0, t);
                         t = 0;
                     }; 
@@ -1835,138 +1827,42 @@ oBrowser = function(name) {
 						this.groups[g].TotalTime+=handle.Length;
 						this.groups[g].load_requested = 0;
 						this.groups[g].cover_formated = false;	
-						this.groups[g].mask_applied = false;
-						this.groups[g].rowId = r;
-						if(properties.showGroupHeaders) {
-							for(k=0; k < properties.groupHeaderRowsNumber; k++) {
-								this.rows[r] = new Object();
-								this.rows[r].type = k + 1; // 1st line of group header
-								this.rows[r].metadb = this.groups[g].metadb;
-								this.rows[r].albumId = g;
-								this.rows[r].albumTrackId = 0;
-								this.rows[r].playlistTrackId = this.groups[g].start;
-								this.rows[r].groupkey = this.groups[g].groupkey;;
-								this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
-								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
-								r++;
-							};
-							this.groups[g].headerTotalRows = properties.groupHeaderRowsNumber;		
-						} else this.groups[g].headerTotalRows = 0;							
+						this.groups[g].mask_applied = false;						
                         g++;
-						j = 0;
                         previous = current;
                     };
                 } else {
                     // add track to current group
                     tr.push(arr[1].split(" ^^ "));
 					this.groups[g-1].TotalTime+=handle.Length;
-					// add track to rows list
-					if(!(this.groups[g-1].collapsed && properties.showGroupHeaders)) {
-						this.rows[r] = new Object();
-						this.rows[r].type = 0; // track
-						this.rows[r].metadb = this.list[this.groups[g-1].start + j];
-						this.rows[r].albumId = g-1;
-						this.rows[r].albumTrackId = j;
-						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
-						this.rows[r].groupkey = this.groups[g-1].groupkey;
-						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;			
-						this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
-						//this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
-						//if(this.rows[r].selected)
-							//this.groups[g-1].selected = true;
-						this.rows[r].rating = -1;
-						j++;	
-						r++;						
-					}
                     t++;
                 };
             };
 		};
-		
-        this.rowsCount = r;
-		
+        
         // update last group properties
         if(g > 0) this.groups[g-1].finalize(t, tr); 
 		
 		//Open group if there is only one group
 		if(brw.groups.length==1) this.groups[0].collapsed = false;
     };
-    this.setList_nolist = function(finalize_groups) {
-		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;			
-        this.rows_new = [];
-        var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0, r_beggining = 0;
-        var headerTotalRows = properties.groupHeaderRowsNumber;	
-
-        var end = this.groups.length;
-        for(i = 0; i < end; i++) {
-
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
-			
-			r_beggining = r;				
-			if(properties.showGroupHeaders) {
-				for(k=0; k < headerTotalRows; k++) {
-					this.rows_new[r] = new Object();
-					this.rows_new[r].type = k + 1; // 1st line of group header
-					this.rows_new[r].metadb = this.groups[i].metadb;
-					this.rows_new[r].albumId = i;
-					this.rows_new[r].albumTrackId = 0;
-					this.rows_new[r].playlistTrackId = this.groups[i].start;
-					this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + k].playlistTrackId);
-					r++;
-				};
-			};
-			
-            if(!(this.groups[i].collapsed && properties.showGroupHeaders)) {			
-                // tracks
-                m = this.groups[i].count;
-                for(j = 0; j < m; j++) {
-                    this.rows_new[r] = new Object();
-                    this.rows_new[r].type = 0; // track
-					console.log(this.rows.length+" - "+(this.groups[i].rowId + this.groups[i].headerTotalRows + j))					
-                    this.rows_new[r].metadb = this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb;  //this.list[this.groups[i].start + j];
-                    this.rows_new[r].albumId = i;
-                    this.rows_new[r].albumTrackId = j;
-                    this.rows_new[r].playlistTrackId = this.groups[i].start + j;
-                    this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;		
-                    this.rows_new[r].tracktype = TrackType(this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb.RawPath.substring(0, 4));
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].playlistTrackId);
-					if(this.rows_new[r].selected)
-						this.groups[i].selected = true;
-                    this.rows_new[r].rating = -1;
-                    r++;
-                };
-            };
-			
-			this.groups[i].rowId = r_beggining;
-			
-			if(properties.showGroupHeaders) 
-				this.groups[i].headerTotalRows = headerTotalRows;
-			else this.groups[i].headerTotalRows = 0;
-			
-			p = this.groups[i].rowsToAdd;
-			for(n = 0; n < p; n++) {
-				this.rows_new[r] = new Object();
-				this.rows_new[r].selected = false;
-				this.rows_new[r].type = 99; // extra row at bottom of the album/group
-				r++;
-			};				
-        };
-        this.rowsCount = r;
-    };
+	
     this.setList = function(finalize_groups) {
 		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;			
         this.rows.splice(0, this.rows.length);
-        var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0;
+        var r = 0, i = 0, j = 0, m = 0, n = 0, s = 0, p = 0;
+        var grptags = "";
         var headerTotalRows = properties.groupHeaderRowsNumber;	
 
         var end = this.groups.length;
-		console.log("setList")
+			
         for(i = 0; i < end; i++) {
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tra);
+			
+            grptags = this.groups[i].groupkey;
+            
+            s = this.groups[i].start;
 			
 			this.groups[i].rowId = r;				
 			if(properties.showGroupHeaders) {
@@ -1976,9 +1872,9 @@ oBrowser = function(name) {
 					this.rows[r].metadb = this.groups[i].metadb;
 					this.rows[r].albumId = i;
 					this.rows[r].albumTrackId = 0;
-					this.rows[r].playlistTrackId = this.groups[i].start;
-					this.rows[r].groupkey = this.groups[i].groupkey;
-					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
+					this.rows[r].playlistTrackId = s;
+					this.rows[r].groupkey = grptags;
+					this.rows[r].groupkeysplit = this.rows[r].groupkey.split(" ^^ ");
 					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 					r++;
 				};
@@ -1990,12 +1886,12 @@ oBrowser = function(name) {
                 for(j = 0; j < m; j++) {
                     this.rows[r] = new Object();
                     this.rows[r].type = 0; // track
-                    this.rows[r].metadb = this.list[this.groups[i].start + j];
+                    this.rows[r].metadb = this.list[s + j];
                     this.rows[r].albumId = i;
                     this.rows[r].albumTrackId = j;
-                    this.rows[r].playlistTrackId = this.groups[i].start + j;
-                    this.rows[r].groupkey = this.groups[i].groupkey;
-					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;					
+                    this.rows[r].playlistTrackId = s + j;
+                    this.rows[r].groupkey = grptags;
+					this.rows[r].groupkeysplit = this.rows[r].groupkey.split(" ^^ ");					
                     this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
 					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 					if(this.rows[r].selected)
@@ -2036,7 +1932,7 @@ oBrowser = function(name) {
 		if(properties.showHeaderBar) g_filterbox.set_default_text();
         this.list = plman.GetPlaylistItems(g_active_playlist);
         this.init_groups();
-        //this.setList();
+        this.setList();
         g_focus_row = brw.getOffsetFocusItem(g_focus_id);
         if(g_focus_id < 0) { // focused item not set
             if(is_first_populate) {
@@ -2067,7 +1963,7 @@ oBrowser = function(name) {
         this.repaint();
         g_first_populate_done = true;
 		console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
-		//this.list = undefined;
+		this.list = undefined;
 		if(Update_Required_function.indexOf("brw.populate(false")!=-1) Update_Required_function="";
     };
     
@@ -2275,13 +2171,13 @@ oBrowser = function(name) {
                                 arr_groupinfo = this.rows[i].groupkeysplit;
 								album_artist_name = arr_groupinfo[1];
 								album_name = arr_groupinfo[0];
-                                arr_e = this.groups[this.rows[i].albumId].tracks[0];
+                                arr_e = this.groups[this.rows[i].albumId].tra[0];
                             } catch(e) {};
                             if(album_name == "?") {
                                 if(this.groups[g].count > 1) {
                                     var album_name = "(Singles)"
                                 } else {
-                                    var arr_tmp = this.groups[g].tracks[0];
+                                    var arr_tmp = this.groups[g].tra[0];
                                     var album_name = "(Single) " + arr_tmp[1];
                                 };
                             } else {
@@ -2456,7 +2352,7 @@ oBrowser = function(name) {
                             try {
                                 arr_t = this.rows[i].infos;
                                 arr_groupinfo = this.rows[i].groupkeysplit;
-                                arr_e = this.groups[this.rows[i].albumId].tracks[this.rows[i].albumTrackId];
+                                arr_e = this.groups[this.rows[i].albumId].tra[this.rows[i].albumTrackId];
                             } catch(e) {};
                             
                             // =========
@@ -3463,7 +3359,7 @@ oBrowser = function(name) {
 									var line2 = album_info[1];
 								}																			
 							} else if(this.rows[this.activeRow].type==0){
-								track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
+								track_info=this.groups[this.rows[this.activeRow].albumId].tra[this.rows[this.activeRow].albumTrackId];
 								if(items.Count>1) {
 									var line1 = "Dragging";	
 									var line2 = items.Count+" tracks";	
@@ -3498,7 +3394,7 @@ oBrowser = function(name) {
 										var line2 = album_info[1];
 									}																			
 								} else if(this.rows[this.activeRow].type==0){
-									track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
+									track_info=this.groups[this.rows[this.activeRow].albumId].tra[this.rows[this.activeRow].albumTrackId];
 									if(items.Count>1) {
 										var line1 = "Dragging";	
 										var line2 = items.Count+" tracks";	
@@ -3570,7 +3466,7 @@ oBrowser = function(name) {
 								album_info=this.rows[this.activeRow].groupkeysplit;
 								new_tooltip_text=album_info[0]+"\n"+album_info[1];									
 							} else if(this.rows[this.activeRow].type==0){
-								track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
+								track_info=this.groups[this.rows[this.activeRow].albumId].tra[this.rows[this.activeRow].albumTrackId];
 								if(properties.doubleRowText) new_tooltip_text=track_info[1]+"\n"+track_info[0];	
 								else  new_tooltip_text=track_info[1]+" - "+track_info[0];	
 							}
@@ -3720,7 +3616,7 @@ oBrowser = function(name) {
         }			
 		
         if(update_size) {
-			on_size();
+			on_size(window.Width, window.Height);
 			repaint_1 = true;
 		}
 		
@@ -4611,12 +4507,12 @@ function setActivePlaylist(){
 }
 
 // START
-function on_size() {
+function on_size(w, h) {
     window.DlgCode = 0x0004;
     
-    ww = Math.max(window.Width,globalProperties.miniMode_minwidth);
-    wh = Math.max(window.Height,globalProperties.minMode_minheight); 
-    wh_real = window.Height;
+    ww = Math.max(w,globalProperties.miniMode_minwidth);
+    wh = Math.max(h,globalProperties.minMode_minheight); 
+    wh_real = h;
     if(!ww || !wh) {
         ww = 1;
         wh = 1;
