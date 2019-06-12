@@ -2431,9 +2431,9 @@ oHeaderBar = function(name) {
 			gr.GdiDrawText(this.mainTxt, g_font.italicplus2, colors.normal_txt, this.mainTxtX, 1, this.mainTxtSpace, this.h-2, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);    
 		}
 		if(covers_loading_progress<101 && properties.show_covers_progress)
-			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww + 39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX);
+			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww + 39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		else 
-			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX);				
+			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);				
 	}	
 	this.isHover_Settings = function(x,y){
 		if(x>this.MarginLeft-7 && x<this.MarginLeft+23 && y>this.padding_top && y<this.padding_top+23) return true;
@@ -5414,15 +5414,15 @@ function populate_with_library_covers(start_items, str_comp_items){
 			if(globalProperties.load_artist_img_at_startup) cachekey_artist = process_cachekey(covers_FullLibraryList[covers_current_item],properties.tf_crc_artist);
 			if(globalProperties.enableDiskCache) {
 				if(globalProperties.load_covers_at_startup && cachekey_album!='undefined') {
-					current_item_filename_album = check_cacheV2(covers_FullLibraryList[covers_current_item], 0, cachekey_album);
+					current_item_filename_album = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_album);
 					if(current_item_filename_album) {				
-						g_image_cache.cachelist[cachekey_album] = load_image_from_cache_directV2(current_item_filename_album);		
+						g_image_cache.cachelist[cachekey_album] = load_image_from_cache_direct(current_item_filename_album);		
 					}	
 				}	
 				if(globalProperties.load_artist_img_at_startup && cachekey_artist!='undefined') {				
-					current_item_filename_artist = check_cacheV2(covers_FullLibraryList[covers_current_item], 0, cachekey_artist);
+					current_item_filename_artist = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_artist);
 					if(current_item_filename_artist) {				
-						g_image_cache.cachelist[cachekey_artist] = load_image_from_cache_directV2(current_item_filename_artist);		
+						g_image_cache.cachelist[cachekey_artist] = load_image_from_cache_direct(current_item_filename_artist);		
 					}
 				}
 			} else {
@@ -5601,7 +5601,6 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
-	
 	g_resizing.on_mouse("lbtn_down", x, y, m);
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 	
@@ -5666,15 +5665,16 @@ function on_mouse_lbtn_down(x, y, m) {
 
 function on_mouse_lbtn_up_delayed(x, y){
 	var changed_showlist = false;
+	
 	if(!g_drag_up_action && !doubleClick) {
 		// set new showlist from selected index to expand and scroll it!
 		if(properties.expandInPlace && y > brw.headerBarHeight) {
-			if(x < brw.x + brw.w && brw.activeIndex > -1) {
-				if(brw.clicked_id == brw.activeIndex && !brw.dontRetractOnMouseUp) {
+			if(x < brw.x + brw.w && brw.activeIndexFirstClick > -1) {
+				if(brw.clicked_id == brw.activeIndexFirstClick && !brw.dontRetractOnMouseUp) {
 					changed_showlist = true;
-					if(brw.activeIndex != g_showlist.drawn_idx) {                       							
+					if(brw.activeIndexFirstClick != g_showlist.drawn_idx) {                       							
 						// set size of new showList of the selected album
-						var playlist = brw.groups[brw.groups_draw[brw.activeIndex]].pl;
+						var playlist = brw.groups[brw.groups_draw[brw.activeIndexFirstClick]].pl;
 						g_showlist.calcHeight(playlist, brw.activeIndex);
 	
 						// force to no scroll if only one line of items
@@ -5686,13 +5686,13 @@ function on_mouse_lbtn_up_delayed(x, y){
 								
 					if(g_showlist.idx < 0) {
 						if(g_showlist.close_bt) g_showlist.close_bt.state = ButtonStates.normal;
-						g_showlist.reset(brw.groups_draw[brw.activeIndex], brw.activeRow);
-					} else if(g_showlist.idx == brw.groups_draw[brw.activeIndex]){
+						g_showlist.reset(brw.groups_draw[brw.activeIndexFirstClick], brw.activeRow);
+					} else if(g_showlist.idx == brw.groups_draw[brw.activeIndexFirstClick]){
 						g_showlist.close();
 					} else {
 						g_showlist.close_bt.state = ButtonStates.normal;
 						g_showlist.delta_ = 0;
-						g_showlist.reset(brw.groups_draw[brw.activeIndex], brw.activeRow);
+						g_showlist.reset(brw.groups_draw[brw.activeIndexFirstClick], brw.activeRow);
 					}
 					if(g_showlist.y + g_showlist.h > window.Height-brw.rowHeight/2 || g_showlist.y - brw.rowHeight < 0){
 						scroll = brw.activeRow*brw.rowHeight
@@ -5760,23 +5760,21 @@ function on_mouse_lbtn_up(x, y, m) {
 		already_saved=false;
 		clearTimeout(timers.afterDoubleClick);
 		timers.afterDoubleClick = false;
-	},100);
+	},150);
 
 	if(properties.DragToPlaylist) g_plmanager.checkstate("up", x, y);		
-	
-	if(g_showlist.idx == brw.activeIndex && brw.activeIndex > -1) delay_time=150;
-	else delay_time=20;
-	
+
 	// Delay some actions, which shouldn't be triggered if there is a double click instead of a simple click
 	if(g_dragA || g_dragR){
 		on_mouse_lbtn_up_delayed(x, y);
 	} else {
-		/*timers.delayForDoubleClick = setTimeout(function() {
-			clearTimeout(timers.delayForDoubleClick);
-			timers.delayForDoubleClick = false;	
-			on_mouse_lbtn_up_delayed(x, y);
-		},delay_time);*/
-		on_mouse_lbtn_up_delayed(x, y);
+		if(g_showlist.idx == brw.activeIndex && brw.activeIndex > -1){
+			timers.delayForDoubleClick = setTimeout(function() {
+				clearTimeout(timers.delayForDoubleClick);
+				timers.delayForDoubleClick = false;	
+				on_mouse_lbtn_up_delayed(x_previous_lbtn_up, y_previous_lbtn_up);
+			},150);
+		} else on_mouse_lbtn_up_delayed(x, y);
 	}	
 	
 	// check g_showlist button to execute action

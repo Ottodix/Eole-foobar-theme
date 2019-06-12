@@ -96,11 +96,24 @@ function adaptButtons(){
 	if(layout_state.isEqual(0) && !mini_controlbar.isActive()) {
 		buttons.Random.N_img = images.random_img;
 		buttons.Random.H_img = images.random_img;	
-		buttons.Random.D_img = images.random_img;			
+		buttons.Random.D_img = images.random_img;	
+		buttons.Pause.N_img = images.pause_img;
+		buttons.Pause.H_img = images.pause_img;	
+		buttons.Pause.D_img = images.pause_img;		
+	} else if(layout_state.isEqual(0)) {
+		buttons.Random.N_img = images.random_img;
+		buttons.Random.H_img = images.random_img;	
+		buttons.Random.D_img = images.random_img;	
+		buttons.Pause.N_img = images.mini_pause_img;
+		buttons.Pause.H_img = images.mini_pause_img;	
+		buttons.Pause.D_img = images.mini_pause_img;				
 	} else {
 		buttons.Random.N_img = images.random_img_mini;
 		buttons.Random.H_img = images.random_img_mini;	
-		buttons.Random.D_img = images.random_img_mini;			
+		buttons.Random.D_img = images.random_img_mini;		
+		buttons.Pause.N_img = images.mini_mini_pause_img;
+		buttons.Pause.H_img = images.mini_mini_pause_img;	
+		buttons.Pause.D_img = images.mini_mini_pause_img;			
 	}
 	//if(typeof g_rating !== 'undefined') setRatingBtn();	
 }
@@ -451,10 +464,10 @@ oImageCache = function () {
 		if(nowPlaying_cachekey==old_cachekey) return "unchanged";	
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
-			cache_filename = check_cacheV2(metadb, 0, nowPlaying_cachekey);	
+			cache_filename = check_cache(metadb, 0, nowPlaying_cachekey);	
 			// load img from cache	
 			if(cache_filename) {	
-				img = load_image_from_cache_directV2(cache_filename);
+				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
 			} else get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey);
 		} 
@@ -779,7 +792,7 @@ function on_notify_data(name, info) {
 }
 function showNowPlayingCover(){
 	if (globalProperties.enableDiskCache) {	
-		cache_filename = check_cacheV2(fb.GetNowPlaying(), 0, nowPlaying_cachekey);	
+		cache_filename = check_cache(fb.GetNowPlaying(), 0, nowPlaying_cachekey);	
 		// load img from cache				
 		if(cache_filename) {	
 			cover_path = cache_filename;
@@ -1038,7 +1051,8 @@ function get_colors(){
 }
 function get_images(){
 	if(properties.darklayout) var theme_path = "controls_Dark"; else var theme_path = "controls_Light";	
-	
+	images.mini_pause_img = gdi.Image(theme_img_path + "\\controls_Dark\\pause_btn_mini.png");
+	images.mini_mini_pause_img = gdi.Image(theme_img_path + "\\controls_Dark\\pause_btn_mini_mini.png");	
 	images.pause_img = gdi.Image(theme_img_path + "\\controls_Dark\\pause_btn.png");
 	images.random_img = gdi.Image(theme_img_path + "\\controls_Dark\\play_random.png");
 	images.random_img_mini = gdi.Image(theme_img_path + "\\controls_Dark\\play_random_mini.png");	

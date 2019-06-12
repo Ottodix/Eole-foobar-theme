@@ -1831,7 +1831,7 @@ oBrowser = function(name) {
                         // add new group
                         tr.push(arr[1].split(" ^^ "));
                         t++;
-                        this.groups.push(new oGroup(g, i, handle, arr[0]));
+                        this.groups.push(new oGroup(g, i, handle, arr[0]));						
 						this.groups[g].TotalTime+=handle.Length;
 						this.groups[g].load_requested = 0;
 						this.groups[g].cover_formated = false;	
@@ -1851,9 +1851,25 @@ oBrowser = function(name) {
 								r++;
 							};
 							this.groups[g].headerTotalRows = properties.groupHeaderRowsNumber;		
-						} else this.groups[g].headerTotalRows = 0;							
+						} else this.groups[g].headerTotalRows = 0;	
+						if(!(this.groups[g].collapsed && properties.showGroupHeaders)) {
+							this.rows[r] = new Object();
+							this.rows[r].type = 0; // track
+							this.rows[r].metadb = this.list[this.groups[g].start];
+							this.rows[r].albumId = g;
+							this.rows[r].albumTrackId = 0;
+							this.rows[r].playlistTrackId = this.groups[g].start;
+							this.rows[r].groupkey = this.groups[g].groupkey;
+							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;			
+							this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
+							//this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
+							//if(this.rows[r].selected)
+								//this.groups[g-1].selected = true;
+							this.rows[r].rating = -1;	
+							r++;						
+						}							
                         g++;
-						j = 0;
+						j = 1;
                         previous = current;
                     };
                 } else {

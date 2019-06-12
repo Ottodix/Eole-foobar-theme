@@ -1963,7 +1963,7 @@ oBrowser = function(name) {
         this.repaint();
         g_first_populate_done = true;
 		console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
-		this.list = undefined;
+
 		if(Update_Required_function.indexOf("brw.populate(false")!=-1) Update_Required_function="";
     };
     
