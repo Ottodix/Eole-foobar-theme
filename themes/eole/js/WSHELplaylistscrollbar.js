@@ -120,8 +120,8 @@ function on_playlist_switch(){
     }
 }
 function on_size(w, h) {   
-	wh = w;
-	ww = h;
+	ww = w;
+	wh = h;	
     initialize_scrollbar()
 }
 function on_playlist_items_added(){

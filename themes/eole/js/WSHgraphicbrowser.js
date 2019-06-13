@@ -847,6 +847,7 @@ oRow = function(metadb,itemIndex) {
 	this.title_length = 0;
 	this.playcount_length = 0;	
 	this.cursorHand = false;
+	this.isFirstRow = false;
 	this.getTags = function(){
 		
 		if(properties.showPlaycount) {
@@ -940,7 +941,7 @@ oRow = function(metadb,itemIndex) {
 		if(isPlaying && !(properties.AlbumArtProgressbar) && properties.drawProgressBar) var color_selected = g_showlist.showlist_selected_grad2_play;
 		else var color_selected = g_showlist.showlist_selected_grad2;
         if(this.isSelected) {
-				if(!(g_showlist.rows_[this.itemIndex-1] && g_showlist.rows_[this.itemIndex-1].isSelected)) {				
+				if(!(g_showlist.rows_[this.itemIndex-1] && g_showlist.rows_[this.itemIndex-1].isSelected) || this.isFirstRow) {				
 					//top
 					gr.FillGradRect(this.x+20-track_gradient_size, this.y, track_gradient_size, 1, 0, g_showlist.showlist_selected_grad1,  color_selected, 1.0);
 					gr.FillGradRect(this.x+20+this.w+5-(track_gradient_size*2), this.y, track_gradient_size, 1, 0, color_selected, g_showlist.showlist_selected_grad1, 1.0);	
@@ -2071,11 +2072,11 @@ oShowList = function(parentPanelName) {
                 this.columns.push(new oColumn());
                 k++;
                 this.columns[k].rows.push((this.rows_[i]));
+				this.columns[k].rows[this.columns[k].rows.length-1].isFirstRow = true;
                 colHeight = this.textHeight;
             }
         }       
         this.totalCols = this.columns.length;
-		
 		/*if(this.totalCols>this.totalColsVis) {
 			this.h += this.hscr_height-20;
 		}*/
