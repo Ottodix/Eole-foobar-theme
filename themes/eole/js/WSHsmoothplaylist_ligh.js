@@ -1490,6 +1490,13 @@ oGroup = function(index, start, handle, groupkey) {
 		} else time_txt="";	
 		return time_txt;
 	}
+	this.setCollapsed = function(){
+        if(this.collapsed) {
+            if(brw.focusedTrackId >= this.start && brw.focusedTrackId < this.start + this.count) { // focused track is in this group!
+                this.collapsed = false;
+            }
+        };		
+	}
     this.finalize = function(count, tracks) {
         this.tracks = tracks.slice(0);
         this.tooltip = Array();		
@@ -1530,7 +1537,8 @@ oBrowser = function(name) {
 	this.coverMask = false;	
     this.cover_img_mask = null;		
 	this.drawLeftLine = false;
-	
+	this.drawn_rows = [];
+	this.initDrawnRow = false;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -1796,6 +1804,7 @@ oBrowser = function(name) {
 
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
+		this.drawn_rows.splice(0, this.drawn_rows.length);
 		console.log("init_groups")
         var tf = properties.tf_groupkey;
         var str_filter = process_string(filter_text);
@@ -1817,14 +1826,16 @@ oBrowser = function(name) {
                         this.groups[g-1].finalize(t, tr);
 						p = this.groups[g-1].rowsToAdd;
 						
-						if(!properties.autocollapse){
+						//if(!properties.autocollapse){
 							for(n = 0; n < p; n++) {
 								this.rows[r] = new Object();
 								this.rows[r].selected = false;
+								this.rows[r].albumId = g-1;
 								this.rows[r].type = 99; // extra row at bottom of the album/group
+								this.drawn_rows.push(r);
 								r++;
 							};		
-						}						
+						//}						
                         tr.splice(0, t);
                         t = 0;
                     }; 
@@ -1838,7 +1849,7 @@ oBrowser = function(name) {
 						this.groups[g].cover_formated = false;	
 						this.groups[g].mask_applied = false;
 						this.groups[g].rowId = r;
-						if(properties.showGroupHeaders && !properties.autocollapse) {
+						if(properties.showGroupHeaders) {// && !properties.autocollapse) {
 							for(k=0; k < properties.groupHeaderRowsNumber; k++) {
 								this.rows[r] = new Object();
 								this.rows[r].type = k + 1; // 1st line of group header
@@ -1849,11 +1860,12 @@ oBrowser = function(name) {
 								this.rows[r].groupkey = this.groups[g].groupkey;;
 								this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
+								this.drawn_rows.push(r);
 								r++;
 							};
 							this.groups[g].headerTotalRows = properties.groupHeaderRowsNumber;		
 						} else this.groups[g].headerTotalRows = 0;	
-						if(!(properties.autocollapse && properties.showGroupHeaders)) {
+						//if(!(properties.autocollapse && properties.showGroupHeaders)) {
 							this.rows[r] = new Object();
 							this.rows[r].type = 0; // track
 							this.rows[r].metadb = this.list[this.groups[g].start];
@@ -1866,9 +1878,10 @@ oBrowser = function(name) {
 							//this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 							//if(this.rows[r].selected)
 								//this.groups[g-1].selected = true;
-							this.rows[r].rating = -1;	
+							this.rows[r].rating = -1;
+							this.drawn_rows.push(r);							
 							r++;						
-						}							
+						//}							
                         g++;
 						j = 1;
                         previous = current;
@@ -1878,7 +1891,7 @@ oBrowser = function(name) {
                     tr.push(arr[1].split(" ^^ "));
 					this.groups[g-1].TotalTime+=handle.Length;
 					// add track to rows list
-					if(!(properties.autocollapse && properties.showGroupHeaders)) {
+					//if(!(properties.autocollapse && properties.showGroupHeaders)) {
 						this.rows[r] = new Object();
 						this.rows[r].type = 0; // track
 						this.rows[r].metadb = this.list[this.groups[g-1].start + j];
@@ -1892,9 +1905,10 @@ oBrowser = function(name) {
 						//if(this.rows[r].selected)
 							//this.groups[g-1].selected = true;
 						this.rows[r].rating = -1;
+						this.drawn_rows.push(r);
 						j++;	
 						r++;						
-					}
+					//}
                     t++;
                 };
             };
@@ -1908,131 +1922,16 @@ oBrowser = function(name) {
 		//Open group if there is only one group
 		if(brw.groups.length==1) this.groups[0].collapsed = false;
     };
-    this.setList_nolist = function(finalize_groups) {
-		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;			
-        this.rows_new = [];
-        var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0, r_beggining = 0;
-        var headerTotalRows = properties.groupHeaderRowsNumber;	
-
-        var end = this.groups.length;
-        for(i = 0; i < end; i++) {
-
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
-			
-			r_beggining = r;				
-			if(properties.showGroupHeaders) {
-				for(k=0; k < headerTotalRows; k++) {
-					this.rows_new[r] = new Object();
-					this.rows_new[r].type = k + 1; // 1st line of group header
-					this.rows_new[r].metadb = this.groups[i].metadb;
-					this.rows_new[r].albumId = i;
-					this.rows_new[r].albumTrackId = 0;
-					this.rows_new[r].playlistTrackId = this.groups[i].start;
-					this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + k].playlistTrackId);
-					r++;
-				};
-			};
-			
-            if(!(this.groups[i].collapsed && properties.showGroupHeaders)) {			
-                // tracks
-                m = this.groups[i].count;
-                for(j = 0; j < m; j++) {
-                    this.rows_new[r] = new Object();
-                    this.rows_new[r].type = 0; // track
-					console.log(this.rows.length+" - "+(this.groups[i].rowId + this.groups[i].headerTotalRows + j))					
-                    this.rows_new[r].metadb = this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb;  //this.list[this.groups[i].start + j];
-                    this.rows_new[r].albumId = i;
-                    this.rows_new[r].albumTrackId = j;
-                    this.rows_new[r].playlistTrackId = this.groups[i].start + j;
-                    this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;		
-                    this.rows_new[r].tracktype = TrackType(this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb.RawPath.substring(0, 4));
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].playlistTrackId);
-					if(this.rows_new[r].selected)
-						this.groups[i].selected = true;
-                    this.rows_new[r].rating = -1;
-                    r++;
-                };
-            };
-			
-			this.groups[i].rowId = r_beggining;
-			
-			if(properties.showGroupHeaders) 
-				this.groups[i].headerTotalRows = headerTotalRows;
-			else this.groups[i].headerTotalRows = 0;
-			
-			p = this.groups[i].rowsToAdd;
-			for(n = 0; n < p; n++) {
-				this.rows_new[r] = new Object();
-				this.rows_new[r].selected = false;
-				this.rows_new[r].type = 99; // extra row at bottom of the album/group
-				r++;
-			};				
-        };
-        this.rowsCount = r;
-    };
     this.setList = function(finalize_groups) {
 		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;			
-        this.rows.splice(0, this.rows.length);
-        var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0;
-        var headerTotalRows = properties.groupHeaderRowsNumber;	
-
         var end = this.groups.length;
 		console.log("setList")
+		this.initDrawnRow = true;
         for(i = 0; i < end; i++) {
+			if(finalize_groups) this.groups[i].setCollapsed();
+		}
+	}		
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
-			
-			this.groups[i].rowId = r;				
-			if(properties.showGroupHeaders) {
-				for(k=0; k < headerTotalRows; k++) {
-					this.rows[r] = new Object();
-					this.rows[r].type = k + 1; // 1st line of group header
-					this.rows[r].metadb = this.groups[i].metadb;
-					this.rows[r].albumId = i;
-					this.rows[r].albumTrackId = 0;
-					this.rows[r].playlistTrackId = this.groups[i].start;
-					this.rows[r].groupkey = this.groups[i].groupkey;
-					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
-					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
-					r++;
-				};
-			};
-			
-            if(!(this.groups[i].collapsed && properties.showGroupHeaders)) {			
-                // tracks
-                m = this.groups[i].count;
-                for(j = 0; j < m; j++) {
-                    this.rows[r] = new Object();
-                    this.rows[r].type = 0; // track
-                    this.rows[r].metadb = this.list[this.groups[i].start + j];
-                    this.rows[r].albumId = i;
-                    this.rows[r].albumTrackId = j;
-                    this.rows[r].playlistTrackId = this.groups[i].start + j;
-                    this.rows[r].groupkey = this.groups[i].groupkey;
-					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;					
-                    this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
-					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
-					if(this.rows[r].selected)
-						this.groups[i].selected = true;
-                    this.rows[r].rating = -1;
-                    r++;
-                };
-            };
-			p = this.groups[i].rowsToAdd;
-			
-			for(n = 0; n < p; n++) {
-				this.rows[r] = new Object();
-				this.rows[r].selected = false;
-				this.rows[r].type = 99; // extra row at bottom of the album/group
-				r++;
-			};				
-        };
-        this.rowsCount = r;
-    };
-	
     this.populate = function(is_first_populate,call_id, set_active_playlist) {
 		var set_active_playlist = typeof set_active_playlist !== 'undefined' ? set_active_playlist : true;
         if(this.list) this.list = undefined;
@@ -2207,7 +2106,8 @@ oBrowser = function(name) {
         var coverWidth, coverTop;
         var arr_groupinfo = [];
         var arr_t = [];
-        var arr_e = [];
+        var arr_e = [];		
+		this.initDrawnRow && this.drawn_rows.splice(0, this.drawn_rows.length);
 		this.group_unrequested_loading = false;
 		
         if(repaint_main || !repaintforced){
@@ -2279,13 +2179,30 @@ oBrowser = function(name) {
 				
 				//this.getlimits();
 				
+				if(this.initDrawnRow && g_start_>0){
+					for(var i = 0;i < g_start_;i++){
+						switch(this.rows[i].type) {
+							 case ghrh:
+								this.drawn_rows.push(i);
+							 break;
+							 case 0:
+							 case 99:							 
+								if(!this.groups[this.rows[i].albumId].collapsed)
+									this.drawn_rows.push(i);
+							 break;							 
+						}
+					}
+				}					
+				
+				var drawn_row = g_start_;
                 for(var i = g_start_;i <= g_end_;i++){
-                    ay = Math.floor(this.y + (i * ah) - scroll_);
+                    ay = Math.floor(this.y + (drawn_row * ah) - scroll_);
                     this.rows[i].x = ax;
                     this.rows[i].y = ay;
                    
                     switch(this.rows[i].type) {
                     case ghrh: // group header row
+						this.initDrawnRow && this.drawn_rows.push(i);
                         if(ay > 0 - (ghrh * ah) && ay < this.h + (ghrh * ah)) {
 							var t_selected = false;
                             try {
@@ -2467,8 +2384,11 @@ oBrowser = function(name) {
 							}
 							
                         };
+						drawn_row++;
                         break;
                     case 0: // track row
+							if(!this.groups[this.rows[i].albumId].collapsed){
+							this.initDrawnRow && this.drawn_rows.push(i);
 							if(ay > this.y - properties.headerBarHeight - ah && ay < this.y + this.h) {
                             try {
                                 arr_t = this.rows[i].infos;
@@ -3107,13 +3027,43 @@ oBrowser = function(name) {
                                 };
                             };
                         };
+						drawn_row++;
+						} else {
+							if(g_end_ < this.rows.length-1) g_end_++;
+						}
                         break;
                     case 99: // extra bottom row
-						var t_selected = false;
-                        break;
+						if(!this.groups[this.rows[i].albumId].collapsed){
+							var t_selected = false;
+							drawn_row++;
+							this.initDrawnRow && this.drawn_rows.push(i);
+							break;
+						} else {
+							if(g_end_ < this.rows.length-1) g_end_++;
+						}
                     };
 
                 };
+				
+				if(this.initDrawnRow){
+					if(g_end_<this.rows.length - 1){
+						for(var i = g_end_+1; i < this.rows.length; i++){
+							switch(this.rows[i].type) {
+								 case ghrh:
+									this.drawn_rows.push(i);
+								 break;
+								 case 0:
+								 case 99:							 
+									if(!this.groups[this.rows[i].albumId].collapsed)
+										this.drawn_rows.push(i);
+								 break;							 
+							}
+						}
+					}						
+					this.rowsCount = this.drawn_rows.length;
+					this.initDrawnRow = false;
+				}
+
 				//if(properties.darklayout) Draw bottom gradient
 				gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);		
 
