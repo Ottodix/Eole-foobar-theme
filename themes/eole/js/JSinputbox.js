@@ -10,10 +10,21 @@ cInputbox = {
 	clipboard: null
 }
 
-oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bordercolor, backselectioncolor, func, parentObjectName,font_size, font_empty, font_search) {
-	font_size = typeof font_size !== 'undefined' ? font_size : 13;	
-    this.font_search = (font_search)?font_search:gdi.Font(g_fname, font_size, 0);
-    this.font_empty = (font_empty)?font_empty:gdi.Font(g_fname, font_size-1, 0);
+oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bordercolor, backselectioncolor, func, parentObjectName, font_size, font_empty, font_search) {
+	this.font_size = typeof font_size !== 'undefined' ? font_size : 13;
+	if(font_empty){
+		this.font_empty_string = font_empty;
+	} else {
+		this.font_empty = gdi.Font(g_fname, this.font_size-1, 0);	
+	}	
+	if(font_search){
+		this.font_search_string = font_search;			
+	} else if(font_empty){
+		this.font_search_string = font_empty;		
+	} else {
+		this.font_search = gdi.Font(g_fname, this.font_size, 0);		
+	}
+
     this.w = w;
     this.h = h;
     this.textcolor = textcolor;
@@ -41,12 +52,14 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
     this.right_margin = 2;
     this.drag = false;
 	this.paddingVertical = 0;
-	
-    this.setSize = function(w, h, font_size) {
+    this.onFontChanged = function() {
+		this.font_search = eval(this.font_search_string);
+		this.font_empty = eval(this.font_empty_string);
+    };
+	this.onFontChanged();
+    this.setSize = function(w, h) {
 		this.w = w;
 		this.h = h;
-		//this.font_search = gdi.Font(g_fname, font_size, 0);
-		//this.font_empty = gdi.Font(g_fname, font_size-1, 0);
     };
 
     this.draw = function (gr, x, y) {

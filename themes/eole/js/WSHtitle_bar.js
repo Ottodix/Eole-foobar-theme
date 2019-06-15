@@ -1825,10 +1825,8 @@ function draw_main_menu(x,y){
 }
 function on_font_changed() {
 	get_font();
-	g_searchbox.on_size();		
-    for (var i in buttons) {
-        buttons[i].calculate_size = true;
-    }	
+	g_searchbox.onFontChanged();		
+    all_btns.calculateSize(true);
 	adapt_buttons_to_layout();
 	window.Repaint();	
 };
@@ -1931,7 +1929,7 @@ function on_notify_data(name, info) {
 		case "set_font":	
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
-			get_font();
+			on_font_changed();
 			window.Repaint();
 		break;		
 		case "library_dark_theme":
@@ -2128,6 +2126,10 @@ oSearch = function() {
 			this.setSize(ww-cSearchBox.marginRight-cSearchBox.marginLeft, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);			
 		}		
 	}	
+	this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+		this.on_size();
+	}
 	this.toggleVisibility = function(new_state) {
 		if(typeof new_state !== 'undefined') this.hide = !new_state;
 		else this.hide = !this.hide;
@@ -2313,7 +2315,7 @@ oSearch = function() {
 		}		
 	};
 	this.on_init = function() {
-		this.inputbox = new oInputbox(this.w, this.h, "", "Search...", colors.search_txt , 0, 0, colors.selected_bg, g_launchSearch, "g_searchbox");
+		this.inputbox = new oInputbox(this.w, this.h, "", "Search...", colors.search_txt , 0, 0, colors.selected_bg, g_launchSearch, "g_searchbox", undefined, "g_font.min1");
         this.inputbox.autovalidation = true;
 		this.adapt_look_to_layout();
     };

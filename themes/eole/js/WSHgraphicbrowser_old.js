@@ -417,7 +417,7 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1+properties.globalFontAdjustement, g_font.italicplus2);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, g_font.italicplus2);
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();

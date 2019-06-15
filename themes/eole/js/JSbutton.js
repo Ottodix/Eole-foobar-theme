@@ -297,7 +297,12 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 			}
 		}	
 		return this.w;
-	};		
+	};	
+	this.calculateSize = function (value){
+		for (var i in this.buttons) {
+			this.buttons[i].obj.calculate_size = value;
+		}		
+	}		
 	this.draw = function(gr, x, y){
 		if(this.hide) return;
 		var x_shift = 0;

@@ -323,13 +323,15 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.italicplus2");
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
     }
 	this.on_init();
-    
+    this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+	}
 	this.draw = function(gr, x , y) {
         var bx = x;
 		var by = y;
@@ -5735,6 +5737,7 @@ function on_font_changed() {
     get_font();
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
+	g_filterbox.onFontChanged();	
 	brw.get_metrics_called = false;
 	on_size(window.Width, window.Height);
 }

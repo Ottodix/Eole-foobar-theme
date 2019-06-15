@@ -885,11 +885,13 @@ oFilterBox = function() {
 	this.getImages();
     
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.normal");
         this.inputbox.autovalidation = true;
     };
 	this.on_init();
-    
+    this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+	}
 	this.set_default_text = function() {
 		if(properties.lockOnNowPlaying) this.inputbox.empty_text = "Playing tracks...";
 		else this.inputbox.empty_text = "Active playlist...";		
@@ -900,8 +902,8 @@ oFilterBox = function() {
         this.inputbox.backselectioncolor = colors.selected_bg;
     };
 
-    this.setSize = function(w, h, font_size) {
-        this.inputbox.setSize(w, h-properties.headerBarPaddingTop, font_size);
+    this.setSize = function(w, h) {
+        this.inputbox.setSize(w, h-properties.headerBarPaddingTop);
         this.getImages();
     };
 
@@ -925,7 +927,7 @@ oFilterBox = function() {
 			this.search_bt.draw(gr, bx, by-2, 255);			
 			//gr.DrawImage(this.images.search_icon, bx, by+Math.round(this.inputbox.h/2-this.images.search_icon.Height/2), this.images.search_icon.Width, this.images.search_icon.Height, 0, 0, this.images.search_icon.Width, this.images.search_icon.Height, 0, 255);
         };
-		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+8, by, 0, 0);
+		this.inputbox.draw(gr, bx+30, by, 0, 0);
     };
         
     this.on_mouse = function(event, x, y, delta) {
@@ -4967,17 +4969,8 @@ function on_mouse_wheel(step, stepstrait, delta){
 			};
             if(previous != globalProperties.fontAdjustement) {
                 timers.mouseWheel = setTimeout(function() {
-					window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);	
+					on_notify_data('set_font',globalProperties.fontAdjustement);
 					window.NotifyOthers('set_font',globalProperties.fontAdjustement);
-                    get_font();
-					g_var_cache.resetAll();
-                    get_metrics();
-                    get_images();
-                    
-                    // refresh covers
-                    brw.refreshThumbnails();
-                    
-                    brw.repaint();
                     timers.mouseWheel && clearTimeout(timers.mouseWheel);
                     timers.mouseWheel = false;
                 }, 100);
@@ -5049,7 +5042,7 @@ function get_metrics(finalize_groups) {
 	cover.max_h = properties.groupHeaderRowsNumber * properties.rowHeight;
     
     cFilterBox.w = Math.floor(cFilterBox.default_w * g_zoom_percent / 100);
-    cFilterBox.h = Math.round(cFilterBox.default_h * g_zoom_percent / 100);
+    cFilterBox.h = Math.round(cFilterBox.default_h * 100 / 100);
     
 	if(properties.doubleRowText)
 		properties.addedRows_end = Math.round(properties.addedRows_end_default/2)-((properties.showGroupHeaders)?properties.extraRowsNumber:0);
@@ -5201,8 +5194,9 @@ function get_colors() {
 function on_font_changed() {
 	g_var_cache.resetAll();
     get_font();
-	brw.ratingImages = false;	
-	g_filterbox.setSize(this.w, cFilterBox.h+2, g_fsize);
+	brw.ratingImages = false;
+	g_filterbox.onFontChanged();	
+	g_filterbox.setSize(this.w, cFilterBox.h+2);
     get_metrics();
     brw.repaint();
 };
@@ -5773,20 +5767,12 @@ function on_key_down(vkey) {
                         if(!timers.mouseWheel) {
                             globalProperties.fontAdjustement = 0;
                             if(previous != globalProperties.fontAdjustement) {
-                                timers.mouseWheel = setTimeout(function() {
-									window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);		
-                                    get_font();
-									g_var_cache.resetAll();
-                                    get_metrics();
-                                    get_images();
-                                    
-                                    // refresh covers
-                                    brw.refreshThumbnails();
-                                    
-                                    brw.repaint();
-                                    timers.mouseWheel && clearTimeout(timers.mouseWheel);
-                                    timers.mouseWheel = false;
-                                }, 100);
+								timers.mouseWheel = setTimeout(function() {
+									on_notify_data('set_font',globalProperties.fontAdjustement);
+									window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+									timers.mouseWheel && clearTimeout(timers.mouseWheel);
+									timers.mouseWheel = false;
+								}, 100);
                             };
                         };
                     };

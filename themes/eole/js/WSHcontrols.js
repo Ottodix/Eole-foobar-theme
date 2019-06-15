@@ -442,6 +442,9 @@ function adapt_display_to_layout(){
 		}			
 	}	
 } 
+function on_font_changed() {
+	g_panel.on_font_changed()
+}
 function build_buttons(){
 	if(mini_controlbar.isActive() && !properties.showTrackInfo) {
 		button_right_m=55;	
@@ -1274,7 +1277,11 @@ function oPanel(){
 	this.title_txt = '';
 	this.artist_txt = '';
 	this.time_txt = '';
-	this.on_size_changed = function(){
+	this.on_font_changed = function(){
+		this.title_length = -1;
+		this.artist_length = -1;
+		this.time_length = -1;
+		this.fullTitle_length = -1;			
 	}
 	this.set_title_text = function(title_txt){
 		this.title_txt = title_txt;
@@ -1474,7 +1481,7 @@ function on_notify_data(name, info) {
 		case "set_font":
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
-			get_font();adapt_display_to_layout();
+			get_font();on_font_changed();adapt_display_to_layout();
 			window.Repaint();
 		break; 			
 		case "cover_cache_finalized": 

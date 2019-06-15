@@ -416,13 +416,15 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1+globalProperties.fontAdjustement, g_font.italicplus2);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.italicplus2");
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
     }
 	this.on_init();
-    
+    this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+	}
 	this.draw = function(gr, x , y) {
 		this.x = x;
 		this.y = y;		
@@ -1273,7 +1275,6 @@ oShowList = function(parentPanelName) {
     this.columns = [];
     this.rows_ = [];
     this.textBot = 4;	
-    this.textHeight = Math.ceil(g_fsize * 1.8)+this.textBot;	
     this.columnWidthMin = 230;
     this.columnWidth = 0;
     this.columnsOffset = 0;
@@ -1317,6 +1318,10 @@ oShowList = function(parentPanelName) {
 			quickSearch(g_showlist.pl[0],"genre");
 		},false,false,false,ButtonStates.normal,255),		
 	}
+	this.onFontChanged = function(){
+		this.textHeight = Math.ceil(g_fsize * 1.8)+this.textBot;
+	}
+	this.onFontChanged();
 	this.setCover = function(){
 		if(!isImage(brw.groups[this.idx].cover_img_full)) {
 			brw.GetAlbumCover(this.idx);
@@ -3825,6 +3830,10 @@ oBrowser = function(name) {
 		on_size(window.Width, window.Height);
 		//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);			
 	}
+	this.on_font_changed = function() {
+		this.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);
+		this.refreshDates();
+	}	
     this.setSize = function(x, y, w, h) {	
         this.x = x;
         this.y = y;
@@ -4072,6 +4081,7 @@ oBrowser = function(name) {
 	this.refreshDates = function() {
 		for(var i = 0;i < this.groups.length;i++){		
 			delete this.groups[i].dateWidth;
+			delete this.groups[i].dateHeight;
 			if(properties.extractYearFromDate) this.groups[i].year = this.groups[i].date.extract_year();
 		}		
 	}
@@ -4524,11 +4534,12 @@ oBrowser = function(name) {
 								try{
 									if(typeof this.groups[this.groups_draw[i]].dateWidth == 'undefined') {
 										this.groups[this.groups_draw[i]].dateWidth=gr.CalcTextWidth(overlayTxt, this.fontDate)+10;
+										this.groups[this.groups_draw[i]].dateHeight=gr.CalcTextHeight(overlayTxt, this.fontDate)+2;
 										if(this.groups[this.groups_draw[i]].dateWidth>this.coverRealWith) this.groups[this.groups_draw[i]].dateWidth=this.coverRealWith;
 									}
 								} catch(e){}								
-								gr.FillSolidRect(ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, 15, colors.cover_date_bg);
-								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, 15, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.FillSolidRect(ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, colors.cover_date_bg);
+								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							}
 						}		
 
@@ -6479,11 +6490,12 @@ function get_colors() {
 
 function on_font_changed() {
     get_font();
-	brw.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);	
+	brw.on_font_changed();	
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
+	g_showlist.onFontChanged();
 	brw.get_metrics_called = false;
-	g_filterbox.on_init();
+	g_filterbox.onFontChanged();
 	on_size(window.Width, window.Height);
 }
 

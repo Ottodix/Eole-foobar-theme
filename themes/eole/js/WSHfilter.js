@@ -810,11 +810,13 @@ oFilterBox = function() {
 	//this.getImages();
     
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
     };
 	this.on_init();
-    
+    this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+	}
     this.reset_layout = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
@@ -4378,12 +4380,8 @@ function on_mouse_wheel(step, stepstrait, delta){
                 };
                 if(previous != globalProperties.fontAdjustement) {
                     timers.mouseWheel = setTimeout(function() {
-                        window.SetProperty("_SYSTEM: Extra font size value", globalProperties.fontAdjustement);
+                        on_notify_data('set_font',globalProperties.fontAdjustement);
 						window.NotifyOthers('set_font',globalProperties.fontAdjustement);
-                        get_font();
-                        get_metrics();
-                        get_images();
-                        brw.repaint();
                         timers.mouseWheel && clearTimeout(timers.mouseWheel);
                         timers.mouseWheel = false;
                     }, 100);
@@ -4611,7 +4609,10 @@ function get_colors() {
 
 function on_font_changed() {
     get_font();
-	if(properties.showHeaderBar) g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
+	if(properties.showHeaderBar) {
+		g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
+		g_filterbox.onFontChanged();	
+	}
     get_metrics();
     brw.repaint();
 };
@@ -4838,15 +4839,12 @@ function on_key_down(vkey) {
                         if(!timers.mouseWheel) {
                             globalProperties.fontAdjustement = 0;
                             if(previous != globalProperties.fontAdjustement) {
-                                timers.mouseWheel = setTimeout(function() {
-                                    window.SetProperty("_SYSTEM: Extra font size value", globalProperties.fontAdjustement);
-                                    get_font();
-                                    get_metrics();
-                                    get_images();
-                                    brw.repaint();
-                                    timers.mouseWheel && clearTimeout(timers.mouseWheel);
-                                    timers.mouseWheel = false;
-                                }, 100);
+								timers.mouseWheel = setTimeout(function() {
+									on_notify_data('set_font',globalProperties.fontAdjustement);
+									window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+									timers.mouseWheel && clearTimeout(timers.mouseWheel);
+									timers.mouseWheel = false;
+								}, 100);
                             };
                         };
                     };

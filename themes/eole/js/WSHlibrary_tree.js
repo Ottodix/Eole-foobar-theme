@@ -4547,10 +4547,8 @@ function on_mouse_wheel(step, stepstrait, delta) {
 			};
 			if(previous != properties.globalFontAdjustement) {
 				timers.mouseWheel = setTimeout(function() {
-					window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
-					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
-					on_font_changed();
-					window.Repaint();	
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 					timers.mouseWheel && clearTimeout(timers.mouseWheel);
 					timers.mouseWheel = false;
 				}, 100);

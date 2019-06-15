@@ -277,11 +277,13 @@ oFilterBox = function() {
 	this.getImages();
     
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Playlists...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Playlists...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
     };
 	this.on_init();
-    
+    this.onFontChanged = function() {
+		this.inputbox.onFontChanged();
+	}
     this.reset_colors = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
@@ -1683,31 +1685,7 @@ oBrowser = function(name) {
 				plman.ActivePlaylist = pl_idx;
 				brw.selectedRow = total;
 			}	
-			window.SetCursor(IDC_ARROW);			
-            /*plman.CreatePlaylist(total, "");
-            plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;
-            // set rename it
-            var rh = properties.rowHeight - 10;
-            var tw = this.w - rh - 20;
-            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
-            this.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
-            this.inputboxID = id;
-            // activate inputbox for edit
-            this.inputbox.on_focus(true);
-            this.inputbox.edit = true;
-            this.inputbox.Cpos = this.inputbox.text.length;
-            this.inputbox.anchor = this.inputbox.Cpos;
-            this.inputbox.SelBegin = this.inputbox.Cpos;
-            this.inputbox.SelEnd = this.inputbox.Cpos;
-            if(!cInputbox.timer_cursor) {
-                this.inputbox.resetCursorTimer();
-            };
-            this.inputbox.dblclk = true;
-            this.inputbox.SelBegin = 0;
-            this.inputbox.SelEnd = this.inputbox.text.length;
-            this.inputbox.text_selected = this.inputbox.text;
-            this.inputbox.select = true;*/			
+			window.SetCursor(IDC_ARROW);				
             this.repaint();
             break;
         case (idx==101):
@@ -1723,31 +1701,6 @@ oBrowser = function(name) {
 				plman.ActivePlaylist = pl_idx;
 			}						
 			window.SetCursor(IDC_ARROW);
-            /*plman.CreateAutoPlaylist(total, new_label, "enter your query here", "", 0);
-            plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;
-            plman.ShowAutoPlaylistUI(pl_idx);
-            // set rename it
-            var rh = properties.rowHeight - 10;
-            var tw = this.w - rh - 20;
-            this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg & 0xd0ffffff, "renamePlaylist()", "brw");
-            this.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
-            this.inputboxID = id;
-            // activate inputbox for edit
-            this.inputbox.on_focus(true);
-            this.inputbox.edit = true;
-            this.inputbox.Cpos = this.inputbox.text.length;
-            this.inputbox.anchor = this.inputbox.Cpos;
-            this.inputbox.SelBegin = this.inputbox.Cpos;
-            this.inputbox.SelEnd = this.inputbox.Cpos;
-            if(!cInputbox.timer_cursor) {
-                this.inputbox.resetCursorTimer();
-            };
-            this.inputbox.dblclk = true;
-            this.inputbox.SelBegin = 0;
-            this.inputbox.SelEnd = this.inputbox.text.length;
-            this.inputbox.text_selected = this.inputbox.text;
-            this.inputbox.select = true; */
             this.repaint();
             break;
         case (idx==2):
@@ -2511,6 +2464,7 @@ function get_colors() {
 function on_font_changed() {
     get_font();
 	g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+2);
+	g_filterbox.onFontChanged();	
     get_metrics();
     brw.repaint();
 };
@@ -2590,7 +2544,7 @@ function on_key_down(vkey) {
                     if(rowId > -1) {
                         var rh = properties.rowHeight - 10;
                         var tw = brw.w - rh - 10;
-                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw");
+                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw", undefined, "g_font.plus1");
                         brw.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
                         brw.inputboxID = rowId;
                         // activate inputbox for edit
@@ -2788,15 +2742,12 @@ function on_key_down(vkey) {
                             if(!timers.mouseWheel) {
                                 globalProperties.fontAdjustement = 0;
                                 if(previous != globalProperties.fontAdjustement) {
-                                    timers.mouseWheel = setTimeout(function() {
-                                        window.SetProperty("DISPLAY: Extra font size value", globalProperties.fontAdjustement);
-                                        get_font();
-                                        get_metrics();
-                                        get_images();
-                                        brw.repaint();
-                                        timers.mouseWheel && clearTimeout(timers.mouseWheel);
-                                        timers.mouseWheel = false;
-                                    }, 100);
+									timers.mouseWheel = setTimeout(function() {
+										on_notify_data('set_font',globalProperties.fontAdjustement);
+										window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+										timers.mouseWheel && clearTimeout(timers.mouseWheel);
+										timers.mouseWheel = false;
+									}, 100);
                                 };
                             };
                         };
