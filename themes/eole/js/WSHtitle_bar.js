@@ -357,26 +357,46 @@ function Lightswitch(switch_all,new_state){
 	}
 	if(switch_all) window.Repaint();
 }
-function toggleNowPlayingState(){
-	switch(main_panel_state.value){
-		case 0:
+function toggleNowPlayingState(switch_all,new_state){
+	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
+	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	if(switch_all){
+		if(new_state===false) {
 			nowplayinglib_state.toggleValue();
-		break;
-		case 1:
 			nowplayingplaylist_state.toggleValue();
-		break;
-		case 2:
 			nowplayingbio_state.toggleValue();
-		break;
-		case 3:
 			nowplayingvisu_state.toggleValue();
-		break;		
+		} else {
+			nowplayinglib_state.setValue(new_state);
+			nowplayingplaylist_state.setValue(new_state);
+			nowplayingbio_state.setValue(new_state);
+			nowplayingvisu_state.setValue(new_state);
+		}
+	} else {
+		switch(main_panel_state.value){
+			case 0:
+				if(new_state!==false) nowplayinglib_state.setValue(new_state);
+				else nowplayinglib_state.toggleValue();
+			break;
+			case 1:
+				if(new_state!==false) nowplayingplaylist_state.setValue(new_state);
+				else nowplayingplaylist_state.toggleValue();
+			break;
+			case 2:
+				if(new_state!==false) nowplayingbio_state.setValue(new_state);			
+				else nowplayingbio_state.toggleValue();
+			break;
+			case 3:
+				if(new_state!==false) nowplayingvisu_state.setValue(new_state);			
+				else nowplayingvisu_state.toggleValue();
+			break;		
+		}
 	}
 	build_buttons();
 	window.Repaint();	
 }
 function saveFilterState(){
-	properties.savedFilterState = filters_panel_state;		
+	properties.savedFilterState = filters_panel_state.value;		
 	window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
 	window.NotifyOthers("save_filter_state",properties.savedFilterState);
 }
@@ -664,6 +684,7 @@ function adapt_buttons_to_layout(){
 			//properties.showPanelBtnText = true;			
 			topleft_btns.setBtnsHeight(btn.height-3);
 			topleft_btns.setPadding([0,7,0,2]);			
+			main_panel_btns.x = 17;
 			main_panel_btns.setBtnsHeight(btn.height);
 			additional_btns.setBtnsHeight(btn.height);
 			window_btns.setBtnsHeight(29);
@@ -1286,7 +1307,7 @@ function draw_main_menu(x,y){
 		playlistpanel_menu.AppendMenuItem(MF_STRING, 4037, "Decrease width");	
 		playlistpanel_menu.AppendMenuItem(MF_STRING, 4038, "Custom width...");				
 		var FiltersMenu = window.CreatePopupMenu();
-		if(filters_panel_state>0)
+		if(filters_panel_state.value>0)
 			FiltersMenu.AppendMenuItem(MF_STRING, 4990, "Hide");	
 		else
 			FiltersMenu.AppendMenuItem(MF_STRING, 4988, "Show");
@@ -1343,6 +1364,9 @@ function draw_main_menu(x,y){
 	font_size.AppendMenuItem(MF_STRING, 4013, "Decrease");	
 	font_size.AppendMenuItem(MF_STRING, 4014, "Reset");	
 	nowplayinglobal = window.CreatePopupMenu();
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4072, "Hide");
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4073, "Show");	
+	nowplayinglobal.AppendMenuSeparator();
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4030, "Increase width");	
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4031, "Decrease width");	
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Custom width...");		
@@ -1570,7 +1594,13 @@ function draw_main_menu(x,y){
    case (idx == 40071):  
         window.NotifyOthers("wallpaperBlurGlobal",true);
 		on_notify_data("wallpaperBlur",true);		
-        break;		
+        break;	
+   case (idx == 4072):  
+        toggleNowPlayingState(true,0);		
+        break;	
+   case (idx == 4073):  
+        toggleNowPlayingState(true,1);
+        break;			
    case (idx == 40081):  
         window.NotifyOthers("wallpaperBlurGlobal",false);
 		on_notify_data("wallpaperBlur",false);		

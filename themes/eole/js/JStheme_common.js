@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 var globalProperties = {
-	theme_version: '1.1.7a',
+	theme_version: '1.2.0a',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -2497,7 +2497,8 @@ function save_image_to_cache(image, albumIndex, cachekey){
 		} catch(e){}			
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
-		brw.groups[albumIndex].cover_img_full = image;
+		if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = image;
+		else brw.groups[albumIndex].cover_img = image;
 		g_image_cache.cachelist[cachekey] = image;
 		brw.groups[albumIndex].load_requested = 2;	
 		brw.repaint();

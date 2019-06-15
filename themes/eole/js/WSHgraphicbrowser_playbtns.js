@@ -994,7 +994,10 @@ oRow = function(metadb,itemIndex) {
 		if(this.tracknumber=="NaN") this.tracknumber="?";
 
 		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
-		if(!isPlaying)  gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if(!isPlaying) {
+			if(!this.ishover) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			else g_showlist.rows_play_bt.draw(gr, this.x+this.tracknumber_w-g_showlist.rows_play_bt.img[0].Width+Math.round((g_showlist.rows_play_bt.img[0].Width-this.tracknumber_w+18)/2), this.y+1, 255);
+		}
 				
         gr.GdiDrawText(this.title_text, g_font.normal, g_showlist.colorSchemeText, (this.x + this.tracknumber_w + 10), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10), this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title_text, g_font.normal);
@@ -1048,6 +1051,7 @@ oRow = function(metadb,itemIndex) {
 		};
     }
     this.check = function(event, x, y) {
+		var isHover_old = this.ishover;
         this.ishover = (x > this.x+10 && x < this.x + 10 + this.w - 5 && y >= this.y && y < this.y + this.h - 1);
 		
         this.ishover_rating = properties.showRating && this.ishover && (x > this.rating_x-this.rating_length/5 && x < this.rating_x + this.rating_length) && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0));
@@ -1235,6 +1239,7 @@ oRow = function(metadb,itemIndex) {
 				}					
                 break;
         }
+		if(this.ishover!=isHover_old) brw.repaint();
 		return this.ishover;
     }
 
@@ -1381,6 +1386,7 @@ oShowList = function(parentPanelName) {
 	this.setImages = function () {
 		this.setShowListArrow();
 		this.setCloseButton(false);
+		this.setRowsButtons(false);		
 		this.setColumnsButtons(false);
 		this.cover_shadow = null;
 		this.reset();
@@ -1477,7 +1483,53 @@ oShowList = function(parentPanelName) {
 			else if(save_btns) this.close_btDark = this.close_bt;			
 		}	
     }
-    
+    this.setRowsButtons = function (save_btns) {
+		if(typeof(save_btns) == "undefined") var save_btns = true;
+		
+		if(this.light_bg) this.rows_play_bt = this.rows_playbtLight;
+		else this.rows_play_bt = this.rows_playbtDark;
+		
+		if(!this.rows_play_bt) {
+			var gb;					
+			var xpts_mright_next = 1;
+			var xpts_mtop = 1;
+			// *** Close button ***
+			this.rows_playbtLight_off = gdi.CreateImage(18, 18);
+			gb = this.rows_playbtLight_off.GetGraphics();
+				gb.SetSmoothingMode(2);
+				gb.FillEllipse(1,1,16,16, this.showlist_close_bg);
+				var xpts = Array(xpts_mright_next,xpts_mtop, 4+xpts_mright_next,4+xpts_mtop, xpts_mright_next,7+xpts_mtop, 4+xpts_mright_next,4+xpts_mtop);
+				gb.FillPolygon(GetGrey(0), 0, xpts);
+				//gb.DrawLine(5,6, 11, 12, 1.0,  this.showlist_close_iconhv);
+				//gb.DrawLine(5,12, 11, 6, 1.0,  this.showlist_close_iconhv);		
+			this.rows_playbtLight_off.ReleaseGraphics(gb);
+
+			this.rows_playbtLight_ov = gdi.CreateImage(18, 18);
+			gb = this.rows_playbtLight_ov.GetGraphics();
+				if(this.big_CloseButton) gb.FillSolidRect(0, 0, 17, 17, this.showlist_close_bg);
+				else gb.FillSolidRect(1, 2, 15, 15, this.showlist_close_bg);
+				gb.SetSmoothingMode(2);
+				if(this.big_CloseButton){			
+					gb.DrawLine(4,4, 12, 12, 1.0, this.showlist_close_iconhv);
+					gb.DrawLine(4,12, 12, 4, 1.0, this.showlist_close_iconhv);
+				} else {
+					gb.DrawLine(5,6, 11, 12, 1.0,  this.showlist_close_iconhv);
+					gb.DrawLine(5,12, 11, 6, 1.0,  this.showlist_close_iconhv);		
+				}				
+			this.rows_playbtLight_ov.ReleaseGraphics(gb);
+					
+			if(typeof(this.rows_play_bt) == "undefined") {
+				this.rows_play_bt = new button(this.rows_playbtLight_off, this.rows_playbtLight_ov, this.rows_playbtLight_ov,"showlist_close");
+			} else {
+				this.rows_play_bt.img[0] = this.rows_playbtLight_off;
+				this.rows_play_bt.img[1] = this.rows_playbtLight_ov;
+				this.rows_play_bt.img[2] = this.rows_playbtLight_ov;
+			}
+			
+			if(this.light_bg && save_btns) this.rows_playbtLight = this.rows_play_bt;
+			else if(save_btns) this.rows_playbtDark = this.rows_play_bt;			
+		}	
+    }	    
     this.setColumnsButtons = function (save_btns) {	
 		if(typeof(save_btns) == "undefined") var save_btns = true;
 		
@@ -1753,7 +1805,8 @@ oShowList = function(parentPanelName) {
 		}
         this.setShowListArrow();
         this.setColumnsButtons();
-        this.setCloseButton();			
+        this.setCloseButton();
+		this.setRowsButtons();		
 	}
     this.close = function() {	
 		this.drawn_idx = -1;

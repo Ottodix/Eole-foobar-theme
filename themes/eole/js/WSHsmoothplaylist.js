@@ -137,7 +137,6 @@ setAllProperties();
 
 function setOneProperty(properties_name,value,update_both) {
 	var update_both = typeof update_both !== 'undefined' ? update_both : false;	
-	console.log("setOneProperty properties_name"+properties_name+" "+update_both)	
 	if(update_both || layout_state.isEqual(1)){
         properties[properties_name] = value;
         properties_mini[properties_name] = value;
@@ -1796,7 +1795,6 @@ oBrowser = function(name) {
 
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
-		console.log("init_groups")
         var tf = properties.tf_groupkey;
         var str_filter = process_string(filter_text);
         
@@ -1940,8 +1938,7 @@ oBrowser = function(name) {
                 m = this.groups[i].count;
                 for(j = 0; j < m; j++) {
                     this.rows_new[r] = new Object();
-                    this.rows_new[r].type = 0; // track
-					console.log(this.rows.length+" - "+(this.groups[i].rowId + this.groups[i].headerTotalRows + j))					
+                    this.rows_new[r].type = 0; // track			
                     this.rows_new[r].metadb = this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb;  //this.list[this.groups[i].start + j];
                     this.rows_new[r].albumId = i;
                     this.rows_new[r].albumTrackId = j;
@@ -1980,7 +1977,7 @@ oBrowser = function(name) {
         var headerTotalRows = properties.groupHeaderRowsNumber;	
 
         var end = this.groups.length;
-		console.log("setList")
+
         for(i = 0; i < end; i++) {
 
 			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
@@ -2039,9 +2036,9 @@ oBrowser = function(name) {
 		if(set_active_playlist && !g_avoid_playlist_displayed_switch) setActivePlaylist();
 		else g_avoid_playlist_displayed_switch = false;
 		
-		gTime_covers = fb.CreateProfiler();			
-		gTime_covers.Reset();
-		console.log("populate Smoothplaylist started time:"+gTime_covers.Time);	
+		//gTime_covers = fb.CreateProfiler();			
+		//gTime_covers.Reset();
+		//console.log("populate Smoothplaylist started time:"+gTime_covers.Time);	
 		
 		if(properties.lockOnNowPlaying) {
 			this.FirstInitialisationDone = true;
@@ -2083,7 +2080,7 @@ oBrowser = function(name) {
         //this.scrollbar.updateScrollbar();
         this.repaint();
         g_first_populate_done = true;
-		console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
+		//console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
 		//this.list = undefined;
 		if(Update_Required_function.indexOf("brw.populate(false")!=-1) Update_Required_function="";
     };
