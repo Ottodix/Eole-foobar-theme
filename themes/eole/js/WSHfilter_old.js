@@ -88,7 +88,6 @@ var properties = {
     tf_time_remaining: fb.TitleFormat("$if(%length%,-%playback_time_remaining%,'0:00')"),
     showPanelToggleButtons: window.GetProperty("_PROPERTY: showPanelToggleButtons", false),	
     showTagSwitcherBar: window.GetProperty("_PROPERTY: show buttons on top to change the source tag", false),
-	showFiltersTogglerBtn: window.GetProperty("_PROPERTY: show filters toggler btn", false),
     showHeaderBar: window.GetProperty("_DISPLAY: Show Top Bar", true),	
     showHeaderBar1: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 1", true),
     showHeaderBar2: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 2", true),	
@@ -985,39 +984,15 @@ oTagSwitcherBar = function() {
 		
 	this.hoverItem = -1;	
 	this.txt_top_margin = 0;
-	this.margin_right = 2;
-	this.margin_left = 6;	
+	this.margin_right = 0;
 	this.images = {};
-	this.hide_bt = false;
-    this.setHideButton = function(){
-		this.hscr_btn_w = 18
-		var xpts_mtop = Math.ceil((this.h-9)/2);	
-		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);			
-		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
-		gb = this.hide_bt_off.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
-			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
-			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
-			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts3);
-			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts4);			
-		this.hide_bt_off.ReleaseGraphics(gb);
-		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
-		gb = this.hide_bt_ov.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
-			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
-			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
-			gb.FillPolygon(colors.normal_txt, 0, xpts3);
-			gb.FillPolygon(colors.normal_txt, 0, xpts4);			
-		this.hide_bt_ov.ReleaseGraphics(gb);		
-		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
-	}	
     this.getImages = function() {
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
 		else icon_theme_subfolder = "";					
 		this.images.library_tree = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\icon_tree.png");
-		if(this.hide_bt) this.setHideButton();
 	};
 	this.getImages();
+    
 	this.on_init = function() {
 		this.activeItem = properties.tagMode+((properties.showLibraryTreeSwitch)?0:1);
     };
@@ -1027,13 +1002,13 @@ oTagSwitcherBar = function() {
         this.w = w;
 		this.h = h;
 		this.font_size = font_size;
-		if(!this.hide_bt) this.setHideButton();
     };
+    
 	this.draw = function(gr, x, y) {
 		this.x = x;
 		this.y = y;
 		var prev_text_width=0;
-		
+
 		// draw background part above playlist (headerbar)
 		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
 		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
@@ -1044,8 +1019,8 @@ oTagSwitcherBar = function() {
 			this.items_width[i] = gr.CalcTextWidth(this.items_txt[i],g_font.min1);
 			total_txt_size += this.items_width[i];
 		}
-		var txt_padding_sides = Math.round(((this.w-(this.margin_left)*2-this.margin_right-((draw_right_line)?1:0)-((properties.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
-		var tx = this.x + this.margin_left;
+		var txt_padding_sides = Math.round(((this.w-(brw.textMarginRight)*2-this.margin_right-((draw_right_line)?1:0))-total_txt_size)/(this.items_txt.length));
+		var tx = this.x + brw.textMarginRight;
 		
 		//Draw texts
 		for(i = this.items_txt.length-1; i >= 0; i--) {
@@ -1061,7 +1036,6 @@ oTagSwitcherBar = function() {
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
-		if(properties.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);	
     };
     this.setHoverStates = function(x, y){
 		var prev_hover_item = this.hoverItem;
@@ -1087,11 +1061,6 @@ oTagSwitcherBar = function() {
 						g_sendResponse();
 					}						
 				}
-				if(properties.showFiltersTogglerBtn && this.hide_bt.checkstate("hover", x, y)){
-					this.hide_bt.checkstate("up", -1, -1);
-					this.hide_bt.checkstate("leave", -1, -1);
-					libraryfilter_state.toggleValue();
-				}
 				break;		
             case "lbtn_up":			
                 break;
@@ -1104,14 +1073,12 @@ oTagSwitcherBar = function() {
 				if(changed_state) {
 					brw.repaint();
 				}
-				if(properties.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);
                 break;
             case "leave":
 				changed_state = this.setHoverStates(-1,-1);
 				if(changed_state) {
 					brw.repaint();	
-				}		
-				if(properties.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);
+				}					
                 break;				
         };
     };
@@ -2366,7 +2333,7 @@ oBrowser = function(name) {
 						if(properties.showAllItem && i == 0 && total > 1) {
 							this.groups[i].cover_img = images.all;
 						} else {					
-							if(this.groups[i].cover_type == null) {								
+							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
 									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false);
 									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
@@ -3474,7 +3441,7 @@ oBrowser = function(name) {
 				this.groups[albumIndex].cover_formated = false;
                 this.groups[albumIndex].save_requested = false;
 				this.groups[albumIndex].cover_img_mask = null;
-                g_image_cache.reset(this.groups[albumIndex].cachekey);
+                g_image_cache.reset(crc);
                 this.groups[albumIndex].cover_img = null;
                 this.groups[albumIndex].cover_type = null;
                 this.repaint();
@@ -3558,8 +3525,6 @@ oBrowser = function(name) {
 			
             _menu2.AppendMenuItem(MF_STRING, 913, "Tag switcher bar");
             _menu2.CheckMenuItem(913, properties.showTagSwitcherBar);			
-            _menu2.AppendMenuItem(MF_STRING, 914, "Filters toggler button");
-            _menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);				
             _menu2.AppendMenuItem(MF_STRING, 910, "Search bar");
             _menu2.CheckMenuItem(910, properties.showHeaderBar);
             _menu2.AppendMenuSeparator();			
@@ -3828,17 +3793,11 @@ oBrowser = function(name) {
                     window.SetProperty("_PROPERTY: show buttons on top to change the source tag", properties.showTagSwitcherBar);
 					g_filterbox.reset_layout();
                     get_metrics();
-                    break;
+                    break;	
                 case (idx == 914):
-                    properties.showFiltersTogglerBtn = !properties.showFiltersTogglerBtn;
-                    window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
-					window.NotifyOthers("showFiltersTogglerBtn",properties.showFiltersTogglerBtn);					
-					brw.repaint();
-                    break;					
-                /*case (idx == 914):
 					enableDiskCacheGlobally();
 					brw.repaint();
-                    break;	*/
+                    break;	
                 case (idx == 915):
 					enableCoversAtStartupGlobally();
 					break;		
@@ -5175,14 +5134,6 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
-		case "libraryfilter_state":
-			libraryfilter_state.value=info;	
-		break;
-		case "showFiltersTogglerBtn":
-			properties.showFiltersTogglerBtn=info;	
-			window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
-			window.Repaint();
-		break;
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);		

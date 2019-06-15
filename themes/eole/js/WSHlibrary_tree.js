@@ -7,6 +7,7 @@ var properties = {
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),	
     globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", 0),	
+	
 	headerbar_height:35,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
@@ -103,14 +104,38 @@ oTagSwitcherBar = function() {
 	}
 		
 	this.hoverItem = -1;
-	this.textMarginRight = 10;	
 	this.txt_top_margin = 0;
-	this.margin_right = 0;
+	this.margin_right = 2;
+	this.margin_left = 6;	
 	this.images = {};
+	this.hide_bt = false;
+    this.setHideButton = function(){
+		this.hscr_btn_w = 18
+		var xpts_mtop = Math.ceil((this.h-9)/2);	
+		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);			
+		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_off.GetGraphics();
+			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
+			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
+			gb.FillPolygon(colors.inactive_txt, 0, xpts3);
+			gb.FillPolygon(colors.inactive_txt, 0, xpts4);			
+		this.hide_bt_off.ReleaseGraphics(gb);
+		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_ov.GetGraphics();
+			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
+			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
+			gb.FillPolygon(colors.normal_txt, 0, xpts3);
+			gb.FillPolygon(colors.normal_txt, 0, xpts4);			
+		this.hide_bt_ov.ReleaseGraphics(gb);		
+		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
+	}		
     this.getImages = function() {
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
 		else icon_theme_subfolder = "";					
 		this.images.library_tree = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\icon_tree.png");
+		if(this.hide_bt) this.setHideButton();
 	};
 	this.getImages();
     
@@ -123,6 +148,7 @@ oTagSwitcherBar = function() {
         this.w = w;
 		this.h = h;
 		this.font_size = font_size;
+		if(!this.hide_bt) this.setHideButton();		
     };
     
 	this.draw = function(gr, x, y) {
@@ -140,8 +166,9 @@ oTagSwitcherBar = function() {
 			this.items_width[i] = gr.CalcTextWidth(this.items_txt[i],g_font.min1);
 			total_txt_size += this.items_width[i];
 		}
-		var txt_padding_sides = Math.round(((this.w-this.textMarginRight*2-this.margin_right-((draw_right_line)?1:0))-total_txt_size)/(this.items_txt.length));
-		var tx = this.x + this.textMarginRight;
+
+		var txt_padding_sides = Math.round(((this.w-this.margin_left*2-this.margin_right-((draw_right_line)?1:0)-((p.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
+		var tx = this.x + this.margin_left;
 		
 		//Draw texts
 		for(i = this.items_txt.length-1; i >= 0; i--) {
@@ -149,7 +176,6 @@ oTagSwitcherBar = function() {
 			if(i<this.items_txt.length-1) tx = tx + this.items_width[i+1];
 			this.items_x[i] = tx;
 			
-			this.margin_left = 5;
 			if(this.items_txt[i].length==1){
 				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
@@ -157,6 +183,7 @@ oTagSwitcherBar = function() {
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
+		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);			
     };
     this.setHoverStates = function(x, y){
 		var prev_hover_item = this.hoverItem;
@@ -177,6 +204,11 @@ oTagSwitcherBar = function() {
 					this.items_functions[this.hoverItem]();
 					if(p.s_txt.length>0) sL.clear();		
 				}
+				if(p.showFiltersTogglerBtn && this.hide_bt.checkstate("hover", x, y)){
+					this.hide_bt.checkstate("up", -1, -1);
+					this.hide_bt.checkstate("leave", -1, -1);
+					libraryfilter_state.toggleValue();
+				}				
 				break;		
             case "lbtn_up":			
                 break;
@@ -187,10 +219,12 @@ oTagSwitcherBar = function() {
             case "move":
 				changed_state = this.setHoverStates(x,y);
 				if(changed_state) window.Repaint();
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);				
                 break;
             case "leave":
 				changed_state = this.setHoverStates(-1,-1);
-				if(changed_state) window.Repaint();			
+				if(changed_state) window.Repaint();	
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);				
                 break;				
         };
     };
@@ -1150,6 +1184,7 @@ function panel_operations() {
     this.base = window.GetProperty(" Node: Show All Music", false);
     this.s_show = window.GetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", 2);
 	this.tag_switcherbar = window.GetProperty(" Tag switcher bar", false);	
+	this.showFiltersTogglerBtn = window.GetProperty("_PROPERTY: show filters toggler btn", false);	
     if (!this.s_show) this.autofit = true;
     this.filter_by = window.GetProperty("SYSTEM.Filter By", 0);
     this.items = function() {
@@ -3523,6 +3558,8 @@ function menu_object() {
 			
 			menuDisplay.AppendMenuItem(MF_STRING, 7017, "Tag switcher bar");		
 			menuDisplay.CheckMenuItem(7017,p.tag_switcherbar)		
+			menuDisplay.AppendMenuItem(MF_STRING, 7018, "Filters toggler button");		
+			menuDisplay.CheckMenuItem(7018,p.showFiltersTogglerBtn)			
 			var searchbar = window.CreatePopupMenu();	
 			searchbar.AppendMenuItem(MF_STRING, 7005, "Hide");	
 			searchbar.AppendMenuItem(MF_STRING, 7006, "Search bar only");
@@ -3847,7 +3884,9 @@ function showSettingsMenu(x,y){
 	var menuDisplay = window.CreatePopupMenu();	
 	
 	menuDisplay.AppendMenuItem(MF_STRING, 7017, "Tag switcher bar");		
-	menuDisplay.CheckMenuItem(7017,p.tag_switcherbar)		
+	menuDisplay.CheckMenuItem(7017,p.tag_switcherbar)	
+	menuDisplay.AppendMenuItem(MF_STRING, 7018, "Filters toggler button");		
+	menuDisplay.CheckMenuItem(7018,p.showFiltersTogglerBtn)		
 	var searchbar = window.CreatePopupMenu();	
 	searchbar.AppendMenuItem(MF_STRING, 7005, "Hide");	
 	searchbar.AppendMenuItem(MF_STRING, 7006, "Search bar only");
@@ -3987,6 +4026,11 @@ function showSettingsMenu(x,y){
 		p.tag_switcherbar = !p.tag_switcherbar;
 		window.SetProperty(" Tag switcher bar", p.tag_switcherbar);
 		p.on_size();but.refresh(true);	
+		window.Repaint();	
+	} else if(idx==7018){
+		p.showFiltersTogglerBtn = !p.showFiltersTogglerBtn;
+		window.SetProperty("_PROPERTY: show filters toggler btn", p.showFiltersTogglerBtn);
+		window.NotifyOthers("showFiltersTogglerBtn",p.showFiltersTogglerBtn);
 		window.Repaint();			
 	} else if(idx==7020){
 		ui.setRowPadding(ui.row_p+2);
@@ -4152,6 +4196,11 @@ function showOptionsMenu(x,y,reduced){
 		p.tag_switcherbar = !p.tag_switcherbar;
 		window.SetProperty(" Tag switcher bar", p.tag_switcherbar);
 		p.on_size();but.refresh(true);	
+		window.Repaint();			
+	} else if(idx==7018){
+		p.showFiltersTogglerBtn = !p.showFiltersTogglerBtn;
+		window.SetProperty("_PROPERTY: show filters toggler btn", p.showFiltersTogglerBtn);
+		window.NotifyOthers("showFiltersTogglerBtn",p.showFiltersTogglerBtn);		
 		window.Repaint();			
 	} else if(idx==7020){
 		ui.setRowPadding(ui.row_p+2);
@@ -4619,6 +4668,14 @@ function get_images() {
 };
 function on_notify_data(name, info) {
     switch(name) {
+		case "libraryfilter_state":
+			libraryfilter_state.value=info;	
+		break;		
+		case "showFiltersTogglerBtn":
+			p.showFiltersTogglerBtn=info;	
+			window.SetProperty("_PROPERTY: show filters toggler btn", p.showFiltersTogglerBtn);
+			window.Repaint();
+		break;		
         case "FocusOnNowPlayingForce":				
 			if(window.IsVisible) pop.showNowPlaying();	
         break;				

@@ -33,7 +33,6 @@ var brw_populate_keep_showlist = false;
 var ww = 0, wh = 0;
 var drag_x = 0, drag_y = 0;
 var g_dragndrop_x, g_dragndrop_y = 0;
-var cur_btn = cur_btn_down = btn_down = false;
 var g_ishover = false;
 var brw = null;
 var g_scrollbar = null;
@@ -2319,7 +2318,36 @@ oHeaderBar = function(name) {
 		this.y=y;	
 		this.w = ww;
 		this.h = brw.headerBarHeight-this.white_space;
-	}
+		if(!this.hide_filters_bt) this.setHideButton();		
+	}	
+    this.setHideButton = function () {	
+		this.hscr_btn_w = 18
+		var xpts_mtop = Math.ceil((this.h-9)/2);	
+		var xpts_mright_next = Math.ceil((this.hscr_btn_w-5)/2);			
+		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_off.GetGraphics();
+			gb.FillSolidRect(this.hscr_btn_w-1, 0, 1, this.h, colors.sidesline);	
+			var xpts1 = Array(1+xpts_mright_next,xpts_mtop, 5+xpts_mright_next,4+xpts_mtop, 1+xpts_mright_next,8+xpts_mtop, xpts_mright_next,7+xpts_mtop, 3+xpts_mright_next,4+xpts_mtop, xpts_mright_next,1+xpts_mtop);
+			var xpts2 = Array(1+xpts_mright_next,1+xpts_mtop, 4+xpts_mright_next,4+xpts_mtop, 1+xpts_mright_next,7+xpts_mtop, 4+xpts_mright_next,4+xpts_mtop);
+			gb.FillPolygon((properties.darklayout?colors.normal_txt:colors.faded_txt), 0, xpts1);
+			gb.FillPolygon(colors.faded_txt, 0, xpts2);			
+		this.hide_bt_off.ReleaseGraphics(gb);
+		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_ov.GetGraphics();
+			gb.FillSolidRect(this.hscr_btn_w-1, 0, 1, this.h, colors.sidesline);	
+			var xpts1 = Array(1+xpts_mright_next,xpts_mtop, 5+xpts_mright_next,4+xpts_mtop, 1+xpts_mright_next,8+xpts_mtop, xpts_mright_next,7+xpts_mtop, 3+xpts_mright_next,4+xpts_mtop, xpts_mright_next,1+xpts_mtop);
+			var xpts2 = Array(1+xpts_mright_next,1+xpts_mtop, 4+xpts_mright_next,4+xpts_mtop, 1+xpts_mright_next,7+xpts_mtop, 4+xpts_mright_next,4+xpts_mtop);
+			gb.FillPolygon(colors.normal_txt, 0, xpts1);
+			gb.FillPolygon(colors.normal_txt, 0, xpts2);			
+		this.hide_bt_ov.ReleaseGraphics(gb);	
+		if(typeof(this.hide_filters_bt) == "undefined") {
+			this.hide_filters_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
+		} else {
+			this.hide_filters_bt.img[0] = this.hide_bt_off;
+			this.hide_filters_bt.img[1] = this.hide_bt_ov;
+			this.hide_filters_bt.img[2] = this.hide_bt_ov;
+		}
+	}		
     this.setButtons = function () {
 		var gb;
 		
@@ -2349,7 +2377,7 @@ oHeaderBar = function(name) {
 			this.FullLibraryButton.img[1] = this.full_library_hover;
 			this.FullLibraryButton.img[2] = this.full_library_off;
 		}
-		
+
 		this.settings_off = gdi.CreateImage(23, 23);
 		gb = this.settings_off.GetGraphics();
 			gb.SetSmoothingMode(0);
@@ -2387,25 +2415,41 @@ oHeaderBar = function(name) {
 		this.SettingsButton.y = this.padding_top-1;
     }	
 	this.setButtons();
+    this.onColorsChanged = function () {
+		this.setButtons();
+		this.setHideButton();
+	}	
     this.draw = function(gr) {
 		gr.FillSolidRect(0, 0, ww, this.h,colors.headerbar_bg);
 
 		//bottom line
-		gr.FillSolidRect(0, this.h, ww, 1,colors.headerbar_line);	
+		gr.FillSolidRect(0, this.h, ww, 1,colors.headerbar_line);
+		
 		if(brw.playlistName != globalProperties.whole_library && !libraryfilter_state.isActive()) {
-			this.FullLibraryButton.hide = false;	
-			this.FullLibraryButton.draw(gr,this.MarginLeft-3,this.padding_top-1,255);
-			this.btn_left_margin = 25;
+			this.FullLibraryButton.hide = false;			
+			if(properties.displayToggleBtns){
+				this.hide_filters_bt.hide = false;			
+				this.hide_filters_bt.draw(gr, this.x, this.y, 255);
+				this.btn_left_margin = 30;
+				this.FullLibraryButton.draw(gr,this.MarginLeft+4,this.padding_top-2,255);
+			}
+			else {
+				this.btn_left_margin = 24;
+				this.FullLibraryButton.draw(gr,this.MarginLeft-3,this.padding_top-2,255);
+			}
+		} else if(!libraryfilter_state.isActive()) {	
+			if(properties.displayToggleBtns){		
+				this.hide_filters_bt.hide = false;			
+				this.hide_filters_bt.draw(gr, this.x, this.y, 255);	
+				this.btn_left_margin = 10;	
+			} else this.btn_left_margin = 4;				
 		} else {
 			this.FullLibraryButton.hide = true;			
+			this.hide_filters_bt.hide = true;					
 			this.btn_left_margin = 4;			
 		}
-		if(properties.displayToggleBtns) {
-			this.rightpadding=140;
-		} else {
-			this.rightpadding=105;			
-		}
 		
+		this.rightpadding=105;			
 
 		this.SettingsButton.x = ww-47;
 		this.SettingsButton.draw(gr,this.SettingsButton.x,this.SettingsButton.y,255);
@@ -2434,7 +2478,7 @@ oHeaderBar = function(name) {
 		if(covers_loading_progress<101 && properties.show_covers_progress)
 			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww + 39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		else 
-			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);				
+			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);	
 	}	
 	this.isHover_Settings = function(x,y){
 		if(x>this.MarginLeft-7 && x<this.MarginLeft+23 && y>this.padding_top && y<this.padding_top+23) return true;
@@ -2501,13 +2545,18 @@ oHeaderBar = function(name) {
 						this.draw_header_menu(this.SettingsButton.x+30, this.SettingsButton.y+25,true);
 					}
 				}
-				if((!this.FullLibraryButton.hide)  && this.FullLibraryButton.state == ButtonStates.hover) {
+				if(!this.FullLibraryButton.hide && this.FullLibraryButton.state == ButtonStates.hover) {
 					window.RepaintRect(this.x,this.y,this.w,this.h);
 					//g_history.restoreLastElem();
 					g_history.fullLibrary();
 					//if(plman.GetPlaylistName(plman.ActivePlaylist) == globalProperties.whole_library) FocusOnNowPlaying = true;
 					window.NotifyOthers("history_previous",true);
 				}
+				if(!this.hide_filters_bt.hide && this.hide_filters_bt.checkstate("hover", x, y)){
+					this.hide_filters_bt.checkstate("up", -1, -1);
+					this.hide_filters_bt.checkstate("leave", -1, -1);
+					libraryfilter_state.toggleValue();
+				}				
                 break;	
             case "lbtn_dblclk":
 				if((brw.playlistName != globalProperties.whole_library && !libraryfilter_state.isActive())  && this.FullLibraryButton.state == ButtonStates.hover) {
@@ -2522,6 +2571,7 @@ oHeaderBar = function(name) {
             case "move":
 				if(typeof(this.SettingsButton) !== "undefined") this.SettingsButton.checkstate("move", x, y);
 				if(typeof(this.FullLibraryButton) !== "undefined") this.FullLibraryButton.checkstate("move", x, y);
+				if(typeof(this.hide_filters_bt) !== "undefined") this.hide_filters_bt.checkstate("move", x, y);
 				if(properties.showToolTip && this.showToolTip && this.ishoverMainText && !(g_dragA || g_dragR || g_scrollbar.cursorDrag)){	
 					new_tooltip_text=this.mainTxt;
 					g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay);	
@@ -2537,6 +2587,7 @@ oHeaderBar = function(name) {
             case "leave":
 				if(typeof(this.SettingsButton) !== "undefined") this.SettingsButton.checkstate("move", x, y);
 				if(typeof(this.FullLibraryButton) !== "undefined") this.FullLibraryButton.checkstate("move", x, y);
+				if(typeof(this.hide_filters_bt) !== "undefined") this.hide_filters_bt.checkstate("move", x, y);
                 break;
         }
     }
@@ -3195,10 +3246,9 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 39):		
 			properties.displayToggleBtns = !properties.displayToggleBtns;
 			window.SetProperty("_DISPLAY: Toggle buttons", properties.displayToggleBtns);
-			if(properties.displayToggleBtns) buttons.filterToggle.changeState(ButtonStates.normal);		
-			positionButtons();			
+			window.NotifyOthers("showFiltersTogglerBtn",properties.displayToggleBtns);	
 			brw.repaint();
-			break;			
+			break;						
 		case (idx == 40):		
 			toggleLibraryFilterState();
 			break;	
@@ -3206,14 +3256,12 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			properties.showTotalTime = !properties.showTotalTime;
 			window.SetProperty("_DISPLAY: Total time", properties.showTotalTime);
 			g_headerbar.setDisplayedInfo();
-			positionButtons();
 			brw.repaint();
 			break;			
 		case (idx == 42):		
 			properties.showCoverResizer = !properties.showCoverResizer;
 			window.SetProperty("_DISPLAY: Cover resizer", properties.showCoverResizer);
 			g_headerbar.setDisplayedInfo();
-			positionButtons();
 			brw.repaint();
 			break;			
 		case (idx == 47):		
@@ -4585,7 +4633,6 @@ oBrowser = function(name) {
 				if(this.showFilterBox && g_filterbox.inputbox.visible) {
 					g_filterbox.draw(gr, g_headerbar.mainTxtX,cFilterBox.y);
 				}	
-				drawAllButtons(gr);
 			}
 			
 			
@@ -5184,47 +5231,18 @@ oBrowser = function(name) {
 	}	
 }
 // ===================================================== Filter Toggle Button =============================================
-buttons = { 
-    filterToggle: new SimpleButton(27, 25, 31, 30, "filterToggle", function () {
-		toggleLibraryFilterState()
-    },false,black_images.filter_on_icon,black_images.filter_on_hover_icon,ButtonStates.normal,224) 		
-}
-function drawAllButtons(gr) {
-    for (var i in buttons) {
-        buttons[i].draw(gr);
-    }
-}
-function positionButtons(){
-	buttons.filterToggle.x = ww-88;
-	buttons.filterToggle.y = 7;
-	
-	if(properties.darklayout){
-		if(!libraryfilter_state.isActive()){
-			buttons.filterToggle.N_img = white_images.nowplaying_on_icon
-			buttons.filterToggle.H_img = white_images.nowplaying_on_hover_icon
-		} else {
-			buttons.filterToggle.N_img = white_images.nowplaying_off_icon
-			buttons.filterToggle.H_img = white_images.nowplaying_off_hover_icon			
-		}			
+function toggleLibraryFilterState(){
+	libraryfilter_state.toggleValue();
+	if(libraryfilter_state.isActive()){
+		properties.showFilterBox = properties.showFilterBox_filter_active;
+		brw.showFilterBox = properties.showFilterBox;
 	} else {
-		if(!libraryfilter_state.isActive()){
-			buttons.filterToggle.N_img = black_images.nowplaying_on_icon
-			buttons.filterToggle.H_img = black_images.nowplaying_on_hover_icon
-		} else {
-			buttons.filterToggle.N_img = black_images.nowplaying_off_icon
-			buttons.filterToggle.H_img = black_images.nowplaying_off_hover_icon			
-		}				
+		properties.showFilterBox = properties.showFilterBox_filter_inactive;
+		brw.showFilterBox = properties.showFilterBox;		
 	}	
-	if(!properties.displayToggleBtns){
-		buttons.filterToggle.changeState(ButtonStates.hide);
-	}
-} 
-
-function chooseButton(x, y) {
-    for (var i in buttons) {
-        if (buttons[i].containXY(x, y) && buttons[i].state != ButtonStates.hide) return buttons[i];
-    }
-    return false;
+	g_history.reset();
+	g_history.saveCurrent();
+	window.Repaint();
 }
 function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
@@ -5297,21 +5315,6 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
-}
-
-function toggleLibraryFilterState(){
-	libraryfilter_state.toggleValue();
-	if(libraryfilter_state.isActive()){
-		properties.showFilterBox = properties.showFilterBox_filter_active;
-		brw.showFilterBox = properties.showFilterBox;
-	} else {
-		properties.showFilterBox = properties.showFilterBox_filter_inactive;
-		brw.showFilterBox = properties.showFilterBox;		
-	}	
-	g_history.reset();
-	g_history.saveCurrent();
-	positionButtons();	
-	window.Repaint();
 }
 // ===================================================== Cover Images =====================================================
 function on_get_album_art_done(metadb, art_id, image, image_path) {
@@ -5535,7 +5538,6 @@ function on_size(w, h) {
 			scroll = g_scrollbar.check_scroll(scroll);				
 		}
 		g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);				
-		positionButtons();
 		update_size = false;	
 		first_on_size = false;		
 	} else {
@@ -5544,7 +5546,6 @@ function on_size(w, h) {
 		g_scrollbar.setSize(ww - cScrollBar.activeWidth, brw.y-brw.headerBarHeight, cScrollBar.activeWidth, wh - brw.y+brw.headerBarHeight, cScrollBar.normalWidth);
 		g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
 		scroll = g_scrollbar.check_scroll(scroll);
-		positionButtons();
 		update_wallpaper = true;
 		set_update_function("on_size(window.Width, window.Height)");*/
 	}
@@ -5605,14 +5606,6 @@ function on_mouse_lbtn_down(x, y, m) {
 	g_resizing.on_mouse("lbtn_down", x, y, m);
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 	
-    cur_btn_down = chooseButton(x, y);
-    if (cur_btn_down) {
-		btn_down = true;	
-        cur_btn_down.changeState(ButtonStates.down);
-        window.Repaint();
-		return;
-    }	
-
 	doubleClick=false;
 	brw.click_down = true;
     brw.on_mouse("lbtn_down", x, y);
@@ -5737,18 +5730,6 @@ function on_mouse_lbtn_up(x, y, m) {
 	
 	brw.click_down = false;	
 	g_showlist.click_down_scrollbar = false;	
-    cur_btn = chooseButton(x, y);
-	var quit_function = false
-    if (cur_btn_down != null && typeof cur_btn_down === 'object') {
-        cur_btn_down.onClick();
-		cur_btn_down = null;
-		quit_function = true; 
-    }
-	if (cur_btn != null && typeof cur_btn === 'object') {        
-        cur_btn.changeState(ButtonStates.hover);
-        window.Repaint();
-    }	
-	if(quit_function) return;
 
 	g_resizing.on_mouse("lbtn_up", x, y, m);
 
@@ -6142,22 +6123,7 @@ function on_mouse_move(x, y, m) {
 	g_cursor.onMouse("move", x, y, m);	  
 	
 	g_resizing.on_mouse("move", x, y, m);
-	
-    var old = cur_btn;
-    if(!brw.resize_click) cur_btn = chooseButton(x, y);	
-    if (old == cur_btn && cur_btn) {
-        return;
-    } else if(cur_btn){
-		brw.setActiveRow(-1,-1);
-        old && old.changeState(ButtonStates.normal);
-        cur_btn && cur_btn.changeState(ButtonStates.hover);
-        brw.repaint();
-		return;
-    } else if(old){	
-		old.changeState(ButtonStates.normal);
-		brw.repaint();
-	}
-	
+
     g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
     g_ishover && brw.on_mouse("move", x, y);
 
@@ -6277,11 +6243,6 @@ function on_mouse_leave() {
 	if(brw.album_Rclicked_index>-1 && !g_avoid_on_mouse_leave) brw.album_Rclicked_index = -1;
 	else g_avoid_on_mouse_leave=false;
 
-    if (cur_btn) {
-        cur_btn.changeState(ButtonStates.normal);
-        cur_btn=null;        
-    }	
-	
     if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
         g_scrollbar.check("leave", 0, 0);
     }
@@ -6509,9 +6470,8 @@ function on_colours_changed() {
 	brw.dateCircleBG=null;
 	g_showlist.setImages();	
 	g_filterbox.on_init();
-	g_headerbar.setButtons();
+	g_headerbar.onColorsChanged();
 	brw.setResizeButton(65,14);
-	positionButtons();
 	if(g_scrollbar.isVisible) g_scrollbar.setCursorButton();
     window.Repaint();
 }
@@ -6835,6 +6795,11 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
 			window.Reload();			
 		break; 
+		case "showFiltersTogglerBtn":
+			properties.displayToggleBtns=info;	
+			window.SetProperty("_DISPLAY: Toggle buttons", properties.displayToggleBtns);	
+			brw.repaint();
+		break;			
 		case "thumbnailWidthMax":
 			globalProperties.thumbnailWidthMax = Number(info);			
 			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
@@ -7194,7 +7159,6 @@ function on_init() {
 	g_headerbar = new oHeaderBar("g_headerbar");
 	g_filterbox = new oFilterBox();
 	g_filterbox.inputbox.visible = true;
-	positionButtons();
 	g_tooltip = new oTooltip('brw');
 	
 	g_resizing = new Resizing();
