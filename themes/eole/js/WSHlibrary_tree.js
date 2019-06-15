@@ -680,8 +680,7 @@ function userinterface() {
     this.h = 0;
     this.linecol = "";
     this.pen_c = 0x55888888;
-    this.row_h = 20;
-    this.row_p = window.GetProperty(" Row Vertical Item Padding", 18);	
+    this.row_h = 20;	
 	this.row_p_min = 10;	
     this.s_font;
     this.s_linecol = "";
@@ -749,12 +748,17 @@ function userinterface() {
         };
     }
 	this.setRowPadding = function(new_padding){
-		if(new_padding<ui.row_p_min) new_padding=ui.row_p_min;
-		this.row_p = new_padding;
-		window.SetProperty(" Row Vertical Item Padding", this.row_p);	
-		on_size(window.Width, window.Height);
-		window.Repaint();		
+		if(typeof new_padding !== 'undefined'){		
+			if(new_padding<ui.row_p_min) new_padding=ui.row_p_min;
+			this.row_p = new_padding;
+			window.SetProperty(" Row Vertical Item Padding", this.row_p);	
+			on_size(window.Width, window.Height);
+			window.Repaint();		
+		} else {
+			this.row_p = window.GetProperty(" Row Vertical Item Padding", 18) + g_fsize - 11;			
+		}
 	}
+	this.setRowPadding();
     this.get_textselcol = function(c) {
         var cc = [R(c), G(c), B(c)];
         var ccc = [];
@@ -888,8 +892,9 @@ function on_colours_changed() {
 function on_font_changed() {
 	get_font();
     ui.get_font();
+	ui.setRowPadding();
     sbar.reset();
-    p.on_size();
+    on_size(window.Width, window.Height);
     if (p.s_show || ui.scrollbar_show) but.refresh(true);
 }
 

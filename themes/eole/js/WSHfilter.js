@@ -4492,7 +4492,8 @@ function get_metrics() {
     cPlaylistManager.scrollbarWidth = Math.floor(cPlaylistManager.default_scrollbarWidth * g_zoom_percent / 100);
     
     properties.thumbnailWidth = Math.floor(properties.thumbnailWidth * (g_zoom_percent / 100));
-    properties.lineHeightMin = Math.floor(properties.default_lineHeightMin * g_zoom_percent / 100);
+    properties.lineHeightMin = Math.floor(properties.default_lineHeightMin * g_zoom_percent / 100) + g_fsize - 11;
+
     properties.botStampHeight = Math.floor(properties.default_botStampHeight * g_zoom_percent / 100);
     properties.botGridHeight = Math.floor(properties.default_botGridHeight * g_zoom_percent / 100);
     properties.botTextRowHeight = Math.floor(properties.default_botTextRowHeight * g_zoom_percent / 100); // panelMode 1 || 3

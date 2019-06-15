@@ -3773,7 +3773,6 @@ oBrowser = function(name) {
 	this.previousPlaylistIdx = -1;
 	this.found_searched_track = false;
 	this.setSizeFirstCall = false;
-	this.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);
     this.cover_img_mask = null;	
 	this.coverMask = false;
 	this.dateCircleBG = false;
@@ -3830,10 +3829,11 @@ oBrowser = function(name) {
 		on_size(window.Width, window.Height);
 		//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);			
 	}
-	this.on_font_changed = function() {
-		this.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);
-		this.refreshDates();
+	this.on_font_changed = function(refreshDates) {
+		this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
+		if(refreshDates) this.refreshDates();
 	}	
+	this.on_font_changed();
     this.setSize = function(x, y, w, h) {	
         this.x = x;
         this.y = y;
@@ -6490,7 +6490,7 @@ function get_colors() {
 
 function on_font_changed() {
     get_font();
-	brw.on_font_changed();	
+	brw.on_font_changed(true);	
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
 	g_showlist.onFontChanged();

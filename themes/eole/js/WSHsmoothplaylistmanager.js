@@ -2351,7 +2351,7 @@ function get_metrics() {
     };
 
     var _defaultRowHeight = properties.defaultRowHeight;
-    properties.rowHeight = Math.round(_defaultRowHeight * g_zoom_percent / 100);
+    properties.rowHeight = Math.round(_defaultRowHeight * g_zoom_percent / 100) + g_fsize - 11;
     cScrollBar.width = Math.floor(cScrollBar.defaultWidth * g_zoom_percent / 100);
     cScrollBar.minCursorHeight = Math.round(cScrollBar.defaultMinCursorHeight * g_zoom_percent / 100);
     
