@@ -2077,7 +2077,7 @@ oBrowser = function(name) {
 			}
 		}
         if(brw.rowsCount > 0) brw.gettags(true);
-        //this.scrollbar.updateScrollbar();
+        this.scrollbar.updateScrollbar();
         this.repaint();
         g_first_populate_done = true;
 		//console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
