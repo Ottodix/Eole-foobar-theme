@@ -3558,7 +3558,7 @@ function menu_object() {
 			
 			menuDisplay.AppendMenuItem(MF_STRING, 7017, "Tag switcher bar");		
 			menuDisplay.CheckMenuItem(7017,p.tag_switcherbar)		
-			menuDisplay.AppendMenuItem(MF_STRING, 7018, "Filters toggler button");		
+			menuDisplay.AppendMenuItem(MF_STRING, 7018, "Hide menu button");		
 			menuDisplay.CheckMenuItem(7018,p.showFiltersTogglerBtn)			
 			var searchbar = window.CreatePopupMenu();	
 			searchbar.AppendMenuItem(MF_STRING, 7005, "Hide");	
@@ -3885,7 +3885,7 @@ function showSettingsMenu(x,y){
 	
 	menuDisplay.AppendMenuItem(MF_STRING, 7017, "Tag switcher bar");		
 	menuDisplay.CheckMenuItem(7017,p.tag_switcherbar)	
-	menuDisplay.AppendMenuItem(MF_STRING, 7018, "Filters toggler button");		
+	menuDisplay.AppendMenuItem(MF_STRING, 7018, "Hide menu button");		
 	menuDisplay.CheckMenuItem(7018,p.showFiltersTogglerBtn)		
 	var searchbar = window.CreatePopupMenu();	
 	searchbar.AppendMenuItem(MF_STRING, 7005, "Hide");	

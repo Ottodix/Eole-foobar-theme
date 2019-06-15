@@ -3558,7 +3558,7 @@ oBrowser = function(name) {
 			
             _menu2.AppendMenuItem(MF_STRING, 913, "Tag switcher bar");
             _menu2.CheckMenuItem(913, properties.showTagSwitcherBar);			
-            _menu2.AppendMenuItem(MF_STRING, 914, "Filters toggler button");
+            _menu2.AppendMenuItem(MF_STRING, 914, "Hide menu button");
             _menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);				
             _menu2.AppendMenuItem(MF_STRING, 910, "Search bar");
             _menu2.CheckMenuItem(910, properties.showHeaderBar);
