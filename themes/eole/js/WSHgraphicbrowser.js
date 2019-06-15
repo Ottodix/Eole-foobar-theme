@@ -4082,6 +4082,7 @@ oBrowser = function(name) {
 		for(var i = 0;i < this.groups.length;i++){		
 			delete this.groups[i].dateWidth;
 			delete this.groups[i].dateHeight;
+			delete this.dateCircleBG;
 			if(properties.extractYearFromDate) this.groups[i].year = this.groups[i].date.extract_year();
 		}		
 	}
@@ -4355,6 +4356,17 @@ oBrowser = function(name) {
 			this.groups[idx].CoverMainColor = colors.cover_hoverOverlay;
 		}			
 	}
+    this.DefineDateCircleBG = function(size){
+		if(properties.showdateOverCover){			
+			var dateCircleBG = gdi.CreateImage(size, size);
+			gb = dateCircleBG.GetGraphics();
+			gb.SetSmoothingMode(2);
+			gb.FillEllipse(-Math.round(size/3), -size+1+this.groups[0].dateHeight, Math.round(size*5/3), size, colors.cover_date_bg);
+			dateCircleBG.ReleaseGraphics(gb);
+			dateCircleBG.ApplyMask(this.coverMask);	
+			this.dateCircleBG = dateCircleBG;			
+		}
+	}	
     this.DefineCircleMask = function(size){
 		var Mimg = gdi.CreateImage(size, size);
 		gb = Mimg.GetGraphics();		
@@ -4363,18 +4375,6 @@ oBrowser = function(name) {
 		gb.FillEllipse(1, 1, size-2, size-2, GetGrey(0));		
 		Mimg.ReleaseGraphics(gb);
 		this.coverMask = Mimg;	
-		
-		if(properties.showdateOverCover){			
-			var dateCircleBG = gdi.CreateImage(size, size);
-			gb = dateCircleBG.GetGraphics();
-			//gb.FillSolidRect(0, 0, size, 18, colors.cover_date_bg);
-			gb.SetSmoothingMode(2);
-			gb.FillEllipse(-Math.round(size/3), -size+18, Math.round(size*5/3), size, colors.cover_date_bg);
-			dateCircleBG.ReleaseGraphics(gb);
-			
-			dateCircleBG.ApplyMask(this.coverMask);	
-			this.dateCircleBG = dateCircleBG;			
-		}
 	}		
     this.draw = function(gr) {        
         if(repaint_main || repaint_f || !repaintforced){
@@ -4524,20 +4524,20 @@ oBrowser = function(name) {
 							else overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].date;
 						}
 						if(overlayTxt!=""){
+							try{
+								if(typeof this.groups[this.groups_draw[i]].dateWidth == 'undefined') {
+									this.groups[this.groups_draw[i]].dateWidth=gr.CalcTextWidth(overlayTxt, this.fontDate)+10;
+									this.groups[this.groups_draw[i]].dateHeight=gr.CalcTextHeight(overlayTxt, this.fontDate)+2;
+									if(this.groups[this.groups_draw[i]].dateWidth>this.coverRealWith) this.groups[this.groups_draw[i]].dateWidth=this.coverRealWith;
+								}
+							} catch(e){}								
 							if(properties.circleMode) {
-								if(!this.dateCircleBG) this.DefineCircleMask(this.coverRealWith); {
+								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
-									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, 18, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 								}
 							}
-							else {
-								try{
-									if(typeof this.groups[this.groups_draw[i]].dateWidth == 'undefined') {
-										this.groups[this.groups_draw[i]].dateWidth=gr.CalcTextWidth(overlayTxt, this.fontDate)+10;
-										this.groups[this.groups_draw[i]].dateHeight=gr.CalcTextHeight(overlayTxt, this.fontDate)+2;
-										if(this.groups[this.groups_draw[i]].dateWidth>this.coverRealWith) this.groups[this.groups_draw[i]].dateWidth=this.coverRealWith;
-									}
-								} catch(e){}								
+							else {							
 								gr.FillSolidRect(ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, colors.cover_date_bg);
 								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							}
