@@ -13,7 +13,6 @@ var properties = {
     headerBarHeight: 40,
     headerBarPaddingTop: 0,		
     paddingTopDefault: 45,	
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
     showFilterBox: window.GetProperty("PROPERTY: Enable Playlist Filterbox in Top Bar", true),
     drawUpAndDownScrollbar: window.GetProperty("PROPERTY: Draw Up and Down Scrollbar Buttons", false),
     drawItemsCounter: window.GetProperty("PROPERTY: Show numbers of items", true),			
@@ -2350,29 +2349,26 @@ function on_mouse_wheel(step){
         cTouch.timer = false;
     };
     
-    if(utils.IsKeyPressed(VK_CONTROL)) {
-        var zoomStep = 1;
-        var previous = properties.globalFontAdjustement;
-        if(!timers.mouseWheel) {
-            /*if(intern_step > 0) {
-                properties.globalFontAdjustement += zoomStep;
-                if(properties.globalFontAdjustement > 10) properties.globalFontAdjustement = 10;
-            } else {
-                properties.globalFontAdjustement -= zoomStep;
-                if(properties.globalFontAdjustement < -2) properties.globalFontAdjustement = -2;
-            };
-            if(previous != properties.globalFontAdjustement) {
-                timers.mouseWheel = setTimeout(function() {
-                    window.SetProperty("DISPLAY: Extra font size value", properties.globalFontAdjustement);
-                    get_font();
-                    get_metrics();
-                    get_images();
-                    brw.repaint();
-                    timers.mouseWheel && clearTimeout(timers.mouseWheel);
-                    timers.mouseWheel = false;
-                }, 100);
-            };*/
-        };
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		}
     } else if(utils.IsKeyPressed(VK_SHIFT)) { // increase/decrease row height
 		brw.setRowHeight(intern_step);
     } else if(cScrollBar.visible) {
@@ -2788,12 +2784,12 @@ function on_key_down(vkey) {
                             brw.repaint();
                         };
                         if(vkey == 48 || vkey == 96) { // CTRL + 0
-                            var previous = properties.globalFontAdjustement;
+                            var previous = globalProperties.fontAdjustement;
                             if(!timers.mouseWheel) {
-                                properties.globalFontAdjustement = 0;
-                                if(previous != properties.globalFontAdjustement) {
+                                globalProperties.fontAdjustement = 0;
+                                if(previous != globalProperties.fontAdjustement) {
                                     timers.mouseWheel = setTimeout(function() {
-                                        window.SetProperty("DISPLAY: Extra font size value", properties.globalFontAdjustement);
+                                        window.SetProperty("DISPLAY: Extra font size value", globalProperties.fontAdjustement);
                                         get_font();
                                         get_metrics();
                                         get_images();
@@ -2997,8 +2993,8 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	
 		break;				
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			on_font_changed();
 		break; 			
 		case "rePopulate": 

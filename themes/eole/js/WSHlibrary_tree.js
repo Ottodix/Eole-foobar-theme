@@ -6,8 +6,6 @@ var properties = {
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),	
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", 0),	
-	
 	headerbar_height:35,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
@@ -4536,6 +4534,28 @@ function on_mouse_wheel(step, stepstrait, delta) {
 	
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		ui.setRowPadding(ui.row_p+intern_step);	
+	} else if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) properties.globalFontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != properties.globalFontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					on_font_changed();
+					window.Repaint();	
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};		
 	} else if(pman.state == 1) {
 		if(pman.scr_w > 0) pman.on_mouse("wheel", p.m_x, p.m_y, intern_step);		
     } else if (!v.k(1)) {
@@ -4680,8 +4700,8 @@ function on_notify_data(name, info) {
 			if(window.IsVisible) pop.showNowPlaying();	
         break;				
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),			
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);	
 			on_font_changed();
 			window.Repaint();			
 		break; 

@@ -644,7 +644,11 @@ function on_notify_data(name, info) {
 		case "coverCacheWidthMax":
 			globalProperties.coverCacheWidthMax = Number(info);				
 			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
-		break; 			
+		break; 	
+		case "set_font":
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		break; 				
 		case "mouse_move":
 			last_mouse_move_notified = info;
 		break;	
@@ -1022,8 +1026,30 @@ function draw_settings_menu(x,y){
 function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;		
-	fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
-    window.NotifyOthers("AdjustVolume", true);    
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {	
+		fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
+		window.NotifyOthers("AdjustVolume", true);   
+	}	
 }
 var colors = {};
 function get_colors(){

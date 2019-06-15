@@ -111,7 +111,6 @@ var properties = {
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),		
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
     DropInplaylist: window.GetProperty("_SYSTEM: Allow to drag items into a playlist", true),	
     enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", false),
     default_botStampHeight: 48,
@@ -2628,11 +2627,11 @@ oBrowser = function(name) {
 									if(properties.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
 										try{
 											if(properties.tagMode == 1) {
-												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
-												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
+												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
 											};
 										} catch(e) {console.log(e)}
 									} else {
@@ -2654,8 +2653,8 @@ oBrowser = function(name) {
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(album_name, font1);
 												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);											
 												this.groups[i].showToolTip = (this.groups[i].text1Length > coverWidth || this.groups[i].text2Length > coverWidth);
-												gr.GdiDrawText(album_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(album_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
 											  this.groups[i].tooltipText = this.groups[i].artist_name;
 											  font1 = g_font.normal;
@@ -2663,8 +2662,8 @@ oBrowser = function(name) {
 											  font = g_font.normal;
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > coverWidth);
-											  gr.GdiDrawText(this.groups[i].groupkey, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + properties.globalFontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
+											  gr.GdiDrawText(this.groups[i].groupkey, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
 											};
 										} catch(e) {}
 									};
@@ -2692,15 +2691,15 @@ oBrowser = function(name) {
 												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);											
 												this.groups[i].showToolTip = (this.groups[i].text1Length > aw-20 || this.groups[i].text2Length > aw-20);
 												
-												gr.GdiDrawText(album_name, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(album_name, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
 											  this.groups[i].tooltipText = this.groups[i].artist_name;
 											  font = (i == this.selectedIndex ? g_font.bold : g_font.normal);
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > aw-20);
 											  
-											  gr.GdiDrawText(this.groups[i].groupkey, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + properties.globalFontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											  gr.GdiDrawText(this.groups[i].groupkey, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											};
 										} catch(e) {}
 									};
@@ -3531,28 +3530,29 @@ oBrowser = function(name) {
             //_menu.CheckMenuItem(60, properties.followFocusChange);
             //_menu.AppendMenuSeparator();
 
-            _menu11.AppendMenuItem(MF_STRING, 111, "Default (%album%)");
-            _menu11.CheckMenuItem(111, properties.tagMode==1 && properties.tf_groupkey_album == properties.tf_groupkey_album_default);				
-            _menu11.AppendMenuItem(MF_STRING, 114, "Custom titleformat...");			
-            _menu11.CheckMenuItem(114, properties.tagMode==1 && properties.tf_groupkey_album != properties.tf_groupkey_album_default);	
+
+            _menu13.AppendMenuItem(MF_STRING, 113, "Default (%genre%)");
+            _menu13.CheckMenuItem(113, properties.tagMode==3 && properties.tf_groupkey_genre == properties.tf_groupkey_genre_default);				
+            _menu13.AppendMenuItem(MF_STRING, 116, "Custom titleformat...");	
+            _menu13.CheckMenuItem(116, properties.tagMode==3 && properties.tf_groupkey_genre != properties.tf_groupkey_genre_default);	
 			
             _menu12.AppendMenuItem(MF_STRING, 112, "Default (%artist%)");
             _menu12.CheckMenuItem(112, properties.tagMode==2 && properties.tf_groupkey_artist == properties.tf_groupkey_artist_default);				
             _menu12.AppendMenuItem(MF_STRING, 115, "Custom titleformat...");				
             _menu12.CheckMenuItem(115, properties.tagMode==2 && properties.tf_groupkey_artist != properties.tf_groupkey_artist_default);	
 			
-            _menu13.AppendMenuItem(MF_STRING, 113, "Default (%genre%)");
-            _menu13.CheckMenuItem(113, properties.tagMode==3 && properties.tf_groupkey_genre == properties.tf_groupkey_genre_default);				
-            _menu13.AppendMenuItem(MF_STRING, 116, "Custom titleformat...");	
-            _menu13.CheckMenuItem(116, properties.tagMode==3 && properties.tf_groupkey_genre != properties.tf_groupkey_genre_default);	
+            _menu11.AppendMenuItem(MF_STRING, 111, "Default (%album%)");
+            _menu11.CheckMenuItem(111, properties.tagMode==1 && properties.tf_groupkey_album == properties.tf_groupkey_album_default);				
+            _menu11.AppendMenuItem(MF_STRING, 114, "Custom titleformat...");			
+            _menu11.CheckMenuItem(114, properties.tagMode==1 && properties.tf_groupkey_album != properties.tf_groupkey_album_default);				
 			
 			if(properties.showLibraryTreeSwitch) {
 				_menu.AppendMenuItem(MF_STRING, 990, "Switch to library tree");
 				_menu.AppendMenuSeparator();
 			}
-            _menu11.AppendTo(_menu1,(properties.tagMode==1)?MF_CHECKED:MF_STRING, "Album");
-            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Artist");
             _menu13.AppendTo(_menu1,(properties.tagMode==3)?MF_CHECKED:MF_STRING, "Genre");			
+            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Artist");			
+            _menu11.AppendTo(_menu1,(properties.tagMode==1)?MF_CHECKED:MF_STRING, "Album");
 
             _menu1.AppendTo(_menu,MF_STRING, "Columns");
 			
@@ -4367,18 +4367,19 @@ function on_mouse_wheel(step, stepstrait, delta){
     } else {
         if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements)
             var zoomStep = 1;
-            var previous = properties.globalFontAdjustement;
+            var previous = globalProperties.fontAdjustement;
             if(!timers.mouseWheel) {
-                /*if(intern_step > 0) {
-                    properties.globalFontAdjustement += zoomStep;
-                    if(properties.globalFontAdjustement > 10) properties.globalFontAdjustement = 10;
+                if(intern_step > 0) {
+                    globalProperties.fontAdjustement += zoomStep;
+                    if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
                 } else {
-                    properties.globalFontAdjustement -= zoomStep;
-                    if(properties.globalFontAdjustement < -2) properties.globalFontAdjustement = -2;
+                    globalProperties.fontAdjustement -= zoomStep;
+                    if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
                 };
-                if(previous != properties.globalFontAdjustement) {
+                if(previous != globalProperties.fontAdjustement) {
                     timers.mouseWheel = setTimeout(function() {
-                        window.SetProperty("_SYSTEM: Extra font size value", properties.globalFontAdjustement);
+                        window.SetProperty("_SYSTEM: Extra font size value", globalProperties.fontAdjustement);
+						window.NotifyOthers('set_font',globalProperties.fontAdjustement);
                         get_font();
                         get_metrics();
                         get_images();
@@ -4386,7 +4387,7 @@ function on_mouse_wheel(step, stepstrait, delta){
                         timers.mouseWheel && clearTimeout(timers.mouseWheel);
                         timers.mouseWheel = false;
                     }, 100);
-                };*/
+                };
             };
         } else {
             if(pman.state == 1) {
@@ -4833,12 +4834,12 @@ function on_key_down(vkey) {
                         brw.repaint();
                     };
                     if(vkey == 48 || vkey == 96) { // CTRL+0
-                        var previous = properties.globalFontAdjustement;
+                        var previous = globalProperties.fontAdjustement;
                         if(!timers.mouseWheel) {
-                            properties.globalFontAdjustement = 0;
-                            if(previous != properties.globalFontAdjustement) {
+                            globalProperties.fontAdjustement = 0;
+                            if(previous != globalProperties.fontAdjustement) {
                                 timers.mouseWheel = setTimeout(function() {
-                                    window.SetProperty("_SYSTEM: Extra font size value", properties.globalFontAdjustement);
+                                    window.SetProperty("_SYSTEM: Extra font size value", globalProperties.fontAdjustement);
                                     get_font();
                                     get_metrics();
                                     get_images();
@@ -5214,8 +5215,8 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	
 		break;				
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement);		
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);		
 			on_font_changed();
 		break; 			
 		case "display_toggle_buttons":

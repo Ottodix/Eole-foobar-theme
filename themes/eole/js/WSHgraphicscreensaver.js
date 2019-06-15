@@ -118,8 +118,7 @@ var properties = {
     smooth_scroll_value: window.GetProperty("MAINPANEL Smooth Scroll value (0 to disable)", 0.5),
     smooth_expand_value: window.GetProperty("TRACKLIST Smooth Expand value (0 to disable)", 0.3),
 	smooth_expand_default_value:0.3,
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", 0),
-	panelFontAdjustement: 0,
+	panelFontAdjustement: -1,
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),
     deleteDiskCache: window.GetProperty("COVER delete cover cache on next startup", false),	
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),	
@@ -3155,7 +3154,7 @@ oBrowser = function(name) {
     }
    this.get_metrics = function(gr){
 		this.get_metrics_called = true;
-	   	this.firstRowHeight =  gr.CalcTextHeight("Who is Larry Dorman ?", g_font.plus1)
+	   	this.firstRowHeight =  gr.CalcTextHeight("Wcgregor", g_font.plus2)
 	}
 	
     this.get_albums = function(start, str_comp){
@@ -3815,15 +3814,20 @@ oBrowser = function(name) {
 						
 						// text
 						try{
-							this.groups_draw[i].text_y = coverTop + this.coverRealWith + 3;
-							this.groups_draw[i].showToolTip = ( (this.groups_draw[i].firstRowLength > this.coverRealWith) || (this.groups_draw[i].secondRowLength > this.coverRealWith) )						
-
-							gr.GdiDrawText(this.groups_draw[i].firstRow, g_font.plus2, text_color, ax, this.groups_draw[i].text_y, this.coverRealWith, 25, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+							this.groups_draw[i].text_y = coverTop + this.coverRealWith + 6;
+							var space_between_lines = 2;
+							this.groups_draw[i].showToolTip = ( (this.groups_draw[i].firstRowLength > this.coverRealWith) || (this.groups_draw[i].secondRowLength > this.coverRealWith) )
 							
-							if(this.groups_draw[i].text_y+22>this.headerBarHeight) gr.GdiDrawText(this.groups_draw[i].secondRow, g_font.italic, text_color, ax, this.groups_draw[i].text_y + this.firstRowHeight, this.coverRealWith, 25, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+							//if(this.groups_draw[i].text_y+this.firstRowHeight<g_headerbar.h || this.groups_draw[i].text_y>g_headerbar.h) 
+								gr.GdiDrawText(this.groups_draw[i].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups_draw[i].text_y, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+
+							if(this.groups_draw[i].text_y+22>this.headerBarHeight)
+								gr.GdiDrawText(this.groups_draw[i].secondRow, g_font.italic, colors.faded_txt, ax, this.groups_draw[i].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 							
 							if(typeof this.groups_draw[i].firstRowLength == 'undefined') this.groups_draw[i].firstRowLength = gr.CalcTextWidth(this.groups_draw[i].firstRow,g_font.plus2);
-							if(typeof this.groups_draw[i].secondRowLength == 'undefined') this.groups_draw[i].secondRowLength = gr.CalcTextWidth(this.groups_draw[i].secondRow,g_font.normal);	
+							if(typeof this.groups_draw[i].secondRowLength == 'undefined') this.groups_draw[i].secondRowLength = gr.CalcTextWidth(this.groups_draw[i].secondRow,g_font.normal);								
+							
+
 						} catch(e) {}						
 						
 					} else if (this.groups_draw[i].cover_img=="no_cover") {
@@ -5417,49 +5421,70 @@ function on_mouse_move(x, y, m) {
 function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;
-	
-    if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
-        properties.thumbnailWidth += (intern_step)*4;
-        if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
-        if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
-        window.SetProperty("COVER Width", properties.thumbnailWidth);
-		brw.refresh_browser_thumbnails();
-		if(properties.CoverShadowOpacity>0 && cover_shadow != null){
-			cover_shadow = undefined;
-			cover_shadow = null;	
-		}				
-        on_size(window.Width, window.Height);
-        return;
-    }
-    if(!g_dragA) {
-        if(g_showlist.idx > -1 && g_showlist.hscr_visible && (g_showlist.isHover_hscrollbar(g_cursor.x , g_cursor.y))) {
-                if(intern_step<0) {
-                    g_showlist.columnsOffset = (g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset;
-                } else {
-                    g_showlist.columnsOffset = (g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
-                }
-                brw.repaint();
-        } else {
-            scroll -= (intern_step) * brw.rowHeight;
-            scroll = g_scrollbar.check_scroll(scroll);
-			if(g_showlist.idx>-1){
-				var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
-				if(intern_step<0) { //on descend
-					if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
-						scroll += g_showlist.h;
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {
+		if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
+			properties.thumbnailWidth += (intern_step)*4;
+			if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
+			if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
+			window.SetProperty("COVER Width", properties.thumbnailWidth);
+			brw.refresh_browser_thumbnails();
+			if(properties.CoverShadowOpacity>0 && cover_shadow != null){
+				cover_shadow = undefined;
+				cover_shadow = null;	
+			}				
+			on_size(window.Width, window.Height);
+			return;
+		}
+		if(!g_dragA) {
+			if(g_showlist.idx > -1 && g_showlist.hscr_visible && (g_showlist.isHover_hscrollbar(g_cursor.x , g_cursor.y))) {
+					if(intern_step<0) {
+						g_showlist.columnsOffset = (g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset;
+					} else {
+						g_showlist.columnsOffset = (g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
 					}
-				} else { //on remonte
-					if(g_showlist_futur_y<brw.headerBarHeight+brw.rowHeight && g_showlist_futur_y > - g_showlist.h +brw.rowHeight) {
-						//scroll -= g_showlist.h;
-						scroll = g_showlist.rowIdx*brw.rowHeight;
-					}				
-				}			
+					brw.repaint();
+			} else {
+				scroll -= (intern_step) * brw.rowHeight;
+				scroll = g_scrollbar.check_scroll(scroll);
+				if(g_showlist.idx>-1){
+					var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
+					if(intern_step<0) { //on descend
+						if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
+							scroll += g_showlist.h;
+						}
+					} else { //on remonte
+						if(g_showlist_futur_y<brw.headerBarHeight+brw.rowHeight && g_showlist_futur_y > - g_showlist.h +brw.rowHeight) {
+							//scroll -= g_showlist.h;
+							scroll = g_showlist.rowIdx*brw.rowHeight;
+						}				
+					}			
+				}
+				scroll = g_scrollbar.check_scroll(scroll);
+				g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
+				
 			}
-			scroll = g_scrollbar.check_scroll(scroll);
-            g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
-			
-        }
-    }
+		}
+	}
 }
 
 function on_mouse_leave() {
@@ -6030,8 +6055,8 @@ function on_notify_data(name, info) {
 			}
 		break;			
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			on_font_changed();
 			if(g_showlist.idx>=0){
 				playlist = brw.groups_draw[g_showlist.idx].pl;

@@ -136,7 +136,7 @@ var properties = {
     smooth_scroll_value: window.GetProperty("MAINPANEL Smooth Scroll value (0 to disable)", 0.5),
     smooth_expand_value: window.GetProperty("TRACKLIST Smooth Expand value (0 to disable)", 0.3),
 	smooth_expand_default_value:0.3,
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", 0),
+    globalFontAdjustement: window.GetProperty("GLOBAL Font Adjustement", 0),
 	panelFontAdjustement: -1,
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),	
@@ -416,7 +416,7 @@ oFilterBox = function() {
 	}
  
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1+properties.globalFontAdjustement, g_font.italicplus2);
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", g_fsize+1+globalProperties.fontAdjustement, g_font.italicplus2);
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
@@ -2761,15 +2761,19 @@ oHeaderBar = function(name) {
 	}
 	this.append_properties_menu = function(basemenu,actions){
 		basemenu.AppendMenuSeparator();        
-		basemenu.AppendMenuItem(MF_STRING, 801, "Tracks properties");
 		if(fb.IsPlaying) basemenu.AppendMenuItem(MF_STRING, 802, "Show now playing");
-
+		basemenu.AppendMenuItem(MF_STRING, 803, "Play all");
+		basemenu.AppendMenuSeparator();  		
+		basemenu.AppendMenuItem(MF_STRING, 801, "Tracks properties");		
 		actions[801] = function(){	
 			fb.RunContextCommandWithMetadb("Properties", plman.GetPlaylistItems(brw.getSourcePlaylist()), 0);
 		}
 		actions[802] = function(){	
 			brw.focus_on_now_playing(fb.GetNowPlaying());
 		}			
+		actions[803] = function(){	
+			apply_playlist(plman.GetPlaylistItems(brw.SourcePlaylistIdx),true,false,false);
+		}		
 	}	
 	this.draw_header_menu = function(x,y,right_align){
 		var basemenu = window.CreatePopupMenu();
@@ -3764,7 +3768,7 @@ oBrowser = function(name) {
 	this.previousPlaylistIdx = -1;
 	this.found_searched_track = false;
 	this.setSizeFirstCall = false;
-	this.fontDate = gdi.Font("Arial", g_fsize-1+properties.globalFontAdjustement, 2);
+	this.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);
     this.cover_img_mask = null;	
 	this.coverMask = false;
 	this.dateCircleBG = false;
@@ -5927,7 +5931,7 @@ function on_mouse_rbtn_down(x, y){
 					sendTo.AppendMenuItem(MF_STRING, 3001 + i, plman.GetPlaylistName(i));
 				};
 			};	
-			if(brw.currentSorting=='' && !brw.currently_sorted  && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
+			if(!nowplayinglib_state.isActive() && brw.currentSorting=='' && !brw.currently_sorted  && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
 				_menu.AppendMenuItem(MF_STRING, 16, "Delete items from playlist");	
 			}
 			
@@ -5966,7 +5970,7 @@ function on_mouse_rbtn_down(x, y){
 										sendTo.AppendMenuItem(MF_STRING, 3001 + i, plman.GetPlaylistName(i));
 									};
 								};									
-								if(brw.currentSorting=='' && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
+								if(!nowplayinglib_state.isActive() && brw.currentSorting=='' && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
 									
 									if(metadblist_selection.Count>1)
 										_menu.AppendMenuItem(MF_STRING, 17, "Delete items from playlist");
@@ -5980,8 +5984,6 @@ function on_mouse_rbtn_down(x, y){
                                 //Context.InitContext(g_showlist.columns[c].rows[r].metadb);
 								Context.InitContext(metadblist_selection);
                                 Context.BuildMenu(_menu, 100, -1);
-								//delete items
-
                             }
                         }
                     }
@@ -6193,49 +6195,71 @@ function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;
 	
-    if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
-        properties.thumbnailWidth += (intern_step)*4;
-        if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
-        if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
-        window.SetProperty("COVER Width", properties.thumbnailWidth);
-		brw.refresh_browser_thumbnails();
-		if(properties.CoverShadowOpacity>0 && this.cover_shadow != null){
-			this.cover_shadow = undefined;
-			this.cover_shadow = null;	
-		}				
-        on_size(window.Width, window.Height);
-        return;
-    }
-    if(!g_dragA && !g_dragR) {
-        if(g_showlist.idx > -1 && g_showlist.hscr_visible && (g_showlist.isHover_hscrollbar(g_cursor.x , g_cursor.y))) {
-                if(intern_step<0) {
-                    g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
-                } else {
-                    g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
-                }
-                brw.repaint();
-        } else {
-            scroll -= (intern_step) * brw.rowHeight;
-            scroll = g_scrollbar.check_scroll(scroll);
-			if(g_showlist.idx>-1){
-				var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
-				if(intern_step<0) { //on descend
-					if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
-						scroll += g_showlist.h;
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {
+		if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
+			properties.thumbnailWidth += (intern_step)*4;
+			if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
+			if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
+			window.SetProperty("COVER Width", properties.thumbnailWidth);
+			brw.refresh_browser_thumbnails();
+			if(properties.CoverShadowOpacity>0 && this.cover_shadow != null){
+				this.cover_shadow = undefined;
+				this.cover_shadow = null;	
+			}				
+			on_size(window.Width, window.Height);
+			return;
+		}
+		if(!g_dragA && !g_dragR) {
+			if(g_showlist.idx > -1 && g_showlist.hscr_visible && (g_showlist.isHover_hscrollbar(g_cursor.x , g_cursor.y))) {
+					if(intern_step<0) {
+						g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
+					} else {
+						g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
 					}
-				} else { //on remonte
-					if(g_showlist_futur_y<brw.headerBarHeight+brw.rowHeight && g_showlist_futur_y > - g_showlist.h +brw.rowHeight) {
-						//scroll -= g_showlist.h;
-						scroll = g_showlist.rowIdx*brw.rowHeight;
-					}				
-				}			
+					brw.repaint();
+			} else {
+				scroll -= (intern_step) * brw.rowHeight;
+				scroll = g_scrollbar.check_scroll(scroll);
+				if(g_showlist.idx>-1){
+					var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
+					if(intern_step<0) { //on descend
+						if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
+							scroll += g_showlist.h;
+						}
+					} else { //on remonte
+						if(g_showlist_futur_y<brw.headerBarHeight+brw.rowHeight && g_showlist_futur_y > - g_showlist.h +brw.rowHeight) {
+							//scroll -= g_showlist.h;
+							scroll = g_showlist.rowIdx*brw.rowHeight;
+						}				
+					}			
+				}
+				scroll = g_scrollbar.check_scroll(scroll);
+				g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
+				g_tooltip.Deactivate();
 			}
-			scroll = g_scrollbar.check_scroll(scroll);
-            g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
-			g_tooltip.Deactivate();
-        }
-    } else {
-		if(properties.DragToPlaylist) g_plmanager.checkstate("wheel", g_cursor.x, g_cursor.y, intern_step);
+		} else {
+			if(properties.DragToPlaylist) g_plmanager.checkstate("wheel", g_cursor.x, g_cursor.y, intern_step);
+		}
 	}
 }
 
@@ -6455,7 +6479,7 @@ function get_colors() {
 
 function on_font_changed() {
     get_font();
-	brw.fontDate = gdi.Font("Arial", g_fsize-1+properties.globalFontAdjustement, 2);	
+	brw.fontDate = gdi.Font("Arial", g_fsize-1+globalProperties.fontAdjustement, 2);	
 	g_showlist.ratingImgsLight = false;
 	g_showlist.ratingImgsDark = false;
 	brw.get_metrics_called = false;
@@ -6831,8 +6855,8 @@ function on_notify_data(name, info) {
 			//g_filterbox.inputbox.on_char(0);
 		break; 	
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			on_font_changed();
 			if(g_showlist.idx>=0){
 				playlist = brw.groups[g_showlist.idx].pl;

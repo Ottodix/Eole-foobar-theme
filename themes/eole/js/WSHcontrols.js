@@ -4,7 +4,6 @@ var properties = {
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
     random_function: window.GetProperty("Random function", "default"),	
 	remaining_time: window.GetProperty("Show remaining time",false),
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", -1),
 	maindarklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),		
 	minidarklayout: window.GetProperty("_DISPLAY: Mini layout:Dark", true),		
 	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
@@ -1074,15 +1073,37 @@ function on_mouse_leave() {
 function on_mouse_wheel(step, stepstrait, delta){
 	
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
-	else intern_step = stepstrait/delta;	
+	else intern_step = stepstrait/delta;
 	
-    if(!hooverprogress){
-		fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
-		showVolumeSliderTemp();
-	}    
-    if(hooverprogress){    
-        fb.PlaybackTime = fb.PlaybackTime + (stepstrait/delta) * 2;
-    }	
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {
+		if(!hooverprogress){
+			fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
+			showVolumeSliderTemp();
+		}    
+		if(hooverprogress){    
+			fb.PlaybackTime = fb.PlaybackTime + (stepstrait/delta) * 2;
+		}	
+	}
 }
 function on_volume_change(val) {
     if(!volume_vars.drag) showVolumeSliderTemp();
@@ -1451,8 +1472,8 @@ function on_notify_data(name, info) {
 			}
 		break;		
 		case "set_font":
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			get_font();adapt_display_to_layout();
 			window.Repaint();
 		break; 			

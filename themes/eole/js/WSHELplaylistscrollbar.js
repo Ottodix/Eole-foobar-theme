@@ -14,7 +14,7 @@ var scrollbar_size=(scrollbar_size<scroll_min_height) ? scroll_min_height : (scr
 var scrollbar_zone=wh-scrollbar_size+0;
 properties = {
 	panelName: 'WSHELplaylistscrollbar',		
-	darklayout: window.GetProperty("_DISPLAY: Dark layout", false)  		
+	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),	
 };
 
 function get_colors() {
@@ -86,13 +86,37 @@ function on_mouse_leave() {
     }          
 }
 
-function on_mouse_wheel(delta){
-    if(delta>0)
-    focus_item=(focus_item>9)? focus_item-9 : 0;
-    else
-    focus_item=(focus_item<playlist_count-10)? focus_item+9 : playlist_count-1;
-    window.Repaint();
-    plman.SetPlaylistFocusItem(plman.ActivePlaylist,focus_item);    
+function on_mouse_wheel(step, stepstrait, delta){
+	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
+	else intern_step = stepstrait/delta;	
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {	
+		if(intern_step>0)
+		focus_item=(focus_item>9)? focus_item-9 : 0;
+		else
+		focus_item=(focus_item<playlist_count-10)? focus_item+9 : playlist_count-1;
+		window.Repaint();
+		plman.SetPlaylistFocusItem(plman.ActivePlaylist,focus_item);    
+	}
 }
 
 function on_item_focus_change(){
@@ -142,6 +166,10 @@ function on_notify_data(name, info) {
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
 		break; 
+		case "set_font":
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		break; 			
 		case "nowplayingplaylist_state":
 			nowplayingplaylist_state.value=info;
 		break; 

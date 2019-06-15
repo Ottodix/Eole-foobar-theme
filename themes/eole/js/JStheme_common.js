@@ -18,9 +18,9 @@ var randomBtnTimer = false;
 var PlaylistExclude = Array("Whole Library");
 var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
-
+var timers = []
 var globalProperties = {
-	theme_version: '1.2.0a',
+	theme_version: '1.2.0b',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -31,6 +31,9 @@ var globalProperties = {
 	miniMode_minwidth: 150,
 	minMode_minheight:200,	
 	tooltip_delay:500,	
+	fontAdjustement_min:-10,	
+	fontAdjustement_max:10,	
+    fontAdjustement: window.GetProperty("GLOBAL Font Adjustement", 0),	
 	mem_solicitation:window.GetProperty("GLOBAL memory solicitation", 0),	
 	enable_screensaver:window.GetProperty("GLOBAL enable screensaver", false),
 	escape_on_mouse_move:window.GetProperty("GLOBAL screensaver escape on mouse move", false),	
@@ -2267,7 +2270,7 @@ function get_font() {
         font_error = true;
     };
     // adjust font size if extra zoom activated
-    g_fsize += properties.globalFontAdjustement+properties.panelFontAdjustement;
+    g_fsize += globalProperties.fontAdjustement+properties.panelFontAdjustement;
 	
 	g_font.normal = gdi.Font(g_fname, g_fsize, g_fstyle);
 	g_font.min1 = gdi.Font(g_fname, g_fsize-1, g_fstyle);

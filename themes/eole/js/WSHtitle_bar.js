@@ -4,7 +4,6 @@ var properties = {
 	panelName: 'WSHtitle_bar',			
     Remember_previous_state: window.GetProperty("Resume panel state on startup, except on visualization tab", false),
     background_color: window.GetProperty("Background color", "255-255-255"),		
-    globalFontAdjustement: window.GetProperty("MAINPANEL: Global Font Adjustement", 0),
 	fullMode_savedwidth: window.GetProperty("Full mode saved width", 1100),
 	fullMode_pmanagerheight: window.GetProperty("Full mode pmanager saved height", 820),
 	miniMode_savedwidth: window.GetProperty("Mini mode saved width", 290),
@@ -906,6 +905,31 @@ function on_mouse_lbtn_dblclk(x, y) {
 function on_mouse_rbtn_down(x, y, mask) {
 	g_searchbox.on_mouse("rbtn_down", x, y);	
 }
+function on_mouse_wheel(step, stepstrait, delta){
+	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
+	else intern_step = stepstrait/delta;	
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	}
+}
 function on_mouse_rbtn_up(x, y){
         var _menu = window.CreatePopupMenu();	
         var _screensaver = window.CreatePopupMenu();			
@@ -1362,7 +1386,10 @@ function draw_main_menu(x,y){
 	font_size.AppendTo(appearance_menu,MF_STRING, "Font size");	
 	font_size.AppendMenuItem(MF_STRING, 4012, "Increase");	
 	font_size.AppendMenuItem(MF_STRING, 4013, "Decrease");	
-	font_size.AppendMenuItem(MF_STRING, 4014, "Reset");	
+	font_size.AppendMenuItem(MF_STRING, 4014, "Reset");
+	font_size.AppendMenuSeparator();
+	font_size.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold CTRL and use your");
+	font_size.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over (almost) any panel!");		
 	nowplayinglobal = window.CreatePopupMenu();
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4072, "Hide");
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4073, "Show");	
@@ -1615,21 +1642,21 @@ function draw_main_menu(x,y){
 		toggleLayoutMode(0);get_colors();g_searchbox.adapt_look_to_layout();
 		break;	
 	case (idx == 4012):
-		properties.globalFontAdjustement++;
-		window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement);
-		window.NotifyOthers('set_font',properties.globalFontAdjustement);
+		globalProperties.fontAdjustement++;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 		on_font_changed();		
 		break;	
 	case (idx == 4013):
-		properties.globalFontAdjustement--;
-		window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement);
-		window.NotifyOthers('set_font',properties.globalFontAdjustement);
+		globalProperties.fontAdjustement--;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 		on_font_changed();			
 		break;
 	case (idx == 4014):
-		properties.globalFontAdjustement = 0;
-		window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement);
-		window.NotifyOthers('set_font',properties.globalFontAdjustement);
+		globalProperties.fontAdjustement = 0;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 		on_font_changed();		
 		break;	
 	case (idx == 4015):
@@ -1902,8 +1929,8 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL screensaver escape on mouse move", globalProperties.escape_on_mouse_move);	
 		break;		
 		case "set_font":	
-			properties.globalFontAdjustement = info;
-			window.SetProperty("MAINPANEL: Global Font Adjustement", properties.globalFontAdjustement),
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			get_font();
 			window.Repaint();
 		break;		
