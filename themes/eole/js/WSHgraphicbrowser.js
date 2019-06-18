@@ -966,7 +966,6 @@ oRow = function(metadb,itemIndex) {
 				gr.FillSolidRect(this.x+20, y-3, current_size-7, 1, g_showlist.progressbar_linecolor1); //line top
 				if(!g_showlist.light_bg) gr.FillSolidRect(this.x+20-track_gradient_size, y-4, current_size-5+track_gradient_size, 1, g_showlist.progressbar_color_shadow); //horizontal top shadow			
 
-				
 				gr.FillGradRect(this.x+20-track_gradient_size, y-4+this.h, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad bottom
 				gr.FillSolidRect(this.x+20, y-4+this.h, current_size-7, 1, g_showlist.progressbar_linecolor1); //line bottom		
 				gr.FillSolidRect(this.x+current_size+12, y-2, 1, this.h-2, g_showlist.progressbar_linecolor1);	//vertical line	
@@ -1012,7 +1011,6 @@ oRow = function(metadb,itemIndex) {
 			this.ToolTipText = this.title_text + this.playcount_text;
 		}
 		
-
         gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
         if(isPlaying && properties.AlbumArtProgressbar && properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
@@ -1033,9 +1031,9 @@ oRow = function(metadb,itemIndex) {
 				gr.DrawImage(playingText, this.x, this.y, current_size+12, this.h, 0, 0, current_size+12, this.h, 0, 255);
 				gr.DrawRect(this.x+10, this.y, Math.min(current_size+1,this.w), this.h-1,1,g_showlist.albumartprogressbar_color_rectline)
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
-				else var title_w = current_size-this.tracknumber_w+2;
+				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
 				gr.GdiDrawText(this.title_text, g_font.normal, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10), this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((this.x + this.tracknumber_w + 10 + this.title_length+this.playcount_length+5)<this.rating_x) || this.rating_x<=0){	
+				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((this.x + this.tracknumber_w + 10 + this.title_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+this.playcount_length<this.w - length_w))){	
 					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, current_size-this.tracknumber_w+2 - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 				}
         } 
@@ -5196,19 +5194,21 @@ oBrowser = function(name) {
 	}
 	this.focus_on_now_playing = function (track){		
 		FocusOnNowPlaying = true;
+		var results = true;
 		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !(!this.followActivePlaylist && nowplayinglib_state.isActive() && this.isPlayingIdx>-1)){
 			if(this.followActivePlaylist){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
 				brw.populate(29, false, false, plman.PlayingPlaylist);
 			} else {
-				if(!nowplayinglib_state.isActive()){
+				if(nowplayinglib_state.isActive()){
+					var results = quickSearch(track,properties.leftFilterState);							
+				}
+				if(!nowplayinglib_state.isActive() || !results){
 					plman.ClearPlaylist(this.getSourcePlaylist());
 					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
 					//brw.populate(29, false, false);		
-				} else {		
-					quickSearch(track,properties.leftFilterState);		
-				}					
+				}				
 			}									
 		} else {					
 			var isFound = brw.seek_track(track);
@@ -5218,11 +5218,12 @@ oBrowser = function(name) {
 						plman.ActivePlaylist = plman.PlayingPlaylist;
 						//brw.populate(28);
 					} else {
-						if(!nowplayinglib_state.isActive()){
+						if(nowplayinglib_state.isActive()){
+							var results = quickSearch(track,properties.leftFilterState);							
+						}	
+						if(!nowplayinglib_state.isActive() || !results){
 							brw.populate(26);
-						} else {		
-							quickSearch(track,properties.leftFilterState);		
-						}				
+						}
 					}
 				} else {	
 					timers.showItem = setTimeout(function(){
@@ -6959,8 +6960,9 @@ function on_notify_data(name, info) {
 			libraryfilter_state.value=info;
 		break; 		
 		case "RefreshImageCover":
-			if(window.IsVisible) brw.refresh_all_images();
-			else set_update_function('brw.refresh_all_images();');
+			//if(window.IsVisible) brw.refresh_all_images();
+			//else set_update_function('brw.refresh_all_images();');
+			brw.refresh_all_images();
 			var metadb = new FbMetadbHandleList(info);
 			g_image_cache.resetMetadb(metadb[0])			
 		break; 		

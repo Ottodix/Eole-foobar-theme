@@ -1652,53 +1652,73 @@ function quickSearch(start,search_function){
 			var arr = fb.TitleFormat("%artist%").EvalWithMetadb(start);	
 			try{			
 				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr));
-				artist_items.OrderByFormat(tfo, 1);
-				apply_playlist(artist_items,false,false);
+				if(artist_items.Count>0){
+					artist_items.OrderByFormat(tfo, 1);
+					apply_playlist(artist_items,false,false);
+				} else {
+					return false;
+				}
 				artist_items = undefined;
-			} catch(e) {}
+			} catch(e) {return false;}
 			break;  	
 		case 'album':	
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
 			var arr = fb.TitleFormat("%album%").EvalWithMetadb(start);		
 			try{			
 				album_items = fb.GetQueryItems(fb.GetLibraryItems(), "%album% IS "+trim1(arr));
-				album_items.OrderByFormat(tfo, 1);
-				apply_playlist(album_items,false,false);
+				if(album_items.Count>0){				
+					album_items.OrderByFormat(tfo, 1);
+					apply_playlist(album_items,false,false);
+				} else {
+					return false;
+				}				
 				album_items = undefined;				
-			} catch(e) {}			
+			} catch(e) {return false;}			
 			break; 		
 		case 'genre':	
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
 			var arr = fb.TitleFormat("%genre%").EvalWithMetadb(start);		
 			try{			
 				genre_items = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+trim1(arr));
-				genre_items.OrderByFormat(tfo, 1);
-				apply_playlist(genre_items,false,false);
+				if(genre_items.Count>0){				
+					genre_items.OrderByFormat(tfo, 1);
+					apply_playlist(genre_items,false,false);
+				} else {
+					return false;
+				}				
 				genre_items = undefined;				
-			} catch(e) {}			
+			} catch(e) {return false;}			
 			break; 	
 		case 'date':	
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
 			var arr = fb.TitleFormat("%date%").EvalWithMetadb(start);	
 			try{
 				date_items = fb.GetQueryItems(fb.GetLibraryItems(), "%date% IS "+trim1(arr));
-				date_items.OrderByFormat(tfo, 1);
-				apply_playlist(date_items,false,false);
+				if(date_items.Count>0){				
+					date_items.OrderByFormat(tfo, 1);
+					apply_playlist(date_items,false,false);
+				} else {
+					return false;
+				}				
 				date_items = undefined;				
-			} catch(e) {}			
+			} catch(e) {return false;}			
 			break; 	
 		case 'title':	
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
 			var arr = fb.TitleFormat("%title%").EvalWithMetadb(start);	
 			try{
 				title_items = fb.GetQueryItems(fb.GetLibraryItems(), "%title% IS "+trim1(arr));
-				title_items.OrderByFormat(tfo, 1);
-				apply_playlist(title_items,false,false);
+				if(title_items.Count>0){				
+					title_items.OrderByFormat(tfo, 1);
+					apply_playlist(title_items,false,false);
+				} else {
+					return false;
+				}				
 				title_items = undefined;				
-			} catch(e) {}			
+			} catch(e) {return false;}			
 			break; 				
-	}			
-	
+	}
+	return true;	
 }
 function shuffleList(metadb_list) {
   var currentIndex = metadb_list.Count, temporaryValue, randomIndex;
@@ -2472,12 +2492,12 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 		if(brw.groups[albumIndex].tracktype<0) brw.groups[albumIndex].tracktype = TrackType(handle.RawPath.substring(0, 4));	
 		if(brw.groups[albumIndex].tracktype < 2) {
 			brw.groups[albumIndex].cover_img = cover.nocover_img;
-			brw.groups[albumIndex].cover_img_full = cover.nocover_img;
-			g_image_cache.cachelist[cachekey] = cover.nocover_img;
+			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = cover.nocover_img;
+			if(cachekey!="undefined") g_image_cache.cachelist[cachekey] = cover.nocover_img;
 		} else {
 			brw.groups[albumIndex].cover_img = cover.stream_img;
-			brw.groups[albumIndex].cover_img_full = cover.stream_img;
-			g_image_cache.cachelist[cachekey] = cover.stream_img;
+			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = cover.stream_img;
+			if(cachekey!="undefined") g_image_cache.cachelist[cachekey] = cover.stream_img;
 		}
 		brw.groups[albumIndex].load_requested = 2;	
 		brw.repaint();

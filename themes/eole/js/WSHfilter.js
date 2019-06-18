@@ -113,7 +113,7 @@ var properties = {
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),		
     DropInplaylist: window.GetProperty("_SYSTEM: Allow to drag items into a playlist", true),	
     enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", false),
-    default_botStampHeight: 48,
+    default_botStampHeight: 16,
     botStampHeight: 0,
     default_botGridHeight: 42,
     botGridHeight: 0,
@@ -1197,7 +1197,6 @@ oScrollbar = function(themed) {
         // normal cursor Image
         this.cursorImage_normal = gdi.CreateImage(this.cursorw, this.cursorh);
         var gb = this.cursorImage_normal.GetGraphics();
-		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
 		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);
 
         this.cursorImage_normal.ReleaseGraphics(gb);
@@ -1206,14 +1205,12 @@ oScrollbar = function(themed) {
         this.cursorImage_hover = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_hover.GetGraphics();
         // Draw Themed Scrollbar (lg/col)
-		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
 		gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,colors.scrollbar_hover_cursor);
         this.cursorImage_hover.ReleaseGraphics(gb);
 		
         // down cursor Image
         this.cursorImage_down = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_down.GetGraphics();
-		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
 		gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,colors.scrollbar_down_cursor);
 
         this.cursorImage_down.ReleaseGraphics(gb);
@@ -1557,6 +1554,8 @@ oBrowser = function(name) {
 	this.timer_populate_is_first = false;	
 	this.drag_moving = false;
 	this.tempSelectedItem = -1;
+	this.firstRowHeight = false;
+	this.secondRowHeight = false;	
     this.launch_populate = function() {
 		brw.populate(is_first_populate = true,0);
 		pman.populate(exclude_active = false, reset_scroll = true);
@@ -1615,7 +1614,7 @@ oBrowser = function(name) {
 				}
                 // Adjust Row & showList bloc Height
                 if(properties.displayMode == 1) {
-                    this.rowHeight = 5 + cover.max_w + properties.botStampHeight;
+                    this.rowHeight = 5 + cover.max_w + this.firstRowHeight + this.secondRowHeight + properties.botStampHeight; //properties.botStampHeight;
                 } else {
                     this.rowHeight = cover.max_w + 1;
                 };
@@ -2318,13 +2317,14 @@ oBrowser = function(name) {
 		Mimg.ReleaseGraphics(gb);
 		this.coverMask = Mimg;	
 	}
-	
+	this.onFontChanged = function(){
+		this.firstRowHeight = false;
+		this.secondRowHeight = false;
+	}
     this.draw = function(gr) {
         var tmp, offset;
         var cx = 0;
         var ax, ay, by, rowStart, row, coverTop;
-        var aw = this.thumbnailWidth - (this.marginSide * 2);
-        var ah = this.rowHeight - this.marginTop - this.marginBot;
 		this.group_unrequested_loading = false;
         if(properties.displayMode > 0) {
             var coverWidth = cover.max_w;
@@ -2335,9 +2335,17 @@ oBrowser = function(name) {
         var total = this.groups.length;
         var all_x = -1, all_y = -1, all_w = 0, all_h = 0;
         var coverImg = null;
-		
-		//if(!this.coverMask && properties.circleMode) this.DefineCircleMask(coverWidth);
-
+		if((properties.displayMode == 1 || properties.displayMode == 3) && (!this.firstRowHeight || !this.secondRowHeight)) {
+			if(!this.firstRowHeight) {
+				this.firstRowHeight = gr.CalcTextHeight("WcLrego9", g_font.normal);	
+			}
+			if(!this.secondRowHeight) {
+				this.secondRowHeight = gr.CalcTextHeight("WcLrego9", g_font.italicmin1);
+			}
+			this.get_metrics();
+		}
+        var aw = this.thumbnailWidth - (this.marginSide * 2);
+        var ah = this.rowHeight - this.marginTop - this.marginBot;
 		if(properties.displayMode == 3) var padding_covers = 6;
 		else var padding_covers = 0
 		var im_w = coverWidth+2-padding_covers;
@@ -2443,10 +2451,7 @@ oBrowser = function(name) {
 									if(i==0) gr.FillSolidRect(ax, ay-properties.first_item_top_margin, aw, ah+properties.first_item_top_margin, colors.alternate_row); 
 									else gr.FillSolidRect(ax, ay, aw, ah, colors.alternate_row);
 								};
-							} else {
-								//gr.FillSolidRect(ax, ay, aw, ah, colors.normal_txt & 0x06ffffff);
-								//gr.DrawRect(ax, ay, aw-1, ah-1, 1.0, colors.normal_txt & 0x07ffffff);
-							};
+							}
 							// background selection
 							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
 								txt_color1 = colors.normal_txt;
@@ -2487,8 +2492,7 @@ oBrowser = function(name) {
 									//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay+ah-1, track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line, 1.0);
 								} else if(properties.displayMode == 1)	{
 									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);																
-									//if(this.activeIndex<0)
-										gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, colors.selected_item_line);
+									gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, colors.selected_item_line);
 								}								
 												
 											
@@ -2517,10 +2521,8 @@ oBrowser = function(name) {
 										if(g_rightClickedIndex == i && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 											if(this.stampDrawMode) {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
 											} else {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.selected_bg & 0xddffffff);
 											};
 										};
 									} else {
@@ -2545,12 +2547,11 @@ oBrowser = function(name) {
 												} else if(ax>aw*(this.totalColumns-2)+aw/2){ //last column
 													hover_w = aw+2;												
 												}			
-												gr.FillSolidRect(ax, ay, hover_w, hover_h, colors.selected_item_bg);												
+												gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);												
 												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  colors.selected_item_line);	
-												//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
+	
 											} else {
 												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
-												//gr.DrawRect(ax + Math.round((aw - frame_w) / 2) + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, colors.selected_bg & 0xddffffff);
 											};
 										};
 									};
@@ -2602,7 +2603,6 @@ oBrowser = function(name) {
 										if(properties.displayMode == 3) {
 											if(i == this.selectedIndex) {
 												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
-												//gr.DrawRect(ax+padding_covers-1, coverTop + coverWidth - properties.botGridHeight+1, im_w-1, properties.botGridHeight-2, 1.0, colors.gridselected_bg);
 											} else gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
 										};
 									};
@@ -2625,16 +2625,11 @@ oBrowser = function(name) {
 
 
 								if(properties.displayMode == 1) { // panelMode = 1 (Art + bottom labels)
-									// draw text
+									// draw text									
 									if(properties.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
 										try{
-											if(properties.tagMode == 1) {
-												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											} else {
-												gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
-											};
+											gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, this.firstRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											gr.GdiDrawText(""+(total-1)+" items", g_font.italicmin1, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + this.firstRowHeight), coverWidth, this.secondRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 										} catch(e) {console.log(e)}
 									} else {
 										if(this.groups[i].album == "?") {
@@ -2656,7 +2651,7 @@ oBrowser = function(name) {
 												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].artist_name, font2);											
 												this.groups[i].showToolTip = (this.groups[i].text1Length > coverWidth || this.groups[i].text2Length > coverWidth);
 												gr.GdiDrawText(album_name, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.firstRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
 											  this.groups[i].tooltipText = this.groups[i].artist_name;
 											  font1 = g_font.normal;
@@ -2665,7 +2660,7 @@ oBrowser = function(name) {
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > coverWidth);
 											  gr.GdiDrawText(this.groups[i].groupkey, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + properties.botTextRowHeight), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
+											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.secondRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
 											};
 										} catch(e) {}
 									};
@@ -2765,7 +2760,6 @@ oBrowser = function(name) {
 
 								// Hover effect
 								if(((g_rightClickedIndex > -1 && g_rightClickedIndex == i) || i == this.activeIndex) && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
-									//gr.DrawRect(ax+1, ay+1, aw-2, ah-2, 2.0, colors.selected_bg & 0xd0ffffff);
 									if(i==0)
 										gr.FillSolidRect(ax, ay-properties.first_item_top_margin, colors.width_marker_hover_item, ah+properties.first_item_top_margin, colors.marker_hover_item);
 									else
@@ -3382,23 +3376,23 @@ oBrowser = function(name) {
         if(Math.abs(scroll - scroll_) >= 5){
             scroll_ += (scroll - scroll_) / properties.scrollSmoothness;
             isScrolling = true;
-            repaint_1 = true; //console.log("Math.abs(scroll - scroll_) >= 5")
+            repaint_1 = true; 
             if(scroll_prev != scroll) brw.scrollbar.updateScrollbar();
         } else {
             if(scroll_ != scroll) {
                 scroll_ = scroll; // force to scroll_ value to fixe the 5.5 stop value for expanding album action
-                repaint_1 = true; //console.log("scroll_ != scroll")
+                repaint_1 = true; 
             };
             if(isScrolling) {
                 if(scroll_< 1) scroll_ = 0;
                 isScrolling = false;
-                repaint_1 = true; //console.log("isScrolling")
+                repaint_1 = true;
             };
         };	
 		
         if(brw.group_unrequested_loading) {
 			brw.group_unrequested_loading=false;
-			repaint_1 = true; //console.log("group_unrequested_loading")
+			repaint_1 = true;
 		}
         if(repaint_1){
             repaintforced = true;
@@ -4614,6 +4608,7 @@ function on_font_changed() {
 		g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
 		g_filterbox.onFontChanged();	
 	}
+	brw.onFontChanged();
     get_metrics();
     brw.repaint();
 };
@@ -5335,14 +5330,12 @@ function on_notify_data(name, info) {
 		case "cover_cache_finalized": 	
 			//g_image_cache.cachelist = info.map( (arg)=>{ return (arg ? cloneImg(arg) : null); } );
 			//g_image_cache.cachelist = cloneImgs(info);
-			/*console.log("info type:"+(typeof(info))+" length:"+info.length);
+			/*
 			for (var i in info) {
 				//console.log("filter image_cache size: "+g_image_cache.cachelist.length);
 				g_image_cache.cachelist = new GdiBitmap(info[i]);
 			}
-			
-			console.log("filter image_cache size: "+g_image_cache.cachelist.length);*/
-			window.Repaint();
+			window.Repaint();*/
 		break;	
 		case "layout_state":  
 			layout_state.value=info;			
