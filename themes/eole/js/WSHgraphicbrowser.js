@@ -1018,7 +1018,8 @@ oRow = function(metadb,itemIndex) {
 				pt = playingText.GetGraphics();
 					pt.SetTextRenderingHint(5);
 					if(typeof(g_showlist.g_wallpaperImg) == "undefined" || !g_showlist.g_wallpaperImg) {		
-						g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+						g_showlist.g_wallpaperImg = setWallpaperImgV2(g_showlist.cover_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+						//g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 					};						
 					pt.DrawImage(g_showlist.g_wallpaperImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.g_wallpaperImg.Width, this.h);
 					pt.FillSolidRect(10, 0, this.w, this.h, g_showlist.progressbar_color_bg_on); //solid bg

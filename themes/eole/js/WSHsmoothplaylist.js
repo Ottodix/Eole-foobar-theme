@@ -1449,7 +1449,7 @@ oGroup = function(index, start, handle, groupkey) {
     this.groupkey = groupkey;
 	this.groupkeysplit = groupkey.split(" ^^ ");
     this.cachekey = process_cachekey(handle);
-    //
+    this.is_fallback = false;
     this.cover_img = null;
 	this.isPlaying = false;
     this.cover_type = null;
@@ -2358,7 +2358,7 @@ oBrowser = function(name) {
 								else if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 								else gr.FillSolidRect(ax, ay - ((ghrh - 1) * ah)-line_vertical_fix, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 							}							
-							if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay + ah + Math.round(ah/2), aw+this.paddingRight, 2, colors.dragdrop_marker_line);
+							//if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay + ah + Math.round(ah/2), aw+this.paddingRight, 2, colors.dragdrop_marker_line);
                             // ==========
                             // cover art
                             // ==========
@@ -2388,6 +2388,7 @@ oBrowser = function(name) {
 									width = this.groups[g].cover_img.Width;
 									height = this.groups[g].cover_img.Height;
 									coverMask = this.coverMask.Resize(width, height, 7);
+									if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height) 									
 									this.groups[g].cover_img.ApplyMask(coverMask);
 									this.groups[g].mask_applied = true;
 								};
@@ -2644,10 +2645,10 @@ oBrowser = function(name) {
 											if(properties.AlbumArtProgressbar) {												
 												var playingText = gdi.CreateImage(total_size+15, ah);
 												pt = playingText.GetGraphics();
-													pt.SetTextRenderingHint(globalProperties.TextRendering);
-													
-													if(typeof(this.groups[this.rows[i].albumId].g_wallpaperImg) == "undefined" || !this.groups[this.rows[i].albumId].g_wallpaperImg) {		
-														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying(), true, ww, ah*16);
+													pt.FillSolidRect(0, 0, total_size+15, ah,colors.normal_bg)
+													pt.SetTextRenderingHint(5);
+													if(typeof(this.groups[this.rows[i].albumId].g_wallpaperImg) == "undefined" || !this.groups[this.rows[i].albumId].g_wallpaperImg) {	
+														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImgV2(undefined, this.groups[this.rows[i].albumId].metadb, true, ww, ah*16);
 													};						
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)	
@@ -2726,6 +2727,7 @@ oBrowser = function(name) {
 													width = this.groups[g].cover_img.Width;
 													height = this.groups[g].cover_img.Height;
 													coverMask = this.coverMask.Resize(width, height, 7);
+													if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height); 
 													this.groups[g].cover_img.ApplyMask(coverMask);
 													this.groups[g].mask_applied = true;
 												}													
@@ -2795,6 +2797,7 @@ oBrowser = function(name) {
 													width = this.groups[g].cover_img.Width;
 													height = this.groups[g].cover_img.Height;
 													coverMask = this.coverMask.Resize(width, height, 7);
+													if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height) 													
 													this.groups[g].cover_img.ApplyMask(coverMask);
 													this.groups[g].mask_applied = true;
 												}													
@@ -2975,7 +2978,7 @@ oBrowser = function(name) {
 													pt.SetTextRenderingHint(globalProperties.TextRendering);
 													
 													if(typeof(this.groups[this.rows[i].albumId].g_wallpaperImg) == "undefined" || !this.groups[this.rows[i].albumId].g_wallpaperImg) {		
-														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying(), true);
+														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImgV2(undefined, this.groups[this.rows[i].albumId].metadb, true, ww, ah*16);
 													};						
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)	

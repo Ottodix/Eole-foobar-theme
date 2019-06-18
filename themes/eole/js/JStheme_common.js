@@ -2469,9 +2469,22 @@ function get_albumArt(metadb,cachekey){
 		// load img from cache				
 		if(cache_filename) {	
 			artwork_img = load_image_from_cache_direct(cache_filename);
-		} else artwork_img = utils.GetAlbumArtV2(metadb, AlbumArtId.front);
+		} else {
+			artwork_img = utils.GetAlbumArtV2(metadb, AlbumArtId.front);
+			if(!isImage(artwork_img)) {
+				artwork_img = get_fallbackCover(metadb);
+			}
+		}
 	}	
 	return artwork_img;
+}
+function get_fallbackCover(metadb, tracktype){
+	var tracktype = typeof tracktype !== 'undefined' ? tracktype : TrackType(metadb.RawPath.substring(0, 4));	
+	if(tracktype < 2) {
+		return cover.nocover_img;
+	} else {
+		return cover.stream_img;
+	}
 }
 const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_embed, no_load) =>
 {
@@ -2489,16 +2502,10 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			window.Repaint();     	
 		}		
 	} else if (typeof brw == "object" && albumIndex>=0) {
-		if(brw.groups[albumIndex].tracktype<0) brw.groups[albumIndex].tracktype = TrackType(handle.RawPath.substring(0, 4));	
-		if(brw.groups[albumIndex].tracktype < 2) {
-			brw.groups[albumIndex].cover_img = cover.nocover_img;
-			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = cover.nocover_img;
-			if(cachekey!="undefined") g_image_cache.cachelist[cachekey] = cover.nocover_img;
-		} else {
-			brw.groups[albumIndex].cover_img = cover.stream_img;
-			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = cover.stream_img;
-			if(cachekey!="undefined") g_image_cache.cachelist[cachekey] = cover.stream_img;
-		}
+		brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
+		brw.groups[albumIndex].is_fallback = true;
+		if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = brw.groups[albumIndex].cover_img;
+		g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
 		brw.groups[albumIndex].load_requested = 2;	
 		brw.repaint();
 	}
@@ -2578,6 +2585,9 @@ function createDragImg(img, cover_size, count){
 oImageCache = function () {
     this.cachelist = Array();
 	this.cover_load_timer = [];
+    this.addToCache = function (image, cachekey) {
+		if(cachekey!="undefined") this.cachelist[cachekey] = image;
+	}
     this.hit = function (metadb, albumIndex, direct_return, cachekey, resize) {	
 		var cachekey = typeof cachekey !== 'undefined' ? cachekey : brw.groups[albumIndex].cachekey;
 		var resize = typeof resize !== 'undefined' ? resize : true;		
@@ -2773,7 +2783,36 @@ function draw_blurred_image(image,ix,iy,iw,ih,bx,by,bw,bh,blur_value,overlay_col
     
     return bbox;
 };
+function setWallpaperImgV2(image, metadb, progressbar_art, width, height, blur_value, rawBitmap, quality) {
+	progressbar_art = typeof progressbar_art !== 'undefined' ? progressbar_art : false;	
+	rawBitmap = typeof rawBitmap !== 'undefined' ? rawBitmap : false;		
+	quality = typeof quality !== 'undefined' ? quality : 1;			
+	width = typeof width !== 'undefined' ? width : ww;	
+	height = typeof height !== 'undefined' ? height : wh;
+	blur_value = typeof blur_value !== 'undefined' ? blur_value : properties.wallpaperblurvalue;	
+	
+    if(isImage(image)) {
+		var tmp_img = image;
+    } else if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
+		cachekey = process_cachekey(metadb);
+		var tmp_img = get_albumArt(metadb, cachekey);
+    } else {
+        tmp_img = gdi.Image(globalProperties.default_wallpaper);
+    };
+    if(!tmp_img) {
+        tmp_img = gdi.Image(globalProperties.default_wallpaper);
+    };
 
+    if(!progressbar_art) {
+		if(metadb!==null) g_wallpaperImg = null;
+		var display = properties.wallpaperdisplay;
+	} else {
+		var display = 2;
+	}
+    var img = FormatWallpaper(tmp_img, width, height, 2, display, 0, "", rawBitmap, progressbar_art, blur_value, quality);
+	update_wallpaper = false;	
+    return img;
+};
 function setWallpaperImg(defaultpath, metadb, progressbar_art, width, height, blur_value, rawBitmap, quality) {
 	progressbar_art = typeof progressbar_art !== 'undefined' ? progressbar_art : false;	
 	rawBitmap = typeof rawBitmap !== 'undefined' ? rawBitmap : false;		
@@ -2783,17 +2822,8 @@ function setWallpaperImg(defaultpath, metadb, progressbar_art, width, height, bl
 	blur_value = typeof blur_value !== 'undefined' ? blur_value : properties.wallpaperblurvalue;	
 	    
     if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
-		try{
-			cachekey = process_cachekey(metadb)		
-			var tmp_img = g_image_cache.cachelist[cachekey];
-			if (typeof tmp_img == "undefined" || tmp_img==null) {
-				tracktype = TrackType(metadb.RawPath.substring(0, 4));
-				if(tracktype == 3) tmp_img = cover.stream_img			
-				else tmp_img = get_albumArt(metadb, properties.wallpapermode);
-			}			
-		} catch(e){
-			var tmp_img = get_albumArt(metadb, properties.wallpapermode);
-		}
+		cachekey = process_cachekey(metadb);
+		var tmp_img = get_albumArt(metadb, cachekey);
     } else {
         if(defaultpath) {
             tmp_img = gdi.Image(defaultpath);

@@ -685,11 +685,6 @@ function on_size(w, h) {
     ww = Math.max(w,globalProperties.miniMode_minwidth-50);
     wh = h;
 	
-    // set wallpaper
-    if(fb.IsPlaying && properties.showwallpaper) {
-        //g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-    }
-	
 	//Volume
 	if(layout_state.isEqual(0)) volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
 	else volume_vars.width = window.Width-volume_vars.margin_right-volume_vars.margin_left
