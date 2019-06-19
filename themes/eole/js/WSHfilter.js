@@ -201,9 +201,6 @@ cover = {
     masks: window.GetProperty("_PROPERTY: Cover art masks (for disk cache)","*front*.*;*cover*.*;*folder*.*;*.*"),
     keepaspectratio: false,
 	max_w: 1,
-    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
-    stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
-	noartist_img: gdi.Image(theme_img_path+"\\no_artist.png"),
 };
 
 cList = {
@@ -2418,13 +2415,13 @@ oBrowser = function(name) {
 									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 									this.groups[i].cover_img = g_image_cache.cachelist[this.groups[i].cachekey];
 								} else {
-									this.groups[i].cover_img = images.noart;	
-									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);					
+									this.groups[i].cover_img = globalProperties.noart;	
+									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);					
 								}
 
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
-								this.groups[i].cover_img = images.stream;
-								g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+								this.groups[i].cover_img = globalProperties.stream_img;
+								g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 							};
 							if(!this.groups[i].cover_formated){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
@@ -2560,7 +2557,7 @@ oBrowser = function(name) {
 								
 								// draw cover
 								if(typeof this.groups[i].cover_img == "string"){
-									this.groups[i].cover_img = cover.nocover_img;
+									this.groups[i].cover_img = globalProperties.nocover_img;
 								}
 								if(this.groups[i].cover_img) {
 									
@@ -2709,7 +2706,7 @@ oBrowser = function(name) {
 									// draw cover
 									this.coverMarginLeft = this.marginCover;
 									if(typeof this.groups[i].cover_img == "string"){
-										this.groups[i].cover_img = cover.nocover_img;
+										this.groups[i].cover_img = globalProperties.nocover_img;
 									}								
 									if(this.groups[i].cover_img) {
 										
@@ -4550,10 +4547,7 @@ function get_images() {
 	
 	images.loading = gdi.Image(images.path+"load.png");
 	images.loading_draw = images.loading;
-	
-    images.noart = cover.nocover_img;
-    images.noartist = cover.noartist_img;	
-	images.stream = cover.stream_img;
+    images.noartist = gdi.Image(theme_img_path+"\\no_artist.png");
 	
 	images.filters_increase_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase.png");   
 	images.filters_increase_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase_hover.png");  

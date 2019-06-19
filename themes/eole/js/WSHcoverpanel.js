@@ -292,9 +292,9 @@ function on_paint(gr) {
 	if(!g_cover.isSetArtwork()) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying().RawPath.substring(0, 4));
-			if(tracktype == 3) g_cover.setArtwork(images.stream_img,true,true)
-			else g_cover.setArtwork(images.no_cover,true,true);
-		} catch (e){g_cover.setArtwork(images.no_cover,true,true)}	
+			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
+			else g_cover.setArtwork(globalProperties.stream_img,true,true);
+		} catch (e){g_cover.setArtwork(globalProperties.stream_img,true,true)}	
 	}
 	
 	g_cover.draw(gr,0,0);
@@ -1086,8 +1086,6 @@ function get_images(){
 	images.nothing_played_mini = gdi.Image(theme_img_path + "\\"+theme_path+"\\nothing_played_mini.png");
 	images.nothing_played_compact = gdi.Image(theme_img_path + "\\"+theme_path+"\\nothing_played_compact.png");	
 	images.nothing_played_supercompact = gdi.Image(theme_img_path + "\\"+theme_path+"\\nothing_played_supercompact.png");	
-	images.no_cover = gdi.Image(theme_img_path + "\\no_cover.png");
-	images.stream_img = gdi.Image(theme_img_path + "\\stream_icon.png");
 
 	images.rating0_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_0_hover.png");
 	images.rating0_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_0.png");	

@@ -3874,7 +3874,7 @@ oBrowser = function(name) {
                     gr.DrawImage(this.groups_draw[g_dragA_idx].cover_img, g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, 0, 0, this.groups_draw[g_dragA_idx].cover_img.Width, this.groups_draw[g_dragA_idx].cover_img.Height, 0, 150);
 					gr.FillSolidRect(g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, colors.dragcover_overlay);
 				} else {
-					gr.DrawImage(cover.nocover_img, g_cursor.x - Math.floor(cover.load_img.Width / 2), g_cursor.y - Math.floor(cover.load_img.Height / 2), cover.load_img.Width, cover.load_img.Height, 0, 0, cover.load_img.Width, cover.load_img.Height, 0, 150);		
+					gr.DrawImage(globalProperties.nocover_img, g_cursor.x - Math.floor(cover.load_img.Width / 2), g_cursor.y - Math.floor(cover.load_img.Height / 2), cover.load_img.Width, cover.load_img.Height, 0, 0, cover.load_img.Width, cover.load_img.Height, 0, 150);		
 					gr.FillSolidRect(g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, colors.dragcover_overlay);					
 				}
 				gr.DrawRect(g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80-1, 80-1, 1.0,colors.dragcover_rectline);
@@ -4616,7 +4616,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 				g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
 			}
 		} else {
-			g_image_cache.cachelist[cachekey] = cover.nocover_img				
+			g_image_cache.cachelist[cachekey] = globalProperties.nocover_img				
 		}			
     } else if(i < brw.groups.length && i>=0) {
         if(brw.groups[i].metadb) {
@@ -4627,9 +4627,9 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 					}									
 				} else {
 					if(brw.groups[i].tracktype == 3 ) {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.stream_img;
+						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.stream_img;
 					} else {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.nocover_img	
+						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.nocover_img	
 					}						
 				}						
 				// save img to cache

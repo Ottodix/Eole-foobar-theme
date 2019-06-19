@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.0b4',
+	theme_version: '1.2.0b5',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -49,6 +49,8 @@ var globalProperties = {
 	playing_playlist : "Library Playback",
 	whole_library : "Whole Library",
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
+    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
+    stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),	
 	ResizeQLY: 2,	
 }	
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
@@ -2353,10 +2355,6 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
-cover = {
-    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
-    stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),	
-};
 function FormatCover(image, w, h, rawBitmap, callID) {
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
@@ -2481,9 +2479,9 @@ function get_albumArt(metadb,cachekey){
 function get_fallbackCover(metadb, tracktype){
 	var tracktype = typeof tracktype !== 'undefined' ? tracktype : TrackType(metadb.RawPath.substring(0, 4));	
 	if(tracktype < 2) {
-		return cover.nocover_img;
+		return globalProperties.nocover_img;
 	} else {
-		return cover.stream_img;
+		return globalProperties.stream_img;
 	}
 }
 const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_embed, no_load) =>
@@ -2627,7 +2625,7 @@ oImageCache = function () {
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename)
 						if(img) {
 							this.cachelist[cachekey] = img
-						} else this.cachelist[cachekey] = cover.nocover_img;						
+						} else this.cachelist[cachekey] = globalProperties.nocover_img;						
 						brw.groups[albumIndex].load_requested = 2;
 					}		
 			} else {
@@ -2656,7 +2654,7 @@ oImageCache = function () {
 								timers.saveCover = false;
 							}, 100);
 						}; 
-					} else this.cachelist[cachekey] = cover.nocover_img
+					} else this.cachelist[cachekey] = globalProperties.nocover_img
 				}		
 			}
         };
@@ -2796,9 +2794,8 @@ function setWallpaperImgV2(image, metadb, progressbar_art, width, height, blur_v
     } else if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
 		cachekey = process_cachekey(metadb);
 		var tmp_img = get_albumArt(metadb, cachekey);
-    } else {
-        tmp_img = gdi.Image(globalProperties.default_wallpaper);
     };
+	
     if(!tmp_img) {
         tmp_img = gdi.Image(globalProperties.default_wallpaper);
     };
@@ -2824,13 +2821,8 @@ function setWallpaperImg(defaultpath, metadb, progressbar_art, width, height, bl
     if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
 		cachekey = process_cachekey(metadb);
 		var tmp_img = get_albumArt(metadb, cachekey);
-    } else {
-        if(defaultpath) {
-            tmp_img = gdi.Image(defaultpath);
-        } else {
-            tmp_img = null;
-        };
     };
+	
     if(!tmp_img) {
         if(defaultpath) {
             tmp_img = gdi.Image(defaultpath);

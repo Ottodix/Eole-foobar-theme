@@ -87,6 +87,7 @@ var properties = {
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
     extractYearFromDate: window.GetProperty("COVER extract year from date", false),		
     showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),	
+    adaptNowPlayingToLeftMenu: window.GetProperty("MAINPANEL adapt now playing to left menu", true),		
     leftFilterState: window.GetProperty("MAINPANEL Left filter state", "genre"),	
 	circleMode: window.GetProperty("COVER Circle artwork", false),	
 	centerText: window.GetProperty("COVER Center text", true),	
@@ -2865,6 +2866,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	var _additionalInfos = window.CreatePopupMenu();
 	var _dateMenu = window.CreatePopupMenu();	
 	var _filterMenu = window.CreatePopupMenu();		
+	var _NowPlaying = window.CreatePopupMenu();		
 	var actions = Array();
 	
 	if(sort_group){
@@ -2875,7 +2877,12 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menu.AppendMenuItem(MF_STRING, 10, "Always follow playback");
 	_menu.CheckMenuItem(10, properties.followNowPlaying);		
 	_menu.AppendMenuItem(MF_STRING, 31, "Show tooltips");
-	_menu.CheckMenuItem(31, properties.showToolTip);		
+	_menu.CheckMenuItem(31, properties.showToolTip);	
+
+	_NowPlaying.AppendMenuItem(MF_STRING, 51, "Show in library");
+	_NowPlaying.AppendMenuItem(MF_STRING, 52, "Show in playing playlist");
+	_NowPlaying.CheckMenuRadioItem(51, 52, (properties.adaptNowPlayingToLeftMenu) ? 51 : 52);			
+	_NowPlaying.AppendTo(_menu,MF_STRING, '"Show now playing" behavior');
 	
 	_menu.AppendMenuSeparator();		
 	_menuHeaderBar.AppendMenuItem(MF_STRING, 27, "Show");
@@ -3131,6 +3138,14 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 50):		
 			properties.filterBox_filter_tracks = !properties.filterBox_filter_tracks;
 			window.SetProperty("MAINPANEL filter tracks", properties.filterBox_filter_tracks);
+			break;	
+		case (idx == 51):		
+			properties.adaptNowPlayingToLeftMenu = true;
+			window.SetProperty("MAINPANEL adapt now playing to left menu", properties.adaptNowPlayingToLeftMenu);
+			break;			
+		case (idx == 52):		
+			properties.adaptNowPlayingToLeftMenu = false;
+			window.SetProperty("MAINPANEL adapt now playing to left menu", properties.adaptNowPlayingToLeftMenu);
 			break;				
 		case (idx == 21):
 			properties.drawProgressBar = false;
@@ -4144,16 +4159,18 @@ oBrowser = function(name) {
 		g_avoid_on_playlists_changed = false;
 		return WholeLibraryPlaylistIndex;
 	}	
-	this.setSourcePlaylist = function() {
+	this.setSourcePlaylist = function(show_now_playing) {
 		this.SourcePlaylistIdx = this.calculateSourcePlaylist();
 	}		
-	this.calculateSourcePlaylist = function() {
+	this.calculateSourcePlaylist = function(show_now_playing) {
 		var new_SourcePlaylistIdx = -1;
 		var old_g_avoid_on_playlists_changed = g_avoid_on_playlists_changed;		
-		g_avoid_on_playlists_changed = true;	
-		if(!nowplayinglib_state.isActive()){
+		g_avoid_on_playlists_changed = true;
+		
+		if(!nowplayinglib_state.isActive() || this.followActivePlaylist_temp){
 			new_SourcePlaylistIdx = plman.ActivePlaylist;
 			this.followActivePlaylist = true;
+			this.followActivePlaylist_temp = false;
 		} else if(nowplayinglib_state.isActive() && !libraryfilter_state.isActive()){
 			var active_playlist_name = plman.GetPlaylistName(plman.ActivePlaylist);
 			if(active_playlist_name==globalProperties.whole_library) {
@@ -4579,7 +4596,7 @@ oBrowser = function(name) {
 						}
 		
 					} else if (this.groups[this.groups_draw[i]].cover_img=="no_cover") {
-						gr.DrawImage(cover.nocover_img, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, cover.nocover_img.Width, cover.nocover_img.Height);		
+						gr.DrawImage(globalProperties.nocover_img, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, globalProperties.nocover_img.Width, globalProperties.nocover_img.Height);		
 						if(!properties.circleMode)
 							gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_nocover_rectline);
 						else
@@ -5196,22 +5213,22 @@ oBrowser = function(name) {
 	this.focus_on_now_playing = function (track){		
 		FocusOnNowPlaying = true;
 		var results = true;
-		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !(!this.followActivePlaylist && nowplayinglib_state.isActive() && this.isPlayingIdx>-1)){
-			if(this.followActivePlaylist){
+		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && (!properties.adaptNowPlayingToLeftMenu || !nowplayinglib_state.isActive())){	
+			if(this.followActivePlaylist || this.followActivePlaylist_temp){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
 				brw.populate(29, false, false, plman.PlayingPlaylist);
 			} else {
-				if(nowplayinglib_state.isActive()){
+				if(nowplayinglib_state.isActive() && properties.adaptNowPlayingToLeftMenu){
 					var results = quickSearch(track,properties.leftFilterState);							
 				}
-				if(!nowplayinglib_state.isActive() || !results){
+				if(!nowplayinglib_state.isActive() || !properties.adaptNowPlayingToLeftMenu || !results){
 					plman.ClearPlaylist(this.getSourcePlaylist());
 					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
 					//brw.populate(29, false, false);		
 				}				
 			}									
-		} else {					
+		} else {	
 			var isFound = brw.seek_track(track);
 			if(!isFound) { 
 				if(fb.GetNowPlaying()!=null) {
@@ -5219,10 +5236,10 @@ oBrowser = function(name) {
 						plman.ActivePlaylist = plman.PlayingPlaylist;
 						//brw.populate(28);
 					} else {
-						if(nowplayinglib_state.isActive()){
+						if(nowplayinglib_state.isActive() && properties.adaptNowPlayingToLeftMenu){
 							var results = quickSearch(track,properties.leftFilterState);							
 						}	
-						if(!nowplayinglib_state.isActive() || !results){
+						if(!nowplayinglib_state.isActive() || !properties.adaptNowPlayingToLeftMenu  || !results){
 							brw.populate(26);
 						}
 					}
@@ -5345,7 +5362,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 				g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
 			}
 		} else {
-			g_image_cache.cachelist[cachekey] = cover.nocover_img				
+			g_image_cache.cachelist[cachekey] = globalProperties.nocover_img				
 		}			
     } else if(i < brw.groups.length && i>=0) {
         if(brw.groups[i].metadb) {
@@ -5355,9 +5372,9 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 					} else g_image_cache.cachelist[brw.groups[i].cachekey] = image;									
 				} else {
 					if(brw.groups[i].tracktype == 3 ) {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.stream_img;
+						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.stream_img;
 					} else {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = cover.nocover_img;					
+						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.nocover_img;					
 					}		
 					brw.groups[i].save_requested = true;					
 				}						
@@ -6973,6 +6990,7 @@ function on_notify_data(name, info) {
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
 			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
+				if(!properties.adaptNowPlayingToLeftMenu) brw.followActivePlaylist_temp = true;
 				avoidShowNowPlaying = true;						
 				/*if(properties.leftFilterState=="library_tree" && libraryfilter_state.isActive() && nowplayinglib_state.isActive()){
 					FocusOnNowPlaying = true;

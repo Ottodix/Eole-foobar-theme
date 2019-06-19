@@ -241,30 +241,18 @@ cNowPlaying = {
 }
 
 cover = {
-    masks: "*front*.*;*cover*.*;*folder*.*;*.*",
-    show: true,
-	column: false,
-    draw_glass_reflect: false,
-    glass_reflect: null,
-    keepaspectratio: false,
     default_margin: 4,
     margin: 4,
     padding: 12,
 	trackMargin:7,
-	trackMarginRight:7,
     w: properties.groupHeaderRowsNumber * properties.rowHeight,
 	max_w: properties.groupHeaderRowsNumber * properties.rowHeight,
     h: properties.groupHeaderRowsNumber * properties.rowHeight,
 	max_h: properties.groupHeaderRowsNumber * properties.rowHeight,
-    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
-    stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),	
-	previous_max_size: -1,
-	resized: false
 };
 
 images = {
     path: theme_img_path + "\\",
-    glass_reflect: null,
     loading_angle: 0,
     loading_cover: null,
     noart: null,
@@ -2362,7 +2350,7 @@ oBrowser = function(name) {
                             // ==========
                             // cover art
                             // ==========
-                            if((ghrh > 1 || properties.doubleRowText) && cover.show) {
+                            if(ghrh > 1 || properties.doubleRowText) {
 								cover.padding = (properties.doubleRowText)?16:10;
                                 if(this.groups[g].cover_type == null) {
                                     if(this.groups[g].load_requested == 0) {
@@ -2375,13 +2363,13 @@ oBrowser = function(name) {
                                     }
                                 } else if(this.groups[g].cover_type == 0) {
 									console.log("")
-                                    this.groups[g].cover_img = images.noart;
+                                    this.groups[g].cover_img = globalProperties.nocover_img;
 									this.groups[g].mask_applied = false;
-									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 } else if(this.groups[g].cover_type == 3) {
-									this.groups[g].cover_img = images.stream;
+									this.groups[g].cover_img = globalProperties.stream_img;
 									this.groups[g].mask_applied = false;
-									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 };															
                                 if(isImage(this.groups[g].cover_img) && properties.circleMode && !this.groups[g].mask_applied) {
 									if(!this.coverMask) this.DefineCircleMask(GroupCover_w);
@@ -2711,11 +2699,11 @@ oBrowser = function(name) {
 													}
 												}
 											} else if(this.groups[g].cover_type == 0) {
-												this.groups[g].cover_img = images.noart;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												this.groups[g].cover_img = globalProperties.nocover_img;
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
-												this.groups[g].cover_img = images.stream;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												this.groups[g].cover_img = globalProperties.stream_img;
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};									
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -2781,11 +2769,11 @@ oBrowser = function(name) {
 													}
 												}
 											} else if(this.groups[g].cover_type == 0) {
-												this.groups[g].cover_img = images.noart;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												this.groups[g].cover_img = globalProperties.nocover_img;
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
-												this.groups[g].cover_img = images.stream;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(images.stream, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												this.groups[g].cover_img = globalProperties.stream_img;
+												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};										
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -4535,8 +4523,6 @@ var g_radio_artist = "";
 var list_img = [];
 var g_valid_tid = 0;
 
-var cover_path = new RegExp("(artwork)|(cover)|(scan)|(image)");
-var cover_img = cover.masks.split(";");
 var stub_image,cell_null;
 
 var brw = null;
@@ -5110,13 +5096,6 @@ function get_images() {
     images.loading_cover_group = img_loading;
     images.loading_cover_resized = false;
     images.loading_cover_group_resized = false;
-	
-    images.noart = cover.nocover_img;
-	
-	
-    var sw = 250, sh= 250;
-    txt = "STREAM";
-	images.stream = cover.stream_img;
 };
 
 
