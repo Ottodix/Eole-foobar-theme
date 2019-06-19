@@ -293,8 +293,8 @@ function on_paint(gr) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying().RawPath.substring(0, 4));
 			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
-			else g_cover.setArtwork(globalProperties.stream_img,true,true);
-		} catch (e){g_cover.setArtwork(globalProperties.stream_img,true,true)}	
+			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
+		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}	
 	}
 	
 	g_cover.draw(gr,0,0);
@@ -543,10 +543,10 @@ oCover = function() {
 			this.tintDrawed = true;
 		}
     };
-    this.refresh = function (metadb, delete_file_cache, cachekey) {
+    this.refresh = function (metadb, call_delete_file_cache, cachekey) {
 		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
-		delete_file_cache = typeof delete_file_cache !== 'undefined' ? delete_file_cache : false;		
-		if(globalProperties.enableDiskCache && delete_file_cache) delete_file_cache(metadb,0, cachekey);
+		call_delete_file_cache = typeof call_delete_file_cache !== 'undefined' ? call_delete_file_cache : false;		
+		if(globalProperties.enableDiskCache && call_delete_file_cache) delete_file_cache(metadb,0, cachekey);
 		this.reset();
 		g_image_cache.resetMetadb(metadb);
 		nowPlaying_cachekey = "";
