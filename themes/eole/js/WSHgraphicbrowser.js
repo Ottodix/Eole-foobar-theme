@@ -87,7 +87,8 @@ var properties = {
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
     extractYearFromDate: window.GetProperty("COVER extract year from date", false),		
     showDiscNbOverCover: window.GetProperty("COVER Show Disc number over album art", false),	
-    adaptNowPlayingToLeftMenu: window.GetProperty("MAINPANEL adapt now playing to left menu", true),		
+    showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),		
+    showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),			
     leftFilterState: window.GetProperty("MAINPANEL Left filter state", "genre"),	
 	circleMode: window.GetProperty("COVER Circle artwork", false),	
 	centerText: window.GetProperty("COVER Center text", true),	
@@ -2879,9 +2880,17 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menu.AppendMenuItem(MF_STRING, 31, "Show tooltips");
 	_menu.CheckMenuItem(31, properties.showToolTip);	
 
+	_NowPlaying.AppendMenuItem(MF_GRAYED, 0, "Right playlist visible:");
+	_NowPlaying.AppendMenuSeparator();
 	_NowPlaying.AppendMenuItem(MF_STRING, 51, "Show in library");
 	_NowPlaying.AppendMenuItem(MF_STRING, 52, "Show in playing playlist");
-	_NowPlaying.CheckMenuRadioItem(51, 52, (properties.adaptNowPlayingToLeftMenu) ? 51 : 52);			
+	_NowPlaying.CheckMenuRadioItem(51, 52, (properties.showInLibrary_RightPlaylistOn) ? 51 : 52);			
+	_NowPlaying.AppendMenuSeparator();
+	_NowPlaying.AppendMenuItem(MF_GRAYED, 0, "Right playlist hidden:");	
+	_NowPlaying.AppendMenuSeparator();	
+	_NowPlaying.AppendMenuItem(MF_STRING, 53, "Show in library");
+	_NowPlaying.AppendMenuItem(MF_STRING, 54, "Show in playing playlist");	
+	_NowPlaying.CheckMenuRadioItem(53, 54, (properties.showInLibrary_RightPlaylistOff) ? 53 : 54);			
 	_NowPlaying.AppendTo(_menu,MF_STRING, '"Show now playing" behavior');
 	
 	_menu.AppendMenuSeparator();		
@@ -3140,12 +3149,20 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("MAINPANEL filter tracks", properties.filterBox_filter_tracks);
 			break;	
 		case (idx == 51):		
-			properties.adaptNowPlayingToLeftMenu = true;
-			window.SetProperty("MAINPANEL adapt now playing to left menu", properties.adaptNowPlayingToLeftMenu);
+			properties.showInLibrary_RightPlaylistOn = true;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist on", properties.showInLibrary_RightPlaylistOn);
 			break;			
 		case (idx == 52):		
-			properties.adaptNowPlayingToLeftMenu = false;
-			window.SetProperty("MAINPANEL adapt now playing to left menu", properties.adaptNowPlayingToLeftMenu);
+			properties.showInLibrary_RightPlaylistOn = false;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist on", properties.showInLibrary_RightPlaylistOn);
+			break;		
+		case (idx == 53):		
+			properties.showInLibrary_RightPlaylistOff = true;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist off", properties.showInLibrary_RightPlaylistOff);
+			break;			
+		case (idx == 54):		
+			properties.showInLibrary_RightPlaylistOff = false;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist off", properties.showInLibrary_RightPlaylistOff);
 			break;				
 		case (idx == 21):
 			properties.drawProgressBar = false;
@@ -4167,11 +4184,13 @@ oBrowser = function(name) {
 		var old_g_avoid_on_playlists_changed = g_avoid_on_playlists_changed;		
 		g_avoid_on_playlists_changed = true;
 		
-		if(!nowplayinglib_state.isActive() || this.followActivePlaylist_temp){
+		if((!nowplayinglib_state.isActive() && !properties.showInLibrary_RightPlaylistOff) || this.followActivePlaylist_temp){
+		//if(this.followActivePlaylist_temp){
 			new_SourcePlaylistIdx = plman.ActivePlaylist;
 			this.followActivePlaylist = true;
 			this.followActivePlaylist_temp = false;
-		} else if(nowplayinglib_state.isActive() && !libraryfilter_state.isActive()){
+		} else if((nowplayinglib_state.isActive() || properties.showInLibrary_RightPlaylistOff) && !libraryfilter_state.isActive()){
+		//} else if(!libraryfilter_state.isActive()){
 			var active_playlist_name = plman.GetPlaylistName(plman.ActivePlaylist);
 			if(active_playlist_name==globalProperties.whole_library) {
 				new_SourcePlaylistIdx = plman.ActivePlaylist;
@@ -4186,13 +4205,11 @@ oBrowser = function(name) {
 				new_SourcePlaylistIdx = this.getWholeLibraryPlaylist();
 				this.followActivePlaylist = true;					
 			}
-		} else if(nowplayinglib_state.isActive() && libraryfilter_state.isActive()){
+		} else if((nowplayinglib_state.isActive() || !properties.showInLibrary_RightPlaylistOff) && libraryfilter_state.isActive()){
+		//} else if(libraryfilter_state.isActive()){
 			new_SourcePlaylistIdx = this.getSelectionPlaylist();
 			this.followActivePlaylist = false;			
-		} /*else if(properties.lockOnPlaylistNamed!=""){
-			new_SourcePlaylistIdx = check_playlist(properties.lockOnPlaylistNamed);
-			this.followActivePlaylist = false;
-		}*/
+		}
 		if (new_SourcePlaylistIdx<0 && properties.followActivePlaylist){
 			this.followActivePlaylist = true;
 		} else if(new_SourcePlaylistIdx<0 && properties.lockOnFullLibrary) {
@@ -5213,16 +5230,19 @@ oBrowser = function(name) {
 	this.focus_on_now_playing = function (track){		
 		FocusOnNowPlaying = true;
 		var results = true;
-		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && (!properties.adaptNowPlayingToLeftMenu || !nowplayinglib_state.isActive())){	
+		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && (!properties.showInLibrary_RightPlaylistOn || (!nowplayinglib_state.isActive() && !properties.showInLibrary_RightPlaylistOff))){	
+		//if(this.getSourcePlaylist()!=plman.PlayingPlaylist && !properties.showInLibrary_RightPlaylistOn){	
 			if(this.followActivePlaylist || this.followActivePlaylist_temp){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
 				brw.populate(29, false, false, plman.PlayingPlaylist);
 			} else {
-				if(nowplayinglib_state.isActive() && properties.adaptNowPlayingToLeftMenu){
+				if((nowplayinglib_state.isActive() || properties.showInLibrary_RightPlaylistOff) && properties.showInLibrary_RightPlaylistOn){
+				//if(properties.showInLibrary_RightPlaylistOn){
 					var results = quickSearch(track,properties.leftFilterState);							
 				}
-				if(!nowplayinglib_state.isActive() || !properties.adaptNowPlayingToLeftMenu || !results){
+				if(!(nowplayinglib_state.isActive() || properties.showInLibrary_RightPlaylistOff) || !properties.showInLibrary_RightPlaylistOn || !results){
+				//if(!properties.showInLibrary_RightPlaylistOn || !results){
 					plman.ClearPlaylist(this.getSourcePlaylist());
 					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);			
 					//brw.populate(29, false, false);		
@@ -5236,10 +5256,12 @@ oBrowser = function(name) {
 						plman.ActivePlaylist = plman.PlayingPlaylist;
 						//brw.populate(28);
 					} else {
-						if(nowplayinglib_state.isActive() && properties.adaptNowPlayingToLeftMenu){
+						if((nowplayinglib_state.isActive() || properties.showInLibrary_RightPlaylistOff) && properties.showInLibrary_RightPlaylistOn){
+						//if(properties.showInLibrary_RightPlaylistOn){
 							var results = quickSearch(track,properties.leftFilterState);							
 						}	
-						if(!nowplayinglib_state.isActive() || !properties.adaptNowPlayingToLeftMenu  || !results){
+						if(!(nowplayinglib_state.isActive() || properties.showInLibrary_RightPlaylistOff) || !properties.showInLibrary_RightPlaylistOn  || !results){
+						//if(!properties.showInLibrary_RightPlaylistOn  || !results){
 							brw.populate(26);
 						}
 					}
@@ -6989,8 +7011,9 @@ function on_notify_data(name, info) {
 		break;*/
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
+			//if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
 			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
-				if(!properties.adaptNowPlayingToLeftMenu) brw.followActivePlaylist_temp = true;
+				if(!properties.showInLibrary_RightPlaylistOn) brw.followActivePlaylist_temp = true;
 				avoidShowNowPlaying = true;						
 				/*if(properties.leftFilterState=="library_tree" && libraryfilter_state.isActive() && nowplayinglib_state.isActive()){
 					FocusOnNowPlaying = true;
