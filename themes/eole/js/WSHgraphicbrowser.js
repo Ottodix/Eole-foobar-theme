@@ -982,9 +982,9 @@ oRow = function(metadb,itemIndex) {
         } 
 		if(isPlaying) {	
             if(elapsed_seconds%2==0)
-				gr.DrawImage(image0, this.x+12,  this.y+Math.ceil((this.h-image0.Height)/2)-1, image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
+				gr.DrawImage(image0, this.x+12,  this.y+Math.ceil((this.h-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
 			else
-				gr.DrawImage(image1, this.x+12,  this.y+Math.ceil((this.h-image1.Height)/2)-1, image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);	
+				gr.DrawImage(image1, this.x+12,  this.y+Math.ceil((this.h-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);	
 		}
 		
 		if(properties.showRating && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0))) {
@@ -1295,7 +1295,7 @@ oShowList = function(parentPanelName) {
     this.playing_row_y = 0;
     this.playing_row_w = 0;
     this.playing_row_h = 0;	
-
+	this.isHoverLink = false;
 	this.hscr_height = 20;
 	this.hscr_vpadding = 9;
 	this.hscr_vpadding_hover = 6;	
@@ -1602,9 +1602,13 @@ oShowList = function(parentPanelName) {
 				this.close_bt.checkstate("move", x, y);
 				for (var i in this.links) {
 					if (this.links[i].containXY(x, y) && this.links[i].state != ButtonStates.hide && !this.links[i].hide) {
-						isHoverBtn = true;
 						this.links[i].changeState(ButtonStates.hover);
-					} else this.links[i].changeState(ButtonStates.normal);
+						if(!this.isHoverLink) brw.repaint();
+						this.isHoverLink = true;						
+					} else {
+						this.links[i].changeState(ButtonStates.normal);
+						if(this.isHoverLink) brw.repaint();
+					}
 				}
 				if(properties.showToolTip && !(g_dragA || g_dragR)){
 					if(!this.ishoverTextTop && this.tooltipActivated) {
@@ -4364,15 +4368,14 @@ oBrowser = function(name) {
 		else return brw.groups[idx].pl;
 	}	
 	this.GetAlbumCover = function(idx){	
-		//idx = this.groups_draw[idx];
 		var img_final = null;
 		var img_full = null;
 
-		if (typeof this.groups[idx].cover_img_full == "object" && this.groups[idx].cover_img_full != null) {
+		if (isImage(this.groups[idx].cover_img_full)) {
 			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
-			if (typeof img_full == "object" && img_full != null) {
+			if (isImage(img_full)) {
 				this.groups[idx].cover_img_full = img_full;
 				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover2");
 			}
@@ -5264,7 +5267,8 @@ oBrowser = function(name) {
 							if(!libraryfilter_state.isActive()) g_history.fullLibrary();
 							else var results = quickSearch(track,properties.leftFilterState);							
 						}	
-						if(!properties.showInLibrary || !results){
+						else {
+						//if(!properties.showInLibrary || !results){
 							this.populate(26);
 						}
 					}

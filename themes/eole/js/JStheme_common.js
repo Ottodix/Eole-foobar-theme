@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.0b8',
+	theme_version: '1.2.0b9',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -157,6 +157,7 @@ var oCursor = function () {
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
 		window.SetCursor(cursor_code);
+		//console.log(cursor_code+" "+this.active_zone)
 	}
 	this.getCursor = function(){
 		return this.cursor;
@@ -2526,11 +2527,13 @@ function save_image_to_cache(image, albumIndex, cachekey){
 		} catch(e){}			
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
-		if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = image;
-		else brw.groups[albumIndex].cover_img = image;
-		g_image_cache.cachelist[cachekey] = image;
-		brw.groups[albumIndex].load_requested = 2;	
-		brw.repaint();
+		try{
+			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = image;
+			else brw.groups[albumIndex].cover_img = image;
+			g_image_cache.cachelist[cachekey] = image;
+			brw.groups[albumIndex].load_requested = 2;	
+			brw.repaint();
+		} catch(e){}
 	}
 	if (typeof brw == "object") brw.repaint();
 	//return image;

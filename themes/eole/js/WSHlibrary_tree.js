@@ -551,7 +551,6 @@ oPlaylistManager = function(name) {
                 ui.drag_clicked = false;
                 if(ui.drag_moving) {
 					g_cursor.setCursor(IDC_ARROW);
-                    //window.SetCursor(IDC_ARROW);
                     this.drop_done = false;
                     if(this.activeIndex > -1) {
 						var list = pop.sel_items;

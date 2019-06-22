@@ -730,7 +730,7 @@ oPlaylistManager = function(name) {
             case "up":
                 brw.drag_clicked = false;
                 if(brw.drag_moving) {
-                    window.SetCursor(IDC_ARROW);
+                    g_cursor.setCursor(IDC_ARROW);
                     this.drop_done = false;
                     if(this.activeIndex > -1) {
                         brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
@@ -3448,7 +3448,7 @@ oBrowser = function(name) {
 						if(properties.DropInplaylist && !this.drag_tracks && (Math.abs(y - this.drag_clicked_y) < 15 && Math.abs(x - this.drag_clicked_x) > 15) && plman.GetPlaylistSelectedItems(g_active_playlist).Count>0) {
 							this.drag_moving = true;				
 							pman.state = 1;
-							window.SetCursor(IDC_HELP);
+							g_cursor.setCursor(IDC_HELP,'dragtrack');
 							g_tooltip.Deactivate();
 							if(timers.hidePlaylistManager) {
 								window.ClearInterval(timers.hidePlaylistManager);
@@ -3537,7 +3537,7 @@ oBrowser = function(name) {
                 // scrollbar
                 if(this.ishover_rating && !this.drag_tracks) {
                     if(!this.cursorHand) {
-						window.SetCursor(IDC_HAND);
+						g_cursor.setCursor(IDC_HAND,'rating');
 						this.cursorHand = true;
 					}					
 					var hover_rating_old = this.rows[this.activeRow].hover_rating;
@@ -3549,7 +3549,7 @@ oBrowser = function(name) {
 					
                 } else if(!this.drag_tracks){
                     if(this.cursorHand) {
-						window.SetCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW);
 						this.cursorHand = false;
 						try{
 							if(this.hoverRatingRow>-1){
@@ -4806,7 +4806,7 @@ function on_mouse_lbtn_up(x, y, m) {
         }		
 		on_drag_leave();
 		brw.drag_tracks = false;
-		window.SetCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW);
 		brw.repaint();
 	}	
 	else if(properties.DropInplaylist && pman.state == 1) {
@@ -4867,7 +4867,7 @@ function on_mouse_rbtn_down(x, y, mask) {
 		brw.drag_clicked = false;		
 		on_drag_leave();
 		brw.drag_tracks = false;
-		window.SetCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW);
 		brw.repaint();
 	}	    
     if(!utils.IsKeyPressed(VK_SHIFT)) {
@@ -4888,7 +4888,7 @@ function on_mouse_mbtn_down(x, y, mask) {
 		brw.drag_clicked = false;
 		on_drag_leave();
 		brw.drag_tracks = false;
-		window.SetCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW);
 		brw.repaint();
 	}		
 }

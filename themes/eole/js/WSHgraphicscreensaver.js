@@ -1000,7 +1000,7 @@ oRow = function(metadb,itemIndex) {
             case "move":
                 if(this.ishover_rating && !g_dragR) {
                     if(!this.cursorHand) {
-						window.SetCursor(IDC_HAND);
+						g_cursor.setCursor(IDC_HAND,'rating');
 						this.cursorHand = true;
 					}
 					if(brw.TooltipRow==this.itemIndex) {
@@ -1014,7 +1014,7 @@ oRow = function(metadb,itemIndex) {
 					if(this.hover_rating_old != this.hover_rating) this.repaint();
                 } else if(!g_dragR){
                     if(this.cursorHand) {
-						window.SetCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW);
 						this.cursorHand = false;
 						this.hover_rating = -1;
 						this.repaint();
@@ -5347,7 +5347,7 @@ function on_mouse_move(x, y, m) {
         old && old.changeState(ButtonStates.normal);
         cur_btn && cur_btn.changeState(ButtonStates.hover);
 		if(brw.cursor == 'resize') {
-			window.SetCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW);
 		}			
         brw.repaint();
 		return;
@@ -5358,11 +5358,11 @@ function on_mouse_move(x, y, m) {
 	
 	if(y<32 && !cur_btn){	
 		brw.setActiveRow(-1,-1);
-		window.SetCursor(IDC_SIZEALL);
+		g_cursor.setCursor(IDC_SIZEALL,'titlebar');
 		brw.cursor = 'resize';
 		return;	
 	} else if(brw.cursor == 'resize') {
-		window.SetCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW);
 	}
 
     g_ishover = (x > 0 && x < ww && y > 0 && y < wh);

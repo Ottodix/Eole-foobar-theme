@@ -5420,7 +5420,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);	
 		else g_cursor.setCursor(IDC_ARROW);					
         return old_state;
-    }    
+    }
     this.draw = function (gr) {
         if (this.state == ButtonStates.hide) return;
         b_img=this.N_img;        
@@ -5430,7 +5430,8 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
             b_img=this.N_img;
             break;
         case ButtonStates.hover:
-            b_img=this.H_img;
+			b_img=this.H_img;
+            g_cursor.setCursor(IDC_HAND, this.text);
             break;
         case ButtonStates.down:
             break;

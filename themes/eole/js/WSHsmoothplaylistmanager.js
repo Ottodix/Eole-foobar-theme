@@ -1016,7 +1016,7 @@ oBrowser = function(name) {
     this.draw = function(gr) {
         
         if(cPlaylistManager.playlist_switch_pending) {
-            window.SetCursor(IDC_ARROW);
+            g_cursor.setCursor(IDC_ARROW);
             cPlaylistManager.playlist_switch_pending = false;
         };
         
@@ -1249,7 +1249,7 @@ oBrowser = function(name) {
 								plman.ActivePlaylist = total;
 								brw.selectedRow = total;
 							}	
-							window.SetCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
@@ -1260,7 +1260,6 @@ oBrowser = function(name) {
 							this.repaint();
 							plman.ActivePlaylist = this.rows[this.activeRow].idx;
 							cPlaylistManager.playlist_switch_pending = true;
-							//window.SetCursor(IDC_WAIT);
 						} else if(this.activeRow == this.inputboxID) {
 							this.inputbox.check("down", x, y);
 						} else {
@@ -1284,7 +1283,7 @@ oBrowser = function(name) {
 								plman.MovePlaylist(total, total);
 								plman.ActivePlaylist = total;
 							}	
-							window.SetCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
@@ -1332,7 +1331,7 @@ oBrowser = function(name) {
                 
                 this.down = false;
                 
-                if(cPlaylistManager.drag_moved) window.SetCursor(IDC_ARROW);
+                if(cPlaylistManager.drag_moved) g_cursor.setCursor(IDC_ARROW);
                 
                 cPlaylistManager.drag_clicked = false;
                 cPlaylistManager.drag_moved = false;
@@ -1344,13 +1343,6 @@ oBrowser = function(name) {
             case "dblclk":  //browser dblclk
 			
                 if(this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
-                    /*if(plman.ActivePlaylist != this.rows[this.activeRow].idx) {
-                        if(this.inputboxID > -1) this.inputboxID = -1;
-                        this.repaint();
-                        plman.ActivePlaylist = this.rows[this.activeRow].idx;
-                        cPlaylistManager.playlist_switch_pending = true;
-                        window.SetCursor(IDC_WAIT);
-                    };*/
 					plman.ExecutePlaylistDefaultAction(this.rows[this.activeRow].idx,0);
                 } else {
                     // scrollbar
@@ -1362,7 +1354,7 @@ oBrowser = function(name) {
 							plman.ActivePlaylist = total;	
 							brw.selectedRow = total;
 						}
-						window.SetCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW);
 					}
                 };
                 break;
@@ -1373,7 +1365,7 @@ oBrowser = function(name) {
                 } else {
                     if(cPlaylistManager.drag_clicked && (Math.abs(cPlaylistManager.drag_x-x)>10 || Math.abs(cPlaylistManager.drag_y-y)>10)) {
                         cPlaylistManager.drag_moved = true;
-						window.SetCursor(IDC_HELP);
+						g_cursor.setCursor(IDC_HELP,'drag');
                     };
                     if(cPlaylistManager.drag_moved) {
                         if(this.activeRow > -1) {
@@ -1685,7 +1677,7 @@ oBrowser = function(name) {
 				plman.ActivePlaylist = pl_idx;
 				brw.selectedRow = total;
 			}	
-			window.SetCursor(IDC_ARROW);				
+			g_cursor.setCursor(IDC_ARROW);				
             this.repaint();
             break;
         case (idx==101):
@@ -1700,7 +1692,7 @@ oBrowser = function(name) {
 				plman.MovePlaylist(total, pl_idx);
 				plman.ActivePlaylist = pl_idx;
 			}						
-			window.SetCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW);
             this.repaint();
             break;
         case (idx==2):
@@ -2632,7 +2624,6 @@ function on_key_down(vkey) {
 							plman.ActivePlaylist = brw.selectedRow;
 						} catch(e){plman.ActivePlaylist = brw.rowsCount - 1;console.log("active error")}
                         cPlaylistManager.playlist_switch_pending = true;
-                        //window.SetCursor(IDC_WAIT);
                     };
                     break;
 				case VK_END:
@@ -2819,7 +2810,7 @@ function on_playback_time(time) {
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed && g_first_populate_done && window.IsVisible){	
 		if(cPlaylistManager.drag_droped) {
-			window.SetCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW);
 		} else {
 			if(brw.previous_playlistCount != plman.PlaylistCount) g_filterbox.clearInputbox();
 		};

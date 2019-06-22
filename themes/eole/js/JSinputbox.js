@@ -295,9 +295,9 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
                 }
                 // Set Mouse Cursor Style
 				if(this.hover || this.drag) {
-					window.SetCursor(IDC_IBEAM);		
+					g_cursor.setCursor(IDC_IBEAM,'inputbox');		
 				} else if(this.ibeam_set) {
-					window.SetCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW);
 				}
 				this.ibeam_set = (this.hover || this.drag);
                 break;
