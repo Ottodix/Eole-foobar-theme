@@ -2413,13 +2413,6 @@ oBrowser = function(name) {
 									gr.DrawEllipse(cv_x+9, cv_y+1, cv_w-2, cv_h-2, 1.0, colors.cover_rectline);		
 									gr.SetSmoothingMode(0);
 								}														
-                                /*} else {
-									if(!images.loading_cover_group_resized) {
-										images.loading_cover_group = FormatCover(images.loading_cover_group, cv_w, cv_h, false);
-										images.loading_cover_group_resized = true;
-									}
-                                    gr.DrawImage(images.loading_cover_group, cv_x+8, cv_y, cv_w, cv_h, 0, 0, images.loading_cover_group.Width, images.loading_cover_group.Height, images.loading_angle, 230);
-                                };*/
                                 var text_left_margin = cover.max_w+cv_x+((properties.doubleRowText)?16:0);
                             } else {
                                 var text_left_margin = 0;
@@ -2441,7 +2434,7 @@ oBrowser = function(name) {
                             gr.GdiDrawText(arr_e[3], g_font.min1,  colors.faded_txt, header_text_x, ay - ((ghrh - 2) * ah)+group_height_fix-((properties.doubleRowText)?10:0), header_text_x + header_text_w -6-this.paddingLeft, Math.round(ah*2/3)*(ghrh - 1), DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                             // left area
                             gr.GdiDrawText(group_header_row_1, g_font.italicplus3, colors.normal_txt, header_text_x + text_left_margin, ay - ((ghrh - 1) * ah) + Math.round(ah*1/3)*(ghrh - 1) - 2+group_height_fix, header_text_w - text_left_margin - this.groups[g].timeWidth - 10, Math.round(ah*2/3), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                            gr.GdiDrawText(group_header_row_2, g_font.normal, colors.faded_txt, header_text_x + text_left_margin, ay - ((ghrh - 2) * ah)+group_height_fix-((properties.doubleRowText)?10:0), header_text_w - text_left_margin - this.groups[g].dateWidth, Math.round(ah*2/3)*(ghrh - 1), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                            gr.GdiDrawText(group_header_row_2, g_font.normal, colors.faded_txt, header_text_x + text_left_margin, ay - ((ghrh - 2) * ah)+group_height_fix-((properties.doubleRowText)?10:0), header_text_w - text_left_margin - this.groups[g].dateWidth-10, Math.round(ah*2/3)*(ghrh - 1), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 														
 							if(properties.showToolTip) {
 								if((header_text_w - text_left_margin - this.groups[g].dateWidth)<this.groups[g].row2_Width || (header_text_w - text_left_margin - this.groups[g].timeWidth - 10)<this.groups[g].row1_Width){
@@ -2512,7 +2505,7 @@ oBrowser = function(name) {
                             // =====
                             if(ay >= (0 - ah) && ay < this.y + this.h) {
                                 
-                                var track_type =  this.groups[this.rows[i].albumId].tracktype;
+                                var track_type = this.groups[this.rows[i].albumId].tracktype;
                                 
                                 var nbc = this.groups[this.rows[i].albumId].count.toString().length;
                                 if(nbc == 1) nbc++;

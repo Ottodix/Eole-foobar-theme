@@ -232,6 +232,7 @@ oPlaylist = function(idx, rowId, name) {
 };
 
 oFilterBox = function() {
+	this.empty_txt_width = -1;
 	this.images = {
         resetIcon_off: null,
         resetIcon_ov: null
@@ -306,12 +307,6 @@ oFilterBox = function() {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
         var bw = this.inputbox.w + Math.round(44 * g_zoom_percent / 100);
-        
-        if(this.inputbox.edit) {
-            gr.SetSmoothingMode(2);
-            gr.SetSmoothingMode(0);
-        };
-
         if(this.inputbox.text.length > 0) {
             this.reset_bt.draw(gr, bx+2, by+1, 255);
         } else {
@@ -1181,20 +1176,27 @@ oBrowser = function(name) {
 			 
             // draw header
             if(properties.showHeaderBar) {
-                var boxText = this.rows.length+" playlist"+(this.rows.length>1?"s  ":"  ");
+                if(globalProperties.fontAdjustement>=globalProperties.fontAdjustement_max-2) var boxText = this.rows.length;
+				else var boxText = this.rows.length+" playlist"+(this.rows.length>1?"s":"");
 
                 gr.FillSolidRect(this.x, 0, this.w - this.x -1, properties.headerBarHeight, colors.headerbar_bg);
                 gr.FillSolidRect(this.x, properties.headerBarHeight, this.w - this.x -1, 1, colors.headerbar_line);
 				
 				if(g_filterbox.inputbox.text.length==0) {
+					if(g_filterbox.empty_txt_width < 0) g_filterbox.empty_txt_width = gr.CalcTextWidth(g_filterbox.inputbox.empty_text, g_filterbox.inputbox.font_empty);
 					var text_width = gr.CalcTextWidth(boxText,g_font.plus1)
-					var tx = cFilterBox.x + cFilterBox.w + Math.round(22 * g_zoom_percent / 100) + 5 - text_width;
+					var tx = cFilterBox.x + g_filterbox.empty_txt_width;
 					
-					var tw = this.w - tx - 6;
+					var tw = this.w - tx - 12;
 					try {
 						gr.GdiDrawText(boxText, g_font.min1, colors.faded_txt, tx, properties.headerBarPaddingTop, tw, properties.headerBarHeight-properties.headerBarPaddingTop, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 					} catch(e) {console.log(e)};
 				}
+				if(properties.showFilterBox && g_filterbox) {
+					if(g_filterbox.inputbox.visible) {
+						g_filterbox.draw(gr, cFilterBox.x, Math.round(properties.headerBarHeight/2-cFilterBox.h/2)-2);
+					};
+				};				
             };
 			
 			
@@ -2100,15 +2102,6 @@ function on_paint(gr) {
         }
 		
         brw && brw.draw(gr);	
-		
-        if(properties.showHeaderBar) {
-            // inputBox
-            if(properties.showFilterBox && g_filterbox) {
-                if(g_filterbox.inputbox.visible) {
-                    g_filterbox.draw(gr, cFilterBox.x, Math.round(properties.headerBarHeight/2-cFilterBox.h/2)-2);
-                };
-            };
-        };
     };
 
 };
