@@ -134,6 +134,7 @@ var properties = {
     TFshowlist: "%album artist% ^^ %album% ^^ [' - Disc '%discnumber%] ^^ %date% ^^ %genre%",
 	TFshowlistReduced: "[%discnumber%]",
     TFgroupinfos: "%genre% ^^ %date% ^^ %discnumber%",	
+    TFgroupinfoscustom: "%album artist% ^^ %album% ^^ %genre% ^^ %date% ^^ %discnumber%",		
     tf_crc_artist: fb.TitleFormat("$crc32('artists'$meta(artist,0))"),	
     smooth_scroll_value: window.GetProperty("MAINPANEL Smooth Scroll value (0 to disable)", 0.5),
     smooth_expand_value: window.GetProperty("TRACKLIST Smooth Expand value (0 to disable)", 0.3),
@@ -192,7 +193,8 @@ var TF = {
 	grouping_singlemultidisc_filterbox : fb.TitleFormat(properties.TFgrouping_singlemultidisc_filterbox),	
 	grouping_singlemultidisc : fb.TitleFormat(properties.TFgrouping_singlemultidisc),		
 	grouping_populate : fb.TitleFormat(properties.TFgrouping_populate),		
-	groupinfos: fb.TitleFormat(properties.TFgroupinfos+" ^^ "+globalProperties.crc),			
+	groupinfos: fb.TitleFormat(properties.TFgroupinfos+" ^^ "+globalProperties.crc),		
+	groupinfoscustom: fb.TitleFormat(properties.TFgroupinfoscustom+" ^^ "+globalProperties.crc),	
 	albumartist: fb.TitleFormat("%album artist%"),	
 	album: fb.TitleFormat("%album%"),
 	genre: fb.TitleFormat("%genre%"),
@@ -4018,10 +4020,13 @@ oBrowser = function(name) {
 				this.groups[i].tracktype = TrackType(this.list[k].RawPath.substring(0, 4));
 				
 				if(properties.TFgrouping.length > 0) {
-					this.groups[i].artist = TF.albumartist.EvalWithMetadb(this.list[k]);
-					this.groups[i].album = TF.album.EvalWithMetadb(this.list[k]);
-					this.groups[i].genre = TF.genre.EvalWithMetadb(this.list[k]);
-					this.groups[i].date = TF.date.EvalWithMetadb(this.list[k]);
+					groupinfoscustom = TF.groupinfoscustom.EvalWithMetadb(this.list[k]);
+					groupinfoscustom = groupinfoscustom.split(" ^^ ");						
+					this.groups[i].artist = groupinfoscustom[0];
+					this.groups[i].album = groupinfoscustom[1];
+					this.groups[i].genre = groupinfoscustom[2];					
+					this.groups[i].date = groupinfoscustom[3];	
+					this.groups[i].discnb = groupinfoscustom[4];						
 					this.groups[i].cachekey = process_cachekey(this.list[k]);					
 				} else {
 					if(!this.showFilterBox) arr = trackinfos.split(" ^^ ");			

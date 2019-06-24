@@ -1861,6 +1861,12 @@ oBrowser = function(name) {
 		_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");			
 		_rowHeight.AppendTo(_menu,MF_STRING, "Row height");		
 		
+		var _panelWidth = window.CreatePopupMenu();
+		_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
+		_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
+		_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+		_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");		
+		
 		_menu2.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu2.CheckMenuItem(200, properties.showwallpaper);
 		_menu2.AppendMenuItem(MF_STRING, 220, "Blur");
@@ -1962,6 +1968,15 @@ oBrowser = function(name) {
 				break;	
 			case (idx == 1001):
 				this.setRowHeight(2);
+				break;		
+			case (idx == 1030):
+				playlistpanel_width.increment(10);
+				break;		
+			case (idx == 1031):
+				playlistpanel_width.decrement(10);
+				break;	
+			case (idx == 1032):
+				playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 				break;					
         };
         _menu2 = undefined;
@@ -1969,6 +1984,7 @@ oBrowser = function(name) {
         _menu1 = undefined;
         _menu = undefined;
 		_rowHeight = undefined;		
+		_panelWidth = undefined;			
         g_rbtn_click = false;
         return true;
     };
@@ -2936,6 +2952,9 @@ function on_notify_data(name, info) {
 			if(window.IsVisible){
 				brw.populate(true, 16, true);
 			} else {set_update_function("brw.populate(true, 16, true)");}
+			break;			
+		case "playlistpanel_width":
+			playlistpanel_width.value = info;
 			break;				
 		case "layout_state":
 			layout_state.value = info;

@@ -4125,7 +4125,15 @@ oBrowser = function(name) {
 			_menuRating.AppendMenuItem(MF_STRING, 116, "Don't show rating");	
 			_menuRating.CheckMenuRadioItem(113, 116, (properties.showRating && !properties.showRatingSelected) ? 113 : (properties.showRating && properties.showRatingSelected && !properties.showRatingRated) ? 114 : (properties.showRating && properties.showRatingRated) ? 115 : 116);	
 			_menuRating.AppendTo(_menu,MF_STRING, "Rating display");		
-			
+
+			if(layout_state.isEqual(0)){
+				var _panelWidth = window.CreatePopupMenu();
+				_panelWidth.AppendMenuItem(MF_STRING, 2030, "Increase width");	
+				_panelWidth.AppendMenuItem(MF_STRING, 2031, "Decrease width");	
+				_panelWidth.AppendMenuItem(MF_STRING, 2032, "Custom width...");	
+				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
+			}
+
             _menu2.AppendMenuItem(MF_STRING, 200, "Enable");
             _menu2.CheckMenuItem(200, properties.showwallpaper);
             _menu2.AppendMenuItem(MF_STRING, 220, "Blur");
@@ -4348,6 +4356,15 @@ oBrowser = function(name) {
                 case (idx == 1001):
                     this.setRowHeight(2);
                     break;						
+				case (idx == 2030):
+					rightplaylist_width.increment(10);
+					break;		
+				case (idx == 2031):
+					rightplaylist_width.decrement(10);
+					break;	
+				case (idx == 2032):
+					rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+					break;						
 				case (idx == 3298):	
 					setOneProperty("enableAutoSwitchPlaylistMode",!properties.enableAutoSwitchPlaylistMode);
 					if(filters_panel_state.isMaximumValue()) setOneProperty("lockOnNowPlaying",false);
@@ -6232,6 +6249,14 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);	
 			on_font_changed();
 		break; 	
+		case "rightplaylist_width":
+			rightplaylist_width.value = info;
+			break;				
+		case "set_font":
+			globalProperties.fontAdjustement = info;
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);	
+			on_font_changed();
+		break; 		
 		case "enable_screensaver":		
 			globalProperties.enable_screensaver = info;
 			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	

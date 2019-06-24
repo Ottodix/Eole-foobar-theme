@@ -3591,8 +3591,8 @@ function menu_object() {
 			menuDisplay.CheckMenuItem(7008,pop.show_counts)
 			menuDisplay.AppendMenuItem(MF_STRING, 7016, "Show Tooltips");	
 			menuDisplay.CheckMenuItem(7016,p.tooltip)		
-			
-			menuDisplay.AppendMenuItem(MF_SEPARATOR, 0, 0);
+
+			menuDisplay.AppendTo(Menu,MF_STRING, "Display");
 			
 			var rowPadding = window.CreatePopupMenu();	
 			rowPadding.AppendMenuItem(MF_STRING, 7020, "Increase");	
@@ -3600,8 +3600,14 @@ function menu_object() {
 			rowPadding.AppendMenuItem(MF_SEPARATOR, 0, 0);		
 			rowPadding.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold SHIFT and use your");
 			rowPadding.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");		
-			rowPadding.AppendTo(menuDisplay, MF_STRING, "Row height");		
+			rowPadding.AppendTo(Menu, MF_STRING, "Row height");	
 			
+			var _panelWidth = window.CreatePopupMenu();
+			_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
+			_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
+			_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+			_panelWidth.AppendTo(Menu,MF_STRING, "Panel width");
+		
 			var wallpaper = window.CreatePopupMenu();	
 			wallpaper.AppendMenuItem(MF_STRING, 9000, "Enable");
 			wallpaper.CheckMenuItem(9000, properties.showwallpaper);
@@ -3615,9 +3621,10 @@ function menu_object() {
 			wallpaper2.AppendMenuItem(MF_STRING, 9023, "Stretch");
 			wallpaper2.CheckMenuItem(9023, properties.wallpaperdisplay==2);
 			wallpaper2.AppendTo(wallpaper,MF_STRING, "Wallpaper size");
-			wallpaper.AppendTo(menuDisplay,MF_STRING, "Background Wallpaper");			
+			wallpaper.AppendTo(Menu,MF_STRING, "Background Wallpaper");	
 			
-			menuDisplay.AppendTo(Menu,MF_STRING, "Display");
+			Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);
+			
 			Menu.AppendMenuItem(MF_STRING, 7015, "Auto collapse");	
 			Menu.CheckMenuItem(7015,pop.auto);		
 			Menu.AppendMenuItem(MF_STRING, 7023, "Auto expand only children");	
@@ -3919,7 +3926,9 @@ function showSettingsMenu(x,y){
 	menuDisplay.AppendMenuItem(MF_STRING, 7016, "Show Tooltips");	
 	menuDisplay.CheckMenuItem(7016,p.tooltip)		
 	
-	menuDisplay.AppendMenuItem(MF_SEPARATOR, 0, 0);
+	menuDisplay.AppendMenuItem(MF_SEPARATOR, 0, 0);		
+	
+	menuDisplay.AppendTo(menu,MF_STRING, "Display");
 	
 	var rowPadding = window.CreatePopupMenu();	
 	rowPadding.AppendMenuItem(MF_STRING, 7020, "Increase");	
@@ -3927,13 +3936,20 @@ function showSettingsMenu(x,y){
 	rowPadding.AppendMenuItem(MF_SEPARATOR, 0, 0);		
 	rowPadding.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold SHIFT and use your");
 	rowPadding.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");		
-	rowPadding.AppendTo(menuDisplay, MF_STRING, "Row height");		
+	rowPadding.AppendTo(menu, MF_STRING, "Row height");		
 	
+	var _panelWidth = window.CreatePopupMenu();
+	_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
+	_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
+	_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+	_panelWidth.AppendTo(menu,MF_STRING, "Panel width");
+			
 	var wallpaper = window.CreatePopupMenu();	
 	wallpaper.AppendMenuItem(MF_STRING, 9000, "Enable");
 	wallpaper.CheckMenuItem(9000, properties.showwallpaper);
 	wallpaper.AppendMenuItem(MF_STRING, 9020, "Blur");
 	wallpaper.CheckMenuItem(9020, properties.wallpaperblurred);
+	
 	var wallpaper2 = window.CreatePopupMenu();	
 	wallpaper2.AppendMenuItem(MF_STRING, 9021, "Filling");
 	wallpaper2.CheckMenuItem(9021, properties.wallpaperdisplay==0);	
@@ -3942,9 +3958,10 @@ function showSettingsMenu(x,y){
 	wallpaper2.AppendMenuItem(MF_STRING, 9023, "Stretch");
 	wallpaper2.CheckMenuItem(9023, properties.wallpaperdisplay==2);
 	wallpaper2.AppendTo(wallpaper,MF_STRING, "Wallpaper size");
-	wallpaper.AppendTo(menuDisplay,MF_STRING, "Background Wallpaper");			
+	wallpaper.AppendTo(menu,MF_STRING, "Background Wallpaper");	
 	
-	menuDisplay.AppendTo(menu,MF_STRING, "Display");
+	menu.AppendMenuItem(MF_SEPARATOR, 0, 0);		
+	
 	menu.AppendMenuItem(MF_STRING, 7015, "Auto collapse");	
 	menu.CheckMenuItem(7015,pop.auto);		
 	menu.AppendMenuItem(MF_STRING, 7023, "Auto expand only children");	
@@ -4038,6 +4055,12 @@ function showSettingsMenu(x,y){
 		ui.setRowPadding(ui.row_p+2);
 	} else if(idx==7021){
 		ui.setRowPadding(ui.row_p-2);	
+	} else if(idx==1030){
+		libraryfilter_width.increment(10);
+	} else if(idx==1031){
+		libraryfilter_width.decrement(10);
+	} else if(idx==1032){
+		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");		
 	} else if(idx==9000){
 		toggleWallpaper();
 	} else if(idx==9020){
@@ -4208,6 +4231,12 @@ function showOptionsMenu(x,y,reduced){
 		ui.setRowPadding(ui.row_p+2);
 	} else if(idx==7021){
 		ui.setRowPadding(ui.row_p-2);	
+	} else if(idx==1030){
+		libraryfilter_width.increment(10);
+	} else if(idx==1031){
+		libraryfilter_width.decrement(10);
+	} else if(idx==1032){
+		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");			
 	} else if(idx==9000){
 		toggleWallpaper();
 	} else if(idx==9020){
@@ -4690,6 +4719,9 @@ function get_images() {
 };
 function on_notify_data(name, info) {
     switch(name) {
+		case "libraryfilter_width":
+			libraryfilter_width.value=info;	
+		break;				
 		case "libraryfilter_state":
 			libraryfilter_state.value=info;	
 		break;		

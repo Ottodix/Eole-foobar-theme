@@ -3578,8 +3578,8 @@ oBrowser = function(name) {
 
             _menu2.AppendTo(_menu,MF_STRING, "Display");            		
 			
-			_rowHeight.AppendMenuItem(MF_STRING, 1000, "Increase");
-			_rowHeight.AppendMenuItem(MF_STRING, 1001, "Decrease");	
+			_rowHeight.AppendMenuItem(MF_STRING, 1001, "Increase");
+			_rowHeight.AppendMenuItem(MF_STRING, 1000, "Decrease");	
 			_rowHeight.AppendMenuSeparator();
 			_rowHeight.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold SHIFT and use your");
 			_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");				
@@ -3587,7 +3587,15 @@ oBrowser = function(name) {
 				_rowHeight.AppendTo(_menu,MF_STRING, "Row height");
 			} else {
 				_rowHeight.AppendTo(_menu,MF_STRING, "Columns Width");				
-			}				
+			}			
+			
+			if(properties.ParentName=='Library'){
+				var _panelWidth = window.CreatePopupMenu();
+				_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
+				_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
+				_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
+			}
 			
             _menu3.AppendMenuItem(MF_STRING, 200, "Enable");
             _menu3.CheckMenuItem(200, properties.showwallpaper);
@@ -3873,7 +3881,16 @@ oBrowser = function(name) {
                     break;	
                 case (idx == 1001):
                     this.setRowHeight(2);
-                    break;						
+                    break;		
+				case (idx == 1030):
+					libraryfilter_width.increment(10);
+					break;		
+				case (idx == 1031):
+					libraryfilter_width.decrement(10);
+					break;	
+				case (idx == 1032):
+					libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+					break;						
 				case (idx == 2992):
 					if(filters_panel_state.isActive()) toggleFilterState(0,true);
 					else toggleFilterState(1);
@@ -5164,6 +5181,9 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "libraryfilter_width":
+			libraryfilter_width.value=info;	
+		break;		
 		case "libraryfilter_state":
 			libraryfilter_state.value=info;	
 		break;

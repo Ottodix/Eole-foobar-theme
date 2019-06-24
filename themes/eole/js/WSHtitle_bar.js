@@ -1735,7 +1735,7 @@ function draw_main_menu(x,y){
 		libraryfilter_width.decrement(10);
 		break;			
 	case (idx == 4035):	
-		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 		break;	
 	case (idx == 4036):		
 		playlistpanel_width.increment(10);
@@ -1744,7 +1744,7 @@ function draw_main_menu(x,y){
 		playlistpanel_width.decrement(10);
 		break;			
 	case (idx == 4038):		
-		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 		break;			
 	case (idx == 4040):	
 		setMemoryUsageGlobally(0);
@@ -1882,7 +1882,16 @@ function on_notify_data(name, info) {
 		case "history_previous":
 			g_searchbox.clearInputbox(false);
 			window.Repaint();
-		break;			
+		break;		
+		case "libraryfilter_width":
+			libraryfilter_width.value=info;	
+		break;		
+		case "rightplaylist_width":
+			rightplaylist_width.value = info;
+			break;	
+		case "playlistpanel_width":
+			playlistpanel_width.value = info;
+			break;					
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
 			build_buttons();

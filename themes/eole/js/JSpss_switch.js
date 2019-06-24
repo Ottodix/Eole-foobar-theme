@@ -58,7 +58,6 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		window.NotifyOthers(this.name,this.value);	
 		
 		RefreshPSS();
-		
 	}
 	this.toggleValue = function () {
 		if(this.value==0) this.setValue(1);
