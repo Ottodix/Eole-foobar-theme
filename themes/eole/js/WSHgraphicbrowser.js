@@ -6185,6 +6185,7 @@ function on_mouse_rbtn_down(x, y){
     }
 }
 function on_mouse_move(x, y, m) {
+
     if(x == g_cursor.x && y == g_cursor.y) return;
 	g_cursor.onMouse("move", x, y, m);	  
 	

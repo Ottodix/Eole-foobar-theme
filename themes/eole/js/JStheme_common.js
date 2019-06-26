@@ -776,6 +776,14 @@ function Resizing(name, resizing_left,resizing_right) {
 					if(this.over_resizing_left){
 						this.resizing_left_active = true;
 						this.resizing_x = x;
+						/*var options = {
+							show_text : false,	
+							use_album_art : false,
+							use_theming : false,
+							custom_image : createDragText("sd", "sd", 220),
+						}		
+						var items = new FbMetadbHandleList(fb.GetFocusItem());
+						fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);*/
 					}
 					else if(this.over_resizing_right){
 						this.resizing_right_active = true;

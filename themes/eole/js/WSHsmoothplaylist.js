@@ -4130,7 +4130,8 @@ oBrowser = function(name) {
 				var _panelWidth = window.CreatePopupMenu();
 				_panelWidth.AppendMenuItem(MF_STRING, 2030, "Increase width");	
 				_panelWidth.AppendMenuItem(MF_STRING, 2031, "Decrease width");	
-				_panelWidth.AppendMenuItem(MF_STRING, 2032, "Custom width...");	
+				_panelWidth.AppendMenuItem(MF_STRING, 2032, "Default width");					
+				_panelWidth.AppendMenuItem(MF_STRING, 2033, "Custom width...");					
 				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
 			}
 
@@ -4363,6 +4364,9 @@ oBrowser = function(name) {
 					rightplaylist_width.decrement(10);
 					break;	
 				case (idx == 2032):
+					rightplaylist_width.setDefault();
+					break;						
+				case (idx == 2033):
 					rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 					break;						
 				case (idx == 3298):	
@@ -4635,7 +4639,8 @@ function on_size() {
         wh = 1;
 		return;
     };
-	//if(window.IsVisible || first_on_size || !g_first_populate_done){
+	//if(g_resizing.isResizing()) {update_size = true;return;}
+	if(window.IsVisible || first_on_size || !g_first_populate_done || update_size){
 		window.MinWidth = 1;
 		window.MinHeight = 1;
 		
@@ -4647,7 +4652,7 @@ function on_size() {
 		brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
 		update_size = false;	
 		first_on_size = false;		
-	//} else update_size = true;	
+	} else update_size = true;	
 };
 function set_update_function(string){
 	if( Update_Required_function.indexOf("on_playback_new_track(")!=-1) {
@@ -4720,46 +4725,47 @@ function on_mouse_lbtn_down(x, y, m) {
         };
     };
 	
-	g_resizing.on_mouse("lbtn_down", x, y, m);
-	
-    var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
-    if(properties.enableTouchControl && is_scroll_enabled) {
-        if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
-            if(!timers.mouseDown) {
-                cTouch.y_prev = y;
-                cTouch.y_start = y;
-                if(cTouch.t1) {
-                    cTouch.t1.Reset();
-                } else {
-                    cTouch.t1 = fb.CreateProfiler("t1");
-                };
-                timers.mouseDown = setTimeout(function() {
-                    clearTimeout(timers.mouseDown);
-                    timers.mouseDown = false;
-                    if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
-                        cTouch.down = true;
-                    } else {
-                        brw.on_mouse("down", x, y);
-                    };
-                },50);
-            };
-        } else {		
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	if(!isResizing){
+		var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
+		if(properties.enableTouchControl && is_scroll_enabled) {
+			if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
+				if(!timers.mouseDown) {
+					cTouch.y_prev = y;
+					cTouch.y_start = y;
+					if(cTouch.t1) {
+						cTouch.t1.Reset();
+					} else {
+						cTouch.t1 = fb.CreateProfiler("t1");
+					};
+					timers.mouseDown = setTimeout(function() {
+						clearTimeout(timers.mouseDown);
+						timers.mouseDown = false;
+						if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
+							cTouch.down = true;
+						} else {
+							brw.on_mouse("down", x, y);
+						};
+					},50);
+				};
+			} else {		
+				// scrollbar
+				if(cScrollBar.enabled && cScrollBar.visible) {
+					brw.scrollbar && brw.scrollbar.on_mouse("down", x, y);
+				} else brw.on_mouse("down", x, y);
+			}
+		} else {
 			// scrollbar
-			if(cScrollBar.enabled && cScrollBar.visible) {
+			if(brw.scrollbar._isHover(x, y) && cScrollBar.enabled && cScrollBar.visible) {
 				brw.scrollbar && brw.scrollbar.on_mouse("down", x, y);
 			} else brw.on_mouse("down", x, y);
-        }
-    } else {
-		// scrollbar
-		if(brw.scrollbar._isHover(x, y) && cScrollBar.enabled && cScrollBar.visible) {
-			brw.scrollbar && brw.scrollbar.on_mouse("down", x, y);
-		} else brw.on_mouse("down", x, y);
-    }
-    
-    // inputBox
-    if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_down", x, y);
-    }
+		}
+		
+		// inputBox
+		if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_down", x, y);
+		}
+	}
 };
 
 function on_mouse_lbtn_up(x, y, m) {
@@ -4918,28 +4924,37 @@ function on_mouse_move(x, y, m) {
     if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible && !brw.drag_tracks) {
         g_filterbox.on_mouse("move", x, y);
     };
-    
-	g_resizing.on_mouse("move", x, y, m);
-	
-    if(properties.DropInplaylist && pman.state == 1) {
-        pman.on_mouse("move", x, y);
-	} else if(brw.drag_tracks){
-		on_drag_over(null, x, y, null);
-		//brw.on_mouse("drag_over", x, y);
-    } else {
-        if(cTouch.down) {
-            cTouch.y_current = y;
-            cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
-            if(x < brw.w) {
-                    scroll -= cTouch.y_move;
-                    cTouch.scroll_delta = scroll - scroll_;
-                    if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
-                    cTouch.y_prev = cTouch.y_current;
-            };
-        } else {
-            brw.on_mouse("move", x, y);
-        };
-    };
+
+	var isResizing = g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
+	if(isResizing){
+		if(g_resizing.resizing_x>x+5){
+			g_resizing.resizing_x = x;
+			rightplaylist_width.increment(5);
+		} else if(g_resizing.resizing_x<x-5){
+			g_resizing.resizing_x = x;			
+			rightplaylist_width.decrement(5);
+		}
+	} else {
+		if(properties.DropInplaylist && pman.state == 1) {
+			pman.on_mouse("move", x, y);
+		} else if(brw.drag_tracks){
+			on_drag_over(null, x, y, null);
+			//brw.on_mouse("drag_over", x, y);
+		} else {
+			if(cTouch.down) {
+				cTouch.y_current = y;
+				cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
+				if(x < brw.w) {
+						scroll -= cTouch.y_move;
+						cTouch.scroll_delta = scroll - scroll_;
+						if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
+						cTouch.y_prev = cTouch.y_current;
+				};
+			} else {
+				brw.on_mouse("move", x, y);
+			};
+		};
+	};
 };
 
 function on_mouse_wheel(step, stepstrait, delta){
@@ -4989,6 +5004,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 };
 
 function on_mouse_leave() {
+	g_resizing.on_mouse("leave", -1, -1);
     // inputBox
     if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
         g_filterbox.on_mouse("leave", 0, 0);
@@ -6231,6 +6247,10 @@ function stopFlashNowPlaying() {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "enableResizableBorders":
+			globalProperties.enableResizableBorders = info;
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
+		break; 			
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
@@ -6769,7 +6789,7 @@ function on_init() {
 	g_image_cache = new oImageCache();
 	g_var_cache = new var_cache;
 	
-	g_resizing = new Resizing();
+	g_resizing = new Resizing("smoothplaylist",true,false);
 	g_cursor = new oCursor();	
 	g_tooltip = new oTooltip();
 	setActivePlaylist()
