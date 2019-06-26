@@ -153,11 +153,15 @@ var oCursor = function () {
 			break;			
 		}
     }
-	this.setCursor = function(cursor_code,active_zone){
+	this.setCursor = function(cursor_code,active_zone,numberOfTry){
 		var active_zone = typeof active_zone !== 'undefined' ? active_zone : "";
+		var numberOfTry = typeof numberOfTry !== 'undefined' ? numberOfTry : 1;		
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
-		window.SetCursor(cursor_code);
+		//for(i=0;i<numberOfTry;i++) {
+			//console.log(cursor_code+" "+this.active_zone)
+			window.SetCursor(cursor_code);
+		//}
 		//console.log(cursor_code+" "+this.active_zone)
 	}
 	this.getCursor = function(){
@@ -759,10 +763,10 @@ function Resizing(name, resizing_left,resizing_right) {
 					if(resizing){
 						if(this.resizing_right && x>ww-10){
 							this.over_resizing_right = true;
-							g_cursor.setCursor(IDC_SIZEWE,this.name);				
+							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);				
 						} else if(this.resizing_left && x<10){
 							this.over_resizing_left = true;
-							g_cursor.setCursor(IDC_SIZEWE,this.name);
+							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);
 						} else if(g_cursor.getActiveZone()==this.name && !this.resizing_left_active){
 							g_cursor.setCursor(IDC_ARROW);
 						}
@@ -782,8 +786,8 @@ function Resizing(name, resizing_left,resizing_right) {
 							use_theming : false,
 							custom_image : createDragText("sd", "sd", 220),
 						}		
-						var items = new FbMetadbHandleList(fb.GetFocusItem());
-						fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);*/
+						var items = new FbMetadbHandleList(fb.GetFocusItem(true));
+						fb.DoDragDrop(window.ID, items, g_drop_effect.link, options);*/
 					}
 					else if(this.over_resizing_right){
 						this.resizing_right_active = true;
@@ -797,15 +801,20 @@ function Resizing(name, resizing_left,resizing_right) {
 			case "lbtn_up":
 				var return_var = (this.resizing_left_active || this.resizing_right_active);
 				if(globalProperties.enableResizableBorders){					
-					this.resizing_left_active = this.resizing_right_active = false;
-					this.resizing_x = 0;	
+					this.resizing_left_active = false;
+					this.resizing_right_active = false;
+					this.over_resizing_left = false;
+					this.over_resizing_right = false;
+					this.resizing_x = 0;
+					window.Repaint();
+					g_cursor.setCursor(IDC_ARROW);
 				}				
 				this.enableSizing(m);
 				return return_var;
 				
 			break;
 			case "leave":
-				g_cursor.setCursor(IDC_ARROW);
+				g_cursor.setCursor(IDC_ARROW); 
 			break;
 		}
 	}

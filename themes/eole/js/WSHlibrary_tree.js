@@ -3311,8 +3311,9 @@ function on_paint(gr) {
 	if(pman.offset > 0) {
 		pman.draw(gr);
 	};
-
-    gr.FillSolidRect(ui.w - 1, 0, 1, ui.h, colors.sidesline);	
+	if(g_resizing.isResizing()) gr.FillSolidRect(ui.w-1, 0, 1, wh, colors.dragdrop_marker_line);	 
+	else gr.FillSolidRect(ui.w-1, 0, 1, wh, colors.sidesline);
+	
     if (ui.scrollbar_show && pman.state !=1) sbar.draw(gr);
 }
 

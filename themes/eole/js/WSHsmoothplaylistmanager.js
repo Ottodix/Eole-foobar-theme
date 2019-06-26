@@ -1203,8 +1203,10 @@ oBrowser = function(name) {
 			// draw scrollbar
 			if(cScrollBar.enabled)  {
 				brw.scrollbar && brw.scrollbar.draw(gr);
-			};			
-			gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
+			};		
+			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);	 
+			else gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);			
+			
         };
     };
         

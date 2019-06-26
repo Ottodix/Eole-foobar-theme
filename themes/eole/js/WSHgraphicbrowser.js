@@ -4705,8 +4705,8 @@ oBrowser = function(name) {
                 if(g_plmanager.isOpened) g_plmanager.draw(gr);
             }
 			
-			this.drawRightLine = nowplayinglib_state.isActive();
-			if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
+			//this.drawRightLine = nowplayinglib_state.isActive();
+			//if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
 
             if(this.groups_draw.length == 0) { // library empty
                 var px = 0;

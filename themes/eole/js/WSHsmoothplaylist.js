@@ -3141,7 +3141,7 @@ oBrowser = function(name) {
 					gr.GdiDrawText("Playlist viewer", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
             };
 			
-			this.drawLeftLine = (main_panel_state.isEqual(2) || main_panel_state.isEqual(3))
+			this.drawLeftLine = layout_state.isEqual(0); //&& (main_panel_state.isEqual(0) || main_panel_state.isEqual(2) || main_panel_state.isEqual(3)))
 
             // draw header
             if(properties.showHeaderBar) {
@@ -3169,8 +3169,8 @@ oBrowser = function(name) {
 					} catch(e) {console.log(e)};
 				}
             };
-			
-			if(this.drawLeftLine) gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
+			if(g_resizing.isResizing()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
+			else if(this.drawLeftLine) gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
 
 			//if(cScrollBar.enabled || (g_cursor.x > ww - cScrollBar.width && g_cursor.x < ww && g_cursor.y > properties.headerBarHeight && g_cursor.y < wh))  {
 			if(cScrollBar.enabled && pman.state !=1)  {

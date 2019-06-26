@@ -34,14 +34,14 @@ var focus_item=plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist);
 function on_paint(gr) {
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	//gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
-	if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
+	//if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
 	
     if(wh<playlist_item_size*playlist_count) {
 		scrollbar_top=Math.floor((focus_item*scrollbar_zone)/(playlist_count-1));
 		
 		if(!hooverstate){  
 			if(g_cursor.getCursor()!=IDC_ARROW) g_cursor.setCursor(IDC_ARROW);			
-			gr.FillSolidRect(ww-cScrollBar.normalWidth-1,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
+			gr.FillSolidRect(ww-cScrollBar.normalWidth,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
 		}
 		else {          
 			if(g_cursor.getCursor()!=IDC_HAND) g_cursor.setCursor(IDC_HAND, "scrollbar");			

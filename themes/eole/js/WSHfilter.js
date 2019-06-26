@@ -1261,7 +1261,7 @@ oScrollbar = function(themed) {
     this.setSize = function() {
         if(properties.drawUpAndDownScrollbar) this.buttonh = cScrollBar.width;
 		else this.buttonh = 0;
-        this.x = brw.x + brw.w-cScrollBar.activeWidth;
+        this.x = brw.x + brw.w-cScrollBar.activeWidth+(brw.draw_right_line?0:1);
         this.y = brw.y - properties.headerBarHeight*0;
         this.w = cScrollBar.activeWidth;
         this.h = brw.h + properties.headerBarHeight*0;
@@ -1553,6 +1553,7 @@ oBrowser = function(name) {
 	this.tempSelectedItem = -1;
 	this.firstRowHeight = false;
 	this.secondRowHeight = false;	
+	this.draw_right_line = false;
     this.launch_populate = function() {
 		brw.populate(is_first_populate = true,0);
 		pman.populate(exclude_active = false, reset_scroll = true);
@@ -2993,8 +2994,8 @@ oBrowser = function(name) {
 					gr.GdiDrawText("Filter", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			};
 			
-			draw_right_line = (properties.DrawRightLine && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && properties.filterOrder==2) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && properties.filterOrder==1) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0));
-			
+			//draw_right_line = (properties.DrawRightLine && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && properties.filterOrder==2) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && properties.filterOrder==1) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0));
+			this.draw_right_line = (properties.DrawRightLine && (!(properties.filterOrder==2) && !(!filter3_state.isActive() && properties.filterOrder==1) && !(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0) || main_panel_state.isEqual(0)));
             // draw top header bar 
             if(properties.showHeaderBar) {
                 var item_txt = new Array("", "album", "artist", "genre");
@@ -3006,7 +3007,7 @@ oBrowser = function(name) {
 				height_top_fix1 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight-1 : 0;
 				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;				
                 gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bg);
-                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
+                gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((this.draw_right_line)?1:0), 1, colors.headerbar_line);
                 
 				if(g_filterbox.inputbox.text.length==0) {
 					var text_width = gr.CalcTextWidth(boxText,g_font.min1)
@@ -3027,11 +3028,12 @@ oBrowser = function(name) {
 				pman.draw(gr);
 			};	
 			
-			if(draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
+			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);	 
+			else if(this.draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
 						
             // draw scrollbar
             if(cScrollBar.enabled && pman.state !=1) {
-                brw.scrollbar && brw.scrollbar.draw(gr);
+                this.scrollbar && this.scrollbar.draw(gr);
             };
 		};
     };
