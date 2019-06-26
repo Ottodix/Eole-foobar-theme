@@ -5671,58 +5671,59 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
-	g_resizing.on_mouse("lbtn_down", x, y, m);
-	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
-	
-	doubleClick=false;
-	brw.click_down = true;
-    brw.on_mouse("lbtn_down", x, y);
-	g_showlist.click_down_scrollbar = false;
-	
-    if(g_showlist.idx > -1) {
-        if(g_showlist.close_bt.checkstate("down", x, y)){
-			g_showlist.close_bt.state=ButtonStates.hide;
-			g_showlist.close_bt.isdown = false;
-			g_showlist.close();		
-			g_cursor.setCursor(IDC_ARROW);
-			g_showlist.close_bt.cursor = IDC_ARROW;				
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover);
+	if(!isResizing){
+		if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
+		
+		doubleClick=false;
+		brw.click_down = true;
+		brw.on_mouse("lbtn_down", x, y);
+		g_showlist.click_down_scrollbar = false;
+		
+		if(g_showlist.idx > -1) {
+			if(g_showlist.close_bt.checkstate("down", x, y)){
+				g_showlist.close_bt.state=ButtonStates.hide;
+				g_showlist.close_bt.isdown = false;
+				g_showlist.close();		
+				g_cursor.setCursor(IDC_ARROW);
+				g_showlist.close_bt.cursor = IDC_ARROW;				
+			}
+			if(g_showlist.totalCols > g_showlist.totalColsVis) {
+				(g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("down", x, y);
+				(g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("down", x, y);
+			}
 		}
-        if(g_showlist.totalCols > g_showlist.totalColsVis) {
-            (g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("down", x, y);
-            (g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("down", x, y);
-        }
-    }
-    
-    // check showList Tracks
-    if(g_showlist.idx > -1) {
-		isHover_Row = false;
-        for(var c = g_showlist.columnsOffset; c < g_showlist.columnsOffset + g_showlist.totalColsVis; c++) {
-            if(g_showlist.columns[c]) {
-                for(var r = 0; r < g_showlist.columns[c].rows.length; r++) {
-                    check_isHover_Row = g_showlist.columns[c].rows[r].check("down", x, y);
-					if(check_isHover_Row) isHover_Row = true;
-                }
-            }
-        }
-		//Check showList scrollbar
-		if(g_showlist.hscr_visible && g_showlist.isHover_hscrollbar(x,y)) {					
-				g_showlist.drag_start_x = x;		
-				g_showlist.drag_x = x;
-				g_showlist.drag_old_x = x;		
-				g_showlist.click_down_scrollbar = true;				
-		} else if(!isHover_Row) g_showlist.check("down", x, y);
-    }  
+		
+		// check showList Tracks
+		if(g_showlist.idx > -1) {
+			isHover_Row = false;
+			for(var c = g_showlist.columnsOffset; c < g_showlist.columnsOffset + g_showlist.totalColsVis; c++) {
+				if(g_showlist.columns[c]) {
+					for(var r = 0; r < g_showlist.columns[c].rows.length; r++) {
+						check_isHover_Row = g_showlist.columns[c].rows[r].check("down", x, y);
+						if(check_isHover_Row) isHover_Row = true;
+					}
+				}
+			}
+			//Check showList scrollbar
+			if(g_showlist.hscr_visible && g_showlist.isHover_hscrollbar(x,y)) {					
+					g_showlist.drag_start_x = x;		
+					g_showlist.drag_x = x;
+					g_showlist.drag_old_x = x;		
+					g_showlist.click_down_scrollbar = true;				
+			} else if(!isHover_Row) g_showlist.check("down", x, y);
+		}  
 
-    // check scrollbar
-    if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
-        g_scrollbar.check("down", x, y);
-    }
-	
-    // inputBox
-    if(brw.showFilterBox && properties.showheaderbar && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_down", x, y);
-    }	
-	
+		// check scrollbar
+		if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
+			g_scrollbar.check("down", x, y);
+		}
+		
+		// inputBox
+		if(brw.showFilterBox && properties.showheaderbar && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_down", x, y);
+		}	
+	};
 }
 
 function on_mouse_lbtn_up_delayed(x, y){
@@ -5799,102 +5800,103 @@ function on_mouse_lbtn_up(x, y, m) {
 	brw.click_down = false;	
 	g_showlist.click_down_scrollbar = false;	
 
-	g_resizing.on_mouse("lbtn_up", x, y, m);
-
-	if(!already_saved){
-		x_previous_lbtn_up=x;
-		y_previous_lbtn_up=y;
-		brw.activeIndexFirstClick=brw.activeIndex;
-		already_saved=true;
-	}
-	timers.afterDoubleClick = setTimeout(function() {
-		already_saved=false;
-		clearTimeout(timers.afterDoubleClick);
-		timers.afterDoubleClick = false;
-	},150);
-
-	if(properties.DragToPlaylist) g_plmanager.checkstate("up", x, y);		
-
-	// Delay some actions, which shouldn't be triggered if there is a double click instead of a simple click
-	if(g_dragA || g_dragR){
-		on_mouse_lbtn_up_delayed(x, y);
-	} else {
-		if(g_showlist.idx == brw.activeIndex && brw.activeIndex > -1){
-			timers.delayForDoubleClick = setTimeout(function() {
-				clearTimeout(timers.delayForDoubleClick);
-				timers.delayForDoubleClick = false;	
-				on_mouse_lbtn_up_delayed(x_previous_lbtn_up, y_previous_lbtn_up);
-			},150);
-		} else on_mouse_lbtn_up_delayed(x, y);
-	}	
-	
-	// check g_showlist button to execute action
-	g_showlist_click_on_next=false;
-	g_showlist_click_on_prev=false;		
-	if(g_showlist.idx > -1 && !g_showlist.drag_showlist_hscrollbar) {
-		if(g_showlist.totalCols > g_showlist.totalColsVis) {	
-			if((g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("up", x, y) == ButtonStates.hover) {
-				g_showlist_click_on_prev=true;						
-				g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
-				if(g_showlist.columnsOffset == 0) {
-					g_showlist.prev_bt.state = ButtonStates.normal;
-					g_cursor.setCursor(IDC_ARROW);
-					g_showlist.prev_bt.cursor = IDC_ARROW;						
-				}
-				brw.repaint();
-			}
-			else if((g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("up", x, y) == ButtonStates.hover) {
-				g_showlist_click_on_next=true;
-				g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
-				if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) {
-					g_showlist.next_bt.state = ButtonStates.normal;
-					g_cursor.setCursor(IDC_ARROW);
-					g_showlist.prev_bt.cursor = IDC_ARROW;						
-				}				
-				brw.repaint();
-			}
-			else if(y > g_showlist.hscr_y && y < g_showlist.hscr_y + g_showlist.hscr_height && x < g_showlist.hscr_x && !g_showlist_click_on_prev ){
-				g_showlist_click_on_prev=true;						
-				g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
-				if(g_showlist.columnsOffset == 0) g_showlist.prev_bt.state = ButtonStates.normal;
-				brw.repaint();					
-			}					
-			else if(y > g_showlist.hscr_y && y < g_showlist.hscr_y + g_showlist.hscr_height && x > g_showlist.hscr_x + g_showlist.hscr_cursor_width && !g_showlist_click_on_next ){
-				g_showlist_click_on_next=true;			
-				g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
-				if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) g_showlist.next_bt.state = ButtonStates.normal;
-				brw.repaint();						
-			}
+	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
+		if(!isResizing){
+		if(!already_saved){
+			x_previous_lbtn_up=x;
+			y_previous_lbtn_up=y;
+			brw.activeIndexFirstClick=brw.activeIndex;
+			already_saved=true;
 		}
-	}		
+		timers.afterDoubleClick = setTimeout(function() {
+			already_saved=false;
+			clearTimeout(timers.afterDoubleClick);
+			timers.afterDoubleClick = false;
+		},150);
 
-	
-	// check scrollbar scroll on click above or below the cursor
-	if(g_scrollbar.hover && !g_scrollbar.cursorDrag && !g_showlist_click_on_next && !g_showlist.drag_showlist_hscrollbar) {
-		var scrollstep = brw.totalRowsVis;
-		if(y < g_scrollbar.cursorPos) {
-			if(!brw.buttonclicked) {
-				brw.buttonclicked = true;
-				on_mouse_wheel(1*scrollstep);
-			};
+		if(properties.DragToPlaylist) g_plmanager.checkstate("up", x, y);		
+
+		// Delay some actions, which shouldn't be triggered if there is a double click instead of a simple click
+		if(g_dragA || g_dragR){
+			on_mouse_lbtn_up_delayed(x, y);
 		} else {
-			if(!brw.buttonclicked) {
-				brw.buttonclicked = true;
-				on_mouse_wheel(-1*scrollstep);
+			if(g_showlist.idx == brw.activeIndex && brw.activeIndex > -1){
+				timers.delayForDoubleClick = setTimeout(function() {
+					clearTimeout(timers.delayForDoubleClick);
+					timers.delayForDoubleClick = false;	
+					on_mouse_lbtn_up_delayed(x_previous_lbtn_up, y_previous_lbtn_up);
+				},150);
+			} else on_mouse_lbtn_up_delayed(x, y);
+		}	
+		
+		// check g_showlist button to execute action
+		g_showlist_click_on_next=false;
+		g_showlist_click_on_prev=false;		
+		if(g_showlist.idx > -1 && !g_showlist.drag_showlist_hscrollbar) {
+			if(g_showlist.totalCols > g_showlist.totalColsVis) {	
+				if((g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("up", x, y) == ButtonStates.hover) {
+					g_showlist_click_on_prev=true;						
+					g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
+					if(g_showlist.columnsOffset == 0) {
+						g_showlist.prev_bt.state = ButtonStates.normal;
+						g_cursor.setCursor(IDC_ARROW);
+						g_showlist.prev_bt.cursor = IDC_ARROW;						
+					}
+					brw.repaint();
+				}
+				else if((g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("up", x, y) == ButtonStates.hover) {
+					g_showlist_click_on_next=true;
+					g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
+					if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) {
+						g_showlist.next_bt.state = ButtonStates.normal;
+						g_cursor.setCursor(IDC_ARROW);
+						g_showlist.prev_bt.cursor = IDC_ARROW;						
+					}				
+					brw.repaint();
+				}
+				else if(y > g_showlist.hscr_y && y < g_showlist.hscr_y + g_showlist.hscr_height && x < g_showlist.hscr_x && !g_showlist_click_on_prev ){
+					g_showlist_click_on_prev=true;						
+					g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
+					if(g_showlist.columnsOffset == 0) g_showlist.prev_bt.state = ButtonStates.normal;
+					brw.repaint();					
+				}					
+				else if(y > g_showlist.hscr_y && y < g_showlist.hscr_y + g_showlist.hscr_height && x > g_showlist.hscr_x + g_showlist.hscr_cursor_width && !g_showlist_click_on_next ){
+					g_showlist_click_on_next=true;			
+					g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
+					if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) g_showlist.next_bt.state = ButtonStates.normal;
+					brw.repaint();						
+				}
+			}
+		}		
+
+		
+		// check scrollbar scroll on click above or below the cursor
+		if(g_scrollbar.hover && !g_scrollbar.cursorDrag && !g_showlist_click_on_next && !g_showlist.drag_showlist_hscrollbar) {
+			var scrollstep = brw.totalRowsVis;
+			if(y < g_scrollbar.cursorPos) {
+				if(!brw.buttonclicked) {
+					brw.buttonclicked = true;
+					on_mouse_wheel(1*scrollstep);
+				};
+			} else {
+				if(!brw.buttonclicked) {
+					brw.buttonclicked = true;
+					on_mouse_wheel(-1*scrollstep);
+				};
 			};
 		};
+		brw.stopResizing();
+		g_showlist.drag_showlist_hscrollbar = false;
+		// check scrollbar
+		if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
+			g_scrollbar.check("up", x, y);
+		}		
+		// inputBox
+		if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_up", x, y);
+		}	
+		if(properties.showheaderbar && y>0 && y<brw.headerBarHeight) g_headerbar.on_mouse("lbtn_up", x, y);	
 	};
-	brw.stopResizing();
-	g_showlist.drag_showlist_hscrollbar = false;
-	// check scrollbar
-	if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
-		g_scrollbar.check("up", x, y);
-	}		
-	// inputBox
-	if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
-		g_filterbox.on_mouse("lbtn_up", x, y);
-	}	
-	if(properties.showheaderbar && y>0 && y<brw.headerBarHeight) g_headerbar.on_mouse("lbtn_up", x, y);	
 }
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
@@ -6189,71 +6191,90 @@ function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
 	g_cursor.onMouse("move", x, y, m);	  
 	
-	g_resizing.on_mouse("move", x, y, m);
-
-    g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
-    g_ishover && brw.on_mouse("move", x, y);
-
-    if(!g_dragA && !g_dragR && !brw.external_dragging) {	
-		// check showList Tracks
-		if(g_showlist.idx > -1) {
-			g_showlist.check("move", x, y);
-		}
-        // check scrollbar
-        if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
-            g_scrollbar.check("move", x, y);
-        }
-        // inputBox
-        if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
-            g_filterbox.on_mouse("move", x, y);
-        }		
-    } else {
-        if(properties.DragToPlaylist) g_plmanager.checkstate("move", x, y);
-    }
-    
-    // if dragging out of the panel limits, repaint to clear the dragged cover
-    //if(!g_ishover) {
-		if(g_dragA) {
-			g_avoid_on_playlist_switch = true;
-			var items = brw.groups[brw.groups_draw[brw.clicked_id]].pl; 
-			brw.external_dragging = true; 
-			var options = {
-				show_text : false,	
-				use_album_art : false,
-				use_theming : false,
-				custom_image : createDragImg(brw.groups[brw.groups_draw[brw.clicked_id]].cover_img_full, 80, brw.groups[brw.groups_draw[brw.clicked_id]].pl.Count),
+	var isResizing = g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
+	if(isResizing){
+		if(g_resizing.resizing_right_active){
+			if(g_resizing.resizing_x>x+5){
+				g_resizing.resizing_x = x;
+				rightplaylist_width.increment(5);
+			} else if(g_resizing.resizing_x<x-5){
+				g_resizing.resizing_x = x;			
+				rightplaylist_width.decrement(5);
 			}
-			var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);
-			// nothing happens here until the mouse button is released	
-			brw.external_dragging = false; 
-			brw.stopDragging();	
-			items = undefined;			
+		} else {
+			if(g_resizing.resizing_x>x+5){
+				g_resizing.resizing_x = x;
+				libraryfilter_width.decrement(5);
+			} else if(g_resizing.resizing_x<x-5){
+				g_resizing.resizing_x = x;
+				libraryfilter_width.increment(5);
+			}
 		}
-		if(g_dragR) {
-			g_avoid_on_playlist_switch = true;			
-			var items = plman.GetPlaylistSelectedItems(brw.getSourcePlaylist());
-			showlist_selected_count = 0;
-			for(var i = 0; i < g_showlist.rows_.length; i++) {
-				if(g_showlist.rows_[i].isSelected) showlist_selected_count++;
+	} else {
+		g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
+		g_ishover && brw.on_mouse("move", x, y);
+
+		if(!g_dragA && !g_dragR && !brw.external_dragging) {	
+			// check showList Tracks
+			if(g_showlist.idx > -1) {
+				g_showlist.check("move", x, y);
+			}
+			// check scrollbar
+			if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
+				g_scrollbar.check("move", x, y);
+			}
+			// inputBox
+			if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
+				g_filterbox.on_mouse("move", x, y);
+			}		
+		} else {
+			if(properties.DragToPlaylist) g_plmanager.checkstate("move", x, y);
+		}
+		
+		// if dragging out of the panel limits, repaint to clear the dragged cover
+		//if(!g_ishover) {
+			if(g_dragA) {
+				g_avoid_on_playlist_switch = true;
+				var items = brw.groups[brw.groups_draw[brw.clicked_id]].pl; 
+				brw.external_dragging = true; 
+				var options = {
+					show_text : false,	
+					use_album_art : false,
+					use_theming : false,
+					custom_image : createDragImg(brw.groups[brw.groups_draw[brw.clicked_id]].cover_img_full, 80, brw.groups[brw.groups_draw[brw.clicked_id]].pl.Count),
+				}
+				var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);
+				// nothing happens here until the mouse button is released	
+				brw.external_dragging = false; 
+				brw.stopDragging();	
+				items = undefined;			
+			}
+			if(g_dragR) {
+				g_avoid_on_playlist_switch = true;			
+				var items = plman.GetPlaylistSelectedItems(brw.getSourcePlaylist());
+				showlist_selected_count = 0;
+				for(var i = 0; i < g_showlist.rows_.length; i++) {
+					if(g_showlist.rows_[i].isSelected) showlist_selected_count++;
+				}			
+				if(showlist_selected_count==items.Count) var drag_img = createDragImg(brw.groups[g_showlist.idx].cover_img_full, 80,items.Count);
+				else drag_img = createDragText("Dragging", items.Count+" tracks", 220);
+				brw.external_dragging = true;	
+				var options = {
+					show_text : false,	
+					use_album_art : false,
+					use_theming : false,
+					custom_image : drag_img,
+				}
+				var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);  	
+				// nothing happens here until the mouse button is released
+				brw.external_dragging = false; 
+				brw.stopDragging();								
+				items = undefined;
+
 			}			
-			if(showlist_selected_count==items.Count) var drag_img = createDragImg(brw.groups[g_showlist.idx].cover_img_full, 80,items.Count);
-			else drag_img = createDragText("Dragging", items.Count+" tracks", 220);
-			brw.external_dragging = true;	
-			var options = {
-				show_text : false,	
-				use_album_art : false,
-				use_theming : false,
-				custom_image : drag_img,
-			}
-			var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);  	
-			// nothing happens here until the mouse button is released
-			brw.external_dragging = false; 
-			brw.stopDragging();								
-			items = undefined;
-
-		}			
-        //brw.repaint();
-    //}
+			//brw.repaint();
+		//}
+		};
 }
 
 function on_mouse_wheel(step, stepstrait, delta){
@@ -6329,6 +6350,8 @@ function on_mouse_wheel(step, stepstrait, delta){
 }
 
 function on_mouse_leave() {
+	g_resizing.on_mouse("leave", -1, -1);
+	
 	if(brw.album_Rclicked_index>-1 && !g_avoid_on_mouse_leave) brw.album_Rclicked_index = -1;
 	else g_avoid_on_mouse_leave=false;
 
@@ -7257,7 +7280,7 @@ function on_init() {
 	g_filterbox.inputbox.visible = true;
 	g_tooltip = new oTooltip('brw');
 	
-	g_resizing = new Resizing();
+	g_resizing = new Resizing("graphicbrowser",true,true);
 	
 	g_history = new oPlaylistHistory();
 	

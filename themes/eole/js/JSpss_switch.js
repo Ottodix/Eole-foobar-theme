@@ -106,6 +106,20 @@ const refreshPSS_async = async() =>
 	}
 };
 function RefreshPSS() {
+//let handle_list = plman.GetPlaylistItems(plman.ActivePlaylist);
+	if (fb.IsPaused) {
+		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
+		handle_list.RefreshStats();
+	}
+	else if (fb.IsPlaying) {
+		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
+		handle_list.RefreshStats();
+	}	
+	else {
+		fb.Play();fb.Stop();
+	}	
+}	
+function RefreshPSS_old1() {
 	if (fb.IsPaused) {
 		fb.Play();
 		fb.Pause();
@@ -118,7 +132,7 @@ function RefreshPSS() {
 		fb.Play();fb.Stop();
 	}
 }
-function RefreshPSS_old() {
+function RefreshPSS_old2() {
 	if (fb.IsPlaying || fb.IsPaused) {
 		fb.PlayOrPause();
 		fb.PlayOrPause();
