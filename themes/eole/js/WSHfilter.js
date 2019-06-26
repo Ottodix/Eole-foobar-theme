@@ -5565,7 +5565,7 @@ function on_init() {
 	g_image_cache = new oImageCache();
 	g_filterbox.reset_layout();	
     g_active_playlist = plman.ActivePlaylist;	
-	g_resizing = new Resizing("libraryfilter",false,true);	
+	g_resizing = new Resizing("libraryfilter",false,main_panel_state.isEqual(0));	
     switch(properties.tagMode) {
         case 1:
             properties.albumArtId = 0;
