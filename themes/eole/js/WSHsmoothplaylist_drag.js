@@ -4926,7 +4926,7 @@ function on_mouse_move(x, y, m) {
     };
 
 	var isResizing = g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
-	if(isResizing && layout_state.isEqual(0)){
+	if(isResizing){
 		if(g_resizing.resizing_x>x+5){
 			g_resizing.resizing_x = x;
 			rightplaylist_width.increment(5);
