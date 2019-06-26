@@ -1298,7 +1298,8 @@ function draw_main_menu(x,y){
 	nowplaying.AppendMenuSeparator();         
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4030, "Increase width");	
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4031, "Decrease width");	
-	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Custom width...");	
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Default width");	
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4033, "Custom width...");	
 	
 	if(layout_state.isEqual(1)){	
 		minimode_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");		
@@ -1314,9 +1315,10 @@ function draw_main_menu(x,y){
 		if(libraryfilter_state.isActive()) left_menu.AppendMenuItem(MF_STRING, 4028, "Hide");
 		else left_menu.AppendMenuItem(MF_STRING, 4028, "Show");			
 		left_menu.AppendMenuSeparator();		
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4033, "Increase width");	
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4034, "Decrease width");	
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4035, "Custom width...");			
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4034, "Increase width");	
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4035, "Decrease width");	
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4036, "Default width");		
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4037, "Custom width...");			
 		library_menu.AppendMenuSeparator();
 		library_menu.AppendMenuItem(MF_STRING, 4000, "Dark theme");	
 		library_menu.CheckMenuItem(4000, properties.library_dark_theme);
@@ -1327,9 +1329,10 @@ function draw_main_menu(x,y){
 		nowplaying.AppendTo(playlists_menu,MF_STRING, "Right playlist");
 		playlistpanel_menu = window.CreatePopupMenu();
 		playlistpanel_menu.AppendTo(playlists_menu,MF_STRING, "Playlist panel");
-		playlistpanel_menu.AppendMenuItem(MF_STRING, 4036, "Increase width");	
-		playlistpanel_menu.AppendMenuItem(MF_STRING, 4037, "Decrease width");	
-		playlistpanel_menu.AppendMenuItem(MF_STRING, 4038, "Custom width...");				
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4038, "Increase width");	
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4039, "Decrease width");	
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4040, "Default width");		
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4041, "Custom width...");				
 		var FiltersMenu = window.CreatePopupMenu();
 		if(filters_panel_state.value>0)
 			FiltersMenu.AppendMenuItem(MF_STRING, 4990, "Hide");	
@@ -1396,9 +1399,11 @@ function draw_main_menu(x,y){
 	nowplayinglobal.AppendMenuSeparator();
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4030, "Increase width");	
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4031, "Decrease width");	
-	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Custom width...");		
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Default width");		
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4033, "Custom width...");		
 	nowplayinglobal.AppendTo(appearance_menu,MF_STRING, "Right playlist");	
-	
+	appearance_menu.AppendMenuItem(MF_STRING, 4046, "Enable resizable borders");
+	appearance_menu.CheckMenuItem(4046, globalProperties.enableResizableBorders);
 	appearance_menu.AppendMenuSeparator(); 
 	appearance_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");		
@@ -1422,12 +1427,12 @@ function draw_main_menu(x,y){
 		
 	skin_settings_menu.AppendMenuSeparator(); 
 	/*mem_solicitation = window.CreatePopupMenu();
-	mem_solicitation.AppendMenuItem(MF_STRING, 4040, "0 - Minimum");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4041, "1 - Keep loaded covers in memory");	
-	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "2 - Load all covers at startup");
-	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "3 - Load all covers && artist thumbnails at startup");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4042, "0 - Minimum");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4043, "1 - Keep loaded covers in memory");	
+	mem_solicitation.AppendMenuItem(MF_STRING, 4044, "2 - Load all covers at startup");
+	mem_solicitation.AppendMenuItem(MF_STRING, 4045, "3 - Load all covers && artist thumbnails at startup");	
 	mem_solicitation.AppendMenuSeparator();	
-	mem_solicitation.CheckMenuRadioItem(4040, 4043, 4040+globalProperties.mem_solicitation);	
+	mem_solicitation.CheckMenuRadioItem(4042, 4045, 4042+globalProperties.mem_solicitation);	
 	mem_solicitation.AppendMenuItem(MF_STRING, 4026, "Reset images cache");
 	mem_solicitation.AppendTo(skin_settings_menu, MF_STRING, "Covers && Memory usage");*/
 
@@ -1724,39 +1729,53 @@ function draw_main_menu(x,y){
 		break;			
 	case (idx == 4031):	
 		rightplaylist_width.decrement(10);
-		break;			
-	case (idx == 4032):		
+		break;	
+	case (idx == 4032):	
+		rightplaylist_width.setDefault();
+		break;				
+	case (idx == 4033):		
 		rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom playlist width");
 		break;		
-	case (idx == 4033):			
+	case (idx == 4034):			
 		libraryfilter_width.increment(10);
 		break;			
-	case (idx == 4034):			
+	case (idx == 4035):			
 		libraryfilter_width.decrement(10);
-		break;			
-	case (idx == 4035):	
-		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
-		break;	
-	case (idx == 4036):		
-		playlistpanel_width.increment(10);
+		break;		
+	case (idx == 4036):	
+		libraryfilter_width.setDefault();
 		break;			
 	case (idx == 4037):	
+		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+		break;	
+	case (idx == 4038):		
+		playlistpanel_width.increment(10);
+		break;			
+	case (idx == 4039):	
 		playlistpanel_width.decrement(10);
 		break;			
-	case (idx == 4038):		
+	case (idx == 4040):	
+		playlistpanel_width.setDefault();
+		break;			
+	case (idx == 4041):		
 		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 		break;			
-	case (idx == 4040):	
+	case (idx == 4042):	
 		setMemoryUsageGlobally(0);
 		break;	
-	case (idx == 4041):	
+	case (idx == 4043):	
 		setMemoryUsageGlobally(1);
 		break;	
-	case (idx == 4042):	
+	case (idx == 4044):	
 		setMemoryUsageGlobally(2);
 		break;	
-	case (idx == 4043):	
+	case (idx == 4045):	
 		setMemoryUsageGlobally(3);	
+		break;	
+	case (idx == 4046):	
+		globalProperties.enableResizableBorders = !globalProperties.enableResizableBorders;
+		window.NotifyOthers("enableResizableBorders",globalProperties.enableResizableBorders);
+		on_notify_data("enableResizableBorders",globalProperties.enableResizableBorders);
 		break;			
     case (idx == 4988):
 		if(properties.savedFilterState>=0 && !properties.displayToggleBtns) filters_panel_state.setValue(properties.savedFilterState);
@@ -1867,6 +1886,10 @@ function on_focus(is_focused) {
 }
 function on_notify_data(name, info) {
     switch(name) {	
+		case "enableResizableBorders":
+			globalProperties.enableResizableBorders = info;
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
+		break; 			
 		case "MemSolicitation":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);			

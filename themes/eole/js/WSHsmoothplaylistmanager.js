@@ -1864,7 +1864,8 @@ oBrowser = function(name) {
 		var _panelWidth = window.CreatePopupMenu();
 		_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
 		_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-		_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+		_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");				
+		_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
 		_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");		
 		
 		_menu2.AppendMenuItem(MF_STRING, 200, "Enable");
@@ -1976,6 +1977,9 @@ oBrowser = function(name) {
 				playlistpanel_width.decrement(10);
 				break;	
 			case (idx == 1032):
+				playlistpanel_width.setDefault();		
+				break;
+			case (idx == 1033):
 				playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 				break;					
         };
@@ -2126,97 +2130,98 @@ function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
 	
-	g_resizing.on_mouse("lbtn_down", x, y, m);
-	
-    // stop inertia
-    if(cTouch.timer) {
-        window.ClearInterval(cTouch.timer);
-        cTouch.timer = false;
-        // stop scrolling but not abrupt, add a little offset for the stop
-        if(Math.abs(scroll - scroll_) > properties.rowHeight) {
-            scroll = (scroll > scroll_ ? scroll_ + properties.rowHeight : scroll_ - properties.rowHeight);
-            scroll = check_scroll(scroll);
-        };
-    };
-    
-    var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
-    if(properties.enableTouchControl && is_scroll_enabled) {
-        if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
-            if(!timers.mouseDown) {
-                cTouch.y_prev = y;
-                cTouch.y_start = y;
-                if(cTouch.t1) {
-                    cTouch.t1.Reset();
-                } else {
-                    cTouch.t1 = fb.CreateProfiler("t1");
-                };
-                timers.mouseDown = setTimeout(function() {
-                    clearTimeout(timers.mouseDown);
-                    timers.mouseDown = false;
-                    if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
-                        cTouch.down = true;
-                    } else {
-                        brw.on_mouse("down", x, y);
-                    };
-                },50);
-            };
-        } else {
-            brw.on_mouse("down", x, y);
-        };
-    } else {
-        brw.on_mouse("down", x, y);
-    };
-    
-    // inputBox
-    if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_down", x, y);
-    };
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	if(!isResizing){	
+		// stop inertia
+		if(cTouch.timer) {
+			window.ClearInterval(cTouch.timer);
+			cTouch.timer = false;
+			// stop scrolling but not abrupt, add a little offset for the stop
+			if(Math.abs(scroll - scroll_) > properties.rowHeight) {
+				scroll = (scroll > scroll_ ? scroll_ + properties.rowHeight : scroll_ - properties.rowHeight);
+				scroll = check_scroll(scroll);
+			};
+		};
+		
+		var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
+		if(properties.enableTouchControl && is_scroll_enabled) {
+			if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
+				if(!timers.mouseDown) {
+					cTouch.y_prev = y;
+					cTouch.y_start = y;
+					if(cTouch.t1) {
+						cTouch.t1.Reset();
+					} else {
+						cTouch.t1 = fb.CreateProfiler("t1");
+					};
+					timers.mouseDown = setTimeout(function() {
+						clearTimeout(timers.mouseDown);
+						timers.mouseDown = false;
+						if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
+							cTouch.down = true;
+						} else {
+							brw.on_mouse("down", x, y);
+						};
+					},50);
+				};
+			} else {
+				brw.on_mouse("down", x, y);
+			};
+		} else {
+			brw.on_mouse("down", x, y);
+		};
+		
+		// inputBox
+		if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_down", x, y);
+		};	
+	};		
 };
 
 function on_mouse_lbtn_up(x, y, m) {
+	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
+	if(!isResizing){	
+		// inputBox
+		if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_up", x, y);
+		};
+		
+		brw.on_mouse("up", x, y);
+		
+		if(timers.mouseDown) {
+			clearTimeout(timers.mouseDown);
+			timers.mouseDown = false;
+			if(Math.abs(cTouch.y_start - g_cursor.y) <= 030) {
+				brw.on_mouse("down", x, y);
+			};
+		};
 
-    // inputBox
-    if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_up", x, y);
-    };
-    
-    brw.on_mouse("up", x, y);
-
-	g_resizing.on_mouse("lbtn_up", x, y, m);
-	
-    if(timers.mouseDown) {
-        clearTimeout(timers.mouseDown);
-        timers.mouseDown = false;
-        if(Math.abs(cTouch.y_start - g_cursor.y) <= 030) {
-            brw.on_mouse("down", x, y);
-        };
-    };
-
-    // create scroll inertia on mouse lbtn up
-    if(cTouch.down) {
-        cTouch.down = false;
-        cTouch.y_end = y;
-        cTouch.scroll_delta = scroll - scroll_;
-        //cTouch.y_delta = cTouch.y_start - cTouch.y_end;
-        if(Math.abs(cTouch.scroll_delta) > 030 ) {
-            cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
-            cTouch.delta = Math.round((cTouch.scroll_delta) / 030);
-            if(cTouch.multiplier < 1) cTouch.multiplier = 1;
-            if(cTouch.timer) window.ClearInterval(cTouch.timer);
-            cTouch.timer = setInterval(function() {
-                scroll += cTouch.delta * cTouch.multiplier;
-                scroll = check_scroll(scroll);
-                cTouch.multiplier = cTouch.multiplier - 1;
-                cTouch.delta = cTouch.delta - (cTouch.delta / 10);
-                if(cTouch.multiplier < 1) {
-                    window.ClearInterval(cTouch.timer);
-                    cTouch.timer = false;
-                };
-            }, 75);
-        };
-    };
-    
-    g_lbtn_click = false;
+		// create scroll inertia on mouse lbtn up
+		if(cTouch.down) {
+			cTouch.down = false;
+			cTouch.y_end = y;
+			cTouch.scroll_delta = scroll - scroll_;
+			//cTouch.y_delta = cTouch.y_start - cTouch.y_end;
+			if(Math.abs(cTouch.scroll_delta) > 030 ) {
+				cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
+				cTouch.delta = Math.round((cTouch.scroll_delta) / 030);
+				if(cTouch.multiplier < 1) cTouch.multiplier = 1;
+				if(cTouch.timer) window.ClearInterval(cTouch.timer);
+				cTouch.timer = setInterval(function() {
+					scroll += cTouch.delta * cTouch.multiplier;
+					scroll = check_scroll(scroll);
+					cTouch.multiplier = cTouch.multiplier - 1;
+					cTouch.delta = cTouch.delta - (cTouch.delta / 10);
+					if(cTouch.multiplier < 1) {
+						window.ClearInterval(cTouch.timer);
+						cTouch.timer = false;
+					};
+				}, 75);
+			};
+		};
+		
+		g_lbtn_click = false;
+	};
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
@@ -2251,46 +2256,56 @@ function on_mouse_rbtn_up(x, y){
 function on_mouse_move(x, y, m) {
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);	
-
-    // inputBox
-    if(!cPlaylistManager.drag_moved) {
-        if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
-            g_filterbox.on_mouse("move", x, y);
-        };
-    };
-	
-	g_resizing.on_mouse("move", x, y, m);	
-	
-	if(g_dragndrop_status){
-		if(y < brw.y) {
-			if(!timers.movePlaylist) {
-				timers.movePlaylist = setInterval(function() {
-					scroll -= properties.rowHeight;
-					scroll = check_scroll(scroll);										
-				}, 100);
-			}
-		} else if (y > brw.y + brw.h) {
-			if(!timers.movePlaylist) {
-				timers.movePlaylist = setInterval(function() {
-					scroll += properties.rowHeight;
-					scroll = check_scroll(scroll);
-				}, 100);
-			}
-		};			
-	}
-	
-    if(cTouch.down) {
-        cTouch.y_current = y;
-        cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
-        if(x < brw.w) {
-                scroll -= cTouch.y_move;
-                cTouch.scroll_delta = scroll - scroll_;
-                if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
-                cTouch.y_prev = cTouch.y_current;
-        };
-    } else {
-        brw.on_mouse("move", x, y);
-    };
+	var isResizing = g_resizing.on_mouse("move", x, y, m);
+	if(isResizing){
+		if(g_resizing.resizing_x>x+5){
+			g_resizing.resizing_x = x;
+			playlistpanel_width.decrement(5);
+		} else if(g_resizing.resizing_x<x-5){
+			g_resizing.resizing_x = x;			
+			playlistpanel_width.increment(5);
+		}
+	} else {	
+		// inputBox
+		if(!cPlaylistManager.drag_moved) {
+			if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
+				g_filterbox.on_mouse("move", x, y);
+			};
+		};
+		
+		g_resizing.on_mouse("move", x, y, m);	
+		
+		if(g_dragndrop_status){
+			if(y < brw.y) {
+				if(!timers.movePlaylist) {
+					timers.movePlaylist = setInterval(function() {
+						scroll -= properties.rowHeight;
+						scroll = check_scroll(scroll);										
+					}, 100);
+				}
+			} else if (y > brw.y + brw.h) {
+				if(!timers.movePlaylist) {
+					timers.movePlaylist = setInterval(function() {
+						scroll += properties.rowHeight;
+						scroll = check_scroll(scroll);
+					}, 100);
+				}
+			};			
+		}
+		
+		if(cTouch.down) {
+			cTouch.y_current = y;
+			cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
+			if(x < brw.w) {
+					scroll -= cTouch.y_move;
+					cTouch.scroll_delta = scroll - scroll_;
+					if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
+					cTouch.y_prev = cTouch.y_current;
+			};
+		} else {
+			brw.on_mouse("move", x, y);
+		};					
+	};
 };
 
 function on_mouse_wheel(step){
@@ -2335,6 +2350,7 @@ function on_mouse_wheel(step){
 };
 
 function on_mouse_leave() {
+	g_resizing.on_mouse("leave", -1, -1);	
     // inputBox
     if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
         g_filterbox.on_mouse("leave", 0, 0);
@@ -2932,6 +2948,10 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "enableResizableBorders":
+			globalProperties.enableResizableBorders = info;
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
+		break; 			
 		case "avoid_on_playlists_changed":  
 			g_avoid_on_playlists_changed=info;
 			//if(!g_avoid_on_playlists_changed) on_playlists_changed();
@@ -3122,7 +3142,7 @@ function on_init() {
 	
 	g_cursor = new oCursor();	
     g_active_playlist = plman.ActivePlaylist;
-	g_resizing = new Resizing();
+	g_resizing = new Resizing("playlistmanager",false,true);	
 	
     brw = new oBrowser("brw");
 	brw.startTimer();	

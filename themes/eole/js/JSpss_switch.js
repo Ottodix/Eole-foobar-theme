@@ -59,6 +59,9 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		
 		RefreshPSS();
 	}
+	this.setDefault = function () {
+		this.setValue(this.default_value);
+	}	
 	this.toggleValue = function () {
 		if(this.value==0) this.setValue(1);
 		else this.setValue(0);
@@ -103,6 +106,19 @@ const refreshPSS_async = async() =>
 	}
 };
 function RefreshPSS() {
+	if (fb.IsPaused) {
+		fb.Play();
+		fb.Pause();
+	}
+	else if (fb.IsPlaying) {
+		fb.Pause();
+		fb.Play();
+	}	
+	else {
+		fb.Play();fb.Stop();
+	}
+}
+function RefreshPSS_old() {
 	if (fb.IsPlaying || fb.IsPaused) {
 		fb.PlayOrPause();
 		fb.PlayOrPause();
@@ -111,7 +127,6 @@ function RefreshPSS() {
 		fb.Play();fb.Stop();
 	}
 }
-
 
 var main_panel_state = new oPanelSetting("main_panel_state", "MAINPANEL_", 0, 0, 3);
 var layout_state = new oPanelSetting("layout_state", "LAYOUT_", 0, 0, 1);

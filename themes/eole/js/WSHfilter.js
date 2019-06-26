@@ -3593,7 +3593,8 @@ oBrowser = function(name) {
 				var _panelWidth = window.CreatePopupMenu();
 				_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
 				_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-				_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+				_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");						
+				_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
 				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
 			}
 			
@@ -3889,6 +3890,9 @@ oBrowser = function(name) {
 					libraryfilter_width.decrement(10);
 					break;	
 				case (idx == 1032):
+					libraryfilter_width.setDefault();
+					break;						
+				case (idx == 1033):
 					libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 					break;						
 				case (idx == 2992):
@@ -4154,123 +4158,124 @@ function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
 	
-	g_resizing.on_mouse("lbtn_down", x, y, m);
-	
-    // stop inertia
-    if(cTouch.timer) {
-        window.ClearInterval(cTouch.timer);
-        cTouch.timer = false;
-        // stop scrolling but not abrupt, add a little offset for the stop
-        if(Math.abs(scroll - scroll_) > properties.rowHeight) {
-            scroll = (scroll > scroll_ ? scroll_ + properties.rowHeight : scroll_ - properties.rowHeight);
-            scroll = check_scroll(scroll);
-        };
-    };
-    
-	if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-		cur_btn_down = chooseButton(x, y);		
-		if (cur_btn_down) {
-			g_down = true;	
-			cur_btn_down.changeState(ButtonStates.down);
-			 window.Repaint();
-		}
-	}	
-    var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
-    if(properties.enableTouchControl && is_scroll_enabled) {
-        if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
-            if(!timers.mouseDown) {
-                cTouch.y_prev = y;
-                cTouch.y_start = y;
-                if(cTouch.t1) {
-                    cTouch.t1.Reset();
-                } else {
-                    cTouch.t1 = fb.CreateProfiler("t1");
-                };
-                timers.mouseDown = setTimeout(function() {
-                    clearTimeout(timers.mouseDown);
-                    timers.mouseDown = false;
-                    if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
-                        cTouch.down = true;
-                    } else {
-                        brw.on_mouse("down", x, y);
-                    };
-                },50);
-            };
-        } else if(!cur_btn_down) {
-            brw.on_mouse("down", x, y);
-        };
-    } else if(!cur_btn_down) {
-        brw.on_mouse("down", x, y);
-    };
-       
-    // inputBox
-    if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_down", x, y);
-    };
-	if(properties.showTagSwitcherBar) {
-		g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
-	}					
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	if(!isResizing){	
+		// stop inertia
+		if(cTouch.timer) {
+			window.ClearInterval(cTouch.timer);
+			cTouch.timer = false;
+			// stop scrolling but not abrupt, add a little offset for the stop
+			if(Math.abs(scroll - scroll_) > properties.rowHeight) {
+				scroll = (scroll > scroll_ ? scroll_ + properties.rowHeight : scroll_ - properties.rowHeight);
+				scroll = check_scroll(scroll);
+			};
+		};
+		
+		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
+			cur_btn_down = chooseButton(x, y);		
+			if (cur_btn_down) {
+				g_down = true;	
+				cur_btn_down.changeState(ButtonStates.down);
+				 window.Repaint();
+			}
+		}	
+		var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
+		if(properties.enableTouchControl && is_scroll_enabled) {
+			if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
+				if(!timers.mouseDown) {
+					cTouch.y_prev = y;
+					cTouch.y_start = y;
+					if(cTouch.t1) {
+						cTouch.t1.Reset();
+					} else {
+						cTouch.t1 = fb.CreateProfiler("t1");
+					};
+					timers.mouseDown = setTimeout(function() {
+						clearTimeout(timers.mouseDown);
+						timers.mouseDown = false;
+						if(Math.abs(cTouch.y_start - g_cursor.y) > 015) {
+							cTouch.down = true;
+						} else {
+							brw.on_mouse("down", x, y);
+						};
+					},50);
+				};
+			} else if(!cur_btn_down) {
+				brw.on_mouse("down", x, y);
+			};
+		} else if(!cur_btn_down) {
+			brw.on_mouse("down", x, y);
+		};
+		   
+		// inputBox
+		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_down", x, y);
+		};
+		if(properties.showTagSwitcherBar) {
+			g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
+		}						
+	};		
 };
 
 function on_mouse_lbtn_up(x, y, m) {
-
-    // inputBox
-    if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
-        g_filterbox.on_mouse("lbtn_up", x, y);
-    };
-	if(properties.showTagSwitcherBar) {
-		g_tagswitcherbar.on_mouse("lbtn_up", x, y);	
-	}	
-	
-	g_resizing.on_mouse("lbtn_up", x, y, m);
-	
-	if(!g_on_mouse_lbtn_dblclk) {
-		if(pman.state == 1) {
-			pman.on_mouse("up", x, y);
-			brw.clearSaved_sendItemToPlaylist();
-		} else {
-			brw.on_mouse("up", x, y);
+	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
+	if(!isResizing){	
+		// inputBox
+		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
+			g_filterbox.on_mouse("lbtn_up", x, y);
 		};
-	} else g_on_mouse_lbtn_dblclk = false; 
-	
-    if(timers.mouseDown) {
-        clearTimeout(timers.mouseDown);
-        timers.mouseDown = false;
-        if(Math.abs(cTouch.y_start - g_cursor.y) <= 030) {
-            brw.on_mouse("down", x, y);
-        };
-    };
+		if(properties.showTagSwitcherBar) {
+			g_tagswitcherbar.on_mouse("lbtn_up", x, y);	
+		}	
+		
+		if(!g_on_mouse_lbtn_dblclk) {
+			if(pman.state == 1) {
+				pman.on_mouse("up", x, y);
+				brw.clearSaved_sendItemToPlaylist();
+			} else {
+				brw.on_mouse("up", x, y);
+			};
+		} else g_on_mouse_lbtn_dblclk = false; 
+		
+		if(timers.mouseDown) {
+			clearTimeout(timers.mouseDown);
+			timers.mouseDown = false;
+			if(Math.abs(cTouch.y_start - g_cursor.y) <= 030) {
+				brw.on_mouse("down", x, y);
+			};
+		};
 
-    // create scroll inertia on mouse lbtn up
-    if(cTouch.down) {
-        cTouch.down = false;
-        cTouch.y_end = y;
-        cTouch.scroll_delta = scroll - scroll_;
-        if(Math.abs(cTouch.scroll_delta) > 015 ) {
-            cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
-            cTouch.delta = Math.round((cTouch.scroll_delta) / 015);
-            if(cTouch.multiplier < 1) cTouch.multiplier = 1;
-            if(cTouch.timer) window.ClearInterval(cTouch.timer);
-            cTouch.timer = setInterval(function() {
-                scroll += cTouch.delta * cTouch.multiplier;
-                scroll = check_scroll(scroll);
-                cTouch.multiplier = cTouch.multiplier - 1;
-                cTouch.delta = cTouch.delta - (cTouch.delta / 10);
-                if(cTouch.multiplier < 1) {
-                    window.ClearInterval(cTouch.timer);
-                    cTouch.timer = false;
-                };
-            }, 75);
-        };
-    };
-    
-    g_lbtn_click = false;
-	if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-		g_down = false;      
-		if (cur_btn_down != null && typeof cur_btn_down === 'object') {
-			cur_btn_down.onClick();
-		}
-	}		
+		// create scroll inertia on mouse lbtn up
+		if(cTouch.down) {
+			cTouch.down = false;
+			cTouch.y_end = y;
+			cTouch.scroll_delta = scroll - scroll_;
+			if(Math.abs(cTouch.scroll_delta) > 015 ) {
+				cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
+				cTouch.delta = Math.round((cTouch.scroll_delta) / 015);
+				if(cTouch.multiplier < 1) cTouch.multiplier = 1;
+				if(cTouch.timer) window.ClearInterval(cTouch.timer);
+				cTouch.timer = setInterval(function() {
+					scroll += cTouch.delta * cTouch.multiplier;
+					scroll = check_scroll(scroll);
+					cTouch.multiplier = cTouch.multiplier - 1;
+					cTouch.delta = cTouch.delta - (cTouch.delta / 10);
+					if(cTouch.multiplier < 1) {
+						window.ClearInterval(cTouch.timer);
+						cTouch.timer = false;
+					};
+				}, 75);
+			};
+		};
+		
+		g_lbtn_click = false;
+		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
+			g_down = false;      
+			if (cur_btn_down != null && typeof cur_btn_down === 'object') {
+				cur_btn_down.onClick();
+			}
+		}		
+	};		
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
@@ -4314,52 +4319,62 @@ function on_mouse_rbtn_up(x, y){
 function on_mouse_move(x, y, m) {   
     if(g_cursor.x == x && g_cursor.y == y) return;
 	g_cursor.onMouse("move", x, y, m);		
-	
-	if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-		var old = cur_btn;
-		cur_btn = chooseButton(x, y);
+	var isResizing = g_resizing.on_mouse("move", x, y, m);
+	if(isResizing){
+		if(g_resizing.resizing_x>x+5){
+			g_resizing.resizing_x = x;
+			libraryfilter_width.decrement(5);
+		} else if(g_resizing.resizing_x<x-5){
+			g_resizing.resizing_x = x;			
+			libraryfilter_width.increment(5);
+		}
+	} else {	
+		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
+			var old = cur_btn;
+			cur_btn = chooseButton(x, y);
+			
+			if (old == cur_btn) {
+				if (g_down) return;
+			} else if (g_down && cur_btn && cur_btn.state != ButtonStates.down) {
+				cur_btn.changeState(ButtonStates.down);
+				return;
+			} else {
+				old && old.changeState(ButtonStates.normal);
+				cur_btn && cur_btn.changeState(ButtonStates.hover);
+				window.Repaint();
+			}		
+		}   
 		
-		if (old == cur_btn) {
-			if (g_down) return;
-		} else if (g_down && cur_btn && cur_btn.state != ButtonStates.down) {
-			cur_btn.changeState(ButtonStates.down);
+		g_resizing.on_mouse("move", x, y, m);	
+		
+		if(cur_btn!=null && properties.showPanelToggleButtons && filters_panel_state.isActive()){
+			brw.on_mouse("leave", -1, -1);
 			return;
+		}
+		// inputBox
+		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible && !brw.drag_moving) {
+			g_filterbox.on_mouse("move", x, y);
+		};
+		if(properties.showTagSwitcherBar) {
+			g_tagswitcherbar.on_mouse("move", x, y);	
+		};
+		if(pman.state == 1) {
+			pman.on_mouse("move", x, y);
 		} else {
-			old && old.changeState(ButtonStates.normal);
-			cur_btn && cur_btn.changeState(ButtonStates.hover);
-			window.Repaint();
-		}		
-	}   
-	
-	g_resizing.on_mouse("move", x, y, m);	
-	
-	if(cur_btn!=null && properties.showPanelToggleButtons && filters_panel_state.isActive()){
-		brw.on_mouse("leave", -1, -1);
-		return;
-	}
-    // inputBox
-    if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible && !brw.drag_moving) {
-        g_filterbox.on_mouse("move", x, y);
-    };
-	if(properties.showTagSwitcherBar) {
-		g_tagswitcherbar.on_mouse("move", x, y);	
+			if(cTouch.down) {
+				cTouch.y_current = y;
+				cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
+				if(x < brw.w) {
+						scroll -= cTouch.y_move;
+						cTouch.scroll_delta = scroll - scroll_;
+						if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
+						cTouch.y_prev = cTouch.y_current;
+				};
+			} else {
+				brw.on_mouse("move", x, y);
+			};
+		};
 	};
-    if(pman.state == 1) {
-        pman.on_mouse("move", x, y);
-    } else {
-        if(cTouch.down) {
-            cTouch.y_current = y;
-            cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
-            if(x < brw.w) {
-                    scroll -= cTouch.y_move;
-                    cTouch.scroll_delta = scroll - scroll_;
-                    if(Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
-                    cTouch.y_prev = cTouch.y_current;
-            };
-        } else {
-            brw.on_mouse("move", x, y);
-        };
-    };
 };
 
 function on_mouse_wheel(step, stepstrait, delta){  
@@ -5181,6 +5196,10 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "enableResizableBorders":
+			globalProperties.enableResizableBorders = info;
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
+		break; 			
 		case "libraryfilter_width":
 			libraryfilter_width.value=info;	
 		break;		
@@ -5548,7 +5567,7 @@ function on_init() {
 	g_image_cache = new oImageCache();
 	g_filterbox.reset_layout();	
     g_active_playlist = plman.ActivePlaylist;	
-	g_resizing = new Resizing();
+	g_resizing = new Resizing("libraryfilter",false,true);	
     switch(properties.tagMode) {
         case 1:
             properties.albumArtId = 0;

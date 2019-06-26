@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.0',
+	theme_version: '1.2.1b1',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -43,6 +43,7 @@ var globalProperties = {
     load_artist_img_at_startup: window.GetProperty("ARTIST IMG Load all at startup", true),	
 	enableDiskCache: window.GetProperty("COVER Disk Cache",true),
 	deleteDiskCache: window.GetProperty("COVER delete cover cache on next startup",false),	
+	enableResizableBorders: window.GetProperty("GLOBAL enableResizableBorders",true),		
 	record_move_every_x_ms:3000,	
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
 	selection_playlist : "Library Selection",
@@ -729,25 +730,74 @@ oUIHacks = function () {
 	}		
 }
 var g_uihacks = new oUIHacks();
-function Resizing() {
+function Resizing(name, resizing_left,resizing_right) {
+	this.resizing_left = typeof resizing_left !== 'undefined' ? resizing_left : false;	
+	this.resizing_right = typeof resizing_right !== 'undefined' ? resizing_right : false;
+	this.name = typeof name !== 'undefined' ? name : "unknown";
+	this.over_resizing_left = false;
+	this.over_resizing_right = false;
+	this.resizing_left_active = false;
+	this.resizing_right_active = false;	
+	this.resizing_x = 0;		
 	this.enableSizing = function(m){
 		g_uihacks.EnableSizing(m);
 	}	
+	this.draw = function(gr){
+	}
+	this.isResizing = function(){
+		return (this.resizing_left_active || this.resizing_right_active);
+	}
 	this.disableSizing = function(m){
 		g_uihacks.DisableSizing(m);
 	}
-	this.on_mouse = function(event, x, y, m){
+	this.on_mouse = function(event, x, y, m, resizing){
+		var resizing = typeof resizing !== 'undefined' ? resizing : true;
 		switch(event){
 			case "move":
+				if(globalProperties.enableResizableBorders){
+					this.over_resizing_right = this.over_resizing_right = false;
+					if(resizing){
+						if(this.resizing_right && x>ww-10){
+							this.over_resizing_right = true;
+							g_cursor.setCursor(IDC_SIZEWE,this.name);				
+						} else if(this.resizing_left && x<10){
+							this.over_resizing_left = true;
+							g_cursor.setCursor(IDC_SIZEWE,this.name);
+						} else if(g_cursor.getActiveZone()==this.name && !this.resizing_left_active){
+							g_cursor.setCursor(IDC_ARROW);
+						}
+					}
+				}
+				return (this.resizing_left_active || this.resizing_right_active);
 				//this.enableSizing(m);
 			break;
 			case "lbtn_down":
+				if(globalProperties.enableResizableBorders){			
+					if(this.over_resizing_left){
+						this.resizing_left_active = true;
+						this.resizing_x = x;
+					}
+					else if(this.over_resizing_right){
+						this.resizing_right_active = true;
+						this.resizing_x = x;
+					}				
+					if(typeof g_tooltip == 'object') g_tooltip.Deactivate();
+				}
 				this.disableSizing(m);
+				return (this.resizing_left_active || this.resizing_right_active);
 			break;
 			case "lbtn_up":
+				var return_var = (this.resizing_left_active || this.resizing_right_active);
+				if(globalProperties.enableResizableBorders){					
+					this.resizing_left_active = this.resizing_right_active = false;
+					this.resizing_x = 0;	
+				}				
 				this.enableSizing(m);
+				return return_var;
+				
 			break;
 			case "leave":
+				g_cursor.setCursor(IDC_ARROW);
 			break;
 		}
 	}

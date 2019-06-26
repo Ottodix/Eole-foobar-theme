@@ -3605,7 +3605,9 @@ function menu_object() {
 			var _panelWidth = window.CreatePopupMenu();
 			_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
 			_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-			_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+			_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");				
+			_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
+			
 			_panelWidth.AppendTo(Menu,MF_STRING, "Panel width");
 		
 			var wallpaper = window.CreatePopupMenu();	
@@ -3941,7 +3943,8 @@ function showSettingsMenu(x,y){
 	var _panelWidth = window.CreatePopupMenu();
 	_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
 	_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-	_panelWidth.AppendMenuItem(MF_STRING, 1032, "Custom width...");	
+	_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");				
+	_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
 	_panelWidth.AppendTo(menu,MF_STRING, "Panel width");
 			
 	var wallpaper = window.CreatePopupMenu();	
@@ -4060,6 +4063,8 @@ function showSettingsMenu(x,y){
 	} else if(idx==1031){
 		libraryfilter_width.decrement(10);
 	} else if(idx==1032){
+		libraryfilter_width.setDefault();		
+	} else if(idx==1033){
 		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");		
 	} else if(idx==9000){
 		toggleWallpaper();
@@ -4236,6 +4241,8 @@ function showOptionsMenu(x,y,reduced){
 	} else if(idx==1031){
 		libraryfilter_width.decrement(10);
 	} else if(idx==1032){
+		libraryfilter_width.setDefault();		
+	} else if(idx==1033){
 		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");			
 	} else if(idx==9000){
 		toggleWallpaper();
@@ -4442,14 +4449,17 @@ function on_mouse_lbtn_dblclk(x, y) {
     pop.lbtn_dblclk(x, y);
 }
 
-function on_mouse_lbtn_down(x, y) {
-    if (p.s_show) sL.lbtn_dn(x, y);
-    if (p.s_show || ui.scrollbar_show) but.lbtn_dn(x, y);	
-    pop.lbtn_dn(x, y);
-    sbar.lbtn_dn(x, y);
-	if(p.tag_switcherbar) {
-		g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
-	}		
+function on_mouse_lbtn_down(x, y, m) {
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	if(!isResizing){	
+		if (p.s_show) sL.lbtn_dn(x, y);
+		if (p.s_show || ui.scrollbar_show) but.lbtn_dn(x, y);	
+		pop.lbtn_dn(x, y);
+		sbar.lbtn_dn(x, y);
+		if(p.tag_switcherbar) {
+			g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
+		}	
+	};	
 }
 function on_mouse_rbtn_down(x, y, mask) {
 	if(pman.state == 1) {
@@ -4470,31 +4480,35 @@ function on_mouse_rbtn_up(x, y) {
 
 }
 
-function on_mouse_lbtn_up(x, y) {
-	p.m_x = x;
-	p.m_y = y;
-    if (p.s_show) {
-        but.lbtn_up(x, y);		
-        sL.lbtn_up();
-    }
-	if(!g_on_mouse_lbtn_dblclk) {
-		pop.lbtn_up(x, y);
-	} else g_on_mouse_lbtn_dblclk = false;
-	/*timers.delayForDoubleClick = setTimeout(function() {
-		clearTimeout(timers.delayForDoubleClick);
-		timers.delayForDoubleClick = false;	
-		on_mouse_lbtn_up_delayed(m_x, m_y);
-	},20);*/
-    if(pman.state == 1) {
-        pman.on_mouse("up", x, y);
-    }	
-    sbar.lbtn_up(x, y);
-	if(p.tag_switcherbar) {
-		g_tagswitcherbar.on_mouse("lbtn_up", x, y);	
-	}		
+function on_mouse_lbtn_up(x, y, m) {
+	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
+	if(!isResizing){	
+		p.m_x = x;
+		p.m_y = y;
+		if (p.s_show) {
+			but.lbtn_up(x, y);		
+			sL.lbtn_up();
+		}
+		if(!g_on_mouse_lbtn_dblclk) {
+			pop.lbtn_up(x, y);
+		} else g_on_mouse_lbtn_dblclk = false;
+		/*timers.delayForDoubleClick = setTimeout(function() {
+			clearTimeout(timers.delayForDoubleClick);
+			timers.delayForDoubleClick = false;	
+			on_mouse_lbtn_up_delayed(m_x, m_y);
+		},20);*/
+		if(pman.state == 1) {
+			pman.on_mouse("up", x, y);
+		}	
+		sbar.lbtn_up(x, y);
+		if(p.tag_switcherbar) {
+			g_tagswitcherbar.on_mouse("lbtn_up", x, y);	
+		}	
+	};	
 }
 
 function on_mouse_leave() {
+	g_resizing.on_mouse("leave", -1, -1);	
     if (p.s_show || ui.scrollbar_show) but.leave();
     sbar.leave();
 	pop.leave();
@@ -4511,6 +4525,7 @@ function on_drag_enter(action, x, y, mask) {
 }
 
 function on_drag_leave() {
+	g_resizing.on_mouse("lbtn_up", 0, 0, null);		
     /*if(pman.state == 1) {
         pman.on_mouse("leave", 0, 0);
     };*/
@@ -4546,18 +4561,29 @@ function on_mouse_move(x, y, m) {
     if (p.m_x == x && p.m_y == y) return;
 	g_cursor.onMouse("move", x, y, m);	
 	
-    if (p.s_show) sL.move(x, y);
-    if (p.s_show || ui.scrollbar_show) but.move(x, y);
+	var isResizing = g_resizing.on_mouse("move", x, y, m);
+	if(isResizing){
+		if(g_resizing.resizing_x>x+5){
+			g_resizing.resizing_x = x;
+			libraryfilter_width.decrement(5);
+		} else if(g_resizing.resizing_x<x-5){
+			g_resizing.resizing_x = x;			
+			libraryfilter_width.increment(5);
+		}
+	} else {		
+		if (p.s_show) sL.move(x, y);
+		if (p.s_show || ui.scrollbar_show) but.move(x, y);
 
-    pop.move(x, y);
-    sbar.move(x, y);
-    if(pman.state == 1) {
-        pman.on_mouse("move", x, y);
-    }	
-    p.m_x = x;
-    p.m_y = y;
-	if(p.tag_switcherbar) {
-		g_tagswitcherbar.on_mouse("move", x, y);	
+		pop.move(x, y);
+		sbar.move(x, y);
+		if(pman.state == 1) {
+			pman.on_mouse("move", x, y);
+		}	
+		p.m_x = x;
+		p.m_y = y;
+		if(p.tag_switcherbar) {
+			g_tagswitcherbar.on_mouse("move", x, y);	
+		};	
 	};	
 }
 
@@ -4719,6 +4745,10 @@ function get_images() {
 };
 function on_notify_data(name, info) {
     switch(name) {
+		case "enableResizableBorders":
+			globalProperties.enableResizableBorders = info;
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
+		break; 			
 		case "libraryfilter_width":
 			libraryfilter_width.value=info;	
 		break;				
@@ -4824,6 +4854,7 @@ function on_init() {
 	get_images();
 	g_tooltip = new oTooltip('ui');	
 	g_cursor = new oCursor();	
+	g_resizing = new Resizing("libraryfilter",false,true);	
 	ui = new userinterface();
 	sbar = new scrollbar();
 	p = new panel_operations();
