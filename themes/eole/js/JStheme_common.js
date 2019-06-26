@@ -123,6 +123,8 @@ var g_drop_effect = {
 var oCursor = function () {
 	this.x = -1;
 	this.y = -1;
+	this.active_zone = "";
+	this.timer = false;
     this.onMouse = function (state, x, y, m) {    
 		switch(state){
 			case 'lbtn_down':
@@ -158,8 +160,19 @@ var oCursor = function () {
 		var numberOfTry = typeof numberOfTry !== 'undefined' ? numberOfTry : 1;		
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
+		if(numberOfTry>1 && !this.timer){
+			this.timerExecution = 0;
+			this.timer = setInterval(function() {
+				g_cursor.timerExecution++;
+				window.SetCursor(g_cursor.cursor);
+				if(g_cursor.timerExecution >= numberOfTry) {
+					window.ClearInterval(g_cursor.timer);
+					g_cursor.timer = false;
+				};
+			}, 2);
+		}
 		//for(i=0;i<numberOfTry;i++) {
-			//console.log(cursor_code+" "+this.active_zone)
+		else	
 			window.SetCursor(cursor_code);
 		//}
 		//console.log(cursor_code+" "+this.active_zone)
@@ -734,10 +747,10 @@ oUIHacks = function () {
 	}		
 }
 var g_uihacks = new oUIHacks();
-function Resizing(name, resizing_left,resizing_right) {
+function Resizing(panelName, resizing_left,resizing_right) {
 	this.resizing_left = typeof resizing_left !== 'undefined' ? resizing_left : false;	
 	this.resizing_right = typeof resizing_right !== 'undefined' ? resizing_right : false;
-	this.name = typeof name !== 'undefined' ? name : "unknown";
+	this.panelName = typeof panelName !== 'undefined' ? panelName : "unknown";
 	this.over_resizing_left = false;
 	this.over_resizing_right = false;
 	this.resizing_left_active = false;
@@ -764,12 +777,12 @@ function Resizing(name, resizing_left,resizing_right) {
 						if(this.resizing_right && x>ww-10){
 							this.over_resizing_right = true;
 							this.over_resizing_left = false;
-							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);				
+							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);				
 						} else if(this.resizing_left && x<10){
 							this.over_resizing_left = true;
 							this.over_resizing_right = false;
-							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);
-						} else if(g_cursor.getActiveZone()==this.name && !this.resizing_left_active){
+							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);
+						} else if(g_cursor.getActiveZone()==this.panelName && !this.resizing_left_active){
 							g_cursor.setCursor(IDC_ARROW);
 							this.over_resizing_left = false;
 							this.over_resizing_right = false;							
@@ -1368,9 +1381,9 @@ oGenreCache = function () {
 		if(genre_added) this.onFinish();	
     };	
 	this.build_from_library = function () {		
-		var gTime = fb.CreateProfiler();			
-		gTime.Reset();
-		console.log("Genre list started time:"+gTime.Time);
+		//var gTime = fb.CreateProfiler();			
+		//gTime.Reset();
+		//console.log("Genre list started time:"+gTime.Time);
 		var libraryList = fb.GetLibraryItems();		
 		libraryList.OrderByFormat(fb.TitleFormat(sort_by_genre), 1);	
 		var i = 0;
@@ -1387,7 +1400,7 @@ oGenreCache = function () {
 		}
 		libraryList = undefined;
 		this.onFinish();	
-		console.log("Genre list built in: " + gTime.Time / 1000 + " seconds");		
+		//console.log("Genre list built in: " + gTime.Time / 1000 + " seconds");		
 	}	
 }
 var_cache = function(){
