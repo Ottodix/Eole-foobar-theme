@@ -763,12 +763,19 @@ function Resizing(name, resizing_left,resizing_right) {
 					if(resizing){
 						if(this.resizing_right && x>ww-10){
 							this.over_resizing_right = true;
+							this.over_resizing_left = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);				
 						} else if(this.resizing_left && x<10){
 							this.over_resizing_left = true;
+							this.over_resizing_right = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.name,400);
 						} else if(g_cursor.getActiveZone()==this.name && !this.resizing_left_active){
 							g_cursor.setCursor(IDC_ARROW);
+							this.over_resizing_left = false;
+							this.over_resizing_right = false;							
+						} else {
+							this.over_resizing_left = false;
+							this.over_resizing_right = false;								
 						}
 					}
 				}
