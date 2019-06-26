@@ -3605,9 +3605,9 @@ function menu_object() {
 			
 			var _panelWidth = window.CreatePopupMenu();
 			_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
-			_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-			_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");				
+			_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");				
 			_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
+			_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");				
 			
 			_panelWidth.AppendTo(Menu,MF_STRING, "Panel width");
 		
@@ -3943,9 +3943,9 @@ function showSettingsMenu(x,y){
 	
 	var _panelWidth = window.CreatePopupMenu();
 	_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
-	_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-	_panelWidth.AppendMenuItem(MF_STRING, 1032, "Default width");				
+	_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");					
 	_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
+	_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");	
 	_panelWidth.AppendTo(menu,MF_STRING, "Panel width");
 			
 	var wallpaper = window.CreatePopupMenu();	

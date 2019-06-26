@@ -1298,8 +1298,8 @@ function draw_main_menu(x,y){
 	nowplaying.AppendMenuSeparator();         
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4030, "Increase width");	
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4031, "Decrease width");	
-	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Default width");	
 	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4033, "Custom width...");	
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Reset");	
 	
 	if(layout_state.isEqual(1)){	
 		minimode_menu.AppendTo(skin_settings_menu,MF_STRING, "Panel layout");		
@@ -1316,9 +1316,9 @@ function draw_main_menu(x,y){
 		else left_menu.AppendMenuItem(MF_STRING, 4028, "Show");			
 		left_menu.AppendMenuSeparator();		
 		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4034, "Increase width");	
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4035, "Decrease width");	
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4036, "Default width");		
-		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4037, "Custom width...");			
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4035, "Decrease width");		
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4037, "Custom width...");
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4036, "Reset");			
 		library_menu.AppendMenuSeparator();
 		library_menu.AppendMenuItem(MF_STRING, 4000, "Dark theme");	
 		library_menu.CheckMenuItem(4000, properties.library_dark_theme);
@@ -1331,8 +1331,8 @@ function draw_main_menu(x,y){
 		playlistpanel_menu.AppendTo(playlists_menu,MF_STRING, "Playlist panel");
 		playlistpanel_menu.AppendMenuItem(MF_STRING, 4038, "Increase width");	
 		playlistpanel_menu.AppendMenuItem(MF_STRING, 4039, "Decrease width");	
-		playlistpanel_menu.AppendMenuItem(MF_STRING, 4040, "Default width");		
-		playlistpanel_menu.AppendMenuItem(MF_STRING, 4041, "Custom width...");				
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4041, "Custom width...");		
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4040, "Reset");			
 		var FiltersMenu = window.CreatePopupMenu();
 		if(filters_panel_state.value>0)
 			FiltersMenu.AppendMenuItem(MF_STRING, 4990, "Hide");	
@@ -1398,9 +1398,9 @@ function draw_main_menu(x,y){
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4073, "Show");	
 	nowplayinglobal.AppendMenuSeparator();
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4030, "Increase width");	
-	nowplayinglobal.AppendMenuItem(MF_STRING, 4031, "Decrease width");	
-	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Default width");		
-	nowplayinglobal.AppendMenuItem(MF_STRING, 4033, "Custom width...");		
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4031, "Decrease width");			
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4033, "Custom width...");	
+	nowplayinglobal.AppendMenuItem(MF_STRING, 4032, "Reset");	
 	nowplayinglobal.AppendTo(appearance_menu,MF_STRING, "Right playlist");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4046, "Enable resizable borders");
 	appearance_menu.CheckMenuItem(4046, globalProperties.enableResizableBorders);

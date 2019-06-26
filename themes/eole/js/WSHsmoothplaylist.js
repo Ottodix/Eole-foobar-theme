@@ -4129,9 +4129,9 @@ oBrowser = function(name) {
 			if(layout_state.isEqual(0)){
 				var _panelWidth = window.CreatePopupMenu();
 				_panelWidth.AppendMenuItem(MF_STRING, 2030, "Increase width");	
-				_panelWidth.AppendMenuItem(MF_STRING, 2031, "Decrease width");	
-				_panelWidth.AppendMenuItem(MF_STRING, 2032, "Default width");					
-				_panelWidth.AppendMenuItem(MF_STRING, 2033, "Custom width...");					
+				_panelWidth.AppendMenuItem(MF_STRING, 2031, "Decrease width");					
+				_panelWidth.AppendMenuItem(MF_STRING, 2033, "Custom width...");	
+				_panelWidth.AppendMenuItem(MF_STRING, 2032, "Reset");					
 				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
 			}
 
