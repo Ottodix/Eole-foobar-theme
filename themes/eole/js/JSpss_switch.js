@@ -106,7 +106,6 @@ const refreshPSS_async = async() =>
 	}
 };
 function RefreshPSS() {
-//let handle_list = plman.GetPlaylistItems(plman.ActivePlaylist);
 	if (fb.IsPaused) {
 		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
 		handle_list.RefreshStats();
