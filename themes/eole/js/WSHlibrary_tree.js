@@ -4450,7 +4450,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 }
 
 function on_mouse_lbtn_down(x, y, m) {
-	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !sbar.hover);
 	if(!isResizing){	
 		if (p.s_show) sL.lbtn_dn(x, y);
 		if (p.s_show || ui.scrollbar_show) but.lbtn_dn(x, y);	
@@ -4561,7 +4561,7 @@ function on_mouse_move(x, y, m) {
     if (p.m_x == x && p.m_y == y) return;
 	g_cursor.onMouse("move", x, y, m);	
 	
-	var isResizing = g_resizing.on_mouse("move", x, y, m);
+	var isResizing = g_resizing.on_mouse("move", x, y, m, !sbar.hover && !sbar.b_is_dragging);
 	if(isResizing){
 		if(g_resizing.resizing_x>x+5){
 			g_resizing.resizing_x = x;

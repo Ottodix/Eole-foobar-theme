@@ -2130,7 +2130,7 @@ function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
 	
-	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m);
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !brw.scrollbar.cursorHover);
 	if(!isResizing){	
 		// stop inertia
 		if(cTouch.timer) {
@@ -2256,7 +2256,7 @@ function on_mouse_rbtn_up(x, y){
 function on_mouse_move(x, y, m) {
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);	
-	var isResizing = g_resizing.on_mouse("move", x, y, m);
+	var isResizing = g_resizing.on_mouse("move", x, y, m, !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
 	if(isResizing){
 		if(g_resizing.resizing_x>x+5){
 			g_resizing.resizing_x = x;

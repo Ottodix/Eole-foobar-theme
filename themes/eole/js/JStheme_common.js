@@ -772,7 +772,7 @@ function Resizing(name, resizing_left,resizing_right) {
 				//this.enableSizing(m);
 			break;
 			case "lbtn_down":
-				if(globalProperties.enableResizableBorders){			
+				if(globalProperties.enableResizableBorders && resizing){			
 					if(this.over_resizing_left){
 						this.resizing_left_active = true;
 						this.resizing_x = x;
