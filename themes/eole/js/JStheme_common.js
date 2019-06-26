@@ -747,15 +747,17 @@ oUIHacks = function () {
 	}		
 }
 var g_uihacks = new oUIHacks();
-function Resizing(panelName, resizing_left,resizing_right) {
+function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 	this.resizing_left = typeof resizing_left !== 'undefined' ? resizing_left : false;	
 	this.resizing_right = typeof resizing_right !== 'undefined' ? resizing_right : false;
 	this.panelName = typeof panelName !== 'undefined' ? panelName : "unknown";
+	this.y_min = typeof y_min !== 'undefined' ? y_min : 0;
+	this.y_max = typeof y_max !== 'undefined' ? y_max : 0;	
 	this.over_resizing_left = false;
 	this.over_resizing_right = false;
 	this.resizing_left_active = false;
 	this.resizing_right_active = false;	
-	this.resizing_x = 0;		
+	this.resizing_x = 0;	
 	this.enableSizing = function(m){
 		g_uihacks.EnableSizing(m);
 	}	
@@ -774,11 +776,11 @@ function Resizing(panelName, resizing_left,resizing_right) {
 				if(globalProperties.enableResizableBorders){
 					this.over_resizing_right = this.over_resizing_right = false;
 					if(resizing){
-						if(this.resizing_right && x>ww-10){
+						if(this.resizing_right && x>ww-10 && y>this.y_min && y<wh-this.y_max){
 							this.over_resizing_right = true;
 							this.over_resizing_left = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);				
-						} else if(this.resizing_left && x<10){
+						} else if(this.resizing_left && x<10 && y>this.y_min && y<wh-this.y_max){
 							this.over_resizing_left = true;
 							this.over_resizing_right = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);

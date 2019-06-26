@@ -4855,7 +4855,7 @@ function on_init() {
 	get_images();
 	g_tooltip = new oTooltip('ui');	
 	g_cursor = new oCursor();	
-	g_resizing = new Resizing("libraryfilter",false,true);	
+	g_resizing = new Resizing("libraryfilter",false,true,properties.TagSwitcherBarHeight);	
 	ui = new userinterface();
 	sbar = new scrollbar();
 	p = new panel_operations();
