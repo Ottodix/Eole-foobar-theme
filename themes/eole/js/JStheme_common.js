@@ -258,6 +258,65 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
 		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax],  
 	});
 }
+function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			//for(i=0;i<input_values.length;i++) input_values_string+=input_values[i];
+			//fb.ShowPopupMessage('ok_callback status:'+status+" - "+input_values, "ok_callback_title");
+			console.log(input_values);
+			var input_values = input_values.split('##');
+			var refresh_filters = false;
+			switch(properties.tagMode) {
+				case 1:
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.album_customGroup_label==input_values[0])) {
+						properties.album_customGroup_label = input_values[0].substring(0, 10);
+						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
+						refresh_filters = true;
+					}					
+					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
+						properties.tf_groupkey_album = input_values[1];
+						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
+						refresh_filters = true;
+					}
+				break;
+				case 2:
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.artist_customGroup_label==input_values[0])) {
+						properties.artist_customGroup_label = input_values[0].substring(0, 10);
+						window.SetProperty("_DISPLAY: album customGroup name", properties.artist_customGroup_label);
+						refresh_filters = true;
+					}					
+					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
+						properties.tf_groupkey_artist = input_values[1];
+						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_artist);
+						refresh_filters = true;
+					}				
+				break;
+				case 3:
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.genre_customGroup_label==input_values[0])) {
+						properties.genre_customGroup_label = input_values[0].substring(0, 10);
+						window.SetProperty("_DISPLAY: album customGroup name", properties.genre_customGroup_label);
+						refresh_filters = true;
+					}					
+					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
+						properties.tf_groupkey_genre = input_values[1];
+						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_genre);
+						refresh_filters = true;
+					}				
+				break;
+			}
+			if(refresh_filters){
+				properties.albumArtId = 0;
+				g_tagswitcherbar.on_init();
+				g_filterbox.reset_layout();
+				brw.populate(true,1);	
+			}			
+		}
+		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: ["", top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],  
+	});
+}
 //Colors ------------------------------------------------------------------------------
 var colors = {};
 function get_colors_global(){
