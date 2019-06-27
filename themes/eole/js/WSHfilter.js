@@ -2778,19 +2778,19 @@ oBrowser = function(name) {
 												gr.GdiDrawText("All items", g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);													
 												gr.GdiDrawText("("+(total-1)+" albums)", g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 										case 2: // artist
 											try{
 												gr.GdiDrawText("All ("+(total-1)+" artists)", g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 										case 3: // genre
 											try{ 
 												gr.GdiDrawText("All ("+(total-1)+" genres)", g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 									}; 
 								} else {
@@ -2831,7 +2831,7 @@ oBrowser = function(name) {
 												gr.GdiDrawText(album_name+date, font1, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, available_width1, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
 												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].artist_name, font2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, available_width2, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 										case 2: // artist
 											try{
@@ -2844,7 +2844,7 @@ oBrowser = function(name) {
 												
 												gr.GdiDrawText(this.groups[i].groupkey, font, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 										case 3: // genre
 											try{			
@@ -2857,7 +2857,7 @@ oBrowser = function(name) {
 												
 												gr.GdiDrawText(this.groups[i].groupkey, font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
-											} catch(e) {console.log(e)}
+											} catch(e) {}
 											break;
 									};
 								};
@@ -2888,7 +2888,7 @@ oBrowser = function(name) {
 					gr.FillSolidRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, colors.keyboard_search_bg);
 					try {
 						gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?colors.keyboard_search_txtred:colors.keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
-					} catch(e) {console.log(e)};
+					} catch(e) {};
 				};
 				
 				// fill ALL cover image with the 1st four cover art found
@@ -4322,11 +4322,11 @@ function on_mouse_move(x, y, m) {
     if(g_cursor.x == x && g_cursor.y == y) return;
 	g_cursor.onMouse("move", x, y, m);		
 	var isResizing = g_resizing.on_mouse("move", x, y, m, main_panel_state.isEqual(0) && !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
-	console.log("g_resizing.resizing_x "+g_resizing.resizing_x+"brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag"+(!brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag))
+	//console.log("g_resizing.resizing_x "+g_resizing.resizing_x+"brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag"+(!brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag))
 	if(isResizing){
 		
 		if(g_resizing.resizing_x>x+5){
-			g_resizing.resizing_x = x;console.log("g_resizing.resizing_x "+g_resizing.resizing_x)
+			g_resizing.resizing_x = x;//console.log("g_resizing.resizing_x "+g_resizing.resizing_x)
 			libraryfilter_width.decrement(5);
 		} else if(g_resizing.resizing_x<x-5){
 			g_resizing.resizing_x = x;
@@ -5368,7 +5368,6 @@ function on_notify_data(name, info) {
 			//g_image_cache.cachelist = cloneImgs(info);
 			/*
 			for (var i in info) {
-				//console.log("filter image_cache size: "+g_image_cache.cachelist.length);
 				g_image_cache.cachelist = new GdiBitmap(info[i]);
 			}
 			window.Repaint();*/
