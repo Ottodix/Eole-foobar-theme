@@ -176,6 +176,7 @@ var first_on_size = true;
 var nowplaying_cachekey = '';
 var toPlaylistIdx = -1;
 var g_avoid_playlist_displayed_switch = false;
+var g_avoid_on_metadb_changed = false;
 var avoidShowNowPlaying = false;
 if(!properties.showGroupHeaders) properties.extraRowsNumber=0;
 var gTime_covers = null;
@@ -2362,7 +2363,6 @@ oBrowser = function(name) {
 										}
                                     }
                                 } else if(this.groups[g].cover_type == 0) {
-									console.log("")
                                     this.groups[g].cover_img = globalProperties.nocover_img;
 									this.groups[g].mask_applied = false;
 									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
@@ -6102,7 +6102,10 @@ function on_item_focus_change(playlist, from, to) {
 };
 
 function on_metadb_changed(metadbs, fromhook) {
-    if(!brw.list) return;
+    if(!brw.list || g_avoid_on_metadb_changed) {
+		g_avoid_on_metadb_changed = false;
+		return;
+	}
 	playing_track_new_count = parseInt(playing_track_playcount,10)+1
 	try {
 		if(fb.IsPlaying && metadbs.Count==1 && metadbs[0].RawPath==fb.GetNowPlaying().RawPath && TF.play_count.Eval()==(playing_track_new_count)) {	
@@ -6112,7 +6115,7 @@ function on_metadb_changed(metadbs, fromhook) {
 	} catch(e){
 		console.log("ERROR:on_metadb_changed, WSHsmoothplaylist try/catch");
 	}
-
+	
     if(window.IsVisible){	
 		// rebuild list
 		if(g_rating_updated) { // no repopulate if tag update is from rating click action in playlist
@@ -6270,6 +6273,12 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);	
 			on_font_changed();
 		break; 	
+		case "g_avoid_on_metadb_changed":
+			g_avoid_on_metadb_changed = true;
+			break;			
+		case "libraryfilter_width":
+			libraryfilter_width.value = info;
+			break;			
 		case "rightplaylist_width":
 			rightplaylist_width.value = info;
 			break;				

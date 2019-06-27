@@ -53,8 +53,9 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		if(g_files.FileExists(SettingsPath+this.file_prefix+new_value)) g_files.DeleteFile(SettingsPath+this.file_prefix+new_value);
 		if(!g_files.FileExists(SettingsPath+this.file_prefix+this.value)) g_files.CreateTextFile(SettingsPath+this.file_prefix+this.value, true).Close();	
 		g_files.MoveFile(SettingsPath + this.file_prefix + this.value,SettingsPath + this.file_prefix + new_value);
-
+		g_avoid_on_metadb_changed = true;
 		this.value = new_value;
+		window.NotifyOthers("g_avoid_on_metadb_changed",true);			
 		window.NotifyOthers(this.name,this.value);	
 		
 		RefreshPSS();
@@ -105,12 +106,8 @@ const refreshPSS_async = async() =>
 		fb.Play();fb.Stop();
 	}
 };
-function RefreshPSS_metadb() {
-	if (fb.IsPaused) {
-		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
-		handle_list.RefreshStats();
-	}
-	else if (fb.IsPlaying) {
+function RefreshPSS() {
+	if (fb.IsPlaying || fb.IsPaused) {
 		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
 		handle_list.RefreshStats();
 	}	
@@ -118,7 +115,7 @@ function RefreshPSS_metadb() {
 		fb.Play();fb.Stop();
 	}	
 }	
-function RefreshPSS() {
+function RefreshPSS_old() {
 	if (fb.IsPaused) {
 		fb.Play();
 		fb.Pause();

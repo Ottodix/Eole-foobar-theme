@@ -1772,6 +1772,16 @@ oShowList = function(parentPanelName) {
         this.setColumnsButtons();
         this.setCloseButton();			
 	}
+	this.setSize = function(){
+		if(this.idx > -1) {
+				this.rowIdx = Math.floor(this.idx / brw.totalColumns);
+				// set size of new showList of the selected album
+				var playlist = brw.groups_draw[this.idx].pl;
+				this.calcHeight(playlist, this.idx, 0, false);
+				this.reset(this.idx, this.rowIdx, false);
+				//brw.repaint();
+		}
+	}
     this.close = function() {	
 		this.drawn_idx = -1;
 		this.idx = -1;
@@ -1780,9 +1790,10 @@ oShowList = function(parentPanelName) {
 		this.delta = 0;
 		this.delta_ = 0;		
 	}	
-    this.reset = function(idx, rowIdx) {	
+    this.reset = function(idx, rowIdx, update_static_infos) {	
 	    idx = typeof idx !== 'undefined' ? idx : -1;			
 	    rowIdx = typeof rowIdx !== 'undefined' ? rowIdx : -1;						
+	    update_static_infos = typeof update_static_infos !== 'undefined' ? update_static_infos : true;	
 		
 		nbRows = Math.round(this.h / brw.rowHeight * 100) / 100;
 		height = Math.round(nbRows * brw.rowHeight);		
@@ -1794,7 +1805,6 @@ oShowList = function(parentPanelName) {
 			this.links[i].positioned = false;
 			this.links[i].changeState(ButtonStates.normal);			
 		}	
-		
 		if(this.idx<0 && idx<0) return;		
 		
 		if(idx!=-1) this.idx = idx;
@@ -1802,7 +1812,7 @@ oShowList = function(parentPanelName) {
 		if(nbRows!=-1) this.nbRows = nbRows;
 		if(nbRows!=-1) this.delta = nbRows;
 		this.hscr_visible = false;
-		this.getColorSchemeFromImageDone = false;
+
 		//this.clearSelection();
 		this.w = brw.w;
 		this.x = brw.x;
@@ -1817,46 +1827,49 @@ oShowList = function(parentPanelName) {
 		this.playing_row_h = 0;
 		this.selected_row = false;
 		this.last_click_row_index = -1;
-		if(!isImage(this.cover_img)){
-			this.setCover();
-		}
-		if(properties.showListColoredOneColor) {
-			this.getColorSchemeFromImage();	
-		} else if(properties.showListColoredMixedColor) {
-			this.getColorSchemeFromImage();			
-			if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
-				this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
-			}			
-		} else if(properties.showListColoredBlurred) {
-			this.light_bg = false;
-			if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
-				this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
-				try{
-					g_wallpaperImg_main_color = this.g_wallpaperImg.GetColourScheme(1);
-					this.colorSchemeBack = blendColors(g_wallpaperImg_main_color[0],RGB(0,0,0),0.4);	
-					this.colorSchemeOverlay = setAlpha(blendColors(this.colorSchemeBack,RGB(0,0,0),0.4),140);			
-				} catch(e){
-					this.colorSchemeBack = GetGrey(0);
-				}
+		
+		if(update_static_infos){
+			this.getColorSchemeFromImageDone = false;			
+			if(!isImage(this.cover_img)){
+				this.setCover();
 			}
-			this.setColors();			
-		} else {
-			if(properties.darklayout) this.light_bg = false;
-			else this.light_bg = true;			
-			this.colorSchemeBack = colors.showlist_bg;
-			this.setColors();
+			if(properties.showListColoredOneColor) {
+				this.getColorSchemeFromImage();	
+			} else if(properties.showListColoredMixedColor) {
+				this.getColorSchemeFromImage();			
+				if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
+					this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
+				}			
+			} else if(properties.showListColoredBlurred) {
+				this.light_bg = false;
+				if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
+					this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
+					try{
+						g_wallpaperImg_main_color = this.g_wallpaperImg.GetColourScheme(1);
+						this.colorSchemeBack = blendColors(g_wallpaperImg_main_color[0],RGB(0,0,0),0.4);	
+						this.colorSchemeOverlay = setAlpha(blendColors(this.colorSchemeBack,RGB(0,0,0),0.4),140);			
+					} catch(e){
+						this.colorSchemeBack = GetGrey(0);
+					}
+				}
+				this.setColors();			
+			} else {
+				if(properties.darklayout) this.light_bg = false;
+				else this.light_bg = true;			
+				this.colorSchemeBack = colors.showlist_bg;
+				this.setColors();
+			}
+			
+			if(this.light_bg) this.ratingImages = this.ratingImgsLight;
+			else this.ratingImages = this.ratingImgsDark;
+			
+			this.getHeaderInfos();
+			
+			time = brw.groups[this.idx].length;
+			
+			if(time>0) this.length = brw.FormatTime(time);
+			else this.length = 'ON AIR';		
 		}
-		
-		if(this.light_bg) this.ratingImages = this.ratingImgsLight;
-		else this.ratingImages = this.ratingImgsDark;
-		
-		this.getHeaderInfos();
-		
-		time = brw.groups[this.idx].length;
-		
-		if(time>0) this.length = brw.FormatTime(time);
-		else this.length = 'ON AIR';		
-		
 		this.hscr_width = this.w - 65 - (this.hscr_btn_w*2);
 		this.hscr_step_width = this.hscr_width / this.totalCols;							
 		this.hscr_cursor_width = this.hscr_step_width * this.totalColsVis + 41;													
@@ -1965,21 +1978,22 @@ oShowList = function(parentPanelName) {
 		}
 		this.pl = playlist;
 	}
-    this.calcHeight = function(playlist, drawn_idx, columnsOffset) {		
+    this.calcHeight = function(playlist, drawn_idx, columnsOffset, update_tracks) {		
 		columnsOffset = typeof columnsOffset !== 'undefined' ? columnsOffset : 0;		
+		update_tracks = typeof update_tracks !== 'undefined' ? update_tracks : true;		
 		
-		var playlist = brw.groups[brw.groups_draw[drawn_idx]].pl;		
-		this.drawn_idx = drawn_idx;
+		if(update_tracks){
+			var playlist = brw.groups[brw.groups_draw[drawn_idx]].pl;		
+			this.drawn_idx = drawn_idx;
 
-		try{
-			if(this.pl[0].RawPath!=playlist[0].RawPath) this.g_wallpaperImg = null;
-		}catch(e){this.g_wallpaperImg = null}
-		
-        this.pl = playlist;	
-		
-		if(properties.filterBox_filter_tracks && g_filterbox.isActive) this.setFilteredPlaylist();
-		
-		this.isPlaying = false;		
+			try{
+				if(this.pl[0].RawPath!=playlist[0].RawPath) this.g_wallpaperImg = null;
+			}catch(e){this.g_wallpaperImg = null}
+			
+			this.pl = playlist;	
+			if(properties.filterBox_filter_tracks && g_filterbox.isActive) this.setFilteredPlaylist();
+		}
+			
 		if(brw.followActivePlaylist && window.IsVisible) {
 			plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist,this.pl[0]);
 		}		
@@ -1991,6 +2005,7 @@ oShowList = function(parentPanelName) {
 		}		
 		
 		this.CoverSize = properties.showlistCoverMaxSize;
+		var totalColsVisMax_old = this.totalColsVisMax;		
 		this.totalColsVisMax=1;
 		var decrement_count = 1;
 		while(this.CoverSize > properties.showlistCoverMinSize && this.totalColsVisMax==1){
@@ -2008,24 +2023,31 @@ oShowList = function(parentPanelName) {
 			this.heightMax = 100000;
 		
 		if(this.heightMin>this.heightMax) this.heightMax=this.heightMin;
-        this.totaltracks = this.pl.Count;
-        this.rows_.splice(0, this.rows_.length);
-        this.totalHeight = 0;
-		var playing_track = fb.GetNowPlaying();
-        for(var i = 0; i < this.totaltracks; i++) {
-            this.rows_.push(new oRow(this.pl[i],i));
-            this.totalHeight += this.textHeight;
-			if(!this.isPlaying && playing_track!=null && this.pl[i].Compare(playing_track)) {
-				this.isPlaying = true;
-				brw.groups[brw.groups_draw[drawn_idx]].isPlaying = true; 
-				brw.isPlayingIdx = brw.groups_draw[drawn_idx];
+		if(this.totalColsVisMax > properties.showlistMaxColumns && properties.showlistMaxColumns>0) this.totalColsVisMax = properties.showlistMaxColumns;
+		
+		if(update_tracks){
+			this.isPlaying = false;	
+			this.totaltracks = this.pl.Count;
+			this.rows_.splice(0, this.rows_.length);
+			this.totalHeight = 0;			
+			var playing_track = fb.GetNowPlaying();
+			for(var i = 0; i < this.totaltracks; i++) {
+				this.rows_.push(new oRow(this.pl[i],i));
+				this.totalHeight += this.textHeight;
+				if(!this.isPlaying && playing_track!=null && this.pl[i].Compare(playing_track)) {
+					this.isPlaying = true;
+					brw.groups[brw.groups_draw[drawn_idx]].isPlaying = true; 
+					brw.isPlayingIdx = brw.groups_draw[drawn_idx];
+				}
 			}
-        }
-
-        if(this.totalColsVisMax > properties.showlistMaxColumns && properties.showlistMaxColumns>0) this.totalColsVisMax = properties.showlistMaxColumns;		
-
-		if(this.pl.Count%2==1 && this.totalColsVisMax>1)
-			this.totalHeight += this.textHeight;		
+			if(this.pl.Count%2==1 && this.totalColsVisMax>1)
+				this.totalHeight += this.textHeight;				
+		} else {
+			if(this.pl.Count%2==1 && this.totalColsVisMax>1 && totalColsVisMax_old<=1)
+				this.totalHeight += this.textHeight;
+			else if(!(this.pl.Count%2==1 && this.totalColsVisMax>1) && (this.pl.Count%2==1 && totalColsVisMax_old>1))
+				this.totalHeight -= this.textHeight;				
+		}
 		
         var a = Math.ceil(this.totalHeight / this.totalColsVisMax);
 		if(this.totaltracks%2==1) {a+=this.textHeight;}
@@ -3924,15 +3946,7 @@ oBrowser = function(name) {
         repaint_main1 = repaint_main2;		
 		
         if(properties.expandInPlace) {
-            if(g_showlist.idx > -1) {
-					g_showlist.rowIdx = Math.floor(g_showlist.idx / brw.totalColumns);
-					// set size of new showList of the selected album
-					var playlist = this.groups_draw[g_showlist.idx].pl;
-					g_showlist.calcHeight(playlist, g_showlist.idx);
-					g_showlist.reset(g_showlist.idx, g_showlist.rowIdx);
-                    					
-                    this.repaint();
-            }
+			g_showlist.setSize();
         }
     }
    this.get_metrics = function(gr){
@@ -4707,7 +4721,12 @@ oBrowser = function(name) {
 			
 			//this.drawRightLine = nowplayinglib_state.isActive();
 			//if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
-
+			
+			if(g_resizing.isResizing()) {
+				if(g_resizing.resizing_right_active) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);	 
+				else gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
+			}				
+			
             if(this.groups_draw.length == 0) { // library empty
                 var px = 0;
                 var py = this.y + Math.floor(this.h / 2);
@@ -6191,9 +6210,9 @@ function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
 	g_cursor.onMouse("move", x, y, m);	  
 	
-	var isResizing = false//g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
+	var isResizing = g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
 	if(isResizing){
-		/*if(g_resizing.resizing_right_active){
+		if(g_resizing.resizing_right_active){
 			if(g_resizing.resizing_x>x+5){
 				g_resizing.resizing_x = x;
 				rightplaylist_width.increment(5);
@@ -6209,7 +6228,7 @@ function on_mouse_move(x, y, m) {
 				g_resizing.resizing_x = x;
 				libraryfilter_width.increment(5);
 			}
-		}*/
+		}
 	} else {
 		g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
 		g_ishover && brw.on_mouse("move", x, y);
