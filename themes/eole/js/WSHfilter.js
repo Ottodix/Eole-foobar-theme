@@ -4322,9 +4322,11 @@ function on_mouse_move(x, y, m) {
     if(g_cursor.x == x && g_cursor.y == y) return;
 	g_cursor.onMouse("move", x, y, m);		
 	var isResizing = g_resizing.on_mouse("move", x, y, m, main_panel_state.isEqual(0) && !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
+	console.log("g_resizing.resizing_x "+g_resizing.resizing_x+"brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag"+(!brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag))
 	if(isResizing){
+		
 		if(g_resizing.resizing_x>x+5){
-			g_resizing.resizing_x = x;
+			g_resizing.resizing_x = x;console.log("g_resizing.resizing_x "+g_resizing.resizing_x)
 			libraryfilter_width.decrement(5);
 		} else if(g_resizing.resizing_x<x-5){
 			g_resizing.resizing_x = x;

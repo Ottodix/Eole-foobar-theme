@@ -105,7 +105,7 @@ const refreshPSS_async = async() =>
 		fb.Play();fb.Stop();
 	}
 };
-function RefreshPSS() {
+function RefreshPSS_metadb() {
 	if (fb.IsPaused) {
 		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
 		handle_list.RefreshStats();
@@ -118,7 +118,7 @@ function RefreshPSS() {
 		fb.Play();fb.Stop();
 	}	
 }	
-function RefreshPSS_old1() {
+function RefreshPSS() {
 	if (fb.IsPaused) {
 		fb.Play();
 		fb.Pause();

@@ -6191,9 +6191,9 @@ function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
 	g_cursor.onMouse("move", x, y, m);	  
 	
-	var isResizing = g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
+	var isResizing = false//g_resizing.on_mouse("move", x, y, m, layout_state.isEqual(0));
 	if(isResizing){
-		if(g_resizing.resizing_right_active){
+		/*if(g_resizing.resizing_right_active){
 			if(g_resizing.resizing_x>x+5){
 				g_resizing.resizing_x = x;
 				rightplaylist_width.increment(5);
@@ -6209,7 +6209,7 @@ function on_mouse_move(x, y, m) {
 				g_resizing.resizing_x = x;
 				libraryfilter_width.increment(5);
 			}
-		}
+		}*/
 	} else {
 		g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
 		g_ishover && brw.on_mouse("move", x, y);

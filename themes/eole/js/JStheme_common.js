@@ -121,8 +121,8 @@ var g_drop_effect = {
 };
 
 var oCursor = function () {
-	this.x = -1;
-	this.y = -1;
+	this.x = -10;
+	this.y = -10;
 	this.active_zone = "";
 	this.timer = false;
     this.onMouse = function (state, x, y, m) {    

@@ -6136,6 +6136,7 @@ function on_metadb_changed(metadbs, fromhook) {
 						plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
 					};
 				} else {
+					//console.log(" Count:"+metadbs.Count+" lenght:"+metadbs[0].Length)
 					brw.populate(is_first_populate = false,14, false);
 				};
 			};
