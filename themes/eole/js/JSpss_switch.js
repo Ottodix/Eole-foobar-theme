@@ -96,20 +96,10 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	}		
 	this.getFileValue();
 }
-const refreshPSS_async = async() =>
-{
-	if (fb.IsPlaying || fb.IsPaused) {
-		fb.PlayOrPause();
-		fb.PlayOrPause();
-	}
-	else {
-		fb.Play();fb.Stop();
-	}
-};
 function RefreshPSS() {
 	if (fb.IsPlaying || fb.IsPaused) {
-		let handle_list = new FbMetadbHandleList(fb.GetNowPlaying());
-		handle_list.RefreshStats();
+		let handle = fb.GetNowPlaying();
+		handle.RefreshStats();
 	}	
 	else {
 		fb.Play();fb.Stop();

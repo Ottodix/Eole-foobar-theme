@@ -69,44 +69,52 @@ String.prototype.trim = function() {
 }
 
 oTagSwitcherBar = function() {
-	this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");
-	this.items_width = new Array(0, 0, 0, 0);		
-	this.items_x = new Array(0, 0, 0, 0);	
-	this.items_functions = new Array(
-		function() {}
-	, 
-		function() {
-			window.NotifyOthers("libraryFilter_tagMode",1);
-			librarytree.setValue(0);	
-			window.NotifyOthers("left_filter_state","album");				
-		}
-	, 
-		function() {
-			window.NotifyOthers("libraryFilter_tagMode",2);
-			librarytree.setValue(0);	
-			window.NotifyOthers("left_filter_state","artist");				
-		}
-	, 
-		function() {
-			window.NotifyOthers("libraryFilter_tagMode",3);
-			librarytree.setValue(0);		
-			window.NotifyOthers("left_filter_state","genre");				
-		}
-	);
-	
-	if(!properties.showLibraryTreeSwitch){
-		this.items_txt.shift();
-		this.items_width.shift();
-		this.items_x.shift();
-		this.items_functions.shift();
-	}
+    this.setItems_infos = function(){	
+		this.items_functions = new Array(
+			function() {}
+		, 
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",1);
+				librarytree.setValue(0);	
+				window.NotifyOthers("left_filter_state","album");				
+			}
+		, 
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",2);
+				librarytree.setValue(0);	
+				window.NotifyOthers("left_filter_state","artist");				
+			}
+		, 
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",3);
+				librarytree.setValue(0);		
+				window.NotifyOthers("left_filter_state","genre");				
+			}
+		);	
+		this.items_width = new Array(0, 0, 0, 0);		
+		this.items_x = new Array(0, 0, 0, 0);
+		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");		
 		
-	this.hoverItem = -1;
+		properties.album_label = this.items_txt[1];
+		properties.artist_label = this.items_txt[2];
+		properties.genre_label = this.items_txt[3];
+		
+		if(!properties.showLibraryTreeSwitch){
+			this.items_txt.shift();
+			this.items_width.shift();
+			this.items_x.shift();
+			this.items_functions.shift();
+		}		
+	}
+	
+	this.setItems_infos();
+	this.hoverItem = -1;	
 	this.txt_top_margin = 0;
 	this.margin_right = 2;
 	this.margin_left = 6;	
 	this.images = {};
 	this.hide_bt = false;
+
     this.setHideButton = function(){
 		this.hscr_btn_w = 18
 		var xpts_mtop = Math.ceil((this.h-9)/2);	
