@@ -338,8 +338,8 @@ function get_colors_global(){
 			colors.selected_item_bg = GetGrey(255,15);	
 			colors.selected_item_line = GetGrey(255,18);
 			colors.selected_item_line_off = GetGrey(255,0);
-			colors.track_gradient_size = 20;
-			colors.padding_gradient = 10;				
+			colors.track_gradient_size = 0;
+			colors.padding_gradient = 0;				
 		}
 		
 		colors.wallpaper_overlay = GetGrey(25,230);

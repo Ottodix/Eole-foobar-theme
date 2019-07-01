@@ -2761,7 +2761,7 @@ function draw_settings_menu(x,y){
 				break;					 		
             case (idx == 3014):
 				properties.forcedarklayout=!properties.forcedarklayout;
-				window.SetProperty("_DISPLAY: force dark layout", properties.maindarklayout); 
+				window.SetProperty("_DISPLAY: force dark layout", properties.forcedarklayout); 
 				window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);						
 				get_colors();
 				window.Repaint();

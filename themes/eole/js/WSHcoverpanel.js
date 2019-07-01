@@ -623,6 +623,25 @@ function on_playback_time() {
 function on_layout_change() {
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
 	else properties.darklayout = properties.minidarklayout;			
+	
+	if(properties.forcedarklayout) properties.darklayout = true;
+	else if(layout_state.isEqual(0)) {
+		switch(main_panel_state.value){
+			case 0:
+				properties.darklayout = properties.library_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 1:
+				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 2:
+				properties.darklayout = properties.bio_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 3:
+				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colors!=0);
+			break;
+		}
+	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colors!=0);	
+	
     if(!fb.IsPlaying) {
 		g_cover.reset();		
     } 	
@@ -705,6 +724,7 @@ function on_notify_data(name, info) {
 		case "main_panel_state":
 			if(main_panel_state!=info) {
 				main_panel_state.value = info;
+				on_layout_change();
 				window.Repaint();
 			}
 		break; 	
@@ -723,26 +743,43 @@ function on_notify_data(name, info) {
 		case "minimode_dark_theme":
 			properties.minimode_dark_theme=info;
 			window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+			on_layout_change();
 			window.Repaint();		
 		break; 		
+		case "bio_stick_to_dark_theme":
+			properties.bio_stick_to_dark_theme = info;
+			window.SetProperty("BIO stick to dark theme", properties.bio_stick_to_dark_theme);
+			on_layout_change();
+			window.Repaint();
+		break;		
+		case "visualization_dark_theme":
+			properties.visualization_dark_theme = info;
+			window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);	
+			on_layout_change();
+			window.Repaint();
+		break;	
 		case "library_dark_theme":
 			properties.library_dark_theme=info;
 			window.SetProperty("LIBRARY dark theme", properties.library_dark_theme);
+			on_layout_change();
 			window.Repaint();		
 		break; 		
 		case "playlists_dark_theme":
 			properties.playlists_dark_theme=info;
 			window.SetProperty("PLAYLISTS dark theme", properties.playlists_dark_theme);
+			on_layout_change();
 			window.Repaint();		
 		break; 	
 		case "bio_dark_theme":	
 			properties.bio_dark_theme = info;
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);
+			on_layout_change();
 			window.Repaint();	
 		break; 	
 		case "screensaver_dark_theme": 
 			properties.screensaver_dark_theme=info;
 			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
+			on_layout_change();
 			window.Repaint();	
 		break;			
 		case "screensaver_state": 

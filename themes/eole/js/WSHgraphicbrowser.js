@@ -2602,6 +2602,7 @@ oHeaderBar = function(name) {
 					this.hide_filters_bt.checkstate("up", -1, -1);
 					this.hide_filters_bt.checkstate("leave", -1, -1);
 					libraryfilter_state.toggleValue();
+					g_resizing.resizing_left = libraryfilter_state.isActive();
 				}				
                 break;	
             case "lbtn_dblclk":
@@ -5698,7 +5699,7 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
-	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover && g_showlist.prev_bt.state != ButtonStates.hover && g_showlist.next_bt.state != ButtonStates.hover);
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover && ((g_showlist.idx > -1 && g_showlist.prev_bt.state != ButtonStates.hover && g_showlist.next_bt.state != ButtonStates.hover) || (g_showlist.idx<=-1)));
 	if(!isResizing){
 		if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 		
@@ -7029,6 +7030,7 @@ function on_notify_data(name, info) {
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
 			if(nowplayinglib_state.isActive()) {
+				g_resizing.resizing_right = true;
 				properties.showInLibrary = properties.showInLibrary_RightPlaylistOn;
 				/*selection_idx = brw.getSelectionPlaylist();
 				brw.calculateSourcePlaylist();
@@ -7039,6 +7041,7 @@ function on_notify_data(name, info) {
 					playlist_items = undefined;
 				}*/
 			} else {
+				g_resizing.resizing_right = false;				
 				properties.showInLibrary = properties.showInLibrary_RightPlaylistOff;		
 				brw.calculateSourcePlaylist();
 			}
@@ -7086,6 +7089,8 @@ function on_notify_data(name, info) {
 		break; 			
 		case "libraryfilter_state":
 			libraryfilter_state.value=info;
+			g_resizing.resizing_left = libraryfilter_state.isActive();	
+			console.log(g_resizing.resizing_left)
 		break; 		
 		case "RefreshImageCover":
 			//if(window.IsVisible) brw.refresh_all_images();
@@ -7329,7 +7334,7 @@ function on_init() {
 	g_filterbox.inputbox.visible = true;
 	g_tooltip = new oTooltip('brw');
 	
-	g_resizing = new Resizing("graphicbrowser",true,true);
+	g_resizing = new Resizing("graphicbrowser",libraryfilter_state.isActive(),nowplayinglib_state.isActive());
 	
 	g_history = new oPlaylistHistory();
 	
