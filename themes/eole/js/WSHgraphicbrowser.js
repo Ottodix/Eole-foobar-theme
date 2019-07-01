@@ -3165,6 +3165,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 26):
 			properties.showDiscNbOverCover = !properties.showDiscNbOverCover;
 			window.SetProperty("COVER Show Disc number over album art", properties.showDiscNbOverCover);
+			brw.refreshDates();
 			brw.repaint();
 			break;			
 		case (idx == 27):
