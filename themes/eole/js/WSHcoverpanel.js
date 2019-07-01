@@ -14,6 +14,7 @@ var properties = {
     bio_dark_theme: window.GetProperty("BIO dark theme", false),	
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),	
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
+	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),			
 	tintOnHover : true,
 	rawBitmap: false,
 	refreshRate: 50,	
@@ -651,6 +652,12 @@ function on_layout_change() {
 }	
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			globalProperties.colors = info;
+			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			on_layout_change();	
+			window.Repaint();
+		break; 			
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
@@ -798,6 +805,12 @@ function on_notify_data(name, info) {
 			on_layout_change();
 			window.Repaint();
 		break; 	
+		case "controls_force_dark_layout":
+			properties.forcedarklayout = info;
+			window.SetProperty("_DISPLAY: force dark layout", properties.forcedarklayout);
+			on_layout_change();
+			window.Repaint();
+		break;		
 		case "controls_main_dark_layout":
 			properties.maindarklayout = info;
 			window.SetProperty("_DISPLAY: Main layout:Dark", properties.maindarklayout);
