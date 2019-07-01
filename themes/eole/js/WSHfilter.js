@@ -2486,8 +2486,7 @@ oBrowser = function(name) {
 							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
 								txt_color1 = colors.normal_txt;
 								txt_color2 = colors.faded_txt;														
-								var track_gradient_size=0;
-
+								
 								hover_x = ax;
 								hover_y = ay;
 								hover_w = aw-1;
@@ -2512,14 +2511,13 @@ oBrowser = function(name) {
 										gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);								
 									//top
 									if(i!=0){
-										//gr.FillGradRect(ax, ay, track_gradient_size, 1, 0, colors.selected_item_line,  colors.selected_item_line, 1.0);
-										gr.FillSolidRect(ax+track_gradient_size, ay, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, colors.selected_item_line);	
-										//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay, track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line, 1.0);		
+										gr.FillSolidRect(ax, ay, aw-colors.track_gradient_size-colors.padding_gradient-(draw_right_line?1:0), 1, colors.selected_item_line);	
+										if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);		
 									}							
 									//bottom
-									//gr.FillGradRect(ax, ay+ah-1, track_gradient_size, 1, 0, colors.selected_item_line,  colors.selected_item_line, 1.0);
-									gr.FillSolidRect(ax+track_gradient_size, ay+ah-1, aw-(track_gradient_size*2)-(draw_right_line?1:0), 1, colors.selected_item_line);		
-									//gr.FillGradRect(ax+aw-(track_gradient_size*2), ay+ah-1, track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line, 1.0);
+
+									gr.FillSolidRect(ax, ay+ah-1, aw-colors.track_gradient_size-colors.padding_gradient-(draw_right_line?1:0), 1, colors.selected_item_line);		
+									if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
 								} else if(properties.displayMode == 1)	{
 									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);																
 									gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, colors.selected_item_line);
@@ -3777,7 +3775,7 @@ oBrowser = function(name) {
                         case 1:
 							try {
 								customFilterGrouping(properties.tagMode
-													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/>See http://tinyurl.com/lwhay6f for informations about foobar title formatting.<br/>"
+													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
 													,properties.album_label+'##'+properties.tf_groupkey_album);	
@@ -3796,7 +3794,7 @@ oBrowser = function(name) {
                         case 2:
 							try {
 								customFilterGrouping(properties.tagMode
-													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/>See http://tinyurl.com/lwhay6f for informations about foobar title formatting.<br/>"
+													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
 													,properties.artist_label+'##'+properties.tf_groupkey_artist);									
@@ -3815,7 +3813,7 @@ oBrowser = function(name) {
                         case 3:					
 							try {
 								customFilterGrouping(properties.tagMode
-													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/>See http://tinyurl.com/lwhay6f for informations about foobar title formatting.<br/>"
+													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
 													,properties.genre_label+'##'+properties.tf_groupkey_genre);									
@@ -3839,42 +3837,33 @@ oBrowser = function(name) {
                     break;
                 case (idx == 210):
                     properties.wallpapermode = 99;
-					on_colours_changed();
                     window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-                    if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
+					on_colours_changed();					
                     break;
                 case (idx == 211):
                     properties.wallpapermode = 0;
-					on_colours_changed();
                     window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-                    if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
+					on_colours_changed();					
                     break;
                 case (idx == 220):
                     properties.wallpaperblurred = !properties.wallpaperblurred;
+                    window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);					
 					on_colours_changed();
-                    window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
-                    g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
                     break;		
                 case (idx == 221):
                     properties.wallpaperdisplay = 0;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-                    g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
+                    on_colours_changed();
                     break;	
                 case (idx == 222):
                     properties.wallpaperdisplay = 1;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-                    g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
+                    on_colours_changed();
                     break;		
                 case (idx == 223):
                     properties.wallpaperdisplay = 2;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-                    g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-                    brw.repaint();
+                    on_colours_changed();
                     break;					
                 case (idx >= 900 && idx <= 903):
                     properties.displayMode = idx - 900;
@@ -4739,7 +4728,10 @@ function on_colours_changed() {
 
 	g_filterbox.getImages();
 	g_filterbox.reset_layout();
-
+	
+	if(properties.showwallpaper || properties.darklayout) {
+		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
+	};
     brw.repaint();
 };
 
@@ -5288,6 +5280,11 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			globalProperties.colors = info;
+			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			on_colours_changed();
+		break; 					
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
 			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
@@ -5424,8 +5421,6 @@ function on_notify_data(name, info) {
 				properties.darklayout = info;
 				window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
 				on_colours_changed();				
-				if(properties.showwallpaper) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-				brw.repaint();
 			}	
 		break;			
 		case"library_dark_theme":
@@ -5433,8 +5428,6 @@ function on_notify_data(name, info) {
 				properties.darklayout = info;
 				window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
 				on_colours_changed();				
-				if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-				brw.repaint();
 			}
 		break; 	
 		case "wallpaperVisibilityGlobal":		
@@ -5631,18 +5624,12 @@ function toggleWallpaper(wallpaper_state){
 	properties.showwallpaper = wallpaper_state;
 	window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
 	on_colours_changed();					
-	if(properties.showwallpaper || properties.darklayout) {
-		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-	};
-	brw.repaint();	
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
 	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;	
 	properties.wallpaperblurred = wallpaper_blur_state;
+	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);	
 	on_colours_changed();
-	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
-	if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-	brw.repaint();
 }
 function on_init() {
     window.DlgCode = 0x0004;

@@ -103,7 +103,8 @@ var properties = {
     refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true), 
     expandOnHover: window.GetProperty("TRACKLIST Expand on hover", true), 	
-    showListColoredOneColor: window.GetProperty("TRACKLIST Color according to albumart (main color)", false),
+    showListColored: window.GetProperty("TRACKLIST Color according to albumart", true),	
+    showListColoredOneColor: window.GetProperty("TRACKLIST Color according to albumart (main color)", true),
     showListColoredBlurred: window.GetProperty("TRACKLIST Color according to albumart (blurred)", false),	
     showListColoredMixedColor: window.GetProperty("TRACKLIST Color according to albumart (mix of both)", false),		
     drawProgressBar: window.GetProperty("TRACKLIST Draw a progress bar under song title", true),	
@@ -1032,7 +1033,7 @@ oRow = function(metadb,itemIndex) {
 						//g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 					};						
 					pt.DrawImage(g_showlist.g_wallpaperImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.g_wallpaperImg.Width, this.h);
-					pt.FillSolidRect(10, 0, this.w, this.h, g_showlist.progressbar_color_bg_on); //solid bg
+					pt.FillSolidRect(10, 0, this.w, this.h, (g_showlist.colorSchemeAlbumArtProgressbar)?g_showlist.colorSchemeAlbumArtProgressbar:g_showlist.progressbar_color_bg_on); //solid bg
 					if(elapsed_seconds%2==0)
 						pt.DrawImage(now_playing_progress0, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
 					else
@@ -1040,7 +1041,9 @@ oRow = function(metadb,itemIndex) {
 					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, 1, length_w, g_showlist.textHeight-g_showlist.textBot, 554696704);
 				playingText.ReleaseGraphics(pt);
 				gr.DrawImage(playingText, this.x, this.y, current_size+12, this.h, 0, 0, current_size+12, this.h, 0, 255);
-				gr.DrawRect(this.x+10, this.y, Math.min(current_size+1,this.w), this.h-1,1,g_showlist.albumartprogressbar_color_rectline)
+				gr.DrawRect(this.x+10, this.y, Math.min(current_size+1,this.w), this.h-1,1,g_showlist.albumartprogressbar_color_rectline);
+				//gr.FillSolidRect(this.x+10, this.y, Math.min(current_size+1,this.w)+1, this.h,g_showlist.albumartprogressbar_color_overlay);
+				
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
 				gr.GdiDrawText(this.title_text, g_font.normal, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10), this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
@@ -1380,7 +1383,7 @@ oShowList = function(parentPanelName) {
 			this.progressbar_color_bg_on = setAlpha(HSL2RGB(new_H, Math.min(new_S*0.45,100), Math.min(40,new_L*0.75), "RGB"),200);
 		} else if(properties.AlbumArtProgressbar){
 			this.progressbar_color_bg_on = setAlpha(HSL2RGB(new_H, Math.min(new_S*0.75,100), Math.min(50,Math.max(35,new_L*1.6)), "RGB"),200);	
-		} else if(new_L<10 && (properties.showListColoredOneColor || properties.showListColoredMixedColor)) {
+		} else if(new_L<10 && (properties.showListColoredOneColor || properties.showListColoredMixedColor) && properties.showListColored) {
 			this.progressbar_color_bg_on = HSL2RGB(new_H, Math.min(new_S*0.35,100), new_L+13, "RGB");				
 		}
 		if(this.light_bg) {
@@ -1704,7 +1707,7 @@ oShowList = function(parentPanelName) {
 			this.rating_icon_off = light.rating_icon_off;				
 			this.rating_icon_border = light.rating_icon_border;
 			
-			if(properties.showListColoredOneColor || properties.showListColoredMixedColor){
+			if((properties.showListColoredOneColor || properties.showListColoredMixedColor) && properties.showListColored){
 				if(properties.darklayout) this.border_color = light.border_color_colored_darklayout; 	
 				else this.border_color = light.border_color_colored; 
 			} else				
@@ -1833,21 +1836,24 @@ oShowList = function(parentPanelName) {
 			if(!isImage(this.cover_img)){
 				this.setCover();
 			}
-			if(properties.showListColoredOneColor) {
+			if(properties.showListColoredOneColor && properties.showListColored) {
 				this.getColorSchemeFromImage();	
-			} else if(properties.showListColoredMixedColor) {
+			} else if(properties.showListColoredMixedColor && properties.showListColored) {
 				this.getColorSchemeFromImage();			
 				if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
 					this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
 				}			
-			} else if(properties.showListColoredBlurred) {
+			} else if(properties.showListColoredBlurred && properties.showListColored) {
 				this.light_bg = false;
 				if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
 					this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
 					try{
 						g_wallpaperImg_main_color = this.g_wallpaperImg.GetColourScheme(1);
+						var tmp_HSL_colour = RGB2HSL(g_wallpaperImg_main_color[0]);
+						if(tmp_HSL_colour.L>80) {console.log("very light"+tmp_HSL_colour.L); this.colorSchemeAlbumArtProgressbar = blendColors(g_wallpaperImg_main_color[0],RGB(0,0,0),0.3);}	
+						else this.colorSchemeAlbumArtProgressbar = blendColors(g_wallpaperImg_main_color[0],RGB(0,0,0),0.4);							
 						this.colorSchemeBack = blendColors(g_wallpaperImg_main_color[0],RGB(0,0,0),0.4);	
-						this.colorSchemeOverlay = setAlpha(blendColors(this.colorSchemeBack,RGB(0,0,0),0.4),140);			
+						this.colorSchemeOverlay = setAlpha(blendColors(this.colorSchemeBack,RGB(0,0,0),0.4),150);			
 					} catch(e){
 						this.colorSchemeBack = GetGrey(0);
 					}
@@ -2140,7 +2146,7 @@ oShowList = function(parentPanelName) {
 		if(!isImage(this.cover_img)){
 			this.setCover();
 		}		
-		if((properties.showListColoredMixedColor || properties.showListColoredOneColor) && !this.getColorSchemeFromImageDone){
+		if((properties.showListColoredMixedColor || properties.showListColoredOneColor)  && properties.showListColored && !this.getColorSchemeFromImageDone){
 			this.getColorSchemeFromImage();	
 		}
         if(this.delta > 0) {
@@ -3019,7 +3025,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuBackground.AppendMenuItem(MF_STRING, 16, "Background according to album art (blurred)");		
 	_menuBackground.AppendMenuItem(MF_STRING, 17, "Background according to album art (mix of both)");	
 	_menuBackground.AppendMenuItem(MF_STRING, 18, "Transparent background");		
-	_menuBackground.CheckMenuRadioItem(15, 18, (properties.showListColoredOneColor) ? 15 : (properties.showListColoredBlurred) ? 16 :  (properties.showListColoredMixedColor) ? 17 : 18);	
+	_menuBackground.CheckMenuRadioItem(15, 18,  (!properties.showListColored) ? 18 : (properties.showListColoredOneColor) ? 15 : (properties.showListColoredBlurred) ? 16 :  (properties.showListColoredMixedColor) ? 17 : 18);	
 	_menuBackground.AppendTo(_menuTracklist,MF_STRING, "Background");	
 	
 	_menuTracklist.AppendTo(_menu,MF_STRING, "Tracklist");
@@ -3101,10 +3107,12 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.populate(0);			
 			break;			
 		case (idx == 15):
+			properties.showListColored = true;		
 			properties.showListColoredBlurred = false;
 			properties.showListColoredOneColor = true;	
 			properties.showListColoredMixedColor = false;				
 			get_colors();
+			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);					
 			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);			
 			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
 			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);			
@@ -3112,10 +3120,12 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();
 			break;		
 		case (idx == 16):
+			properties.showListColored = true;
 			properties.showListColoredBlurred = true;
 			properties.showListColoredOneColor = false;		
 			properties.showListColoredMixedColor = false;				
 			get_colors();
+			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);						
 			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);			
 			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
 			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
@@ -3124,10 +3134,12 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();
 			break;	
 		case (idx == 17):
+			properties.showListColored = true;		
 			properties.showListColoredBlurred = false;
 			properties.showListColoredOneColor = false;	
 			properties.showListColoredMixedColor = true;				
-			get_colors();			
+			get_colors();	
+			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);					
 			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);			
 			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
 			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
@@ -3136,13 +3148,9 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();
 			break;				
 		case (idx == 18):
-			properties.showListColoredBlurred = false;
-			properties.showListColoredOneColor = false;	
-			properties.showListColoredMixedColor = false;			
+			properties.showListColored = false;			
 			get_colors();			
-			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);			
-			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
-			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);			
+			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);							
 			g_showlist.reset();
 			brw.repaint();
 			break;			
@@ -5690,7 +5698,7 @@ function on_mouse_mbtn_down(x, y, mask) {
 	}
 }
 function on_mouse_lbtn_down(x, y, m) {
-	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover);
+	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover && g_showlist.prev_bt.state != ButtonStates.hover && g_showlist.next_bt.state != ButtonStates.hover);
 	if(!isResizing){
 		if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);	
 		
@@ -6422,7 +6430,6 @@ function get_colors() {
 		showlist_close_icon : GetGrey(255),
 		showlist_close_iconhv : GetGrey(0),
 		border_color : GetGrey(255,30),
-		
 	}
 	light = {
 		normal_txt : GetGrey(0),
@@ -6451,6 +6458,13 @@ function get_colors() {
 	}
 	
 	if(properties.darklayout){			
+		if(globalProperties.colors==0 || globalProperties.colors==1){
+			colors.showlist_bg = GetGrey(25);	
+			colors.showlist_border_color = GetGrey(255,30);
+		} else if(globalProperties.colors==2){
+			colors.showlist_bg = GetGrey(0);	
+			colors.showlist_border_color = GetGrey(255,50);			
+		}		
 		colors.grad_bottom_1 = GetGrey(0,70);
 		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 65;
@@ -6501,8 +6515,6 @@ function get_colors() {
 		colors.dragcover_itemsbg = GetGrey(240,255);	
 		colors.dragcover_itemstxt = GetGrey(0);			
 		
-		colors.showlist_bg = GetGrey(0);	
-		colors.showlist_border_color = GetGrey(255,50);		
 		colors.showlist_color_overlay = GetGrey(0,80);			
 		colors.showlist_close_bg = GetGrey(255);
 		colors.showlist_close_icon =  GetGrey(255);
@@ -6514,7 +6526,14 @@ function get_colors() {
 		colors.showlist_scroll_btns_icon = GetGrey(0);
 		colors.showlist_dragtrackbg = GetGrey(255,175);	
 		colors.showlist_dragitemstxt = GetGrey(0);		
-	} else {			
+	} else {		
+		if(globalProperties.colors==0 || globalProperties.colors==1){
+			colors.showlist_bg = GetGrey(0,0);	
+			colors.showlist_border_color = GetGrey(210);
+		} else if(globalProperties.colors==2){
+			colors.showlist_bg = GetGrey(0,10);	
+			colors.showlist_border_color = GetGrey(210);		
+		}		
 		colors.grad_bottom_1 = GetGrey(230,90);
 		colors.grad_bottom_2 = GetGrey(230,0);
 		colors.fading_bottom_height = 39;
@@ -6568,8 +6587,6 @@ function get_colors() {
 		colors.dragcover_itemsbg = GetGrey(20);	
 		colors.dragcover_itemstxt = GetGrey(255);	
 		
-		colors.showlist_bg = GetGrey(0,10);	
-		colors.showlist_border_color = GetGrey(210);
 		colors.showlist_color_overlay = GetGrey(0,80);	
 		colors.showlist_close_bg = GetGrey(0);
 		colors.showlist_close_icon =  GetGrey(0,165);
@@ -6922,6 +6939,19 @@ function on_drag_over(action, x, y, mask) {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			if(layout_state.isEqual(0)) {
+				globalProperties.colors = info;
+				window.SetProperty("GLOBAL colors", globalProperties.colors);
+				properties.showListColored = (globalProperties.colors!=0);
+				properties.AlbumArtProgressbar = (globalProperties.colors!=0);							
+				window.SetProperty("TRACKLIST Blurred album art progress bar", properties.AlbumArtProgressbar);		
+				window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);				
+				get_colors();			
+				g_showlist.reset();
+				brw.repaint();
+			}
+		break; 						
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
@@ -7000,14 +7030,14 @@ function on_notify_data(name, info) {
 			nowplayinglib_state.value=info;
 			if(nowplayinglib_state.isActive()) {
 				properties.showInLibrary = properties.showInLibrary_RightPlaylistOn;
-				selection_idx = brw.getSelectionPlaylist();
+				/*selection_idx = brw.getSelectionPlaylist();
 				brw.calculateSourcePlaylist();
 				if(selection_idx != brw.SourcePlaylistIdx){
 					playlist_items = plman.GetPlaylistItems(brw.SourcePlaylistIdx);
 					plman.ClearPlaylist(selection_idx);
 					plman.InsertPlaylistItems(selection_idx, 0, playlist_items);
 					playlist_items = undefined;
-				}
+				}*/
 			} else {
 				properties.showInLibrary = properties.showInLibrary_RightPlaylistOff;		
 				brw.calculateSourcePlaylist();

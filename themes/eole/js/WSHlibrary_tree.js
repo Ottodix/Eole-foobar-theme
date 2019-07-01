@@ -2401,8 +2401,12 @@ function populate() {
                 if (ui.node_style>=0 || !this.tree[i].track) item_x = item_x + ui.symbol_w;
                 sel_x = item_x - ui.sel;
 				gr.FillSolidRect(0, item_y, ui.w, ui.row_h, colors.selected_item_bg);
-				gr.FillSolidRect(0, item_y, ui.w, 1, colors.selected_item_line);
-				gr.FillSolidRect(0, item_y+ui.row_h-1, ui.w, 1, colors.selected_item_line);
+				gr.FillSolidRect(0, item_y, ui.w-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
+				gr.FillSolidRect(0, item_y+ui.row_h-1, ui.w-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
+				if(colors.track_gradient_size){
+					gr.FillGradRect(ui.w-colors.track_gradient_size-colors.padding_gradient, item_y, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
+					gr.FillGradRect(ui.w-colors.track_gradient_size-colors.padding_gradient, item_y+ui.row_h-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
+				}
             }
         }
 		this.cursor = IDC_ARROW;

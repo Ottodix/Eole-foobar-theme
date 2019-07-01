@@ -1560,10 +1560,7 @@ oBrowser = function(name) {
         this.groupHeaderRowHeight = properties.groupHeaderRowsNumber;
         this.totalRows = Math.ceil(this.h / properties.rowHeight);
         this.totalRowsVis = Math.floor(this.h / properties.rowHeight);
-        
-        if(g_first_populate_done) 
-			this.gettags();
-        
+     
         g_filterbox.setSize(this.w, cFilterBox.h+2, g_fsize);
 
         this.scrollbar.setSize();
@@ -1574,7 +1571,10 @@ oBrowser = function(name) {
         
         // scrollbar update       
         this.scrollbar.updateScrollbar();
-        
+		
+        if(g_first_populate_done) 
+			this.gettags();//this.gettags();
+		
         if(properties.DropInplaylist) pman.setSize(ww, y + 45, ww, h - 90);
     };
 	
@@ -2095,7 +2095,7 @@ oBrowser = function(name) {
     this.gettags = function(all) {
         var start_prev = g_start_;
         var end_prev = g_end_;
-        
+
         this.getlimits();
         
         // force full list refresh especially when library is populating (call from 'on_item_focus_change')
@@ -2105,53 +2105,59 @@ oBrowser = function(name) {
         var tf_trk = properties.tf_track;
         
         if(all) {
-            for(var i = g_start_;i <= g_end_;i++){     
-                switch(this.rows[i].type) {
-                case this.groupHeaderRowHeight: // last group header row
-                    // group tags
-                    this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
-					this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");					
-                    // track tags
-                    this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
-					this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");
-                    break;
-                case 0: // track row
-                    // group tags
-                    this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
-					this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");
-                    // track tags
-                    this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
-					this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");					
-                    break;
-                };
+            for(var i = g_start_;i <= g_end_;i++){
+				if(!this.rows[i].infosraw){		
+					switch(this.rows[i].type) {
+					case this.groupHeaderRowHeight: // last group header row
+						// group tags
+						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");					
+						// track tags
+						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");
+						break;
+					case 0: // track row
+						// group tags
+						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");
+						// track tags
+						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");					
+						break;
+					};
+				};
             };
         } else {           
             if(g_start_ < start_prev) {
-                switch(this.rows[g_start_].type) {
-                case this.groupHeaderRowHeight: // last group header row
-                    // track tags
-                    this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
-					this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");					
-                    break;
-                case 0: // track row
-                    // track tags
-                    this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
-					this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");					
-                    break;
-                };
+				if(!this.rows[g_start_].infosraw){		
+					switch(this.rows[g_start_].type) {
+					case this.groupHeaderRowHeight: // last group header row
+						// track tags
+						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
+						this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");					
+						break;
+					case 0: // track row
+						// track tags
+						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
+						this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");					
+						break;
+					};
+				};
             } else if(g_start_ > start_prev || g_end_ > end_prev) {
+				if(!this.rows[g_end_].infosraw){		
                 switch(this.rows[g_end_].type) {
-                case this.groupHeaderRowHeight: // last group header row
-                    // track tags
-                    this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
-					this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
-                    break;
-                case 0: // track row
-                    // track tags
-                    this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
-					this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
-                    break;
-                };
+					case this.groupHeaderRowHeight: // last group header row
+						// track tags
+						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
+						this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
+						break;
+					case 0: // track row
+						// track tags
+						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
+						this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
+						break;
+					};
+				};
             };
         };
     };
@@ -5210,7 +5216,7 @@ function on_font_changed() {
 };
 function setDarkLayout(){
 	var new_darklayout_state = false;
-	if(properties.ParentName=="MiniPanel") new_darklayout_state = properties.minimode_dark_theme;
+	if(layout_state.isEqual(1)) new_darklayout_state = properties.minimode_dark_theme;
 	else if(main_panel_state.isEqual(0)) new_darklayout_state = properties.library_dark_theme;
 	else if(main_panel_state.isEqual(1)) new_darklayout_state = properties.playlists_dark_theme;	
 	else if(main_panel_state.isEqual(2)) {
@@ -6251,6 +6257,13 @@ function stopFlashNowPlaying() {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			globalProperties.colors = info;
+			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			setOneProperty("AlbumArtProgressbar",(globalProperties.colors!=0),true);	
+			get_images();
+			brw.repaint();	
+		break; 						
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
 			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
@@ -6341,44 +6354,32 @@ function on_notify_data(name, info) {
 			} else {set_update_function("brw.populate(true,16)");}
 		break;		
 		case "playlists_dark_theme":
-			if(properties.ParentName=="MainPanel"){
-				setOneProperty("playlists_dark_theme",info);
-				on_colours_changed();				
-				//if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-				window.Repaint();
-			}	
+			setOneProperty("playlists_dark_theme",info, true);
+			on_colours_changed();				
+			window.Repaint();
 		break; 			
 		case "minimode_dark_theme":
-			if(properties.ParentName=="MiniPanel") {
-				setOneProperty("minimode_dark_theme",info);
-				on_colours_changed();				
-				//if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
-				window.Repaint();
-			}
+			setOneProperty("minimode_dark_theme",info, true);
+			on_colours_changed();				
+			window.Repaint();
 		break; 
 		case "bio_dark_theme":
-			if(properties.ParentName=="MainPanel") {
-				setOneProperty("bio_dark_theme",info);
-				on_colours_changed();
-				window.Repaint();	
-			}			
+			setOneProperty("bio_dark_theme",info, true);
+			on_colours_changed();
+			window.Repaint();	
 		break;	    
 		case "visualization_dark_theme":
-			if(properties.ParentName=="MainPanel") {	
-				setOneProperty("visualization_dark_theme",info);
-				on_colours_changed();
-				window.Repaint();		
-			}
+			setOneProperty("visualization_dark_theme",info, true);
+			on_colours_changed();
+			window.Repaint();		
 		break;	
 		case "library_dark_theme":
-			if(properties.ParentName=="MainPanel") {
-				setOneProperty("library_dark_theme",info);
-				on_colours_changed();
-				window.Repaint();
-			}	
+			setOneProperty("library_dark_theme",info, true);
+			on_colours_changed();
+			window.Repaint();
 		break;	
 		case "bio_stick_to_dark_theme":
-			setOneProperty("bio_stick2darklayout",info);
+			setOneProperty("bio_stick2darklayout",info, true);
 			on_colours_changed();
 			window.Repaint();		
 		break;			
@@ -6417,7 +6418,7 @@ function on_notify_data(name, info) {
 				brw.collapseAll(true);
 			}						
 			on_colours_changed(true);
-			brw.refreshThumbnails();
+			brw.refreshThumbnails(); 
 			if(layout_state.isEqual(0) && window.IsVisible) window.NotifyOthers("playlist_height",window.Height);		
 			if(layout_state.isEqual(1) && g_active_playlist==plman.PlayingPlaylist){
 				//if(g_active_playlist==plman.PlayingPlaylist) brw.showNowPlaying_trigger = true;
@@ -6692,6 +6693,7 @@ function on_drag_drop(action, x, y, mask) {
 			//plman.ActivePlaylist = toPlaylistIdx;
 		} else plman.ActivePlaylist = toPlaylistIdx;
         action.Effect = 1;
+		plman.UndoBackup(toPlaylistIdx);
         action.Playlist = toPlaylistIdx;
 		action.ToSelect = false;		
 		g_dragndrop_timer = setTimeout(function(){
@@ -6709,6 +6711,7 @@ function on_drag_drop(action, x, y, mask) {
         plman.CreatePlaylist(0, "Dropped Items");
         plman.ActivePlaylist = 0;
         action.Effect = 1;
+		plman.UndoBackup(plman.ActivePlaylist);
         action.Playlist = plman.ActivePlaylist;
         action.ToSelect = false;
 		g_dragndrop_trackId = -1;
@@ -6717,6 +6720,7 @@ function on_drag_drop(action, x, y, mask) {
         if(g_dragndrop_bottom) {
             plman.ClearPlaylistSelection(g_active_playlist);
             action.Effect = 1;
+			plman.UndoBackup(g_active_playlist);
 			action.Playlist = g_active_playlist;
             action.ToSelect = false;
 			g_avoid_playlist_displayed_switch = true;
@@ -6739,6 +6743,7 @@ function on_drag_drop(action, x, y, mask) {
 			
 				plman.ClearPlaylistSelection(g_active_playlist);
 				action.Effect = 1;
+				plman.UndoBackup(g_active_playlist);
 				action.Playlist = g_active_playlist;
 				action.ToSelect = false;
 				g_avoid_playlist_displayed_switch = true;				

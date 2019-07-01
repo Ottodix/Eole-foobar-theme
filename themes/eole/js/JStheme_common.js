@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.1b4',
+	theme_version: '1.2.1b5',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -43,7 +43,8 @@ var globalProperties = {
     load_artist_img_at_startup: window.GetProperty("ARTIST IMG Load all at startup", true),	
 	enableDiskCache: window.GetProperty("COVER Disk Cache",true),
 	deleteDiskCache: window.GetProperty("COVER delete cover cache on next startup",false),	
-	enableResizableBorders: window.GetProperty("GLOBAL enableResizableBorders",true),		
+	enableResizableBorders: window.GetProperty("GLOBAL enableResizableBorders",true),	
+	colors: window.GetProperty("GLOBAL colors",0),	
 	record_move_every_x_ms:3000,	
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
 	selection_playlist : "Library Selection",
@@ -321,11 +322,28 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 var colors = {};
 function get_colors_global(){
 	if(properties.darklayout || properties.stick2darklayout){
+		if(globalProperties.colors==0 || globalProperties.colors==1){
+			colors.normal_bg = GetGrey(30);
+			colors.lightgrey_bg = GetGrey(30);		
+			colors.alternate_row = GetGrey(0,0);	
+			colors.selected_item_bg = GetGrey(255,0);	
+			colors.selected_item_line = GetGrey(255,35);
+			colors.selected_item_line_off = GetGrey(255,0);
+			colors.track_gradient_size = 20;
+			colors.padding_gradient = 10;					
+		} else if(globalProperties.colors==2){
+			colors.normal_bg = GetGrey(30);
+			colors.lightgrey_bg = GetGrey(27);	
+			colors.alternate_row = GetGrey(0,30);		
+			colors.selected_item_bg = GetGrey(255,15);	
+			colors.selected_item_line = GetGrey(255,18);
+			colors.selected_item_line_off = GetGrey(255,0);
+			colors.track_gradient_size = 20;
+			colors.padding_gradient = 10;				
+		}
+		
 		colors.wallpaper_overlay = GetGrey(25,230);
 		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
-		
-		colors.normal_bg = GetGrey(30);
-		colors.lightgrey_bg = GetGrey(27);	
 		
 		colors.normal_txt = GetGrey(240);
 		colors.faded_txt = GetGrey(110);	
@@ -334,7 +352,6 @@ function get_colors_global(){
 		
 		colors.selected_bg = RGBA(015,177,255,160);
 		colors.highlight = RGB(255,175,050);
-		colors.alternate_row = GetGrey(0,30);
 		
 		colors.headerbar_bg = GetGrey(30,220);	
 		colors.headerbar_line = GetGrey(255,38);	
@@ -381,25 +398,37 @@ function get_colors_global(){
 		
 		colors.marker_hover_item = GetGrey(255);
 		colors.width_marker_hover_item = 2;		
-		colors.dragdrop_marker_line = GetGrey(255,205);		
-		
-		colors.selected_item_bg = GetGrey(255,15);	
-		colors.selected_item_line = GetGrey(255,18);		
+		colors.dragdrop_marker_line = GetGrey(255,205);				
 	} else {
+		if(globalProperties.colors==0 || globalProperties.colors==1){
+			colors.normal_bg = GetGrey(255);
+			colors.lightgrey_bg = GetGrey(255);
+			colors.alternate_row = GetGrey(0,0);
+			colors.selected_item_bg = GetGrey(0,0);	
+			colors.selected_item_line = GetGrey(0,36);		
+			colors.selected_item_line_off = GetGrey(0,0);
+			colors.track_gradient_size = 20;
+			colors.padding_gradient = 10;			
+		} else if(globalProperties.colors==2){
+			colors.normal_bg = GetGrey(255);
+			colors.lightgrey_bg = GetGrey(245);
+			colors.alternate_row = GetGrey(0,5);		
+			colors.selected_item_bg = GetGrey(0,17);	
+			colors.selected_item_line = GetGrey(0,16);		
+			colors.track_gradient_size = 0;
+			colors.padding_gradient = 0;					
+		}	
+		
 		colors.wallpaper_overlay = GetGrey(255,235);
 		colors.wallpaper_overlay_blurred = GetGrey(255,235);	
 
-		colors.normal_bg = GetGrey(255);
-		colors.lightgrey_bg = GetGrey(245);
-		
 		colors.normal_txt = GetGrey(0);		
 		colors.faded_txt = GetGrey(140);
 		colors.superfaded_txt = GetGrey(200);		
         colors.full_txt = GetGrey(0);		
 		colors.selected_bg = RGBA(015,177,255,100);
 		colors.highlight = RGB(255,175,050);
-		colors.alternate_row = GetGrey(0,5);
-		
+
 		colors.headerbar_bg = GetGrey(255,240);		
 		colors.headerbar_line = GetGrey(215);
 		
@@ -447,9 +476,6 @@ function get_colors_global(){
 		colors.marker_hover_item = GetGrey(30);
 		colors.width_marker_hover_item = 2;		
 		colors.dragdrop_marker_line = GetGrey(20);
-		
-		colors.selected_item_bg = GetGrey(0,17);	
-		colors.selected_item_line = GetGrey(0,16);	
 	}
 }
 //Files, Folders, FileSystemObject ----------------------------------------------------
@@ -1887,12 +1913,53 @@ function shuffleList(metadb_list) {
     metadb_list[randomIndex] = temporaryValue;
   }
 }
-function play_random(start,random_function){
+function pickRandom(metadb_list, nb_of_items){
+	var list_count=metadb_list.Count;
+	var tracks_list=new FbMetadbHandleList();
+	var i=0;
+	while(i < nb_of_items && i < list_count) {
+		tracks_list.Add(metadb_list[Math.floor(Math.random()*list_count)]);
+		i++;
+	}	
+	return tracks_list;
+}
+function play_random(random_function, addAtTheEnd){
 	var random_function = typeof random_function !== 'undefined' ? random_function : '200_tracks';	
+	var addAtTheEnd = typeof addAtTheEnd !== 'undefined' ? addAtTheEnd : false;	
+	console.log(random_function);
+	switch(random_function) {
+		case '20_albums':
+			var number_of_items = addAtTheEnd?1:25;
+			break;  	
+		case '1_genre':
+			var number_of_items = addAtTheEnd?25:0;
+			break;  	
+		case '1_artist':
+			var number_of_items = addAtTheEnd?25:0;
+			break;  	
+		case '200_tracks':
+			var number_of_items = addAtTheEnd?25:200;
+			break;  	
+		default:
+			var genreValue=parseInt(random_function);
+			if(genreValue >= 1000 && genreValue < 2001){			
+				var number_of_items = addAtTheEnd?25:0;
+			} else {
+				var number_of_items = addAtTheEnd?25:200;
+			}
+			break;  	
+	}				
+		
 	randomBtnTimer && clearTimeout(randomBtnTimer);
 	var playlist_index = getPlaybackPlaylist();
-	//plman.ActivePlaylist = playlist_index;
-	plman.ClearPlaylist(playlist_index);
+	plman.UndoBackup(playlist_index);		
+	//plman.ActivePlaylist = playlist_index;	
+	if(!addAtTheEnd) {
+		plman.ClearPlaylist(playlist_index);
+		var start_index = 0;
+	} else {
+		var start_index = plman.PlaylistItemCount(playlist_index);		
+	}
     plman.PlayingPlaylist=playlist_index;	
 	if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
 	switch(random_function) {
@@ -1903,7 +1970,7 @@ function play_random(start,random_function){
 			var albums_list=new FbMetadbHandleList();
 			var i=0;
 			var query = "";
-			while(i < 25 && i < library_items_number) {
+			while(i < number_of_items && i < library_items_number) {
 				try {
 					var random_item = library_items[Math.floor(Math.random()*library_items_number)];
 					var arr = fb.TitleFormat("%album artist% ## %album%").EvalWithMetadb(random_item).split(" ## ");						
@@ -1914,17 +1981,18 @@ function play_random(start,random_function){
 				} catch(e) {}	
 				i++;
 			}
-			plman.InsertPlaylistItems(playlist_index, 0, albums_list);
-			plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+			plman.InsertPlaylistItems(playlist_index, start_index, albums_list);
+			plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 			albums_list = undefined;
 			library_items = undefined;		
 			break;  	
 		case '1_genre':	
 			try{
 				var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
-				shuffleList(genre_item_list)
-				plman.InsertPlaylistItems(playlist_index, 0, genre_item_list);
-				plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+				if(number_of_items>0) genre_item_list = pickRandom(genre_item_list, number_of_items)
+				else shuffleList(genre_item_list)
+				plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
+				plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 				genre_item_list = undefined;		
 			} catch(e) {}					
 			break; 		
@@ -1936,9 +2004,11 @@ function play_random(start,random_function){
 				var random_item = library_items[Math.floor(Math.random()*library_items_number)];
 				var artist_name = fb.TitleFormat("%artist%").EvalWithMetadb(random_item);			
 				var artist_list = fb.GetQueryItems(library_items, "%artist% IS "+artist_name);
-				artist_list.OrderByFormat(tfo, 1);
-				plman.InsertPlaylistItems(playlist_index, 0, artist_list);
-				plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+				if(number_of_items>0) artist_list = pickRandom(artist_list, number_of_items)
+				else shuffleList(artist_list)				
+				//artist_list.OrderByFormat(tfo, 1);
+				plman.InsertPlaylistItems(playlist_index, start_index, artist_list);
+				plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 				artist_list = undefined;
 			} catch(e) {}			
 			library_items = undefined;			
@@ -1948,12 +2018,12 @@ function play_random(start,random_function){
 			var library_items_number=library_items.Count;
 			var tracks_list=new FbMetadbHandleList();
 			var i=0;
-			while(i < 200 && i < library_items_number) {
+			while(i < number_of_items && i < library_items_number) {
 				tracks_list.Add(library_items[Math.floor(Math.random()*library_items_number)]);
 				i++;
 			}
-			plman.InsertPlaylistItems(playlist_index, 0, tracks_list);
-			plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+			plman.InsertPlaylistItems(playlist_index, start_index, tracks_list);
+			plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 			tracks_list = undefined;
 			library_items = undefined;					
 			break;  
@@ -1962,9 +2032,10 @@ function play_random(start,random_function){
 			if(genreValue >= 1000 && genreValue < 2001){	
 				try {		
 					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[genreValue-1000][0]);
-					shuffleList(genre_item_list)
-					plman.InsertPlaylistItems(playlist_index, 0, genre_item_list);
-					plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+					if(number_of_items>0) genre_item_list = pickRandom(genre_item_list, number_of_items)
+					else shuffleList(genre_item_list)
+					plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
+					plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 					genre_item_list = undefined;	
 				} catch(e) {}
 			} else {
@@ -1972,12 +2043,12 @@ function play_random(start,random_function){
 				var library_items_number=library_items.Count;
 				var tracks_list=new FbMetadbHandleList();
 				i=0;
-				while(i < 200 && i < library_items_number) {
+				while(i < number_of_items && i < library_items_number) {
 					tracks_list.Add(library_items[Math.floor(Math.random()*library_items_number)]);
 					i++;
 				}
-				plman.InsertPlaylistItems(playlist_index, 0, tracks_list);
-				plman.ExecutePlaylistDefaultAction(playlist_index,0);	
+				plman.InsertPlaylistItems(playlist_index, start_index, tracks_list);
+				plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 				tracks_list = undefined;
 				library_items = undefined;
 			}

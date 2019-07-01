@@ -1046,10 +1046,12 @@ oBrowser = function(name) {
                             gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);
 							//top
 							if(i>0 ){
-							gr.FillSolidRect(ax, ay, aw-1, 1, colors.selected_item_line);		
+							gr.FillSolidRect(ax, ay, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);	
+							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);				
 							}
 							//bottom
-							gr.FillSolidRect(ax, ay+ah-1, aw-1, 1, colors.selected_item_line);								
+							gr.FillSolidRect(ax, ay+ah-1, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
+							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);						
                         }; 
 						
                         // hover item
@@ -2950,6 +2952,11 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			globalProperties.colors = info;
+			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			on_colours_changed();
+		break; 						
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
 			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			

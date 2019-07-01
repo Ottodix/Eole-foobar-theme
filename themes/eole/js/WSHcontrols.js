@@ -4,6 +4,7 @@ var properties = {
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
     random_function: window.GetProperty("Random function", "default"),	
 	remaining_time: window.GetProperty("Show remaining time",false),
+	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),		
 	maindarklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),		
 	minidarklayout: window.GetProperty("_DISPLAY: Mini layout:Dark", true),		
 	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
@@ -25,6 +26,7 @@ var properties = {
     bio_dark_theme: window.GetProperty("BIO dark theme", false),	
     bio_stick_to_dark_theme: window.GetProperty("BIO stick to dark theme", false),		
     visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", false),
+	playandrandom: window.GetProperty("GLOBAL play and random",false),
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
 	panelFontAdjustement: -1	
 }
@@ -72,6 +74,7 @@ else properties.showTrackInfo = showtrackinfo_small.isActive();
 
 function clamp(x, l, h) { return (x < l) ? l : ((x > h) ? h : x); }
 
+var playAndRandom_triggered = false;
 var drag_timer = false;
 var update_wallpaper = false;
 var nowplaying_cachekey = '';
@@ -206,6 +209,8 @@ function build_images(){
 	repeat_img_active = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeat_active.png");
 	repeat_all_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeat_all_hover.png");
 	repeat_all = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeat_all.png");
+	repeat_random_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeatandrandom_hover.png");
+	repeat_random = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeatandrandom.png");	
 	repeat_track_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeat_track_hover.png");
 	repeat_track = gdi.Image(theme_img_path + "\\" + theme_path + "\\repeat_track.png");
 	menu_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\settings_hover.png");
@@ -263,7 +268,7 @@ function build_images(){
 			gb.FillEllipse(1,1,volume_vars.ellipse_diameter_start+1,volume_vars.ellipse_diameter_start+1,volumeOncolor);			
 		} else if(properties.cursor_style==0) { 
 			gb.DrawEllipse(1,1,volume_vars.ellipse_diameter_start,volume_vars.ellipse_diameter_start,volume_vars.ellipse_line_width, volumeOncolor);				
-			gb.FillEllipse(1,1,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
+			gb.FillEllipse(1+volume_vars.ellipse_border_size,1+volume_vars.ellipse_border_size,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,volume_vars.ellipse_diameter_start-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
 		}
 		gb.SetSmoothingMode(0);		
 	slider_cursor.ReleaseGraphics(gb);
@@ -277,7 +282,7 @@ function build_images(){
 			gb.FillEllipse(1,1,diameter_hover+1,diameter_hover+1,volumeOncolor);			
 		} else if(properties.cursor_style==0) { 
 			gb.DrawEllipse(1,1,diameter_hover,diameter_hover,volume_vars.ellipse_line_width, volumeOncolor);				
-			gb.FillEllipse(1,1,diameter_hover-volume_vars.ellipse_border_size*2,diameter_hover-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
+			gb.FillEllipse(1+volume_vars.ellipse_border_size,1+volume_vars.ellipse_border_size,diameter_hover-volume_vars.ellipse_border_size*2,diameter_hover-volume_vars.ellipse_border_size*2,colors.ellipse_inner);			
 		}
 		gb.SetSmoothingMode(0);		
 	slider_cursor_hover.ReleaseGraphics(gb);
@@ -288,8 +293,23 @@ function build_images(){
 }
 var colors = {};
 function get_colors(){
-	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
-	else properties.darklayout = properties.minidarklayout;
+	if(properties.forcedarklayout) properties.darklayout = true;
+	else if(layout_state.isEqual(0)) {
+		switch(main_panel_state.value){
+			case 0:
+				properties.darklayout = properties.library_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 1:
+				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 2:
+				properties.darklayout = properties.bio_dark_theme || (globalProperties.colors!=0);
+			break;
+			case 3:
+				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colors!=0);
+			break;
+		}
+	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colors!=0);
 	get_colors_global();	
 	if(properties.darklayout) {		
 		colors.wallpaper_overlay = GetGrey(0,200);
@@ -574,13 +594,18 @@ function build_buttons(){
 			Randomize=!Randomize		
 		},shuffle_img_active,shuffle_img_hover),
 		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat",false, function () {
-			if(plman.PlaybackOrder==1) {
-				plman.PlaybackOrder=2;				
+			if(plman.PlaybackOrder==0 && !properties.playandrandom) {
+				properties.playandrandom = true;
+				window.SetProperty("GLOBAL play and random",properties.playandrandom);
+			} else if(plman.PlaybackOrder==0) {
+				plman.PlaybackOrder=1;				
+				properties.playandrandom = false;
+				window.SetProperty("GLOBAL play and random",properties.playandrandom);				
+			} else if(plman.PlaybackOrder==1) {
+				plman.PlaybackOrder=2;	
 			} else if(plman.PlaybackOrder==2) {
 				plman.PlaybackOrder=0;					
-			} else {
-				plman.PlaybackOrder=1;					
-			}			
+			}	
 			this.changeState(ButtonStates.hoverinactive);		
 		},false,repeat_img,repeat_img_hover),   		
 		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume",false, function () {
@@ -728,6 +753,7 @@ function on_paint(gr) {
 		case (main_panel_state.isEqual(0) && !properties.library_dark_theme && layout_state.isEqual(0)):
 		case (main_panel_state.isEqual(1) && !properties.playlists_dark_theme && layout_state.isEqual(0)):
 		case (main_panel_state.isEqual(2) && !(properties.bio_dark_theme || properties.bio_stick_to_dark_theme) && layout_state.isEqual(0)):	
+		case (main_panel_state.isEqual(3) && !properties.visualization_dark_theme && layout_state.isEqual(0)):		
 			gr.FillSolidRect(0, 0, ww, 1, colors.line_top_dark);						
 		break;		
 	}	
@@ -1223,10 +1249,18 @@ function on_playback_stop(reason) {
 	switch(reason) {
 	case 0: // user stop
 	case 1: // eof (e.g. end of playlist)
-		g_wallpaperImg = null;
-		nowplaying_cachekey = null;
-		evalTimeDisplayed();
-		get_text();		
+		if(properties.playandrandom && reason==1){
+			scheduler_timer = setTimeout(function() {
+				playAndRandom_triggered = false;
+			}, 2000);				
+			if(!playAndRandom_triggered) play_random(properties.random_function, true);
+			playAndRandom_triggered = true;
+		} else {
+			g_wallpaperImg = null;
+			nowplaying_cachekey = null;
+			evalTimeDisplayed();
+			get_text();	
+		}		
 		break;
 	case 2: // starting_another (only called on user action, i.e. click on next button)
 		break;
@@ -1428,6 +1462,23 @@ function on_key_down(vkey) {
 }	
 function on_notify_data(name, info) {
     switch(name) {	
+		case "colors":
+			globalProperties.colors = info;
+			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			if(layout_state.isEqual(0)) {
+				properties.maindarklayout=(globalProperties.colors!=0);				
+				window.SetProperty("_DISPLAY: Main layout:Dark", properties.maindarklayout); 
+				window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);						
+			} else {
+				properties.minidarklayout=(globalProperties.colors!=0);				
+				window.SetProperty("_DISPLAY: Mini layout:Dark", properties.minidarklayout); 	
+				window.NotifyOthers("controls_mini_dark_layout", properties.minidarklayout);
+			}			
+			properties.showwallpaper = (globalProperties.colors!=0);
+			window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);				
+			get_colors();	
+			window.Repaint();
+		break; 					
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
@@ -1489,6 +1540,10 @@ function on_notify_data(name, info) {
 		break;   
 	   case "Randomsetfocus":
 			Randomsetfocus = info;
+			if (!Randomsetfocus && properties.random_function >= 1000 && properties.random_function < 2001){
+                properties.random_function = '1_genre';
+                window.SetProperty("Random function", properties.random_function);
+			}			
 			if(Randomsetfocus) showNowPlaying();
 		break; 
 	   case "layout_state":
@@ -1521,40 +1576,53 @@ function on_notify_data(name, info) {
 		case "bio_dark_theme":
 			properties.bio_dark_theme = info;
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);	
+			get_colors();
 			window.Repaint();
 		break;	
+		case "visualization_dark_theme":
+			properties.visualization_dark_theme = info;
+			window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);	
+			get_colors();
+			window.Repaint();
+		break;			
 		case "bio_stick_to_dark_theme":
 			properties.bio_stick_to_dark_theme = info;
 			window.SetProperty("BIO stick to dark theme", properties.bio_stick_to_dark_theme);	
+			get_colors();
 			window.Repaint();
 		break;		
 		case "library_dark_theme":
 			properties.library_dark_theme = info;
 			window.SetProperty("LIBRARY dark theme", properties.library_dark_theme);	
+			get_colors();
 			window.Repaint();
 		break;		  
 		case "playlists_dark_theme":
 			properties.playlists_dark_theme = info;
 			window.SetProperty("PLAYLISTS dark theme", properties.playlists_dark_theme);	
+			get_colors();
 			window.Repaint();
 		break;			
 	   case "main_panel_state":
 			if(main_panel_state!=info) {
 				main_panel_state.value = info;
+				get_colors();
 				window.Repaint();
 			}
-		break;	
-	   case "schedulerState":
-			setScheduler(info,true);
-			window.Repaint();	
 		break;	
 	   case "minimode_dark_theme":
 			if(layout_state.isEqual(1)) {
 				properties.minimode_dark_theme=info;
 				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+				get_colors();
 				window.Repaint();		
 			}
+		break;			
+	   case "schedulerState":
+			setScheduler(info,true);
+			window.Repaint();	
 		break;	
+
 	   case "AdjustVolume":
 			showVolumeSliderTemp();
 		break;       
@@ -1976,20 +2044,17 @@ function randomPlayMenu(x, y){
             case (idx == 2):
                 properties.random_function = '20_albums';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("playRandom", properties.random_function);
-				//play_random(true,properties.random_function);                 
+				window.NotifyOthers("SetRandom", properties.random_function);             
                 break;
             case (idx == 3):
                 properties.random_function = '200_tracks';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("playRandom", properties.random_function);
-				//play_random(true,properties.random_function);                 
+				window.NotifyOthers("playRandom", properties.random_function);             
                 break;
             case (idx == 4):
                 properties.random_function = '1_genre';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("playRandom", properties.random_function);
-				//play_random(true,properties.random_function);                
+				window.NotifyOthers("playRandom", properties.random_function);            
                 break;	
             case (idx == 5):
                 properties.random_function = '1_artist';
@@ -2000,13 +2065,11 @@ function randomPlayMenu(x, y){
                 properties.random_function = '1_genre';
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("playRandom", idx);                
-				//play_random(true,idx);
 				break;                 
             case (idx == 6):
                 properties.random_function = 'default';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("playRandom", properties.random_function);
-				//play_random(true,properties.random_function);                 
+				window.NotifyOthers("playRandom", properties.random_function);           
                 break;					
             default:
 				return true;
@@ -2196,37 +2259,37 @@ function moreMenu(x, y){
                 properties.random_function = '20_albums';
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("SetRandom", properties.random_function);                
-				play_random(true,properties.random_function);
+				play_random(properties.random_function);
                 break;
             case (idx == 503):
                 properties.random_function = '200_tracks';
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("SetRandom", properties.random_function);                
-				play_random(true,properties.random_function);
+				play_random(properties.random_function);
                 break;
             case (idx == 504):
                 properties.random_function = '1_genre';
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("SetRandom", properties.random_function);                
-				play_random(true,properties.random_function);
+				play_random(properties.random_function);
                 break;	   
             case (idx == 505):
                 properties.random_function = '1_artist';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("playRandom", properties.random_function); 
-				play_random(true,properties.random_function);				
+				window.NotifyOthers("SetRandom", properties.random_function); 
+				play_random(properties.random_function);				
                 break;						
 			case (idx >= 1000 && idx < 2001):
-                properties.random_function = '1_genre';
+                properties.random_function = idx;
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("SetRandom", properties.random_function);                
-				play_random(true,idx);
+				play_random(idx);
 				break;  				
             case (idx == 507):
                 properties.random_function = 'default';
                 window.SetProperty("Random function", properties.random_function);
                 window.NotifyOthers("SetRandom", properties.random_function);
-				play_random(true,properties.random_function);
+				play_random(properties.random_function);
                 break;				
             case (idx == 2001):
 				if(g_rating!=0)
@@ -2598,8 +2661,8 @@ function draw_settings_menu(x,y){
 		var _menu_slider = window.CreatePopupMenu();			
         var idx;
 		
-		_menu.AppendMenuItem(MF_STRING, 3014, "Dark theme");
-		_menu.CheckMenuItem(3014, properties.darklayout);
+		_menu.AppendMenuItem(MF_STRING, 3014, "Force dark theme");
+		_menu.CheckMenuItem(3014, properties.forcedarklayout);
 		_menu.AppendMenuItem(MF_STRING, 3027, "Compact controls");
 		_menu.CheckMenuItem(3027, mini_controlbar.isActive());		
 		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
@@ -2697,15 +2760,9 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;					 		
             case (idx == 3014):
-				if(layout_state.isEqual(0)) {
-					properties.maindarklayout=!properties.maindarklayout;
-					window.SetProperty("_DISPLAY: Main layout:Dark", properties.maindarklayout); 
-					window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);						
-				} else {
-					properties.minidarklayout=!properties.minidarklayout;
-					window.SetProperty("_DISPLAY: Mini layout:Dark", properties.minidarklayout); 	
-					window.NotifyOthers("controls_mini_dark_layout", properties.minidarklayout);					
-				}
+				properties.forcedarklayout=!properties.forcedarklayout;
+				window.SetProperty("_DISPLAY: force dark layout", properties.maindarklayout); 
+				window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);						
 				get_colors();
 				window.Repaint();
                 break;
@@ -2860,7 +2917,10 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 				this.H_img=repeat_all_hover;				
 			} else if(plman.PlaybackOrder==2) {
 				this.N_img=repeat_track;
-				this.H_img=repeat_track_hover;				
+				this.H_img=repeat_track_hover;			
+			} else if(plman.PlaybackOrder==0 && properties.playandrandom) {
+				this.N_img=repeat_random;
+				this.H_img=repeat_random_hover;								
 			} else {
 				this.N_img=repeat_img;
 				this.H_img=repeat_img_hover;				

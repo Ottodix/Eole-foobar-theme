@@ -1404,9 +1404,6 @@ function draw_main_menu(x,y){
 	nowplayinglobal.AppendTo(appearance_menu,MF_STRING, "Right playlist");	
 	appearance_menu.AppendMenuItem(MF_STRING, 4046, "Enable resizable borders");
 	appearance_menu.CheckMenuItem(4046, globalProperties.enableResizableBorders);
-	appearance_menu.AppendMenuSeparator(); 
-	appearance_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
-	appearance_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");		
 
 	wallpaper_visibility_global = window.CreatePopupMenu();
 	wallpaper_visibility_global.AppendMenuItem(MF_STRING, 40051, "Enable");	
@@ -1417,7 +1414,25 @@ function draw_main_menu(x,y){
 	appearance_menu.AppendMenuSeparator(); 
 	wallpaper_visibility_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers visibility");			
 	wallpaper_blur_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers blur");
-		
+	
+	colors_menu = window.CreatePopupMenu();
+	colors_menu.AppendTo(skin_settings_menu,MF_STRING, "Colors");
+	colors_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");	
+	colors_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
+	colors_menu.AppendMenuSeparator(); 	
+	if(!properties.darklayout){
+		colors_menu.AppendMenuItem(MF_DISABLED, 0, "Light settings:");		
+		colors_menu.AppendMenuItem(MF_STRING, 5001, "Pure white");	
+		colors_menu.AppendMenuItem(MF_STRING, 5002, "White and album art");		
+		colors_menu.AppendMenuItem(MF_STRING, 5003, "White and grey and album art");
+		colors_menu.CheckMenuItem(5001+globalProperties.colors, true);
+	} else {
+		colors_menu.AppendMenuItem(MF_DISABLED, 0, "Dark settings:");		
+		colors_menu.AppendMenuItem(MF_STRING, 5001, "Pure Dark");	
+		colors_menu.AppendMenuItem(MF_STRING, 5002, "Dark and album art");		
+		colors_menu.AppendMenuItem(MF_STRING, 5003, "Dark and coal and album art");
+		colors_menu.CheckMenuItem(5001+globalProperties.colors, true);		
+	}
 	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4023, "Load all covers at startup");
@@ -1820,6 +1835,11 @@ function draw_main_menu(x,y){
     case (idx == 5000):
 		lyrics_state.setValue(0);
         break;		
+    case (idx >= 5001 && idx < 5010):
+		globalProperties.colors = idx-5001;
+		window.SetProperty("GLOBAL colors",globalProperties.colors);
+		window.NotifyOthers("colors",globalProperties.colors);
+        break;				
     }
 
     basemenu = undefined;

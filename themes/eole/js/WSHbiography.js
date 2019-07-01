@@ -3102,7 +3102,8 @@ function Timers() {
         const timer_dl = () => {this.dl.id = setTimeout(func, times[counter]);}
         timer_dl();
     }
-    this.image = () => {if (!p.server) return; this.clear(this.img); this.img.id = setInterval(() => {img.fresh(); men.fresh(); window.NotifyOthers("img_chg_bio", 0);}, 1000);}
+    this.image = () => {if (!p.server) return; this.clear(this.img); this.img.id = setInterval(() => {img.fresh(); men.fresh(); //window.NotifyOthers("img_chg_bio", 0);
+	}, 1000);}
 }
 timer.image();
 
@@ -3785,6 +3786,8 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 
 // Add to on_notify_data
 // case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
+
+// Comment window.NotifyOthers("img_chg_bio", 0)
 
 function SimpleButtonManager(){
 	this.buttons = {};

@@ -76,7 +76,7 @@ function setButtons(){
 			fb.Pause();
 		},images.pause_img,images.pause_img),
 		Random: new SimpleButton( ww/2-images.pause_img.Width/2, wh/2-images.pause_img.Height/2+global_vertical_fix, 74, 74, "Random", function () {
-			play_random(true,properties.random_function);
+			play_random(properties.random_function);
 		},null,images.random_img,images.random_img)         
 	}  
 } 
@@ -355,7 +355,7 @@ function on_mouse_lbtn_down(x, y) {
         window.Repaint();
     }
     if(!fb.IsPlaying) {
-        play_random(true,properties.random_function);
+        play_random(properties.random_function);
     } else if(!click_on_btn) {
         showNowPlaying(false);      
     }  
@@ -694,11 +694,14 @@ function on_notify_data(name, info) {
 			window.Repaint();
 		break;		
 		case "playRandom":
-			if(info >= 1000 && info < 2001) properties.random_function = '1_genre';
-			else properties.random_function = info;
+			properties.random_function = info;
 			window.SetProperty("Random function", properties.random_function);
-			play_random(true,info);        
+			play_random(info);        
 		break; 
+		case "SetRandom":
+			properties.random_function = info;
+			window.SetProperty("Random function", properties.random_function);  
+		break; 		
 		case "main_panel_state":
 			if(main_panel_state!=info) {
 				main_panel_state.value = info;
@@ -747,6 +750,10 @@ function on_notify_data(name, info) {
 		break;			
 		case "Randomsetfocus":
 			Randomsetfocus = info;
+			if (!Randomsetfocus && properties.random_function >= 1000 && properties.random_function < 2001){
+                properties.random_function = '1_genre';
+                window.SetProperty("Random function", properties.random_function);
+			}
 			window.Repaint();
 		break; 	
 		case "layout_state":
@@ -884,37 +891,37 @@ function on_mouse_rbtn_up(x, y){
 			properties.random_function = '20_albums';
 			window.SetProperty("Random function", properties.random_function);
 			window.NotifyOthers("SetRandom", properties.random_function);                
-			play_random(true,properties.random_function);
+			play_random(properties.random_function);
 			break;
 		case (idx == 3):
 			properties.random_function = '200_tracks';
 			window.SetProperty("Random function", properties.random_function);
 			window.NotifyOthers("SetRandom", properties.random_function);                
-			play_random(true,properties.random_function);
+			play_random(properties.random_function);
 			break;
 		case (idx == 4):
 			properties.random_function = '1_genre';
 			window.SetProperty("Random function", properties.random_function);
 			window.NotifyOthers("SetRandom", properties.random_function);                
-			play_random(true,properties.random_function);
+			play_random(properties.random_function);
 			break;	   
 		case (idx == 5):
 			properties.random_function = '1_artist';
 			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("playRandom", properties.random_function); 
-			play_random(true,properties.random_function);				
+			window.NotifyOthers("SetRandom", properties.random_function); 
+			play_random(properties.random_function);				
 			break;						
 		case (idx >= 1000 && idx < 2001):
-			properties.random_function = '1_genre';
+			properties.random_function = idx;
 			window.SetProperty("Random function", properties.random_function);
 			window.NotifyOthers("SetRandom", properties.random_function);                
-			play_random(true,idx);
+			play_random(idx);
 			break;  				
 		case (idx == 7):
 			properties.random_function = 'default';
 			window.SetProperty("Random function", properties.random_function);
 			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(true,properties.random_function);
+			play_random(properties.random_function);
 			break;				
 		case (idx == 6):
 			fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
