@@ -28,7 +28,8 @@ var properties = {
     visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", false),
 	playandrandom: window.GetProperty("GLOBAL play and random",false),
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
-	panelFontAdjustement: -1	
+	panelFontAdjustement: -1,
+	repeatRandom: false,
 }
 
 scheduler = {	
@@ -594,7 +595,7 @@ function build_buttons(){
 			Randomize=!Randomize		
 		},shuffle_img_active,shuffle_img_hover),
 		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat",false, function () {
-			if(plman.PlaybackOrder==0 && !properties.playandrandom) {
+			if(plman.PlaybackOrder==0 && !properties.playandrandom && properties.repeatRandom) {
 				properties.playandrandom = true;
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);
 			} else if(plman.PlaybackOrder==0) {
@@ -1515,8 +1516,7 @@ function on_notify_data(name, info) {
 				g_image_cache.resetMetadb(metadb[0]);
 				g_wallpaperImg = null;
 				window.Repaint();				
-			};
-				
+			};				
 		break;  		
 		case "rating_updated": 
 			if(current_played_track && info.Compare(current_played_track)){
