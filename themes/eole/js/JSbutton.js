@@ -340,7 +340,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				} else {
 					if(old){
 						old.changeState(ButtonStates.normal);
-						if(g_cursor.getCursor()==IDC_HAND) g_cursor.setCursor(IDC_ARROW);			
+						if(g_cursor.getCursor()==IDC_HAND) g_cursor.setCursor(IDC_ARROW,1);			
 					}
 					if(this.cur_btn){
 						this.cur_btn.changeState(ButtonStates.hover);		
@@ -355,7 +355,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				if (this.cur_btn) {
 					this.cur_btn.changeState(ButtonStates.normal);
 					this.cur_btn=null;   
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,2);
 					window.Repaint();					
 				}			
 			break;

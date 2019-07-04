@@ -4526,6 +4526,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 };
 
 function on_mouse_leave() {
+	g_cursor.onMouse("leave", -1, -1);		
 	g_resizing.on_mouse("leave", -1, -1);	
     // inputBox
     if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {

@@ -493,7 +493,7 @@ function build_buttons(){
 			}, false,false,images.idle_img,images.idle_img,-1, false, false, true),				
 			ShowSearch: new JSButton(-150, btn.top_m, btn.width_small_btns, btn.height, "", "search", function () {
 				toggleSearch();
-				g_cursor.setCursor(IDC_ARROW);					
+				g_cursor.setCursor(IDC_ARROW,2);					
 			}, false,false,images.search_toggle_img,images.search_toggle_img,-1, false, false, true),				
 			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", function () {
 				draw_main_menu(0, 28);
@@ -2231,7 +2231,7 @@ oSearch = function() {
 		if(!this.hide) {
 			buttons.ShowSearch.setVisibility(false);
 		} else {
-			if(this.hide && !properties.alwaysShowSearch) g_cursor.setCursor(IDC_ARROW);
+			if(this.hide && !properties.alwaysShowSearch) g_cursor.setCursor(IDC_ARROW,1);
 			buttons.ShowSearch.setVisibility(true);
 			this.clearInputbox(true);
 		}

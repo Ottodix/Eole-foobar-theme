@@ -1081,6 +1081,7 @@ function on_mouse_move(x,y,m){
 }
 
 function on_mouse_leave() {
+	g_cursor.onMouse("leave", -1, -1);		
 	is_over_panel = false;
 	ResetVolume();
 	if(!timers.hideVolume) showVolumeSlider(false);

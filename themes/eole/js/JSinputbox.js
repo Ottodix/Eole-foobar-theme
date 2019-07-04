@@ -297,7 +297,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 				if(this.hover || this.drag) {
 					g_cursor.setCursor(IDC_IBEAM,'inputbox');		
 				} else if(this.ibeam_set) {
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,5);
 				}
 				this.ibeam_set = (this.hover || this.drag);
                 break;

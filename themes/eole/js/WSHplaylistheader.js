@@ -876,6 +876,7 @@ function is_hover_title(x,y){
 	return (x > margin_left && x < margin_left + main_txt_space)
 }
 function on_mouse_leave() {
+	g_cursor.onMouse("leave", -1, -1);		
     g_down = false;    
 	g_tooltip.Deactivate();
     if (cur_btn) {
@@ -883,8 +884,6 @@ function on_mouse_leave() {
         window.Repaint();
         cur_btn=null;        
     } 
-	g_cursor.x = 0;
-    g_cursor.y = 0;	
 }
 function on_mouse_lbtn_down(x, y) {     
     cur_btn_down = chooseButton(x, y);

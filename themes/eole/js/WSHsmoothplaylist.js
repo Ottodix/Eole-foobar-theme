@@ -739,7 +739,7 @@ oPlaylistManager = function(name) {
             case "up":
                 brw.drag_clicked = false;
                 if(brw.drag_moving) {
-                    g_cursor.setCursor(IDC_ARROW);
+                    g_cursor.setCursor(IDC_ARROW,5);
                     this.drop_done = false;
                     if(this.activeIndex > -1) {
                         brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
@@ -3556,7 +3556,7 @@ oBrowser = function(name) {
 					
                 } else if(!this.drag_tracks){
                     if(this.cursorHand) {
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,1);
 						this.cursorHand = false;
 						try{
 							if(this.hoverRatingRow>-1){
@@ -3804,8 +3804,6 @@ oBrowser = function(name) {
             };
             if(previous != properties.groupHeaderRowsNumber) {
                 timers.mouseWheel = setTimeout(function() {
-					
-					
 					if(properties.doubleRowText) {
 						setOneProperty("groupHeaderRowsNumberDouble", properties.groupHeaderRowsNumber);
 					} else {
@@ -4838,7 +4836,7 @@ function on_mouse_lbtn_up(x, y, m) {
         }		
 		on_drag_leave();
 		brw.drag_tracks = false;
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,2);
 		brw.repaint();
 	}	
 	else if(properties.DropInplaylist && pman.state == 1) {
@@ -4899,7 +4897,7 @@ function on_mouse_rbtn_down(x, y, mask) {
 		brw.drag_clicked = false;		
 		on_drag_leave();
 		brw.drag_tracks = false;
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,3);
 		brw.repaint();
 	}	    
     if(!utils.IsKeyPressed(VK_SHIFT)) {
@@ -4920,7 +4918,7 @@ function on_mouse_mbtn_down(x, y, mask) {
 		brw.drag_clicked = false;
 		on_drag_leave();
 		brw.drag_tracks = false;
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,4);
 		brw.repaint();
 	}		
 }

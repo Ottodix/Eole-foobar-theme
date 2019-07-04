@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b1',
+	theme_version: '1.2.2b2',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -161,24 +161,25 @@ var oCursor = function () {
 	this.setCursor = function(cursor_code,active_zone,numberOfTry){
 		var active_zone = typeof active_zone !== 'undefined' ? active_zone : "";
 		var numberOfTry = typeof numberOfTry !== 'undefined' ? numberOfTry : 1;		
+		
+		if(this.x<0 || this.y<0 || this.x>ww || this.y>wh) return;
+		
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
+		//console.log(active_zone+" - "+cursor_code+' - '+properties.panelName+" this.x"+this.x+" ww"+ww+" this.y"+this.y+" wh"+wh)
 		if(numberOfTry>1 && !this.timer){
 			this.timerExecution = 0;
-			this.timer = setInterval(function() {
+			this.timer = setInterval(function(numberOfTry, cursor_code) {
 				g_cursor.timerExecution++;
 				window.SetCursor(g_cursor.cursor);
 				if(g_cursor.timerExecution >= numberOfTry) {
 					window.ClearInterval(g_cursor.timer);
 					g_cursor.timer = false;
 				};
-			}, 2);
-		}
-		//for(i=0;i<numberOfTry;i++) {
-		else	
+			}, 2, numberOfTry, cursor_code);
+		} else {
 			window.SetCursor(cursor_code);
-		//}
-		//console.log(cursor_code+" "+this.active_zone)
+		}
 	}
 	this.getCursor = function(){
 		return this.cursor;
@@ -266,7 +267,6 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 		if(status!="cancel"){
 			//for(i=0;i<input_values.length;i++) input_values_string+=input_values[i];
 			//fb.ShowPopupMessage('ok_callback status:'+status+" - "+input_values, "ok_callback_title");
-			console.log(input_values);
 			var input_values = input_values.split('##');
 			var refresh_filters = false;
 			switch(properties.tagMode) {
@@ -603,13 +603,12 @@ oTooltip = function (varName) {
 			this.offset_y = y - g_cursor.y;
 			followMouse = typeof followMouse !== 'undefined' ? followMouse : false;				
 			maxWith = typeof maxWith !== 'undefined' ? maxWith : 0;
-			var activeTooltip = this;
 			this.showTimer && clearTimeout(this.showTimer);
-			this.showTimer = setTimeout(function () {
+			this.showTimer = setTimeout(function (activeTooltip) {
 				activeTooltip.Activate(new_text, g_cursor.x + activeTooltip.offset_x, g_cursor.y + activeTooltip.offset_y, maxWith, followMouse, activeZone);
 				window.ClearInterval(this.showTimer);
 				activeTooltip.showTimer = false;
-			}, delay);	
+			}, delay, this);	
 		}
     };	
     this.Activate = function(new_text, x, y, maxWith, followMouse, activeZone) {
@@ -872,7 +871,7 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 							this.over_resizing_right = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);
 						} else if(g_cursor.getActiveZone()==this.panelName && !this.resizing_left_active){
-							g_cursor.setCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW,'1');
 							this.over_resizing_left = false;
 							this.over_resizing_right = false;							
 						} else {
@@ -916,14 +915,14 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 					this.over_resizing_right = false;
 					this.resizing_x = 0;
 					window.Repaint();
-					g_cursor.setCursor(IDC_ARROW);
+					if(g_cursor.getActiveZone()==this.panelName) g_cursor.setCursor(IDC_ARROW,2);
 				}				
 				this.enableSizing(m);
 				return return_var;
 				
 			break;
 			case "leave":
-				g_cursor.setCursor(IDC_ARROW); 
+				g_cursor.setCursor(IDC_ARROW,3); 
 			break;
 		}
 	}
@@ -1928,7 +1927,7 @@ function pickRandom(metadb_list, nb_of_items){
 function play_random(random_function, addAtTheEnd){
 	var random_function = typeof random_function !== 'undefined' ? random_function : '200_tracks';	
 	var addAtTheEnd = typeof addAtTheEnd !== 'undefined' ? addAtTheEnd : false;	
-	console.log(random_function);
+
 	switch(random_function) {
 		case '20_albums':
 			var number_of_items = addAtTheEnd?1:25;
@@ -2298,7 +2297,7 @@ button = function (normal, hover, down, name) {
 			g_cursor.setCursor(IDC_HAND,this.name);	
 			this.cursor = IDC_HAND;
 		} else if((this.old==ButtonStates.hover || this.old==ButtonStates.down) && this.state!=ButtonStates.hover && this.state!=ButtonStates.down && this.cursor!=IDC_ARROW && g_cursor.getActiveZone()==this.name) {
-			g_cursor.setCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW,4);
 			this.cursor = IDC_ARROW;			
 		} 
 		if(event=="hover") return this.ishover;
@@ -2828,7 +2827,7 @@ oImageCache = function () {
 						this.cover_load_timer = Array();
 					} else if(!direct_return){
 						if(this.cover_load_timer.length<10) {
-							this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
+							this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(albumIndex, cachekey){
 								if(brw.groups[albumIndex].load_requested == 0){
 									try {							
 										if(properties.load_image_from_cache_direct) {
@@ -2843,7 +2842,7 @@ oImageCache = function () {
 									g_image_cache.cover_load_timer.pop();
 									brw.repaint();	
 								}
-							}, 5);
+							}, 5, albumIndex, cachekey);
 						}	
 					} else {
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename)
