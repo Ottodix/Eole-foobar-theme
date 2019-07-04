@@ -170,6 +170,7 @@ function _albumart (x, y, w, h) {
 	}
 	
 	let get_album_art = async (obj) => {
+		if (!panel.metadb) return;
 		let result = await utils.GetAlbumArtAsyncV2(window.ID, panel.metadb, obj.properties.id.value);
 		if (result.image) {
 			obj.img = result.image;

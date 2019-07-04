@@ -34,21 +34,23 @@ function clearInterval(timerID) { } // (void)
  * 
  * @param {function()} func
  * @param {number} delay
+ * @param {...*} func_args
  * @return {number}
  */
-function setInterval(func, delay) { } // (uint)
+function setInterval(func, delay, func_args) { } // (uint)
 
 /**
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout}.
  * 
  * @param {function()} func
  * @param {number} delay
+ * @param {...*} func_args
  * @return {number}
  *
  * @example
  * // See samples\basic\Timer.txt
  */
-function setTimeout(func, delay) { } // (uint)
+function setTimeout(func, delay, func_args) { } // (uint)
 
 /**
  * Load ActiveX object.

@@ -6,8 +6,8 @@ console.log(message)
 
 clearInterval(timer_id)
 clearTimeout(timer_id)
-setInterval(func, delay)
-setTimeout(func, delay)
+setInterval(func, delay[, param1, param2, ...])
+setTimeout(func, delay[, param1, param2, ...])
 
 fb.AlwaysOnTop
 fb.ComponentPath
