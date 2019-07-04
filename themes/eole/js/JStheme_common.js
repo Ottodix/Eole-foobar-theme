@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b2',
+	theme_version: '1.2.2b3',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -162,7 +162,8 @@ var oCursor = function () {
 		var active_zone = typeof active_zone !== 'undefined' ? active_zone : "";
 		var numberOfTry = typeof numberOfTry !== 'undefined' ? numberOfTry : 1;		
 		
-		if(this.x<0 || this.y<0 || this.x>ww || this.y>wh) return;
+		if(window.Name!='ArtistBio' && (this.x<0 || this.y<0 || this.x>ww || this.y>wh)) 
+			return;
 		
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
