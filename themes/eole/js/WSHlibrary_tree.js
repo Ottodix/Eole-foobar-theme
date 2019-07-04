@@ -6,6 +6,9 @@ var properties = {
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),	
+    genre_customGroup_label: window.GetProperty("_DISPLAY: genre customGroup name", ""),	
+    artist_customGroup_label: window.GetProperty("_DISPLAY: artist customGroup name", ""),
+    album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),		
 	headerbar_height:35,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
@@ -63,7 +66,7 @@ timers = {
 };
 
 var Update_Required_function = "";
-var draw_right_line = true;
+var draw_right_line = false;
 String.prototype.trim = function() {
     return this.replace(/^\s+|[\n\s]+$/g, "");
 }
@@ -90,10 +93,20 @@ oTagSwitcherBar = function() {
 				librarytree.setValue(0);		
 				window.NotifyOthers("left_filter_state","genre");				
 			}
-		);	
+		);		
 		this.items_width = new Array(0, 0, 0, 0);		
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");		
+
+		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
+			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();			
+		}
+		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
+			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();			
+		}
+		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
+			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();			
+		}
 		
 		properties.album_label = this.items_txt[1];
 		properties.artist_label = this.items_txt[2];
@@ -114,7 +127,7 @@ oTagSwitcherBar = function() {
 	this.margin_left = 6;	
 	this.images = {};
 	this.hide_bt = false;
-
+	
     this.setHideButton = function(){
 		this.hscr_btn_w = 18
 		var xpts_mtop = Math.ceil((this.h-9)/2);	
@@ -144,8 +157,8 @@ oTagSwitcherBar = function() {
 		if(this.hide_bt) this.setHideButton();
 	};
 	this.getImages();
-    
 	this.on_init = function() {
+		this.setItems_infos();
 		this.activeItem = 0;
     };
 	this.on_init();
@@ -154,14 +167,13 @@ oTagSwitcherBar = function() {
         this.w = w;
 		this.h = h;
 		this.font_size = font_size;
-		if(!this.hide_bt) this.setHideButton();		
+		if(!this.hide_bt) this.setHideButton();
     };
-    
 	this.draw = function(gr, x, y) {
 		this.x = x;
 		this.y = y;
 		var prev_text_width=0;
-
+		
 		// draw background part above playlist (headerbar)
 		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
 		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
@@ -172,10 +184,9 @@ oTagSwitcherBar = function() {
 			this.items_width[i] = gr.CalcTextWidth(this.items_txt[i],g_font.min1);
 			total_txt_size += this.items_width[i];
 		}
-
-		var txt_padding_sides = Math.round(((this.w-this.margin_left*2-this.margin_right-((draw_right_line)?1:0)-((p.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
+		var txt_padding_sides = Math.round(((this.w-(this.margin_left)*2-this.margin_right-((draw_right_line)?1:0)-((p.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
 		var tx = this.x + this.margin_left;
-		
+
 		//Draw texts
 		for(i = this.items_txt.length-1; i >= 0; i--) {
 			this.items_width[i] += txt_padding_sides;			
@@ -189,7 +200,7 @@ oTagSwitcherBar = function() {
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
-		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);			
+		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);	
     };
     this.setHoverStates = function(x, y){
 		var prev_hover_item = this.hoverItem;
@@ -4757,7 +4768,23 @@ function get_images() {
 	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn,"reset_bt");
 };
 function on_notify_data(name, info) {
-    switch(name) {
+    switch(name) {						
+		case "album_customGroup_label":
+			properties.album_customGroup_label = info;
+			window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
+			g_tagswitcherbar.on_init();
+		break; 		
+		case "genre_customGroup_label":
+		console.log()
+			properties.genre_customGroup_label = info;
+			window.SetProperty("_DISPLAY: album customGroup name", properties.genre_customGroup_label);
+			g_tagswitcherbar.on_init();
+		break; 	
+		case "artist_customGroup_label":
+			properties.artist_customGroup_label = info;
+			window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
+			g_tagswitcherbar.on_init();
+		break; 			
 		case "colors":
 			globalProperties.colorsMainPanel = info;
 			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);

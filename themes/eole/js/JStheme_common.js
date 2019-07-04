@@ -274,6 +274,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.album_customGroup_label==input_values[0])) {
 						properties.album_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
+						window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);							
 						refresh_filters = true;
 					}					
 					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
@@ -286,6 +287,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.artist_customGroup_label==input_values[0])) {
 						properties.artist_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
+						window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);						
 						refresh_filters = true;
 					}					
 					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
@@ -298,6 +300,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.genre_customGroup_label==input_values[0])) {
 						properties.genre_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
+						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);						
 						refresh_filters = true;
 					}					
 					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {

@@ -1067,7 +1067,7 @@ oTagSwitcherBar = function() {
 		}
 		var txt_padding_sides = Math.round(((this.w-(this.margin_left)*2-this.margin_right-((draw_right_line)?1:0)-((properties.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
 		var tx = this.x + this.margin_left;
-		
+
 		//Draw texts
 		for(i = this.items_txt.length-1; i >= 0; i--) {
 			this.items_width[i] += txt_padding_sides;			
@@ -3758,21 +3758,24 @@ oBrowser = function(name) {
 							properties.tf_groupkey_album = properties.tf_groupkey_album_default;
 							window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);	
 							properties.album_customGroup_label = "";
-							window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);							
+							window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);	
+							window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);							
                             break;
                         case 2:
 							properties.tf_groupkey_artist = properties.tf_groupkey_artist_default;	
 							window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);							
                             properties.albumArtId = 4;
 							properties.artist_customGroup_label = "";
-							window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);							
+							window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);			
+							window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);							
                             break;
                         case 3:
 							properties.tf_groupkey_genre = properties.tf_groupkey_genre_default;						
 							window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);									
                             properties.albumArtId = 5;
 							properties.genre_customGroup_label = "";
-							window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);							
+							window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
+							window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);
                             break;
                     };
                     g_tagswitcherbar.on_init();
