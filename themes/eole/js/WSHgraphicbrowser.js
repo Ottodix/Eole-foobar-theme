@@ -3818,6 +3818,7 @@ oBrowser = function(name) {
 	this.groups_draw = [];
 	this.activeRow=0;
 	this.activeIndexSaved = -1;
+	this.activeTextIndex = -1;
 	this.album_Rclicked_index = -1;
     this.rows = [];
     this.rowHeight = 0;
