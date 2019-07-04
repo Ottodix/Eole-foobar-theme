@@ -133,14 +133,22 @@ function setAllProperties(){
 }
 setAllProperties();
 
-function setOneProperty(properties_name,value,update_both) {
+function setOneProperty(properties_name,value,update_both,layout_state_2_update) {
 	var update_both = typeof update_both !== 'undefined' ? update_both : false;	
-	if(update_both || layout_state.isEqual(1)){
-        properties[properties_name] = value;
+	if(typeof layout_state_2_update !== 'undefined'){
+		var update_current_layout_state = false;
+	} else {
+		var update_current_layout_state = true;
+		var layout_state_2_update = layout_state.value;		
+	}
+	var layout_state_2_update = typeof layout_state_2_update !== 'undefined' ? layout_state_2_update : layout_state.value;		
+
+	if(update_both || layout_state_2_update==1){
+        if(update_current_layout_state) properties[properties_name] = value;
         properties_mini[properties_name] = value;
 		window.SetProperty("MINI:"+properties_name, value);
 	}
-	if(update_both || layout_state.isEqual(0)){
+	if(update_both || layout_state_2_update==0){
         properties[properties_name] = value;
         properties_big[properties_name] = value;	
 		window.SetProperty("BIG:"+properties_name, value);		
@@ -4714,6 +4722,8 @@ function on_paint(gr) {
             };
         };
     };
+	
+	if(main_panel_state.isEqual(2) && layout_state.isEqual(0) && !properties.darklayout) gr.FillSolidRect(0, wh-1, ww, 1, colors.line_top_dark);	
 };
 
 function on_mouse_lbtn_down(x, y, m) {
@@ -5203,6 +5213,7 @@ function get_colors() {
 		colors.albumartprogressbar_overlay = GetGrey(0,80);	
 		colors.albumartprogressbar_rectline = GetGrey(0,40);		
 	}
+	colors.line_top_dark = GetGrey(200);
 };
 
 function on_font_changed() {
@@ -6258,9 +6269,9 @@ function stopFlashNowPlaying() {
 function on_notify_data(name, info) {
     switch(name) {
 		case "colors":
-			globalProperties.colors = info;
-			window.SetProperty("GLOBAL colors", globalProperties.colors);
-			setOneProperty("AlbumArtProgressbar",(globalProperties.colors!=0),true);	
+			globalProperties.colorsMainPanel = info;
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
+			setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMainPanel!=0));	
 			get_images();
 			brw.repaint();	
 		break; 						
@@ -6359,10 +6370,19 @@ function on_notify_data(name, info) {
 			window.Repaint();
 		break; 			
 		case "minimode_dark_theme":
-			setOneProperty("minimode_dark_theme",info, true);
-			on_colours_changed();				
-			window.Repaint();
-		break; 
+			if(info===true || info===false) {
+				setOneProperty("minimode_dark_theme",info, true);
+				on_colours_changed();		
+			} else {
+				setOneProperty("minimode_dark_theme",(info==2 || info==3), true);
+				globalProperties.colorsMiniPlayer = info;
+				window.SetProperty("GLOBAL colorsMiniPlayer", globalProperties.colorsMiniPlayer);
+				setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),false);	
+				toggleWallpaper((globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),1);
+				get_images();on_colours_changed();			
+			}		
+			brw.repaint();					
+		break;
 		case "bio_dark_theme":
 			setOneProperty("bio_dark_theme",info, true);
 			on_colours_changed();
@@ -6772,9 +6792,11 @@ function on_drag_drop(action, x, y, mask) {
     window.Repaint();
 };
 
-function toggleWallpaper(wallpaper_state){
-	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
-	setOneProperty("showwallpaper",wallpaper_state);
+function toggleWallpaper(wallpaper_state, layout_state_2_update){
+	var wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
+	var layout_state_2_update = typeof layout_state_2_update !== 'undefined' ? layout_state_2_update : undefined;		
+	
+	setOneProperty("showwallpaper",wallpaper_state, false, layout_state_2_update);
 	on_colours_changed();					
 	if(properties.showwallpaper) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);

@@ -4,7 +4,6 @@ var properties = {
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
     random_function: window.GetProperty("Random function", "default"),	
 	remaining_time: window.GetProperty("Show remaining time",false),
-	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),		
 	maindarklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),		
 	minidarklayout: window.GetProperty("_DISPLAY: Mini layout:Dark", true),		
 	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
@@ -294,23 +293,24 @@ function build_images(){
 }
 var colors = {};
 function get_colors(){
-	if(properties.forcedarklayout) properties.darklayout = true;
+	if(globalProperties.colorsControls==0 || globalProperties.colorsControls==1) properties.darklayout = false;
+	else if(globalProperties.colorsControls==2 || globalProperties.colorsControls==3) properties.darklayout = true;
 	else if(layout_state.isEqual(0)) {
 		switch(main_panel_state.value){
 			case 0:
-				properties.darklayout = properties.library_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.library_dark_theme || (globalProperties.colorsMainPanel!=0 && globalProperties.colorsMainPanel!=1 && globalProperties.colorsMainPanel!=2);
 			break;
 			case 1:
-				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colorsMainPanel!=0 && globalProperties.colorsMainPanel!=1 && globalProperties.colorsMainPanel!=2);
 			break;
 			case 2:
-				properties.darklayout = properties.bio_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.bio_dark_theme || (globalProperties.colorsMainPanel!=0 && globalProperties.colorsMainPanel!=1 && globalProperties.colorsMainPanel!=2);
 			break;
 			case 3:
-				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colorsMainPanel!=0 && globalProperties.colorsMainPanel!=1 && globalProperties.colorsMainPanel!=2);
 			break;
 		}
-	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colors!=0);
+	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colorsMainPanel!=0 && globalProperties.colorsMainPanel!=1 && globalProperties.colorsMainPanel!=2);
 	get_colors_global();	
 	if(properties.darklayout) {		
 		colors.wallpaper_overlay = GetGrey(0,200);
@@ -325,7 +325,7 @@ function get_colors(){
 		colors.normal_txt = GetGrey(255);		
 	} else {			
 		colors.wallpaper_overlay = GetGrey(255,235);
-		colors.wallpaper_overlay_blurred = GetGrey(255,235);					
+		colors.wallpaper_overlay_blurred = GetGrey(255,225);					
 		colors.slidersOn=GetGrey(30);
 		colors.slidersOff=GetGrey(30,32); 		
 		colors.ellipse_inner=GetGrey(255);
@@ -738,7 +738,7 @@ function on_paint(gr) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
 		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
 	}
-	
+
 	switch(true){
 		case (layout_state.isEqual(0) && screensaver_state.isActive() && properties.screensaver_dark_theme && properties.darklayout):		
 		case (layout_state.isEqual(1) && properties.minimode_dark_theme && properties.darklayout):		
@@ -829,7 +829,7 @@ function on_paint(gr) {
 			gr.DrawImage(slider2draw,volume_vars.margin_left+volume_vars.volumesize-Math.round(slider2draw.Width/2)-1,volume_vars.margin_top-Math.round(slider2draw.Height/2)+1,slider2draw.Width,slider2draw.Height,0,0,slider2draw.Width,slider2draw.Height,0,255);	
 		}		
 	}
-    drawAllButtons(gr);	
+    drawAllButtons(gr);		
 }
 
 function is_hover_volume(x,y){	
@@ -1463,19 +1463,30 @@ function on_key_down(vkey) {
 }	
 function on_notify_data(name, info) {
     switch(name) {	
-		case "colors":
-			globalProperties.colors = info;
-			window.SetProperty("GLOBAL colors", globalProperties.colors);
+		case "colors": 
+			globalProperties.colorsMainPanel = info; 
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);	
+			if(globalProperties.colorsControls==4){
+				properties.showwallpaper = (globalProperties.colorsControls!=2 && globalProperties.colorsControls!=0 && !(globalProperties.colorsControls==4 && (globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==3)));
+				window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);				
+				get_colors();
+			}			
+		break; 				
+		case "colorsControls": 
+			globalProperties.colorsControls = info; 
+			window.SetProperty("GLOBAL colorsControls", globalProperties.colorsControls);
 			if(layout_state.isEqual(0)) {
-				properties.maindarklayout=(globalProperties.colors!=0);				
-				window.SetProperty("_DISPLAY: Main layout:Dark", properties.maindarklayout); 
-				window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);						
+				if(info!=4) {
+					properties.maindarklayout=(globalProperties.colorsControls!=0);				
+					window.SetProperty("_DISPLAY: Main layout:Dark", properties.maindarklayout); 
+					window.NotifyOthers("controls_main_dark_layout", properties.maindarklayout);		
+				}				
 			} else {
-				properties.minidarklayout=(globalProperties.colors!=0);				
+				properties.minidarklayout=(globalProperties.colorsControls!=0);				
 				window.SetProperty("_DISPLAY: Mini layout:Dark", properties.minidarklayout); 	
 				window.NotifyOthers("controls_mini_dark_layout", properties.minidarklayout);
 			}			
-			properties.showwallpaper = (globalProperties.colors!=0);
+			properties.showwallpaper = (globalProperties.colorsControls!=2 && globalProperties.colorsControls!=0 && !(globalProperties.colorsControls==4 && (globalProperties.colorsMainPanel==3 || globalProperties.colorsMainPanel==0)));
 			window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);				
 			get_colors();	
 			window.Repaint();
@@ -2661,8 +2672,6 @@ function draw_settings_menu(x,y){
 		var _menu_slider = window.CreatePopupMenu();			
         var idx;
 		
-		_menu.AppendMenuItem(MF_STRING, 3014, "Force dark theme");
-		_menu.CheckMenuItem(3014, properties.forcedarklayout);
 		_menu.AppendMenuItem(MF_STRING, 3027, "Compact controls");
 		_menu.CheckMenuItem(3027, mini_controlbar.isActive());		
 		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
@@ -2759,13 +2768,6 @@ function draw_settings_menu(x,y){
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				window.Repaint();
 				break;					 		
-            case (idx == 3014):
-				properties.forcedarklayout=!properties.forcedarklayout;
-				window.SetProperty("_DISPLAY: force dark layout", properties.forcedarklayout); 
-				window.NotifyOthers("controls_force_dark_layout", properties.forcedarklayout);						
-				get_colors();
-				window.Repaint();
-                break;
             case (idx == 3015):
 				if(layout_state.isEqual(0)){
 					showtrackinfo_big.toggleValue();

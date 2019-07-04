@@ -2953,8 +2953,8 @@ function g_sendResponse() {
 function on_notify_data(name, info) {
     switch(name) {
 		case "colors":
-			globalProperties.colors = info;
-			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			globalProperties.colorsMainPanel = info;
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
 			on_colours_changed();
 		break; 						
 		case "enableResizableBorders":

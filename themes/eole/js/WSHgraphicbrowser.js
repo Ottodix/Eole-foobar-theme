@@ -4918,10 +4918,10 @@ oBrowser = function(name) {
 					if((this.TooltipAlbum!=this.activeIndex || (this.activeIndex>-1 && this.groups[this.groups_draw[this.activeIndex]].text_y > y)) && this.TooltipAlbum > -1) {
 						this.TooltipAlbum = -1;
 						g_tooltip.Deactivate();	
-					}						
-					if(this.activeIndex>-1 && this.TooltipAlbum!=this.activeIndex && this.groups[this.groups_draw[this.activeIndex]].showToolTip && this.groups[this.groups_draw[this.activeIndex]].text_y < y){
-							this.TooltipAlbum=this.activeIndex;	
-							new_tooltip_text=this.groups[this.groups_draw[this.activeIndex]].firstRow+'\n'+this.groups[this.groups_draw[this.activeIndex]].secondRow;
+					}				
+					if(this.activeTextIndex>-1 && this.TooltipAlbum!=this.activeTextIndex && this.groups[this.groups_draw[this.activeTextIndex]].showToolTip && this.groups[this.groups_draw[this.activeTextIndex]].text_y < y){
+							this.TooltipAlbum=this.activeTextIndex;	
+							new_tooltip_text=this.groups[this.groups_draw[this.activeTextIndex]].firstRow+'\n'+this.groups[this.groups_draw[this.activeTextIndex]].secondRow;
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay,1000);		
 					}
 				}				
@@ -4984,10 +4984,7 @@ oBrowser = function(name) {
             
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((y + scroll_ - this.y - this.CoverMarginTop-1 - ((y > g_showlist.y)?g_showlist.h:0))%this.rowHeight>this.coverRealWith){
-						this.activeColumn = 0;
-						this.activeIndex = -1;						
-					} else if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
 						this.activeColumn = 0;
 						this.activeIndex = -1;	
 					} else {
@@ -4995,6 +4992,11 @@ oBrowser = function(name) {
 						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
 						this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
 						this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+						if((y + scroll_ - this.y - this.CoverMarginTop-1 - ((y > g_showlist.y)?g_showlist.h:0))%this.rowHeight>this.coverRealWith){
+							this.activeTextIndex = this.activeIndex;
+							this.activeIndex = -1;
+							this.activeColumn = 0;
+						}
 					}				
 				} else {
 					if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
@@ -6460,10 +6462,10 @@ function get_colors() {
 	}
 	
 	if(properties.darklayout){			
-		if(globalProperties.colors==0 || globalProperties.colors==1){
+		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.showlist_bg = GetGrey(25);	
 			colors.showlist_border_color = GetGrey(255,30);
-		} else if(globalProperties.colors==2){
+		} else if(globalProperties.colorsMainPanel==2){
 			colors.showlist_bg = GetGrey(0);	
 			colors.showlist_border_color = GetGrey(255,50);			
 		}		
@@ -6529,10 +6531,10 @@ function get_colors() {
 		colors.showlist_dragtrackbg = GetGrey(255,175);	
 		colors.showlist_dragitemstxt = GetGrey(0);		
 	} else {		
-		if(globalProperties.colors==0 || globalProperties.colors==1){
+		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.showlist_bg = GetGrey(0,0);	
 			colors.showlist_border_color = GetGrey(210);
-		} else if(globalProperties.colors==2){
+		} else if(globalProperties.colorsMainPanel==2){
 			colors.showlist_bg = GetGrey(0,10);	
 			colors.showlist_border_color = GetGrey(210);		
 		}		
@@ -6943,10 +6945,10 @@ function on_notify_data(name, info) {
     switch(name) {
 		case "colors":
 			if(layout_state.isEqual(0)) {
-				globalProperties.colors = info;
-				window.SetProperty("GLOBAL colors", globalProperties.colors);
-				properties.showListColored = (globalProperties.colors!=0);
-				properties.AlbumArtProgressbar = (globalProperties.colors!=0);							
+				globalProperties.colorsMainPanel = info;
+				window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
+				properties.showListColored = (globalProperties.colorsMainPanel!=0);
+				properties.AlbumArtProgressbar = (globalProperties.colorsMainPanel!=0);							
 				window.SetProperty("TRACKLIST Blurred album art progress bar", properties.AlbumArtProgressbar);		
 				window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);				
 				get_colors();			

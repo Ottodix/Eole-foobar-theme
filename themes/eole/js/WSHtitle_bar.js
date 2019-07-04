@@ -275,7 +275,7 @@ function get_colors(){
 		colors.wallpaper_overlay = GetGrey(255,252);
 		colors.wallpaper_overlay_blurred = GetGrey(255,252);
 		colors.albumartbg_overlay = GetGrey(0,80);	
-		
+
 		colors.btn_inactive_opacity = 255;	
 		colors.inactive_txt = GetGrey(0);
 		colors.active_tab = GetGrey(0);
@@ -309,7 +309,7 @@ function Lightswitch(switch_all,new_state){
 	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;
 	new_state = typeof new_state !== 'undefined' ? new_state : !properties.darklayout;	
 
-	if(layout_state.isEqual(1) || switch_all){
+	if(layout_state.isEqual(1) && !switch_all){
 		if(switch_all) properties.minimode_dark_theme=new_state;
 		else properties.minimode_dark_theme=!properties.minimode_dark_theme;   
         window.NotifyOthers("minimode_dark_theme",properties.minimode_dark_theme);
@@ -1417,22 +1417,42 @@ function draw_main_menu(x,y){
 	
 	colors_menu = window.CreatePopupMenu();
 	colors_menu.AppendTo(skin_settings_menu,MF_STRING, "Colors");
-	colors_menu.AppendMenuItem(MF_STRING, 4022,"Light theme globally");	
-	colors_menu.AppendMenuItem(MF_STRING, 4021,"Dark theme globally");	
-	colors_menu.AppendMenuSeparator(); 	
-	if(!properties.darklayout){
-		colors_menu.AppendMenuItem(MF_DISABLED, 0, "Light settings:");		
-		colors_menu.AppendMenuItem(MF_STRING, 5001, "Pure white");	
-		colors_menu.AppendMenuItem(MF_STRING, 5002, "White and album art");		
-		colors_menu.AppendMenuItem(MF_STRING, 5003, "White and grey and album art");
-		colors_menu.CheckMenuItem(5001+globalProperties.colors, true);
-	} else {
-		colors_menu.AppendMenuItem(MF_DISABLED, 0, "Dark settings:");		
-		colors_menu.AppendMenuItem(MF_STRING, 5001, "Pure Dark");	
-		colors_menu.AppendMenuItem(MF_STRING, 5002, "Dark and album art");		
-		colors_menu.AppendMenuItem(MF_STRING, 5003, "Dark and coal and album art");
-		colors_menu.CheckMenuItem(5001+globalProperties.colors, true);		
-	}
+
+	main_panel = window.CreatePopupMenu();
+	main_panel.AppendTo(colors_menu,MF_STRING, "Main panel");
+	main_panel.AppendMenuItem(MF_STRING, 5001, "Pure white");	
+	main_panel.AppendMenuItem(MF_STRING, 5002, "White and album art");		
+	main_panel.AppendMenuItem(MF_STRING, 5003, "White and grey and album art");
+	main_panel.AppendMenuSeparator(); 	
+	main_panel.AppendMenuItem(MF_STRING, 5011, "Pure Dark");	
+	main_panel.AppendMenuItem(MF_STRING, 5012, "Dark and album art");		
+	main_panel.AppendMenuItem(MF_STRING, 5013, "Dark and coal and album art");
+	if(layout_state.isEqual(0)) var checked_item = (properties.darklayout?10:0);
+	else var checked_item = (properties.library_dark_theme?10:0);
+	main_panel.CheckMenuItem(5001+globalProperties.colorsMainPanel+checked_item, true);		
+	
+	control_bar = window.CreatePopupMenu();
+	control_bar.AppendTo(colors_menu,MF_STRING, "Control bar");
+
+	
+	control_bar.AppendMenuItem(MF_STRING, 5101, "Pure white");	
+	control_bar.AppendMenuItem(MF_STRING, 5102, "White and album art");		
+	control_bar.AppendMenuSeparator(); 	
+	control_bar.AppendMenuItem(MF_STRING, 5103, "Pure Dark");	
+	control_bar.AppendMenuItem(MF_STRING, 5104, "Dark and album art");		
+	control_bar.AppendMenuSeparator(); 	
+	control_bar.AppendMenuItem(MF_STRING, 5105, "Adapt colors to Main panel");		
+	control_bar.CheckMenuItem(5101+globalProperties.colorsControls, true);	
+	
+	mini_player = window.CreatePopupMenu();
+	mini_player.AppendTo(colors_menu,MF_STRING, "Mini player");
+	mini_player.AppendMenuItem(MF_STRING, 5201, "Pure white");	
+	mini_player.AppendMenuItem(MF_STRING, 5202, "White and album art");		
+	mini_player.AppendMenuSeparator(); 	
+	mini_player.AppendMenuItem(MF_STRING, 5203, "Pure Dark");	
+	mini_player.AppendMenuItem(MF_STRING, 5204, "Dark and album art");		
+	mini_player.CheckMenuItem(5201+globalProperties.colorsMiniPlayer+(properties.minimode_dark_theme?2:0), true);		
+	
 	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		
 	appearance_menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 4023, "Load all covers at startup");
@@ -1836,9 +1856,32 @@ function draw_main_menu(x,y){
 		lyrics_state.setValue(0);
         break;		
     case (idx >= 5001 && idx < 5010):
-		globalProperties.colors = idx-5001;
-		window.SetProperty("GLOBAL colors",globalProperties.colors);
-		window.NotifyOthers("colors",globalProperties.colors);
+		Lightswitch(true,false);	
+		globalProperties.colorsMainPanel = idx-5001;
+		window.SetProperty("GLOBAL colorsMainPanel",globalProperties.colorsMainPanel);
+		window.NotifyOthers("colors",globalProperties.colorsMainPanel);
+        break;		
+    case (idx >= 5011 && idx < 5020):
+		Lightswitch(true,true);	
+		globalProperties.colorsMainPanel = idx-5011;
+		window.SetProperty("GLOBAL colorsMainPanel",globalProperties.colorsMainPanel);
+		window.NotifyOthers("colors",globalProperties.colorsMainPanel);
+        break;				
+    case (idx >= 5101 && idx <= 5105):
+		globalProperties.colorsControls = idx-5101;
+		window.SetProperty("GLOBAL colorsControls",globalProperties.colorsControls);
+		window.NotifyOthers("colorsControls",globalProperties.colorsControls);
+        break;			
+    case (idx >= 5201 && idx < 5205):
+		globalProperties.colorsMiniPlayer = idx-5201;	
+		properties.minimode_dark_theme = (globalProperties.colorsMiniPlayer>=2);
+        window.NotifyOthers("minimode_dark_theme",globalProperties.colorsMiniPlayer);	
+		globalProperties.colorsMiniPlayer = globalProperties.colorsMiniPlayer-(properties.minimode_dark_theme?2:0);
+		
+		window.SetProperty("GLOBAL colorsMiniPlayer",globalProperties.colorsMiniPlayer);
+		window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);	
+		get_colors();g_searchbox.adapt_look_to_layout();		
+		window.Repaint();			
         break;				
     }
 

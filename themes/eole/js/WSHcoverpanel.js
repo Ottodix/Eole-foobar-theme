@@ -326,6 +326,7 @@ function on_paint(gr) {
 	
 	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, colors.border_dark);
 	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);		
+	//if(!properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, colors.border_right);		
 }
 function on_size(w, h) {
     ww = w;
@@ -629,19 +630,19 @@ function on_layout_change() {
 	else if(layout_state.isEqual(0)) {
 		switch(main_panel_state.value){
 			case 0:
-				properties.darklayout = properties.library_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.library_dark_theme || (globalProperties.colorsMainPanel!=0);
 			break;
 			case 1:
-				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.playlists_dark_theme || (globalProperties.colorsMainPanel!=0);
 			break;
 			case 2:
-				properties.darklayout = properties.bio_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.bio_dark_theme || (globalProperties.colorsMainPanel!=0);
 			break;
 			case 3:
-				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colors!=0);
+				properties.darklayout = properties.visualization_dark_theme || (globalProperties.colorsMainPanel!=0);
 			break;
 		}
-	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colors!=0);	
+	} else properties.darklayout = properties.minimode_dark_theme || (globalProperties.colorsMainPanel!=0);	
 	
     if(!fb.IsPlaying) {
 		g_cover.reset();		
@@ -653,11 +654,17 @@ function on_layout_change() {
 function on_notify_data(name, info) {
     switch(name) {
 		case "colors":
-			globalProperties.colors = info;
-			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			globalProperties.colorsMainPanel = info;
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
 			on_layout_change();	
 			window.Repaint();
 		break; 			
+		case "colorsControls":
+			globalProperties.colorsControls = info;
+			window.SetProperty("GLOBAL colorsControls", globalProperties.colorsMainPanel);
+			on_layout_change();	
+			window.Repaint();
+		break; 		
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
@@ -1118,6 +1125,7 @@ function get_colors(){
 		colors.animation = GetGrey(255);		
 		colors.btn_grad_borders = GetGrey(0,50);
 		colors.btn_grad_middle = GetGrey(0,180);
+		colors.border_right = GetGrey(0,100);		
 	} else {
 		colors.grad_bottom = GetGrey(0,20);
 		colors.grad_top = GetGrey(0,20);
@@ -1125,11 +1133,13 @@ function get_colors(){
 		colors.visu_grad_middle = GetGrey(0,50);
 		colors.animation = GetGrey(255);
 		colors.btn_grad_borders = GetGrey(0,30);
-		colors.btn_grad_middle = GetGrey(0,120);		
+		colors.btn_grad_middle = GetGrey(0,120);	
+		colors.border_right = GetGrey(0,10);		
 	}
 	colors.border_light = GetGrey(255,20);
 	colors.border_dark = GetGrey(0,50);
 	colors.line_bottom = GetGrey(40,200);	
+		
 	colors.overlay_on_hover = GetGrey(0,130);		
 }
 function get_images(){

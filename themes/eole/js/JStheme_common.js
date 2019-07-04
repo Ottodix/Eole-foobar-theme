@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.1b5',
+	theme_version: '1.2.2b1',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -44,7 +44,9 @@ var globalProperties = {
 	enableDiskCache: window.GetProperty("COVER Disk Cache",true),
 	deleteDiskCache: window.GetProperty("COVER delete cover cache on next startup",false),	
 	enableResizableBorders: window.GetProperty("GLOBAL enableResizableBorders",true),	
-	colors: window.GetProperty("GLOBAL colors",0),	
+	colorsMainPanel: window.GetProperty("GLOBAL colorsMainPanel",0),	
+	colorsControls: window.GetProperty("GLOBAL colorsControls",0),	
+	colorsMiniPlayer: window.GetProperty("GLOBAL colorsMiniPlayer",0),		
 	record_move_every_x_ms:3000,	
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
 	selection_playlist : "Library Selection",
@@ -322,7 +324,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 var colors = {};
 function get_colors_global(){
 	if(properties.darklayout || properties.stick2darklayout){
-		if(globalProperties.colors==0 || globalProperties.colors==1){
+		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.normal_bg = GetGrey(30);
 			colors.lightgrey_bg = GetGrey(30);		
 			colors.alternate_row = GetGrey(0,0);	
@@ -331,7 +333,7 @@ function get_colors_global(){
 			colors.selected_item_line_off = GetGrey(255,0);
 			colors.track_gradient_size = 20;
 			colors.padding_gradient = 10;					
-		} else if(globalProperties.colors==2){
+		} else if(globalProperties.colorsMainPanel==2){
 			colors.normal_bg = GetGrey(30);
 			colors.lightgrey_bg = GetGrey(27);	
 			colors.alternate_row = GetGrey(0,30);		
@@ -400,7 +402,7 @@ function get_colors_global(){
 		colors.width_marker_hover_item = 2;		
 		colors.dragdrop_marker_line = GetGrey(255,205);				
 	} else {
-		if(globalProperties.colors==0 || globalProperties.colors==1){
+		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.normal_bg = GetGrey(255);
 			colors.lightgrey_bg = GetGrey(255);
 			colors.alternate_row = GetGrey(0,0);
@@ -409,7 +411,7 @@ function get_colors_global(){
 			colors.selected_item_line_off = GetGrey(0,0);
 			colors.track_gradient_size = 20;
 			colors.padding_gradient = 10;			
-		} else if(globalProperties.colors==2){
+		} else if(globalProperties.colorsMainPanel==2){
 			colors.normal_bg = GetGrey(255);
 			colors.lightgrey_bg = GetGrey(245);
 			colors.alternate_row = GetGrey(0,5);		

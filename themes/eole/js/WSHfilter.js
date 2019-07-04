@@ -35,7 +35,8 @@ var properties = {
     circleDisplay1: window.GetProperty("_PROPERTY: Circle Mode for tag mode 1", false),
     circleDisplay2: window.GetProperty("_PROPERTY: Circle Mode for tag mode 2", false),	
     circleDisplay3: window.GetProperty("_PROPERTY: Circle Mode for tag mode 3", false),	
-    displayMode: window.GetProperty("_PROPERTY: Display Mode", 0), // 0 = text, 1 = stamps + text, 2 = lines + text, 3 = stamps no text
+    displayMode: window.GetProperty("_PROPERTY: Display Mode", 0), // 0 = text, 1 = stamps + text, 2 = lines + text, 3 = grid + text
+    displayModeGridNoText: window.GetProperty("_PROPERTY: Display Mode Grid No Text", false), // 3 = grid, without text
     drawItemsCounter: window.GetProperty("_PROPERTY: Show numbers of items in group", false), // Available in display mode 0 = text, 2 = lines + text
     drawItemsCounter1: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 1", true),
     drawItemsCounter2: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 2", true),	
@@ -1612,6 +1613,12 @@ oBrowser = function(name) {
                     this.marginSide = 0;
                     this.marginCover = 10;
 					this.marginLR = 0;					
+                } else if(properties.displayMode == 3 && properties.displayModeGridNoText){
+                    this.marginTop = 0;
+                    this.marginBot = 0;
+                    this.marginSide = 0;
+                    this.marginCover = 0;
+					this.marginLR = 0;					
                 } else {
                     this.marginTop = 0;
                     this.marginBot = 0;
@@ -1637,7 +1644,7 @@ oBrowser = function(name) {
                 if(properties.displayMode == 1) {
                     this.rowHeight = 5 + cover.max_w + this.firstRowHeight + this.secondRowHeight + properties.botStampHeight; //properties.botStampHeight;
                 } else {
-                    this.rowHeight = cover.max_w + 1;
+                    this.rowHeight = cover.max_w;
                 };
                 break;
             case 0:
@@ -1668,7 +1675,7 @@ oBrowser = function(name) {
                         break;
                     case 3: // genre
 						if(properties.displayMode == 0) this.rowHeight =  properties.lineHeightMin;
-						else this.rowHeight =  Math.ceil(g_fsize * 4.5);
+						else this.rowHeight =  Math.ceil(properties.lineHeightMin * 1.5);
                         break;
                 }
                 // calc size of the cover art
@@ -2350,6 +2357,7 @@ oBrowser = function(name) {
 	this.onFontChanged = function(){
 		this.firstRowHeight = false;
 		this.secondRowHeight = false;
+		this.refresh_all_covers();
 	}
     this.draw = function(gr) {
         var tmp, offset;
@@ -2376,10 +2384,10 @@ oBrowser = function(name) {
 		}
         var aw = this.thumbnailWidth - (this.marginSide * 2);
         var ah = this.rowHeight - this.marginTop - this.marginBot;
-		if(properties.displayMode == 3) var padding_covers = 6;
+		if(properties.displayMode == 3) var padding_covers = (!properties.displayModeGridNoText?6:0);
 		else var padding_covers = 0
-		var im_w = coverWidth+2-padding_covers;
-		var im_h = coverWidth+2-padding_covers;	
+		var im_w = coverWidth;
+		var im_h = coverWidth;	
 		
         this.getlimits();
         
@@ -2408,15 +2416,15 @@ oBrowser = function(name) {
 							if(this.groups[i].cover_type == null) {								
 								if(this.groups[i].load_requested == 0) {
 									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false);
-									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
+									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {										
 										this.groups[i].cover_type = 1;
-										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);										
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w+(properties.displayMode==3?0:0));
 									} else if(properties.AlbumArtFallback && properties.albumArtId != 4){
 										this.groups[i].save_requested = true;
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);							
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);							
 										}
 									}
 								} 
@@ -2455,7 +2463,7 @@ oBrowser = function(name) {
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
 								this.groups[i].cover_img = globalProperties.stream_img;
 								g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-							};
+							} 
 							if(!this.groups[i].cover_formated){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
 								this.groups[i].cover_formated = true;
@@ -2592,7 +2600,7 @@ oBrowser = function(name) {
 								}
 								if(this.groups[i].cover_img) {
 									
-									if(!this.groups[i].cover_img_mask && properties.circleMode && properties.displayMode == 1){
+									if(!this.groups[i].cover_img_mask && properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)){
 										if(!this.coverMask) this.DefineCircleMask(this.groups[i].cover_img.Width);
 										width = this.groups[i].cover_img.Width;
 										height = this.groups[i].cover_img.Height;
@@ -2600,10 +2608,9 @@ oBrowser = function(name) {
 										this.groups[i].cover_img_mask = this.groups[i].cover_img.Clone(0, 0, width, height);
 										this.groups[i].cover_img_mask.ApplyMask(coverMask);
 										image_to_draw = this.groups[i].cover_img_mask;
-									} else if(properties.circleMode && properties.displayMode == 1) {
+									} else if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 										image_to_draw = this.groups[i].cover_img_mask;
 									} else image_to_draw = this.groups[i].cover_img;
-										
 									if(cover.keepaspectratio) {
 										var max = image_to_draw.Width > image_to_draw.Height ? image_to_draw.Width: image_to_draw.Height;
 										var rw = image_to_draw.Width / max;
@@ -2619,13 +2626,14 @@ oBrowser = function(name) {
 										all_w = im_w;
 										all_h = im_h;
 										if(this.cover_img_all_finished){
-											if(properties.circleMode && properties.displayMode != 1) {
+											if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 												image_to_draw = this.cover_img_all_mask;
 											} else image_to_draw = this.cover_img_all;
 										}										
 										gr.DrawImage(image_to_draw, ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height, 0, 255);
 									} else {
 										try{
+											
 											gr.DrawImage(image_to_draw, ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height);
 										} catch (e) {
 											console.log("DrawImage: invalid image ");
@@ -2633,7 +2641,7 @@ oBrowser = function(name) {
 										if(!properties.circleMode || properties.displayMode != 1) gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 									};
 									// grid text background rect
-									if(properties.displayMode == 3) {
+									if(properties.displayMode == 3 && !properties.displayModeGridNoText) {
 										if(i == this.selectedIndex) {
 											gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
 										} else gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
@@ -2693,7 +2701,7 @@ oBrowser = function(name) {
 												gr.GdiDrawText(this.groups[i].firstRow, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.firstRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
-											  this.groups[i].tooltipText = this.groups[i].artist_name;
+											  this.groups[i].tooltipText = this.groups[i].groupkey;
 											  font1 = g_font.normal;
 											  font2 = g_font.italicmin1;												  
 											  font = g_font.normal;
@@ -2737,8 +2745,8 @@ oBrowser = function(name) {
 											if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);											
 											this.groups[i].showToolTip = (this.groups[i].text1Length > aw-20 || this.groups[i].text2Length > aw-20);
 											
-											gr.GdiDrawText(this.groups[i].firstRow, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											if(!properties.displayModeGridNoText)gr.GdiDrawText(this.groups[i].firstRow, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+											if(this.groups[i].tracktype != 3 && !properties.displayModeGridNoText) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 										/*} else {
 										  this.groups[i].tooltipText = this.groups[i].secondRow;
 										  font = (i == this.selectedIndex ? g_font.bold : g_font.normal);
@@ -2793,10 +2801,10 @@ oBrowser = function(name) {
 											all_w = im_w;
 											all_h = im_h;
 											if(this.cover_img_all_finished){
-												if(properties.circleMode && properties.displayMode != 1) {
+												if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 													image_to_draw = this.cover_img_all_mask;
 												} else image_to_draw = this.cover_img_all;
-											}											
+											}															
 											gr.DrawImage(image_to_draw, Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height, 0, 255);
 										} else {
 											gr.DrawImage(image_to_draw, Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height);
@@ -2832,18 +2840,18 @@ oBrowser = function(name) {
 											try{
 												gr.GdiDrawText("All items", g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);													
-												gr.GdiDrawText("("+(total-1)+" albums)", g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText("("+(total-1)+(!(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "")?' groups)':" albums)"), g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 										case 2: // artist
 											try{
-												gr.GdiDrawText("All ("+(total-1)+" artists)", g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "")?' groups)':" artists)"), g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
 											} catch(e) {}
 											break;
 										case 3: // genre
 											try{ 
-												gr.GdiDrawText("All ("+(total-1)+" genres)", g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "")?' groups)':" genres)"), g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
 											} catch(e) {}
 											break;
@@ -3010,7 +3018,7 @@ oBrowser = function(name) {
 							}; 
 							All_img.ReleaseGraphics(gb);
 							this.cover_img_all = All_img;	
-							if(properties.circleMode && properties.displayMode != 1){
+							if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)){
 								if(!this.coverMask) this.DefineCircleMask(this.cover_img_all.Width);
 								width = this.cover_img_all.Width;
 								height = this.cover_img_all.Height;
@@ -3025,7 +3033,7 @@ oBrowser = function(name) {
 								brw.repaint();
 							}
 						} else {
-							if(properties.circleMode && properties.displayMode != 1) {
+							if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 								image_to_draw = this.cover_img_all_mask;
 							} else image_to_draw = this.cover_img_all;							
 						}
@@ -3149,6 +3157,7 @@ oBrowser = function(name) {
             case 2:
                 var zoomStep = 1;
                 var previous = properties.default_lineHeightMin;
+				console.log("default_lineHeightMin"+previous+" this.rowHeight"+this.rowHeight)
                 if(!timers.mouseWheel) {
                     properties.default_lineHeightMin -= step * zoomStep;
                     if(properties.displayMode == 0) {
@@ -3629,7 +3638,9 @@ oBrowser = function(name) {
             _menu2.AppendMenuItem(MF_STRING, 902, "Text (Album Art on right)");			
             _menu2.AppendMenuItem(MF_STRING, 901, "Album Art (Text on bottom)");
             _menu2.AppendMenuItem(MF_STRING, 903, "Album Art Grid");
-            _menu2.CheckMenuRadioItem(900, 903, 900 + properties.displayMode);
+			_menu2.AppendMenuItem(MF_STRING, 1806, "Album Art Grid (without Text)");
+			if (properties.displayModeGridNoText) _menu2.CheckMenuItem(1806, properties.showTagSwitcherBar);	
+			else _menu2.CheckMenuRadioItem(900, 903, 900 + properties.displayMode);
             _menu2.AppendMenuSeparator();
 			if(properties.tagMode!=1){
 				_menu2.AppendMenuItem(MF_STRING, 918, "Album art Fallback");
@@ -3866,6 +3877,8 @@ oBrowser = function(name) {
                     on_colours_changed();
                     break;					
                 case (idx >= 900 && idx <= 903):
+                    properties.displayModeGridNoText = false;
+                    window.SetProperty("_PROPERTY: Display Mode Grid No Text", properties.displayModeGridNoText);
                     properties.displayMode = idx - 900;
                     window.SetProperty("_PROPERTY: Display Mode", properties.displayMode);
 					eval("properties.tagModedisplay"+properties.tagMode+" = "+idx+" - 900;");
@@ -3875,6 +3888,18 @@ oBrowser = function(name) {
                     brw.setList();
                     brw.update();
                     break;
+                case (idx == 1806):
+                    properties.displayModeGridNoText = true;
+                    window.SetProperty("_PROPERTY: Display Mode Grid No Text", properties.displayModeGridNoText);
+                    properties.displayMode = 3;
+                    window.SetProperty("_PROPERTY: Display Mode", properties.displayMode);
+					eval("properties.tagModedisplay"+properties.tagMode+" = "+903+" - 900;");
+					window.SetProperty("_PROPERTY: Display Mode for tag mode "+properties.tagMode, properties.displayMode);				
+                    get_metrics();
+					brw.refresh_all_covers();
+                    brw.setList();
+                    brw.update();				
+                    break;					
                 case (idx == 904):
                     properties.circleMode = !properties.circleMode;
                     window.SetProperty("_PROPERTY: Circle Mode", properties.circleMode);
@@ -4400,11 +4425,9 @@ function on_mouse_move(x, y, m) {
     if(g_cursor.x == x && g_cursor.y == y) return;
 	g_cursor.onMouse("move", x, y, m);		
 	var isResizing = g_resizing.on_mouse("move", x, y, m, main_panel_state.isEqual(0) && !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
-	//console.log("g_resizing.resizing_x "+g_resizing.resizing_x+"brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag"+(!brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag))
 	if(isResizing){
-		
 		if(g_resizing.resizing_x>x+5){
-			g_resizing.resizing_x = x;//console.log("g_resizing.resizing_x "+g_resizing.resizing_x)
+			g_resizing.resizing_x = x;
 			libraryfilter_width.decrement(5);
 		} else if(g_resizing.resizing_x<x-5){
 			g_resizing.resizing_x = x;
@@ -5281,8 +5304,8 @@ function g_sendResponse() {
 function on_notify_data(name, info) {
     switch(name) {
 		case "colors":
-			globalProperties.colors = info;
-			window.SetProperty("GLOBAL colors", globalProperties.colors);
+			globalProperties.colorsMainPanel = info;
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
 			on_colours_changed();
 		break; 					
 		case "enableResizableBorders":
