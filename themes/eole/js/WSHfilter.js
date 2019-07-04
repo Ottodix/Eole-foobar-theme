@@ -3157,7 +3157,7 @@ oBrowser = function(name) {
             case 2:
                 var zoomStep = 1;
                 var previous = properties.default_lineHeightMin;
-				console.log("default_lineHeightMin"+previous+" this.rowHeight"+this.rowHeight)
+
                 if(!timers.mouseWheel) {
                     properties.default_lineHeightMin -= step * zoomStep;
                     if(properties.displayMode == 0) {

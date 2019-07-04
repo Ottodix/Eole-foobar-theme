@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b3',
+	theme_version: '1.2.2b4',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -167,7 +167,6 @@ var oCursor = function () {
 		
 		this.cursor = cursor_code;
 		this.active_zone = active_zone;
-		//console.log(active_zone+" - "+cursor_code+' - '+properties.panelName+" this.x"+this.x+" ww"+ww+" this.y"+this.y+" wh"+wh)
 		if(numberOfTry>1 && !this.timer){
 			this.timerExecution = 0;
 			this.timer = setInterval(function(numberOfTry, cursor_code) {
