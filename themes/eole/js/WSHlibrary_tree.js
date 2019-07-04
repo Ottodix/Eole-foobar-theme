@@ -4758,6 +4758,11 @@ function get_images() {
 };
 function on_notify_data(name, info) {
     switch(name) {
+		case "colors":
+			globalProperties.colorsMainPanel = info;
+			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
+			on_colours_changed();
+		break; 		
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
 			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
