@@ -1430,11 +1430,18 @@ function draw_main_menu(x,y){
 	if(layout_state.isEqual(0)) var checked_item = (properties.darklayout?10:0);
 	else var checked_item = (properties.library_dark_theme?10:0);
 	main_panel.CheckMenuItem(5001+globalProperties.colorsMainPanel+checked_item, true);		
+
+	mini_player = window.CreatePopupMenu();
+	mini_player.AppendTo(colors_menu,MF_STRING, "Mini player");
+	mini_player.AppendMenuItem(MF_STRING, 5201, "Pure white");	
+	mini_player.AppendMenuItem(MF_STRING, 5202, "White and album art");		
+	mini_player.AppendMenuSeparator(); 	
+	mini_player.AppendMenuItem(MF_STRING, 5203, "Pure Dark");	
+	mini_player.AppendMenuItem(MF_STRING, 5204, "Dark and album art");		
+	mini_player.CheckMenuItem(5201+globalProperties.colorsMiniPlayer+(properties.minimode_dark_theme?2:0), true);	
 	
 	control_bar = window.CreatePopupMenu();
 	control_bar.AppendTo(colors_menu,MF_STRING, "Control bar");
-
-	
 	control_bar.AppendMenuItem(MF_STRING, 5101, "Pure white");	
 	control_bar.AppendMenuItem(MF_STRING, 5102, "White and album art");		
 	control_bar.AppendMenuSeparator(); 	
@@ -1443,15 +1450,6 @@ function draw_main_menu(x,y){
 	control_bar.AppendMenuSeparator(); 	
 	control_bar.AppendMenuItem(MF_STRING, 5105, "Adapt colors to Main panel");		
 	control_bar.CheckMenuItem(5101+globalProperties.colorsControls, true);	
-	
-	mini_player = window.CreatePopupMenu();
-	mini_player.AppendTo(colors_menu,MF_STRING, "Mini player");
-	mini_player.AppendMenuItem(MF_STRING, 5201, "Pure white");	
-	mini_player.AppendMenuItem(MF_STRING, 5202, "White and album art");		
-	mini_player.AppendMenuSeparator(); 	
-	mini_player.AppendMenuItem(MF_STRING, 5203, "Pure Dark");	
-	mini_player.AppendMenuItem(MF_STRING, 5204, "Dark and album art");		
-	mini_player.CheckMenuItem(5201+globalProperties.colorsMiniPlayer+(properties.minimode_dark_theme?2:0), true);		
 	
 	/*appearance_menu.AppendMenuItem(MF_STRING, 4025, "Enable disk cover cache");
 	appearance_menu.CheckMenuItem(4025, globalProperties.enableDiskCache);		

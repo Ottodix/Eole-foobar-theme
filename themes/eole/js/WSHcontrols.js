@@ -1491,7 +1491,28 @@ function on_notify_data(name, info) {
 			window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);				
 			get_colors();	
 			window.Repaint();
-		break; 					
+		break; 		
+		case "minimode_dark_theme":
+			if(info===true || info===false) {
+				properties.minimode_dark_theme=info;
+				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);				
+				if(layout_state.isEqual(1)) {
+					get_colors();window.Repaint();		
+				}
+			} else {
+				properties.minimode_dark_theme=(info==2 || info==3);
+				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);					
+				globalProperties.colorsMiniPlayer = info;
+				window.SetProperty("GLOBAL colorsMiniPlayer", globalProperties.colorsMiniPlayer);				
+				if(layout_state.isEqual(1)) {
+					if(globalProperties.colorsControls==4) {
+						properties.showwallpaper=(info==1 || info==3);
+						window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);					
+					}						
+					get_colors(); window.Repaint();
+				}				
+			}
+		break;			
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
 			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);	
@@ -1562,9 +1583,17 @@ function on_notify_data(name, info) {
 			layout_state.value = info;
 			if(layout_state.isEqual(1)){
 				properties.showTrackInfo = showtrackinfo_small.isActive();
+				if(globalProperties.colorsControls==4) {
+					properties.showwallpaper=(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3);
+					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
+				}					
 			} else {
-				properties.showTrackInfo = showtrackinfo_big.isActive();		
-			}				
+				properties.showTrackInfo = showtrackinfo_big.isActive();	
+				if(globalProperties.colorsControls==4) {
+					properties.showwallpaper=(globalProperties.colorsMainPanel==1 || globalProperties.colorsMainPanel==3);	
+					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
+				}					
+			}								
 			get_colors();	
 			on_size(window.Width, window.Height);				
 			window.Repaint(); 
@@ -1621,15 +1650,7 @@ function on_notify_data(name, info) {
 				get_colors();
 				window.Repaint();
 			}
-		break;	
-	   case "minimode_dark_theme":
-			if(layout_state.isEqual(1)) {
-				properties.minimode_dark_theme=info;
-				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
-				get_colors();
-				window.Repaint();		
-			}
-		break;			
+		break;		
 	   case "schedulerState":
 			setScheduler(info,true);
 			window.Repaint();	

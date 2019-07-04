@@ -136,7 +136,7 @@ setAllProperties();
 function setOneProperty(properties_name,value,update_both,layout_state_2_update) {
 	var update_both = typeof update_both !== 'undefined' ? update_both : false;	
 	if(typeof layout_state_2_update !== 'undefined'){
-		var update_current_layout_state = false;
+		var update_current_layout_state = (layout_state.value==layout_state_2_update);
 	} else {
 		var update_current_layout_state = true;
 		var layout_state_2_update = layout_state.value;		
@@ -6375,7 +6375,7 @@ function on_notify_data(name, info) {
 				setOneProperty("minimode_dark_theme",(info==2 || info==3), true);
 				globalProperties.colorsMiniPlayer = info;
 				window.SetProperty("GLOBAL colorsMiniPlayer", globalProperties.colorsMiniPlayer);
-				setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),false);	
+				setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),false,1);	
 				toggleWallpaper((globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),1);
 				get_images();on_colours_changed();			
 			}		
