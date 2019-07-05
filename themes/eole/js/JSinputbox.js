@@ -121,7 +121,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
         if(this.text.length>0) {
             gr.GdiDrawText(this.text.substr(this.offset), this.font_search, this.textcolor, this.x, this.y, this.w, this.h, DT);
         } else if(!this.edit) {
-            gr.GdiDrawText(this.empty_text, this.font_search, this.textcolor, this.x, this.y, this.w, this.h, DT);
+            gr.GdiDrawText(this.empty_text, this.font_empty, this.textcolor, this.x, this.y, this.w, this.h, DT);
         }
         // draw cursor
         if(this.edit && !this.select) this.drawcursor(gr);

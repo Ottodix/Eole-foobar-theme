@@ -432,6 +432,7 @@ oFilterBox = function() {
 		var old_y = 0;
 		if(typeof this.inbutbox != 'undefined') var old_y = this.inputbox.y;
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.italicplus2");
+		g_headerbar.RightTextLength = -1;
         this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
@@ -481,7 +482,7 @@ oFilterBox = function() {
 		this.w = w;
 		this.h = h;
 		this.inputbox.paddingVertical = cFilterBox.paddingInboxCursor;
-        this.inputbox.setSize(w-this.paddingLeft, cFilterBox.h, font_size);
+        this.inputbox.setSize(w-this.paddingLeft, h-this.paddingTop-this.paddingBottom, font_size);
     };
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
@@ -4926,7 +4927,7 @@ oBrowser = function(name) {
 					if((this.TooltipAlbum!=this.activeIndex || (this.activeIndex>-1 && this.groups[this.groups_draw[this.activeIndex]].text_y > y)) && this.TooltipAlbum > -1) {
 						this.TooltipAlbum = -1;
 						g_tooltip.Deactivate();	
-					}				
+					}					
 					if(this.activeTextIndex>-1 && this.TooltipAlbum!=this.activeTextIndex && this.groups[this.groups_draw[this.activeTextIndex]].showToolTip && this.groups[this.groups_draw[this.activeTextIndex]].text_y < y){
 							this.TooltipAlbum=this.activeTextIndex;	
 							new_tooltip_text=this.groups[this.groups_draw[this.activeTextIndex]].firstRow+'\n'+this.groups[this.groups_draw[this.activeTextIndex]].secondRow;
@@ -4960,6 +4961,7 @@ oBrowser = function(name) {
                 break;
             case "leave":		
                 this.activeIndex = -1;
+				this.activeTextIndex = -1;
 				this.activeRow = -1;	
 				this.repaint();
 				if(properties.showToolTip) {
@@ -4994,7 +4996,8 @@ oBrowser = function(name) {
 				if(properties.veryTighCoverActiveZone){
 					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
 						this.activeColumn = 0;
-						this.activeIndex = -1;	
+						this.activeIndex = -1;
+						this.activeTextIndex = -1;
 					} else {
 						if(x < this.x + this.marginLR) this.activeColumn=0;
 						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
@@ -5009,16 +5012,19 @@ oBrowser = function(name) {
 				} else {
 					if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
 						this.activeColumn = 0;
-						this.activeIndex = -1;	
+						this.activeIndex = -1;
+						this.activeTextIndex = -1;
 					} else {
 						if(x < this.x + this.marginLR) this.activeColumn=0;
 						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
 						this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
 						this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+						this.activeTextIndex = -1;
 					}
 				}
             } else {
-                this.activeIndex = -1;	
+                this.activeIndex = -1;
+				this.activeTextIndex = -1;
             }
         }	
 	}
