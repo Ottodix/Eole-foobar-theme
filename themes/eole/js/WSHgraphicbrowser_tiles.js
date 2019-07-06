@@ -4467,7 +4467,7 @@ oBrowser = function(name) {
 		var img_full = null;
 
 		if (isImage(this.groups[idx].cover_img_full)) {
-			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false, "GetAlbumCover1");
+			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
 			if (isImage(img_full)) {
@@ -4644,6 +4644,7 @@ oBrowser = function(name) {
 						} else {
 							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
 						}					
+						console.log(this.coverRealWith+" - "+image_to_draw.Width)						
 						if(properties.CoverGridNoText)
 							gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 1, 1, image_to_draw.Width-2, image_to_draw.Height-2);
 						else

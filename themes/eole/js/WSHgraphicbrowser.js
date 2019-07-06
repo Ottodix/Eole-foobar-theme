@@ -4587,7 +4587,7 @@ oBrowser = function(name) {
 						} else {
 							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
 						}					
-						
+
 						gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, image_to_draw.Width, image_to_draw.Height);
 						
 						if(!properties.circleMode)
