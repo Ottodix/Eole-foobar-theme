@@ -1384,15 +1384,7 @@ function draw_main_menu(x,y){
 		visu_menu.CheckMenuItem(4003, properties.visualization_dark_theme);	
 	}
 	
-	appearance_menu.AppendTo(skin_settings_menu, MF_STRING, "Global layout");		
-	font_size = window.CreatePopupMenu();
-	font_size.AppendTo(appearance_menu,MF_STRING, "Font size");	
-	font_size.AppendMenuItem(MF_STRING, 4012, "Increase");	
-	font_size.AppendMenuItem(MF_STRING, 4013, "Decrease");	
-	font_size.AppendMenuItem(MF_STRING, 4014, "Reset");
-	font_size.AppendMenuSeparator();
-	font_size.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold CTRL and use your");
-	font_size.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over (almost) any panel!");		
+	appearance_menu.AppendTo(skin_settings_menu, MF_STRING, "Global layout");			
 	nowplayinglobal = window.CreatePopupMenu();
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4072, "Hide");
 	nowplayinglobal.AppendMenuItem(MF_STRING, 4073, "Show");	
@@ -1414,10 +1406,18 @@ function draw_main_menu(x,y){
 	appearance_menu.AppendMenuSeparator(); 
 	wallpaper_visibility_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers visibility");			
 	wallpaper_blur_global.AppendTo(appearance_menu,MF_STRING, "Wallpapers blur");
+
+	font_size = window.CreatePopupMenu();
+	font_size.AppendTo(skin_settings_menu,MF_STRING, "Font size");	
+	font_size.AppendMenuItem(MF_STRING, 4012, "Increase");	
+	font_size.AppendMenuItem(MF_STRING, 4013, "Decrease");	
+	font_size.AppendMenuItem(MF_STRING, 4014, "Reset");
+	font_size.AppendMenuSeparator();
+	font_size.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold CTRL and use your");
+	font_size.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over (almost) any panel!");	
 	
 	colors_menu = window.CreatePopupMenu();
 	colors_menu.AppendTo(skin_settings_menu,MF_STRING, "Colors");
-
 	main_panel = window.CreatePopupMenu();
 	main_panel.AppendTo(colors_menu,MF_STRING, "Main panel");
 	main_panel.AppendMenuItem(MF_STRING, 5001, "Pure white");	

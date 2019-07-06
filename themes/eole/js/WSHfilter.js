@@ -1632,7 +1632,10 @@ oBrowser = function(name) {
                 // count total of rows for the whole library
                 this.rowsCount = Math.ceil(this.groups.length / this.totalColumns);
                 var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * this.thumb_w);
-                var deltaToAdd = Math.floor(gapeWidth / this.totalColumns);
+				if(properties.displayMode == 3 && properties.displayModeGridNoText)
+					var deltaToAdd = Math.ceil(gapeWidth / this.totalColumns);
+				else
+					var deltaToAdd = Math.floor(gapeWidth / this.totalColumns);
                 this.thumbnailWidth = this.thumb_w + deltaToAdd;
                 // calc size of the cover art
                 cover.max_w = (this.thumbnailWidth - (this.marginSide * 2) - (this.marginCover * 2));
