@@ -4732,11 +4732,14 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 
 
 // ============================================= JScript Callbacks ===========================================================
+function SetPseudoCaption() {  
+	g_uihacks.SetPseudoCaption(0, 0, ww-128, 23);
+}
 function on_size(w, h) {   
     ww = Math.max(w,globalProperties.fullMode_minwidth);
     wh = Math.max(h,globalProperties.fullMode_minheight);  
 	if(window.IsVisible || force_on_size===true){
-		if(window.IsVisible && screensaver_state.isActive()) g_uihacks.SetPseudoCaption(0, 0, ww-128, 23);
+		if(window.IsVisible && screensaver_state.isActive()) SetPseudoCaption();
 		// set wallpaper
 		if(properties.showwallpaper){
 			//g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
@@ -6051,6 +6054,7 @@ function on_notify_data(name, info) {
 				}			
 				else brw.refreshPlayingCover();
 				brw.focusOnNowPlaying(fb.GetNowPlaying()); 
+				SetPseudoCaption();
 			}  			
 		break;	
 		case "mouse_move": 
