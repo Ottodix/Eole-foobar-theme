@@ -4736,7 +4736,7 @@ function on_size(w, h) {
     ww = Math.max(w,globalProperties.fullMode_minwidth);
     wh = Math.max(h,globalProperties.fullMode_minheight);  
 	if(window.IsVisible || force_on_size===true){
-		g_uihacks.SetPseudoCaption(0, 0, ww-128, 23);
+		if(window.IsVisible && screensaver_state.isActive()) g_uihacks.SetPseudoCaption(0, 0, ww-128, 23);
 		// set wallpaper
 		if(properties.showwallpaper){
 			//g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
