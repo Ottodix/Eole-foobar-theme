@@ -2398,7 +2398,7 @@ oHeaderBar = function(name) {
 		this.hscr_btn_w = 18
 		var xpts_mtop = Math.ceil((this.h-9)/2);	
 		var xpts_mright_next = Math.ceil((this.hscr_btn_w-5)/2);		
-		console.log(this.h+" - "+this.hscr_btn_w);
+
 		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_off.GetGraphics();
 			gb.FillSolidRect(this.hscr_btn_w-1, 0, 1, this.h, colors.sidesline);	
@@ -4645,7 +4645,7 @@ oBrowser = function(name) {
 						} else {
 							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
 						}					
-						console.log(this.coverRealWith+" - "+image_to_draw.Width)						
+						
 						if(properties.CoverGridNoText)
 							gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 1, 1, image_to_draw.Width-2, image_to_draw.Height-2);
 						else
