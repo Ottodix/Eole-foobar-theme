@@ -1374,7 +1374,7 @@ oShowList = function(parentPanelName) {
         if(!isImage(this.cover_img)) this.setCover();
 		if(!isImage(this.cover_img)) return;
 
-		if(properties.circleMode)
+		if(properties.circleMode && !properties.CoverGridNoText)
 			image = brw.groups[this.idx].cover_img_full; 
 		else
 			image = brw.groups[this.idx].cover_img; 
@@ -2999,7 +2999,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuGroupDisplay.CheckMenuItem(26, properties.showDiscNbOverCover);	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 46, "Animate while showing now playing");
 	_menuGroupDisplay.CheckMenuItem(46, properties.animateShowNowPlaying);		
-	_menuGroupDisplay.AppendMenuItem(MF_STRING, 37, "Circle Artwork");
+	_menuGroupDisplay.AppendMenuItem(properties.CoverGridNoText?MF_GRAYED:MF_STRING, 37, "Circle Artwork");
 	_menuGroupDisplay.CheckMenuItem(37, properties.circleMode);		
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 38, "Center text");
 	_menuGroupDisplay.CheckMenuItem(38, properties.centerText);	
@@ -3415,6 +3415,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.showheaderbar();
 			on_size(window.Width, window.Height);
 			g_showlist.refresh();
+			brw.refresh_shadows();
 			brw.refresh_browser_thumbnails();
 			brw.refreshDates();
 			brw.repaint();
@@ -4625,15 +4626,15 @@ oBrowser = function(name) {
 						//Shadow
 						if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 
-							if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow,10, properties.circleMode);
-							if(!this.cover_shadow_hover || this.cover_shadow_hover==null) this.cover_shadow_hover = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow_hover,10, properties.circleMode);	
+							if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow,10, (properties.circleMode && !properties.CoverGridNoText));
+							if(!this.cover_shadow_hover || this.cover_shadow_hover==null) this.cover_shadow_hover = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow_hover,10, (properties.circleMode && !properties.CoverGridNoText));	
 							if(i == this.activeIndex && this.activeRow>-1) var drawn_cover_shadow = this.cover_shadow_hover;
 							else var drawn_cover_shadow = this.cover_shadow;
 							gr.DrawImage(drawn_cover_shadow, ax-8, coverTop-8, this.coverRealWith+20, this.coverRealWith+20, 0, 0, drawn_cover_shadow.Width, drawn_cover_shadow.Height);
 	
 						}
 						
-						if(!this.groups[this.groups_draw[i]].mask_applied && properties.circleMode){
+						if(!this.groups[this.groups_draw[i]].mask_applied && (properties.circleMode && !properties.CoverGridNoText)){
 							if(!this.coverMask) this.DefineCircleMask(this.coverRealWith);
 							width = this.groups[this.groups_draw[i]].cover_img.Width;
 							height = this.groups[this.groups_draw[i]].cover_img.Height;
@@ -4654,7 +4655,7 @@ oBrowser = function(name) {
 							this.groups[this.groups_draw[i]].showToolTip = true;
 						}
 						if(!properties.CoverGridNoText){
-							if(!properties.circleMode)
+							if(!(properties.circleMode && !properties.CoverGridNoText))
 								gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_rectline);
 							else
 								gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, colors.cover_rectline);
@@ -4676,7 +4677,7 @@ oBrowser = function(name) {
 									if(this.groups[this.groups_draw[i]].dateWidth>this.coverRealWith) this.groups[this.groups_draw[i]].dateWidth=this.coverRealWith;
 								}
 							} catch(e){}								
-							if(properties.circleMode) {
+							if(properties.circleMode && !properties.CoverGridNoText) {
 								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
 									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -4689,7 +4690,7 @@ oBrowser = function(name) {
 						}		
 
 						if((!properties.expandInPlace || this.groups_draw.length==1) && ((i == this.activeIndex && this.activeRow>-1) || i==this.album_Rclicked_index)) {
-							if(!properties.circleMode){
+							if(!(properties.circleMode && !properties.CoverGridNoText)){
 								gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, colors.covergrad_hoverOverlay, GetGrey(0,0), 0);
 								gr.DrawImage(cover.btn_play, ax + awhalf-20, coverTop+awhalf-20, 41, 41, 0, 0, 41, 41); 
 							} else {
@@ -4706,7 +4707,7 @@ oBrowser = function(name) {
 							if(!(g_cursor.getActiveZone()=="cover"+i)){
 								g_cursor.setCursor(IDC_HAND,"cover"+i);
 							} 
-							if(!properties.circleMode){
+							if(!(properties.circleMode && !properties.CoverGridNoText)){
 								gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, colors.covergrad_hoverOverlay, GetGrey(0,0), 0);
 								//gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, GetGrey(0,0), this.groups[this.groups_draw[i]].CoverMainColor, 1);
 							} else {
@@ -4726,12 +4727,12 @@ oBrowser = function(name) {
 		
 					} else if (this.groups[this.groups_draw[i]].cover_img=="no_cover") {
 						gr.DrawImage(globalProperties.nocover_img, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, globalProperties.nocover_img.Width, globalProperties.nocover_img.Height);		
-						if(!properties.circleMode)
+						if(!(properties.circleMode && !properties.CoverGridNoText))
 							gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_nocover_rectline);
 						else
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, colors.cover_nocover_rectline);						
 					} else {		
-						if(!properties.circleMode)
+						if(!(properties.circleMode && !properties.CoverGridNoText))
 							gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_nocover_rectline);
 						else
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, colors.cover_nocover_rectline);					

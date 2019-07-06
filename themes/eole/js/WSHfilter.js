@@ -2969,8 +2969,8 @@ oBrowser = function(name) {
 				if(properties.displayMode > 0) {
 					// get cover
 					if(all_x > -1 && properties.showAllItem && g_start_ == 0 && total > 1) {
-						var ii_w = Math.floor(all_w / 2);
-						var ii_h = Math.floor(all_h / 2);
+						var ii_w = Math.floor(all_w / 2)+(properties.displayMode==3 && properties.displayModeGridNoText?1:0);
+						var ii_h = Math.floor(all_h / 2)+(properties.displayMode==3 && properties.displayModeGridNoText?1:0);
 						var ii_x1 = 0;
 						var ii_x2 = ii_x1 + ii_w;
 						var ii_y1 = 0;
