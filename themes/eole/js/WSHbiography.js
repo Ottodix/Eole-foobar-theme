@@ -112,11 +112,11 @@ class PanelProperties {
 let properties = [
 	[" Fallback  Text  Biography: Heading|No Heading", "Nothing Found|There is no biography to display", "bioFallbackText"],
 	[" Fallback  Text  Review: Heading|No Heading", "Nothing Found|There is no review to display", "revFallbackText"],
-	[" Heading  Title Format  Album Review [AllMusic]", "$if2(%BIO_ALBUMARTIST%,Artist Unknown) - $if2(%BIO_ALBUM% - Album Review,Album Unknown)", "amRevHeading"],
-	[" Heading  Title Format  Album Review [Last.fm]", "$if2(%BIO_ALBUMARTIST%,Artist Unknown) - $if2(%BIO_ALBUM% - Album Review,Album Unknown)", "lfmRevHeading"],
-	[" Heading  Title Format  Biography [AllMusic]", "$if2(%BIO_ARTIST% - Biography,Artist Unknown)", "amBioHeading"],
-	[" Heading  Title Format  Biography [Last.fm]", "$if2(%BIO_ARTIST% - Biography,Artist Unknown)", "lfmBioHeading"],
-	[" Heading  Title Format  Track Review [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)", "lfmTrackHeading"],
+	[" Heading  Title Format  Album Review [AllMusic]", "$if2(%BIO_ALBUMARTIST%,Artist Unknown) - $if2(%BIO_ALBUM%,Album Unknown)", "amRevHeading"],
+	[" Heading  Title Format  Album Review [Last.fm]", "$if2(%BIO_ALBUMARTIST%,Artist Unknown) - $if2(%BIO_ALBUM%,Album Unknown)", "lfmRevHeading"],
+	[" Heading  Title Format  Biography [AllMusic]", "$if2(%BIO_ARTIST%,Artist Unknown)", "amBioHeading"],
+	[" Heading  Title Format  Biography [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown)", "lfmBioHeading"],
+	[" Heading  Title Format  Track Review [Last.fm]", "> $if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE%,Title Unknown)", "lfmTrackHeading"],
 	[" Heading Items 0 or 1", "BtnBg,1,BtnName,1,BtnRedLastfm,0,Text,1", "show"],
 	[" Heading Metrics +/-", "Gap,0,BottomLinePad,0,BtnSize,0,BtnPad,0", "headerConfig"],
 	[" Highlight Colour 0 or 1", "Btn,0,Heading,1,Line,1,Rim,1,Stars,1,Subheadings,1,Text,0", "hl"],
@@ -152,7 +152,7 @@ let properties = [
 	[" Subheading  [Source]  Text  Biography [Last.fm]: Heading|No Heading", "Last.fm|Last.fm Biography", "lfmBioSubHead"],
 	[" Subheading  [Source]  Text  Review [AllMusic]: Heading|No Heading", "AllMusic|AllMusic Review", "amRevSubHead"],
 	[" Subheading  [Source]  Text  Review [Last.fm]: Heading|No Heading", "Last.fm|Last.fm Review", "lfmRevSubHead"],
-	[" Subheading  [Track Review]  Title Format  [Last.fm]", "$if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE% - Track Review,Title Unknown)", "lfmTrackSubHeading"],
+	[" Subheading  [Track Review]  Title Format  [Last.fm]", "> $if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE%,Title Unknown)", "lfmTrackSubHeading"],
 	[" Text Align Always Top", false, "topAlign"],
 	[" Touch Step 1-10", 1, "touchStep"],
 	[" Zoom Button Size (%)", 100, "zoomBut"],
@@ -173,6 +173,7 @@ let properties = [
 	["ADV.Scrollbar Height Always Full", false, "sbarStyle"],
 	["ADV.Smooth Duration 0-5000 msec (Max)", "Scroll,500,TouchFlick,3000", "duration"],
 	["ADV.Touch Flick Distance 0-10", 0.8, "flickDistance"],
+	["SYSTEM.Album History", JSON.stringify([]), "albumHistory"],
 	["SYSTEM.Allmusic Alb", true, "allmusic_alb"],
 	["SYSTEM.Allmusic Bio", false, "allmusic_bio"],
 	["SYSTEM.Artist History", JSON.stringify([]), "artistHistory"],
@@ -183,7 +184,7 @@ let properties = [
 	["SYSTEM.Blur Light Theme", false, "blurLight"],
 	["SYSTEM.Both Bio", false, "bothBio"],
 	["SYSTEM.Both Rev", false, "bothRev"],
-	["SYSTEM.Button More Items", false, "mul_item"],
+	["SYSTEM.Button More Items", true, "mul_item"],
 	["SYSTEM.Colour Swap", false, "swapCol"],
 	["SYSTEM.Cover Crop [Dual Mode]", false, "covCropDual"],
 	["SYSTEM.Cover Crop [Image Only]", false, "covCropImgOnly"],
@@ -208,6 +209,7 @@ let properties = [
 	["SYSTEM.Image Alignment Horizontal", 1, "alignH"],
 	["SYSTEM.Image Alignment Vertical", 1, "alignV"],
 	["SYSTEM.Image Auto Enlarge", false, "autoEnlarge"],
+	["SYSTEM.Image Bar", 0, "imageBar"],
 	["SYSTEM.Image Blur Background Always Use Front Cover", false, "covBlur"],
 	["SYSTEM.Image Border-1 Shadow-2 Both-3", 0, "imgBorder"],
 	["SYSTEM.Image Only", false, "img_only"],
@@ -234,9 +236,11 @@ let properties = [
 	["SYSTEM.Scrollbar Show", 1, "sbarShow"],
 	["SYSTEM.Scrollbar Width Bar", 11, "sbarBase_w"],
 	["SYSTEM.Scrollbar Windows Metrics", false, "sbarWinMetrics"],
-	["SYSTEM.Show Similar Artists", true, "showSimilarArtists"],
+	["SYSTEM.Show Album History", true, "showAlbumHistory"],
+	["SYSTEM.Show Artist History", true, "showArtistHistory"],
 	["SYSTEM.Show More Tags", true, "showMoreTags"],
-	["SYSTEM.Show Artist History", false, "showArtistHistory"],
+	["SYSTEM.Show Similar Artists", true, "showSimilarArtists"],
+	["SYSTEM.Show Top Albums", true, "showTopAlbums"],
 	["SYSTEM.Summary First", true, "summaryFirst"],
 	["SYSTEM.Subheading Source Hide-0 Auto-1 Show-2", 1, "sourceHeading"],
 	["SYSTEM.Subheading Source Style", 1, "sourceStyle"],
@@ -260,6 +264,7 @@ if (!ppt.get("SYSTEM.Properties Updated", false)) {
 }
 
 String.prototype.clean = function() {return this.replace(/[\/\\|:]/g, "-").replace(/\*/g, "x").replace(/"/g, "''").replace(/[<>]/g, "_").replace(/\?/g, "").replace(/^\./, "_").replace(/\.+$/, "").replace(/^\s+|[\n\s]+$/g, "");}
+String.prototype.cut = function() {const n = this.split("(")[0].trim(); return n.length > 3 ? n : this;}
 String.prototype.regex_escape = function() {return this.replace(/([*+\-?^!:&"~${}()|\[\]\/\\])/g, "\\$1");}
 String.prototype.splt = function(n) {switch (n) {case 0: return this.replace(/\s+|^,+|,+$/g, "").split(","); case 1: return this.replace(/^[,\s]+|[,\s]+$/g, "").split(",");}}
 String.prototype.strip = function() {return this.replace(/[\.,\!\?\:;'\u2019"\-_\u2010\s+]/g, "").toLowerCase();}
@@ -280,7 +285,7 @@ function UserInterface() {
 	if (fadeSetup.length> 2 && fadeSetup[2] == "FadeGradient") {fadeSetup[2] = "Gradient"; ppt.fadeSetup = fadeSetup.toString();}
 	if ([0, 1, 2, 3, 16, 18].every(v => v !== ppt.headFontStyle)) ppt.headFontStyle =  2; if (ppt.overlayStyle > 4 || ppt.overlayStyle < 0) ppt.overlayStyle = 0;
     let baseHeadFontSize = 16, headerGapAdjust = s.value(headerConfig[1], 0, 0), headerLnAdjust = s.value(headerConfig[3], 0, 0), tcol = "", tcol_h = "", sbarMetrics = ppt.sbarMetrics.splt(0), style = 1, zoomFontSize = 16, zoomBold = 1;
-    this.arc_w = ppt.overlayStyle != 2 && ppt.overlayStyle != 4 ? 0 : s.clamp(s.value(fadeSetup[5], 1, 0), 1, 10); this.arrow_pad = s.value(sbarMetrics[5], 0, 0); this.bg = false; this.blurAlpha = s.clamp(ppt.blurAlpha, 0, 100) / 30; this.blurLevel = ppt.blurBlend ? 91.05 - s.clamp(ppt.blurTemp, 1.05, 90) : s.clamp(ppt.blurTemp * 2, 0, 254); this.BtnBg = s.value(show[1], 1, 1); this.BtnName = s.value(show[3], 1, 1); this.local = typeof conf === 'undefined' ? false : true; this.c_c = this.local && typeof opt_c_c !== 'undefined'; this.col = {}; this.custHeadFont = false; this.dui = window.InstanceType; this.fadeAlpha = s.clamp(255 * (100 - s.value(fadeSetup[1], 14.5, 0)) / 100, 0, 255); this.fadeSlope = s.clamp(s.value(fadeSetup[3], 10, 0) / 10 - 1, -1, 9); this.font = ""; this.font_h = 37; this.grip_h = s.value(sbarMetrics[7], 12, 0); this.headFont = ""; this.headFont_h = 37; this.heading_h = 56; ppt.hdLine = s.value(ppt.hdLine, 1, 2); this.head_ln_h = 46; this.headText = s.value(show[7], 0, 1); this.l_h = Math.round(1 * s.scale); this.lfmTheme = s.value(show[5], 0, 1); this.messageFont = ""; if (ppt.narrowSbarWidth != 0) ppt.narrowSbarWidth = s.clamp(ppt.narrowSbarWidth, 2, 10); this.narrowSbarWidth = 2; ppt.sbarCol = s.clamp(ppt.sbarCol, 0, 1); this.sbarCol = ppt.sbarCol; this.src_pad = s.value(headerConfig[7], 0, 0); ppt.src = s.value(ppt.src, 2, 2); this.srcSizeAdjust = s.value(headerConfig[5], 0, 0); this.sourceFont = ""; this.trans = false;
+    this.arc_w = ppt.overlayStyle != 2 && ppt.overlayStyle != 4 ? 0 : s.clamp(s.value(fadeSetup[5], 1, 0), 1, 10); this.arrow_pad = s.value(sbarMetrics[5], 0, 0); this.bg = false; this.blurAlpha = s.clamp(ppt.blurAlpha, 0, 100) / 30; this.blurLevel = ppt.blurBlend ? 91.05 - s.clamp(ppt.blurTemp, 1.05, 90) : s.clamp(ppt.blurTemp * 2, 0, 254); this.BtnBg = s.value(show[1], 1, 1); this.BtnName = s.value(show[3], 1, 1); this.local = typeof conf === 'undefined' ? false : true; this.c_c = this.local && typeof opt_c_c !== 'undefined'; this.col = {}; this.custHeadFont = false; this.dui = window.InstanceType; this.fadeAlpha = s.clamp(255 * (100 - s.value(fadeSetup[1], 14.5, 0)) / 100, 0, 255); this.fadeSlope = s.clamp(s.value(fadeSetup[3], 10, 0) / 10 - 1, -1, 9); this.font = ""; this.font_h = 37; this.grip_h = s.value(sbarMetrics[7], 12, 0); this.headFont = ""; this.headFont_h = 37; this.heading_h = 56; ppt.hdLine = s.value(ppt.hdLine, 1, 2); this.head_ln_h = 46; this.headText = s.value(show[7], 0, 1); this.l_h = Math.round(1 * s.scale); this.lfmTheme = s.value(show[5], 0, 1); this.messageFont = ""; this.smallFont = ""; if (ppt.narrowSbarWidth != 0) ppt.narrowSbarWidth = s.clamp(ppt.narrowSbarWidth, 2, 10); this.narrowSbarWidth = 2; ppt.sbarCol = s.clamp(ppt.sbarCol, 0, 1); this.sbarCol = ppt.sbarCol; this.src_pad = s.value(headerConfig[7], 0, 0); ppt.src = s.value(ppt.src, 2, 2); this.srcSizeAdjust = s.value(headerConfig[5], 0, 0); this.sourceFont = ""; this.trans = false;
 
     const chgBrightness = (c, percent) => {c = s.toRGB(c); return RGB(s.clamp(c[0] + (256 - c[0]) * percent / 100, 0, 255), s.clamp(c[1] + (256 - c[1]) * percent / 100, 0, 255), s.clamp(c[2] + (256 - c[2]) * percent / 100, 0, 255));}
     const dim = (c, bg, alpha) => {c = s.toRGB(c); bg = s.toRGB(bg); const r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, a = alpha / 255, bgr = bg[0] / 255, bgg = bg[1] / 255, bgb = bg[2] / 255; let nR = ((1 - a) * bgr) + (a * r), nG = ((1 - a) * bgg) + (a * g), nB = ((1 - a) * bgb) + (a * b); nR = s.clamp(Math.round(nR * 255), 0, 255); nG = s.clamp(Math.round(nG * 255), 0, 255); nB = s.clamp(Math.round(nB * 255), 0, 255); return RGB(nR, nG, nB);}
@@ -351,7 +356,7 @@ function UserInterface() {
 		if (this.font.Size != ppt.baseFontSize) ppt.zoomFont = 100;
 		ppt.baseFontSize = baseHeadFontSize = this.font.Size;
         zoomFontSize = Math.max(Math.round(ppt.baseFontSize * ppt.zoomFont / 100), 1);
-		const setSegoeUI = ppt.heading && ppt.headFontStyle > 15 || ppt.sourceHeading && ppt.sourceStyle > 15 || ppt.inclTrackRev && ppt.trackHeading && ppt.trackStyle > 15;
+		const setSegoeUI = ppt.heading && ppt.headFontStyle > 15 || ppt.sourceHeading && ppt.sourceStyle > 15 || p.inclTrackRev && ppt.trackHeading && ppt.trackStyle > 15;
         if (ppt.customCol && ppt.custHeadFont.length) {const custHeadFont = ppt.custHeadFont.splt(1); baseHeadFontSize = Math.round(s.value(custHeadFont[1], 16, 0)); this.headFont = gdi.Font(custHeadFont[0], baseHeadFontSize, style); style = Math.round(s.value(custHeadFont[2], 3, 0)); this.custHeadFont = true;}
         else {style = ppt.headFontStyle; this.headFont = gdi.Font(!setSegoeUI ? this.font.Name : ppt.headFontStyle < 16 ? "Segoe UI" : "Segoe UI Semibold", this.font.Size, style);}
 		zoomBold = style != 1 && style != 16 && style != 18 ? 1 : 1.5;
@@ -362,6 +367,7 @@ function UserInterface() {
         this.sourceFont = gdi.Font(!setSegoeUI ? this.font.Name : ppt.sourceStyle < 16 ? "Segoe UI" : "Segoe UI Semibold", this.font.Size, ppt.sourceStyle);
 		this.trackFont = gdi.Font(!setSegoeUI ? this.font.Name : ppt.trackStyle < 16 ? "Segoe UI" : "Segoe UI Semibold", this.font.Size, ppt.trackStyle);
 		this.messageFont = gdi.Font(this.font.Name, this.font.Size * 1.5, 1);
+		this.smallFont = gdi.Font(this.font.Name, Math.round(this.font.Size * 12 / 14), this.font.Style);
 		this.narrowSbarWidth = ppt.narrowSbarWidth == 0 ? s.clamp(Math.floor(this.font.Size / 7), 2, 10) : ppt.narrowSbarWidth;
         if (this.local) {this.font = c_font; this.sourceFont = gdi.Font(this.font.Name, this.font.Size, ppt.sourceStyle); this.trackFont = gdi.Font(this.font.Name, this.font.Size, ppt.trackStyle); this.messageFont = gdi.Font(this.font.Name, this.font.Size * 1.5, 1); if (ppt.sbarShow) {this.sbarType = 0; this.sbar_w = c_scr_w; this.scr_but_w = this.sbar_w + 1; this.but_h = this.sbar_w + 1; this.sbar_sp = this.sbar_w + 1;}}
         this.calc_text(); p.sizes(); but.create_stars(); t.get_widths(); t.art_calc(); t.alb_calc();
@@ -389,6 +395,7 @@ function UserInterface() {
                 this.sourceFont = gdi.Font(this.sourceFont.Name, zoomFontSize, ppt.sourceStyle);
 				this.trackFont = gdi.Font(this.trackFont.Name, zoomFontSize, ppt.trackStyle);
                 this.messageFont = gdi.Font(this.font.Name, zoomFontSize * 1.5, 1);
+				this.smallFont = gdi.Font(this.font.Name, Math.round(zoomFontSize * 12 / 14), this.font.Style);
 				this.narrowSbarWidth = ppt.narrowSbarWidth == 0 ? s.clamp(Math.floor(zoomFontSize / 7), 2, 10) : ppt.narrowSbarWidth;
             }
             this.calc_text(); but.create_stars(); t.get_widths(); window.Repaint(); ppt.zoomFont = Math.round(zoomFontSize / ppt.baseFontSize * 100); t.toggle(13);
@@ -445,8 +452,8 @@ function on_font_changed() {ui.get_font(); alb_scrollbar.reset(); art_scrollbar.
 
 function Panel() {
     const bio_sim = [], id = {alb: "", alb_o: "", artist: "", artist_o: "", lockAlb: "", lockArt: "",   tr: "", tr_o: ""}, inBio = [false, false, true, true, true, false, false], inRev = [true, true, false, false, false, true, true], q = n => n.split("").reverse().join(""), sbarStyle = !ppt.sbarStyle ? 2 : 0, t_l = ppt.textL + ui.arc_w, t_t = ppt.textT + ui.arc_w;
-    let alb_top = [], artFieldsArr = [], calc = true, enabled = 0, enlarged_img = false, init_albums = [], init_artists = [], i = 0, j = 0, langSetOK = false, nn = 0, t_r = ppt.textR + ui.arc_w, t_b = ppt.textB + ui.arc_w, txt_sp = 0;
-    this.alb_ix = 0; this.albums = []; this.albumsUniq = []; this.arc = 10; this.art_ix = 0; this.artistHistory = s.jsonParse(ppt.artistHistory, []); this.artists = []; this.artistsUniq = []; this.bor_l = ppt.borL; this.bor_r = ppt.borR; this.bor_t = ppt.borT; this.bor_b = ppt.borB; this.calcText = false; this.clicked = false; this.covView = 1; this.cycTimeItem = Math.max(ppt.cycTimeItem, 30); this.h = 0; this.iBoxL = 0; this.iBoxT = 0; this.iBoxH = 100; this.iBoxW = 100; this.im_l = 0; this.im_r = 100; this.im_t = 0; this.im_b = 100; this.img_l = 20; this.img_r = 20; this.img_t = 0; this.img_b = 0; this.imgs = 0; this.imgText = !ppt.imgText; this.langArr = ["EN", "DE", "ES", "FR", "IT", "JA", "PL", "PT", "RU", "SV", "TR", "ZH"]; this.last_pressed_coord = {x: -1, y: -1}; this.lfmLang_ix = 0; this.local = s.file("C:\\check_local\\1450343922.txt"); this.lock = 0; this.m_x = 0; this.m_y = 0; this.max_y = 0; this.minH = 50; this.mul = {}; this.newStyle = false; this.overlay = s.jsonParse(ppt.overlay, false); this.pth = {}; this.rp_x = 0; this.rp_y = 0; this.rp_w = 0; this.rp_h = 0; this.top_corr = 0; this.sbar_o = 0; this.sbar_x = 0; this.sbar_y = 0; this.sbar_h = 0; this.style_arr = []; this.styles = s.jsonParse(ppt.styles, false); this.sup = {}; this.tag = []; this.tBoxL = 0; this.tBoxT = 0; this.tBoxH = 100; this.tBoxW = 100; this.text_trace = false; this.text_w = 0; this.tx_l = 0; this.tx_r = 100; this.tx_t = 0; this.tx_b = 100; this.tf = {}; this.w = 0; let txt_h = this.h; if (ppt.overlayStyle == 2 || ppt.overlayStyle == 4) {t_r += 1; t_b += 1;};
+    let alb_top = [], albumHistory = [], artFieldsArr = [], artistHistory = [], calc = true, enabled = 0, enlarged_img = false, history_handle = "", init_albums = [], init_artists = [], i = 0, j = 0, langSetOK = false, nn = 0, t_r = ppt.textR + ui.arc_w, t_b = ppt.textB + ui.arc_w, txt_sp = 0;
+    this.alb_ix = 0; this.albums = []; this.albumsUniq = []; this.arc = 10; this.art_ix = 0; this.artistHistory = s.jsonParse(ppt.artistHistory, []); this.albumHistory = s.jsonParse(ppt.albumHistory, []); this.artists = []; this.artistsUniq = []; this.bor_l = ppt.borL; this.bor_r = ppt.borR; this.bor_t = ppt.borT; this.bor_b = ppt.borB; this.calcText = false; this.clicked = false; this.covView = 1; this.cycTimeItem = Math.max(ppt.cycTimeItem, 30); this.h = 0; this.iBoxL = 0; this.iBoxT = 0; this.iBoxH = 100; this.iBoxW = 100; this.im_l = 0; this.im_r = 100; this.im_t = 0; this.im_b = 100; this.img_l = 20; this.img_r = 20; this.img_t = 0; this.img_b = 0; this.imgs = 0; this.imgText = !ppt.imgText; this.inclTrackRev = ppt.inclTrackRev; this.langArr = ["EN", "DE", "ES", "FR", "IT", "JA", "PL", "PT", "RU", "SV", "TR", "ZH"]; this.last_pressed_coord = {x: -1, y: -1}; this.lfmLang_ix = 0; this.local = s.file("C:\\check_local\\1450343922.txt"); this.lock = 0; this.m_x = 0; this.m_y = 0; this.max_y = 0; this.minH = 50; this.mul = {}; this.newStyle = false; this.overlay = s.jsonParse(ppt.overlay, false); this.pth = {}; this.rp_x = 0; this.rp_y = 0; this.rp_w = 0; this.rp_h = 0; this.top_corr = 0; this.sbar_o = 0; this.sbar_x = 0; this.sbar_y = 0; this.sbar_h = 0; this.style_arr = []; this.styles = s.jsonParse(ppt.styles, false); this.sup = {}; this.tag = []; this.tBoxL = 0; this.tBoxT = 0; this.tBoxH = 100; this.tBoxW = 100; this.text_trace = false; this.text_w = 0; this.tx_l = 0; this.tx_r = 100; this.tx_t = 0; this.tx_b = 100; this.tf = {}; this.w = 0; let txt_h = this.h; if (ppt.overlayStyle == 2 || ppt.overlayStyle == 4) {t_r += 1; t_b += 1;};
 
     const albumsSame = () => {if (ppt.mul_item && this.alb_ix && this.albums.length && JSON.stringify(init_albums) === JSON.stringify(this.albums)) return true; return false;}
     const box = n => n != null ? 'Unescape("' + encodeURIComponent(n + "") + '")' : "Empty";
@@ -460,15 +467,16 @@ function Panel() {
     const getSimilar_search_done = (artist, list) => {bio_sim.push({name:artist, similar:list}); this.get_multi(true);}
     const getTopAlb_search_done = (artist, list) => {alb_top.push({name:artist, album:list}); this.get_multi(true);}
     const sort = (data, prop) => {data.sort((a, b) => {a = a[prop].toLowerCase(); b = b[prop].toLowerCase(); return a.localeCompare(b);}); return data;}
-    const uniq = a => {
+    const uniqAlbum = a => {
         const flags = []; let result = [];
         a.forEach(v => {
-            if (flags[v.album.toLowerCase()]) return;
-            result.push(v); flags[v.album.toLowerCase()] = true;
+			const name = v.artist.toLowerCase() + " - " + v.album.toLowerCase();
+            if (flags[name]) return;
+            result.push(v); flags[name] = true;
         });
         return result = result.filter(v => v.type != "label");
     }
-    const uniqHistory = a => {
+    const uniqArtist = a => {
         const flags = []; let result = [];
         a.forEach(v => {
             if (flags[v.name]) return;
@@ -494,11 +502,11 @@ function Panel() {
 		} else if(!ppt.autoEnlarge && ppt.img_only) {
 			this.mode(0); 
 			this.move(x,y,false);
-		} else {
-			if (this.zoom() || x < 0 || y < 0 || x > this.w || y > this.h || but.Dn) return;  if (ppt.touchControl && !p.dblClick && Math.sqrt((Math.pow(this.last_pressed_coord.x - x, 2) + Math.pow(this.last_pressed_coord.y - y, 2))) > 3 * s.scale) return; if (t.text && (!ppt.img_only || ppt.text_only) && t.scrollbar_type().onSbar || ppt.heading && t.head && !ppt.img_only && (but.btns["src"] && but.btns["src"].trace(x, y) || but.btns["mt"] && but.btns["mt"].trace(x, y))) return; this.clicked = true; t.logScrollPos(); ppt.artistView = !ppt.artistView; if (ppt.cycPic) {ppt.artistView ? img.photoTimestamp = Date.now() : img.covTimestamp = Date.now();} if (!ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) this.sizes(); t.na = ""; timer.clear(timer.source); ppt.sameStyle || (ppt.bioMode == ppt.revMode && ppt.bioStyle == ppt.revStyle) ? but.check() : but.refresh(true); if (calc) calc = ppt.artistView ? 1 : 2; if (!this.lock && this.multi_new()) {this.get_multi(true); if (!ppt.artistView) t.album_reset();} if (!this.art_ix && ppt.artistView || !this.alb_ix && !ppt.artistView) {t.getText(calc); img.get_images();} else {t.get_multi(calc, this.art_ix, this.alb_ix); img.get_multi(this.art_ix, this.alb_ix);} if (ppt.img_only) img.setCrop(true); if (!ppt.artistView) img.set_chk_arr(null); this.move(x, y, true); t.getScrollPos(); calc = false;
+		} else {		
+			if (this.zoom() || x < 0 || y < 0 || x > this.w || y > this.h || but.Dn) return; if (ppt.touchControl && !p.dblClick && Math.sqrt((Math.pow(this.last_pressed_coord.x - x, 2) + Math.pow(this.last_pressed_coord.y - y, 2))) > 3 * s.scale) return; if (t.text && (!ppt.img_only || ppt.text_only) && t.scrollbar_type().onSbar || ppt.heading && t.head && !ppt.img_only && (but.btns["src"] && but.btns["src"].trace(x, y) || but.btns["mt"] && but.btns["mt"].trace(x, y))) return; this.clicked = true; t.logScrollPos(); ppt.artistView = !ppt.artistView; if (ppt.cycPic) {ppt.artistView ? img.photoTimestamp = Date.now() : img.covTimestamp = Date.now();} if (!ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) this.sizes(); t.na = ""; timer.clear(timer.source); ppt.sameStyle || (ppt.bioMode == ppt.revMode && ppt.bioStyle == ppt.revStyle) ? but.check() : but.refresh(true); if (calc) calc = ppt.artistView ? 1 : 2; if (!this.lock && this.multi_new()) {this.get_multi(true); if (!ppt.artistView) t.album_reset();} if (ppt.showAlbumHistory && ppt.artistView && !this.art_ix && this.alb_ix && this.albums[this.alb_ix].type.includes("history")) {t.get_multi(calc, this.art_ix, 0); img.get_images();} else if (!this.art_ix && ppt.artistView || !this.alb_ix && !ppt.artistView) {t.getText(calc); img.get_images();} else {t.get_multi(calc, this.art_ix, this.alb_ix); img.get_multi(this.art_ix, this.alb_ix);} if (ppt.img_only) img.setCrop(true); if (!ppt.artistView) img.set_chk_arr(null); this.move(x, y, true); t.getScrollPos(); calc = false;
 		}
-	}	
-    this.d = parseFloat(q("0000029142")); this.lfm = q("f50a8f9d80158a0fa0c673faec4584be=yek_ipa&");
+	}; 
+	this.d = parseFloat(q("0000029142")); this.lfm = q("f50a8f9d80158a0fa0c673faec4584be=yek_ipa&");
     this.moveIni = n => {
         const d = new Date, timestamp = [d.getFullYear(), s.padNumber((d.getMonth()+1), 2), s.padNumber(d.getDate(), 2)].join("-") + "_" + [s.padNumber(d.getHours(), 2), s.padNumber(d.getMinutes(), 2), s.padNumber(d.getSeconds(), 2)].join("-");
         try {const fn = yttm + "biography_old_" + timestamp + ".ini"; if (!s.file(fn)) s.fs.MoveFile(this.bio_ini, fn);} catch (e) {if (n) fb.ShowPopupMessage("Unable to reset server settings.\n\nbiography.ini is being used by another program.", "Biography");}
@@ -543,18 +551,21 @@ function Panel() {
     const tfRev = (n, aa, l, focus) => {n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*(%bio_albumartist%|%bio_album%)/gi, "$&#@!%path%#@!").replace(/%bio_albumartist%/gi, aa.tf_escape()).replace(/%bio_album%/gi, l.tf_escape()).replace(/%bio_title%/gi, this.tf.t); n = this.eval(n, focus); n = n.replace(/#@!.*?#@!/g, ""); return n;}
     this.ir = focus => fb.IsPlaying && fb.PlaybackLength <= 0 && (!focus || ir_focus());
     this.leave = () => {if (!ppt.autoEnlarge || men.right_up) return; if (ppt.img_only) {this.mode(0); enlarged_img = false;}}
-	this.logArtistHistory = a => {if (a != "Artist Unknown") this.artistHistory.unshift({name: a, field: "", type: "history"}); this.artistHistory = uniqHistory(this.artistHistory); ppt.artistHistory = JSON.stringify(this.artistHistory);}
-	this.mbtn_up = (x, y) => {if (x < 0 || y < 0 || x > this.w || y > this.h) return; if (ppt.mul_item && but.btns["mt"].trace(x, y)) {if (!this.lock) {id.lockArt = this.eval(artFieldsArr, ppt.focus); id.lockAlb = name.albID(ppt.focus, 'full') + (ppt.inclTrackRev ? name.trackID(ppt.focus) : "");} this.lock = this.lock == 0 ? 1 : 0; t.curHeadingID = this.lock ? t.headingID() : ""; if (!this.lock && (ppt.artistView && id.lockArt != this.eval(artFieldsArr, ppt.focus) || !ppt.artistView && id.lockAlb != name.albID(ppt.focus, 'full') + (ppt.inclTrackRev ? name.trackID(ppt.focus) : ""))) {t.on_playback_new_track(true); img.on_playback_new_track(true);} but.check(); t.paint(); return;} switch (true) {case (ppt.img_only || ppt.text_only): this.mode(0); break; case !this.text_trace && img.trace(x, y): this.mode(1); break; case this.text_trace: this.mode(2); break;} this.move(x, y, true);}
+	this.logAlbumHistory = (aa, l) => {if (aa != "Artist Unknown" && l != "Album Unknown") this.albumHistory.unshift({artist: aa, album: l, type: "history"}); this.albumHistory = uniqAlbum(this.albumHistory); if (this.albumHistory.length > 20) this.albumHistory.length = 20; ppt.albumHistory = JSON.stringify(this.albumHistory);}
+	this.logArtistHistory = a => {if (a != "Artist Unknown") this.artistHistory.unshift({name: a, field: "", type: "history"}); this.artistHistory = uniqArtist(this.artistHistory); if (this.artistHistory.length > 20) this.artistHistory.length = 20; ppt.artistHistory = JSON.stringify(this.artistHistory);}
+	this.mbtn_up = (x, y) => {if (x < 0 || y < 0 || x > this.w || y > this.h) return; if (ppt.mul_item && but.btns["mt"].trace(x, y)) {if (!this.lock) {id.lockArt = this.eval(artFieldsArr, ppt.focus); id.lockAlb = name.albID(ppt.focus, 'full') + (this.inclTrackRev ? name.trackID(ppt.focus) : "");} this.lock = this.lock == 0 ? 1 : 0; t.curHeadingID = this.lock ? t.headingID() : ""; if (!this.lock && (ppt.artistView && id.lockArt != this.eval(artFieldsArr, ppt.focus) || !ppt.artistView && id.lockAlb != name.albID(ppt.focus, 'full') + (this.inclTrackRev ? name.trackID(ppt.focus) : ""))) {t.on_playback_new_track(true); img.on_playback_new_track(true);} but.check(); t.paint(); return;} switch (true) {case (ppt.img_only || ppt.text_only): this.mode(0); break; case !this.text_trace && img.trace(x, y): this.mode(1); break; case this.text_trace: this.mode(2); break;} this.move(x, y, true);}
     this.metadb_serv = s.debounce(() => {this.changed();}, 500);
-    this.multi_new = () => {switch (true) {case ppt.artistView: id.artist_o = id.artist; id.artist = this.eval(artFieldsArr, ppt.focus); if (!ppt.mul_item) return true; else return id.artist != id.artist_o || !this.artists.length || !this.art_ix; break; case !ppt.artistView: id.alb_o = id.alb; id.alb = name.albID(ppt.focus, 'simple'); if (ppt.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus);} else id.tr_o = id.tr = ""; if (!ppt.mul_item) return true; else return id.alb != id.alb_o || id.tr != id.tr_o || !this.albums.length || !this.alb_ix; break;}}
+    this.multi_new = () => {switch (true) {case ppt.artistView: id.artist_o = id.artist; id.artist = this.eval(artFieldsArr, ppt.focus); if (!ppt.mul_item) return true; else return id.artist != id.artist_o || !this.artists.length || !this.art_ix; break; case !ppt.artistView: id.alb_o = id.alb; id.alb = name.albID(ppt.focus, 'simple'); if (this.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus);} else id.tr_o = id.tr = ""; if (!ppt.mul_item) return true; else return id.alb != id.alb_o || id.tr != id.tr_o || !this.albums.length || !this.alb_ix; break;}}
     this.multi_serv = s.debounce(() => {this.getData(false, ppt.focus, "multi_tag_bio", 0);}, 1500);
     this.move = (x, y, click) => {if (ppt.text_only) this.text_trace = true; else if (ppt.img_only || !t.text) this.text_trace = false; else if (ppt.style < 4) {switch (ppt.style) {case 0: this.text_trace = y > this.img_t + this.imgs; break; case 1: this.text_trace = x < this.w - this.imgs - this.img_r; break; case 2: this.text_trace = y < this.img_t; break; case 3: this.text_trace =  x > this.img_l + this.imgs; break;}} else this.text_trace = y > this.tBoxT && y < this.tBoxT + this.tBoxH && x > this.tBoxL && x < this.tBoxL + this.tBoxW; if (!ppt.autoEnlarge || click || this.zoom()) return; const enlarged_img_o = enlarged_img; enlarged_img = !this.text_trace && img.trace(x, y); if (enlarged_img && !ppt.text_only && !ppt.img_only && !enlarged_img_o) this.mode(1);}
     this.paint = () => window.RepaintRect(this.rp_x, this.rp_y, this.rp_w, this.rp_h);
+	this.resetAlbumHistory = () => {this.alb_ix = 0; this.albumHistory = []; ppt.albumHistory = JSON.stringify([]); history_handle = ""; this.get_multi(true);}
+	this.resetArtistHistory = () => {this.art_ix = 0; this.artistHistory = []; ppt.artistHistory = JSON.stringify([]); history_handle = ""; this.get_multi(true);}
     this.server = true; window.NotifyOthers("not_server_bio", 0);
     this.setBorder = (imgFull, bor, refl, butRefresh) => {if (imgFull) {this.bor_l = 0; this.bor_r = bor > 1 && !refl ? 10 : 0; this.bor_t = 0; this.bor_b = bor > 1 && !refl ? 10 : 0;} else {this.bor_l = ppt.borL; this.bor_r = bor < 2 || refl ? ppt.borR : Math.max(ppt.borR, 10); this.bor_t = ppt.borT; this.bor_b = bor < 2 || refl ? ppt.borB : Math.max(ppt.borB, 10);}}
     this.setCycItem = n => {const ns = utils.InputBox(window.ID, "Enter time in seconds\n\nMinimum = 30 seconds", "Item: Cycle Time", this.cycTimeItem); if (!ns || ns == this.cycTimeItem) return false; this.cycTimeItem = Math.round(ns); if (!this.cycTimeItem || isNaN(this.cycTimeItem)) this.cycTimeItem = 30; this.cycTimeItem = Math.max(this.cycTimeItem, 30); ppt.cycTimeItem = this.cycTimeItem;}
     this.setCycPic = () => {const ns = utils.InputBox(window.ID, "\n\nEnter time in seconds", "Photo: Cycle Time", ppt.cycTimePic); if (!ns || ns == ppt.cycTimePic) return false; ppt.cycTimePic = Math.round(ns); if (!ppt.cycTimePic || isNaN(ppt.cycTimePic)) ppt.cycTimePic = 15; img.delay = Math.min(ppt.cycTimePic, 7) * 1000;}
-    this.setSimTagNo = () => {const ns = utils.InputBox(window.ID, "Enter number 0-100 (0 Disables writing the tag)\n\nUp to 4 are read from the biography\nUsing 5+ requires saved lists\n\nSaving auto-enables while 5+\nLists save on playing tracks etc\n", "Set Number of Similar Artists to Write to Tag ", this.tag[8].enabled); if (!ns || ns == this.tag[8].enabled) return false; this.tag[8].enabled = parseFloat(ns); this.updIniTag(8);}
+	this.setSimTagNo = () => {const ns = utils.InputBox(window.ID, "Enter number 0-100 (0 Disables writing the tag)\n\nUp to 6 are read from the biography\nUsing 6+ requires saved lists\n\nSaving auto-enables while 6+\nLists save on playing tracks etc\n", "Set Number of Similar Artists to Write to Tag ", this.tag[8].enabled); if (!ns || ns == this.tag[8].enabled) return false; this.tag[8].enabled = parseFloat(ns); this.updIniTag(8);}
 	this.updIniClickAction = n => {utils.WriteINI(this.bio_ini, "MISCELLANEOUS", this.def_tf[9].name, n); window.NotifyOthers("refresh_bio", "refresh_bio");}
     this.updIniLang = n => utils.WriteINI(this.bio_ini, "LASTFM LANGUAGE", this.lang[0].name, n);
     this.updIniTag = n => {enabled = this.tag[n].enabled; if (n < 8) {if (enabled !== 1 && enabled !== 0) enabled = advTag[n].tag;} else {enabled = s.clamp(enabled, 0, 100);} this.tag[n].enabled = enabled; utils.WriteINI(this.bio_ini, "ADVANCED: TAG WRITER", advTag[n].name, enabled); window.NotifyOthers("refresh_bio", "refresh_bio");}
@@ -650,8 +661,7 @@ function Panel() {
         + "MISCELLANEOUS:\r\nImage [Artist] Cache Limit: limits number of images stored to value set. If used with \"Auto-Add New\", newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\n"
         + "ADVANCED:\r\nCustom cover paths. Most users shouldn't need this feature as covers are auto-loaded via foobar2000 album art reader or from save locations. Enable if required.\r\nSimilar Artists (\"Tagger\" & \"More Menu\"). Up to 4 are read from the biography. Using 5+ requires a saved list. Saving auto-enables by default while either set to 5+.\r\nWrite Tag: sets which tags are available to be written. Enter 0 or 1 or as indicated. Change tag names as required.\r\n***See documentation for full info on advanced items.***"
 
-    let bio_ini = s.open(this.bio_ini); if (s.file(this.bio_ini) && !bio_ini.includes("Version A0001") && !bio_ini.includes("Version A0002")) this.moveIni(); // Check correct ini. Remove & back-up any can't auto-update. Back compatibility: number as A0002.x to avoid old bios resetting; use A0003 etc to force reset
-
+    let bio_ini = s.open(this.bio_ini); if (s.file(this.bio_ini) && !bio_ini.includes("Version A0001") && !bio_ini.includes("Version A0002")) this.moveIni(); // Check correct ini. Remove & back-up any can't auto-update. Back compatibility: number as A0002.x.x etc to avoid old bios resetting; use A0003 etc to force reset
     if (!s.file(this.bio_ini)) { // No ini: fresh install, reset or unable to auto-update. Create new ini
         utils.WriteINI(this.bio_ini, helpText, "", "=======================================\r\n");
         ini("AUTO-FETCH", this.def_dn, 'dn', 0, 1);
@@ -686,7 +696,17 @@ function Panel() {
 			.replace("artist and album", "artist, album and title")
 			.replace(" or %BIO_ALBUM%", ", %BIO_ALBUM% or %BIO_TITLE")
 			.replace(", %BIO_ALBUM%,", ", %BIO_ALBUM%, %BIO_TITLE,")
-			.replace("\r\n\r\n[SAVE]", "\r\n" + this.def_tf[3].name + "=" + this.def_tf[3].tf + "\r\n\r\n[SAVE]")
+			.replace("\r\n\r\n[SAVE]", "\r\n" + this.def_tf[3].name + "=" + this.def_tf[3].tf + "\r\n\r\n[SAVE]");
+			this.moveIni();
+		s.save(this.bio_ini, bio_ini, true);
+	}
+
+	if (!bio_ini.includes("Version A0002.1.1")) { // Update A0002.1 to A0002.1.1
+		bio_ini = bio_ini
+			.replace("Version A0002.1", "Version A0002.1.1")
+			.replace("Number to Display(0-10)=4", "Number to Display(0-10)=6")
+			.replace("Number to Write (0-100)=4", "Number to Write (0-100)=6")
+			.replace("4 are read from the biography. Using 5+ requires a saved list. Saving auto-enables by default while either set to 5+", "6 are read from the biography. Using 7+ requires a saved list. Saving auto-enables by default while either set to 7+")
 			this.moveIni();
 		s.save(this.bio_ini, bio_ini, true);
 	} advTag.splice(7, 0, {name:"Write Tag: Locale Last.fm", tag:1}); advTag.splice(16, 0, {name:"Tag Name: Locale Last.fm", tag:"Locale Last.fm"}); // finalise advTag
@@ -729,7 +749,7 @@ function Panel() {
             nn = this.valueIni("ADVANCED: TAG WRITER", advTag[i + 9].name, advTag[i + 9].tag, 0);
             this.tag[i] = {name:nn, enabled:enabled};
         }
-    }); this.lfm_sim = this.valueIni("ADVANCED: SIMILAR ARTISTS", advSimilar[0].name, advSimilar[0].tag, 1); if (this.lfm_sim && similarNo < 5 && this.tag[8].enabled < 5) this.lfm_sim = 0; if (this.local) {this.lfm_sim = 0; this.sup.imgRevHQ = 1; this.sup.Cache = 1;}
+    }); this.lfm_sim = this.valueIni("ADVANCED: SIMILAR ARTISTS", advSimilar[0].name, advSimilar[0].tag, 1); if (this.lfm_sim && similarNo < 7 && this.tag[8].enabled < 7) this.lfm_sim = 0; if (this.local) {this.lfm_sim = 0; this.sup.imgRevHQ = 1; this.sup.Cache = 1;}
 
     if (this.sup.Cache) { // supplemental
         pthArr = ["amRev", "lfmRev", "amBio", "lfmBio", "imgArt", "imgRev"];
@@ -779,12 +799,12 @@ function Panel() {
 				if (s.file(lfmBio)) {
 					kw = "Similar Artists: |Ähnliche Künstler: |Artistas Similares: |Artistes Similaires: |Artisti Simili: |似ているアーティスト: |Podobni Wykonawcy: |Artistas Parecidos: |Похожие исполнители: |Liknande Artister: |Benzer Sanatçılar: |相似艺术家: "
 					let found = false, sim = lfm_a.match(RegExp(kw)); if (sim) {sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {sa = lfm_a.substring(ix + sim.length); sa = sa.split('\n')[0].trim().split(", ");}}
-					if (sa.length < 5 && sa) {$.take(sa, similarNo); found = true;}
+					if (sa.length < 7 && sa) {$.take(sa, similarNo); found = true;}
 					if (!found) {
 						bio_sim.some(v => {
 							if (v.name == a) {sa = $.take(v.similar, similarNo); return found = true;}
 						});
-						if (!found) {const getSimilar = new Lfm_similar_artists(() => getSimilar.on_state_change(), getSimilar_search_done); getSimilar.Search(a, "", "", 4);}
+						if (!found) {const getSimilar = new Lfm_similar_artists(() => getSimilar.on_state_change(), getSimilar_search_done); getSimilar.Search(a, "", "", 6);}
 					}
 					if (found && $.isArray(sa) && sa.length) {
 						this.artists.push({name: "Similar Artists:", field: "", type: "label"});
@@ -808,18 +828,26 @@ function Panel() {
 			}}
 			if (mult_arr.length) {this.artists.push({name: "More Tags:", field: "", type: "label"}); this.artists = this.artists.concat(mult_arr); this.artists[this.artists.length - 1].type = "tagend";}
 		}
-		this.logArtistHistory(a);
-		if (this.artistHistory.length > 21) this.artistHistory.length = 21;
-		if (this.artistHistory.length > 1 && ppt.showArtistHistory) {
-			this.artists.push({name: "History:", field: "", type: "label"}); 
-			for (let h = 1; h < this.artistHistory.length; h++) this.artists.push(this.artistHistory[h]);
+
+		const cur_handle = fb.IsPlaying && !ppt.focus ? fb.GetNowPlaying() : fb.GetFocusItem();
+		if (!cur_handle || !history_handle || !cur_handle.Compare(history_handle)) {
+			artistHistory = JSON.parse(JSON.stringify(this.artistHistory))
+			this.logArtistHistory(a);
+			albumHistory = JSON.parse(JSON.stringify(this.albumHistory));
+			this.logAlbumHistory(aa, l);
+			this.inclTrackRev = ppt.inclTrackRev;
+			history_handle = cur_handle;
+		}
+		if (artistHistory.length && ppt.showArtistHistory) {
+			this.artists.push({name: "Artist History:", field: "", type: "label"}); 
+			for (let h = 0; h < artistHistory.length; h++) this.artists.push(artistHistory[h]);
 			this.artists[this.artists.length - 1].type = "historyend";
 		}
 
         this.artists.forEach((v, i) => v.ix = i);
         this.artistsUniq = this.artists.filter(v => v.type != "label");
 
-        if (s.file(lfmBio)) { // albums
+        if (ppt.showTopAlbums && s.file(lfmBio)) { // albums
             kw = "Top Albums: |Top-Alben: |Álbumes Más Escuchados: |Top Albums: |Album Più Ascoltati: |人気アルバム: |Najpopularniejsze Albumy: |Álbuns Principais: |Популярные альбомы: |Toppalbum: |En Sevilen Albümler: |最佳专辑: "; ix = -1;
             let found = false, talb = lfm_a.match(RegExp(kw)); if (talb) {talb = talb.toString(); ix = lfm_a.lastIndexOf(talb); if (ix != -1) {ta = lfm_a.substring(ix + talb.length); ta = ta.split('\n')[0].trim().split(", ");}}
             if (ta.length < 7 && ta) found = true;
@@ -836,8 +864,15 @@ function Panel() {
                 ta.forEach((v, i) => this.albums.push({artist: a, album: v, type: i != ta.length - 1 ? "album" : "albumend"}));
             }
         } else {this.albums = []; this.albums.push({artist: aa, album: l, type: "Current Album"});}
+
+		if (albumHistory.length && ppt.showAlbumHistory) {
+			this.albums.push({artist: "Album History:", l: "", album: "Album History:", type: "label"}); 
+			for (let h = 0; h < albumHistory.length; h++) this.albums.push(albumHistory[h]);
+			this.albums[this.albums.length - 1].type = "historyend";
+		}
+
         this.albums.forEach((v, i) => v.ix = i);
-        this.albumsUniq = uniq(this.albums);
+        this.albumsUniq = uniqAlbum(this.albums);
         if (!this.artistsSame() && p_clear) this.art_ix = 0; if (!albumsSame() && p_clear) this.alb_ix = 0;
     }
 
@@ -1045,7 +1080,7 @@ function Lfm_similar_artists(state_callback, on_search_done_callback) {
         const data = s.jsonParse(this.xmlhttp.responseText, false, 'get', 'similarartists.artist', 'name\":');
         if ((!data || data.length < lmt) && !retry) {retry = true; return this.Search(artist, done, handles, lmt, pth_sim, fn_sim);}
         switch (true) {
-            case lmt < 15: if (data) {$.take(data, 4); list = data.map(v => v.name);}
+            case lmt < 17: if (data) {$.take(data, 6); list = data.map(v => v.name);}
             if (data || retry) this.on_search_done_callback(artist, list, done, handles); break;
             case lmt > 99: if (data) {
                     list = data.map(v => ({name: v.name, score: Math.round(v.match * 100)}));
@@ -1056,17 +1091,28 @@ function Lfm_similar_artists(state_callback, on_search_done_callback) {
 }
 
 function Lfm_top_albums(state_callback, on_search_done_callback) {
-    const list = []; let artist; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.on_search_done_callback = on_search_done_callback;
+    const list = [], popAlbums = []; let artist, i = 0, topAlbums = []; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.on_search_done_callback = on_search_done_callback;
     this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {if (this.xmlhttp.status == 200) this.func(); else {this.on_search_done_callback(artist, list);}}}
-    this.Analyse = () => {const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText;
-    s.htmlParse(div.getElementsByTagName('p'), 'className', 'grid-items-item-aux-text', v => {if (v.innerText != "") list.push(v.previousSibling.innerText.trim());});
-    this.on_search_done_callback(artist, list); doc.close();}
 
     this.Search = (p_artist) => {
         artist = p_artist; this.func = null; this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        const URL = "https://www.last.fm/music/" + encodeURIComponent(artist);
+		const URL = "https://www.last.fm/music/" + encodeURIComponent(artist) + "/+albums";
         this.func = this.Analyse; this.xmlhttp.open("GET", URL); this.xmlhttp.onreadystatechange = this.ready_callback; this.xmlhttp.send();
     }
+
+	this.Analyse = () => {
+		const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText;
+		s.htmlParse(div.getElementsByTagName('h3'), 'className', 'resource-list--release-list-item-name', v => {i < 4 ? popAlbums.push(v.innerText.trim().titlecase()) : topAlbums.push(v.innerText.trim().titlecase()); i++; if (i == 10) return true;});
+		if (popAlbums.length) {
+			const mapAlbums = topAlbums.map(v => v.cut());
+			const match = mapAlbums.includes(popAlbums[0].cut());
+			if (topAlbums.length > 5 && !match) topAlbums.splice(5, 0, popAlbums[0]);
+			else topAlbums = topAlbums.concat(popAlbums);
+		}
+		topAlbums = [...new Set(topAlbums)];
+		topAlbums.length = Math.min(6, topAlbums.length);
+		this.on_search_done_callback(artist, topAlbums); doc.close();
+	}
 }
 
 function Names() {
@@ -1230,10 +1276,11 @@ function Scrollbar() {
 
     this.move = (p_x, p_y) => {
 		this.active = true;
-		if (p_x > p.w - this.w) {
+		const x = p_x - this.x, y = p_y - this.y;
+		if (x >= 0 && x <= this.w && y >= 0 && y <= this.h) {
 			sbarZone = true;
 			this.narrow = false;
-			if (ppt.sbarShow == 1 && sbarZone != sbarZone_o) {but.set_scroll_btns_hide(!sbarZone || this.scrollable_lines < 1, this.type); sbarZone_o = sbarZone;}
+			if (ppt.sbarShow == 1 && sbarZone != sbarZone_o) {but.set_scroll_btns_hide(!sbarZone || this.scrollable_lines < 1 || ppt.img_only, this.type); sbarZone_o = sbarZone;}
 		} else sbarZone = false;
 		if (ppt.sbarShow == 1) {minimise_debounce(); hide_debounce();}
         if (ppt.touchControl) {
@@ -1244,7 +1291,6 @@ function Scrollbar() {
             }
         }
         if (this.touch.dn) {if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y) || !p.text_trace) return; ts = Date.now(); if (ts - startTime > 300) startTime = ts; lastTouchDn = ts; this.check_scroll(initial_scr + (initial_y - p_y) * ppt.touchStep, ppt.touchStep == 1 ? 'drag' : 'scroll'); return;}
-        const x = p_x - this.x, y = p_y - this.y;
         if (x < 0 || x > this.w || y > bar_y + bar_ht || y < bar_y || but.Dn) hover = false; else hover = true;
         if (!bar_timer && (hover != hover_o || this.active != active_o)) {init = false; this.paint(); active_o = this.active;}
         if (!b_is_dragging || this.row_count <= this.rows_drawn) return;
@@ -1331,7 +1377,7 @@ function Buttons() {
     if (!ui.BtnName) {amBioBtn = ""; amRevBtn = ""; lfmBioBtn = ""; lfmRevBtn = "";} else {amlfmBioBtn = amBioBtn + " | " + lfmBioBtn; amlfmRevBtn = amRevBtn + " | " + lfmRevBtn; lfmamBioBtn = lfmBioBtn + " | " + amBioBtn; lfmamRevBtn = lfmRevBtn + " | " + amRevBtn;}
     const albScrBtns = ["alb_scrollDn", "alb_scrollUp"], artScrBtns = ["art_scrollDn", "art_scrollUp"], fontAwesomeInstalled = utils.CheckFont("FontAwesome"), orig_mt_sz = 15 * s.scale, scc = 2, rc = StringFormat(2, 1, 3), scrBtns = albScrBtns.concat(artScrBtns);
     let arrow_symb = 0, b_x, btnTxt = false, btnVisible = false, byDn, byUp, cur_btn = null, drawTxt = "", hoverCol = ui.col.text & RGBA(255, 255, 255, 51), iconFontName = "Segoe UI Symbol", iconFontStyle = 0, init = true, l = false, m = false, mt = false, mtL = false, name_w = 0, r = false, sAlpha = 255, sbarButPad = s.clamp(ppt.sbarButPad / 100, -0.5, 0.3), scrollBtn = false, scrollBtn_x, scrollDn_y, scrollUp_y, sp_w = [], src_fs = 12, src_h = 19, src_im = false, src_w = 50, src_font = gdi.Font("Segoe UI", src_fs, 1), tooltip, transition, tt_start = Date.now() - 2000, zoom_mt_sz = Math.max(Math.round(orig_mt_sz * ppt.zoomBut / 100), 7), scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); ppt.zoomBut = scale;
-	let mt_w = 12, mtCol = s.toRGB(ui.col.text), mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0), mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
+	let mt_w = 12, mtCol = s.toRGB(ui.col.text), mtFont = gdi.Font("FontAwesome", 15 * scale / 100, 0), mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
     this.btns = {}; this.Dn = false; this.r_h1 = 0; this.r_h2 = 0; this.r_w1 = 0; this.r_w2 = 0; this.ratingImages = []; if (ui.stars == 1 && ui.lfmTheme) this.ratingImagesLfm = []; this.show_tt = true;
 
 	this.setSbarIcon = () => {
@@ -1358,8 +1404,8 @@ function Buttons() {
 
     const clear = () => {this.Dn = false; Object.values(this.btns).forEach(v => v.down = false);}
     const scroll = () => ppt.sbarShow && alb.show;
-    const scroll_alb = () => ppt.sbarShow && !ppt.artistView && !ppt.img_only && t.alb_txt && alb_scrollbar.scrollable_lines > 0;
-    const scroll_art = () => ppt.sbarShow && ppt.artistView && !ppt.img_only && t.art_txt && art_scrollbar.scrollable_lines > 0;
+    const scroll_alb = () => ppt.sbarShow && !ppt.artistView && !ppt.img_only && t.alb_txt && alb_scrollbar.scrollable_lines > 0 && alb_scrollbar.active && !alb_scrollbar.narrow;
+    const scroll_art = () => ppt.sbarShow && ppt.artistView && !ppt.img_only && t.art_txt && art_scrollbar.scrollable_lines > 0 && art_scrollbar.active && !art_scrollbar.narrow;
     const src_tiptext = () => "Switch To " + (ppt.artistView ? (!ppt.allmusic_bio ? (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "AllMusic" + (ppt.bothBio ? " First" : "") : (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "Last.fm" + (ppt.bothBio ? " First" : "")) : (!ppt.allmusic_alb ? (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "AllMusic"  + (ppt.bothRev ? " First" : ""): (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "Last.fm" + (ppt.bothRev ? " First" : "")));
     const tt = (n, force) => {if (tooltip.Text !== n || force) {tooltip.Text = n; tooltip.SetMaxWidth(800); tooltip.Activate();}}
 
@@ -1375,7 +1421,7 @@ function Buttons() {
 			case true: 
 				mtCol = s.toRGB(ui.col.text); 
 				s.gr(1, 1, true, g => {
-					mt_w = Math.max(g.CalcTextWidth("\uF078", mtFont), g.CalcTextWidth("\uF023", mtFontL), g.CalcTextHeight("\uF078", mtFont), g.CalcTextHeight("\uF023", mtFontL));});
+					mt_w = Math.max(g.CalcTextWidth("\uF107", mtFont), g.CalcTextWidth("\uF023", mtFontL), g.CalcTextHeight("\uF107", mtFont), g.CalcTextHeight("\uF023", mtFontL));});
 				break;
 			case false:
 				const sz = Math.max(Math.round(20 * scale / 100), 20), sc = sz / 100;
@@ -1399,7 +1445,7 @@ function Buttons() {
 		ppt.zoomFont = 100; ppt.zoomHead = 115;
 		zoom_mt_sz = orig_mt_sz;
 		scale = ppt.zoomBut = 100;
-		mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0);
+		mtFont = gdi.Font("FontAwesome", 15 * scale / 100, 0);
 		mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
 		ppt.set(" Zoom Tooltip (%)", 100); ui.get_font(); this.create_mt(); this.create_tooltip(); this.refresh(true); t.toggle(12);
 	}
@@ -1515,7 +1561,7 @@ function Buttons() {
 				case true:
 					const col = this.state !== "down" ? ui.get_blend(im.hover, im.normal, this.transition_factor, true) : im.hover;
 				    gr.SetTextRenderingHint(5);
-					!p.lock ? gr.DrawString("\uF078", mtFont, col, this.x, this.y, ft, txt, StringFormat(1, 1)) :
+					!p.lock ? gr.DrawString("\uF107", mtFont, col, this.x, this.y, ft, txt, StringFormat(1, 1)) :
 					gr.DrawString("\uF023", mtFontL, col, this.x, this.y + 3 * s.scale, ft, txt, StringFormat(1, 1));
 					break;
 				case false:
@@ -1537,6 +1583,7 @@ function Buttons() {
              if (!v.hide && (!this.Dn || this.Dn == v.name)) return v.trace(x, y);
         });
         let hand = false; init = false;
+		
         check_scrollBtns(x, y, hover_btn); if (hover_btn) hand = hover_btn.hand; if (!tb.down) {
 			if(!hand && this.hand) {
 				window.SetCursor(32512);
@@ -1545,7 +1592,8 @@ function Buttons() {
 				window.SetCursor(32649);
 				this.hand = true;
 			}
-		}
+		}		
+		
         if (hover_btn && hover_btn.hide) {if (cur_btn) {cur_btn.cs("normal"); transition.start();} cur_btn = null; return null;} // btn hidden, ignore
         if (cur_btn === hover_btn) return cur_btn;
         if (cur_btn) {cur_btn.cs("normal"); transition.start();} // return prev btn to normal state
@@ -1567,7 +1615,7 @@ function Buttons() {
         zoom_mt_sz += step; zoom_mt_sz = s.clamp(zoom_mt_sz, 7, 100);
         window.RepaintRect(this.btns["mt"].x, this.btns["mt"].y, this.btns["mt"].w, this.btns["mt"].h);
         scale = Math.round(zoom_mt_sz / orig_mt_sz * 100); 
-		mtFont = gdi.Font("FontAwesome", 12 * scale / 100, 0);
+		mtFont = gdi.Font("FontAwesome", 15 * scale / 100, 0);
 		mtFontL = gdi.Font("FontAwesome", 14 * scale / 100, 0);
 		this.create_mt(); this.refresh(true); ppt.zoomBut = scale;
     }
@@ -1596,7 +1644,7 @@ function Buttons() {
         if (ppt.mul_item) {
 			switch (fontAwesomeInstalled) {
 				case true:
-					this.btns.mt = new Btn(2 * s.scale, 0, mt_w * 1.5, mt_w * 1.5, 7, mt_w, mt_w, "", {normal: RGBA(mtCol[0], mtCol[1], mtCol[2], sAlpha[0]), hover: RGBA(mtCol[0], mtCol[1], mtCol[2], sAlpha[1])}, !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");
+					this.btns.mt = new Btn(1 * s.scale, 0, mt_w * 1.5, mt_w * 1.5, 7, mt_w, mt_w, "", {normal: RGBA(mtCol[0], mtCol[1], mtCol[2], 50), hover: RGBA(mtCol[0], mtCol[1], mtCol[2], sAlpha[1])}, !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");
 					break;
 				case false:
 					this.btns.mt = new Btn(0, 0, 12 * scale / 100 * 1.5, 12 * scale / 100 * 1.5, 7, "", "", "", [mt, mtL], !ppt.mul_item, "", () => men.button(12 * scale / 100, 16), () => "Click: More...\r\nMiddle Click: " + (!p.lock ? "Lock: Stop Track Change Updates" : "Unlock") + "...", true, "mt");
@@ -1718,11 +1766,9 @@ function MenuItems() {
     const langTypeMenu= (Menu, StartIndex) => {let Index = StartIndex; const n = p.langArr; n.forEach((v, i) => {newMenuItem(Index, "Language", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + n.length - 1, StartIndex + p.lfmLang_ix); return Index;}
     const lfmRevTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Album", "Album + Track", "Track"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 9); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.inclTrackRev); return Index;}
     const modeTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = [!p.imgText ? "Auto Display" : "Image+Text", "Image Only", "Text Only"]; n.forEach((v, i) => {newMenuItem(Index, "Mode", i); Menu.AppendMenuItem(i != 1 || !ppt.autoEnlarge ? MF_STRING : MF_GRAYED, Index, v); Index++; if (i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + (ppt.sameStyle ? (!ppt.img_only && !ppt.text_only ? 0 : ppt.img_only ? 1 : 2) : ppt.artistView ? ppt.bioMode : ppt.revMode)); return Index;}
-    const moreAlbMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.albums.forEach((v, i) => {newMenuItem(Index, "More-Album", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, !i ? v.artist.replace(/&/g, "&&") + " - " + v.album.replace(/&/g, "&&") : v.album.replace(/&/g, "&&")); Index++; if (!i || v.type == "albumend" || v.type == "label") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.albums.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.albums.length, StartIndex + p.alb_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Album", p.albums.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
+    const moreAlbMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.albums.forEach((v, i) => {newMenuItem(Index, "More-Album", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, !i || v.type.includes("history") ? v.artist.replace(/&/g, "&&") + " - " + v.album.replace(/&/g, "&&") : v.album.replace(/&/g, "&&")); Index++; if (!i || v.type == "albumend" || v.type == "label" || v.type == "historyend") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.albums.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.albums.length, StartIndex + p.alb_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Album", p.albums.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
 	const moreArtMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Manual Cycle: Wheel Over Button", "Auto Cycle Items", "Cycle Time..."]; p.artists.forEach((v, i) => {newMenuItem(Index, "More-Artist", i); Menu.AppendMenuItem(v.type != "label" ? MF_STRING : MF_GRAYED, Index, v.name.replace(/&/g, "&&") + v.field.replace(/&/g, "&&")); Index++; if (!i || v.type == "similarend" || v.type == "label" || v.type == "tagend" || v.type == "historyend") Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); if (p.artists.length) Menu.CheckMenuRadioItem(StartIndex, StartIndex + p.artists.length, StartIndex + p.art_ix); n.forEach((v, i) => {newMenuItem(Index, "More-Artist", p.artists.length + i); Menu.AppendMenuItem(!i ? MF_GRAYED : MF_STRING, Index, v); if (i == 1) Menu.CheckMenuItem(Index++, ppt.cycItem); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const openTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const fo = [imgPth, amPth[3], lfmPth[3], tracksPth[3]], n = ["Image", ppt.artistView ? "Biography [AllMusic]" : "Review [AllMusic]", ppt.artistView ? "Biography [Last.fm]" : "Review [Last.fm]", ppt.artistView ? "" : "Tracks [Last.fm]"]; let i = n.length; while (i--) if (!fo[i]) {n.splice(i, 1); fo.splice(i, 1); pths.splice(i, 1);} n.forEach((v, i) => {newMenuItem(Index, "Open", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++; if (!i && n.length > 1 && imgPth) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
-	
-	
 	const optionsTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.sameStyle, !p.imgText, ppt.smooth, ppt.touchControl, p.dblClick,,], n = ["Use Same Style for Artist && Album", "Dual Style Auto", "Smooth Scroll", "Touch Control", "Click Action: Use Double Click", "Fallback Text...", "Line Spacing...", "Reset Zoom", "Reload"]; n.forEach((v, i) => {newMenuItem(Index, "Options", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 2 || i > 2 && i < 6) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Menu.CheckMenuItem(Index++, c[i]);}); return Index;}
     const overlayTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Gradient", "Standard", "Standard + Rim", "Rounded", "Rounded + Rim"]; n.forEach((v, i) => {newMenuItem(Index, "Overlay", i); Menu.AppendMenuItem(MF_STRING, Index, v); Menu.CheckMenuItem(Index++, i == ppt.overlayStyle); if (!i || i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const pasteTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = [ppt.artistView ? "Biography [AllMusic Location]" : "Review [AllMusic Location]", ppt.artistView ? "Biography [Last.fm Location]" : "Review [Last.fm Location]", "Open Last Edited", "Undo"]; n.forEach((v, i) => {newMenuItem(Index, "Paste", i); Menu.AppendMenuItem(!i && !amPth[2] || i == 1 && !lfmPth[2] || i == 2 && !undoPth || i == 3 && undoTxt == "#!#" ? MF_GRAYED : MF_STRING, Index, v); Index++; if (i == 1 || i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
@@ -1731,6 +1777,7 @@ function MenuItems() {
     const reflTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Show", "Auto Position", "Top", "Left", "Bottom", "Right"]; n.forEach((v, i) => {newMenuItem(Index, "Reflection", i); Menu.AppendMenuItem(!i || ppt.imgReflection ? MF_STRING : MF_GRAYED, Index, v); if (!i) Menu.CheckMenuItem(Index++, ppt.imgReflection); else Index++; if (!i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex + 1, StartIndex + 5, StartIndex + ppt.imgReflType + 1); return Index;}
     const revTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [ppt.allmusic_alb && !ppt.bothRev, !ppt.allmusic_alb && !ppt.bothRev, ppt.bothRev, ppt.lockRev], n = [(!ppt.lockRev ? "Prefer " : "") + "AllMusic", (!ppt.lockRev ? "Prefer " : "") + "Last.fm", "Prefer Both", "Lock To Single Source"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 5); Menu.AppendMenuItem((i < 2 || i == 3) && ppt.bothRev ? MF_GRAYED : MF_STRING, Index, v); if (i > 1) Menu.CheckMenuItem(Index++, c[i]); else {Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);} if (i) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
 	const sbarTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Hide", "Auto", "Show", "Default", "Styled", "Themed", "Use Theme Metrics", "Arrows", "Triangles", "Custom Arrows", "Set Custom Arrows..."]; n.forEach((v, i) => {newMenuItem(Index, "Scrollbar", i); Menu.AppendMenuItem(ui.sbarType != 2 || i < 7 ? MF_STRING : MF_GRAYED, Index, v); if (i == 2 || i == 5 || i == 6 || i == 9) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); if ( i == 6) Menu.CheckMenuItem(Index++, ppt.sbarWinMetrics); else Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.sbarShow); Menu.CheckMenuRadioItem(StartIndex + 3, StartIndex + 5, StartIndex + 3 + ui.sbarType); Menu.CheckMenuRadioItem(StartIndex + 7, StartIndex + 9, StartIndex + 7 + ppt.sbarButType); return Index;}
+	const seekBarTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Hide", "Auto", "Show"]; n.forEach((v, i) => {newMenuItem(Index, "SeekBar", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.imageBar); return Index;}
     const selectionTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Prefer Now Playing", "Follow Selected Track (Playlist)"]; n.forEach((v, i) => {newMenuItem(Index, "Selection", i); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 1, StartIndex + ppt.focus); return Index;}
     const serverTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; newMenuItem(Index, "Server", 0); if (shift && utils.IsKeyPressed(0x11)) {Menu.AppendMenuItem(MF_GRAYED, Index, "Biography Server"); Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index++;} return Index;}
     const servTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ["Configure...", "Reset To Default"]; n.forEach((v, i) => {newMenuItem(Index, "Sources", i + 25); Menu.AppendMenuItem(MF_STRING, Index, v); Index++;}); return Index;}
@@ -1742,7 +1789,8 @@ function MenuItems() {
     const themeTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [!ppt.blurDark && !ppt.blurBlend && !ppt.blurLight, ppt.blurDark, ppt.blurBlend, ppt.blurLight, ppt.covBlur, ppt.swapCol, ppt.summaryFirst], n = ["None", "Dark", "Blend", "Light", "Always Cover-Based", "Swap Colours", "Text: Summary First"]; n.forEach((v, i) 	=> {newMenuItem(Index, "Theme", i); Menu.AppendMenuItem(!ui.blur && i == 4 ? MF_GRAYED : MF_STRING, Index, v); if (i < 4) {Index++; if (c[i]) Menu.CheckMenuRadioItem(StartIndex + i, StartIndex + i, StartIndex + i);} else Menu.CheckMenuItem(Index++, c[i]); if (!i || i == 3  || i == 4 || i == 5) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
     const toggleTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const n = ppt.artistView ? "Biography: Switch To " + (!ppt.allmusic_bio ? (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "AllMusic" + (ppt.bothBio ? " First" : "") : (!ppt.lockBio || ppt.bothBio ? "Prefer " : "") + "Last.fm" + (ppt.bothBio ? " First" : "")) : "Review: Switch To " + (!ppt.allmusic_alb ? (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "AllMusic" + (ppt.bothRev ? " First" : "") : (!ppt.lockRev || ppt.bothRev ? "Prefer " : "") + "Last.fm" + (ppt.bothRev ? " First" : "")); newMenuItem(Index, "Toggle", 0); Menu.AppendMenuItem(MF_STRING, Index, n); Index++; Menu.AppendMenuItem(MF_SEPARATOR, 0, 0); return Index;}
 	const trackHeadTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const c = [, , , ppt.trackStyle == 1, ppt.trackStyle == 2, ppt.trackStyle == 3, ppt.trackStyle == 16, ppt.trackStyle == 18, false], n = ["Hide", "Auto", "Show", "Bold", "Italic", "Bold Italic", "SemiBold [Segoe UI]", "SemiBold Italic [Segoe UI]", "Subheading Title Format..."]; n.forEach((v, i) => {newMenuItem(Index, "TrackHead", i); Menu.AppendMenuItem(MF_STRING, Index, v); if (i < 3) Index++; else Menu.CheckMenuItem(Index++, c[i]); if (i == 2 || i == 5 || i == 7) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); Menu.CheckMenuRadioItem(StartIndex, StartIndex + 2, StartIndex + ppt.trackHeading); return Index;}
-    const webTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), c = [ppt.showSimilarArtists, ppt.showMoreTags, ppt.showArtistHistory], n = ["Show Similar Artists", "Show More Tags", "Show Artist History", "Reset Artist History...", "Last.fm: " + artist + "...", "Last.fm: " + artist + ": Similar Artists...", "Last.fm: " + artist + ": Top Albums...", "AllMusic: " + artist + "..."]; n.forEach((v, i) => {newMenuItem(Index, "Web", i); Menu.AppendMenuItem(i != 3 || ppt.showArtistHistory ? MF_STRING : MF_GRAYED, Index, v); if (i < 3) Menu.CheckMenuItem(Index++, c[i]); else Index++; if (i == 2 || i == 3 || i == 6) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
+	const webAlbumTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), c = [ppt.showTopAlbums, ppt.showAlbumHistory], n = ["Show Top Albums", "Show Album History", "Reset Album History...", "Last.fm: " + artist + "...", "Last.fm: " + artist + ": Similar Artists...", "Last.fm: " + artist + ": Top Albums...", "AllMusic: " + artist + "..."]; n.forEach((v, i) => {newMenuItem(Index, "Web", i); Menu.AppendMenuItem(i != 2 || ppt.showAlbumHistory ? MF_STRING : MF_GRAYED, Index, v); if (i < 2) Menu.CheckMenuItem(Index++, c[i]); else Index++; if (i == 1 || i == 2 || i == 5) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
+    const webArtistTypeMenu = (Menu, StartIndex) => {let Index = StartIndex; const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), c = [ppt.showSimilarArtists, ppt.showMoreTags, ppt.showArtistHistory], n = ["Show Similar Artists", "Show More Tags", "Show Artist History", "Reset Artist History...", "Last.fm: " + artist + "...", "Last.fm: " + artist + ": Similar Artists...", "Last.fm: " + artist + ": Top Albums...", "AllMusic: " + artist + "..."]; n.forEach((v, i) => {newMenuItem(Index, "Web", i); Menu.AppendMenuItem(i != 3 || ppt.showArtistHistory ? MF_STRING : MF_GRAYED, Index, v); if (i < 3) Menu.CheckMenuItem(Index++, c[i]); else Index++; if (i == 2 || i == 3 || i == 6) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);}); return Index;}
 
     const blacklistImageMenu = (Menu, StartIndex) => {
         let blacklist = [], Index = StartIndex; bn = fb.ProfilePath + "yttm\\" + "blacklist_image.json";
@@ -1768,7 +1816,7 @@ function MenuItems() {
     this.playlists_changed = () => {if (!pl_show) return; pl_menu = []; for (let i = 0; i < plman.PlaylistCount; i++) pl_menu.push({name:plman.GetPlaylistName(i).replace(/&/g, "&&"), ix:i});}; this.playlists_changed();
 
     this.rbtn_up = (x, y) => {
-        shift = utils.IsKeyPressed(0x10); this.right_up = true; const popupMenu = ["alignMenu", "alignHMenu", "alignVMenu", "bioMenu", "biographyMenu", "blackImageMenu", "covMenu", "cropMenu", "headingMenu", "imageMenu", "langMenu", "lfmRevMenu", "menu", "openMenu", "optionsMenu", "overlayMenu", "pasteMenu", "photoMenu", "reflMenu", "revMenu", "sbarMenu", "selectionMenu", "servMenu", "styleMenu", "stylesEditorMenu", "sourceHeadMenu", "tagsMenu", "themeMenu", "trackHeadMenu"]; let handles, imgInfo = img.pth();
+        shift = utils.IsKeyPressed(0x10); this.right_up = true; const popupMenu = ["alignMenu", "alignHMenu", "alignVMenu", "bioMenu", "biographyMenu", "blackImageMenu", "covMenu", "cropMenu", "headingMenu", "imageMenu", "langMenu", "lfmRevMenu", "menu", "openMenu", "optionsMenu", "overlayMenu", "pasteMenu", "photoMenu", "reflMenu", "revMenu", "sbarMenu", "seekBarMenu", "selectionMenu", "servMenu", "styleMenu", "stylesEditorMenu", "sourceHeadMenu", "tagsMenu", "themeMenu", "trackHeadMenu"]; let handles, imgInfo = img.pth();
         popupMenu.forEach(v => this[v] = window.CreatePopupMenu()); let PlaylistsMenu; if (pl_show) PlaylistsMenu = window.CreatePopupMenu();
         amPth = ppt.artistView ? t.amBioPth() : t.amRevPth(); imgArtist = imgInfo.artist; imgPth = imgInfo.imgPth; imgBlk = imgInfo.blk && imgPth; imgName = imgBlk ? imgPth.slice(imgPth.lastIndexOf("_") + 1) : imgPth.slice(imgPth.lastIndexOf("\\") + 1); lfmPth = ppt.artistView ? t.lfmBioPth() : t.lfmRevPth(); tracksPth = t.lfmTrackPth(); pths = [imgPth, amPth[1], lfmPth[1], tracksPth[1]];
         const doc = new ActiveXObject('htmlfile'), docTxt = doc.parentWindow.clipboardData.getData('text'); let idx, Index = 1;
@@ -1797,6 +1845,7 @@ function MenuItems() {
 		Index = overlayTypeMenu(this.overlayMenu, Index); this.overlayMenu.AppendTo(this.themeMenu, ppt.style < 4 ? MF_GRAYED : MF_STRING, "Overlay Type"); this.styleMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
 		Index = optionsTypeMenu(this.optionsMenu, Index); this.optionsMenu.AppendTo(this.styleMenu, MF_STRING, "Mode");
         Index = imageTypeMenu(this.imageMenu, Index); this.imageMenu.AppendTo(this.menu, MF_STRING, "Image");
+		Index = seekBarTypeMenu(this.seekBarMenu, Index); this.seekBarMenu.AppendTo(this.imageMenu, MF_STRING, "SeekBar"); this.imageMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
 		Index = blacklistImageMenu(this.blackImageMenu, Index); this.blackImageMenu.AppendTo(this.imageMenu, MF_STRING, "Black List"); this.imageMenu.AppendMenuItem(MF_SEPARATOR, 0, 0);
         Index = cropTypeMenu(this.cropMenu, Index); this.cropMenu.AppendTo(this.imageMenu, MF_STRING, "Auto-Fill");
         if (ppt.style < 4) {Index = alignTypeMenu(this.alignMenu, Index); this.alignMenu.AppendTo(this.imageMenu, !ppt.img_only && t.text && !ppt.text_only ? MF_STRING : MF_GRAYED, "Alignment");}
@@ -1816,7 +1865,7 @@ function MenuItems() {
                 case "Sources":
                     switch (i) {
                         case 1: case 2: t.toggle(0); break; case 3: t.toggle(4); break; case 4: t.toggle(2); break; case 5: case 6: t.toggle(1); break; case 7: t.toggle(5); break; case 8: t.toggle(3); break;
-                        case 9: case 10: case 11: ppt.inclTrackRev = i - 9; if (ppt.inclTrackRev) serv.chk_track({force: true, artist: p.artists.length ? p.artists[0].name : name.artist(ppt.focus), title: name.title(ppt.focus)}); t.toggle(9); break;
+                        case 9: case 10: case 11: ppt.inclTrackRev = i - 9; p.inclTrackRev = ppt.inclTrackRev; if (ppt.inclTrackRev) serv.chk_track({force: true, artist: p.artists.length ? p.artists[0].name : name.artist(ppt.focus), title: name.title(ppt.focus)}); t.toggle(9); break;
                         case 12: case 13: ppt.cycPhoto = !ppt.cycPhoto; if (!ppt.artistView) img.clear_art_cache(); if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) img.get_images(true); else img.get_multi(p.art_ix, p.alb_ix, true); break;
                         case 14: case 15: case 16: case 17:  case 18:  ppt.covType = i - 14; img.get_images(); break;
 						case 19: img.toggle('loadCovAllFb'); break;
@@ -1908,6 +1957,7 @@ function MenuItems() {
 					img.chkArtImg(); window.NotifyOthers("blacklist_bio", "blacklist_bio");
                     break;
 				case "Image": switch (i) {case 0: ppt.autoEnlarge = !ppt.autoEnlarge; break; case 1: ppt.imgSmoothTrans = !ppt.imgSmoothTrans; if (ui.blur) {img.clear_rs_cache(); img.get_images();} break;} break;
+				case "SeekBar": ppt.imageBar = i; img.bar.show = !ppt.artistView && p.alb_ix || ppt.imageBar != 2 ? false : true; img.clear_rs_cache(); img.get_images(); break;
                 case "Crop":
                     switch (i) {
                         case 0: ppt.artCropImgOnly = !ppt.artCropImgOnly; img.setCrop(true); img.clear_rs_cache(); img.get_images(); break;
@@ -1921,14 +1971,14 @@ function MenuItems() {
                 case "AlignV": switch (i) {case 3: ppt.alignAuto = true; p.sizes(); img.clear_rs_cache(); img.get_images(); break; default: ppt.alignV = i; ppt.alignAuto = false; p.sizes(); img.clear_rs_cache(); img.get_images(); break;} break;
                 case "Reflection": switch (i) {case 0: ppt.imgReflection = !ppt.imgReflection; img.setCrop(true); img.clear_rs_cache(); img.get_images(); break; default: ppt.imgReflType = i - 1; img.setCrop(true); img.clear_rs_cache(); img.get_images(); break;} break;
                 case "Border": switch (i) {case 0: ppt.imgBorder = ppt.imgBorder == 0 ? 1 : ppt.imgBorder == 1 ? 0 : ppt.imgBorder == 2 ? 3 : 2; img.create_images(); img.setCrop(true); img.clear_rs_cache(); img.get_images(); break; case 1: ppt.imgBorder = ppt.imgBorder == 0 ? 2 : ppt.imgBorder == 1 ? 3 : ppt.imgBorder == 2 ? 0 : 1; img.setCrop(true); img.clear_rs_cache(); img.get_images(); break;} break;
-                case "Tags": if (i && i < ln) {p.tag[i - 1].enabled = p.tag[i - 1].enabled ? 0 : 1; p.updIniTag(i - 1);} if (i == ln) p.setSimTagNo(); if (i == ln + 1) {if (p.tag[8].enabled && p.tag[8].enabled < 5) tag.check(handles); else tag.write_tags(handles);} break;
+                case "Tags": if (i && i < ln) {p.tag[i - 1].enabled = p.tag[i - 1].enabled ? 0 : 1; p.updIniTag(i - 1);} if (i == ln) p.setSimTagNo(); if (i == ln + 1) {if (p.tag[8].enabled && p.tag[8].enabled < 7) tag.check(handles); else tag.write_tags(handles);} break;
                 case "Playlists": plman.ActivePlaylist = pl_menu[i].ix; break; case "Default": switch (i) {case 0: window.ShowProperties(); break; case 1: window.ShowConfigure(); break;}
             }
         } this.right_up = false;
     }
 
     this.button = (x, y) => {
-        const menu = window.CreatePopupMenu(), WebMenu = window.CreatePopupMenu(); let idx, Index = 1; Index = ppt.artistView ? moreArtMenu(menu, Index) : moreAlbMenu(menu, Index); menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index = webTypeMenu(WebMenu, Index); WebMenu.AppendTo(menu, MF_STRING, "More...");
+        const menu = window.CreatePopupMenu(), WebMenu = window.CreatePopupMenu(); let idx, Index = 1; Index = ppt.artistView ? moreArtMenu(menu, Index) : moreAlbMenu(menu, Index); menu.AppendMenuItem(MF_SEPARATOR, 0, 0); Index = ppt.artistView ? webArtistTypeMenu(WebMenu, Index) : webAlbumTypeMenu(WebMenu, Index); WebMenu.AppendTo(menu, MF_STRING, "More...");
         const origArr = JSON.stringify(p.artists), origArrl = JSON.stringify(p.albums);
         idx = menu.TrackPopupMenu(x, y);
         if (idx >= 1 && idx <= Index) {
@@ -1950,37 +2000,83 @@ function MenuItems() {
                     break;
                 case "More-Album":
                     switch (true) {
-                        case i < p.albums.length: if (origArrl != JSON.stringify(p.albums) || !i && !p.alb_ix || p.alb_ix == i) break; t.logScrollPos(); p.alb_ix = i; img.get = false; t.get = 0; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0); break;
+                        case i < p.albums.length: 
+						if (origArrl != JSON.stringify(p.albums) || !i && !p.alb_ix || p.alb_ix == i) break;
+							t.logScrollPos(); p.alb_ix = i; img.get = false; t.get = 0; let force = false; p.inclTrackRev = ppt.inclTrackRev;
+							if (ppt.showAlbumHistory && ppt.inclTrackRev) {
+								if (p.albums[p.alb_ix].type.includes("history")) p.inclTrackRev = 0;
+								t.albumFlush(); force = true;
+							}
+							t.get_multi(false, p.art_ix, p.alb_ix, force); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0);
+							if (p.albums[p.alb_ix].type.includes("history")) break;
+							p.logAlbumHistory(p.albums[p.alb_ix].artist, p.albums[p.alb_ix].album); p.get_multi();
+							break;
                         case i == p.albums.length + 1: ppt.cycItem = !ppt.cycItem; break;
                         case i == p.albums.length + 2: p.setCycItem(); break;
                     }
 					this.revCounter = 0;
                     break;
                 case "Web":
-				switch (i) {
-					case 0: ppt.showSimilarArtists = !ppt.showSimilarArtists; p.get_multi(!ppt.showSimilarArtists ? true : false); break;
-					case 1: ppt.showMoreTags = !ppt.showMoreTags; p.get_multi(!ppt.showMoreTags ? true : false); break;
-					case 2: ppt.showArtistHistory = !ppt.showArtistHistory; p.get_multi(!ppt.showArtistHistory ? true : false); break;
-					case 3: p.artistHistory = []; ppt.artistHistory = JSON.stringify([]); p.get_multi(true); break;
-					default: const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), brArr = ["", "/+similar", "/+albums"]; if (i < 7) s.browser("https://" + "www.last.fm/" + (p.lfmLang == "en" ? "" : p.lfmLang + "/") + "music/" + encodeURIComponent(artist) + brArr[i - 4], true); else s.browser("https://www.allmusic.com/search/artists/" + encodeURIComponent(artist), true); break;
+					switch (true) {
+						case ppt.artistView:
+							switch (i) {
+								case 0: p.art_ix = 0; ppt.showSimilarArtists = !ppt.showSimilarArtists; p.get_multi(!ppt.showSimilarArtists ? true : false); break;
+								case 1: p.art_ix = 0; ppt.showMoreTags = !ppt.showMoreTags; p.get_multi(!ppt.showMoreTags ? true : false); break;
+								case 2: p.art_ix = 0; ppt.showArtistHistory = !ppt.showArtistHistory; p.get_multi(!ppt.showArtistHistory ? true : false); break;
+								case 3: p.resetArtistHistory(); ; break;
+								default: const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), brArr = ["", "/+similar", "/+albums"]; if (i < 7) s.browser("https://" + "www.last.fm/" + (p.lfmLang == "en" ? "" : p.lfmLang + "/") + "music/" + encodeURIComponent(artist) + brArr[i - 4], true); else s.browser("https://www.allmusic.com/search/artists/" + encodeURIComponent(artist), true); break;
+							}
+							if (i < 4) {
+								t.logScrollPos(); img.get = false; t.get = 0; 
+								t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0);
+							}
+							break;
+						case !ppt.artistView:
+							switch (i) {
+								case 0: p.alb_ix = 0; ppt.showTopAlbums = !ppt.showTopAlbums; p.get_multi(!ppt.showTopAlbums ? true : false); break;
+								case 1: p.alb_ix = 0; ppt.showAlbumHistory = !ppt.showAlbumHistory; p.get_multi(!ppt.showAlbumHistory ? true : false); break;
+								case 2: p.resetAlbumHistory(); break;
+								default: const artist = p.artists.length ? p.artists[0].name : name.artist(ppt.focus), brArr = ["", "/+similar", "/+albums"]; if (i < 6) s.browser("https://" + "www.last.fm/" + (p.lfmLang == "en" ? "" : p.lfmLang + "/") + "music/" + encodeURIComponent(artist) + brArr[i - 3], true); else s.browser("https://www.allmusic.com/search/artists/" + encodeURIComponent(artist), true); break;
+							}
+							if (i < 3) {
+								t.logScrollPos(); img.get = false; t.get = 0; p.inclTrackRev = ppt.inclTrackRev;
+								if (ppt.inclTrackRev) {
+									if (p.albums[p.alb_ix].type.includes("history")) p.inclTrackRev = 0;
+									t.albumFlush();
+								}
+								t.get_multi(false, p.art_ix, p.alb_ix, true); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.getData(false, ppt.focus, "multi_tag_bio", 0);
+							}
+							break;
 				}
             }
         }
     }
 
     this.wheel = (step, resetCounters) => {
-        let i = 0; but.clear_tooltip();
+        let i = 0; but.clear_tooltip(); let force = false;
         switch (true) {
-            case ppt.artistView: if (!p.artistsUniq.length) break; for (i = 0; i < p.artistsUniq.length; i++) if (!p.art_ix && name.artist(ppt.focus) == p.artistsUniq[i].name || p.art_ix == p.artistsUniq[i].ix) break; i += step; if (i < 0) i = p.artistsUniq.length - 1; else if (i >= p.artistsUniq.length) i = 0; t.logScrollPos(); p.art_ix = p.artistsUniq[i].ix; if (p.artists[p.art_ix].type.includes("history")) break; p.logArtistHistory(p.artists[p.art_ix].name); p.get_multi(); break;
-            case !ppt.artistView: if (!p.albumsUniq.length) break; for (i = 0; i < p.albumsUniq.length; i++) if (!p.alb_ix && name.alb_artist(ppt.focus) + " - " +  name.album(ppt.focus) == p.albumsUniq[i].artist + " - " + p.albumsUniq[i].album || p.alb_ix == p.albumsUniq[i].ix) break; i += step; if (i < 0) i = p.albumsUniq.length - 1; else if (i >= p.albumsUniq.length) i = 0; t.logScrollPos(); p.alb_ix = p.albumsUniq[i].ix; break;
-        } img.get = false; t.get_multi(false, p.art_ix, p.alb_ix); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.multi_serv(); if (resetCounters) ppt.artistView ? this.bioCounter = 0 : this.revCounter = 0;
+            case ppt.artistView:
+				if (!p.artistsUniq.length) break; for (i = 0; i < p.artistsUniq.length; i++) if (!p.art_ix && name.artist(ppt.focus) == p.artistsUniq[i].name || p.art_ix == p.artistsUniq[i].ix) break;
+				i += step; if (i < 0) i = p.artistsUniq.length - 1; else if (i >= p.artistsUniq.length) i = 0; t.logScrollPos(); p.art_ix = p.artistsUniq[i].ix;
+				if (p.artists[p.art_ix].type.includes("history")) break; p.logArtistHistory(p.artists[p.art_ix].name); p.get_multi(); break;
+            case !ppt.artistView: 
+				if (!p.albumsUniq.length) break; for (i = 0; i < p.albumsUniq.length; i++) if (!p.alb_ix && name.alb_artist(ppt.focus) + " - " +  name.album(ppt.focus) == p.albumsUniq[i].artist + " - " + p.albumsUniq[i].album || p.alb_ix == p.albumsUniq[i].ix) break;
+				i += step; if (i < 0) i = p.albumsUniq.length - 1; else if (i >= p.albumsUniq.length) i = 0; t.logScrollPos(); p.alb_ix = p.albumsUniq[i].ix; if (p.alb_ix) img.bar.show = false;
+				if (ppt.showAlbumHistory && ppt.inclTrackRev) {
+					p.inclTrackRev = ppt.inclTrackRev;
+					if (p.albums[p.alb_ix].type.includes("history")) p.inclTrackRev = 0;
+					t.albumFlush(); force = true;
+				}
+				if (p.albums[p.alb_ix].type.includes("history")) break; p.logAlbumHistory(p.albums[p.alb_ix].artist, p.albums[p.alb_ix].album); p.get_multi();
+				break;
+        } img.get = false; t.get_multi(false, p.art_ix, p.alb_ix, force); t.getScrollPos(); img.get_multi(p.art_ix, p.alb_ix); p.multi_serv(); if (resetCounters) ppt.artistView ? this.bioCounter = 0 : this.revCounter = 0;
     }
 }
 
 function Text() {
 	const amBioSubHead = ppt.amBioSubHead.split("|"), amRevSubHead = ppt.amRevSubHead.split("|"), lfmBioSubHead = ppt.lfmBioSubHead.split("|"), lfmRevSubHead = ppt.lfmRevSubHead.split("|");
 	const bioFallbackText = ppt.bioFallbackText.split("|"), revFallbackText = ppt.revFallbackText.split("|");
-    const DT_CENTER = 0x00000001, DT_RIGHT = 0x00000002, DT_VCENTER = 0x00000004, DT_SINGLELINE = 0x00000020, DT_NOPREFIX = 0x00000800, DT_WORD_ELLIPSIS = 0x00040000, extra_y = Math.max(1, ui.font_h * 0.05);
+    const DT_CENTER = 0x00000001, DT_RIGHT = 0x00000002, DT_VCENTER = 0x00000004, DT_SINGLELINE = 0x00000020, DT_NOPREFIX = 0x00000800, DT_WORD_ELLIPSIS = 0x00040000, extra_y = Math.round(Math.max(1, ui.font_h * 0.05));
     const d = {ax1: 0, ax2: 0, aB1: false, aB2: false, aR1: false, aR2: false, bothB_ix: -1, bothR_ix: -1, lB1: false, lB2: false, lR1: false, lR2: false, lx1: 0, lx2: 0, w: []}
     const done = {amBio: false, amRev: false,  lfmBio: false, lfmRev: false}
     const id = {alb: "", alb_o: "", album: "", album_o: "",   tr: "", tr_o: ""}
@@ -1994,24 +2090,24 @@ function Text() {
     const getTxtFallback = () => {if (this.scrollbar_type().draw_timer) return; if (!p.multi_new()) return; if (!this.get && !textUpdate) return; this.na = ""; if (textUpdate) updText(); if (this.get) {this.album_reset(); this.artist_reset(); if (calc) calc = ppt.artistView ? 1 : 2; this.getText(calc); if (this.get == 2) p.focus_serv(); calc = false; this.get = 0;}}
 	const halt = () => p.w <= 10 || p.h <= 10;
 	const updText = () => {this.getText(false, true); img.getArtImg(); img.getFbImg(); textUpdate = 0; done.amBio = done.lfmBio = done.amRev = done.lfmRev = false;}
-	const updTrackSubHead = () => {if (ppt.artistView || ppt.inclTrackRev != 2 || checkedTrackSubHead || !showTrackHead || !ppt.bothRev || !amRev) return false; mod.amRev = amRev = lfmRev = mod.lfmRev = ""; mod.amRev_o = mod.lfmRev_o = "1"; done.amRev = done.lfmRev = false; checkedTrackSubHead = true; return true;}
+	const updTrackSubHead = () => {if (ppt.artistView || p.inclTrackRev != 2 || checkedTrackSubHead || !showTrackHead || !ppt.bothRev || !amRev) return false; mod.amRev = amRev = lfmRev = mod.lfmRev = ""; mod.amRev_o = mod.lfmRev_o = "1"; done.amRev = done.lfmRev = false; checkedTrackSubHead = true; return true;}
 
 	this.albumFlush = () => {this.text = false; mod.amRev = amRev = lfmRev = mod.lfmRev = ""; mod.amRev_o = mod.lfmRev_o = "1"; checkedTrackSubHead = done.amRev = done.lfmRev = false; this.alb_txt = ""; this.head = false; but.set_scroll_btns_hide(); but.set_src_btn_hide();}
     this.amBioPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('bio', ppt.focus, artist, "", "", p.sup.Cache, artist.clean(), "", "", 'amBio', false);}
     this.amRevPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('rev', ppt.focus, artist, album, "", p.sup.Cache, artist.clean(), albumartist.clean(), album.clean(), 'amRev', false);}
     this.artistFlush = () => {this.text = false; done.amBio = done.lfmBio = false; mod.amBio = amBio = mod.lfmBio = lfmBio = ""; mod.amBio_o = mod.lfmBio_o = "1"; this.art_txt = ""; this.head = false; but.set_scroll_btns_hide(); but.set_src_btn_hide();}
-    this.album_reset = upd => {if (p.lock) return; id.album_o = id.album; id.album = name.albID(ppt.focus, 'simple'); const new_album = id.album != id.album_o; if (new_album || upd) {album = name.album(ppt.focus); albumartist = name.alb_artist(ppt.focus); this.albumFlush(); this.mulAlbum = false;} if (ppt.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus); const new_track = id.tr != id.tr_o; if (new_track) {checkedTrackSubHead = done.amRev = done.lfmRev = false; if (ppt.inclTrackRev == 1) this.logScrollPos('rev');}}}
-    this.artist_reset = upd => {if (p.artistsSame() || p.lock) return; artist_o = artist; artist = name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist || upd) {this.mulArtist = false; this.artistFlush();}}
-    this.get_multi = (p_calc, art_ix, alb_ix) => {if (ppt.img_only) return; switch (true) {case ppt.artistView: artist_o = artist; artist = art_ix < p.artists.length ? p.artists[art_ix].name : name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist) {this.artistFlush(); p.art_ix = art_ix; this.mulArtist = true;} this.getText(p_calc); this.get = 0; break; case !ppt.artistView: id.alb_o = id.alb; artist = alb_ix < p.albums.length ? p.albums[alb_ix].artist : name.alb_artist(ppt.focus); const alb = alb_ix < p.albums.length ? p.albums[alb_ix].album : name.album(ppt.focus); id.alb = artist + alb; const new_album = id.alb != id.alb_o; if (new_album) {album = alb; albumartist = artist; this.albumFlush(); this.mulAlbum = true;} this.getText(p_calc); this.get = 0; break;}}
+    this.album_reset = upd => {if (p.lock) return; id.album_o = id.album; id.album = name.albID(ppt.focus, 'simple'); const new_album = id.album != id.album_o; if (new_album) id.alb = ""; if (new_album || upd) {album = name.album(ppt.focus); albumartist = name.alb_artist(ppt.focus); this.albumFlush(); this.mulAlbum = false;} if (p.inclTrackRev) {id.tr_o = id.tr; id.tr = name.trackID(ppt.focus); const new_track = id.tr != id.tr_o; if (new_track) {checkedTrackSubHead = done.amRev = done.lfmRev = false; if (p.inclTrackRev == 1) this.logScrollPos('rev');}}}
+	this.artist_reset = upd => {if (p.artistsSame() || p.lock) return; artist_o = artist; artist = name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist || upd) {this.mulArtist = false; this.artistFlush();}}
+    this.get_multi = (p_calc, art_ix, alb_ix, force) => {if (ppt.img_only) return; switch (true) {case ppt.artistView: artist_o = artist; artist = art_ix < p.artists.length ? p.artists[art_ix].name : name.artist(ppt.focus); const new_artist = artist != artist_o; if (new_artist) {this.artistFlush(); p.art_ix = art_ix; this.mulArtist = true;} this.getText(p_calc); this.get = 0; break; case !ppt.artistView: id.alb_o = id.alb; artist = alb_ix < p.albums.length ? p.albums[alb_ix].artist : name.alb_artist(ppt.focus); const alb = alb_ix < p.albums.length ? p.albums[alb_ix].album : name.album(ppt.focus); id.alb = artist + alb; const new_album = id.alb != id.alb_o; if (new_album || force) {album = alb; albumartist = artist; this.albumFlush(); this.mulAlbum = true;} this.getText(p_calc); this.get = 0; break;}}
     this.block = () => halt() || !window.IsVisible;
     this.get_widths = () => {s.gr(1, 1, false, g => d.w = [" ", amBioSubHead[0] + " ", lfmBioSubHead[0] + " ", amRevSubHead[0] + " ", lfmRevSubHead[0] + " ", amBioSubHead[1] + " ", lfmBioSubHead[1] + " ", amRevSubHead[1] + " ", lfmRevSubHead[1] + " "].map(v => Math.max(g.CalcTextWidth(v, ui.sourceFont), 1)));}
     this.grab = () => {textUpdate = 1; if (this.block()) return; updText();}
-	this.headingID = () => ppt.artistView + "-" + p.art_ix + "-" + p.alb_ix + "-" + ppt.allmusic_bio + "-" + ppt.allmusic_alb + "-" + ppt.inclTrackRev;
+	this.headingID = () => ppt.artistView + "-" + p.art_ix + "-" + p.alb_ix + "-" + ppt.allmusic_bio + "-" + ppt.allmusic_alb + "-" + p.inclTrackRev;
     this.lfmBioPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('bio', ppt.focus, artist, "", "", p.sup.Cache, artist.clean(), "", "", 'lfmBio', false);}
     this.lfmRevPth = () => {if (ppt.img_only) return ["", "", false, false]; return p.getPth('rev', ppt.focus, artist, album, "", p.sup.Cache, artist.clean(), albumartist.clean(), album.clean(), 'lfmRev', false);}
     this.lfmTrackPth = () => {if (ppt.img_only || ppt.artistView) return ["", "", false, false]; return p.getPth('track', ppt.focus, artist, "Track Reviews", "", "", artist.clean(), "", "Track Reviews", 'lfmRev', false);}
 	this.messageDraw = gr => {if (ppt.heading || !this.na) return; const j_x = Math.round(p.text_w / 2) + p.text_l, j_h = Math.round(ui.font_h * 1.5), j_y = p.text_t + (p.lines_drawn * ui.font_h - j_h) / 3, rs1 = Math.min(5, j_h / 2), rs2 = Math.min(4, (j_h - 2) / 2); gr.SetSmoothingMode(4); const j_w = gr.CalcTextWidth(this.na, ui.messageFont) + 25; gr.FillRoundRect(j_x - j_w / 2, j_y, j_w, j_h, rs1, rs1, 0xDB000000); gr.DrawRoundRect(j_x - j_w / 2, j_y, j_w, j_h, rs1, rs1, 1, 0x64000000); gr.DrawRoundRect(j_x - j_w / 2 + 1, j_y + 1, j_w - 2, j_h - 2, rs2, rs2, 1, 0x28ffffff); gr.GdiDrawText(this.na, ui.messageFont, RGB(0, 0, 0), j_x - j_w / 2 + 1, j_y + 1 , j_w, j_h, this.cc); gr.GdiDrawText(this.na, ui.messageFont, 0xffff4646, j_x - j_w / 2, j_y, j_w, j_h, this.cc);}
-	this.on_playback_new_track = force => {if (!p.multi_new() && !force) return; if (this.block()) {this.get = 1; p.get_multi(true); this.album_reset(); this.artist_reset(); if (ppt.inclTrackRev) trackUpd = true;} else {p.get_multi(true); this.album_reset(); this.artist_reset(); this.na = ""; this.getText(false); this.get = 0;}}
+	this.on_playback_new_track = force => {if (!p.multi_new() && !force) return; if (this.block()) {this.get = 1; p.get_multi(true); this.logScrollPos(); this.album_reset(); this.artist_reset(); if (p.inclTrackRev) trackUpd = true;} else {p.get_multi(true); this.logScrollPos(); this.album_reset(); this.artist_reset(); this.na = ""; this.getText(false); this.get = 0;}}
     this.on_size = () => {if (initialise) {this.album_reset(); this.artist_reset(); initialise = false;} scrollBioPos = {}; scrollRevPos = {}; this.getText(false); p.get_multi(true); but.refresh();}
     this.paint = () => {if (this.rp) window.Repaint();}
     this.scrollbar_type = () => ppt.artistView ? art_scrollbar : alb_scrollbar;
@@ -2020,23 +2116,23 @@ function Text() {
 		let v;
 		switch (ppt.artistView) {
 			case true:
-				v = p.art_ix + "-" + this.bio_allmusic + "-" + ppt.lockBio + "-" + ppt.bothBio;
+				v = artist + "-" + this.bio_allmusic + "-" + ppt.lockBio + "-" + ppt.bothBio;
 				if (!scrollBioPos[v]) return art_scrollbar.set_scroll(0);
 				if (scrollBioPos[v].text === art_txt_arr.length + "-" + this.art_txt) art_scrollbar.set_scroll(scrollBioPos[v].scroll || 0);
 				else {scrollBioPos[v].scroll = 0; scrollBioPos[v].text = "";}
 				break;
 			case false:
-				v = (this.alb_allmusic || ppt.inclTrackRev != 2 || ppt.bothRev ? p.alb_ix + "-" : "") + this.alb_allmusic + "-" + ppt.lockRev + "-" + ppt.bothRev + "-" + ppt.inclTrackRev;
+				v = (this.alb_allmusic || p.inclTrackRev != 2 || ppt.bothRev ? albumartist + album + "-" : "") + this.alb_allmusic + "-" + ppt.lockRev + "-" + ppt.bothRev + "-" + ppt.inclTrackRev;
 				if (!scrollRevPos[v]) return alb_scrollbar.set_scroll(0);
 				let match = false;
-				if (ppt.inclTrackRev != 1) {
+				if (p.inclTrackRev != 1) {
 					if (scrollRevPos[v].text === ui.font.Size + "-" + p.text_w + "-" + this.alb_txt) match = true;
 				} else {
 					const tx1 = (ui.font.Size + "-" + p.text_w).toString(), tx2 = alb_inf.strip(), tx3 = amRev.strip();
 					if (scrollRevPos[v].text.startsWith(tx1) && (tx2 && scrollRevPos[v].text.includes(tx2) || tx3 && scrollRevPos[v].text.includes(tx3))) match = true;
 				}
 				if (match) {
-					const set_scroll = ppt.inclTrackRev != 1 ? scrollRevPos[v].scroll : Math.min(scrollRevPos[v].scroll, alb_scrollbar.max_scroll);
+					const set_scroll = p.inclTrackRev != 1 ? scrollRevPos[v].scroll : Math.min(scrollRevPos[v].scroll, alb_scrollbar.max_scroll);
 					alb_scrollbar.set_scroll(set_scroll || 0);
 				}
 				else {scrollRevPos[v].scroll = 0; scrollRevPos[v].text = "";}
@@ -2045,34 +2141,39 @@ function Text() {
 	}
 
 	this.logScrollPos = n => {
-		let v;
+		let keys = [], v;
 		n = n == 'rev' ? false : ppt.artistView;
 		switch (n) {
 			case true:
-				v = p.art_ix + "-" + this.bio_allmusic + "-" + ppt.lockBio + "-" + ppt.bothBio;
+				keys = Object.keys(scrollBioPos);
+				if (keys.length > 70) delete scrollBioPos[keys[0]];
+				v = artist + "-" + this.bio_allmusic + "-" + ppt.lockBio + "-" + ppt.bothBio;
 				scrollBioPos[v] = {};
 				scrollBioPos[v].scroll = art_scrollbar.scroll;
 				scrollBioPos[v].text = art_txt_arr.length + "-" + this.art_txt;
 				break;
 			case false:
-				v = (this.alb_allmusic || ppt.inclTrackRev != 2 || ppt.bothRev ? p.alb_ix + "-" : "") + this.alb_allmusic + "-" + ppt.lockRev + "-" + ppt.bothRev + "-" + ppt.inclTrackRev;
+				keys = Object.keys(scrollRevPos);
+				if (keys.length > 70) delete scrollRevPos[keys[0]];
+				v = (this.alb_allmusic || p.inclTrackRev != 2 || ppt.bothRev ? albumartist + album + "-" : "") + this.alb_allmusic + "-" + ppt.lockRev + "-" + ppt.bothRev + "-" + ppt.inclTrackRev;
 				scrollRevPos[v] = {};
 				scrollRevPos[v].scroll = alb_scrollbar.scroll;
-				scrollRevPos[v].text = ui.font.Size + "-" + p.text_w + "-" + (ppt.inclTrackRev != 1 ? this.alb_txt : (alb_inf + amRev).strip());
+				scrollRevPos[v].text = ui.font.Size + "-" + p.text_w + "-" + (p.inclTrackRev != 1 ? this.alb_txt : (alb_inf + amRev).strip());
 				break;
 		}
 	}
 
     const summaryFirstText = (s1, s2, text, s3, rating) => {
-        let ix = -1, m = text.match(RegExp(s2, "i")), sub1 = "", sub2 = ""; ix = text.lastIndexOf(s1);
+        let ix = -1, m = text.match(RegExp(s2, "gi")), sub1 = "", sub2 = ""; ix = text.lastIndexOf(s1);
         if (ix != -1) {
             sub1 = text.substring(ix); sub1 = sub1.split('\n')[0].trim();
             text = text.replace(RegExp(sub1), "");
             sub1 = sub1.replace(RegExp(s1), "").replace(/, /g, " \u2219 ");
             let sub1_w = 0; s.gr(1, 1, false, g => sub1_w = g.CalcTextWidth(sub1, ui.font));
-            if (sub1) sub1 += sub1_w < p.text_w ? "\r\n" : "  |  ";
+            if (sub1) sub1 += sub1_w < p.text_w || init ? "\r\n" : "  |  ";
         }
-        if (m) {ix = -1; m = m.toString(); ix = text.lastIndexOf(m);}
+		init = false;
+        if (m) {ix = -1; m = m[m.length - 1].toString(); ix = text.lastIndexOf(m);}
         if (ix != -1) {sub2 = text.substring(ix); sub2 = sub2.split('\n')[0].trim();
             text = text.replace(RegExp(sub2.regex_escape()), "");
             sub2 = sub2.replace(" | ", "  |  ");
@@ -2088,8 +2189,8 @@ function Text() {
             m = m.toString();
             ix = text.lastIndexOf(m);
             if (ix != -1) {
-                sub3 = text.substring(ix); sub3 = sub3.split(';')[0].trim();
-                text = text.replace(RegExp(sub3.regex_escape() + "; "), "");
+                sub3 = text.substring(ix).replace("\r\n\r\n", ";"); sub3 = sub3.split(';')[0].trim();
+                text = text.replace(RegExp(sub3.regex_escape() + "; "), ""); text = text.replace(RegExp(sub3.regex_escape() + "\r\n\r\n"), "");
             }
         }
         if (sub2 && sub3) sub4 += sub2 + "  |  " + sub3; else sub4 += sub2 + sub3;
@@ -2119,8 +2220,8 @@ function Text() {
                 break;
             case !ppt.artistView:
                 const aa = albumartist.clean(), l = album.clean();
-                if (!aa || !l && !ppt.inclTrackRev) break;
-                if (p.ir(ppt.focus) && !ppt.inclTrackRev && !p.alb_ix) break;
+                if (!aa || !l && !p.inclTrackRev) break;
+                if (p.ir(ppt.focus) && !p.inclTrackRev && !p.alb_ix) break;
                 if (ppt.bothRev) {if (!done.amRev || update) {done.amRev = true; am_rev(a, aa, l); if (!done.lfmRev || update) {done.lfmRev = true; lfm_rev(a, aa, l);}} break;}
                 if (ppt.allmusic_alb && (!done.amRev || update)) {done.amRev = true; am_rev(a, aa, l); if (!amRev && !ppt.lockRev && (!done.lfmRev || update)) {done.lfmRev = true; lfm_rev(a, aa, l);}}
                 if (!ppt.allmusic_alb && (!done.lfmRev || update)) {done.lfmRev = true; lfm_rev(a, aa, l); if (!lfmRev && !ppt.lockRev && (!done.amRev || update)) {done.amRev = true; am_rev(a, aa, l);}}
@@ -2156,20 +2257,20 @@ function Text() {
             if (this.art_txt != art_txt_o || p_calc && p_calc !== 2) {art_txt_o = this.art_txt; this.art_calc();}
             if (this.alb_txt != alb_txt_o || p_calc && p_calc !== 1) {alb_txt_o = this.alb_txt; this.alb_calc();}
             if (ppt.text_only && !ui.blur) this.paint();
-			if (p.alb_ix && ppt.inclTrackRev) this.paint();
+			if (p.alb_ix && p.inclTrackRev) this.paint();
         }
         if (!ppt.heading) {new_text = false; return;}
 		if (updTrackSubHead()) return this.getText(false);
 		if (p.lock && !new_text) {if (this.curHeadingID == this.headingID()) {new_text = false; return;} else this.curHeadingID = this.headingID();}
 		new_text = false;
         if (ppt.artistView) this.heading = ui.headText ? tf(this.bio_allmusic ? ppt.amBioHeading : ppt.lfmBioHeading) : "";
-		else this.heading = ui.headText ? (ppt.inclTrackRev && !this.alb_allmusic && showTrackHead ? tf(ppt.lfmTrackHeading, true) : tf(this.alb_allmusic ? ppt.amRevHeading : ppt.lfmRevHeading)) : "";
+		else this.heading = ui.headText ? (p.inclTrackRev && !this.alb_allmusic && showTrackHead ? tf(ppt.lfmTrackHeading, true) : tf(this.alb_allmusic ? ppt.amRevHeading : ppt.lfmRevHeading)) : "";
 		if (p.lock) this.curHeadingID = this.headingID();
     }
 
     this.alb_calc = () => {
         if (!this.alb_txt || ppt.img_only) return; alb_txt_arr = []; d.bothR_ix = -1; let ctt = 0, l = [];
-        s.gr(1, 1, false, g => {if (ppt.inclTrackRev) {let ti = this.alb_txt.match(/#!!#.+?$/m); if (ti) {ti = ti.toString(); if (g.CalcTextWidth(ti, ui.font) > p.text_w) {const new_ti = g.EstimateLineWrap(ti, ui.font, p.text_w - g.CalcTextWidth("... ", ui.font))[0] +"..."; this.alb_txt = this.alb_txt.replace(RegExp(ti.regex_escape()), new_ti);}}} l = g.EstimateLineWrap(this.alb_txt, ui.font, p.text_w);});
+        s.gr(1, 1, false, g => {if (p.inclTrackRev) {let ti = this.alb_txt.match(/#!!#.+?$/m); if (ti) {ti = ti.toString(); if (g.CalcTextWidth(ti, ui.font) > p.text_w) {const new_ti = g.EstimateLineWrap(ti, ui.font, p.text_w - g.CalcTextWidth("... ", ui.font))[0] +"..."; this.alb_txt = this.alb_txt.replace(RegExp(ti.regex_escape()), new_ti);}}} l = g.EstimateLineWrap(this.alb_txt, ui.font, p.text_w);});
         for (let i = 0; i < l.length; i += 2) {if (!revSubHead) alb_txt_arr.push(l[i].trim()); else {if (l[i].includes("#!#")) {d.bothR_ix = ctt; l[i] = l[i].replace("#!#", "");} !i || ctt == d.bothR_ix ? alb_txt_arr.push(l[i]) : alb_txt_arr.push(l[i].trim()); ctt++;}}
         but.refresh(true); alb_scrollbar.reset(); alb_scrollbar.metrics(p.sbar_x, p.sbar_y, ui.sbar_w, p.sbar_h, p.lines_drawn, ui.font_h); alb_scrollbar.set_rows(alb_txt_arr.length);
         d.r = !ppt.summaryFirst && (ui.stars == 2 || ui.stars == 1 && !ppt.src) && (ppt.ratingTextPos == 2 || revSubHead && !ppt.ratingTextPos) && !ppt.artistView && alb_txt_arr.length > 1 && (!revSubHead ? (this.alb_allmusic && this.amRating != -1 || !this.alb_allmusic && this.lfmRating != -1) : true);
@@ -2180,7 +2281,7 @@ function Text() {
             d.ry = Math.round((ui.font_h - but.r_h1 / 2) / 1.8);
         }
         if (!ppt.heading && revSubHead) {d.xa1 = p.text_l + d.aw1; d.xl1 = p.text_l +  d.lw1; d.x1a = p.text_l + d.aw2; d.x1l = p.text_l + d.lw2; const lw = p.text_l + p.text_w; d.xa2 = Math.max(d.xa1, lw); d.xl2 = Math.max(d.xl1, lw); d.x2a = Math.max(d.x1a, lw); d.x2l = Math.max(d.x1l, lw);}
-		if (ppt.inclTrackRev == 1) this.getScrollPos();
+		if (p.inclTrackRev == 1) this.getScrollPos();
     }
 
     this.art_calc = () => {
@@ -2220,18 +2321,18 @@ function Text() {
 
     const lfm_rev = (a, aa, l) => {
         let lfm_tr_mod = "", rat = "", trackRev = "", trk = ""; const lfm_b = p.getPth('rev', ppt.focus, artist, album, "", p.sup.Cache, a, aa, l, 'lfmRev', true).pth;
-        if (!s.file(lfm_b)) {this.lfmRating = -1; but.check(); if (!ppt.inclTrackRev) {alb_inf = ""; return;}}
-        if (ppt.inclTrackRev) {
+        if (!s.file(lfm_b)) {this.lfmRating = -1; but.check(); if (!p.inclTrackRev) {alb_inf = ""; return;}}
+        if (p.inclTrackRev) {
 			trk = track.toLowerCase();
             trackRev = s.jsonParse(p.getPth('track', ppt.focus, trackartist, "Track Reviews", "", "", trackartist.clean(), "", "Track Reviews", 'lfmRev', true).pth, false, 'file');
             if (trackRev[trk] && trackRev[trk].update) lfm_tr_mod = trackRev[trk].update;
         }
-        mod.lfmRev = s.file(lfm_b) && ppt.inclTrackRev != 2 ? s.lastModified(lfm_b) + lfm_tr_mod : lfm_tr_mod;
+        mod.lfmRev = s.file(lfm_b) && p.inclTrackRev != 2 ? s.lastModified(lfm_b) + lfm_tr_mod : lfm_tr_mod;
         if (mod.lfmRev == mod.lfmRev_o) return; alb_inf = "";
-        if (ppt.inclTrackRev != 2) alb_inf = s.open(lfm_b).trim();
+        if (p.inclTrackRev != 2) alb_inf = s.open(lfm_b).trim();
         new_text = true; mod.lfmRev_o = mod.lfmRev; this.lfmRating = -1;
-        if (ppt.inclTrackRev != 2) {
-            if (ui.lfmRating) {const b = alb_inf.indexOf("Rating: "); if (b != -1) {this.lfmRating = alb_inf.substring(b).replace(/\D/g, "");
+        if (p.inclTrackRev != 2) {
+            if (ppt.lfmRating) {const b = alb_inf.indexOf("Rating: "); if (b != -1) {this.lfmRating = alb_inf.substring(b).replace(/\D/g, "");
 			this.lfmRating = Math.min(((Math.floor(0.1111 * this.lfmRating + 0.3333) / 2)), 5);
 			if (ui.stars == 1 && ppt.src) this.lfmRating *= 2;
 			if ((ui.stars == 2 || ui.stars == 1 && !ppt.src) && this.lfmRating != -1) {const subHeadOn = ppt.bothRev && ppt.sourceHeading || ppt.sourceHeading == 2; if (ppt.ratingTextPos == 2 || subHeadOn && !ppt.ratingTextPos) {this.lfmRating *= 2; if (!ppt.summaryFirst) alb_inf = (!subHeadOn ? ppt.lastfm_name + ":\r\n\r\n" : "") + alb_inf; else rat = ppt.lastfm_name + ": " + this.lfmRating;} else {if (!ppt.summaryFirst) alb_inf = ">> " + ppt.lastfm_name + ": " + this.lfmRating + " <<  " + ((/^Top Tags: /).test(alb_inf) ? "\r\n\r\n" : "") + alb_inf; else rat = ppt.lastfm_name + ": " + this.lfmRating;}}}}
@@ -2240,12 +2341,12 @@ function Text() {
         }
 		if (!ppt.stats) {alb_inf = alb_inf.replace(/^Last.fm: .*$(\n)?/gm, "").trim();}
         lfmRev = alb_inf;
-        if (ppt.inclTrackRev) {
+        if (p.inclTrackRev) {
             if (trackRev && trackRev[trk]) {
                 let wiki = ""; if (trackRev[trk].releases) wiki = trackRev[trk].releases;
                 if (trackRev[trk].wiki) wiki += wiki ? "\r\n\r\n" + trackRev[trk].wiki : trackRev[trk].wiki;
                 if (trackRev[trk].stats) wiki += wiki ? "\r\n\r\n" + trackRev[trk].stats : trackRev[trk].stats;
-				if (wiki) {if (ppt.trackHeading == 1 && (alb_inf || !ppt.heading || ppt.bothRev && ppt.inclTrackRev == 2 && (alb_inf || amRev)) || ppt.trackHeading == 2) {showTrackHead = false; trackRev =  "#!!#" + tf(ppt.lfmTrackSubHeading, true) + "\r\n" + wiki;} else {showTrackHead = true; trackRev = wiki;} lfmRev = alb_inf + (alb_inf ? "\r\n\r\n" : "") + trackRev;} else showTrackHead = false;
+				if (wiki) {if (ppt.trackHeading == 1 && (alb_inf || !ppt.heading || ppt.bothRev && p.inclTrackRev == 2 && (alb_inf || amRev)) || ppt.trackHeading == 2) {showTrackHead = false; trackRev =  "#!!#" + tf(ppt.lfmTrackSubHeading, true) + "\r\n" + wiki;} else {showTrackHead = true; trackRev = wiki;} lfmRev = alb_inf + (alb_inf ? "\r\n\r\n" : "") + trackRev;} else showTrackHead = false;
 				if ((alb_inf || amRev) && ppt.heading && !ppt.trackHeading) showTrackHead = false;
             }
         }
@@ -2354,10 +2455,10 @@ function Text() {
 				this.getScrollPos(); if (!ppt.img_only && !ppt.text_only && this.text != text_state) img.clear_rs_cache(); img.get_images();
 				break;
             case 8: p.sizes(); img.clear_rs_cache(); this.albumFlush(); this.artistFlush(); alb_txt_o = ""; art_txt_o = ""; this.getText(true); img.get_images(); break;
-            case 9: if (ppt.inclTrackRev == 1) this.logScrollPos(); ui.get_font(); ui.calc_text(); p.sizes(); ui.get_colors(); but.create_stars(); this.albumFlush(); this.artistFlush(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.getText(true); but.refresh(true); img.get_images(); break;
-            case 10: if (ppt.inclTrackRev == 1) this.logScrollPos(); ui.calc_text(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.alb_calc(); this.art_calc(); img.get_images(); if (ppt.text_only && !ui.blur) this.paint(); break;
-            case 11: if (ppt.inclTrackRev == 1) ui.get_colors(); ui.get_font(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); this.albumFlush(); this.getText(false); img.get_images(); break;
-            case 12: if (ppt.inclTrackRev == 1) this.logScrollPos(); ui.get_colors(); ui.get_font(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.alb_calc(); this.art_calc(); img.get_images(); if (ppt.text_only && !ui.blur) this.paint(); break;
+            case 9: if (p.inclTrackRev == 1) this.logScrollPos(); ui.get_font(); ui.calc_text(); p.sizes(); ui.get_colors(); but.create_stars(); this.albumFlush(); this.artistFlush(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.getText(true); but.refresh(true); img.get_images(); break;
+            case 10: if (p.inclTrackRev == 1) this.logScrollPos(); ui.calc_text(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.alb_calc(); this.art_calc(); img.get_images(); if (ppt.text_only && !ui.blur) this.paint(); break;
+            case 11: if (p.inclTrackRev == 1) ui.get_colors(); ui.get_font(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); this.albumFlush(); this.getText(false); img.get_images(); break;
+            case 12: if (p.inclTrackRev == 1) this.logScrollPos(); ui.get_colors(); ui.get_font(); p.sizes(); if (!ppt.img_only ) img.clear_rs_cache(); alb_txt_o = ""; art_txt_o = ""; this.alb_calc(); this.art_calc(); img.get_images(); if (ppt.text_only && !ui.blur) this.paint(); break;
             case 13: p.sizes(); this.albumFlush(); this.artistFlush(); img.clear_rs_cache(); if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) {this.getText(false); img.get_images();} else {this.get_multi(false, p.art_ix, p.alb_ix); img.get_multi(p.art_ix, p.alb_ix);} if (ppt.artistView) {alb_txt_o = ""; this.art_calc();} else {art_txt_o = ""; this.alb_calc();} break;
 			case 14: ppt.mul_item = !ppt.mul_item; if (ppt.mul_item) p.get_multi(false); else {p.lock = 0; p.alb_ix = 0; p.art_ix = 0; p.albums = []; p.artists = []; this.album_reset(true); this.artist_reset(true); this.getText(false); img.get_images(true);} but.refresh(); this.paint(); break;
         }
@@ -2387,8 +2488,8 @@ function Tagger() {
         if (!handles) return;
         let a = "", a_o = "####", rec = 0, writeSent = false;
         const tf_a = FbTitleFormat(p.tf.a), artists = tf_a.EvalWithMetadbs(handles), sa = [], simArr = [];
-        for (let i = 0; i < handles.Count; i++) {a = artists[i].toUpperCase(); if (a != a_o) {a_o = a; sa[i] = ""; const lfmBio = p.cleanPth(p.pth.lfmBio, handles[i], 'tag') + a.clean() + ".txt"; if (s.file(lfmBio)) {const lfm_a = s.open(lfmBio); let sim = lfm_a.match(RegExp(kw)); if (sim) {sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {sa[i] = lfm_a.substring(ix + sim.length); sa[i] = sa[i].split('\n')[0].trim().split(", "); if (sa[i].length > 4) simArr.push(a);}}}}}
-        if (simArr.length) {let i = 0; timer.clear(timer.sim1); timer.sim1.id = setInterval(() => {if (i < simArr.length) {const lfm_similar = new Lfm_similar_artists(() => lfm_similar.on_state_change(), lfm_similar_search_done); lfm_similar.Search(simArr[i], simArr.length, handles, 4); i++;} else timer.clear(timer.sim1);}, simArr.length < 100 ? 20 : 300);} else this.write_tags(handles);
+        for (let i = 0; i < handles.Count; i++) {a = artists[i].toUpperCase(); if (a != a_o) {a_o = a; sa[i] = ""; const lfmBio = p.cleanPth(p.pth.lfmBio, handles[i], 'tag') + a.clean() + ".txt"; if (s.file(lfmBio)) {const lfm_a = s.open(lfmBio); let sim = lfm_a.match(RegExp(kw)); if (sim) {sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {sa[i] = lfm_a.substring(ix + sim.length); sa[i] = sa[i].split('\n')[0].trim().split(", "); if (sa[i].length > 6) simArr.push(a);}}}}}
+        if (simArr.length) {let i = 0; timer.clear(timer.sim1); timer.sim1.id = setInterval(() => {if (i < simArr.length) {const lfm_similar = new Lfm_similar_artists(() => lfm_similar.on_state_change(), lfm_similar_search_done); lfm_similar.Search(simArr[i], simArr.length, handles, 6); i++;} else timer.clear(timer.sim1);}, simArr.length < 100 ? 20 : 300);} else this.write_tags(handles);
         const lfm_similar_search_done = (res1, res2, p_done, p_handles) => {rec++; if (!timer.sim2.id) timer.sim2.id = setTimeout(() => {writeSent = true; this.write_tags(p_handles); timer.sim2.id = null;}, 60000); simList.push({name:res1,similar:res2}); if (p_done == rec && !writeSent) {timer.clear(timer.sim2); this.write_tags(p_handles);}};
     }
 
@@ -2404,7 +2505,7 @@ function Tagger() {
             else l = l.replace(/CD(\s*\d|\.0\d)|CD\s*(One|Two|Three)|Disc\s*\d|Disc\s*(III|II|I|One|Two|Three)\b|(Bonus\s*Track|Collector's|(Digital\s*|Super\s*|)Deluxe|Digital|Expanded|Limited|Platinum|Reissue|Special)\s*(Edition|Version)|(Bonus\s*(CD|Disc))|\d\d\w\w\s*Anniversary\s*(Expanded\s*|Re(-|)master\s*|)(Edition|Re(-|)master|Version)|((19|20)\d\d(\s*|\s*-\s*)|)(Digital(ly|)\s*|)(Re(-|)master(ed|)|Re(-|)recorded)(\s*Edition|\s*Version|)|\(Deluxe\)|\(Mono\)|\(Reissue\)|\(Revisited\)|\(Stereo\)|\(Web\)|\[Deluxe\]|\[Mono\]|\[Reissue\]|\[Revisited\]|\[Stereo\]|\[Web\]/gi,"").replace(/\(\s*\)|\[\s*\]/g, " ").replace(/\s\s+/g, " ").replace(/-\s*$/g, " ").trim();
             if (a != a_o) {
                 a_o = a; sa[i] = "";
-                if (p.tag[6].enabled || p.tag[7].enabled || p.tag[8].enabled && p.tag[8].enabled < 5) {
+                if (p.tag[6].enabled || p.tag[7].enabled || p.tag[8].enabled && p.tag[8].enabled < 7) {
                     artTags[i] = ""; locale[i] = ""; const lfmBio = p.cleanPth(p.pth.lfmBio, handles[i], 'tag') + a.clean() + ".txt";
                     if (s.file(lfmBio)) {
                         const lfm_a = s.open(lfmBio);
@@ -2417,19 +2518,19 @@ function Tagger() {
                                     locale[i] = lfm_a.substring(ix + loc.length);
                                     locale[i] = locale[i].split('\n')[0].trim().split(", ");
                         }}}
-                        if (p.tag[8].enabled && p.tag[8].enabled < 5) {
+                        if (p.tag[8].enabled && p.tag[8].enabled < 7) {
                             let sim = lfm_a.match(RegExp(kw)); if (sim) {
                                 sim = sim.toString(); ix = lfm_a.lastIndexOf(sim); if (ix != -1) {
                                     sa[i] = lfm_a.substring(ix + sim.length); sa[i] = sa[i].split('\n')[0].trim().split(", ");
                                 }
-                                if (sa[i].length > 4) {
+                                if (sa[i].length > 6) {
                                     sa[i] = ""; simList.some(v => {
                                         if (v.name == a && v.similar.length) {
                                             sa[i] =  v.similar; return true;
                                 }});}
                                 if (sa[i]) $.take(sa[i], p.tag[8].enabled);
                 }}}}
-                if (p.tag[8].enabled > 4) {
+                if (p.tag[8].enabled > 6) {
                     const lfmSim = p.cleanPth(p.pth.lfmSim, handles[i], 'tag') + a.clean() + " And Similar Artists.json"; let nm = ""; sa[i] = "";
                     if (s.file(lfmSim)) {const lfm_s = s.jsonParse(lfmSim, false, 'file'); let newStyle = false; if (lfm_s) {
                         if (lfm_s[0].hasOwnProperty('name')) {newStyle = true; lfm_s.shift();}
@@ -2614,10 +2715,14 @@ function Library() {
 }}
 
 function Images() {
-    this.blkArtist = ""; this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; this.covTimestamp = Date.now(); this.crop = false; this.delay = Math.min(ppt.cycTimePic, 7) * 1000; this.displayed_other_panel = null; this.get = true; this.handle = null; this.photoTimestamp = Date.now(); this.resetFade = false; this.adjustMode = false; this.touch = {dn: false, end: 0, start: 0}; this.undo = [];
+    this.blkArtist = ""; this.cycCov = ppt.loadCovAllFb || ppt.loadCovFolder; this.covTimestamp = Date.now(); this.crop = false; this.delay = Math.min(ppt.cycTimePic, 7) * 1000; this.displayed_other_panel = null; this.down = false; this.get = true; this.handle = null; this.photoTimestamp = Date.now(); this.resetFade = false; this.adjustMode = false; this.touch = {dn: false, end: 0, start: 0}; this.undo = [];
+	this.bar = {
+		debounce: s.debounce(() => {if (ppt.imageBar == 2 || p.m_x > this.bar.x1 && p.m_x < this.bar.x1 + this.bar.w1 && p.m_y > this.bar.y1 + this.bar.y4 && p.m_y < this.bar.y1 + this.bar.y5) return; this.bar.show = false; paint();}, 3000),
+		dn: false, hand: false, grip_h: 11 * s.scale, ix: -1, i_x: -1, l: 0, show: ppt.imageBar == 2 ? true : false, x1: 25, x2: 26, y1: 25, y2: 200, y3: 201, y4: 200, y5: 200, w: 100, h: 5 * s.scale
+	}
     const aPth = fb.ProfilePath + "yttm\\artist_stub_user", art_img = {}, artImgFolder = p.albCovFolder.toUpperCase() == p.pth.imgArt.toUpperCase(), cov_img = {}, cPth = fb.ProfilePath + "yttm\\front_cover_stub_user", exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 35875, 37235, 47700, 68626, 86884, 92172], ext = [".jpg", ".png", ".gif", ".bmp", ".jpeg"], blacklist_img = fb.ProfilePath + "yttm\\" + "blacklist_image.json", noimg = [], reflSetup = ppt.reflSetup.splt(0), reflSlope = s.clamp(s.value(reflSetup[5], 10, 0) / 10 - 1, -1, 9), reflSz = s.clamp(s.value(reflSetup[3], 100, 0) / 100, 0.1, 1), transLevel = s.clamp(100 - ppt.transLevel, 0.1, 100), transIncr = Math.pow(284.2171 / transLevel, 0.0625), userArtStubFile = fb.ProfilePath + "yttm\\artist_stub_user.png", userCovStubFile = fb.ProfilePath + "yttm\\front_cover_stub_user.png";
     const id = {albCounter: "", albCounter_o: "", albCyc: "", albCyc_o: "", album: "", album_o: "", artCache: "", artCounter: "", artCounter_o: "", blur: "", blur_o: "", covCache: "", img: "", img_o: "", w1: 0, w2: 0}
-    let a_run = true, all_files_o_length = 0, alpha = 255, ap = "", artImages = [], artist = "", artist_o = "", blkArtist = "", blacklist = [], bor_w1 = 0, bor_w2 = 0, chk_arr = [], counter = 0, covCycle_ix = 1, covers = [{id: 0, pth: ""}], covImages = [], cp = "", cur_blur = null, cur_handle = null, cur_img = null, cur_imgPth = "", f_blur = null, fade_mask = null, fe_done = "", folder = "", folderSup = "", i_x = 0, ix = 0, imgb = 0, imgx = 0, imgy = 0, imgw = 100, imgh = 100, init = true, new_BlurAlb = false, nh = 10, nw = 10, refl_mask = null, reflAlpha = s.clamp(255 * s.value(reflSetup[1], 14.5, 0) / 100, 0, 255), s1 = 1, s2 = 1, sc = 1, sh_img = null, tw = 0, th = 0, userArtStub = null, userCovStub = null, validate = [], x_l = 0, x_r = 0, xa = 0, y_b = 0, y_t = 0, ya = 0;
+    let a_run = true, all_files_o_length = 0, alpha = 255, ap = "", artImages = [], artist = "", artist_o = "", blkArtist = "", blacklist = [], bor_w1 = 0, bor_w2 = 0, chk_arr = [], counter = 0, covCycle_ix = 1, covers = [{id: 0, pth: ""}], covImages = [], cp = "", cur_blur = null, cur_handle = null, cur_img = null, cur_imgPth = "", f_blur = null, fade_mask = null, fe_done = "", folder = "", folderSup = "", i_x = 0, ix = 0, imgb = 0, imgx = 0, imgy = 0, imgw = 100, imgh = 100, init = true, new_BlurAlb = false, nh = 10, nhh = 10, nw = 10, refl_mask = null, reflAlpha = s.clamp(255 * s.value(reflSetup[1], 14.5, 0) / 100, 0, 255), s1 = 1, s2 = 1, sc = 1, sh_img = null, tw = 0, th = 0, userArtStub = null, userCovStub = null, validate = [], x_l = 0, x_r = 0, xa = 0, y_b = 0, y_t = 0, ya = 0;
 
     if (transLevel == 100) transLevel = 255;
     ext.some(v => {ap = aPth + v; if (s.file(ap)) {userArtStub = gdi.Image(ap); return true;}});
@@ -2638,10 +2743,12 @@ function Images() {
 	const cycImages = artImgFolder ? images : v => {if (!s.file(v)) return false; const fileSize = utils.FileTest(v, "s"); return (incl_lge || fileSize <= 8388608) && (/(?:jpe?g|gif|png|bmp)$/i).test(s.fs.GetExtensionName(v));}
     const memoryLimit = () => window.PanelMemoryUsage / window.MemoryLimit > 0.4 || window.TotalMemoryUsage / window.MemoryLimit > 0.5;
 	const resetCounters = () => {if (p.lock) return; id.albCounter_o = id.albCounter; id.albCounter = name.albID(ppt.focus, 'full'); if (id.albCounter != id.albCounter_o || !id.albCounter) {counter = 0; men.revCounter = 0;} id.artCounter_o = id.artCounter; id.artCounter = name.artist(ppt.focus); if (id.artCounter && id.artCounter != id.artCounter_o || !id.artCounter) {counter = 0; men.bioCounter = 0;}}
+	const setCov = s.debounce((incr) => {covCycle_ix = incr; if (covCycle_ix < 1) covCycle_ix = covers.length - 1; else if (covCycle_ix >= covers.length) covCycle_ix = 1; i_x = covCycle_ix; if (cov.cacheHit(i_x, covers[i_x].pth)) return; cov_img.i_x = i_x; cov_img.id = gdi.LoadImageAsync(window.ID, covers[i_x].pth);}, 100);	
+	const setPhoto = s.debounce((incr) => {ix = incr; if (ix < 0) ix = artImages.length - 1; else if (ix >= artImages.length) ix = 0; let i = 0; while (this.displayed_other_panel == artImages[ix] && i < artImages.length) {ix += incr; if (ix < 0) ix = artImages.length - 1; else if (ix >= artImages.length) ix = 0; i++;} this.set_chk_arr(artImages[ix]); loadArtImage();}, 100);
     const setReflStrength = n => {reflAlpha += n; reflAlpha = s.clamp(reflAlpha, 0, 255); ppt.reflSetup = "Strength," + Math.round(reflAlpha / 2.55) + ",Size," + reflSetup[3] + ",Gradient," + reflSetup[5]; refl_mask = false; this.adjustMode = true; if (ppt.artistView && ppt.cycPhoto) this.clear_a_rs_cache(); if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) this.get_images(); else this.get_multi(p.art_ix, p.alb_ix);}
 	const sort = (data, prop) => {data.sort((a, b) => a[prop] - b[prop]); return data;}
 	const uniq = a => [...new Set(a)];
-	const uniqPth = a => {const flags = []; let result = []; a.forEach(v => {if (flags[v.pth]) return; result.push(v); flags[v.pth] = true;}); return result;}
+	const uniqPth = a => {const flags = []; let result = []; a.forEach(v => {const vpth = v.pth.toLowerCase(); if (flags[vpth]) return; result.push(v); flags[vpth] = true;}); return result;}
 
     this.artist_reset = force => {if (p.lock) return; blurCheck(); artist_o = artist; artist = name.artist(ppt.focus); const new_artist = artist && artist != artist_o || !artist || ppt.covBlur && id.blur != id.blur_o || force; if (new_artist) {folderSup = ""; folder = p.cleanPth(p.pth.imgArt, ppt.focus); this.clear_art_cache(); if (ppt.cycPhoto) a_run = true; if (!artImages.length) {all_files_o_length = 0; ix = 0;}}}
 	this.blacklist = clean_artist => {let black_list = []; if (!s.file(blacklist_img)) return black_list; const list = s.jsonParse(blacklist_img, false, 'file'); 
@@ -2655,7 +2762,7 @@ function Images() {
     this.create_images = () => {const cc = StringFormat(1, 1), font1 = gdi.Font("Segoe UI", 270, 1), font2 = gdi.Font("Segoe UI", 120, 1), font3 = gdi.Font("Segoe UI", 200, 1), font4 = gdi.Font("Segoe UI", 90, 1), tcol = !ppt.blurDark && !ppt.blurLight || (ppt.imgBorder != 1 && ppt.imgBorder != 3) ? ui.col.text : ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0); for (let i = 0; i < 3; i++) {noimg[i] = s.gr(500, 500, true, g => {g.SetSmoothingMode(2); if (!ppt.blurDark && !ppt.blurLight || ppt.imgBorder == 1 || ppt.imgBorder == 3) {g.FillSolidRect(0, 0, 500, 500, tcol); g.FillGradRect(-1, 0, 505, 500, 90, ui.col.bg & 0xbbffffff, ui.col.bg, 1.0);} g.SetTextRenderingHint(3); g.DrawString("NO", i == 2 ? font3 : font1, tcol & 0x25ffffff, 0, 0, 500, 275, cc); g.DrawString(["COVER", "PHOTO", "SELECTION"][i], i == 2 ? font4 : font2, tcol & 0x20ffffff, 2.5, 175, 500, 275, cc); g.FillSolidRect(60, 388, 380, 50, tcol & 0x15ffffff);});} this.get = true;}; this.create_images();
     this.fresh = () => {
 		counter++; if (counter < ppt.cycTimePic) return; counter = 0;
-		if (t.block() || !ppt.cycPic || ppt.text_only || p.zoom()) return;
+		if (t.block() || !ppt.cycPic || ppt.text_only || this.bar.dn || p.zoom()) return;
 		if (ppt.artistView) {
 			if (artImages.length < 2 || Date.now() - this.photoTimestamp < this.delay || !ppt.cycPhoto) return; changePhoto(1);
 		} else if (this.cycCov) {
@@ -2665,18 +2772,14 @@ function Images() {
     this.get_images = force => {if (ppt.text_only && !ui.blur) return; if (ppt.artistView && ppt.cycPhoto) {if (!p.art_ix) this.artist_reset(force); this.getArtImg();} else this.getFbImg();}
     this.getArtImg = update => {if (!ppt.artistView || ppt.text_only && !ui.blur) return; if (a_run || update) {a_run = false; if (artist) getArtImages();} this.set_chk_arr(ppt.cycPhoto ? artImages[ix] : null); loadArtImage();}
 	this.grab = force => {if (t.block()) return this.get = true; this.getArtImg(true); if (force) this.getFbImg();}
-    this.lbtn_dn = (p_x, p_y) => {if (!ppt.touchControl || p.text_trace) return; this.touch.dn = true; this.touch.start = p_x;}
-    this.lbtn_up = (p_x, p_y) => {if (this.touch.dn) {this.touch.dn = false;}}
     this.leave = () => {if (this.touch.dn) {this.touch.dn = false; this.touch.start = 0;}}
 	this.on_playback_new_track = force => {check_cache(); resetCounters(); if (!p.multi_new() && !force) return; if (t.block()) {this.get = true; this.artist_reset();} else {if (ppt.artistView && ppt.cycPhoto) {this.artist_reset(); this.getArtImg();} else this.getFbImg(); this.get = false;}}
     this.on_size = () => {if (ppt.text_only) {this.clear_c_rs_cache(); this.getFbImg();} if (ppt.text_only && !ui.blur) return init = false; this.clear_a_rs_cache(); this.clear_c_rs_cache(); if (ppt.artistView) {if (init) this.artist_reset(); this.getArtImg();} else this.getFbImg(); init = false; if (ppt.img_only) p.get_multi(true); but.refresh(true);}
 	this.pth = () => ({imgPth: ppt.text_only || !s.file(cur_imgPth) ? "" : cur_imgPth, artist: artist || name.artist(ppt.focus), blk: (/_([a-z0-9]){32}\.jpg$/).test(s.fs.GetFileName(cur_imgPth))});
     this.set_chk_arr = arr_ix => {chk_arr = [window.ID, arr_ix, this.displayed_other_panel]; window.NotifyOthers("chk_arr_bio", chk_arr);}
     this.setCrop = sz => {const imgRefresh = ppt.img_only || !ppt.text_only && !t.text; this.crop = ppt.artistView && (ppt.artCropImgOnly && imgRefresh || ppt.artCropDual && !ppt.img_only) || !ppt.artistView && (ppt.covCropImgOnly && imgRefresh || ppt.covCropDual && !ppt.img_only); p.setBorder(imgRefresh && this.crop, ppt.imgBorder, ppt.imgReflection, imgRefresh); if (sz) {p.sizes(); if (ppt.heading && !ppt.img_only) but.check();}}; if (ppt.img_only) this.setCrop(true);
-	this.trace = (x, y) => {
-		// if (!ppt.autoEnlarge) return true;
-		let arr = [], ex; if (ppt.artistView && ppt.cycPhoto && artImages.length) {arr = art.cache; ex = ix;} else {arr = cov.cache; ex = i_x;} if (ex >= arr.length || !arr[ex]) return false; return x > arr[ex].x && x < arr[ex].x + arr[ex].w && y > arr[ex].y && y < arr[ex].y + arr[ex].h;
-	}	
+    this.trace = (x, y) => {//if (!ppt.autoEnlarge) return true; 
+	let arr = [], ex; if (ppt.artistView && ppt.cycPhoto && artImages.length) {arr = art.cache; ex = ix;} else {arr = cov.cache; ex = i_x;} if (ex >= arr.length || !arr[ex]) return false; return x > arr[ex].x && x < arr[ex].x + arr[ex].w && y > arr[ex].y && y < arr[ex].y + arr[ex].h;}
     this.wheel = step => {switch (utils.IsKeyPressed(0x10)) {case false: if (artImages.length > 1 && ppt.artistView && !ppt.text_only && ppt.cycPhoto) {changePhoto(-step); if (ppt.cycPic) this.photoTimestamp = Date.now();} if (this.cycCov && covers.length > 1 && !ppt.artistView && !ppt.text_only && !p.alb_ix) {changeCov(-step); if (this.cycCov) this.covTimestamp = Date.now();} break; case true: if (!p || (ppt.mul_item && but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) || p.text_trace || !ppt.imgReflection) break; setReflStrength(-step * 5); break;}}
 
     this.chkPths = (pths, fn, type, extraPaths) => {
@@ -2756,7 +2859,7 @@ function Images() {
     }
 
     const getCovImages = () => {
-		if (ppt.artistView || !this.cycCov || p.lock  || p.alb_ix) return false;
+		if (ppt.artistView || !this.cycCov || p.lock || p.alb_ix) return false;
 		id.albCyc_o = id.albCyc; id.albCyc = name.albID(ppt.focus, 'full');
 		const new_album = id.albCyc != id.albCyc_o || !id.albCyc;
 		if (new_album) {
@@ -2929,8 +3032,22 @@ function Images() {
 		}
 		if ((ppt.style == 0 || ppt.style == 2 || ppt.style > 3) && !ppt.img_only && t.text && ppt.alignH != 1) {if (ppt.alignH == 2) x_l = Math.round(p.w - p.img_r - tw - bor_w2);} else x_l = Math.round((nw - tw) / 2 + x_l);
 		if ((ppt.style == 1 || ppt.style == 3 || ppt.style > 3 && !ppt.alignAuto) && !ppt.img_only && t.text && ppt.alignV != 1) {if (ppt.alignV == 2) y_t = Math.round(p.h - p.img_b - th - bor_w2);} else if (ppt.style < 4 || !ppt.alignAuto || !t.text || ppt.img_only) y_t = Math.round((nh - th) / 2 + y_t);
+		if (!ppt.imageBar) return;
+		nhh = ppt.style < 4 || !t.text || ppt.img_only ? nh : p.imgs;
+		this.bar.gripOffset = Math.round((this.bar.grip_h - this.bar.h) / 2) + Math.ceil(ui.l_h / 2);
+		this.bar.w1 = Math.round(Math.min(nw, nhh) * 2 / 3);
+		this.bar.w2 = this.bar.w1 + Math.round(this.bar.grip_h);
+		this.bar.l = !t.text ? p.bor_l : p.img_l;
+		this.bar.x1 = Math.round(this.bar.l + (nw - this.bar.w1) / 2);
+		this.bar.x2 = this.bar.x1 + Math.ceil(ui.l_h / 2);
+		this.bar.x3 = this.bar.x1 - Math.round(this.bar.grip_h / 2);
+		this.bar.y1 = !t.text ? p.bor_t : p.img_t;
+		this.bar.y2 = Math.round(this.bar.y1 + nhh * 0.9); if (ppt.style > 3 && !ppt.img_only && t.text) this.bar.y2 -= p.bor_t;
+		this.bar.y3 = this.bar.y2 + Math.ceil(ui.l_h / 2);
+		this.bar.y4 = nhh * 0.8 - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
+		this.bar.y5 = nhh - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
     }
-	
+
     const blur_img = (image, im, x, y, w, h) => {
         if (!image || !im || !p.w || !p.h) return;
         if (ppt.covBlur && (ppt.artistView || this.cycCov || ppt.text_only || p.alb_ix) && new_BlurAlb) {
@@ -3064,9 +3181,82 @@ function Images() {
         if (ui.blur && cur_blur) gr.DrawImage(cur_blur, 0, 0, cur_blur.Width, cur_blur.Height, 0, 0, cur_blur.Width, cur_blur.Height);
 		if (this.get) return getImgFallback();
         if (!ppt.text_only && cur_img) gr.DrawImage(cur_img, xa, ya, cur_img.Width, cur_img.Height, 0, 0, cur_img.Width, cur_img.Height, 0, alpha);
+		if (!this.bar.show) return;
+		if (ppt.text_only || !(ppt.cycPhoto && ppt.artistView && artImages.length > 1) && !(this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)) return;
+		const prog = this.bar.dn ? s.clamp(p.m_x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? (ix + 1) / artImages.length :  i_x / (covers.length - 1)) * this.bar.w1;
+		gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.l_h, RGB(128, 128, 128));
+		gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.l_h, this.bar.h - ui.l_h, RGBA(0, 0, 0, 75));
+		gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.l_h, this.bar.h - ui.l_h, RGB(245, 245, 245));
+		gr.SetSmoothingMode(2);
+		gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+		gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.l_h, RGB(128, 128, 128));
+		
+		let count = 0, count_m = 0;
+		if (ppt.artistView) {count = (ix + 1 + (" / " + artImages.length)); count_m = (artImages.length + (" / " + artImages.length)) + " ";}
+		else {count = (i_x + (" / " + (covers.length - 1))); count_m = (covers.length - 1 + (" / " + (covers.length - 1))) + " ";}
+		if (count) {
+			const count_w = gr.CalcTextWidth(count_m, ui.smallFont), count_x = s.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + nw + (!t.text ? p.bor_r : p.img_r) - count_w - 4), count_h = gr.CalcTextHeight(count, ui.smallFont), count_y = this.bar.y2 - this.bar.gripOffset - count_h * 1.5;
+			gr.FillRoundRect(count_x, count_y, count_w + 2, count_h + 2, 3, 3, RGBA(0, 0, 0, 210));
+			gr.DrawRoundRect(count_x + 1, count_y + 1, count_w, count_h, 1, 1, 1, RGBA(255, 255, 255, 60));
+			gr.DrawRoundRect(count_x, count_y, count_w + 2, count_h + 2, 1, 1, 1, RGBA(0, 0, 0, 200));
+			gr.GdiDrawText(count, ui.smallFont, RGB(250, 250, 250), count_x + 1, count_y, count_w, count_h + 2, t.cc);
+		}
+		gr.SetSmoothingMode(0);
     }
+	
+    this.lbtn_dn = (p_x, p_y) => {
+		this.bar.dn = false;
+		this.down = true;
+		if (ppt.imageBar) {
+			if (!ppt.text_only && ((ppt.cycPhoto && ppt.artistView && artImages.length > 1) || (this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)))
+				this.bar.dn = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y1 + this.bar.y4 && p_y < this.bar.y1 + this.bar.y5;
+			
+		if (this.bar.dn) {
+			const prog = s.clamp(p_x - this.bar.x1, 0, this.bar.w1);
+			if (ppt.artistView) {
+					ix = Math.min(Math.floor(prog / this.bar.w1 * artImages.length), artImages.length - 1);
+					if (ix != this.bar.ix) {setPhoto(ix); this.bar.ix = ix;}
+		   } else {
+				i_x = Math.min(Math.floor(prog / this.bar.w1 * (covers.length - 1) + 1), covers.length - 1);
+					if (i_x != this.bar.i_x) {setCov(i_x); this.bar.i_x = i_x;}
+			}
+			paint();
+		}
+
+		}
+		if (!ppt.touchControl || p.text_trace || this.bar.dn) return; this.touch.dn = true; this.touch.start = p_x;
+	}
+
+    this.lbtn_up = (p_x, p_y) => {
+		if (ppt.imageBar && !this.bar.dn) img_metrics(cur_img, ppt.artistView ? 0 : 1);
+		this.bar.dn = false;
+		this.down = false;
+		if (this.touch.dn) {this.touch.dn = false;}
+	}
 
     this.move = (p_x, p_y) => {
+		this.bar.hand = false;
+		if (ppt.imageBar) {
+			const show = !ppt.text_only && (ppt.artistView || !p.alb_ix) && (ppt.imageBar == 2 || p_x > this.bar.l && p_x < this.bar.l + nw && p_y > this.bar.y1 && p_y < this.bar.y1 + this.bar.y5);
+			if (show) this.bar.show = true;
+			if (!ppt.text_only && ((ppt.cycPhoto && ppt.artistView && artImages.length > 1) || (this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)))
+				if (!this.down || this.bar.dn) this.bar.hand = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y1 + nhh * 0.8  - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t) && p_y < this.bar.y1 + this.bar.y5;
+			paint();
+			this.bar.debounce();
+		}
+
+        if (this.bar.dn) {
+			const prog = s.clamp(p_x - this.bar.x1, 0, this.bar.w1);
+			if (ppt.artistView) {
+				ix = Math.min(Math.floor(prog / this.bar.w1 * artImages.length), artImages.length - 1);
+				if (ix != this.bar.ix) {setPhoto(ix); this.bar.ix = ix;}
+			} else {
+				i_x = Math.min(Math.floor(prog / this.bar.w1 * (covers.length - 1) + 1), covers.length - 1);
+				if (i_x != this.bar.i_x) {setCov(i_x); this.bar.i_x = i_x;}
+			}
+			paint();
+		}
+
         if (this.touch.dn) {
             if (!p.imgBox(p_x, p_y)) return;
             this.touch.end = p_x;
@@ -3116,7 +3306,6 @@ function on_library_items_added() {if (!lib) return; lib.update = true;}; functi
 function on_load_image_done(id, image, image_path) {img.load_image_done(id, image, image_path);}
 function on_metadb_changed() {if (p.ir(ppt.focus) || t.block() && !p.server || !p.multi_new()) return; p.get_multi(true); if (!ppt.img_only) t.on_playback_new_track(); if (!ppt.text_only || ui.blur) img.on_playback_new_track(); p.metadb_serv();}
 function on_mouse_lbtn_dblclk(x, y) {but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dblclk(x, y); if (!p.dblClick) return; if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; p.click(x, y);}
-
 function on_mouse_lbtn_down(x, y) {
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);		
 	var hover_btn = btns_manager.on_mouse("lbtn_down",x, y);
@@ -3127,7 +3316,7 @@ function on_mouse_lbtn_down(x, y) {
 function on_mouse_lbtn_up(x, y) {
 	var down_btn = btns_manager.on_mouse("lbtn_up",x, y);
 	if(!down_btn){	
-		t.scrollbar_type().lbtn_drag_up(x, y); if (!p.dblClick && !but.Dn) p.click(x, y); t.scrollbar_type().lbtn_up(x, y); p.clicked = false; tb.lbtn_up(x, y); but.lbtn_up(x, y); img.lbtn_up(x, y);
+		t.scrollbar_type().lbtn_drag_up(x, y); if (!p.dblClick && !but.Dn && !img.bar.dn) p.click(x, y); t.scrollbar_type().lbtn_up(x, y); p.clicked = false; tb.lbtn_up(x, y); but.lbtn_up(x, y); img.lbtn_up(x, y);
 	}
 }
 function on_mouse_leave() {
@@ -3139,16 +3328,19 @@ function on_mouse_leave() {
 
 function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
-	g_cursor.onMouse("move", x, y, m);	  		
-	p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;
+	g_cursor.onMouse("move", x, y, m);	  	
+	if (p.m_x == x && p.m_y == y) return; p.move(x, y); but.move(x, y); t.scrollbar_type().move(x, y); tb.img_move(x, y); tb.move(x, y); img.move(x, y); p.m_x = x; p.m_y = y;
 	btns_manager.on_mouse("move",x, y);
 }
-
 function on_mouse_mbtn_up(x, y) {p.mbtn_up(x, y);}
 function on_mouse_rbtn_up(x, y) {men.rbtn_up(x, y); return true;}
 function on_mouse_wheel(step) {switch (p.zoom()) {case false: if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true); else if (p.text_trace) {if (!ppt.img_only) t.scrollbar_type().wheel(step, false);} else img.wheel(step); break; case true: ui.wheel(step); if (utils.IsKeyPressed(0x11)) but.wheel(step); if (utils.IsKeyPressed(0x10)) {if (!p.text_trace) img.wheel(step); if (but.btns["mt"] && but.btns["mt"].trace(p.m_x, p.m_y)) men.wheel(step, true);} break;}}
-function on_notify_data(name, info) {if (ui.local) on_cui_notify(name, info); switch(name) {case "lyrics_state": lyrics_state.value = info; positionButtons(); break; case "chkTrackRev_bio": if (!p.server && ppt.inclTrackRev) {const copy = Object.assign({}, info); copy.inclTrackRev = true; window.NotifyOthers("isTrackRev_bio", copy);} break; case "isTrackRev_bio": if (p.server && info.inclTrackRev == true) serv.get_track(info); break; case "img_chg_bio": img.fresh(); men.fresh(); break; case "chk_arr_bio": img.chk_arr(JSON.parse(JSON.stringify(info))); ; break; case "custom_style_bio": p.on_notify(info); break; case "force_update_bio": if (p.server) serv.fetch(1, info[0], info[1]); break; case "get_multi_bio": p.get_multi(false); break; case "get_rev_img_bio": if (p.server) serv.get_rev_img(info[0], info[1], info[2], info[3], false); break; case "get_img_bio": img.grab(info); break; case "get_txt_bio": t.grab(); break; case "multi_tag_bio": if (p.server) serv.fetch(false, info[0], info[1]); break; case "not_server_bio": p.server = false; timer.clear(timer.img); timer.clear(timer.zSearch); break; case "blacklist_bio": img.blkArtist = ""; img.chkArtImg(); break; case "script_unload_bio": p.server = true; window.NotifyOthers("not_server_bio", 0); break; case "refresh_bio": window.Reload(); break; case "reload_bio": if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) window.Reload(); else {t.artistFlush(); t.albumFlush(); t.grab(); if (ppt.text_only) t.paint();} break;}}
-function on_paint(gr) {if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}ui.draw(gr); img.draw(gr); t.draw(gr); t.messageDraw(gr); but.draw(gr); tb.drawEd(gr); ui.lines(gr);btns_manager.draw(gr);}
+function on_notify_data(name, info) {if (ui.local) on_cui_notify(name, info); switch(name) {case "chkTrackRev_bio": if (!p.server && p.inclTrackRev) {const copy = Object.assign({}, info); copy.inclTrackRev = true; window.NotifyOthers("isTrackRev_bio", copy);} break; case "isTrackRev_bio": if (p.server && info.inclTrackRev == true) serv.get_track(info); break; case "img_chg_bio": img.fresh(); men.fresh(); break; case "chk_arr_bio": img.chk_arr(JSON.parse(JSON.stringify(info))); ; break; case "custom_style_bio": p.on_notify(info); break; case "force_update_bio": if (p.server) serv.fetch(1, info[0], info[1]); break; case "get_multi_bio": p.get_multi(false); break; case "get_rev_img_bio": if (p.server) serv.get_rev_img(info[0], info[1], info[2], info[3], false); break; case "get_img_bio": img.grab(info); break; case "get_txt_bio": t.grab(); break; case "lyrics_state": lyrics_state.value = info; positionButtons(); break; case "multi_tag_bio": if (p.server) serv.fetch(false, info[0], info[1]); break; case "not_server_bio": p.server = false; timer.clear(timer.img); timer.clear(timer.zSearch); break; case "blacklist_bio": img.blkArtist = ""; img.chkArtImg(); break; case "script_unload_bio": p.server = true; window.NotifyOthers("not_server_bio", 0); break; case "refresh_bio": window.Reload(); break; case "reload_bio": if (!p.art_ix && ppt.artistView || !p.alb_ix && !ppt.artistView) window.Reload(); else {t.artistFlush(); t.albumFlush(); t.grab(); if (ppt.text_only) t.paint();} break;}}
+function on_paint(gr) {
+	if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
+	ui.draw(gr); img.draw(gr); t.draw(gr); t.messageDraw(gr); but.draw(gr); tb.drawEd(gr); ui.lines(gr);
+	btns_manager.draw(gr);	
+}
 function on_playback_dynamic_info_track() {if (p.server) serv.fetch_dynamic(); t.on_playback_new_track(); img.on_playback_new_track();}
 function on_playback_new_track() {if (p.server) serv.fetch(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]}); if (ppt.focus) return; t.on_playback_new_track(); img.on_playback_new_track();}
 function on_playback_stop(reason) {if (reason == 2) return; on_item_focus_change();}
@@ -3179,7 +3371,7 @@ function Server() {
     }
     const auto_add = p.valueIni("MISCELLANEOUS", p.def_tf[7].name, p.def_tf[7].tf, 1); let exp = Math.max(p.d * utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[5].name) / 28, p.d), upd = p.d / 28, url = {lfm: "https://ws.audioscrobbler.com/2.0/?format=json" + p.lfm, lfm_sf: "https://www.songfacts.com/"}; if (!exp || isNaN(exp)) exp = p.d;
     const imgNo = s.clamp(p.valueIni("MISCELLANEOUS", p.def_tf[6].name, p.def_tf[6].tf, 2), 0, 20);
-    let artLimit = parseFloat(utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[8].name)); artLimit = artLimit ? Math.max(artLimit, imgNo) : 0; if (artLimit && !ppt.get("SYSTEM.Cache Limit Advisory", false)) {let f_pth = p.cleanPth(p.pth.imgArt, ppt.focus); f_pth = f_pth ? f_pth : "N/A"; fb.ShowPopupMessage("Artist image cache limit: now enabled. This is a BETA feature.\r\n\r\nLimits number of images stored per artist to the value set. If used with auto-add, newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\nOnly considers images ending in \"_32-alphanumeric-string.jpg\", e.g. Coldplay_421cac7d8e42662f069c4b69e7934d7b.jpg.\r\n\r\nIf a custom save location is used, ensure images are saving where expected & there aren't other matching images.\r\n\r\nCurrent save folder: " + f_pth + "\r\n\r\nThe cache limit is applied following image update and when images are no longer in use.", "Biography"); ppt.set("SYSTEM.Cache Limit Advisory", true);}
+    let artLimit = parseFloat(utils.ReadINI(p.bio_ini, "MISCELLANEOUS", p.def_tf[8].name)); artLimit = artLimit ? Math.max(artLimit, imgNo) : 0; if (artLimit && !ppt.get("SYSTEM.Cache Limit Advisory", false)) {let f_pth = p.cleanPth(p.pth.imgArt, ppt.focus); f_pth = f_pth ? f_pth : "N/A"; fb.ShowPopupMessage("Artist image cache limit: now enabled. \r\n\r\nLimits number of images stored per artist to the value set*. If used with auto-add, newer images are added & older removed to give a fixed number of up-to-date images.\r\n\r\nOnly considers images ending in \"_32-alphanumeric-string.jpg\", e.g. Coldplay_421cac7d8e42662f069c4b69e7934d7b.jpg.\r\n\r\nIf a custom save location is used, ensure images are saving where expected & there aren't other matching images.\r\n\r\nCurrent save folder: " + f_pth + "\r\n\r\nThe cache limit is applied following image update and when images are no longer in use.\r\n\r\n*Actual number also depends on minimum target number (initial fetch number) and whether auto-add is enabled (tops up to a minimum of 5) as these take precedence.", "Biography"); ppt.set("SYSTEM.Cache Limit Advisory", true);}
     const bio_json = fb.ProfilePath + "yttm\\" + "update_bio.json"; if (!s.file(bio_json)) s.save(bio_json, JSON.stringify([{"name":"update", "time":Date.now()}], null, 3), true); let m = s.jsonParse(bio_json, false, 'file'); if (!$.isArray(m)) {m = [{"name":"update", "time":Date.now()}]; s.save(bio_json, JSON.stringify(m, null, 3), true);} if (m[0].name != "update") {m.unshift({"name":"update", "time":Date.now()}); s.save(bio_json, JSON.stringify(m, null, 3), true)}
 
     const done = (f, exp) => {if (!s.file(bio_json)) return false; const m = s.jsonParse(bio_json, false, 'file'); const n = Date.now(), r = n - exp, u = n - upd; let k = m.length; if (m.length && m[0].time < u) {while (k--) if (m[k].time < r && k) m.splice(k, 1); m[0].time = n; s.save(bio_json, JSON.stringify(m, null, 3), true);} for (k = 0; k < m.length; k++) if (m[k].name == f) return true; return false;}
@@ -3199,6 +3391,7 @@ function Server() {
     const res = () => {window.NotifyOthers("get_txt_bio", "get_txt_bio"); t.grab();}
     const similar = ["Similar Artists: ", "Ähnliche Künstler: ", "Artistas Similares: ", "Artistes Similaires: ", "Artisti Simili: ", "似ているアーティスト: ", "Podobni Wykonawcy: ", "Artistas Parecidos: ", "Похожие исполнители: ", "Liknande Artister: ", "Benzer Sanatçılar: ", "相似艺术家: "];
     const sort = data => data.sort((a, b) => a.m - b.m);
+	const topAlb = ["Top Albums: ", "Top-Alben: ", "Álbumes Más Escuchados: ", "Top Albums: ", "Album Più Ascoltati: ", "人気アルバム: ", "Najpopularniejsze Albumy: ", "Álbuns Principais: ", "Популярные альбомы: ", "Toppalbum: ", "En Sevilen Albümler: ", "最佳专辑: "];
     this.fetch = (force, art, alb) => {get_bio(force, art, alb, force == 2 ? true : false); get_rev(force, art, alb, force == 2 ? true : false);}
     this.fetch_dynamic = () => {get_bio(false, {ix:0, focus:false, arr:[]}, {ix:0, focus:false, arr:[]}); amBio(false, {ix:0, focus:false, arr:[]})}
     function create_dl_file() {const n = fb.ProfilePath + "yttm\\foo_lastfm_img.vbs"; if (!s.file(n) || s.fs.GetFile(n).Size == "696") {const dl_im = "If (WScript.Arguments.Count <> 2) Then\r\nWScript.Quit\r\nEnd If\r\n\r\nurl = WScript.Arguments(0)\r\nfile = WScript.Arguments(1)\r\n\r\nSet objFSO = Createobject(\"Scripting.FileSystemObject\")\r\nIf objFSO.Fileexists(file) Then\r\nSet objFSO = Nothing\r\nWScript.Quit\r\nEnd If\r\n\r\nSet objXMLHTTP = CreateObject(\"MSXML2.XMLHTTP\")\r\nobjXMLHTTP.open \"GET\", url, false\r\nobjXMLHTTP.send()\r\n\r\nIf objXMLHTTP.Status = 200 Then\r\nSet objADOStream = CreateObject(\"ADODB.Stream\")\r\nobjADOStream.Open\r\nobjADOStream.Type = 1\r\nobjADOStream.Write objXMLHTTP.ResponseBody\r\nobjADOStream.Position = 0\r\nobjADOStream.SaveToFile file\r\nobjADOStream.Close\r\nSet objADOStream = Nothing\r\nEnd If\r\n\r\nSet objFSO = Nothing\r\nSet objXMLHTTP = Nothing"; s.save(n, dl_im, false);}}; if (p.server) create_dl_file();
@@ -3275,7 +3468,7 @@ function Server() {
 
     this.chk_track = tr => {
         let track_done = false; if (tr.artist + tr.title == trackID1 && !tr.force || tr.artist == "" || tr.title == "") track_done = true; else trackID1 = tr.artist + tr.title;
-        if (this.lfm_rev && !track_done) {if (ppt.inclTrackRev) this.get_track(tr); else window.NotifyOthers("chkTrackRev_bio", tr);}
+        if (this.lfm_rev && !track_done) {if (p.inclTrackRev) this.get_track(tr); else window.NotifyOthers("chkTrackRev_bio", tr);}
     }
 
     this.get_track = tr => {
@@ -3457,7 +3650,7 @@ function Server() {
     }
 
     function Dl_lastfm_bio(state_callback) {
-        const scrobbles = ["", ""]; let artist, counts = ["", ""], fo_bio, itemName = ["", ""], itemTracks = ["", ""], itemValue = ["", ""], pop = "", pth_bio, retry = false, searchBio = 0, simArtists = [], tags = [], topAlbums = []; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
+        const popAlbums = [], scrobbles = ["", ""]; let artist, con = "", counts = ["", ""], fo_bio, itemDate = "", itemName = ["", ""], itemValue = ["", ""], pop = "", pth_bio, retry = false, searchBio = 0, simArtists = [], tags = [], topAlbums = []; this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
         const r1 = ["Popular this week", "Beliebt diese Woche", "Popular esta semana", "Populaire cette semaine", "Popolare questa settimana", "今週の人気音楽", "Popularne w tym tygodniu", "Mais ouvida na semana", "Популярно на этой неделе", "Populärt denna vecka", "Bu hafta popüler olanlar", "本周热门"];
         const r2 = ["Popular Now", "Beliebt Jetzt", "Popular Ahora", "Populaire Maintenant", "Popolare Ora", "今人気", "Popularne Teraz", "Popular Agora", "Популярные сейчас", "Populär Nu", "Şimdi Popüler", "热门 现在"];
         this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {clearTimeout(this.ie_timer); this.ie_timer = null; if (this.xmlhttp.status == 200) this.func(); else {s.trace("last.fm biography: " + artist +  ": not found" + " Status error: " + this.xmlhttp.status, true);}}}
@@ -3465,48 +3658,67 @@ function Server() {
         this.Search = (p_artist, p_fo_bio, p_pth_bio, force) => {
             artist = p_artist; fo_bio = p_fo_bio; pth_bio = p_pth_bio;
             this.func = null; this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            const URL = "https://" + (!retry ? lfm_server : "www.last.fm") + "/music/" + encodeURIComponent(artist) + (searchBio ? "/+wiki" : "");
+            const URL = searchBio == 3 ? "https://" + lfm_server + "/music/" + encodeURIComponent(artist) + "/" + encodeURIComponent(itemValue[0]) : searchBio == 2 ? "https://www.last.fm/music/" + encodeURIComponent(artist) + "/+albums" : "https://" + (!retry ? lfm_server : "www.last.fm") + "/music/" + encodeURIComponent(artist) + (searchBio ? "/+wiki" : "");
             this.func = this.Analyse; this.xmlhttp.open("GET", URL); this.xmlhttp.onreadystatechange = this.ready_callback; if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
 			if (!this.ie_timer) {const a = this.xmlhttp; this.ie_timer = setTimeout(() => {a.abort(); this.ie_timer = null;}, 30000);}
 			this.xmlhttp.send();
         }
 
         this.Analyse = () => {
-            const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText; let con = "", i = 0;
+            const doc = new ActiveXObject("htmlfile"); doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText;
+			let i = 0;
             switch (searchBio) {
                 case 0:
-                    const a = div.getElementsByTagName('a'), p_d = div.getElementsByTagName('p'); let an = "", an_done = 0, j = 0, sa = "";
-                    s.htmlParse(div.getElementsByTagName("li"), 'className', 'tag', v => tags.push(v.innerText.trim().titlecase().replace(/\bAor\b/g, "AOR").replace(/\bDj\b/g, "DJ").replace(/\bFc\b/g, "FC").replace(/\bIdm\b/g, "IDM").replace(/\bNwobhm\b/g, "NWOBHM").replace(/\bR&b\b/g, "R&B").replace(/\bRnb\b/g, "RnB").replace(/\bUsa\b/g, "USA").replace(/\bUs\b/g, "US").replace(/\bUk\b/g, "UK")));
-                    s.htmlParse(a, false, false, v => {if (v.href.includes("+similar")) {sa = v.innerText.trim().titlecase(); return true;}})
-                    s.htmlParse(a, false, false, v => {if (v.href.includes("+albums")) {an_done++; if (an_done == 2) {an = v.innerText.trim().titlecase(); return true;}}})
-                    s.htmlParse(div.getElementsByTagName('h2'), 'className', 'featured-item-heading', v => {itemName[j] = v.innerText.trim(); j++;}); j = 0;
-                    s.htmlParse(div.getElementsByTagName('h3'), 'className', 'featured-item-name', v => {itemValue[j] = v.innerText.trim(); j++;}); j = 0;
-					s.htmlParse(p_d, 'className', 'featured-item-stats', v => {itemTracks[j] = v.innerText.trim(); j++;}); j = 0;
-                    s.htmlParse(p_d, 'className', 'grid-items-item-aux-text', v => {if (v.innerText == "") simArtists.push(v.previousSibling.parentNode.innerText.trim()); else topAlbums.push(v.previousSibling.innerText.trim());});
-                    s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++;}); j = 0;
-                    s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr', v => {counts[j] = v.innerText.trim().titlecase(); j++;});
+                    const a = div.getElementsByTagName('a'), h3 = div.getElementsByTagName('h3'), h4 = div.getElementsByTagName('h4');
+					let an = "", an_done = 0, j = 0;
+                    s.htmlParse(div.getElementsByTagName('li'), 'className', 'tag', v => tags.push(v.innerText.trim().titlecase().replace(/\bAor\b/g, "AOR").replace(/\bDj\b/g, "DJ").replace(/\bFc\b/g, "FC").replace(/\bIdm\b/g, "IDM").replace(/\bNwobhm\b/g, "NWOBHM").replace(/\bR&b\b/g, "R&B").replace(/\bRnb\b/g, "RnB").replace(/\bUsa\b/g, "USA").replace(/\bUs\b/g, "US").replace(/\bUk\b/g, "UK")));
+                    s.htmlParse(h4, 'className', 'artist-header-featured-items-item-header', v => {itemName[j] = v.innerText.trim(); j++;}); j = 0;
+                    s.htmlParse(h3, 'className', 'artist-header-featured-items-item-name', v => {itemValue[j] = v.innerText.trim(); j++;}); j = 0;
+					s.htmlParse(div.getElementsByTagName('p'), 'className', 'artist-header-featured-items-item-aux-text artist-header-featured-items-item-date', v => {itemDate = v.innerText.trim(); return true;});
+					s.htmlParse(h3, 'className', 'catalogue-overview-similar-artists-full-width-item-name', v => {simArtists.push(v.innerText.trim().titlecase())});
+					s.htmlParse(h4, 'className', 'header-metadata-tnew-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++;}); j = 0;
+					s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr js-abbreviated-counter', v => {counts[j] = v.innerText.trim().titlecase(); j++;});
                     if (tags.length) tags = "\r\n\r\n" + "Top Tags: " + tags.join(", "); else tags = "";
-                    if (topAlbums.length) topAlbums = "\r\n\r\n" + an + ": " + topAlbums.join(", "); else topAlbums = "";
-                    if (itemValue[0].length) {
-                        r1.forEach((v, i) => itemName[0] = itemName[0].replace(RegExp(v, "i"), r2[i]));
-                        pop = "\r\n\r\n" + itemName[0] + ": " + itemValue[0];
-                    }
                     if (itemValue[1].length) {
-						pop += "; " + itemName[1].titlecase() + ": " + itemValue[1];
-						if (itemTracks[1].length) pop += " (" + itemTracks[1] + ")";
+                        r1.forEach((v, i) => itemName[1] = itemName[1].replace(RegExp(v, "i"), r2[i]));
+                        pop = "\r\n\r\n" + itemName[1] + ": " + itemValue[1];
+                    }
+                    if (itemValue[0].length) {
+						pop += "; " + itemName[0].titlecase() + ": " + itemValue[0];
 					}
-                    if (simArtists.length) simArtists = "\r\n\r\n" + sa + ": " + simArtists.join(", "); else simArtists = ""; doc.close();
-                    searchBio = 1; return this.Search(artist, fo_bio, pth_bio)
+                    if (simArtists.length) simArtists = "\r\n\r\n" + similar[p.lfmLang_ix] + simArtists.join(", "); else simArtists = ""; doc.close();
+                    searchBio = 1; 
+					return this.Search(artist, fo_bio, pth_bio);
                 case 1:
                     let factbox = ""; con = "";
                     s.htmlParse(div.getElementsByTagName('div'), 'className', 'wiki-content', v => {con = v.innerHTML.format(); return true;});
                     s.htmlParse(div.getElementsByTagName('li'), 'className', 'factbox-item', v => {factbox = ""; factbox = v.innerHTML.replace(/<\/H4>/gi, ": ").replace(/\s*<\/LI>\s*/gi, ", ").replace(/\s*Show all members…\s*/gi, "").format().replace(/,$/, ""); if (factbox) con += ("\r\n\r\n" + factbox);});
-                    doc.close();
+					if (!retry) {searchBio = 2; return this.Search(artist, fo_bio, pth_bio);}
                     break;
+				case 2:
+					i = 0;
+					s.htmlParse(div.getElementsByTagName('h3'), 'className', 'resource-list--release-list-item-name', v => {i < 4 ? popAlbums.push(v.innerText.trim().titlecase()) : topAlbums.push(v.innerText.trim().titlecase()); i++; if (i == 10) return true;});
+					doc.close();
+					if (popAlbums.length) {
+						const mapAlbums = topAlbums.map(v => v.cut()), match = mapAlbums.includes(popAlbums[0].cut());
+						if (topAlbums.length > 5 && !match) topAlbums.splice(5, 0, popAlbums[0]); else topAlbums = topAlbums.concat(popAlbums);
+					}
+					topAlbums = [...new Set(topAlbums)];
+					topAlbums.length = Math.min(6, topAlbums.length);
+					if (topAlbums.length) topAlbums = "\r\n\r\n" + topAlb[p.lfmLang_ix] + topAlbums.join(", "); else topAlbums = "";
+					if (itemValue[0]) {searchBio = 3; return this.Search(artist, fo_bio, pth_bio);}
+					break;
+				case 3:
+					s.htmlParse(div.getElementsByTagName('dd'), 'className', 'catalogue-metadata-description', v => {itemValue[2] = v.innerText.trim().split(',')[0]; return true});
+					if (itemValue[0].length) {
+						const item = itemDate.length && itemValue[2].length && itemDate.length != itemValue[2].length ? " (" + itemDate + " - " + itemValue[2] + ")" : itemValue[2].length ? " (" + itemValue[2] + ")" : itemDate.length ? " (" + itemDate + ")" : "";
+						if (item) pop += item;
+					}
+					break;
             }
             if ((!con.length || con.length < 45 && noWiki(con)) && serverFallback && !retry) {retry = true; searchBio = 1; return this.Search(artist, fo_bio, pth_bio);}
             if (con.length < 45 && noWiki(con)) con = "";
-            con += tags; con += topAlbums; con += pop; con += simArtists; if (scrobbles[0].length && counts[0].length || scrobbles[1].length && counts[1].length) con += ("\r\n\r\nLast.fm: " + (counts[0].length ? scrobbles[0] + " " + counts[0] + "; " : "") + (counts[1].length ? scrobbles[1] + " " + counts[1] : "")); con = con.trim();
+			con += tags; con += topAlbums; con += pop; con += simArtists; if (scrobbles[1].length && counts[1].length || scrobbles[0].length && counts[0].length) con += ("\r\n\r\nLast.fm: " + (counts[1].length ? scrobbles[1] + " " + counts[1] + "; " : "") + (counts[0].length ? scrobbles[0] + " " + counts[0] : "")); con = con.trim();
             if (!con.length) {s.trace("last.fm biography: " + artist +  ": not found", true); return;}
             s.buildPth(fo_bio); s.save(pth_bio, con, true); res(); p.get_multi(false); window.NotifyOthers("get_multi_bio", "get_multi_bio");
         }
@@ -3537,7 +3749,7 @@ function Server() {
             const a = dl_ar.clean(), doc = new ActiveXObject("htmlfile"); doc.open();
             const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText;
             const list = div.getElementsByTagName('img'); let links = []; if (!list) {if (serverFallback && !retry) {retry = true; return this.Search(dl_ar, img_folder);} return s.trace("last.fm artist images: " + dl_ar + ": none found", true);}
-            s.htmlParse(list, 'className', 'image-list-image', v => links.push(v.src.replace("avatar170s/", "")));
+			s.htmlParse(list, false, false, v => {const attr = v.getAttribute("src"); if (attr.includes("avatar170s/")) links.push(attr.replace("avatar170s/", ""));});
 			const blacklist = img.blacklist(a.toLowerCase());
 			links = links.filter(v => !blacklist.includes(v.substring(v.lastIndexOf("/") + 1) + ".jpg"));
             if (links.length) {
@@ -3596,17 +3808,15 @@ function Server() {
             } else if (rev) {
                 doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText; const h2 = div.getElementsByTagName('h2'); let j = 0;
                 s.htmlParse(div.getElementsByTagName('li'), 'className', 'tag', v => tags.push(v.innerText.trim().titlecase().replace(/\bAor\b/g, "AOR").replace(/\bDj\b/g, "DJ").replace(/\bFc\b/g, "FC").replace(/\bIdm\b/g, "IDM").replace(/\bNwobhm\b/g, "NWOBHM").replace(/\bR&b\b/g, "R&B").replace(/\bRnb\b/g, "RnB").replace(/\bUsa\b/g, "USA").replace(/\bUs\b/g, "US").replace(/\bUk\b/g, "UK")));
-                s.htmlParse(h2, 'className', 'metadata-title', v => {rd_n = v.innerText.trim().titlecase(); return true;});
-                s.htmlParse(div.getElementsByTagName('p'), 'className', 'metadata-display', v => {if (!j) rd = v.innerText.trim(); else {tr = v.innerText.trim().replace(/\b1 tracks/, "1 track"); return true;} j++;}); j = 0;
-                s.htmlParse(h2, 'className', 'sr-only', v => {score_n = v.innerText.trim().titlecase(); return true;});
-                s.htmlParse(div.getElementsByTagName('span'), false, false, v => {if (v['className'].startsWith('metacritic-score')) {score = v.innerText.trim(); return true;}});
-                s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++}); j = 0;
-                s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr', v => {counts[j] = v.innerText.trim().titlecase(); j++});
+				s.htmlParse(div.getElementsByTagName('dt'), 'className', 'catalogue-metadata-heading', v => {if (j) {rd_n = v.innerText.trim().titlecase(); return true;} j++;}); j = 0;
+				s.htmlParse(div.getElementsByTagName('dd'), 'className', 'catalogue-metadata-description', v => {if (!j) tr = v.innerText.trim().replace(/\b1 tracks/, "1 track").split(',')[0]; else {rd = v.innerText.trim(); return true;} j++;}); j = 0;
+				s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-tnew-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++}); j = 0;
+				s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr js-abbreviated-counter', v => {counts[j] = v.innerText.trim().titlecase(); j++});
                 doc.close();
-                if (tags.length) tags = "\r\n\r\n" + "Top Tags: " + tags.join(", "); else tags = "";
+                if (tags.length) {tags = [...new Set(tags)]; tags.length = Math.min(5, tags.length); tags = "\r\n\r\n" + "Top Tags: " + tags.join(", ");} else tags = "";
                 if (rd_n && rd && (/\d\d\d\d/).test(rd)) stats += ("\r\n\r\n" + rd_n + ": " + rd + (tr ? " | " + tr : ""));
-                if (scrobbles[0].length && counts[0].length || scrobbles[1].length && counts[1].length) stats += ("\r\n\r\nLast.fm: " + (counts[0].length ? scrobbles[0] + " " + counts[0] + "; " : "") + (counts[1].length ? scrobbles[1] + " " + counts[1] : ""));
-                if (score_n && score) stats += ("\r\n\r\n" + "Rating: " + score_n + ": " + score);
+				if (scrobbles[1].length && counts[1].length || scrobbles[0].length && counts[0].length) stats += ("\r\n\r\nLast.fm: " + (counts[1].length ? scrobbles[1] + " " + counts[1] + "; " : "") + (counts[1].length ? scrobbles[0] + " " + counts[0] : ""));
+				if (scrobbles[2] && counts[2] && scrobbles[2] != scrobbles[0] && scrobbles[1] != scrobbles[0]) stats += ("\r\n\r\n" + "Rating: " + scrobbles[2] + ": " + counts[2]);
                 getStats = false; return this.Search(alb_artist, album, rev, fo, pth);
             } else {
                 if (!s.file(fb.ProfilePath + "yttm\\foo_lastfm_img.vbs")) return;
@@ -3620,7 +3830,7 @@ function Server() {
 
     function Lfm_track(state_callback) {
         const doc = new ActiveXObject("htmlfile"), counts = ["", ""], scrobbles = ["", ""];
-        let album = "", artist, con = "", feat = "", featOn = "", fo, force = false, from = "", getIDs = true, getStats = true, lfm_done = false, others = "", pth, releases = "", retry = false, src = 0, stats = "", text = {ids:{}}, track, URL = "", wiki = "";
+        let album = "", artist, con = "", feat = "", fo, force = false, from = "", getIDs = true, getStats = true, lfm_done = false, others = "", pth, releases = "", retry = false, src = 0, stats = "", text = {ids:{}}, track, URL = "", wiki = "";
         this.xmlhttp = null; this.func = null; this.ready_callback = state_callback; this.ie_timer = null;
         this.on_state_change = () => {if (this.xmlhttp != null && this.func != null) if (this.xmlhttp.readyState == 4) {clearTimeout(this.ie_timer); this.ie_timer = null; if (this.xmlhttp.status == 200) this.func(); else {if (getStats) {getStats = false; return this.Search(artist, track, fo, pth, force);} s.trace("last.fm track review: " + track + " / " + artist + ": not found" + " Status error: " + this.xmlhttp.status, true);}}}
 
@@ -3660,16 +3870,15 @@ function Server() {
                     revSave();
                 } else {
                     doc.open(); const div = doc.createElement('div'); div.innerHTML = this.xmlhttp.responseText; const h2 = div.getElementsByTagName('h2'); let j = 0;
-                    s.htmlParse(h2, 'className', 'featured-item-heading', v => {from = v.innerText.trim(); return true;});
-                    s.htmlParse(div.getElementsByTagName('h3'), 'className', 'featured-item-name', v => {album = v.innerText.trim(); return true;});
-                    s.htmlParse(h2, 'className', 'metadata-title', v => {feat = v.innerText.trim(); return true;});
-                    s.htmlParse(div.getElementsByTagName('a'), false, false, v => {if (!v['className'].includes('image-overlay-playlink-link')) {if (v.title) featOn += v.title.trim() + ", ";}});
-                    s.htmlParse(div.getElementsByTagName('div'), 'className', 'additional-release-count', v => {others = v.innerText.trim(); return true;});
-                    s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++}); j = 0;
-                    s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr', v => {counts[j] = v.innerText.trim().titlecase(); j++});
+					s.htmlParse(div.getElementsByTagName('h3'), 'className', 'text-18', v => {if (v.parentNode && v.parentNode.className && v.parentNode.className == 'visible-xs') {from = v.innerText.trim(); return true;}});
+					s.htmlParse(div.getElementsByTagName('h4'), 'className', 'source-album-name', v => {album = v.innerText.trim(); return true;});
+                    if (!p.lfmLang_ix) s.htmlParse(div.getElementsByTagName('p'), 'className', 'more-link-fullwidth', v => {feat = v.innerText.trim(); return true;});
+					s.htmlParse(div.getElementsByTagName('h4'), 'className', 'header-metadata-tnew-title', v => {scrobbles[j] = v.innerText.trim().titlecase(); j++}); j = 0;
+					s.htmlParse(div.getElementsByTagName('abbr'), 'className', 'intabbr js-abbreviated-counter', v => {counts[j] = v.innerText.trim().titlecase(); j++});
                     doc.close();
-                    featOn = featOn.replace(/,\s*$/, ""); if (from && album) releases += from + ": " + album + ". "; if (feat && featOn) releases += feat + ": " + featOn; if (others) releases += " " + others; if (feat && featOn || others) releases += ".";
-                    if (scrobbles[0].length && counts[0].length || scrobbles[1].length && counts[1].length) stats += ("Last.fm: " + (counts[0].length ? scrobbles[0] + " " + counts[0] + "; " : "") + (counts[1].length ? scrobbles[1] + " " + counts[1] : ""));
+					if (from && album) releases += from + ": " + album + "."; 
+					if (feat) {const featNo = feat.replace(/\D/g, ""), rel = featNo != "1" ? "releases" : "release"; feat = ` Also featured on ${featNo} other ${rel}.`; releases += feat;}
+					if (scrobbles[1].length && counts[1].length || scrobbles[0].length && counts[0].length) stats += ("Last.fm: " + (counts[1].length ? scrobbles[1] + " " + counts[1] + "; " : "") + (counts[0].length ? scrobbles[0] + " " + counts[0] : ""));
                     getStats = false; return this.Search(artist, track, fo, pth, force);
                 }
             } else {
@@ -3691,17 +3900,16 @@ function Server() {
         const revSave = ret => {
             if (text[track] && text[track].lang == p.lfmLang) {
                 if (!releases) releases = text[track].releases;
-                if (!wiki) {wiki = text[track].wiki; if (wiki) src = text[track].s;}
+                if (!wiki && !force) {wiki = text[track].wiki; if (wiki) src = text[track].s;}
                 if (!stats) stats = text[track].stats;
             }
-            text[track] = {releases: releases, wiki: wiki || "", stats: stats, s: src, lang: p.lfmLang, update: Date.now()}; s.buildPth(fo); s.save(pth, JSON.stringify(text, null, 3), true); if (ret) return s.trace("last.fm track review: " + track + " / " + artist + ": not found", true); res();
+			text[track] = {releases: releases, wiki: wiki || "", stats: stats, s: src, lang: p.lfmLang, update: Date.now()}; s.buildPth(fo); s.save(pth, JSON.stringify(text, null, 3), true); if (ret) return s.trace("last.fm track review: " + track + " / " + artist + ": not found", true); res();
         }
     }
 }
 timer.clear(timer.zSearch); timer.zSearch.id = setTimeout(() => {if (p.server) serv.fetch(false, [0, false], [0, false]); timer.zSearch.id = null;}, 3000);
 
 if (!ppt.get("SYSTEM.Software Notice Checked", false)) fb.ShowPopupMessage("THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", "Biography"); ppt.set("SYSTEM.Software Notice Checked", true);
-
 
 // ================================================== // Lyrics Buttons 
 // Update on_mouse_lbtn_down, on_mouse_lbtn_up, on_mouse_leave, on_mouse_move {
