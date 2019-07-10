@@ -20,7 +20,7 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b11',
+	theme_version: '1.2.2b12',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -241,11 +241,11 @@ function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm
 	});
 }
 function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
-	function ok_callback(status, mem_solicitation, covercache_max_mwith) {
+	function ok_callback(status, mem_solicitation, covercache_max_width) {
 		panels_reload = false;
 		if(status!="cancel"){
-			if(covercache_max_mwith!=globalProperties.coverCacheWidthMax){			
-				setCoverCacheMaxWidthGlobally(Number(covercache_max_mwith));
+			if(covercache_max_width!=globalProperties.coverCacheWidthMax){			
+				setCoverCacheMaxWidthGlobally(Number(covercache_max_width));
 				panels_reload = true;
 				globalProperties.deleteDiskCache = true;
 				delete_full_cache();					

@@ -72,11 +72,6 @@
 				//alert(window.div_text.offsetHeight+' - '+window.btn_container.offsetHeight+' - '+window_h);
             }
 			resize();
-			document.onkeydown = function () {
-				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
-					window.document.activeElement.onclick();
-				}
-			};
             window.btn_ok.onclick = function () {
                 callback_fn && callback_fn("ok", true);
                 close_window();

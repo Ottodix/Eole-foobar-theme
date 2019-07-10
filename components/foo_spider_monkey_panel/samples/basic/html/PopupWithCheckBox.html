@@ -116,18 +116,6 @@
             close_window();
         };
 
-        document.onkeydown = function () {
-            var cur_element = window.document.activeElement;
-            if (window.event.keyCode == VK_SPACE
-                && cur_element.tagName.toLowerCase() === 'input' && cur_element.type.toLowerCase() === 'checkbox') {
-                cur_element.checked = !cur_element.checked;
-            }
-            if (window.event.keyCode == VK_RETURN
-                && cur_element.tagName.toLowerCase() === 'button' && cur_element.onclick) {
-                cur_element.onclick();
-            }
-        };
-
         window.onunload = function () {
             if (!is_closed_manually) {
                 callback_fn && callback_fn("cancel", window.input_checkbox.checked);

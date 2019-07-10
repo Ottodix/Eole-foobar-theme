@@ -56,7 +56,7 @@
         <div id="inter_text" class="container">You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much. <u>Warning: changing this value will reset the cover cache.</u></div>
         <div id="size_container">
 			<div class="col col1">
-				<div class="label">Cover cache max width:<br/><span>for all panels, in pixels</span></div>
+				<div class="label">Thumbnails max width:<br/><span>for all panels, in pixels</span></div>
 			</div>	
 			<div class="col col2">			
 				<input id="coverCacheWidthMax" name="coverCacheWidthMax"></input>
@@ -66,7 +66,6 @@
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
         <button class="button_ok" id="btn_ok">Validate</button>		
-        <!--<button class="button_ok_and_reset_cache" id="btn_ok_and_reset_cache" onkeydown="if(event.keyCode == 13) this.click()">Validate and reset image cache</button>-->
         <script>   
             // helpers
             function close_window() {
@@ -112,11 +111,6 @@
 			}
 			window.resizeTo(window_w, window_h);
 			
-			document.onkeydown = function () {
-				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
-					window.document.activeElement.onclick();
-				}
-			};
             window.btn_ok.onclick = function () {
 				var radio_check = document.getElementsByName('radio_btns');
 				var radio_value;
@@ -127,23 +121,7 @@
 				}
                 callback_fn && callback_fn("ok", radio_value, window.coverCacheWidthMax.value);
                 close_window();
-            };
-            window.coverCacheWidthMax.onkeydown = function () {
-				if (window.event.keyCode == 13) {
-					window.btn_ok.onclick();
-				}
-            };			
-            /*window.btn_ok_and_reset_cache.onclick = function () {
-				var radio_check = document.getElementsByName('radio_btns');
-				var radio_value;
-				for(var i = 0; i < radio_check.length; i++){
-					if(radio_check[i].checked){
-						radio_value = radio_check[i].value;
-					}
-				}
-                callback_fn && callback_fn("reset", radio_value);
-                close_window();
-            };*/
+            };		
             window.btn_cancel.onclick = function () {
 				callback_fn && callback_fn("cancel", false);
                 close_window();
