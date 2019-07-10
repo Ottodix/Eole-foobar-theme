@@ -3987,12 +3987,18 @@ oBrowser = function(name) {
 		this.setSizeFirstCall = true;
 		
         // Adjust Column 
-        this.totalColumns = Math.floor((this.w - this.marginLR * 2) / properties.thumbnailWidth);
+		this.totalColumns = Math.floor((this.w - this.marginLR * 2) / properties.thumbnailWidth);
 
-        var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-        var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-        this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
-		
+		var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
+		var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
+		this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;		
+		while(this.thumbnailWidth>globalProperties.coverCacheWidthMax){
+			this.totalColumns = this.totalColumns+1;
+			var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
+			var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
+			this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
+		}
+
 		if(properties.CoverGridNoText)
 			this.marginSide = 0;		
 		else
@@ -4007,7 +4013,8 @@ oBrowser = function(name) {
 		if(properties.CoverGridNoText)
 			this.coverRealWith = this.thumbnailWidth;	
 		else
-			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.16);				
+			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.16);	
+			
 		this.coverHalfWidth = Math.round(this.coverRealWith/2);
         // Adjust Row & showList bloc Height
 		if(!properties.CoverGridNoText)		
