@@ -4645,7 +4645,7 @@ oBrowser = function(name) {
 						} else {
 							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
 						}					
-						
+			
 						if(properties.CoverGridNoText)
 							gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 1, 1, image_to_draw.Width-2, image_to_draw.Height-2);
 						else
@@ -5709,7 +5709,10 @@ function on_size(w, h) {
 		if(properties.showwallpaper){
 			//g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		}
-		
+		if(properties.CoverGridNoText){
+			brw.refresh_browser_thumbnails();
+			brw.refresh_shadows();	
+		}
 		// set Size of browser
 		brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);
 		g_scrollbar.setSize(ww - cScrollBar.activeWidth, brw.y-brw.headerBarHeight, cScrollBar.activeWidth, wh - brw.y+brw.headerBarHeight, cScrollBar.normalWidth);
