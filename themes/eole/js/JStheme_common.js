@@ -1568,6 +1568,42 @@ function sortNumber(a,b) {
     if(a[0] > b[0]) return 1;
     return 0;	
 }
+function logslider(position) {
+	// position will be between 0 and 100
+	var minp = 0;
+	var maxp = 100;
+
+	// The result should be between 100 an 10000000
+	var minv = Math.log(100);
+	var maxv = Math.log(10000000);
+
+	// calculate adjustment factor
+	var scale = (maxv-minv) / (maxp-minp);
+
+	return Math.exp(minv + scale*(position-minp));
+}
+function logposition(value) {
+	// position will be between 0 and 100
+	var minp = 0;
+	var maxp = 100;
+
+	// The result should be between 100 an 10000000
+	var minv = Math.log(100);
+	var maxv = Math.log(10000000);
+
+	// calculate adjustment factor
+	var scale = (maxv-minv) / (maxp-minp);
+	return (Math.log(value)-minv) / scale + minp;
+}
+function logspace(lower, upper, amount) {
+    var start = Math.log(Math.min(lower, upper));
+    var end = Math.log(Math.max(lower, upper));
+    var step = (end - start) / amount;
+
+    for(level = start; level <= end; level += step) {
+        console.log(Math.exp(level));
+    }
+}
 function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 	var checked_item = typeof checked_item !== 'undefined' ? checked_item : -1;
 	var genrePopupMenu = typeof genrePopupMenu !== 'undefined' ? genrePopupMenu : window.CreatePopupMenu();

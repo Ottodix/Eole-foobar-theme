@@ -5283,7 +5283,9 @@ oBrowser = function(name) {
 			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.headerbar_resize_btn);
 	}
 	this.moveResizeBtn = function (x,y){
-		properties.thumbnailWidth = Math.round((globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin)*(Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w))+properties.thumbnailWidthMin);
+		//var new_value = logposition(logslider(Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w)));
+		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
+		properties.thumbnailWidth = Math.round((globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
 		if(properties.thumbnailWidth>globalProperties.thumbnailWidthMax) properties.thumbnailWidth=globalProperties.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 		window.SetProperty("COVER Width", properties.thumbnailWidth);

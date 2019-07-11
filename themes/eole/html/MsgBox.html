@@ -27,7 +27,7 @@
     <body>
         <div id="div_text" class="cnt"></div>
 		<div id="btn_container"> 
-			<button id="btn_ok" class="button" onkeydown="if(event.keyCode == 13) this.click()">Yes</button>	
+			<button id="btn_ok" class="button">Yes</button>	
 		</div>		
         <script>   
             // helpers
@@ -51,7 +51,11 @@
                 window.btn_ok.innerHTML = labelInnerHtml.replace(/Yes/g, parsed_args[2]);
                 callback_fn = parsed_args[4];
             }
-
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
+				}
+			};
             // main script
             var window_w = 358;
             window_h = 120 + window.div_text.offsetHeight + window.btn_container.offsetHeight;
