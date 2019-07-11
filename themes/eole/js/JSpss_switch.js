@@ -20,17 +20,20 @@ for(i=0; i < settings_files.length; i++) {
 }
 console.log("pss_switch 1 time:"+gTime_covers.Time);*/
 	
-oPanelSetting = function (name, file_prefix, default_value, min_value, max_value) {
+oPanelSetting = function (name, file_prefix, default_value, min_value, max_value, int_value, update_settings_file_not_found) {
 	this.name = name;	
 	this.file_prefix = file_prefix;
 	this.default_value = default_value;
 	this.max_value = max_value;
 	this.min_value = min_value;	
+	this.int_value = typeof int_value !== 'undefined' ? int_value : true;	
+	this.update_settings_file_not_found = typeof update_settings_file_not_found !== 'undefined' ? update_settings_file_not_found : true;	
 	this.getFileValue = function () {		
 		setting_file = utils.Glob(SettingsPath+""+this.file_prefix+"*");
 		if(setting_file.length>=1){
 			last_underscore = setting_file[0].lastIndexOf('_');
-			this.value = parseInt(setting_file[0].substring(last_underscore + 1));
+			this.value = setting_file[0].substring(last_underscore + 1);
+			if(this.int_value) this.value = parseInt(this.value);
 			if(setting_file.length>1){
 				for(i=1;i<setting_file.length;i++) {
 					g_files.DeleteFile(setting_file[i]);
@@ -39,10 +42,13 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		} else {
 			this.value = this.default_value;
 			g_files.CreateTextFile(SettingsPath+this.file_prefix+this.value, true).Close();
-			settings_file_not_found = true;	
+			if(this.update_settings_file_not_found) settings_file_not_found = true;	
 		}
 		return this.value;
     };
+	this.getValue = function () {		
+		return this.value;
+	}	
 	this.getNumberOfState = function () {
 		return (this.max_value-this.min_value);
 	}	
@@ -159,6 +165,9 @@ var nowplayingvisu_state = new oPanelSetting("nowplayingvisu_state", "NOWPLAYING
 var libraryfilter_width = new oPanelSetting("libraryfilter_width", "LIBRARYFILTERWIDTH_", 210, 100, 900);
 var playlistpanel_width = new oPanelSetting("playlistpanel_width", "PLAYLISTPANELWIDTH_", 180, 100, 900);
 var rightplaylist_width = new oPanelSetting("rightplaylist_width", "RIGHTPLAYLISTWIDTH_", 270, 100, 900);
+
+//Theme version
+var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", ".", 0, 0, false, false);
 
 //Get Now playing state according to main panel
 function getNowPlayingState(){

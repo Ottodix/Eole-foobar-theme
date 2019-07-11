@@ -20,7 +20,8 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b14',
+	theme_version: '1.2.2b15',
+	lastest_breaking_version: '1.2.2b15',	
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -57,6 +58,7 @@ var globalProperties = {
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),	
 	ResizeQLY: 2,	
 }	
+
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 globalProperties.coverCacheWidthMax = Math.max(50,Math.min(2000,Number(globalProperties.coverCacheWidthMax)));
 if(isNaN(globalProperties.coverCacheWidthMax)) globalProperties.coverCacheWidthMax = 200;
@@ -235,6 +237,22 @@ function HtmlMsg(msg_title, msg_content, btn_label){
 		data: [msg_title, msg_content, btn_label, null],            
 	});
 }
+function NoticeBox(msg_title, msg_content, btn_yes_label, btn_no_label, action){
+	function ok_callback(status, action) {
+		if(status=="ok"){
+			theme_version.setValue(globalProperties.theme_version);			
+			eval(action);
+		}		
+		else if(status=="never"){
+			theme_version.setValue(globalProperties.theme_version);			
+			eval(action);
+		}			
+	}	
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","Notice.html"), {
+		data: [msg_title, msg_content, btn_yes_label, btn_no_label, ok_callback, action],     
+	});
+}
+
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","ConfirmDialog.html"), {
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],            

@@ -2577,11 +2577,17 @@ function on_init(){
 	if(settings_file_not_found){
 		var welcome_msg_timer = setTimeout(function(){
 			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','RadioDialog');
+			theme_version.setValue(globalProperties.theme_version);
 			clearTimeout(welcome_msg_timer);
 			welcome_msg_timer=false;
 		}, 200); 	
 		RefreshPSS();	
-	} else {	
-	}
+	} else if(theme_version.getValue()<globalProperties.lastest_breaking_version) {
+		var welcome_msg_timer = setTimeout(function(){
+			NoticeBox(" ","<div class='titleBig'>Import fcl file, Eole v"+(globalProperties.lastest_breaking_version)+" and after</div><div class='separator'></div><br/>Looks like your column UI configuration file is out of date, you need to import the new configuration file. You may loose some of the customizations you did to this theme, but you'll be able to set them back quickly.<br/><br/>On the preferences page, go to<br/>Display > column UI > Main tab > Import configuration...<br/><br/>And then import this file: [YOUR_FOOBAR_DIRECTORY]/themes/eole/columnsUI_eole.fcl", "Got it, open the preferences","Not now",'fb.RunMainMenuCommand("File/Preferences")');
+			clearTimeout(welcome_msg_timer);
+			welcome_msg_timer=false;
+		}, 200); 
+	}		
 }
 on_init();

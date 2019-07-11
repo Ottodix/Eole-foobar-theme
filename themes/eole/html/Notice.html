@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="x-ua-compatible" content="IE=8"/>
+        <link rel="stylesheet" type="text/css" href="styles10.css">
+        <style type="text/css">
+			body{padding:0;margin:0}
+            .cnt { font:caption; padding: 10px 25px; word-wrap: break-word; white-space: pre-wrap; } 
+			#div_text{ padding-top:10px; padding-bottom:20px; 
+				background: #ffffff; /* Old browsers */
+				background: -moz-linear-gradient(top,  #ffffff 0%, #f0f0f0 100%); /* FF3.6-15 */
+				background: -webkit-linear-gradient(top,  #ffffff 0%,#f0f0f0 100%); /* Chrome10-25,Safari5.1-6 */
+				background: linear-gradient(to bottom,  #ffffff 0%,#f0f0f0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f0f0',GradientType=0 ); /* IE6-9 */
+			}		
+			#btn_container {
+				padding:10px; background:#e5e5e5;
+				border-top:1px solid #d0d0d0;
+				position:absolute; bottom:0;left:0;right:0;
+				text-align:center;
+			}			
+            .button_ok { display:inline-block; width:200px; background:#333; color:#fff; border:1px solid #333; outline:none; height:25px;} 
+            .button_ok:focus {background:#333; border:1px solid #000; outline:none;} 	
+            .button_ok:hover, .button_ok:focus:hover {background:#000; border:1px solid #000; outline:none;} 			
+            .button_cancel { display:inline-block; width:80px;  outline:none; height:25px;} 
+            .button_cancel:focus {outline:none;} 				
+
+			.titleBig {
+				font-size:130%;
+				font-style: italic;
+				text-align:center;
+				padding-bottom:0px;
+			}
+			.separator{width:50px; background:#000; height: 1px; margin: 15px auto 2px; }			
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="div_text" class="cnt"></div>
+		<div id="btn_container"> 
+			<button id="btn_ok" class="button_ok">Yes</button>	
+			<button id="btn_later" class="button_cancel">No</button>			
+			<button id="btn_cancel" class="button_cancel">Never</button>				
+		</div>		
+        <script>   
+            // helpers
+            function close_window() {
+                window.open('', '_self', '');
+                window.close();
+            }
+
+            // parse data
+            var parsed_args;
+            var callback_fn;
+            try {
+                parsed_args = window.external.dialogArguments.toArray();
+            }
+            catch(e) {
+            }
+            if (parsed_args) {
+                document.title = parsed_args[0];
+                window.div_text.insertAdjacentHTML('beforeend',parsed_args[1]);
+                var labelInnerHtml = window.btn_ok.innerHTML;
+                window.btn_ok.innerHTML = labelInnerHtml.replace(/Yes/g, parsed_args[2]);
+                var labelInnerHtml = window.btn_later.innerHTML;
+                window.btn_later.innerHTML = labelInnerHtml.replace(/No/g, parsed_args[3]);				
+                callback_fn = parsed_args[4];
+            }
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
+				}
+			};
+            // main script
+            var window_w = 458;
+            window_h = 60 + window.div_text.offsetHeight + window.btn_container.offsetHeight;
+            if (window_w < window_h + 50) window_w += 50;
+            window.resizeTo(window_w, window_h);
+            window.btn_ok.onclick = function () {
+                callback_fn && callback_fn("ok", parsed_args[5]);
+                close_window();
+            };
+            window.btn_cancel.onclick = function () {
+                callback_fn && callback_fn("never", null);
+                close_window();
+            };			
+            window.btn_later.onclick = function () {
+                close_window();
+            };			
+            window.document.body.focus();
+            window.btn_ok.focus();
+        </script>
+    </body>
+</html>
