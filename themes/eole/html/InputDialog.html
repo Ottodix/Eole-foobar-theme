@@ -52,7 +52,6 @@
         <div id="bottom_msg" class="container"></div>		
 		<button id="btn_cancel" class="button_cancel">Cancel</button>		
         <button class="button_ok" id="btn_ok">Validate</button>		
-        <!--<button class="button_ok_and_reset_cache" id="btn_ok_and_reset_cache" onkeydown="if(event.keyCode == 13) this.click()">Validate and reset image cache</button>-->
         <script>   
             // helpers
             function close_window() {
@@ -108,17 +107,11 @@
                 callback_fn && callback_fn("ok", inputs_values);
                 close_window();
             };	
-            /*window.btn_ok_and_reset_cache.onclick = function () {
-				var radio_check = document.getElementsByName('radio_btns');
-				var radio_value;
-				for(var i = 0; i < radio_check.length; i++){
-					if(radio_check[i].checked){
-						radio_value = radio_check[i].value;
-					}
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
 				}
-                callback_fn && callback_fn("reset", radio_value);
-                close_window();
-            };*/
+			};
             window.btn_cancel.onclick = function () {
 				callback_fn && callback_fn("cancel", false);
                 close_window();

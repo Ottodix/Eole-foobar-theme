@@ -110,7 +110,11 @@
 				window_h = 83 + window.div_text.offsetHeight + window.radio_container.offsetHeight + window.btn_ok.offsetHeight + window.bottom_msg.offsetHeight + window.size_container.offsetHeight + window.inter_text.offsetHeight;
 			}
 			window.resizeTo(window_w, window_h);
-			
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
+				}
+			};
             window.btn_ok.onclick = function () {
 				var radio_check = document.getElementsByName('radio_btns');
 				var radio_value;

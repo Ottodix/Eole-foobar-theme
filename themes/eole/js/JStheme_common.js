@@ -271,7 +271,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 			var refresh_filters = false;
 			switch(properties.tagMode) {
 				case 1:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.album_customGroup_label==input_values[0])) {
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
 						properties.album_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
 						window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);							
@@ -284,7 +284,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					}
 				break;
 				case 2:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.artist_customGroup_label==input_values[0])) {
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {						
 						properties.artist_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
 						window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);						
@@ -297,7 +297,8 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					}				
 				break;
 				case 3:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.genre_customGroup_label==input_values[0])) {
+					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
+						console.log(g_tagswitcherbar.items_txt[3]+" - "+input_values[0]+" - "+(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0]));
 						properties.genre_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);						
