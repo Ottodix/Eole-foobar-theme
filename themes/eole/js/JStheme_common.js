@@ -298,7 +298,6 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 				break;
 				case 3:
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
-						console.log(g_tagswitcherbar.items_txt[3]+" - "+input_values[0]+" - "+(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0]));
 						properties.genre_customGroup_label = input_values[0].substring(0, 10);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);						
