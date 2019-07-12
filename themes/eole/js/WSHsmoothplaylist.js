@@ -1621,12 +1621,12 @@ oBrowser = function(name) {
 	
     this.showNowPlaying = function(flash_nowplaying) {
 		var flash_nowplaying = typeof flash_nowplaying !== 'undefined' ? flash_nowplaying : true;		
-        if(fb.IsPlaying && (properties.lockOnPlaylistNamed=="" || plman.PlayingPlaylist==g_active_playlist)) {
+        if(fb.IsPlaying) {
 			g_filterbox.clearInputbox();			
             try {
                 this.nowplaying = plman.GetPlayingItemLocation();
                 if(this.nowplaying.IsValid) {
-                    if(plman.PlayingPlaylist != g_active_playlist && properties.lockOnPlaylistNamed=="") {
+                    if(plman.PlayingPlaylist != g_active_playlist) {
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
 						this.showNowPlaying_trigger = true;
 						this.populate(is_first_populate = true,21);
@@ -1794,26 +1794,28 @@ oBrowser = function(name) {
 		g_active_playlist = g_active_playlist_new;
 		return changed;
 	};
-	this.setDisplayedPlaylistProperties = function(){
+	this.setDisplayedPlaylistProperties = function(call_setAllProperties){
 		if(properties.enableAutoSwitchPlaylistMode){
-			var old_properties_lockOnNowPlaying = properties.lockOnNowPlaying;
+			var old_properties_lockOnNowPlaying = new_properties_lockOnNowPlaying = properties.lockOnNowPlaying;
+			var old_properties_lockOnPlaylistNamed = new_properties_lockOnPlaylistNamed = properties.lockOnPlaylistNamed;		
 			if(layout_state.isEqual(1)){
-				properties.lockOnNowPlaying=false;	
-				properties.lockOnPlaylistNamed="";	
+				new_properties_lockOnNowPlaying=false;	
+				new_properties_lockOnPlaylistNamed="";	
 			} else if(main_panel_state.isEqual(1)){
-				if(filters_panel_state.isMaximumValue()) properties.lockOnNowPlaying=false;
-				else properties.lockOnNowPlaying=true;	
-				properties.lockOnPlaylistNamed="";				
+				if(filters_panel_state.isMaximumValue()) new_properties_lockOnNowPlaying=false;
+				else new_properties_lockOnNowPlaying=true;	
+				new_properties_lockOnPlaylistNamed="";				
 			} else if(properties.lockOnNowPlaying!=true){
-				properties.lockOnNowPlaying=true;	
-				properties.lockOnPlaylistNamed="";									
+				new_properties_lockOnNowPlaying=true;	
+				new_properties_lockOnPlaylistNamed="";									
 			}		
-			if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying){
+			if(call_setAllProperties) setAllProperties();
+			if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying || old_properties_lockOnPlaylistNamed != properties.lockOnPlaylistNamed || new_properties_lockOnNowPlaying != properties.lockOnNowPlaying || new_properties_lockOnPlaylistNamed != properties.lockOnPlaylistNamed){
 				setOneProperty("lockOnPlaylistNamed","");
-				setOneProperty("lockOnNowPlaying",properties.lockOnNowPlaying);
+				setOneProperty("lockOnNowPlaying",new_properties_lockOnNowPlaying);
 				if(!(this.source_idx == plman.PlayingPlaylist && properties.lockOnNowPlaying) && !(this.source_idx == plman.ActivePlaylist && !properties.lockOnNowPlaying)) brw.populate(true,17);					
 			}					
-		}	
+		} else if(call_setAllProperties) setAllProperties();
 	};
     this.init_groups = function() {
 		var handle = null;
@@ -3731,7 +3733,7 @@ oBrowser = function(name) {
 	}
 	this.startTimer = function(){
 		this.resetTimer();
-		this.setDisplayedPlaylistProperties();
+		this.setDisplayedPlaylistProperties(false);
 		try{
 			this.timerStartTime = Date.now();
 		}catch(e){}
@@ -4431,7 +4433,7 @@ oBrowser = function(name) {
 					rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
 					break;						
 				case (idx == 3298):	
-					setOneProperty("enableAutoSwitchPlaylistMode",!properties.enableAutoSwitchPlaylistMode);
+					setOneProperty("enableAutoSwitchPlaylistMode",!properties.enableAutoSwitchPlaylistMode, true);
 					if(filters_panel_state.isMaximumValue()) setOneProperty("lockOnNowPlaying",false);
 					else setOneProperty("lockOnNowPlaying",true);
 					setOneProperty("lockOnPlaylistNamed","");				
@@ -6349,6 +6351,7 @@ function on_notify_data(name, info) {
         case "FocusOnNowPlayingForce":		
         case "FocusOnNowPlaying":
 			if(window.IsVisible && !avoidShowNowPlaying) {
+				brw.setDisplayedPlaylistProperties(false);				
 				brw.showNowPlaying();
 				avoidShowNowPlaying = true;
 				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
@@ -6463,8 +6466,7 @@ function on_notify_data(name, info) {
 		break; 		
 		case "layout_state":  
 			layout_state.value=info;
-			brw.setDisplayedPlaylistProperties();			
-			setAllProperties();
+			brw.setDisplayedPlaylistProperties(true);		
 			get_metrics(true);
 			if(properties.autocollapse && properties.showGroupHeaders) {
 				brw.collapseAll(true);
