@@ -7,8 +7,8 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 0. Close foobar.
 
 1. Copy everything into your foobar profile directory (so the 3 folders: user-components, themes and plugins).
-STANDARD installation: your foobar profile directory is there: %AppData%/foobar2000
-PORTABLE installation: your foobar profile directory is the same than you installation directory.
+   - STANDARD foobar2000 installation: your foobar profile directory is there: %AppData%/foobar2000
+   - PORTABLE foobar2000 installation: your foobar profile directory is the same than you installation directory.
 
 2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
 
