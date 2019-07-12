@@ -3041,14 +3041,14 @@ function Images() {
 		this.bar.x1 = Math.round(this.bar.l + (nw - this.bar.w1) / 2);
 		this.bar.x2 = this.bar.x1 + Math.ceil(ui.l_h / 2);
 		this.bar.x3 = this.bar.x1 - Math.round(this.bar.grip_h / 2);
+		this.bar.y1 = !t.text ? p.bor_t : p.img_t;
 		imgbar_metrics(nhh * 0.9);
     }
 	const imgbar_metrics = (top_padding) => {
-		this.bar.y1 = !t.text ? p.bor_t : p.img_t;
 		this.bar.y2 = Math.round(this.bar.y1 + top_padding); if (ppt.style > 3 && !ppt.img_only && t.text) this.bar.y2 -= p.bor_t;
 		this.bar.y3 = this.bar.y2 + Math.ceil(ui.l_h / 2);
-		this.bar.y4 = nhh * 0.8 - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
-		this.bar.y5 = nhh - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);		
+		this.bar.y4 = top_padding - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
+		this.bar.y5 = top_padding - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);		
 	}
     const blur_img = (image, im, x, y, w, h) => {
         if (!image || !im || !p.w || !p.h) return;
@@ -3184,18 +3184,22 @@ function Images() {
 		if (this.get) return getImgFallback();
         if (!ppt.text_only && cur_img) gr.DrawImage(cur_img, xa, ya, cur_img.Width, cur_img.Height, 0, 0, cur_img.Width, cur_img.Height, 0, alpha);
 		if (!this.bar.show) return;
+		
+		imgbar_metrics(ya+cur_img.Height);
+		
 		if (ppt.text_only || !(ppt.cycPhoto && ppt.artistView && artImages.length > 1) && !(this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)) return;
 		const prog = this.bar.dn ? s.clamp(p.m_x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? (ix + 1) / artImages.length :  i_x / (covers.length - 1)) * this.bar.w1;
-		gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.l_h, RGB(128, 128, 128));
+		//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.l_h, RGB(128, 128, 128));
 		gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.l_h, this.bar.h - ui.l_h, RGBA(0, 0, 0, 75));
 		gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.l_h, this.bar.h - ui.l_h, RGB(245, 245, 245));
 		gr.SetSmoothingMode(2);
-		gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
-		gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.l_h, RGB(128, 128, 128));
+		//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+		//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.l_h, RGB(128, 128, 128));
 		
 		let count = 0, count_m = 0;
 		if (ppt.artistView) {count = (ix + 1 + (" / " + artImages.length)); count_m = (artImages.length + (" / " + artImages.length)) + " ";}
 		else {count = (i_x + (" / " + (covers.length - 1))); count_m = (covers.length - 1 + (" / " + (covers.length - 1))) + " ";}
+		
 		if (count) {
 			const count_w = gr.CalcTextWidth(count_m, ui.smallFont), count_x = s.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + nw + (!t.text ? p.bor_r : p.img_r) - count_w - 4), count_h = gr.CalcTextHeight(count, ui.smallFont), count_y = this.bar.y2 - this.bar.gripOffset - count_h * 1.5;
 			gr.FillRoundRect(count_x, count_y, count_w + 2, count_h + 2, 3, 3, RGBA(0, 0, 0, 210));
