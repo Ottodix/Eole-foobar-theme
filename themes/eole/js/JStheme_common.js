@@ -1881,6 +1881,11 @@ function process_string(str){
     return str_;
 }
 function quickSearch(start,search_function){
+	if(layout_state.isEqual(0) && (main_panel_state.isEqual(2) || main_panel_state.isEqual(3))){
+		main_panel_state.setValue(0);
+	}
+	//if(properties.panelName=="WSHsmoothplaylist") brw.setActivePlaylist();
+	console.log(properties.lockOnNowPlaying+" g_active_playlist"+g_active_playlist+" plman.ActivePlaylist"+plman.ActivePlaylist);
 	switch(search_function) {
 		case 'artist':
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			

@@ -3041,13 +3041,15 @@ function Images() {
 		this.bar.x1 = Math.round(this.bar.l + (nw - this.bar.w1) / 2);
 		this.bar.x2 = this.bar.x1 + Math.ceil(ui.l_h / 2);
 		this.bar.x3 = this.bar.x1 - Math.round(this.bar.grip_h / 2);
+		imgbar_metrics(nhh * 0.9);
+    }
+	const imgbar_metrics = (top_padding) => {
 		this.bar.y1 = !t.text ? p.bor_t : p.img_t;
-		this.bar.y2 = Math.round(this.bar.y1 + nhh * 0.9); if (ppt.style > 3 && !ppt.img_only && t.text) this.bar.y2 -= p.bor_t;
+		this.bar.y2 = Math.round(this.bar.y1 + top_padding); if (ppt.style > 3 && !ppt.img_only && t.text) this.bar.y2 -= p.bor_t;
 		this.bar.y3 = this.bar.y2 + Math.ceil(ui.l_h / 2);
 		this.bar.y4 = nhh * 0.8 - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
-		this.bar.y5 = nhh - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);
-    }
-
+		this.bar.y5 = nhh - (ppt.style < 4 || !t.text || ppt.img_only ? 0 : p.bor_t);		
+	}
     const blur_img = (image, im, x, y, w, h) => {
         if (!image || !im || !p.w || !p.h) return;
         if (ppt.covBlur && (ppt.artistView || this.cycCov || ppt.text_only || p.alb_ix) && new_BlurAlb) {
