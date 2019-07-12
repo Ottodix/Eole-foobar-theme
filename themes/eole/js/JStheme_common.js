@@ -3,7 +3,7 @@ var theme_name = "eole";
 var ProfilePath = fb.ProfilePath;
 var FoobarPath = fb.FoobarPath;
 
-var skin_global_path = FoobarPath + "themes\\"+theme_name;
+var skin_global_path = ProfilePath + "themes\\"+theme_name;
 var theme_img_path = skin_global_path + "\\img";
 var search_results_order = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 var sort_by_default = "%album artist%|%date%|%album%|%discnumber%|%tracknumber%";
