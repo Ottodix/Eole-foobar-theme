@@ -2,6 +2,7 @@ var properties_big = {
     ParentName:  window.GetProperty("BIG:ParentName", "MainPanel"),	
     lockOnNowPlaying: window.GetProperty("BIG:lockOnNowPlaying", true),
     lockOnPlaylistNamed: window.GetProperty("BIG:lockOnPlaylistNamed", ""),		
+    FollowNowPlaying: window.GetProperty("MINI:FollowNowPlaying", true),	
     defaultRowHeight: window.GetProperty("BIG:defaultRowHeight", 30),
     drawAlternateBG: window.GetProperty("BIG:drawAlternateBG", false),	
     extraRowsNumber: window.GetProperty("BIG:extraRowsNumber", 1),
@@ -50,7 +51,8 @@ var properties_big = {
 var properties_mini = {
     ParentName:  window.GetProperty("MINI:ParentName", "MiniPanel"),	
     lockOnNowPlaying: window.GetProperty("MINI:lockOnNowPlaying", false),
-    lockOnPlaylistNamed: window.GetProperty("MINI:lockOnPlaylistNamed", ""),		
+    lockOnPlaylistNamed: window.GetProperty("MINI:lockOnPlaylistNamed", ""),	
+    FollowNowPlaying: window.GetProperty("MINI:FollowNowPlaying", true),	
     defaultRowHeight: window.GetProperty("MINI:defaultRowHeight", 26),
     drawAlternateBG: window.GetProperty("MINI:drawAlternateBG", false),	
     extraRowsNumber: window.GetProperty("MINI:extraRowsNumber", 1),
@@ -1526,7 +1528,7 @@ oBrowser = function(name) {
 	this.coverMask = false;	
     this.cover_img_mask = null;		
 	this.drawLeftLine = false;
-	
+	this.followNowPlaying = false;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -4080,9 +4082,11 @@ oBrowser = function(name) {
 			}
 			lockOnMenu.AppendMenuSeparator();
 			lockOnMenu.AppendMenuItem(MF_STRING, 3298, "Switch to Playing or Active depending on the filters state");	
-			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);				
+			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);	
 			
-            _menu.AppendMenuItem((fb.IsPlaying ? MF_STRING : MF_GRAYED | MF_DISABLED), 900, "Show Now Playing");
+            _menu.AppendMenuItem(MF_STRING, 899, "Follow now playing");
+			_menu.CheckMenuItem(899, properties.FollowNowPlaying);
+            _menu.AppendMenuItem((fb.IsPlaying ? MF_STRING : MF_GRAYED | MF_DISABLED), 900, "Show now playing");
             _menu.AppendMenuItem(MF_STRING, 901, "Enable Drag'n'Drop to a playlist");		
 			_menu.CheckMenuItem(901, properties.DropInplaylist);
 			
@@ -4281,6 +4285,10 @@ oBrowser = function(name) {
                     brw.collapseAll(false);
                     brw.showFocusedItem();
                     break;
+                case (idx == 899):
+					setOneProperty("FollowNowPlaying",!properties.FollowNowPlaying);
+                    if(properties.FollowNowPlaying) brw.showNowPlaying();
+                    break;					
                 case (idx == 900):
                     brw.showNowPlaying();
                     break;
@@ -5898,7 +5906,7 @@ function on_playback_new_track(metadb) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}		
 		};		
-		if(fb.CursorFollowPlayback && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) {	
+		if((fb.CursorFollowPlayback || properties.FollowNowPlaying) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) {	
 			brw.dontFlashNowPlaying=true;
 			brw.showNowPlaying();
 		}		

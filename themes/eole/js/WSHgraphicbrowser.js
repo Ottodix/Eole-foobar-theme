@@ -2947,7 +2947,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	}
 	_menu.AppendMenuItem(MF_STRING, 60, "Grid mode, no padding, no labels");	
 	_menu.CheckMenuItem(60, properties.CoverGridNoText);		
-	_menu.AppendMenuItem(MF_STRING, 10, "Always follow playback");
+	_menu.AppendMenuItem(MF_STRING, 10, "Follow now playing (right playlist hidden)");
 	_menu.CheckMenuItem(10, properties.followNowPlaying);		
 	_menu.AppendMenuItem(MF_STRING, 31, "Show tooltips");
 	_menu.CheckMenuItem(31, properties.showToolTip);	

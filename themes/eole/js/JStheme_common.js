@@ -258,7 +258,7 @@ function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],            
 	});
 }
-function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
+function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_text){
 	function ok_callback(status, mem_solicitation, covercache_max_width) {
 		panels_reload = false;
 		if(status!="cancel"){
@@ -277,7 +277,7 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name){
 		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");	
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html",dialog_name+".html"), {
-		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax],  
+		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax,inter_text],  
 	});
 }
 function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){

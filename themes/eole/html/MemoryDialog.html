@@ -53,7 +53,7 @@
     <body>
         <div id="div_text" class="container"></div>
         <div id="radio_container" class="container"></div>
-        <div id="inter_text" class="container">You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much. <u>Warning: changing this value will reset the cover cache.</u></div>
+        <div id="inter_text" class="container">inter_text</div>
         <div id="size_container">
 			<div class="col col1">
 				<div class="label">Thumbnails max width:<br/><span>for all panels, in pixels</span></div>
@@ -89,6 +89,9 @@
                 var labelInnerHtml = window.btn_cancel.innerHTML;
                 window.btn_cancel.innerHTML = labelInnerHtml.replace(/Cancel/g, parsed_args[2]);
                 callback_fn = parsed_args[3];
+				
+                var InterTextHtml = window.inter_text.innerHTML;
+                window.inter_text.innerHTML = InterTextHtml.replace(/inter_text/g, parsed_args[8]);
 				
 				var radio_string = parsed_args[4];
 				var radio_btns = radio_string.split("##");
