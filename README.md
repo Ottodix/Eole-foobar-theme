@@ -17,8 +17,8 @@ If you've got some knowledge in javascript, feel free to report bugs and their f
 0. Close foobar.
 
 1. Download this [github repository](https://github.com/Ottodix/Eole-foobar-theme/zipball/master/) and copy everything into your foobar profile directory (so the 3 folders: user-components, themes and plugins).
-STANDARD installation: your foobar profile directory is there: %AppData%/foobar2000
-PORTABLE installation: your foobar profile directory is the same than you installation directory.
+   - STANDARD installation: your foobar profile directory is there: %AppData%/foobar2000
+   - PORTABLE installation: your foobar profile directory is the same than you installation directory.
 
 2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
 
