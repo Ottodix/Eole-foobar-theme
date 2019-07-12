@@ -2624,7 +2624,6 @@ oHeaderBar = function(name) {
 					window.RepaintRect(this.x,this.y,this.w,this.h);
 					//g_history.restoreLastElem();
 					g_history.fullLibrary();
-					//if(plman.GetPlaylistName(plman.ActivePlaylist) == globalProperties.whole_library) FocusOnNowPlaying = true;
 					window.NotifyOthers("history_previous",true);
 				}
 				if(!this.hide_filters_bt.hide && this.hide_filters_bt.checkstate("hover", x, y)){
@@ -2640,7 +2639,6 @@ oHeaderBar = function(name) {
 					g_history.fullLibrary();
 					g_history.reset();
 					//brw.populate(33)
-					//FocusOnNowPlaying = true;
 					window.NotifyOthers("history_previous",true);
 				}
                 break;				
@@ -4393,7 +4391,8 @@ oBrowser = function(name) {
 		console.log("--> populate GraphicBrowser sorted:"+this.currently_sorted+" call_id:"+call_id)			 
         this.get_albums();				
 		this.dont_sort_on_next_populate = false;
-		this.previousPlaylistIdx = this.SourcePlaylistIdx;		
+		this.previousPlaylistIdx = this.SourcePlaylistIdx;	
+		FocusOnNowPlaying = false;
     }
 	this.sortAccordingToProperties = function(force_sorting) {
 		if((properties.TFsorting!=properties.TFsorting_default && force_sorting) || properties.TFsorting_default==""){
@@ -5316,7 +5315,7 @@ oBrowser = function(name) {
 			}
 		} else {a=albumIdx;found=true;}
 		if(found) { // scroll to album and open showlist
-			FocusOnNowPlaying=false;
+			FocusOnNowPlaying = false;
 			if(typeof this.groups[this.groups_draw[a]] !== "undefined" && this.groups[this.groups_draw[a]].pl) {
 				// set size of new showList of the selected album
 				var playlist = this.groups[this.groups_draw[a]].pl;
@@ -5383,7 +5382,8 @@ oBrowser = function(name) {
 				if(!properties.showInLibrary || !results){
 					plman.ClearPlaylist(this.getSourcePlaylist());
 					plman.InsertPlaylistItems(this.getSourcePlaylist(), 0, plman.GetPlaylistItems(plman.PlayingPlaylist), false);				
-				}				
+				}	
+				FocusOnNowPlaying = false;
 			}									
 		} else {	
 			if(!(properties.showInLibrary && ((this.getSourcePlaylist()!=this.getSelectionPlaylist() && libraryfilter_state.isActive()) || (this.getSourcePlaylist()!=this.getWholeLibraryPlaylist() && !libraryfilter_state.isActive())))) 
@@ -5410,7 +5410,7 @@ oBrowser = function(name) {
 					}, 30);                    
 				}
 			} else {
-				g_showlist.isPlaying
+				FocusOnNowPlaying = false;
 			}
 		}	
 		if(!cNowPlaying.flashEnable && !this.dontFlashNowPlaying) {
@@ -6769,22 +6769,27 @@ function on_playback_new_track(metadb) {
 		playing_track_playcount = TF.play_count.Eval();
 	} catch(e){}	
 	if(window.IsVisible){		
-		if((properties.followNowPlaying && !nowplayinglib_state.isActive()) || g_showlist.isPlaying || FocusOnNowPlaying && !brw.firstInitialisation) {
-			FocusOnNowPlaying = true;		
+		if((properties.followNowPlaying && !nowplayinglib_state.isActive()) || g_showlist.isPlaying || FocusOnNowPlaying && !brw.firstInitialisation) {		
 			if(plman.ActivePlaylist!=plman.PlayingPlaylist) {
 				plman.ActivePlaylist = plman.PlayingPlaylist;		
 			}
+
 			var isFound = brw.seek_track(metadb);
 			if(!isFound) { 
-				if(fb.GetNowPlaying()) {
-					brw.populate(18);
-				} else {	
-					timers.showItem = setTimeout(function(){
-						brw.populate(19);
-						clearTimeout(timers.showItem);
-						timers.showItem=false;
-					}, 200);                    
-				}
+				if((properties.followNowPlaying && !nowplayinglib_state.isActive()) || FocusOnNowPlaying && !brw.firstInitialisation){
+					FocusOnNowPlaying = true;
+					if(fb.GetNowPlaying()) {
+						brw.populate(18);
+					} else {	
+						timers.showItem = setTimeout(function(){
+							brw.populate(19);
+							clearTimeout(timers.showItem);
+							timers.showItem=false;
+						}, 200);                    
+					}
+				} /*else if(g_showlist.isPlaying){
+					g_showlist.close();
+				}*/
 			}	
 		}
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
@@ -7204,19 +7209,10 @@ function on_notify_data(name, info) {
 		break;*/
         case "FocusOnNowPlayingForce":			
         case "FocusOnNowPlaying":	
-			//if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
 			if(window.IsVisible && (!nowplayinglib_state.isActive() || name=='FocusOnNowPlayingForce') && !avoidShowNowPlaying){
 				brw.followActivePlaylist_temp = !properties.showInLibrary;
 				avoidShowNowPlaying = true;						
-				/*if(properties.leftFilterState=="library_tree" && libraryfilter_state.isActive() && nowplayinglib_state.isActive()){
-					FocusOnNowPlaying = true;
-					clearTimeout(timers.showItem);
-					timers.showItem = setTimeout(function(){
-						FocusOnNowPlaying = false;
-						clearTimeout(timers.showItem);
-						timers.showItem = false;
-					}, 1000);   
-				} else { */
+
 					if(info!=null) { 
 						brw.focus_on_now_playing(info);
 					} else {
@@ -7232,6 +7228,7 @@ function on_notify_data(name, info) {
 				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
 				timers.avoidShowNowPlaying = setTimeout(function() {
 					avoidShowNowPlaying = false;
+					FocusOnNowPlaying = false;
 					clearTimeout(timers.avoidShowNowPlaying);
 					timers.avoidShowNowPlaying = false;
 				}, 500);					
