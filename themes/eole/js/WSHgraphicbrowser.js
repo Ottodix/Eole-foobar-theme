@@ -6117,14 +6117,14 @@ function on_mouse_rbtn_down(x, y){
 			_menu.AppendMenuSeparator();
 
 			sendTo.AppendTo(_menu, MF_STRING, "Send to...");
-			sendTo.AppendMenuItem(MF_STRING, 3000, "A new playlist...");
+			sendTo.AppendMenuItem(MF_STRING, 5000, "A new playlist...");
 			var pl_count = plman.PlaylistCount;
 			if(pl_count > 1) {
 				sendTo.AppendMenuItem(MF_SEPARATOR, 0, "");
 			};
 			for(var i=0; i < pl_count; i++) {
 				if(i != this.playlist && !plman.IsAutoPlaylist(i)) {
-					sendTo.AppendMenuItem(MF_STRING, 3001 + i, plman.GetPlaylistName(i));
+					sendTo.AppendMenuItem(MF_STRING, 5001 + i, plman.GetPlaylistName(i));
 				};
 			};	
 			if(!nowplayinglib_state.isActive() && brw.currentSorting=='' && !brw.currently_sorted  && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
@@ -6156,14 +6156,14 @@ function on_mouse_rbtn_down(x, y){
 								
 								_menu.AppendMenuSeparator();
 								sendTo.AppendTo(_menu, MF_STRING, "Send to...");
-								sendTo.AppendMenuItem(MF_STRING, 3000, "A new playlist...");
+								sendTo.AppendMenuItem(MF_STRING, 5000, "A new playlist...");
 								var pl_count = plman.PlaylistCount;
 								if(pl_count > 1) {
 									sendTo.AppendMenuItem(MF_SEPARATOR, 0, "");
 								};
 								for(var i=0; i < pl_count; i++) {
 									if(i != this.playlist && !plman.IsAutoPlaylist(i)) {
-										sendTo.AppendMenuItem(MF_STRING, 3001 + i, plman.GetPlaylistName(i));
+										sendTo.AppendMenuItem(MF_STRING, 5001 + i, plman.GetPlaylistName(i));
 									};
 								};									
 								if(!nowplayinglib_state.isActive() && brw.currentSorting=='' && !plman.IsAutoPlaylist(brw.SourcePlaylistIdx)) {
@@ -6295,13 +6295,13 @@ function on_mouse_rbtn_down(x, y){
             case (idx > 0 && idx < 800):
                 Context.ExecuteByID(idx - 100);
                 break;
-			case (idx == 3000):
-				fb.RunMainMenuCommand("File/New playlist");
-				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, metadblist_selection, false);
-				break;
 			case (idx == 10000):
 				g_genre_cache.build_from_library();	
-				break;						
+				break;		
+			case (idx == 5000):
+				fb.RunMainMenuCommand("File/New playlist");
+				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, metadblist_selection, false);
+				break;				
 			case (idx > 5000):
 				var insert_index = plman.PlaylistItemCount(idx-5001);
 				plman.InsertPlaylistItems((idx-5001), insert_index, metadblist_selection, false);

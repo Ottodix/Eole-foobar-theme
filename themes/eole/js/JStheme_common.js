@@ -343,7 +343,10 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 }
 //Colors ------------------------------------------------------------------------------
 var colors = {};
+var darkcolors = {};
+
 function get_colors_global(){
+	darkcolors.normal_txt = GetGrey(240);
 	if(properties.darklayout || properties.stick2darklayout){
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.normal_bg = GetGrey(30);
@@ -368,7 +371,7 @@ function get_colors_global(){
 		colors.wallpaper_overlay = GetGrey(25,230);
 		colors.wallpaper_overlay_blurred = GetGrey(25,200);	
 		
-		colors.normal_txt = GetGrey(240);
+		colors.normal_txt = darkcolors.normal_txt;
 		colors.faded_txt = GetGrey(110);	
 		colors.superfaded_txt = GetGrey(60);		
 		colors.full_txt = GetGrey(255);			
