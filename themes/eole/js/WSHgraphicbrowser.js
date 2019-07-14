@@ -1443,7 +1443,7 @@ oShowList = function(parentPanelName) {
         gb = this.showListArrow.GetGraphics();
         gb.SetSmoothingMode(1);
         var pts1 = Array(2,12, 13,1, 24,12);
-        gb.FillPolygon(this.colorSchemeBack, 0, pts1);
+        gb.FillPolygon(this.color_showlist_arrow, 0, pts1);
         gb.DrawLine(2,12, 12,2, 1.0, this.border_color);
         gb.DrawLine(13,2, 23,12, 1.0, this.border_color);
         this.showListArrow.ReleaseGraphics(gb);
@@ -1736,7 +1736,9 @@ oShowList = function(parentPanelName) {
 		}
     }
 	this.setColors = function(){		
+		this.color_showlist_arrow = this.colorSchemeBack;
 		if(this.light_bg) {
+
 			this.colorSchemeText = light.normal_txt;
 			this.colorSchemeTextFaded = light.faded_txt;	
 			this.rating_icon_on = light.rating_icon_on;
@@ -1807,6 +1809,10 @@ oShowList = function(parentPanelName) {
 		} else {
 			this.colorSchemeBgScrollbar = this.colorSchemeBack;				
 		}
+		if(!((properties.showListColoredOneColor || properties.showListColoredMixedColor) && properties.showListColored)){
+			this.colorSchemeBack = colors.showlist_bg;
+			this.color_showlist_arrow = colors.showlist_arrow;
+		}		
         this.setShowListArrow();
         this.setColumnsButtons();
         this.setCloseButton();			
@@ -2210,7 +2216,7 @@ oShowList = function(parentPanelName) {
 					} catch(e) {
 						gr.FillSolidRect(this.x, this.y + this.marginTop, this.w + g_scrollbar.w, slh+1, this.colorSchemeBack);
 					}
-				} else gr.FillSolidRect(this.x, this.y + this.marginTop, this.w + g_scrollbar.w, slh+1, this.colorSchemeBack);
+				} else gr.FillSolidRect(this.x, this.y + this.marginTop, this.w + g_scrollbar.w, slh+1, this.color_showlist_arrow);
 								                
                 if(slh > 0) {
                     // draw Album Selected Arrow
@@ -6657,10 +6663,11 @@ function get_colors() {
 		border_color_colored : GetGrey(0,20),
 		border_color_colored_darklayout : GetGrey(255,30)
 	}
-	
+	colors.showlist_arrow = colors.showlist_bg;
 	if(properties.darklayout){			
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.showlist_bg = GetGrey(25);	
+			colors.showlist_arrow = GetGrey(25,255);			
 			colors.showlist_border_color = GetGrey(255,30);
 		} else if(globalProperties.colorsMainPanel==2){
 			colors.showlist_bg = GetGrey(0);	
@@ -6729,7 +6736,8 @@ function get_colors() {
 		colors.showlist_dragitemstxt = GetGrey(0);		
 	} else {		
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
-			colors.showlist_bg = GetGrey(0,0);	
+			colors.showlist_bg = GetGrey(255,70);
+			colors.showlist_arrow = GetGrey(255,255);			
 			colors.showlist_border_color = GetGrey(210);
 		} else if(globalProperties.colorsMainPanel==2){
 			colors.showlist_bg = GetGrey(0,10);	
