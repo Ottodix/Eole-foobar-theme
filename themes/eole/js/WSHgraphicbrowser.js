@@ -1183,8 +1183,11 @@ oRow = function(metadb,itemIndex) {
 						plman.ClearPlaylist(PlaybackPlaylist);
 						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.groups[g_showlist.idx].pl);
 						plman.PlayingPlaylist = PlaybackPlaylist;
-						plman.ExecutePlaylistDefaultAction(PlaybackPlaylist,0);
-						fb.Stop();fb.Play();
+						plman.SetPlaylistFocusItemByHandle(PlaybackPlaylist, this.metadb);
+						if(fb.IsPaused) fb.Stop();
+						plman.FlushPlaybackQueue();
+						fb.RunContextCommandWithMetadb("Add to playback queue", this.metadb);
+						fb.Play();
 						
 						/*plman.ClearPlaylist(PlaybackPlaylist);
 						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.groups[g_showlist.idx].pl);
