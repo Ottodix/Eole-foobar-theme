@@ -2472,8 +2472,8 @@ oHeaderBar = function(name) {
 		this.grid_mode_off = gdi.CreateImage(23, 23);
 		gb = this.grid_mode_off.GetGraphics();
 			gb.SetSmoothingMode(0);
-			var rect_x = 6;
-			var rect_y = 6;
+			var rect_x = 7;
+			var rect_y = 7;
 			gb.DrawRect(rect_x, rect_y, 10, 10, 1.0, colors.faded_txt);
 		this.grid_mode_off.ReleaseGraphics(gb);
 
@@ -2482,16 +2482,29 @@ oHeaderBar = function(name) {
 			gb.SetSmoothingMode(2);
 			gb.FillEllipse(0,0,23,23,colors.headerbar_settings_bghv);
 			gb.SetSmoothingMode(0);		
-			var rect_x = 6;
-			var rect_y = 6;			
+			var rect_x = 7;
+			var rect_y = 7;			
 			gb.DrawRect(rect_x, rect_y, 10, 10, 1.0, colors.normal_txt);			
 		this.grid_mode_off_hover.ReleaseGraphics(gb);
+		
+		this.grid_mode_off_circle = gdi.CreateImage(23, 23);
+		gb = this.grid_mode_off_circle.GetGraphics();
+			gb.SetSmoothingMode(2);
+			gb.DrawEllipse(6,6,11,11,1.0, colors.faded_txt);
+		this.grid_mode_off_circle.ReleaseGraphics(gb);
+
+		this.grid_mode_off_circle_hover = gdi.CreateImage(23, 23);
+		gb = this.grid_mode_off_circle_hover.GetGraphics();
+			gb.SetSmoothingMode(2);
+			gb.FillEllipse(0,0,23,23,colors.headerbar_settings_bghv);
+			gb.DrawEllipse(6,6,11,11,1.0, colors.normal_txt);			
+		this.grid_mode_off_circle_hover.ReleaseGraphics(gb);
 		
 		this.grid_mode_on = gdi.CreateImage(23, 23);
 		gb = this.grid_mode_on.GetGraphics();
 			gb.SetSmoothingMode(0);
-			var rect_x = 6;
-			var rect_y = 6;
+			var rect_x = 7;
+			var rect_y = 7;
 			gb.DrawRect(rect_x, rect_y, 3, 3, 1.0, colors.faded_txt);
 			gb.DrawRect(rect_x, rect_y+7, 3, 3, 1.0, colors.faded_txt);
 			gb.DrawRect(rect_x+7, rect_y, 3, 3, 1.0, colors.faded_txt);
@@ -2503,8 +2516,8 @@ oHeaderBar = function(name) {
 			gb.SetSmoothingMode(2);
 			gb.FillEllipse(0,0,23,23,colors.headerbar_settings_bghv);
 			gb.SetSmoothingMode(0);		
-			var rect_x = 6;
-			var rect_y = 6;
+			var rect_x = 7;
+			var rect_y = 7;
 			gb.DrawRect(rect_x, rect_y, 3, 3, 1.0, colors.normal_txt);
 			gb.DrawRect(rect_x, rect_y+7, 3, 3, 1.0, colors.normal_txt);
 			gb.DrawRect(rect_x+7, rect_y, 3, 3, 1.0, colors.normal_txt);
@@ -2514,13 +2527,19 @@ oHeaderBar = function(name) {
 		if(typeof(this.GridModeButton) == "undefined") {
 			if(properties.CoverGridNoText)
 				this.GridModeButton = new button(this.grid_mode_on, this.grid_mode_on_hover, this.grid_mode_on,"gridmode");					
+			else if(properties.circleMode)
+				this.GridModeButton = new button(this.grid_mode_off, this.grid_mode_off_hover, this.grid_mode_off,"gridmode"); 
 			else
-				this.GridModeButton = new button(this.grid_mode_off, this.grid_mode_off_hover, this.grid_mode_off,"gridmode");
+				this.GridModeButton = new button(this.grid_mode_off_circle, this.grid_mode_off_circle_hover, this.grid_mode_off_circle,"gridmode");	
 		} else {
 			if(properties.CoverGridNoText){
 				this.GridModeButton.img[0] = this.grid_mode_on;
 				this.GridModeButton.img[1] = this.grid_mode_on_hover;
 				this.GridModeButton.img[2] = this.grid_mode_on;
+			} else if(!properties.circleMode){
+				this.GridModeButton.img[0] = this.grid_mode_off_circle;
+				this.GridModeButton.img[1] = this.grid_mode_off_circle_hover;
+				this.GridModeButton.img[2] = this.grid_mode_off_circle;
 			} else {
 				this.GridModeButton.img[0] = this.grid_mode_off;
 				this.GridModeButton.img[1] = this.grid_mode_off_hover;
@@ -2605,7 +2624,7 @@ oHeaderBar = function(name) {
 		this.SettingsButton.draw(gr,this.SettingsButton.x,this.SettingsButton.y,255);
 		
 		if(properties.showGridModeButton){
-			this.GridModeButton.draw(gr,this.SettingsButton.x-this.SettingsButton.w-15,this.SettingsButton.y,255);
+			this.GridModeButton.draw(gr,this.SettingsButton.x-this.SettingsButton.w-16,this.SettingsButton.y-1,255);
 			var gridmode_width = this.SettingsButton.w+15;
 		} else var gridmode_width = 0;
 		
@@ -2707,7 +2726,7 @@ oHeaderBar = function(name) {
 					window.NotifyOthers("history_previous",true);
 				}
 				if(properties.showGridModeButton && this.GridModeButton.state == ButtonStates.hover) {
-					brw.toggle_grid_mode();
+					brw.switch_display_mode();
 				}				
 				if(!this.hide_filters_bt.hide && this.hide_filters_bt.checkstate("hover", x, y)){
 					this.hide_filters_bt.checkstate("up", -1, -1);
@@ -3499,7 +3518,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();
 			break;		
 		case (idx == 60):		
-			brw.toggle_grid_mode();
+			brw.toggle_grid_mode(null,!properties.CoverGridNoText);
 			brw.repaint();
 			break;			
 		case (idx == 200):
@@ -4036,18 +4055,48 @@ oBrowser = function(name) {
 			//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);		
 		}		
 	}
-	this.toggle_grid_mode = function() {	
-		properties.CoverGridNoText = !properties.CoverGridNoText;
-		window.SetProperty("COVER no padding, no texts", properties.CoverGridNoText);
-		this.on_init();
-		this.showheaderbar();
-		on_size(window.Width, window.Height);
-		g_showlist.refresh();
+	this.toggle_grid_mode = function(circleMode, gridMode) {	
+		circleMode = typeof circleMode !== 'undefined' ? circleMode : null;	
+		gridMode = typeof gridMode !== 'undefined' ? gridMode : null;	
+		
+		if(circleMode!==null){
+			properties.circleMode = circleMode;
+			window.SetProperty("COVER Circle artwork", properties.circleMode);
+			if(properties.circleMode){
+				properties.centerText = true;
+				window.SetProperty("COVER Center text", properties.centerText);
+			} else {
+				properties.centerText = false;
+				window.SetProperty("COVER Center text", properties.centerText);				
+			}		
+		}
+		
+		if(gridMode!==null){
+			properties.CoverGridNoText = gridMode;
+			window.SetProperty("COVER no padding, no texts", properties.CoverGridNoText);
+			this.on_init();
+			this.showheaderbar();
+
+			g_showlist.refresh();
+		}
+
 		this.refresh_shadows();
 		this.refresh_browser_thumbnails();
 		this.refreshDates();
 		g_headerbar.setButtons();
+		
+		on_size(window.Width, window.Height);		
 	}			
+	
+	this.switch_display_mode = function() {
+		if(!properties.CoverGridNoText && !properties.circleMode){
+			this.toggle_grid_mode(true,null);
+		} else if(properties.circleMode){
+			this.toggle_grid_mode(false,true);
+		} else if(properties.CoverGridNoText){
+			this.toggle_grid_mode(null,false);		
+		}
+	}	
 	this.on_font_changed = function(refreshDates) {
 		this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
 		if(refreshDates) this.refreshDates();
