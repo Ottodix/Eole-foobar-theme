@@ -3035,7 +3035,12 @@ function Images() {
 		if (!ppt.imageBar) return;
 		nhh = ppt.style < 4 || !t.text || ppt.img_only ? nh : p.imgs;
 		this.bar.gripOffset = Math.round((this.bar.grip_h - this.bar.h) / 2) + Math.ceil(ui.l_h / 2);
-		this.bar.w1 = Math.round(Math.min(nw, nhh) * 2 / 3);
+		
+		this.dots_seekbar = true;
+		if(this.dots_seekbar)
+			this.bar.w1 = artImages.length*20;	
+		else
+			this.bar.w1 = Math.round(Math.min(nw, nhh) * 2 / 3);
 		this.bar.w2 = this.bar.w1 + Math.round(this.bar.grip_h);
 		this.bar.l = !t.text ? p.bor_l : p.img_l;
 		this.bar.x1 = Math.round(this.bar.l + (nw - this.bar.w1) / 2);
@@ -3188,26 +3193,30 @@ function Images() {
 		imgbar_metrics(ya+cur_img.Height);
 		
 		if (ppt.text_only || !(ppt.cycPhoto && ppt.artistView && artImages.length > 1) && !(this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)) return;
-		const prog = this.bar.dn ? s.clamp(p.m_x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? (ix + 1) / artImages.length :  i_x / (covers.length - 1)) * this.bar.w1;
-		//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.l_h, RGB(128, 128, 128));
-		gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.l_h, this.bar.h - ui.l_h, RGBA(0, 0, 0, 75));
-		gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.l_h, this.bar.h - ui.l_h, RGB(245, 245, 245));
-		gr.SetSmoothingMode(2);
-		//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
-		//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.l_h, RGB(128, 128, 128));
-		
-		let count = 0, count_m = 0;
-		if (ppt.artistView) {count = (ix + 1 + (" / " + artImages.length)); count_m = (artImages.length + (" / " + artImages.length)) + " ";}
-		else {count = (i_x + (" / " + (covers.length - 1))); count_m = (covers.length - 1 + (" / " + (covers.length - 1))) + " ";}
-		
-		if (count) {
-			const count_w = gr.CalcTextWidth(count_m, ui.smallFont), count_x = s.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + nw + (!t.text ? p.bor_r : p.img_r) - count_w - 4), count_h = gr.CalcTextHeight(count, ui.smallFont), count_y = this.bar.y2 - this.bar.gripOffset - count_h * 1.5;
-			gr.FillRoundRect(count_x, count_y, count_w + 2, count_h + 2, 3, 3, RGBA(0, 0, 0, 210));
-			gr.DrawRoundRect(count_x + 1, count_y + 1, count_w, count_h, 1, 1, 1, RGBA(255, 255, 255, 60));
-			gr.DrawRoundRect(count_x, count_y, count_w + 2, count_h + 2, 1, 1, 1, RGBA(0, 0, 0, 200));
-			gr.GdiDrawText(count, ui.smallFont, RGB(250, 250, 250), count_x + 1, count_y, count_w, count_h + 2, t.cc);
+		const prog = this.bar.dn ? s.clamp(p.m_x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? (ix+(this.dots_seekbar?0.5:1)) / artImages.length :  i_x / (covers.length - 1)) * this.bar.w1;
+
+		if(!this.dots_seekbar){
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.l_h, this.bar.h - ui.l_h, RGBA(0, 0, 0, 75));
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.l_h, this.bar.h - ui.l_h, RGB(245, 245, 245));
+			let count = 0, count_m = 0;
+			if (ppt.artistView) {count = (ix + 1 + (" / " + artImages.length)); count_m = (artImages.length + (" / " + artImages.length)) + " ";}
+			else {count = (i_x + (" / " + (covers.length - 1))); count_m = (covers.length - 1 + (" / " + (covers.length - 1))) + " ";}
+			
+			if (count) {
+				const count_w = gr.CalcTextWidth(count_m, ui.smallFont), count_x = s.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + nw + (!t.text ? p.bor_r : p.img_r) - count_w - 4), count_h = gr.CalcTextHeight(count, ui.smallFont), count_y = this.bar.y2 - this.bar.gripOffset - count_h * 1.5;
+				gr.FillSolidRect(count_x, count_y, count_w + 2, count_h + 2, RGBA(0, 0, 0, 210));
+				gr.GdiDrawText(count, ui.smallFont, RGB(250, 250, 250), count_x + 2, count_y, count_w, count_h + 2, t.cc);
+			}	
+		} else {
+			gr.SetSmoothingMode(2);
+			for(i=0;i<artImages.length;i++){
+				if(i!=ix)
+				gr.FillEllipse(this.bar.x2+((i+0.5)/artImages.length) * this.bar.w1-2, this.bar.y3-17, 4, 4, RGB(245, 245, 245));
+			}
+			gr.FillEllipse(this.bar.x2+prog - ui.l_h-5, this.bar.y3-20, 10, 10, RGB(245, 245, 245));
+			gr.SetSmoothingMode(0);
 		}
-		gr.SetSmoothingMode(0);
+
     }
 	
     this.lbtn_dn = (p_x, p_y) => {
