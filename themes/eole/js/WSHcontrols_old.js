@@ -245,8 +245,8 @@ function build_images(){
 	open_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\open_hover.png");
 	open_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\open.png");	
 
-	more_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\more_vert_hover.png");
-	more_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\more_vert.png");	
+	more_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\more_hover.png");
+	more_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\more.png");	
 	
 	rating0_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_0_hover.png");
 	rating0_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_0.png");	

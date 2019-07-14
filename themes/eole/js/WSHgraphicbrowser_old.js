@@ -81,8 +81,7 @@ var properties = {
 	panelName: 'WSHgraphicbrowser',		
     thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 50),
     thumbnailWidth: window.GetProperty("COVER Width", 100),	
-	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),	
-	showGridModeButton: window.GetProperty("_DISPLAY: grid mode button", true),
+	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
 	showCoverShadow: window.GetProperty("COVER show shadow", false),
     default_CoverShadowOpacity: window.GetProperty("COVER Shadow Opacity", 0),		
     showdateOverCover: window.GetProperty("COVER Show Date over album art", false),	
@@ -175,7 +174,7 @@ var properties = {
 	showlistCoverMinSize:132,	
 	showlistCoverMargin:28,	
 	load_image_from_cache_direct:true,
-	veryTighCoverActiveZone : true,	
+	veryTighCoverActiveZone : true,		
 }
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
 properties.smooth_expand_value = properties.smooth_expand_value < 0 ? 0 : properties.smooth_expand_value > 0.9 ? 0.9 : properties.smooth_expand_value;
@@ -2462,66 +2461,7 @@ oHeaderBar = function(name) {
 			this.FullLibraryButton.img[1] = this.full_library_hover;
 			this.FullLibraryButton.img[2] = this.full_library_off;
 		}
-		
-		this.grid_mode_off = gdi.CreateImage(23, 23);
-		gb = this.grid_mode_off.GetGraphics();
-			gb.SetSmoothingMode(0);
-			var rect_x = 6;
-			var rect_y = 6;
-			gb.DrawRect(rect_x, rect_y, 10, 10, 1.0, colors.faded_txt);
-		this.grid_mode_off.ReleaseGraphics(gb);
 
-		this.grid_mode_off_hover = gdi.CreateImage(23, 23);
-		gb = this.grid_mode_off_hover.GetGraphics();
-			gb.SetSmoothingMode(2);
-			gb.FillEllipse(0,0,23,23,colors.headerbar_settings_bghv);
-			gb.SetSmoothingMode(0);		
-			var rect_x = 6;
-			var rect_y = 6;			
-			gb.DrawRect(rect_x, rect_y, 10, 10, 1.0, colors.normal_txt);			
-		this.grid_mode_off_hover.ReleaseGraphics(gb);
-		
-		this.grid_mode_on = gdi.CreateImage(23, 23);
-		gb = this.grid_mode_on.GetGraphics();
-			gb.SetSmoothingMode(0);
-			var rect_x = 6;
-			var rect_y = 6;
-			gb.DrawRect(rect_x, rect_y, 3, 3, 1.0, colors.faded_txt);
-			gb.DrawRect(rect_x, rect_y+7, 3, 3, 1.0, colors.faded_txt);
-			gb.DrawRect(rect_x+7, rect_y, 3, 3, 1.0, colors.faded_txt);
-			gb.DrawRect(rect_x+7, rect_y+7, 3, 3, 1.0, colors.faded_txt);
-		this.grid_mode_on.ReleaseGraphics(gb);
-
-		this.grid_mode_on_hover = gdi.CreateImage(23, 23);
-		gb = this.grid_mode_on_hover.GetGraphics();
-			gb.SetSmoothingMode(2);
-			gb.FillEllipse(0,0,23,23,colors.headerbar_settings_bghv);
-			gb.SetSmoothingMode(0);		
-			var rect_x = 6;
-			var rect_y = 6;
-			gb.DrawRect(rect_x, rect_y, 3, 3, 1.0, colors.normal_txt);
-			gb.DrawRect(rect_x, rect_y+7, 3, 3, 1.0, colors.normal_txt);
-			gb.DrawRect(rect_x+7, rect_y, 3, 3, 1.0, colors.normal_txt);
-			gb.DrawRect(rect_x+7, rect_y+7, 3, 3, 1.0, colors.normal_txt);		
-		this.grid_mode_on_hover.ReleaseGraphics(gb);
-		
-		if(typeof(this.GridModeButton) == "undefined") {
-			if(properties.CoverGridNoText)
-				this.GridModeButton = new button(this.grid_mode_on, this.grid_mode_on_hover, this.grid_mode_on,"gridmode");					
-			else
-				this.GridModeButton = new button(this.grid_mode_off, this.grid_mode_off_hover, this.grid_mode_off,"gridmode");
-		} else {
-			if(properties.CoverGridNoText){
-				this.GridModeButton.img[0] = this.grid_mode_on;
-				this.GridModeButton.img[1] = this.grid_mode_on_hover;
-				this.GridModeButton.img[2] = this.grid_mode_on;
-			} else {
-				this.GridModeButton.img[0] = this.grid_mode_off;
-				this.GridModeButton.img[1] = this.grid_mode_off_hover;
-				this.GridModeButton.img[2] = this.grid_mode_off;		
-			}			
-		}
-		
 		this.settings_off = gdi.CreateImage(23, 23);
 		gb = this.settings_off.GetGraphics();
 			gb.SetSmoothingMode(0);
@@ -2529,9 +2469,9 @@ oHeaderBar = function(name) {
 			gb.FillSolidRect(7,10,10,1,colors.normal_txt);
 			gb.FillSolidRect(7,13,10,1,colors.normal_txt);
 			gb.FillSolidRect(7,16,10,1,colors.normal_txt);*/
-			gb.FillSolidRect(11,6,2,2,colors.faded_txt);
+			gb.FillSolidRect(6,11,2,2,colors.faded_txt);
 			gb.FillSolidRect(11,11,2,2,colors.faded_txt);
-			gb.FillSolidRect(11,16,2,2,colors.faded_txt);		
+			gb.FillSolidRect(16,11,2,2,colors.faded_txt);		
 		this.settings_off.ReleaseGraphics(gb);
 
 		this.settings_hover = gdi.CreateImage(23, 23);
@@ -2543,9 +2483,9 @@ oHeaderBar = function(name) {
 			gb.FillSolidRect(7,10,10,1,colors.normal_txt);
 			gb.FillSolidRect(7,13,10,1,colors.normal_txt);
 			gb.FillSolidRect(7,16,10,1,colors.normal_txt);*/
-			gb.FillSolidRect(11,6,2,2,colors.normal_txt);
+			gb.FillSolidRect(6,11,2,2,colors.normal_txt);
 			gb.FillSolidRect(11,11,2,2,colors.normal_txt);
-			gb.FillSolidRect(11,16,2,2,colors.normal_txt);		
+			gb.FillSolidRect(16,11,2,2,colors.normal_txt);		
 		this.settings_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.SettingsButton) == "undefined") {
@@ -2598,13 +2538,8 @@ oHeaderBar = function(name) {
 		this.SettingsButton.x = ww-47;
 		this.SettingsButton.draw(gr,this.SettingsButton.x,this.SettingsButton.y,255);
 		
-		if(properties.showGridModeButton){
-			this.GridModeButton.draw(gr,this.SettingsButton.x-this.SettingsButton.w-15,this.SettingsButton.y,255);
-			var gridmode_width = this.SettingsButton.w+15;
-		} else var gridmode_width = 0;
-		
 		if(properties.showCoverResizer) {
-			brw.drawResizeButton(gr,ww-this.rightpadding-5-this.MarginRight-gridmode_width,Math.round((this.h-brw.resize_bt.img[0].Height)/2));
+			brw.drawResizeButton(gr,ww-this.rightpadding-5-this.MarginRight,Math.round((this.h-brw.resize_bt.img[0].Height)/2));
 			this.resize_bt_w = brw.resize_bt.w+34;
 		} else this.resize_bt_w = 0;
 		
@@ -2625,9 +2560,9 @@ oHeaderBar = function(name) {
 			gr.GdiDrawText(this.mainTxt, g_font.italicplus2, colors.normal_txt, this.mainTxtX, 1, this.mainTxtSpace, this.h-2, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);    
 		}
 		if(covers_loading_progress<101 && properties.show_covers_progress)
-			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX-gridmode_width, this.h, DT_VCENTER | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+			gr.GdiDrawText("Cover loading progress: "+covers_loading_progress+"%", g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww + 39-this.resize_bt_w-this.rightpadding-this.MarginRight, this.h, DT_VCENTER | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		else 
-			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX-gridmode_width, this.h, DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);	
+			gr.GdiDrawText(this.timeTxt+this.itemsTxt, g_font.italicmin1, colors.faded_txt, this.mainTxtX, 0, ww+60-this.resize_bt_w-this.rightpadding-this.MarginRight-this.mainTxtX, this.h, DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);	
 	}	
 	this.isHover_Settings = function(x,y){
 		if(x>this.MarginLeft-7 && x<this.MarginLeft+23 && y>this.padding_top && y<this.padding_top+23) return true;
@@ -2700,9 +2635,6 @@ oHeaderBar = function(name) {
 					g_history.fullLibrary();
 					window.NotifyOthers("history_previous",true);
 				}
-				if(properties.showGridModeButton && this.GridModeButton.state == ButtonStates.hover) {
-					brw.toggle_grid_mode();
-				}				
 				if(!this.hide_filters_bt.hide && this.hide_filters_bt.checkstate("hover", x, y)){
 					this.hide_filters_bt.checkstate("up", -1, -1);
 					this.hide_filters_bt.checkstate("leave", -1, -1);
@@ -2721,9 +2653,8 @@ oHeaderBar = function(name) {
                 break;				
             case "move":
 				if(typeof(this.SettingsButton) !== "undefined") this.SettingsButton.checkstate("move", x, y);
-				if(typeof(this.FullLibraryButton) !== "undefined" && !this.FullLibraryButton.hide) this.FullLibraryButton.checkstate("move", x, y);
-				if(typeof(this.GridModeButton) !== "undefined" && properties.showGridModeButton) this.GridModeButton.checkstate("move", x, y);				
-				if(typeof(this.hide_filters_bt) !== "undefined" && !this.hide_filters_bt.hide) this.hide_filters_bt.checkstate("move", x, y);
+				if(typeof(this.FullLibraryButton) !== "undefined") this.FullLibraryButton.checkstate("move", x, y);
+				if(typeof(this.hide_filters_bt) !== "undefined") this.hide_filters_bt.checkstate("move", x, y);
 				if(properties.showToolTip && this.showToolTip && this.ishoverMainText && !(g_dragA || g_dragR || g_scrollbar.cursorDrag)){	
 					new_tooltip_text=this.mainTxt;
 					g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay);	
@@ -2738,9 +2669,8 @@ oHeaderBar = function(name) {
                 break;					
             case "leave":
 				if(typeof(this.SettingsButton) !== "undefined") this.SettingsButton.checkstate("move", x, y);
-				if(typeof(this.FullLibraryButton) !== "undefined" && !this.FullLibraryButton.hide) this.FullLibraryButton.checkstate("move", x, y);
-				if(typeof(this.GridModeButton) !== "undefined" && properties.showGridModeButton) this.GridModeButton.checkstate("move", x, y);				
-				if(typeof(this.hide_filters_bt) !== "undefined" && !this.hide_filters_bt.hide) this.hide_filters_bt.checkstate("move", x, y);
+				if(typeof(this.FullLibraryButton) !== "undefined") this.FullLibraryButton.checkstate("move", x, y);
+				if(typeof(this.hide_filters_bt) !== "undefined") this.hide_filters_bt.checkstate("move", x, y);
                 break;
         }
     }
@@ -3057,8 +2987,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuHeaderBar.CheckMenuItem(41, properties.showTotalTime);		
 	_menuHeaderBar.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 42, "Show cover resizer");
 	_menuHeaderBar.CheckMenuItem(42, properties.showCoverResizer);			
-	_menuHeaderBar.AppendMenuItem((!properties.showheaderbar)?MF_DISABLED:MF_STRING, 55, "Show display mode button");
-	_menuHeaderBar.CheckMenuItem(55, properties.showGridModeButton);		
 	_menuHeaderBar.AppendTo(_menu,MF_STRING, "Header bar");
 	
 	_menuFilters.AppendMenuItem(MF_STRING, 40, (!libraryfilter_state.isActive())?"Show":"Hide");
@@ -3323,11 +3251,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist off", properties.showInLibrary_RightPlaylistOff);
 			setShowInLibrary();			
 			break;				
-		case (idx == 55):		
-			properties.showGridModeButton = !properties.showGridModeButton;
-			window.SetProperty("_DISPLAY: grid mode button", properties.showGridModeButton);
-			brw.repaint();			
-			break;			
 		case (idx == 21):
 			properties.drawProgressBar = false;
 			window.SetProperty("TRACKLIST Draw a progress bar under song title", properties.drawProgressBar);
@@ -3493,7 +3416,15 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.repaint();
 			break;		
 		case (idx == 60):		
-			brw.toggle_grid_mode();
+			properties.CoverGridNoText = !properties.CoverGridNoText;
+			window.SetProperty("COVER no padding, no texts", properties.CoverGridNoText);
+			brw.on_init();
+			brw.showheaderbar();
+			on_size(window.Width, window.Height);
+			g_showlist.refresh();
+			brw.refresh_shadows();
+			brw.refresh_browser_thumbnails();
+			brw.refreshDates();
 			brw.repaint();
 			break;			
 		case (idx == 200):
@@ -4030,18 +3961,6 @@ oBrowser = function(name) {
 			//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);		
 		}		
 	}
-	this.toggle_grid_mode = function() {	
-		properties.CoverGridNoText = !properties.CoverGridNoText;
-		window.SetProperty("COVER no padding, no texts", properties.CoverGridNoText);
-		this.on_init();
-		this.showheaderbar();
-		on_size(window.Width, window.Height);
-		g_showlist.refresh();
-		this.refresh_shadows();
-		this.refresh_browser_thumbnails();
-		this.refreshDates();
-		g_headerbar.setButtons();
-	}			
 	this.on_font_changed = function(refreshDates) {
 		this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
 		if(refreshDates) this.refreshDates();
@@ -5351,12 +5270,12 @@ oBrowser = function(name) {
         var gb;
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
-			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
+			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.headerbar_resize_btn);
         this.ResizeButton_off.ReleaseGraphics(gb);
 
         this.ResizeButton_hover = gdi.CreateImage(w, h);
         gb = this.ResizeButton_hover.GetGraphics();
-			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.normal_txt);			
+			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.headerbar_resize_btnhv);			
         this.ResizeButton_hover.ReleaseGraphics(gb);
                 
         if(typeof(this.resize_bt) == "undefined") {
@@ -5373,9 +5292,9 @@ oBrowser = function(name) {
 		 this.resize_bt.draw(gr,x,y,255);
 		 resizeCursorPos=Math.round(this.resize_bt.w*(properties.thumbnailWidth-properties.thumbnailWidthMin)/(globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin));
 		 if(this.resize_bt.state==ButtonStates.hover || this.resize_bt.state==ButtonStates.down)
-			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.normal_txt);
+			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.headerbar_resize_btnhv);
 		 else
-			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.faded_txt);
+			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.headerbar_resize_btn);
 	}
 	this.moveResizeBtn = function (x,y){
 		//var new_value = logposition(logslider(Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w)));

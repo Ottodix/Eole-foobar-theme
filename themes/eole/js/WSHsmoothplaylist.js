@@ -3274,11 +3274,13 @@ oBrowser = function(name) {
             this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);
             if(this.activeRow >= this.rows.length) {
 				this.activeRow = -1;
-			}			
-			if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
-				//console.log("eho"+this.groups[this.rows[this.activeRow+1].albumId].group_height_fix)
-				this.activeRow = Math.ceil((y - this.groups[this.rows[this.activeRow+1].albumId].group_height_fix + scroll_ - this.y) / properties.rowHeight - 1);
-			}
+			}		
+			try{
+				if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
+					//console.log("eho"+this.groups[this.rows[this.activeRow+1].albumId].group_height_fix)
+					this.activeRow = Math.ceil((y - this.groups[this.rows[this.activeRow+1].albumId].group_height_fix + scroll_ - this.y) / properties.rowHeight - 1);
+				}
+			} catch(e){}
             if(this.activeRow >= this.rows.length) {
 				this.activeRow = -1;
 			}

@@ -48,9 +48,9 @@ function setSettingsBtn() {
 		gb.FillSolidRect(7,10,10,1,colors.normal_txt);
 		gb.FillSolidRect(7,13,10,1,colors.normal_txt);
 		gb.FillSolidRect(7,16,10,1,colors.normal_txt);*/
-		gb.FillSolidRect(11,6,2,2,colors.faded_txt);
+		gb.FillSolidRect(6,11,2,2,colors.faded_txt);
 		gb.FillSolidRect(11,11,2,2,colors.faded_txt);
-		gb.FillSolidRect(11,16,2,2,colors.faded_txt);			
+		gb.FillSolidRect(16,11,2,2,colors.faded_txt);			
 	settings_off.ReleaseGraphics(gb);
 
 	settings_hover = gdi.CreateImage(23, 23);
@@ -62,9 +62,9 @@ function setSettingsBtn() {
 		gb.FillSolidRect(7,10,10,1,colors.normal_txt);
 		gb.FillSolidRect(7,13,10,1,colors.normal_txt);
 		gb.FillSolidRect(7,16,10,1,colors.normal_txt);*/
-		gb.FillSolidRect(11,6,2,2,colors.normal_txt);
+		gb.FillSolidRect(6,11,2,2,colors.normal_txt);
 		gb.FillSolidRect(11,11,2,2,colors.normal_txt);
-		gb.FillSolidRect(11,16,2,2,colors.normal_txt);		
+		gb.FillSolidRect(16,11,2,2,colors.normal_txt);		
 	settings_hover.ReleaseGraphics(gb);	
 } 
 function get_colors() {
@@ -78,7 +78,7 @@ function get_colors() {
 	setSettingsBtn();
 } get_colors();
 buttons = { 
-    Settings: new SimpleButton(0, 8, 21, 21, "", function () {
+    Settings: new SimpleButton(0, 9, 21, 21, "", function () {
         if(plman.PlaylistItemCount(plman.ActivePlaylist)>0) draw_menu(buttons.Settings.x+25,buttons.Settings.y+25);
     },false,settings_off,settings_hover,ButtonStates.normal),
     filtersToggle: new SimpleButton(18, 8, 50, 21, "filtersToggle", function () {
