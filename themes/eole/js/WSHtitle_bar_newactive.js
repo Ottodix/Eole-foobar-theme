@@ -192,13 +192,13 @@ function build_images(){
 	if(properties.darklayout) colors.icons_folder = "white"; else colors.icons_folder = "";	
 
 	images.artist_bio_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\artist_bio_icon.png");
-	images.artist_bio_img_dark = gdi.Image("\\icons\\"+colors.icons_folder+"\\artist_bio_icon.png");
+	images.artist_bio_img_dark = gdi.Image(theme_img_path + "\\icons\\white\\artist_bio_icon.png");
 	
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
-	images.playlist_img_dark = gdi.Image("\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
+	images.playlist_img_dark = gdi.Image(theme_img_path + "\\icons\\white\\playlist_icon.png");
 	
 	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_icon.png");
-	images.visualization_img_dark = gdi.Image("\\icons\\"+colors.icons_folder+"\\nowplaying_icon.png");
+	images.visualization_img_dark = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_icon.png");
 	
 	images.fullscreen_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\fullscreen_icon.png"); 
 	
@@ -212,7 +212,7 @@ function build_images(){
 	images.minimode_off_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\minimode_off_icon.png"); 
 
 	images.library_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\library_icon.png");
-	images.library_img_dark = gdi.Image("\\icons\\"+colors.icons_folder+"\\library_icon.png");
+	images.library_img_dark = gdi.Image(theme_img_path + "\\icons\\white\\library_icon.png");
 	
 	images.global_settings_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\global_settings.png");
 
@@ -467,6 +467,7 @@ function build_buttons(){
 		buttons.Reduce.hover_color = colors.titlebar_btn_hover_bg;
 	} else {
 		btn_initialized = true;
+
 		buttons = {	 
 			Library: new JSButton(btn.left_m+btn.margin*0, btn.top_m, btn.width, btn.height, "Library", "Library", function () {
 				main_panel_state.setValue(0);
@@ -475,15 +476,15 @@ function build_buttons(){
 			Playlists: new JSButton(btn.left_m+btn.width+btn.margin*1, btn.top_m, btn.width, btn.height, "Playlists", "Playlists", function () {
 				main_panel_state.setValue(1);	
 				get_colors();g_searchbox.adapt_look_to_layout();
-			}, false,false,images.playlist_img,images.playlist_img,1, false, false, true),		
+			}, false,false,images.playlist_img,images.playlist_img,1, false, false, true,images.playlist_img_dark),		
 			Artist_Bio: new JSButton(btn.left_m+btn.width+btn.width+btn.margin*2, btn.top_m, btn.width, btn.height, "Now playing", "Now playing", function () {
 				main_panel_state.setValue(2);
 				get_colors();g_searchbox.adapt_look_to_layout();		
-			}, false,false,images.artist_bio_img,images.artist_bio_img,2, false, false, true),  
+			}, false,false,images.artist_bio_img,images.artist_bio_img,2, false, false, true,images.artist_bio_img_dark),  
 			Visualization: new JSButton(btn.left_m+btn.width+btn.width+btn.width+btn.margin*3, btn.top_m, btn.width, btn.height, "Visualization", "Visualization", function () {
 				main_panel_state.setValue(3);
 				get_colors();g_searchbox.adapt_look_to_layout();	
-			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true),
+			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true,images.visualization_img_dark),
 			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", function () {
 				toggleNowPlayingState();
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
@@ -534,7 +535,7 @@ function build_buttons(){
 		
 		main_panel_btns = new JSButtonGroup("top-left", btn.left_m, btn.top_m, 'main_panel_btns', true);
 		main_panel_btns.addButtons([buttons.Library,buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,btn.margin+2,0,0]);
-		main_panel_btns.setPadding(btn.padding);
+		main_panel_btns.setPadding([3,7,0,5]);//btn.padding);
 		
 		window_btns = new JSButtonGroup("top-right", 0, 0, 'window_btns', false);
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
@@ -689,7 +690,7 @@ function adapt_buttons_to_layout(){
 			topleft_btns.setBtnsHeight(btn.height-3);
 			topleft_btns.setPadding([0,7,0,2]);			
 			main_panel_btns.x = 17;
-			main_panel_btns.setBtnsHeight(btn.height);
+			main_panel_btns.setBtnsHeight(btn.height-4);
 			additional_btns.setBtnsHeight(btn.height);
 			window_btns.setBtnsHeight(29);
 			additional_btns.setBtnsWidth(btn.width_small_btns);		

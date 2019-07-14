@@ -3430,14 +3430,15 @@ oBrowser = function(name) {
             g_first_populate_launched = true;
             brw.launch_populate();
         }		
+        if(!window.IsVisible) {
+            window_visible = false;
+            return;
+        } 		
 		if(Update_Required_function!="") {
 			eval(Update_Required_function);
 			Update_Required_function = "";
 		}		
-        if(!window.IsVisible) {
-            window_visible = false;
-            return;
-        } 
+
         var repaint_1 = false;
 
         if(!window_visible){
@@ -5248,7 +5249,12 @@ function on_metadb_changed(metadbs, fromhook) {
 		return;
 	}
 	// rebuild list
-	if(brw.current_sourceMode == 0) {
+	var inLibrary = false;
+	for(i=0; i < metadbs.Count; i++){
+		inLibrary = fb.IsMetadbInMediaLibrary(metadbs[i]);
+		if(inLibrary) break;
+	}
+	if(brw.current_sourceMode == 0 && inLibrary) {
 		if(filter_text.length > 0) {
 			if(!window.IsVisible) set_update_function('brw.populate(true,11)');
 			else brw.populate(is_first_populate = true,11);

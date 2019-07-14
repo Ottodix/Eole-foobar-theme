@@ -1627,7 +1627,7 @@ oBrowser = function(name) {
                 this.nowplaying = plman.GetPlayingItemLocation();
                 if(this.nowplaying.IsValid) {
                     if(plman.PlayingPlaylist != g_active_playlist) {
-                        g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
+                        g_active_playlist = plman.PlayingPlaylist = plman.ActivePlaylist;						
 						this.showNowPlaying_trigger = true;
 						this.populate(is_first_populate = true,21);
                     } else {
@@ -2358,25 +2358,25 @@ oBrowser = function(name) {
                             // group header bg
                             // ================
                             // if group collapsed, check if 1st track of the group is selected to highlight the group as a selected track]
-							var group_height_fix = -2;
+							this.groups[g].group_height_fix = -2;
 							
 							if(properties.doubleRowText) {
 								if(this.groups[g].collapsed){
 									line_vertical_fix = 24;
-									group_height_fix=-2;
+									this.groups[g].group_height_fix=-4;
 								} else {
-									line_vertical_fix = 24;
-									group_height_fix=-10;									
+									line_vertical_fix = 28;
+									this.groups[g].group_height_fix=-10;									
 								}
 							}
 							else {
 								if(this.groups[g].collapsed){
 									line_vertical_fix = 12;
-									group_height_fix=2;
+									this.groups[g].group_height_fix=2;
 
 								} else {
 									line_vertical_fix = 12;
-									group_height_fix=-2;
+									this.groups[g].group_height_fix=-2;
 								
 								}								
 							}						
@@ -2444,14 +2444,14 @@ oBrowser = function(name) {
 									var dx = (cover.max_w - cv_w) / 2;
 									var dy = (cover.max_h - cv_h) / 2;
 									var cv_x = Math.floor(ax + dx + 1)+6;
-									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-1;										
+									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+this.groups[g].group_height_fix-1;										
 								} else {
 									var cv_w = coverWidth - cover.margin * 2-cover.padding;
 									var cv_h = coverWidth - cover.margin * 2-cover.padding;		
 									var dx = (cover.max_w - cv_w) / 2;
 									var dy = (cover.max_h - cv_h) / 2;
 									var cv_x = Math.floor(ax + dx + 1)-2;
-									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+group_height_fix-2;										
+									var cv_y = Math.floor(ay + dy - ((ghrh - 1) * ah))+this.groups[g].group_height_fix-2;										
 								}
 								if(isImage(this.groups[g].cover_img)) {
 									if(!this.groups[g].cover_formated){
@@ -2488,11 +2488,11 @@ oBrowser = function(name) {
 							header_text_x = ax;
 							header_text_w = aw;
                             // right area				
-                            gr.GdiDrawText(this.groups[g].TimeString, ((properties.doubleRowText)?g_font.normal:g_font.min1),  colors.faded_txt, header_text_x + header_text_w - this.groups[g].timeWidth - 5, ay - ((ghrh - 1) * ah) + Math.round(ah*1/3)*(ghrh - 1) - 2+group_height_fix, this.groups[g].timeWidth, Math.round(ah*2/3), DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                            gr.GdiDrawText(arr_e[3], g_font.min1,  colors.faded_txt, header_text_x, ay - ((ghrh - 2) * ah)+group_height_fix-((properties.doubleRowText)?10:0), header_text_x + header_text_w -6-this.paddingLeft, Math.round(ah*2/3)*(ghrh - 1), DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                            gr.GdiDrawText(this.groups[g].TimeString, ((properties.doubleRowText)?g_font.normal:g_font.min1),  colors.faded_txt, header_text_x + header_text_w - this.groups[g].timeWidth - 5, ay - ((ghrh - 1) * ah) + Math.round(ah*1/3)*(ghrh - 1) - 2+this.groups[g].group_height_fix, this.groups[g].timeWidth, Math.round(ah*2/3), DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                            gr.GdiDrawText(arr_e[3], g_font.min1,  colors.faded_txt, header_text_x, ay - ((ghrh - 2) * ah)+this.groups[g].group_height_fix-((properties.doubleRowText)?10:0), header_text_x + header_text_w -6-this.paddingLeft, Math.round(ah*2/3)*(ghrh - 1), DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                             // left area
-                            gr.GdiDrawText(group_header_row_1, g_font.italicplus3, colors.normal_txt, header_text_x + text_left_margin, ay - ((ghrh - 1) * ah) + Math.round(ah*1/3)*(ghrh - 1) - 2+group_height_fix, header_text_w - text_left_margin - this.groups[g].timeWidth - 10, Math.round(ah*2/3), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                            gr.GdiDrawText(group_header_row_2, g_font.normal, colors.faded_txt, header_text_x + text_left_margin, ay - ((ghrh - 2) * ah)+group_height_fix-((properties.doubleRowText)?10:0), header_text_w - text_left_margin - this.groups[g].dateWidth-10, Math.round(ah*2/3)*(ghrh - 1), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                            gr.GdiDrawText(group_header_row_1, g_font.italicplus3, colors.normal_txt, header_text_x + text_left_margin, ay - ((ghrh - 1) * ah) + Math.round(ah*1/3)*(ghrh - 1) - 2+this.groups[g].group_height_fix, header_text_w - text_left_margin - this.groups[g].timeWidth - 10, Math.round(ah*2/3), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                            gr.GdiDrawText(group_header_row_2, g_font.normal, colors.faded_txt, header_text_x + text_left_margin, ay - ((ghrh - 2) * ah)+this.groups[g].group_height_fix-((properties.doubleRowText)?10:0), header_text_w - text_left_margin - this.groups[g].dateWidth-10, Math.round(ah*2/3)*(ghrh - 1), DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 														
 							if(properties.showToolTip) {
 								if((header_text_w - text_left_margin - this.groups[g].dateWidth)<this.groups[g].row2_Width || (header_text_w - text_left_margin - this.groups[g].timeWidth - 10)<this.groups[g].row1_Width){
@@ -3269,19 +3269,24 @@ oBrowser = function(name) {
     };
     this.on_mouse = function(event, x, y) {
         this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
-        
         // get hover row index (mouse cursor hover)
         if(y > this.y && y < this.y + this.h) {
             this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);
             if(this.activeRow >= this.rows.length) {
 				this.activeRow = -1;
-				
+			}			
+			if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
+				//console.log("eho"+this.groups[this.rows[this.activeRow+1].albumId].group_height_fix)
+				this.activeRow = Math.ceil((y - this.groups[this.rows[this.activeRow+1].albumId].group_height_fix + scroll_ - this.y) / properties.rowHeight - 1);
+			}
+            if(this.activeRow >= this.rows.length) {
+				this.activeRow = -1;
 			}
         } else {
             this.activeRow = -1;
-			
         };
-		
+		//this.groups[this.rows[this.activeRow].albumId].group_height_fix
+							
         // rating check
         if(this.activeRow > -1) {
             var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -5;
@@ -3467,19 +3472,11 @@ oBrowser = function(name) {
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();	
 							else fb.Play();							
 							//previous_active_playlist = plman.ActivePlaylist;
-							//window.NotifyOthers("nowPlayingTrack",true);
 							//plman.ActivePlaylist = g_active_playlist;
-
-							
 							//if(fb.IsPaused || fb.IsPlaying) fb.Stop();
-							
-
 							//plman.SetPlaylistFocusItemByHandle(g_active_playlist, this.rows[this.activeRow].metadb);
 							//plman.ExecutePlaylistDefaultAction(g_active_playlist, this.rows[this.activeRow].playlistTrackId);
-
 							//fb.RunContextCommandWithMetadb("Play", this.rows[this.activeRow].metadb);
-													
-							//fb.RunContextCommandWithMetadb(cmd, this.metadb, 0);
                             break;
                         case (rowType == 99): // extra empty row
 
@@ -3618,7 +3615,6 @@ oBrowser = function(name) {
 				ToolTip_mouse_y = y;				
 				
 				if(this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2 && (this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1 || this.rows[this.activeRow].type==0) && properties.showToolTip && !this.drag_moving) {
-					
 					if (!timers.showToolTip && !this.ishover_rating && g_tooltip.activeZone!=this.activeRow) {
 						if(g_tooltip.activeZone!='') g_tooltip.Deactivate();
 						if(this.rows[this.activeRow].tooltip && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)){

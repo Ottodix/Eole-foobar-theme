@@ -107,7 +107,7 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
         {
 			case ButtonStates.normal:
 				b_img=this.N_img;
-				b_img_dark=b_img;
+				b_img_dark=this.H_img_dark;
 				break;
 			case ButtonStates.active:				
 			case ButtonStates.hover:
@@ -124,9 +124,12 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 				break			
         }
 		
-		if(this.hover_color && (this.state==ButtonStates.hover || this.state==ButtonStates.down))
+		if(this.hover_color && (this.state==ButtonStates.hover || this.state==ButtonStates.down)){
 			gr.FillSolidRect(this.x, this.y, this.w, this.h, this.hover_color);
 
+		} 
+		var hover_state = (this.state==ButtonStates.hover || this.state==ButtonStates.down);
+		
 		if((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "idle" || this.name == "nowplaying") && compact_titlebar.isActive() && layout_state.isEqual(0)) {
 			if(this.state==ButtonStates.hover || this.state==ButtonStates.down){
 				//gr.FillSolidRect(this.x, -1, this.w, this.h, colors.settings_btn_hover_bg);
@@ -166,31 +169,38 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 			text_color = (this.name == "Foobar")?colors.normal_txt:colors.inactive_txt;			
 		}
 		
-		if(this.hover_bar_bottom && !this.hover_color && (main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down)){
+		if(hover_state){
 			gr.FillSolidRect(this.x, wh-this.h, this.w, this.h, colors.active_tab);
 			text_color = darkcolors.normal_txt;
 			btn_opacity = 255;
 			drawn_img = b_img_dark;
+		} else if(this.hover_bar_bottom && !this.hover_color && (main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down)){
+			gr.FillSolidRect(this.x, wh-colors.active_tab_line_height, this.w, colors.active_tab_line_height, colors.active_tab);
+			text_color = colors.normal_txt;
+			btn_opacity = 255;
+			drawn_img = b_img;
 		} else {
 			drawn_img = b_img;
 		}
+		
+		if(typeof drawn_img=="undefined" || drawn_img==null) drawn_img = b_img;
 		
 		if(!this.display_label || this.label=="") 
 			var btn_x = this.x+Math.floor((this.w-b_img.Width)/2)+this.img_x_adjustement;
 		else var btn_x = padding_x+this.img_x_adjustement;
         switch (this.state)
         {    
-        case ButtonStates.normal:            
-            gr.DrawImage(drawn_img, btn_x, this.y+Math.floor((this.h-drawn_img.Height)/2)+this.img_y_adjustement, drawn_img.Width, drawn_img.Height, 0, 0, drawn_img.Width, drawn_img.Height,0,btn_opacity);
-            break;
-        default:            
-            gr.DrawImage(drawn_img, btn_x, this.y+Math.floor((this.h-drawn_img.Height)/2)+this.img_y_adjustement, drawn_img.Width, drawn_img.Height, 0, 0, drawn_img.Width, drawn_img.Height,0,btn_opacity);
-            break;            
+			case ButtonStates.normal:            
+				gr.DrawImage(drawn_img, btn_x, this.y+Math.floor((this.h-drawn_img.Height)/2)+this.img_y_adjustement+this.padding[0], drawn_img.Width, drawn_img.Height, 0, 0, drawn_img.Width, drawn_img.Height,0,btn_opacity);
+				break;
+			default:            
+				gr.DrawImage(drawn_img, btn_x, this.y+Math.floor((this.h-drawn_img.Height)/2)+this.img_y_adjustement+this.padding[0], drawn_img.Width, drawn_img.Height, 0, 0, drawn_img.Width, drawn_img.Height,0,btn_opacity);
+				break;            
         }   
 		
 		if(this.display_label && this.label!="") {
 			var text2_draw = (this.upperCase) ? this.label_uppercase : this.label;	
-			gr.GdiDrawText(text2_draw, g_font.normal, text_color, padding_x+b_img.Width+this.txt_x_adjustement, this.y+this.txt_y_adjustement, this.w, this.h, DT_LEFT| DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+			gr.GdiDrawText(text2_draw, g_font.normal, text_color, padding_x+b_img.Width+this.txt_x_adjustement, this.y+this.txt_y_adjustement+this.padding[0], this.w, this.h, DT_LEFT| DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 		}
     }
     this.onMouse = function (state,x,y) {    
