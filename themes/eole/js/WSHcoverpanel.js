@@ -147,7 +147,7 @@ function startAnimation(){
 	if(properties.showVisualization || globalProperties.enable_screensaver){
 		animationTimer = setInterval(function() {
 			animationCounter++;
-			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0)){
+			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0) && !main_panel_state.isEqual(3)){
 				current_ms = (new Date).getTime();
 				if(current_ms >= last_mouse_move_notified+globalProperties.mseconds_before_screensaver){
 					screensaver_state.setValue(1);

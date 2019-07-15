@@ -159,8 +159,10 @@ var oCursor = function () {
 				}	
 			break;
 			case 'leave':
-				this.x = -1;
-				this.y = -1;
+				this.x = -10;
+				this.y = -10;
+				this.first_x = -10;
+				this.first_y = -10;					
 				this.active_zone = "";
 			break;			
 		}
