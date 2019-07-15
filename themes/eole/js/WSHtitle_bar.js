@@ -349,7 +349,7 @@ function Lightswitch(switch_all,new_state){
 		window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);	
 		on_notify_data("visualization_dark_theme",properties.visualization_dark_theme);			
 	}
-	if(switch_all){	
+	if(screensaver_state.isActive()){	
 		properties.screensaver_dark_theme=new_state;
 		window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);				
 		window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);	
@@ -2358,7 +2358,6 @@ oSearch = function() {
 				
                 break;
             case "leave":
-			console.log("leave")
 				this.search_history_bt.changeState(ButtonStates.normal);
 				/*if(this.isHoverHistory) {
 					this.isHoverHistory = false;
