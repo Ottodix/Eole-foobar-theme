@@ -2164,9 +2164,10 @@ oSearch = function() {
         var button_size = 18;
 		this.images.search_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_icon.png");
 		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
-		
+
 		this.images.search_history_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history.png");
 		this.images.search_history_hover_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history_hover.png");
+		this.search_history_bt = new button(this.images.search_history_icon, this.images.search_history_hover_icon, this.images.search_history_hover_icon,"search_history_bt");
 		
         this.images.resetIcon_off = gdi.CreateImage(button_size, button_size);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -2281,17 +2282,19 @@ oSearch = function() {
 		this.y = y;
 		if(this.hide) return; 	
 		
-		if(this.isHoverHistory){
+		/*if(this.isHoverHistory){
 			gr.DrawImage(this.images.search_history_hover_icon, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), this.images.search_history_hover_icon.Width, this.images.search_history_hover_icon.Height, 0, 0, this.images.search_history_hover_icon.Width, this.images.search_history_hover_icon.Height,0,255);
 		} else {
 			gr.DrawImage(this.images.search_history_icon, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), this.images.search_history_icon.Width, this.images.search_history_icon.Height, 0, 0, this.images.search_history_icon.Width, this.images.search_history_hover_icon.Height,0,255);			
-		}
-
+		}*/
+		this.search_history_bt.draw(gr, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), 255);		
+		
         if(this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) {
             this.reset_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-1, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.reset_bt.img[0].Height/2)+2 + (compact_titlebar.isActive()?1:0), 255);
         } else {
 			this.search_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-4, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.images.search_icon.Height/2)+3, 255);					
         };
+		
 		this.inputbox.draw(gr, this.x+cSearchBox.paddingLeft, this.y+cSearchBox.paddingTop, 0, 0);
 		if(layout_state.isEqual(0)){	
 			gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
@@ -2305,8 +2308,9 @@ oSearch = function() {
 				if(this.isHover){
 					var reset_btn_state = this.reset_bt.checkstate("down", x, y);
 					var search_btn_state = this.search_bt.checkstate("down", x, y);
-					if(reset_btn_state!=ButtonStates.down && !this.isHoverHistory) this.inputbox.check("down", x, y);				
-					if(this.isHoverHistory) draw_searchHistory_menu(this.x+this.w,this.h+this.y-1);		
+					var search_history_btn_state = this.search_history_bt.checkstate("down", x, y);					
+					if(reset_btn_state!=ButtonStates.down && !search_history_btn_state) this.inputbox.check("down", x, y);				
+					if(search_history_btn_state) draw_searchHistory_menu(this.x+this.w,this.h+this.y-1);		
 				}
 				else if(!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && this.inputbox.text.length == 0 && layout_state.isEqual(0) && !this.hide){
 					this.toggleVisibility(false);
@@ -2342,17 +2346,24 @@ oSearch = function() {
 				this.isHoverHistoryOld = this.isHoverHistory;
 				this.checkHover(x,y);
 				if(!this.hide) this.inputbox.check("move", x, y);
-				this.search_bt.checkstate("move", x, y);				
+				this.search_bt.checkstate("move", x, y);	
+				this.search_history_bt.checkstate("move", x, y);
                 if((this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) && !this.hide) this.reset_bt.checkstate("move", x, y);
-				if(x > this.x+this.w-cSearchBox.paddingRight && x<this.x+this.w && y>cSearchBox.marginTop && !this.hide) this.isHoverHistory = true;
+				
+				/*//if(x > this.x+this.w-cSearchBox.paddingRight && x<this.x+this.w && y>cSearchBox.marginTop && !this.hide) this.isHoverHistory = true;
+				var x_start =this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2)-5;
+				if(x > x_start && x < x_start + this.images.search_history_icon.Width+8) this.isHoverHistory = true;
 				else this.isHoverHistory = false;
-				if(this.isHoverHistoryOld!=this.isHoverHistory) this.repaint();
+				if(this.isHoverHistoryOld!=this.isHoverHistory) this.repaint();*/
+				
                 break;
             case "leave":
-				if(this.isHoverHistory) {
+			console.log("leave")
+				this.search_history_bt.changeState(ButtonStates.normal);
+				/*if(this.isHoverHistory) {
 					this.isHoverHistory = false;
 					this.repaint();
-				}
+				}*/
                 break;				
         };
     };

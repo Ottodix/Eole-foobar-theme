@@ -2320,6 +2320,18 @@ button = function (normal, hover, down, name) {
     this.repaint = function () {
         window.RepaintRect(this.x, this.y, this.w, this.h);
     };
+    this.changeState = function (state) {
+        var old_state = this.state;
+        this.state = state;
+		if(this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
+			g_cursor.setCursor(IDC_HAND,this.text);
+			this.cursor = IDC_HAND;
+		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
+			g_cursor.setCursor(IDC_ARROW,26);	
+			this.cursor = IDC_ARROW;
+		}			
+        return old_state;
+    }    	
     this.checkstate = function (event, x, y) {
         this.ishover = (x > this.x && x < this.x + this.w - 1 && y > this.y && y < this.y + this.h - 1);
         this.old = this.state;
