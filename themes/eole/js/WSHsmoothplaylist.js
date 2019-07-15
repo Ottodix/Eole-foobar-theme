@@ -1461,7 +1461,7 @@ oGroup = function(index, start, handle, groupkey) {
     this.collapsed = properties.autocollapse;
     this.TimeString = "";
     this.TotalTime = 0;
-	this.track_rated = false;
+	this.track_rating = false;
 	
 	this.FormatTime = function(time){
 		if(time>0){
@@ -1627,7 +1627,7 @@ oBrowser = function(name) {
                 this.nowplaying = plman.GetPlayingItemLocation();
                 if(this.nowplaying.IsValid) {
                     if(plman.PlayingPlaylist != g_active_playlist) {
-                        g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist //;						
+                        g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
 						this.showNowPlaying_trigger = true;
 						this.populate(is_first_populate = true,21);
                     } else {
@@ -1664,20 +1664,22 @@ oBrowser = function(name) {
 	
     this.showFocusedItem = function() {
         g_focus_row = this.getOffsetFocusItem(g_focus_id);
+		
        // if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + this.totalRowsVis) {
 		   if(properties.showGroupHeaders) {
-				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis / 2)) * properties.rowHeight;
+				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis/4)) * properties.rowHeight;
 				scroll_to_header = this.groups[this.rows[g_focus_row].albumId].rowId * properties.rowHeight - properties.rowHeight*(properties.extraRowsNumber+1)
-				if(g_focus_row*properties.rowHeight-scroll_to_header+properties.rowHeight>wh-properties.rowHeight) scroll=scroll_to_track
+				if(g_focus_row*properties.rowHeight-scroll_to_header+properties.rowHeight>wh-properties.rowHeight*5) scroll=scroll_to_track
 				else scroll=scroll_to_header				
 		   } else 
 				scroll = (g_focus_row - Math.floor(this.totalRowsVis / 4)) * properties.rowHeight;
-				scroll = check_scroll(scroll);
+
+			scroll = check_scroll(scroll);
+
             //if(!properties.enableFullScrollEffectOnFocusChange) {
              //   scroll_ = scroll + properties.rowHeight * 5 * (g_focus_id_prev <= g_focus_id ? -1 : 1);
            //     scroll_ = check_scroll(scroll_);
           //  };
-           
             this.scrollbar.updateScrollbar();
        // };
     };
@@ -1901,7 +1903,7 @@ oBrowser = function(name) {
 							this.rows[r].groupkey = this.groups[g].groupkey;
 							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;			
 							this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
-							//this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
+							this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 							//if(this.rows[r].selected)
 								//this.groups[g-1].selected = true;
 							this.rows[r].rating = -1;	
@@ -1926,7 +1928,7 @@ oBrowser = function(name) {
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;			
 						this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
-						//this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
+						this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 						//if(this.rows[r].selected)
 							//this.groups[g-1].selected = true;
 						this.rows[r].rating = -1;
@@ -2728,7 +2730,7 @@ oBrowser = function(name) {
 										}				
                                         // rating Stars
 										try {								
-											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
+											if(!this.drag_tracks && properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
 													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
@@ -2892,7 +2894,7 @@ oBrowser = function(name) {
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay_1, cColumns.track_time_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         // rating Stars
 										try {
-											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
+											if(!this.drag_tracks && properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
 													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah_1, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
@@ -3059,7 +3061,7 @@ oBrowser = function(name) {
 										}		
                                         // rating Stars
 										try {
-											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
+											if(!this.drag_tracks && properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
 													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
@@ -3131,7 +3133,7 @@ oBrowser = function(name) {
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         // rating Stars
 										try {
-											if(properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
+											if(!this.drag_tracks && properties.showRating && track_type != 3 && (!properties.showRatingSelected || t_selected || (properties.showRatingRated && track_rating_part>0))) {
 												if(!this.ratingImages && properties.showRating) {
 													this.ratingImages = this.SetRatingImages(this.rows[i].rating_length, ah, colors.rating_icon_on, colors.rating_icon_off, colors.rating_icon_border);
 												}				
@@ -3304,7 +3306,7 @@ oBrowser = function(name) {
         
         switch(event) {
             case "down":
-			
+				this.track_rating = false;
 				if( this.activeRow == -1) plman.ClearPlaylistSelection(g_active_playlist)
                 this.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
                 if(!cTouch.down && !timers.mouseDown && this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
@@ -3363,20 +3365,9 @@ oBrowser = function(name) {
                                 };
                                 this.SHIFT_start_id = null;
                             } else {
-								
                                 // check if rating to update ?
                                 if(this.ishover_rating) {
-                                    // calc new rating
-                                    var l_rating = Math.ceil((x - rating_x) / (this.rows[this.activeRow].rating_length / 5) + 0.1);
-                                    if(l_rating > 5) l_rating = 5;
-									else if(l_rating < 0) l_rating = 0;
-                                    // update if new rating <> current track rating
-                                    if (this.rows[this.activeRow].tracktype < 2) {
-                                        g_rating_updated = true;
-                                        g_rating_rowId = this.activeRow;
-										if(l_rating!=this.rows[this.activeRow].rating) this.rows[this.activeRow].rating = rateSong(l_rating,this.rows[this.activeRow].rating, this.rows[this.activeRow].metadb);
-										this.track_rated = true;
-                                    };
+									this.track_rating = true;
                                 } else {
                                     if(plman.IsPlaylistItemSelected(g_active_playlist, playlistTrackId)) {
                                         if(this.metadblist_selection.Count > 1) {
@@ -3420,7 +3411,7 @@ oBrowser = function(name) {
                             var playlistTrackId = this.rows[this.activeRow].playlistTrackId;
                             if(!utils.IsKeyPressed(VK_SHIFT) && !utils.IsKeyPressed(VK_CONTROL)) {
                                 if(plman.IsPlaylistItemSelected(g_active_playlist, playlistTrackId)) {
-                                    if(this.metadblist_selection.Count > 1 && !this.track_rated) {
+                                    if(this.metadblist_selection.Count > 1 && !this.track_rating) {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
@@ -3434,9 +3425,20 @@ oBrowser = function(name) {
                     };
                     this.repaint();
                 };
+				if(this.track_rating && this.ishover_rating){
+					var l_rating = Math.ceil((x - rating_x) / (this.rows[this.activeRow].rating_length / 5) + 0.1);
+					if(l_rating > 5) l_rating = 5;
+					else if(l_rating < 0) l_rating = 0;
+					// update if new rating <> current track rating
+					if (this.rows[this.activeRow].tracktype < 2) {
+						g_rating_updated = true;
+						g_rating_rowId = this.activeRow;
+						if(l_rating!=this.rows[this.activeRow].rating) this.rows[this.activeRow].rating = rateSong(l_rating,this.rows[this.activeRow].rating, this.rows[this.activeRow].metadb);
+					};			
+				}
 				this.drag_tracks = false;
                 this.drag_clicked = false;
-				this.track_rated = false;
+				this.track_rating = false;
                 // scrollbar
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     brw.scrollbar && brw.scrollbar.on_mouse(event, x, y);
