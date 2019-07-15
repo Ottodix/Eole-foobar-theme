@@ -128,6 +128,8 @@ var g_drop_effect = {
 var oCursor = function () {
 	this.x = -10;
 	this.y = -10;
+	this.first_x = -10;
+	this.first_y = -10;	
 	this.active_zone = "";
 	this.timer = false;
     this.onMouse = function (state, x, y, m) {    
@@ -145,6 +147,8 @@ var oCursor = function () {
 				this.down_y = y;				
 			break;
 			case 'move':
+				if(this.x==-10) this.first_x = x;
+				if(this.y==-10) this.first_y = y;				
 				this.x = x;
 				this.y = y;	
 				if(!globalProperties.enable_screensaver) return;

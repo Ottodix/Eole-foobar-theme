@@ -5354,8 +5354,16 @@ function on_mouse_move(x, y, m) {
     if(x == g_cursor.x && y == g_cursor.y) return;
 	g_cursor.onMouse("move", x, y, m);		
 	
+    g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
+	
 	if(globalProperties.escape_on_mouse_move){
-		escape_screensaver(); return;	
+		if(g_ishover && (g_cursor.first_x<0 || g_cursor.first_y<0)){
+			g_cursor.first_x = x;
+			g_cursor.first_y = y;
+		}
+		else if(Math.abs(x-g_cursor.first_x)>5 || Math.abs(y-g_cursor.first_y)>5){
+			escape_screensaver(); return;	
+		}
 	}
 
     var old = cur_btn;
@@ -5384,7 +5392,6 @@ function on_mouse_move(x, y, m) {
 		g_cursor.setCursor(IDC_ARROW,32);
 	}
 
-    g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
     g_ishover && brw.on_mouse("move", x, y);
     
 	// Enable showlist drag scrollbar
@@ -6169,6 +6176,8 @@ function on_notify_data(name, info) {
 function escape_screensaver(){
 	window.NotifyOthers("escape_screensaver",true);	
 	screensaver_state.setValue(0);	
+	g_cursor.first_x = -10;
+	g_cursor.first_y = -10;	
 }
 function on_char(code) {
     // inputBox
