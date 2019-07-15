@@ -1091,7 +1091,7 @@ oTagSwitcherBar = function() {
 			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
 		}
 		if(prev_hover_item!=this.hoverItem){
-			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW);			
+			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW,20);			
 			else g_cursor.setCursor(IDC_HAND,this.items_txt[this.hoverItem]);
 		}
 		return (prev_hover_item!=this.hoverItem);
@@ -5577,7 +5577,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         var old_state = this.state;
         this.state = state;
 		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);	
-		else g_cursor.setCursor(IDC_ARROW);					
+		else g_cursor.setCursor(IDC_ARROW,21);					
         return old_state;
     }
     this.draw = function (gr) {

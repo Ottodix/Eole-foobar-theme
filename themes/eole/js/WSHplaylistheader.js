@@ -183,7 +183,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
         var old_state = this.state;
         this.state = state;
 		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);	
-		else g_cursor.setCursor(IDC_ARROW);					
+		else g_cursor.setCursor(IDC_ARROW,39);					
         return old_state;
     }    
     this.draw = function (gr) {

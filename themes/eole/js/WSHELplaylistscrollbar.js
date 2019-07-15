@@ -40,7 +40,7 @@ function on_paint(gr) {
 		scrollbar_top=Math.floor((focus_item*scrollbar_zone)/(playlist_count-1));
 		
 		if(!hooverstate){  
-			if(g_cursor.getCursor()!=IDC_ARROW) g_cursor.setCursor(IDC_ARROW);			
+			if(g_cursor.getCursor()!=IDC_ARROW) g_cursor.setCursor(IDC_ARROW,19);			
 			gr.FillSolidRect(ww-cScrollBar.normalWidth,scrollbar_top+cScrollBar.marginTop, cScrollBar.normalWidth-2,scrollbar_size-cScrollBar.marginTop-cScrollBar.marginBottom,colors.scrollbar_normal_cursor); 
 		}
 		else {          

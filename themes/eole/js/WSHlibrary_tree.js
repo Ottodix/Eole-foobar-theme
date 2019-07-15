@@ -569,7 +569,7 @@ oPlaylistManager = function(name) {
             case "up":
                 ui.drag_clicked = false;
                 if(ui.drag_moving) {
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,33);
                     this.drop_done = false;
                     if(this.activeIndex > -1) {
 						var list = pop.sel_items;
@@ -1033,7 +1033,7 @@ function scrollbar() {
         };
         this.count = -1;
 		if(this.cursorSet && !this.hover) {
-			g_cursor.setCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW,34);
 			this.cursorSet = false;
 		}
     }
@@ -1062,7 +1062,7 @@ function scrollbar() {
         else this.hover = true;
         if (this.hover != this.hover_o) {
 			if(!this.hover){
-				g_cursor.setCursor(IDC_ARROW);
+				g_cursor.setCursor(IDC_ARROW,35);
 				this.cursorSet = false;
 				pop.cursor = IDC_ARROW;				
 			}
@@ -1856,7 +1856,7 @@ function populate() {
 		} else {
 			if(g_cursor.getCursor()!=IDC_ARROW && pop.cursor != IDC_HAND) {
 				if(pop.setCursor==IDC_HAND) {
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,36);
 					pop.setCursor = IDC_ARROW;	
 				}
 			}	
@@ -2916,7 +2916,7 @@ function searchLibrary() {
 	}
     this.leave = function() {
 		if(this.cursorSet) {
-			if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);
+			if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW,36);
 			this.cursorSet = false;
 		}
     }	
@@ -2928,7 +2928,7 @@ function searchLibrary() {
 		}
         if (!this.hover || !this.lbtn_down) {
 			if(!this.hover && this.cursorSet) {
-				if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW);				
+				if(g_cursor.getCursor()==IDC_IBEAM) g_cursor.setCursor(IDC_ARROW,37);				
 				this.cursorSet = false;
 			}
 			return;
@@ -3478,7 +3478,7 @@ function button_manager() {
             } else {
                 this.img = this.img_normal;
 				if(this.cursor!=IDC_ARROW){
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,38);
 					this.cursor = IDC_ARROW;
 				}
             }			

@@ -579,7 +579,7 @@ oCover = function() {
 						}
 					}
 				} else {
-					g_cursor.setCursor(IDC_ARROW);
+					g_cursor.setCursor(IDC_ARROW,17);
 					this.isHover = false;
 					this.tintDrawed = false;
 					window.Repaint();					
@@ -589,7 +589,7 @@ oCover = function() {
 				this.x = -1;
 				this.y = -1;
 				if(this.isHover){
-					g_cursor.setCursor(IDC_ARROW);					
+					g_cursor.setCursor(IDC_ARROW,18);					
 					this.isHover = false;
 					this.tintDrawed = false;
 					window.Repaint();					

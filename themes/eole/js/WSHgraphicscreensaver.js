@@ -1014,7 +1014,7 @@ oRow = function(metadb,itemIndex) {
 					if(this.hover_rating_old != this.hover_rating) this.repaint();
                 } else if(!g_dragR){
                     if(this.cursorHand) {
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,30);
 						this.cursorHand = false;
 						this.hover_rating = -1;
 						this.repaint();
@@ -3771,8 +3771,14 @@ oBrowser = function(name) {
 								gr.SetSmoothingMode(0);
 								gr.DrawImage(cover.btn_play, ax + awhalf-20, coverTop+awhalf-20, 41, 41, 0, 0, 41, 41); 
 							}
+							if((i == this.activeIndex && this.activeRow>-1) && !(g_cursor.getActiveZone()=="cover"+i)){
+								g_cursor.setCursor(IDC_HAND,"cover"+i);
+							} 							
 						}				
 						else if((i == this.activeIndex && this.activeRow>-1) || i==this.album_Rclicked_index) {
+							if(!(g_cursor.getActiveZone()=="cover"+i)){
+								g_cursor.setCursor(IDC_HAND,"cover"+i);
+							} 							
 							if(!properties.circleMode){
 								gr.FillGradRect(ax, coverTop, this.coverRealWith, this.coverRealWith, 91, colors.covergrad_hoverOverlay, GetGrey(0,0), 0);
 							} else {
@@ -3808,9 +3814,13 @@ oBrowser = function(name) {
 								gr.DrawImage(this.images.icon_speaker_off, ax + awhalf-16, coverTop+awhalf-16, this.images.icon_speaker_off.Width, this.images.icon_speaker_off.Height, 0, 0, this.images.icon_speaker_off.Width, this.images.icon_speaker_off.Height);
 							else
 								gr.DrawImage(this.images.icon_speaker_on, ax + awhalf-16, coverTop+awhalf-16, this.images.icon_speaker_on.Width, this.images.icon_speaker_on.Height, 0, 0, this.images.icon_speaker_on.Width, this.images.icon_speaker_on.Height);
-
+							if(this.activeIndex<0 && g_cursor.getActiveZone()=="cover"+i) {
+								g_cursor.setCursor(IDC_ARROW,25);
+							}		
 						}  						
-
+						else if(this.activeIndex<0 && g_cursor.getActiveZone()=="cover"+i) {
+							g_cursor.setCursor(IDC_ARROW,25);
+						}		
 						
 	
 						
@@ -4559,6 +4569,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.N_img = N_img;
     this.H_img = H_img;  
 	this.opacity = opacity;
+	this.cursor = IDC_ARROW;	
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
         
@@ -4568,6 +4579,11 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
+		if(this.state==ButtonStates.hover && g_cursor.getActiveZone() != this.text) {
+			g_cursor.setCursor(IDC_HAND,this.text);
+		} else if(g_cursor.getActiveZone() == this.text && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
+			g_cursor.setCursor(IDC_ARROW,10);	
+		}			
         return old_state;
     }    
     this.draw = function (gr) {
@@ -5350,8 +5366,8 @@ function on_mouse_move(x, y, m) {
 		brw.setActiveRow(-1,-1);
         old && old.changeState(ButtonStates.normal);
         cur_btn && cur_btn.changeState(ButtonStates.hover);
-		if(brw.cursor == 'resize') {
-			g_cursor.setCursor(IDC_ARROW);
+		if(g_cursor.getActiveZone() == 'resize') {
+			g_cursor.setCursor(IDC_ARROW,31);
 		}			
         brw.repaint();
 		return;
@@ -5362,11 +5378,10 @@ function on_mouse_move(x, y, m) {
 	
 	if(y<32 && !cur_btn){	
 		brw.setActiveRow(-1,-1);
-		g_cursor.setCursor(IDC_SIZEALL,'titlebar');
-		brw.cursor = 'resize';
+		g_cursor.setCursor(IDC_SIZEALL,'resize');
 		return;	
-	} else if(brw.cursor == 'resize') {
-		g_cursor.setCursor(IDC_ARROW);
+	} else if(g_cursor.getActiveZone() == 'resize') {
+		g_cursor.setCursor(IDC_ARROW,32);
 	}
 
     g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
@@ -5501,7 +5516,7 @@ function on_mouse_leave() {
         cur_btn.changeState(ButtonStates.normal);
         cur_btn=null;        
     }	
-	
+	g_cursor.onMouse("leave");
     if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
         g_scrollbar.check("leave", 0, 0);
     }

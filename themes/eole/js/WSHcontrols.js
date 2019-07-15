@@ -983,7 +983,7 @@ function on_mouse_move(x,y,m){
 			else if(!volume_vars.drag){ResetVolume();}
 		} else if(hoovervolume && !volume_vars.drag){
 			ResetVolume();
-			g_cursor.setCursor(IDC_ARROW);		
+			g_cursor.setCursor(IDC_ARROW,12);		
 			if(!timers.hideVolume) showVolumeSlider(false);
 		} else if(!timers.hideVolume && !volume_vars.drag && VolumeSliderActive) {
 			showVolumeSlider(false);
@@ -1000,7 +1000,7 @@ function on_mouse_move(x,y,m){
 			g_cursor.setCursor(IDC_HAND,"time");
 		}		
 	} else if(g_cursor.getActiveZone()=='time'){
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,13);
 	}
 	
 	if(is_hover_title(x,y)){
@@ -1012,7 +1012,7 @@ function on_mouse_move(x,y,m){
 			g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, 'track_title');
 		}
 	} else if(g_cursor.getActiveZone()=='title'){
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,14);
 	}
 	//Progress
 	m_pos_progress = clamp(x-progress_margin_left, 0, ww_progress);	
@@ -1025,7 +1025,7 @@ function on_mouse_move(x,y,m){
 		}				 
            
 	} else if(hooverprogress && !progress_vars.drag){
-		g_cursor.setCursor(IDC_ARROW);
+		g_cursor.setCursor(IDC_ARROW,15);
 		ResetProgress();
 	}
   
@@ -2922,7 +2922,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
         var old_state = this.state;
         this.state = state;
 		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND,this.text);	
-		else g_cursor.setCursor(IDC_ARROW);					
+		else g_cursor.setCursor(IDC_ARROW,16);					
         return old_state;
     }    
     this.Togglehide = function () {

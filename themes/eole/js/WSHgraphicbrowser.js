@@ -1231,7 +1231,7 @@ oRow = function(metadb,itemIndex) {
 					if(this.hover_rating_old != this.hover_rating) this.repaint();
                 } else if(!g_dragR){
                     if(this.cursorHand) {
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,22);
 						this.cursorHand = false;
 						this.hover_rating = -1;
 						this.repaint();
@@ -1631,7 +1631,7 @@ oShowList = function(parentPanelName) {
             case "up":
 				if(this.cursor!=IDC_ARROW && !this.scrollbar_cursor_hover) {
 					this.cursor = IDC_ARROW;
-					g_cursor.setCursor(IDC_ARROW);																			
+					g_cursor.setCursor(IDC_ARROW,23);																			
 				}			
                 break;	
             case "leave":
@@ -1695,7 +1695,7 @@ oShowList = function(parentPanelName) {
 						}									
 					} else if(!this.scrollbar_cursor_hover && this.cursor!=IDC_ARROW) {
 						this.cursor = IDC_ARROW;
-						g_cursor.setCursor(IDC_ARROW);																			
+						g_cursor.setCursor(IDC_ARROW,24);																			
 					}
 				}				
                 break;								
@@ -4878,7 +4878,7 @@ oBrowser = function(name) {
 							else
 								gr.DrawImage(cover.extend_img, ax + awhalf-11, coverTop+awhalf-11, 22, 22, 0, 0, 22, 22);								
 						} else if(this.activeIndex<0 && g_cursor.getActiveZone()=="cover"+i) {
-							g_cursor.setCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW,25);
 						}
 		
 					} else if (this.groups[this.groups_draw[i]].cover_img=="no_cover") {
@@ -5623,7 +5623,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 			g_cursor.setCursor(IDC_HAND,this.text);
 			this.cursor = IDC_HAND;
 		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
-			g_cursor.setCursor(IDC_ARROW);	
+			g_cursor.setCursor(IDC_ARROW,26);	
 			this.cursor = IDC_ARROW;
 		}			
         return old_state;
@@ -5978,7 +5978,7 @@ function on_mouse_lbtn_down(x, y, m) {
 				g_showlist.close_bt.state=ButtonStates.hide;
 				g_showlist.close_bt.isdown = false;
 				g_showlist.close();		
-				g_cursor.setCursor(IDC_ARROW);
+				g_cursor.setCursor(IDC_ARROW,27);
 				g_showlist.close_bt.cursor = IDC_ARROW;				
 			}
 			if(g_showlist.totalCols > g_showlist.totalColsVis) {
@@ -6122,7 +6122,7 @@ function on_mouse_lbtn_up(x, y, m) {
 					g_showlist.setColumnsOffset(g_showlist.columnsOffset > 0 ? g_showlist.columnsOffset-1 : 0);
 					if(g_showlist.columnsOffset == 0) {
 						g_showlist.prev_bt.state = ButtonStates.normal;
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,28);
 						g_showlist.prev_bt.cursor = IDC_ARROW;						
 					}
 					brw.repaint();
@@ -6132,7 +6132,7 @@ function on_mouse_lbtn_up(x, y, m) {
 					g_showlist.setColumnsOffset((g_showlist.totalCols - g_showlist.columnsOffset) > g_showlist.totalColsVis ? g_showlist.columnsOffset+1 : g_showlist.columnsOffset);
 					if(g_showlist.columnsOffset >= g_showlist.totalCols - g_showlist.totalColsVis) {
 						g_showlist.next_bt.state = ButtonStates.normal;
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,29);
 						g_showlist.prev_bt.cursor = IDC_ARROW;						
 					}				
 					brw.repaint();
@@ -6634,7 +6634,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 
 function on_mouse_leave() {
 	g_resizing.on_mouse("leave", -1, -1);
-	
+	g_cursor.onMouse("leave");
 	if(brw.album_Rclicked_index>-1 && !g_avoid_on_mouse_leave) brw.album_Rclicked_index = -1;
 	else g_avoid_on_mouse_leave=false;
 

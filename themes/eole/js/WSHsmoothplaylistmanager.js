@@ -1011,7 +1011,7 @@ oBrowser = function(name) {
     this.draw = function(gr) {
         
         if(cPlaylistManager.playlist_switch_pending) {
-            g_cursor.setCursor(IDC_ARROW);
+            g_cursor.setCursor(IDC_ARROW,39);
             cPlaylistManager.playlist_switch_pending = false;
         };
         
@@ -1255,7 +1255,7 @@ oBrowser = function(name) {
 								plman.ActivePlaylist = total;
 								brw.selectedRow = total;
 							}	
-							g_cursor.setCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW,40);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
@@ -1289,7 +1289,7 @@ oBrowser = function(name) {
 								plman.MovePlaylist(total, total);
 								plman.ActivePlaylist = total;
 							}	
-							g_cursor.setCursor(IDC_ARROW);
+							g_cursor.setCursor(IDC_ARROW,41);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
@@ -1337,7 +1337,7 @@ oBrowser = function(name) {
                 
                 this.down = false;
                 
-                if(cPlaylistManager.drag_moved) g_cursor.setCursor(IDC_ARROW);
+                if(cPlaylistManager.drag_moved) g_cursor.setCursor(IDC_ARROW,42);
                 
                 cPlaylistManager.drag_clicked = false;
                 cPlaylistManager.drag_moved = false;
@@ -1360,7 +1360,7 @@ oBrowser = function(name) {
 							plman.ActivePlaylist = total;	
 							brw.selectedRow = total;
 						}
-						g_cursor.setCursor(IDC_ARROW);
+						g_cursor.setCursor(IDC_ARROW,43);
 					}
                 };
                 break;
@@ -1683,7 +1683,7 @@ oBrowser = function(name) {
 				plman.ActivePlaylist = pl_idx;
 				brw.selectedRow = total;
 			}	
-			g_cursor.setCursor(IDC_ARROW);				
+			g_cursor.setCursor(IDC_ARROW,44);				
             this.repaint();
             break;
         case (idx==101):
@@ -1698,7 +1698,7 @@ oBrowser = function(name) {
 				plman.MovePlaylist(total, pl_idx);
 				plman.ActivePlaylist = pl_idx;
 			}						
-			g_cursor.setCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW,45);
             this.repaint();
             break;
         case (idx==2):
@@ -2839,7 +2839,7 @@ function on_playback_time(time) {
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed && g_first_populate_done && window.IsVisible){	
 		if(cPlaylistManager.drag_droped) {
-			g_cursor.setCursor(IDC_ARROW);
+			g_cursor.setCursor(IDC_ARROW,46);
 		} else {
 			if(brw.previous_playlistCount != plman.PlaylistCount) g_filterbox.clearInputbox();
 		};

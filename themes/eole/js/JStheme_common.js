@@ -157,6 +157,7 @@ var oCursor = function () {
 			case 'leave':
 				this.x = -1;
 				this.y = -1;
+				this.active_zone = "";
 			break;			
 		}
     }
@@ -182,6 +183,7 @@ var oCursor = function () {
 		} else {
 			window.SetCursor(cursor_code);
 		}
+		//console.log(cursor_code+" - "+this.active_zone)
 	}
 	this.getCursor = function(){
 		return this.cursor;

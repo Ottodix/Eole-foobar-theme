@@ -4106,7 +4106,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 			g_cursor.setCursor(IDC_HAND,this.text);
 			this.cursor = IDC_HAND;
 		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
-			g_cursor.setCursor(IDC_ARROW);	
+			g_cursor.setCursor(IDC_ARROW,11);	
 			this.cursor = IDC_ARROW;
 		}			
         return old_state;
