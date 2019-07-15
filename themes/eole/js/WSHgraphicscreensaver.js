@@ -3871,7 +3871,7 @@ oBrowser = function(name) {
 				}		
 			}
 			
-			if(!globalProperties.escape_on_mouse_move) drawAllButtons(gr);
+			if(!(globalProperties.escape_on_mouse_move && globalProperties.enable_screensaver)) drawAllButtons(gr);
 			
             // panel playlist	
             if(properties.DragToPlaylist) {
@@ -5356,7 +5356,7 @@ function on_mouse_move(x, y, m) {
 	
     g_ishover = (x > 0 && x < ww && y > 0 && y < wh);
 	
-	if(globalProperties.escape_on_mouse_move){
+	if(globalProperties.escape_on_mouse_move && globalProperties.enable_screensaver){
 		if(g_ishover && (g_cursor.first_x<0 || g_cursor.first_y<0)){
 			g_cursor.first_x = x;
 			g_cursor.first_y = y;

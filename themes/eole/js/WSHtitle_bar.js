@@ -947,16 +947,17 @@ function on_mouse_rbtn_up(x, y){
 			_menu.AppendMenuSeparator();
 			_screensaver.AppendMenuItem(MF_STRING, 8, "Activate Now");	
 			_screensaver.AppendMenuSeparator(); 
+			_screensaver.AppendMenuItem(MF_GRAYED, 0, "Screensaver:");
 			_screensaver.AppendMenuItem(MF_STRING, 9, "Enable");
+			_screensaver.CheckMenuItem(9,globalProperties.enable_screensaver);			
 			_screensaver.AppendMenuItem(MF_STRING, 11, "Set time (current: "+Math.round(globalProperties.mseconds_before_screensaver/1000)+"s)");			
-			_screensaver.CheckMenuItem(9,globalProperties.enable_screensaver);
 			_screensaver.AppendMenuItem(MF_STRING, 10, "Escape on mouse move");	
 			_screensaver.CheckMenuItem(10,globalProperties.escape_on_mouse_move);	
 			_screensaver.AppendMenuSeparator(); 
 			_screensaver.AppendMenuItem(MF_STRING, 13, "Light theme");			
 			_screensaver.AppendMenuItem(MF_STRING, 12, "Dark theme");
 			_screensaver.CheckMenuRadioItem(12, 13, (properties.screensaver_dark_theme)?12:13);		
-			_screensaver.AppendTo(_menu,MF_STRING, "Idle screen");				
+			_screensaver.AppendTo(_menu,MF_STRING, "Idle screen / Screensaver");				
 			_menu.AppendMenuItem(MF_STRING, 6, "Compact player");	
 			if(g_uihacks.getFullscreenState())
 				_menu.AppendMenuItem(MF_STRING, 5, "Quit Fullscreen");	
@@ -1508,16 +1509,18 @@ function draw_main_menu(x,y){
  	
 	_screensaver.AppendMenuItem(MF_STRING, 4015, "Activate Now");	
 	_screensaver.AppendMenuSeparator(); 
+	_screensaver.AppendMenuItem(MF_GRAYED, 0, "Screensaver:");	
 	_screensaver.AppendMenuItem(MF_STRING, 4016, "Enable");	
 	_screensaver.CheckMenuItem(4016,globalProperties.enable_screensaver);
 	_screensaver.AppendMenuItem(MF_STRING, 4018, "Set time (current: "+Math.round(globalProperties.mseconds_before_screensaver/1000)+"s)");		
 	_screensaver.AppendMenuItem(MF_STRING, 4017, "Escape on mouse move");	
-	_screensaver.CheckMenuItem(4017,globalProperties.escape_on_mouse_move);	
+	_screensaver.CheckMenuItem(4017,globalProperties.escape_on_mouse_move);		
+	
 	_screensaver.AppendMenuSeparator(); 
 	_screensaver.AppendMenuItem(MF_STRING, 4020, "Light theme");		
 	_screensaver.AppendMenuItem(MF_STRING, 4019, "Dark theme");	
 	_screensaver.CheckMenuRadioItem(4019, 4020, (properties.screensaver_dark_theme)?4019:4020);		
-	_screensaver.AppendTo(skin_settings_menu,MF_STRING, "Idle screen");		
+	_screensaver.AppendTo(skin_settings_menu,MF_STRING, "Idle screen / Screensaver");		
 	
 	if(layout_state.isEqual(0)) {
 		skin_settings_menu.AppendMenuItem(MF_STRING, 4010, "Compact player");	
