@@ -2077,7 +2077,7 @@ function randomPlayMenu(x, y){
             case (idx == 2):
                 properties.random_function = '20_albums';
                 window.SetProperty("Random function", properties.random_function);
-				window.NotifyOthers("SetRandom", properties.random_function);             
+				window.NotifyOthers("playRandom", properties.random_function);             
                 break;
             case (idx == 3):
                 properties.random_function = '200_tracks';
