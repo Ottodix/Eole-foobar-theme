@@ -1530,6 +1530,7 @@ oBrowser = function(name) {
     this.cover_img_mask = null;		
 	this.drawLeftLine = false;
 	this.followNowPlaying = false;
+	this.playlist_on_next_populate = -1;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -1780,7 +1781,9 @@ oBrowser = function(name) {
     };
 	this.setActivePlaylist = function(call){
 		var g_active_playlist_new=-1
-		if(properties.lockOnPlaylistNamed!="") {
+		if(this.playlist_on_next_populate>-1){
+			g_active_playlist_new = this.playlist_on_next_populate;
+		} else if(properties.lockOnPlaylistNamed!="") {
 			g_active_playlist_new = check_playlist(properties.lockOnPlaylistNamed);
 			if(g_active_playlist_new==-1) {
 				setOneProperty("lockOnPlaylistNamed",'');	
@@ -2075,7 +2078,10 @@ oBrowser = function(name) {
     this.populate = function(is_first_populate,call_id, set_active_playlist) {
 		var set_active_playlist = typeof set_active_playlist !== 'undefined' ? set_active_playlist : true;
         if(this.list) this.list = undefined;
-		if(set_active_playlist && !g_avoid_playlist_displayed_switch) brw.setActivePlaylist(1);
+		if(this.playlist_on_next_populate>-1){
+			g_active_playlist = this.playlist_on_next_populate;
+			this.playlist_on_next_populate = -1;
+		} else if(set_active_playlist && !g_avoid_playlist_displayed_switch) brw.setActivePlaylist(1);
 		else g_avoid_playlist_displayed_switch = false;
 		
 		//gTime_covers = fb.CreateProfiler();			
@@ -6032,7 +6038,9 @@ var callback_items_removed=false;
 var callback_avoid_populate=false
 function on_playlist_items_added(playlist_idx) {
 	if(!callback_avoid_populate){	
+
 		if(window.IsVisible) brw.setActivePlaylist(4);	
+	console.log("on_playlist_items_added "+playlist_idx+" g_active_playlist "+g_active_playlist+ "pman.drop_done"+pman.drop_done)		
 		if(playlist_idx == g_active_playlist && !pman.drop_done) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
@@ -6776,6 +6784,7 @@ function on_drag_drop(action, x, y, mask) {
             action.Effect = 1;
 			plman.UndoBackup(g_active_playlist);
 			action.Playlist = g_active_playlist;
+			brw.playlist_on_next_populate = g_active_playlist;
             action.ToSelect = false;
 			g_avoid_playlist_displayed_switch = true;
 			action.Base = g_dragndrop_total_before;
@@ -6799,6 +6808,7 @@ function on_drag_drop(action, x, y, mask) {
 				action.Effect = 1;
 				plman.UndoBackup(g_active_playlist);
 				action.Playlist = g_active_playlist;
+				brw.playlist_on_next_populate = g_active_playlist;
 				action.ToSelect = false;
 				g_avoid_playlist_displayed_switch = true;				
 				action.Base = g_dragndrop_trackId;
