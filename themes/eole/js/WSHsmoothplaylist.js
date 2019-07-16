@@ -3285,7 +3285,6 @@ oBrowser = function(name) {
 			}		
 			try{
 				if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
-					//console.log("eho"+this.groups[this.rows[this.activeRow+1].albumId].group_height_fix)
 					this.activeRow = Math.ceil((y - this.groups[this.rows[this.activeRow+1].albumId].group_height_fix + scroll_ - this.y) / properties.rowHeight - 1);
 				}
 			} catch(e){}
@@ -6038,9 +6037,7 @@ var callback_items_removed=false;
 var callback_avoid_populate=false
 function on_playlist_items_added(playlist_idx) {
 	if(!callback_avoid_populate){	
-
-		if(window.IsVisible) brw.setActivePlaylist(4);	
-	console.log("on_playlist_items_added "+playlist_idx+" g_active_playlist "+g_active_playlist+ "pman.drop_done"+pman.drop_done)		
+		if(window.IsVisible) brw.setActivePlaylist(4);		
 		if(playlist_idx == g_active_playlist && !pman.drop_done) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
