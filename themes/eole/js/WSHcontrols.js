@@ -330,7 +330,7 @@ function get_colors(){
 		colors.slidersOff=GetGrey(30,32); 		
 		colors.ellipse_inner=GetGrey(255);
 		colors.line_top_light = GetGrey(255,20)		
-		colors.line_top_dark = GetGrey(200);
+		colors.line_top_dark = GetGrey(215);
 		colors.line_bottom = GetGrey(40,200);		
 		colors.dotted_progress = GetGrey(0);
 	}

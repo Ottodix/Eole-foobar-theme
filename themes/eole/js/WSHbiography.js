@@ -3190,7 +3190,7 @@ function Images() {
         if (!ppt.text_only && cur_img) gr.DrawImage(cur_img, xa, ya, cur_img.Width, cur_img.Height, 0, 0, cur_img.Width, cur_img.Height, 0, alpha);
 		if (!this.bar.show) return;
 		
-		imgbar_metrics(ya+cur_img.Height);
+		if (!ppt.text_only && cur_img) imgbar_metrics(ya+cur_img.Height);
 		
 		if (ppt.text_only || !(ppt.cycPhoto && ppt.artistView && artImages.length > 1) && !(this.cycCov && !ppt.artistView && covers.length > 2 && !p.alb_ix)) return;
 		const prog = this.bar.dn ? s.clamp(p.m_x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? (ix+(this.dots_seekbar?0.5:1)) / artImages.length :  i_x / (covers.length - 1)) * this.bar.w1;

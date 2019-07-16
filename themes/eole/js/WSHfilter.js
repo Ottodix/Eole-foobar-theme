@@ -10,7 +10,6 @@ var g_genre_cache=false;
 var Update_Required_function="";
 var browser_refresh_required=false;
 var playing_track_playcount = 0;
-var draw_right_line = false;
 var cur_btn_down = false;
 var g_avoid_on_library_items_added=false;
 var g_avoid_on_library_items_removed=false;	
@@ -495,12 +494,12 @@ oPlaylistManager = function(name) {
             gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, colors.pm_overlay);
 			
 			//Shadows
-			gr.FillGradRect(cx,this.y-gradient_size,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,0)
-			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,1.0)
+			gr.FillGradRect(cx,this.y-gradient_size,ww-(brw.draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,0)
+			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(brw.draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,1.0)
 			//Main BG
 			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, colors.pm_bg);
-			gr.FillSolidRect(cx, this.y, ww-(draw_right_line?1:0), 1, colors.pm_border);
-			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(draw_right_line?1:0), 1, colors.pm_border);			
+			gr.FillSolidRect(cx, this.y, ww-(brw.draw_right_line?1:0), 1, colors.pm_border);
+			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(brw.draw_right_line?1:0), 1, colors.pm_border);			
             
             // ** items **
             var rowIdx = 0;
@@ -1015,7 +1014,7 @@ oTagSwitcherBar = function() {
 		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);			
 		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_off.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts3);
@@ -1023,7 +1022,7 @@ oTagSwitcherBar = function() {
 		this.hide_bt_off.ReleaseGraphics(gb);
 		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_ov.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.normal_txt, 0, xpts3);
@@ -1057,7 +1056,7 @@ oTagSwitcherBar = function() {
 		
 		// draw background part above playlist (headerbar)
 		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
-		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((draw_right_line)?1:0), 1, colors.headerbar_line);
+		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((brw.draw_right_line)?1:0), 1, colors.headerbar_line);
 		
 		//Calculate text size
 		total_txt_size = 0
@@ -1065,7 +1064,7 @@ oTagSwitcherBar = function() {
 			this.items_width[i] = gr.CalcTextWidth(this.items_txt[i],g_font.min1);
 			total_txt_size += this.items_width[i];
 		}
-		var txt_padding_sides = Math.round(((this.w-(this.margin_left)*2-this.margin_right-((draw_right_line)?1:0)-((properties.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
+		var txt_padding_sides = Math.round(((this.w-(this.margin_left)*2-this.margin_right-((brw.draw_right_line)?1:0)-((properties.showFiltersTogglerBtn)?this.hide_bt.w:0))-total_txt_size)/(this.items_txt.length));
 		var tx = this.x + this.margin_left;
 
 		//Draw texts
@@ -2495,6 +2494,9 @@ oBrowser = function(name) {
 							}
 							// background selection
 							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
+								
+								this.groups[i].selected = true;
+								
 								txt_color1 = colors.normal_txt;
 								txt_color2 = colors.faded_txt;														
 								
@@ -2521,13 +2523,13 @@ oBrowser = function(name) {
 									else
 										gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);								
 									//top
-									if(i!=0){
-										gr.FillSolidRect(ax, ay, aw-colors.track_gradient_size-colors.padding_gradient-(draw_right_line?1:0), 1, colors.selected_item_line);	
+									if(i!=0 && this.groups[i-1].selected != true){
+										gr.FillSolidRect(ax, ay, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);	
 										if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);		
 									}							
 									//bottom
-
-									gr.FillSolidRect(ax, ay+ah-1, aw-colors.track_gradient_size-colors.padding_gradient-(draw_right_line?1:0), 1, colors.selected_item_line);		
+								
+									gr.FillSolidRect(ax, ay+ah-1, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);		
 									if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
 								} else if(properties.displayMode == 1)	{
 									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);																
@@ -2536,6 +2538,7 @@ oBrowser = function(name) {
 												
 											
 							} else {
+								this.groups[i].selected = false;
 								txt_color1 = colors.normal_txt;
 								txt_color2 = colors.faded_txt;
 							};

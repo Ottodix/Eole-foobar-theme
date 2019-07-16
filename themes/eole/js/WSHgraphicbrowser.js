@@ -3817,10 +3817,10 @@ oScrollbar = function(parentObjectName) {
     
     this.setSize = function(x, y, whover, h, wnormal) {
 		this.x = x;
-		this.y = y + (brw.headerBarHeight-g_headerbar.white_space);
+		this.y = y + (brw.headerBarHeight-(properties.CoverGridNoText?0:g_headerbar.white_space));
 		this.w = cScrollBar.activeWidth;
 		this.wnormal = wnormal;		
-		this.h = h - (brw.headerBarHeight-g_headerbar.white_space);
+		this.h = h - (brw.headerBarHeight-(properties.CoverGridNoText?0:g_headerbar.white_space));
 		// scrollbar area for the cursor (<=> scrollbar height minus up & down buttons height)
 		this.area_y = this.y;
 		this.area_h = this.h;

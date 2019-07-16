@@ -66,7 +66,7 @@ timers = {
 };
 
 var Update_Required_function = "";
-var draw_right_line = false;
+var draw_right_line = true;
 String.prototype.trim = function() {
     return this.replace(/^\s+|[\n\s]+$/g, "");
 }
@@ -134,7 +134,7 @@ oTagSwitcherBar = function() {
 		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);			
 		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_off.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.inactive_txt, 0, xpts3);
@@ -142,7 +142,7 @@ oTagSwitcherBar = function() {
 		this.hide_bt_off.ReleaseGraphics(gb);
 		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_ov.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.normal_txt, 0, xpts3);
@@ -3187,7 +3187,8 @@ function searchLibrary() {
         e = Math.min(Math.max(e, 0), p.s_txt.length);
         cx = Math.min(Math.max(cx, 0), p.s_txt.length);
         gr.FillSolidRect(0, this.y, ui.w, p.s_sp, colors.headerbar_bg);
-        gr.DrawLine(0, this.y+p.s_sp, ui.w, this.y+p.s_sp, 1,colors.headerbar_line);
+       // gr.DrawLine(0, this.y+p.s_sp, ww -((draw_right_line)?2:1), this.y+p.s_sp, 1,colors.headerbar_line);
+		gr.FillSolidRect(0, this.y+p.s_sp, ww -((draw_right_line)?1:0), 1,colors.headerbar_line);
 		
         if (p.s_txt) {
             e = (e < p.s_txt.length) ? e : p.s_txt.length;

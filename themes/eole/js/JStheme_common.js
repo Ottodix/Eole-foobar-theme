@@ -439,7 +439,7 @@ function get_colors_global(){
 			colors.lightgrey_bg = GetGrey(255);
 			colors.alternate_row = GetGrey(0,0);
 			colors.selected_item_bg = GetGrey(0,0);	
-			colors.selected_item_line = GetGrey(0,36);		
+			colors.selected_item_line = GetGrey(0,37);		
 			colors.selected_item_line_off = GetGrey(0,0);
 			colors.track_gradient_size = 20;
 			colors.padding_gradient = 10;			
@@ -464,7 +464,7 @@ function get_colors_global(){
 		colors.highlight = RGB(255,175,050);
 
 		colors.headerbar_bg = GetGrey(255,240);		
-		colors.headerbar_line = GetGrey(215);
+		colors.headerbar_line = GetGrey(0,37);
 		
 		colors.scrollbar_normal_cursor = GetGrey(0,120);
 		colors.scrollbar_hover_cursor = GetGrey(0);

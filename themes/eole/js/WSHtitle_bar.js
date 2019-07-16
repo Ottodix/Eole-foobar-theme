@@ -287,7 +287,7 @@ function get_colors(){
 	
 		colors.search_line=GetGrey(0,49);
 		colors.search_reset_icon = GetGrey(0);		
-		colors.bottom_line =  GetGrey(210);	
+		colors.bottom_line =  colors.sidesline;	
 		colors.icons_folder = "";
 
 		colors.titlebar_btn_hover_bg = GetGrey(0,27);		

@@ -5227,7 +5227,7 @@ function get_colors() {
 			colors.fadedsmall_txt = GetGrey(125);			
 		}
 		
-		colors.grad_line = GetGrey(0,36);
+		colors.grad_line = GetGrey(0,37);
 		colors.grad_line_bg = GetGrey(255,0);	
 		colors.grad_line_selected = GetGrey(0,16);
 		colors.grad_line_bg_selected = GetGrey(255,0);
