@@ -1203,7 +1203,7 @@ oScrollbar = function(themed) {
         this.total = brw.rowsCount+properties.addedRows_end;
         this.rowh = properties.rowHeight;
         this.totalh = this.total * this.rowh+brw.PaddingTop*2+properties.margin_bottom;
-		console.log("brw.PaddingTop:"+brw.PaddingTop+" this.rowh:"+this.rowh);
+
         // set scrollbar visibility
         cScrollBar.visible = (this.totalh > brw.h +5 );
 
@@ -1213,13 +1213,11 @@ oScrollbar = function(themed) {
         if(this.total > 0) {
             this.cursorh = Math.round((brw.h / this.totalh) * this.areah);
             if(this.cursorh < cScrollBar.minCursorHeight) this.cursorh = cScrollBar.minCursorHeight;
-			console.log("this.cursorh:"+this.cursorh);
         } else {
             this.cursorh = cScrollBar.minCursorHeight;
         };
         // set cursor y pos
         this.setCursorY();
-		console.log("this.cursorh:"+this.cursorh+"  this.cursorw:"+this.cursorw)
         if(this.cursorh != prev_cursorh) this.setCursorButton();
     };
     
@@ -1566,8 +1564,6 @@ oBrowser = function(name) {
 		else if(properties.showGroupHeaders)
 			this.PaddingTop = 10;			
 		else this.PaddingTop = 7;
-		
-		console.log("setSize")
 		
         this.y = y+this.PaddingTop;
         this.w = w;
@@ -2130,7 +2126,6 @@ oBrowser = function(name) {
             };
         };
 		if((this.showNowPlaying_trigger || (!g_first_populate_done && properties.lockOnNowPlaying))) {
-			console.log("properties.lockOnNowPlaying "+properties.lockOnNowPlaying+" this.showNowPlaying_trigger "+this.showNowPlaying_trigger)
 			if(!g_first_populate_done) {
 				this.dontFlashNowPlaying = true;			
 				this.showNowPlaying_trigger = true;
@@ -4716,7 +4711,6 @@ function on_size() {
 		return;
     };
 	//if(g_resizing.isResizing()) {update_size = true;return;}
-	console.log('first_on_size:'+first_on_size+" g_first_populate_done:"+g_first_populate_done+" update_size:"+update_size);
 	if(window.IsVisible || first_on_size || !g_first_populate_done || update_size){
 		window.MinWidth = 1;
 		window.MinHeight = 1;
@@ -4725,7 +4719,7 @@ function on_size() {
 		if(properties.showwallpaper && window.IsVisible){
 			//g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		} else update_wallpaper = true;
-		console.log('on_size');
+		
 		brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
 		update_size = false;	
 		first_on_size = false;		
@@ -6221,7 +6215,6 @@ function on_metadb_changed(metadbs, fromhook) {
 						plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
 					};
 				} else {
-					//console.log(" Count:"+metadbs.Count+" lenght:"+metadbs[0].Length)
 					brw.populate(is_first_populate = false,14, false);
 				};
 			};
@@ -6595,8 +6588,7 @@ function on_notify_data(name, info) {
 			break;	
 		case "cover_cache_finalized": 
 			//g_image_cache.cachelist = cloneImgs(info);
-			//console.log("smoothplaylist image_cache size: "+info.length);
-			window.Repaint();
+			//window.Repaint();
 		break;	
 		case "WSH_panels_reload":
 			window.Reload();
