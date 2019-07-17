@@ -1203,6 +1203,7 @@ oScrollbar = function(themed) {
         this.total = brw.rowsCount+properties.addedRows_end;
         this.rowh = properties.rowHeight;
         this.totalh = this.total * this.rowh+brw.PaddingTop*2+properties.margin_bottom;
+		console.log("brw.PaddingTop:"+brw.PaddingTop+" this.rowh:"+this.rowh);
         // set scrollbar visibility
         cScrollBar.visible = (this.totalh > brw.h +5 );
 
@@ -1212,11 +1213,13 @@ oScrollbar = function(themed) {
         if(this.total > 0) {
             this.cursorh = Math.round((brw.h / this.totalh) * this.areah);
             if(this.cursorh < cScrollBar.minCursorHeight) this.cursorh = cScrollBar.minCursorHeight;
+			console.log("this.cursorh:"+this.cursorh);
         } else {
             this.cursorh = cScrollBar.minCursorHeight;
         };
         // set cursor y pos
         this.setCursorY();
+		console.log("this.cursorh:"+this.cursorh+"  this.cursorw:"+this.cursorw)
         if(this.cursorh != prev_cursorh) this.setCursorButton();
     };
     
@@ -1563,6 +1566,8 @@ oBrowser = function(name) {
 		else if(properties.showGroupHeaders)
 			this.PaddingTop = 10;			
 		else this.PaddingTop = 7;
+		
+		console.log("setSize")
 		
         this.y = y+this.PaddingTop;
         this.w = w;
@@ -2135,6 +2140,7 @@ oBrowser = function(name) {
 				this.showNowPlaying_trigger = false;
 			}
 		}
+		if(first_on_size) on_size();			
         if(brw.rowsCount > 0) brw.gettags(true);
         this.scrollbar.updateScrollbar();
         this.repaint();
@@ -4710,6 +4716,7 @@ function on_size() {
 		return;
     };
 	//if(g_resizing.isResizing()) {update_size = true;return;}
+	console.log('first_on_size:'+first_on_size+" g_first_populate_done:"+g_first_populate_done+" update_size:"+update_size);
 	if(window.IsVisible || first_on_size || !g_first_populate_done || update_size){
 		window.MinWidth = 1;
 		window.MinHeight = 1;
@@ -4718,7 +4725,7 @@ function on_size() {
 		if(properties.showwallpaper && window.IsVisible){
 			//g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		} else update_wallpaper = true;
-		
+		console.log('on_size');
 		brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
 		update_size = false;	
 		first_on_size = false;		
