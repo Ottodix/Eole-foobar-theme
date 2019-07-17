@@ -2811,7 +2811,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
 			brw.groups[albumIndex].load_requested = 2;	
 			brw.repaint();
-		} catch(e){fb.ShowPopupMessage("albumIndex undefined "+albumIndex+" brw.groups.length:"+brw.groups.length, "Error");}	
+		} catch(e){fb.ShowPopupMessage("albumIndex undefined "+albumIndex+" brw.groups.length:"+brw.groups.length+"\n"+e, "Error");}	
 	}
 	//on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };

@@ -126,6 +126,7 @@ var properties_common = {
     enableFullScrollEffectOnFocusChange: false,
 	margin_bottom:0,
 	panelFontAdjustement: 0,
+	extraBottomRows: 1,
 	load_image_from_cache_direct:true,
 };
 var properties = {}
@@ -1955,12 +1956,11 @@ oBrowser = function(name) {
                 };
             };
 		};
-		
+
         this.rowsCount = r;
 		
         // update last group properties
         if(g > 0) this.groups[g-1].finalize(t, tr); 
-		
 		//Open group if there is only one group
 		if(brw.groups.length==1) this.groups[0].collapsed = false;
     };
@@ -3723,7 +3723,7 @@ oBrowser = function(name) {
                         this.dragndrop_check(x, y, i);
                     };
                     var rowId = fin - 1;
-                    var item_height_row = (this.rows[rowId].type == 0 ? 1 : properties.groupHeaderRowsNumber);
+                    var item_height_row = (this.rows[rowId].type == 0 ? 1 : properties.groupHeaderRowsNumber+1);
                     var limit = this.rows[rowId].y + (item_height_row * properties.rowHeight);
 					if(y<this.y+this.PaddingTop) {
 						rowId=0
@@ -3731,6 +3731,7 @@ oBrowser = function(name) {
                         g_dragndrop_rowId = rowId;						
 					}					
                     else if(y > limit || g_dragndrop_trackId==-1) {
+						console.log("g_dragndrop_bottom")
                         g_dragndrop_bottom = true;
                         g_dragndrop_trackId = this.rows[rowId].playlistTrackId;
                         g_dragndrop_rowId = rowId;
