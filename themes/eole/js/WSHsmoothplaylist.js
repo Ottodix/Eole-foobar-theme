@@ -1632,6 +1632,9 @@ oBrowser = function(name) {
                 if(this.nowplaying.IsValid) {
                     if(plman.PlayingPlaylist != g_active_playlist) {
 						if(!properties.lockOnPlaylistNamed=="") {
+							if(properties.enableAutoSwitchPlaylistMode) {
+								brw.setDisplayedPlaylistProperties(false);
+							}
 							return;
 						}
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
@@ -4120,7 +4123,12 @@ oBrowser = function(name) {
 			lockOnMenu.AppendTo(_menu, MF_STRING, "Displayed Playlist");
 			lockOnMenu.AppendMenuItem(MF_STRING, 3300, "Playing Playlist");		
 			lockOnMenu.AppendMenuItem(MF_STRING, 3299, "Active Playlist");		
-				
+			lockOnMenu.AppendMenuSeparator();
+			lockOnMenu.AppendMenuItem(MF_STRING, 3298, "Automatically switch back to Playing or Active playlist");	
+			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);	
+			lockOnMenu.AppendMenuItem(MF_STRING, 3297, "Playing playlist: display active playlist when nothing is played");	
+			lockOnMenu.CheckMenuItem(3297, properties.displayActiveOnPlaybackStopped);	
+			
 			var pl_count = plman.PlaylistCount;
 			if(pl_count > 1) {
 				lockOnMenu.AppendMenuItem(MF_SEPARATOR, 0, "");
@@ -4139,11 +4147,7 @@ oBrowser = function(name) {
 				lockOnMenu.CheckMenuItem(3299, !properties.lockOnNowPlaying);
 				lockOnMenu.CheckMenuItem(3300, properties.lockOnNowPlaying);
 			}
-			lockOnMenu.AppendMenuSeparator();
-			lockOnMenu.AppendMenuItem(MF_STRING, 3298, "Switch to Playing or Active depending on the layout");	
-			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);	
-			lockOnMenu.AppendMenuItem(MF_STRING, 3297, "Lock on playing playlist: display active instead when nothing is played");	
-			lockOnMenu.CheckMenuItem(3297, properties.displayActiveOnPlaybackStopped);	
+
 			
             _menu.AppendMenuItem(MF_STRING, 899, "Follow now playing");
 			_menu.CheckMenuItem(899, properties.FollowNowPlaying);
