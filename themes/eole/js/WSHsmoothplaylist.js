@@ -4152,7 +4152,7 @@ oBrowser = function(name) {
 			
             _menu.AppendMenuItem(MF_STRING, 899, "Follow now playing");
 			_menu.CheckMenuItem(899, properties.FollowNowPlaying);
-            _menu.AppendMenuItem((fb.IsPlaying ? MF_STRING : MF_GRAYED | MF_DISABLED), 900, "Show now playing");
+            _menu.AppendMenuItem(((fb.IsPlaying && !(!properties.enableAutoSwitchPlaylistMode && properties.lockOnPlaylistNamed!="")) ? MF_STRING : MF_GRAYED | MF_DISABLED), 900, "Show now playing");
             _menu.AppendMenuItem(MF_STRING, 901, "Enable Drag'n'Drop to a playlist");		
 			_menu.CheckMenuItem(901, properties.DropInplaylist);
 			
