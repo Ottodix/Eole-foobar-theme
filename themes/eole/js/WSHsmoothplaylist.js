@@ -4136,7 +4136,8 @@ oBrowser = function(name) {
 			for(var i=0; i < pl_count; i++) {
 				if(i != this.playlist) {
 					playlist_name = plman.GetPlaylistName(i);
-					lockOnMenu.AppendMenuItem(MF_STRING, 3301 + i, plman.GetPlaylistName(i));
+					//count = plman.PlaylistItemCount(i);
+					lockOnMenu.AppendMenuItem(MF_STRING, 3301 + i, plman.GetPlaylistName(i));//+" ("+count+(count>1?" items)":" item)"));
 				};
 			};	
 			if(properties.lockOnPlaylistNamed!="") playlist_idx = check_playlist(properties.lockOnPlaylistNamed);
