@@ -2804,12 +2804,14 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			window.Repaint();     	
 		}		
 	} else if (typeof brw == "object" && albumIndex>=0) {
-		brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
-		brw.groups[albumIndex].is_fallback = true;
-		if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = brw.groups[albumIndex].cover_img;
-		g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
-		brw.groups[albumIndex].load_requested = 2;	
-		brw.repaint();
+		try {		
+			brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
+			brw.groups[albumIndex].is_fallback = true;
+			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = brw.groups[albumIndex].cover_img;
+			g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
+			brw.groups[albumIndex].load_requested = 2;	
+			brw.repaint();
+		} catch(e){}	
 	}
 	//on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };
