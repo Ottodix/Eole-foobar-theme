@@ -4126,7 +4126,7 @@ oBrowser = function(name) {
 			lockOnMenu.AppendMenuSeparator();
 			lockOnMenu.AppendMenuItem(MF_STRING, 3298, "Automatically switch back to Playing or Active playlist");	
 			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);	
-			lockOnMenu.AppendMenuItem(MF_STRING, 3297, "Playing playlist: display active playlist when nothing is played");	
+			lockOnMenu.AppendMenuItem(MF_STRING, 3297, "Playing playlist: display Active playlist when nothing is played");	
 			lockOnMenu.CheckMenuItem(3297, properties.displayActiveOnPlaybackStopped);	
 			
 			var pl_count = plman.PlaylistCount;
