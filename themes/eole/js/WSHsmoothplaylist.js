@@ -1628,7 +1628,9 @@ oBrowser = function(name) {
                 this.nowplaying = plman.GetPlayingItemLocation();
                 if(this.nowplaying.IsValid) {
                     if(plman.PlayingPlaylist != g_active_playlist) {
-						if(!properties.lockOnPlaylistNamed=="") return;
+						if(!properties.lockOnPlaylistNamed=="") {
+							return;
+						}
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
 						this.showNowPlaying_trigger = true;
 						this.populate(is_first_populate = true,21);
