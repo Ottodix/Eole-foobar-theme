@@ -11,8 +11,8 @@ var properties_big = {
     groupHeaderRowsNumberDouble: window.GetProperty("BIG:groupHeaderRowsNumberDouble", 1),	
     showHeaderBar: window.GetProperty("showHeaderBar", true),
 	showToolTip: window.GetProperty("BIG:showToolTip", true),
-    expandBySingleClick: window.GetProperty("BIG:expandBySingleClick", true),	
 	darklayout: window.GetProperty("BIG:darklayout", false),		
+    expandBySingleClick: window.GetProperty("BIG:expandBySingleClick", true),	
     minimode_dark_theme: window.GetProperty("BIG:minimode_dark_theme", true),	
     library_dark_theme: window.GetProperty("BIG:library_dark_theme", false),
     screensaver_dark_theme: window.GetProperty("BIG:screensaver_dark_theme", false),		
@@ -1628,6 +1628,7 @@ oBrowser = function(name) {
                 this.nowplaying = plman.GetPlayingItemLocation();
                 if(this.nowplaying.IsValid) {
                     if(plman.PlayingPlaylist != g_active_playlist) {
+						if(!properties.lockOnPlaylistNamed=="") return;
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;						
 						this.showNowPlaying_trigger = true;
 						this.populate(is_first_populate = true,21);
@@ -1820,7 +1821,11 @@ oBrowser = function(name) {
 				setOneProperty("lockOnNowPlaying",new_properties_lockOnNowPlaying);
 				if(!(this.source_idx == plman.PlayingPlaylist && properties.lockOnNowPlaying) && !(this.source_idx == plman.ActivePlaylist && !properties.lockOnNowPlaying)) brw.populate(true,17);					
 			}					
-		} else if(call_setAllProperties) setAllProperties();
+		} else {
+			if(call_setAllProperties) setAllProperties();
+			changed = brw.setActivePlaylist(2);
+			if(changed) brw.populate(true,71, false);			
+		}
 	};
     this.init_groups = function() {
 		var handle = null;
@@ -2116,6 +2121,7 @@ oBrowser = function(name) {
             };
         };
 		if((this.showNowPlaying_trigger || (!g_first_populate_done && properties.lockOnNowPlaying))) {
+			console.log("properties.lockOnNowPlaying "+properties.lockOnNowPlaying+" this.showNowPlaying_trigger "+this.showNowPlaying_trigger)
 			if(!g_first_populate_done) {
 				this.dontFlashNowPlaying = true;			
 				this.showNowPlaying_trigger = true;
@@ -6480,7 +6486,6 @@ function on_notify_data(name, info) {
 			brw.refreshThumbnails(); 
 			if(layout_state.isEqual(0) && window.IsVisible) window.NotifyOthers("playlist_height",window.Height);		
 			if(layout_state.isEqual(1) && g_active_playlist==plman.PlayingPlaylist){
-				//if(g_active_playlist==plman.PlayingPlaylist) brw.showNowPlaying_trigger = true;
 				brw.showNowPlaying(false);
 			}
 		break; 
@@ -6548,7 +6553,7 @@ function on_notify_data(name, info) {
 				setOneProperty("autocollapse",false);
 			}				
 			if(!properties.showGroupHeaders) brw.collapseAll(false);
-			brw.populate(is_first_populate = false,21);
+			brw.populate(is_first_populate = false,22);
 			window.Repaint();
 			break;
 		case "doubletrackline":
@@ -6596,7 +6601,7 @@ function on_drag_leave() {
 	cScrollBar.timerID1 && window.ClearInterval(cScrollBar.timerID1);
 	cScrollBar.timerID1 = false;		
     if(g_dragndrop_drop_forbidden) {
-		fb.ShowPopupMessage("The current playlist is an autoplaylist: you can't reorder tracks in an autoplaylist.", "Error");
+		//fb.ShowPopupMessage("The current playlist is an autoplaylist: you can't reorder tracks in an autoplaylist.", "Error");
         g_dragndrop_drop_forbidden = false;
         window.Repaint();
     };
