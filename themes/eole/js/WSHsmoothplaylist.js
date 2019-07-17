@@ -44,7 +44,7 @@ var properties_big = {
 	circleMode: window.GetProperty("BIG:circleMode", false),		
 	showSettingsMenu: window.GetProperty("BIG:showSettingsMenu", true),
 	enableAutoSwitchPlaylistMode: window.GetProperty("BIG:enableAutoSwitchPlaylistMode", true),
-	displayActiveOnPlaybackStopped: window.GetProperty("BIG:displayActiveOnPlaybackStopped", true),	
+	displayActiveOnPlaybackStopped: window.GetProperty("BIG:displayActiveOnPlaybackStopped", false),	
     showGroupHeaders: window.GetProperty("BIG:showGroupHeaders", true),
     autocollapse: window.GetProperty("BIG:autocollapse", false),
     addedRows_end_default: window.GetProperty("BIG:addedRows_end_default", 1),
