@@ -44,6 +44,7 @@ var properties_big = {
 	circleMode: window.GetProperty("BIG:circleMode", false),		
 	showSettingsMenu: window.GetProperty("BIG:showSettingsMenu", true),
 	enableAutoSwitchPlaylistMode: window.GetProperty("BIG:enableAutoSwitchPlaylistMode", true),
+	displayActiveOnPlaybackStopped: window.GetProperty("BIG:displayActiveOnPlaybackStopped", true),	
     showGroupHeaders: window.GetProperty("BIG:showGroupHeaders", true),
     autocollapse: window.GetProperty("BIG:autocollapse", false),
     addedRows_end_default: window.GetProperty("BIG:addedRows_end_default", 1),
@@ -94,6 +95,7 @@ var properties_mini = {
 	circleMode: window.GetProperty("MINI:circleMode", false),		
 	showSettingsMenu: window.GetProperty("MINI:showSettingsMenu", true),
 	enableAutoSwitchPlaylistMode: window.GetProperty("MINI:enableAutoSwitchPlaylistMode", false),
+	displayActiveOnPlaybackStopped: window.GetProperty("MINI:displayActiveOnPlaybackStopped", true),		
     showGroupHeaders: window.GetProperty("MINI:showGroupHeaders", false),
     autocollapse: window.GetProperty("MINI:autocollapse", false),
     addedRows_end_default: window.GetProperty("MINI:addedRows_end_default", 2),	
@@ -1794,7 +1796,7 @@ oBrowser = function(name) {
 			}
 		}
 		else if(fb.IsPlaying && properties.lockOnNowPlaying) g_active_playlist_new = plman.PlayingPlaylist;
-		else if(properties.lockOnNowPlaying) g_active_playlist_new = -1
+		else if(properties.lockOnNowPlaying && !properties.displayActiveOnPlaybackStopped) g_active_playlist_new = -1;
 		else g_active_playlist_new = plman.ActivePlaylist;
 		
 		if(g_active_playlist!=g_active_playlist_new) changed = true;
@@ -4139,6 +4141,8 @@ oBrowser = function(name) {
 			lockOnMenu.AppendMenuSeparator();
 			lockOnMenu.AppendMenuItem(MF_STRING, 3298, "Switch to Playing or Active depending on the layout");	
 			lockOnMenu.CheckMenuItem(3298, properties.enableAutoSwitchPlaylistMode);	
+			lockOnMenu.AppendMenuItem(MF_STRING, 3297, "Lock on playing playlist: display active instead when nothing is played");	
+			lockOnMenu.CheckMenuItem(3297, properties.displayActiveOnPlaybackStopped);	
 			
             _menu.AppendMenuItem(MF_STRING, 899, "Follow now playing");
 			_menu.CheckMenuItem(899, properties.FollowNowPlaying);
@@ -4444,14 +4448,22 @@ oBrowser = function(name) {
 					break;						
 				case (idx == 2033):
 					rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+					break;				
+				case (idx == 3297):	
+					setOneProperty("displayActiveOnPlaybackStopped",!properties.displayActiveOnPlaybackStopped, true);
+					if(properties.displayActiveOnPlaybackStopped && !fb.IsPlaying){	
+						brw.populate(true,4);	
+					}
 					break;						
 				case (idx == 3298):	
 					setOneProperty("enableAutoSwitchPlaylistMode",!properties.enableAutoSwitchPlaylistMode, true);
-					if(filters_panel_state.isMaximumValue()) setOneProperty("lockOnNowPlaying",false);
-					else setOneProperty("lockOnNowPlaying",true);
-					setOneProperty("lockOnPlaylistNamed","");				
-					brw.populate(true,4);	
-					break;		
+					if(properties.enableAutoSwitchPlaylistMode){
+						if(filters_panel_state.isMaximumValue()) setOneProperty("lockOnNowPlaying",false);
+						else setOneProperty("lockOnNowPlaying",true);
+						setOneProperty("lockOnPlaylistNamed","");				
+						brw.populate(true,4);	
+					}
+					break;	
 				case (idx == 3299):	
 					setOneProperty("lockOnNowPlaying",false);	
 					setOneProperty("lockOnPlaylistNamed","");
