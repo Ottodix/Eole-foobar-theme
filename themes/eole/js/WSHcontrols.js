@@ -855,7 +855,7 @@ function is_hover_title(x,y){
 	if(!fb.IsPlaying) return false;
     if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+g_panel.get_fullTitle_length() && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
     else {
-		g_tooltip.Deactivate();
+		//g_tooltip.Deactivate();
 		return false;    
 	}
 }
@@ -926,7 +926,7 @@ function on_mouse_lbtn_up(x,y,m){
 	//Progress
     if (g_length_progress > 0 && progress_vars.drag) {
         fb.PlaybackTime = g_length_progress * g_pos_progress / ww_progress;
-		g_tooltip.Deactivate(); 
+		if(!is_hover_progress(x,y)) g_tooltip.Deactivate(); 
         //on_mouse_move(x, y);
     }
     progress_vars.drag = false;  
@@ -1023,8 +1023,16 @@ function on_mouse_move(x,y,m){
 			repaint_progress = true;            
 			progress_vars.height=progress_vars.height_hover;calculate_progress_ellipse_vars(true);repaint = true;
 		}				 
-           
+		if ((x != g_tooltip.x || y != g_tooltip.y) && !progress_vars.drag ){//&& g_tooltip.getActiveZone()!="progress") {         	
+			t = g_length_progress * m_pos_progress / ww_progress;
+			h = Math.floor(t / 3600);
+			m = Math.floor((t -= h * 3600) / 60);
+			s = Math.floor(t -= m * 60);
+			new_text = (h > 0 ? h + ":" + (m < 10 ? "0" + m : m) : m) + ":" + (s < 10 ? "0" + s : s);            
+			g_tooltip.Activate(new_text, Math.min(Math.max(x-17,progress_margin_left),progress_margin_left+ww_progress), progress_margin_top-35, 0, false, 'progress');          
+		} 	  
 	} else if(hooverprogress && !progress_vars.drag){
+		if(g_tooltip.getActiveZone()=="progress") g_tooltip.Deactivate();
 		g_cursor.setCursor(IDC_ARROW,15);
 		ResetProgress();
 	}

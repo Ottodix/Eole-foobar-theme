@@ -619,6 +619,7 @@ oTooltip = function (varName) {
 	this.activated = false;
 	this.toolTipText = false;	
 	this.varName = varName;
+	this.followMouse = false;
 	this.x = -1;
 	this.y = -1;		
 	this.activeZone = '';
@@ -628,6 +629,9 @@ oTooltip = function (varName) {
 	this.getText = function () {
 		return this.tooltip.Text;
 	}
+	this.getActiveZone = function () {
+		return this.activeZone;
+	}	
     this.ActivateDelay = function(new_text, x, y, delay, maxWith, followMouse, activeZone) {
 		this.activeZone = activeZone;
 		if((!this.showTimer && !this.activated) || new_text!=this.tooltip.Text){
@@ -668,6 +672,7 @@ oTooltip = function (varName) {
     };
     this.Deactivate = function() {
 		this.activeZone = '';
+		this.followMouse = false;
 		if(this.activated){
 			this.tooltip.Deactivate();
 			this.activated = false;
@@ -677,6 +682,8 @@ oTooltip = function (varName) {
 			clearTimeout(this.showTimer);
 			this.showTimer = false;
 		}
+		this.x = -1;
+		this.y = -1;			
     };
     this.onMouse = function (state, x, y, m) {    
 		switch(state){
