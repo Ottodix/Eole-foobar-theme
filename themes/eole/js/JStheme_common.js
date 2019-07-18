@@ -2797,7 +2797,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
         return;
     }	
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
-	try {	
+	try {	 
 		if(isImage(result.image)) {
 			save_image_to_cache(result.image, albumIndex, cachekey);
 			if (typeof g_cover == "object") {
@@ -2817,7 +2817,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			}
 		}
 	} catch(e){
-		fb.ShowPopupMessage("albumIndex "+albumIndex+" brw.groups.length:"+brw.groups.length+" "+isImage(result.image)+"\n"+e, "Error");
+		/*fb.ShowPopupMessage("albumIndex "+albumIndex+" brw.groups.length:"+brw.groups.length+" "+isImage(result.image)+"\n"+e, "Error");
 		if (typeof brw == "object" && albumIndex>=0) {	
 			brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
 			brw.groups[albumIndex].is_fallback = true;
@@ -2825,7 +2825,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
 			brw.groups[albumIndex].load_requested = 2;	
 			brw.repaint();
-		}
+		}*/
 	}		
 	//on_get_album_art_done(metadb, albumIndex, result.image, result.path);
 };
