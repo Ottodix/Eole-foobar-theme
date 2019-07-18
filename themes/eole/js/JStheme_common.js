@@ -2804,16 +2804,20 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				g_cover.setArtwork(result.image,true,false);
 				window.Repaint();     	
 			}		
-		} else if (typeof brw == "object" && albumIndex>=0) {		
+		} else if (typeof brw == "object" && albumIndex>=0) {			
+			if(typeof brw.groups[albumIndex] == "undefined" || brw.groups[albumIndex].cachekey!= cachekey){
+				g_image_cache.addToCache(get_fallbackCover(metadb,undefined),cachekey);		
+			} else {
 				brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
 				brw.groups[albumIndex].is_fallback = true;
 				if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = brw.groups[albumIndex].cover_img;
 				g_image_cache.addToCache(brw.groups[albumIndex].cover_img,cachekey);		
-				brw.groups[albumIndex].load_requested = 2;	
+				brw.groups[albumIndex].load_requested = 2;
 				brw.repaint();
+			}
 		}
 	} catch(e){
-		fb.ShowPopupMessage("albumIndex "+albumIndex+" brw.groups.length:"+brw.groups.length+""+isImage(result.image)+"\n"+e, "Error");
+		fb.ShowPopupMessage("albumIndex "+albumIndex+" brw.groups.length:"+brw.groups.length+" "+isImage(result.image)+"\n"+e, "Error");
 		if (typeof brw == "object" && albumIndex>=0) {	
 			brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
 			brw.groups[albumIndex].is_fallback = true;
@@ -2955,7 +2959,7 @@ oImageCache = function () {
 						} catch(e){console.log("timers.coverLoad line 5151 failed")}			
 					} else { //if(this.cover_load_timer.length<20){
 						//this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
-							try{
+							try{							
 								get_albumArt_async(metadb,albumIndex, cachekey);
 							} catch(e){console.log("timers.coverLoad line 5157 failed")}								
 							//clearTimeout(g_image_cache.cover_load_timer[g_image_cache.cover_load_timer.length-1]);

@@ -4257,6 +4257,7 @@ oBrowser = function(name) {
 				}
 								
                 this.groups[i] = {};
+				this.groups_draw.push(i);
                 this.groups[i].trackIndex = k;
 				this.groups[i].tracktype = TrackType(this.list[k].RawPath.substring(0, 4));
 				
@@ -4297,8 +4298,7 @@ oBrowser = function(name) {
                 this.groups[i].tid = -1;
 				this.groups[i].mask_applied=false;				
                 this.groups[i].idx = i; 				
-				this.groups_draw.push(i);
-				
+
 				if(k==0){
 					this.albumName = this.groups[i].album;
 					this.artistName = this.groups[i].artist;
