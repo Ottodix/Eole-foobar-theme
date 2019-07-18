@@ -1022,7 +1022,8 @@ function on_mouse_move(x,y,m){
 		if(!repaint_progress) {
 			repaint_progress = true;            
 			progress_vars.height=progress_vars.height_hover;calculate_progress_ellipse_vars(true);repaint = true;
-		}				 
+		}
+		if(g_tooltip.getActiveZone()=="track_title") g_tooltip.Deactivate();
 		if ((x != g_tooltip.x || y != g_tooltip.y) && !progress_vars.drag ){//&& g_tooltip.getActiveZone()!="progress") {         	
 			t = g_length_progress * m_pos_progress / ww_progress;
 			h = Math.floor(t / 3600);
