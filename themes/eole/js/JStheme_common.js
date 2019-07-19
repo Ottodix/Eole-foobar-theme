@@ -20,8 +20,8 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.2b23',
-	lastest_breaking_version: '1.2.2b16',	
+	theme_version: '1.2.2RC1',
+	lastest_breaking_version: '1.2.2RC1',	
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
