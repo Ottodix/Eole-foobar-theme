@@ -3634,9 +3634,11 @@ oBrowser = function(name) {
             _menu1.AppendTo(_menu,MF_STRING, "Group by");
 			
             _menu2.AppendMenuItem(MF_STRING, 913, "Tag switcher bar");
-            _menu2.CheckMenuItem(913, properties.showTagSwitcherBar);			
-            _menu2.AppendMenuItem(MF_STRING, 914, "Hide menu button");
-            _menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);				
+            _menu2.CheckMenuItem(913, properties.showTagSwitcherBar);
+			if(main_panel_state.isEqual(0)){
+				_menu2.AppendMenuItem(MF_STRING, 914, "Hide menu button");
+				_menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);	
+			}			
             _menu2.AppendMenuItem(MF_STRING, 910, "Search bar");
             _menu2.CheckMenuItem(910, properties.showHeaderBar);
             _menu2.AppendMenuSeparator();			
@@ -5335,9 +5337,11 @@ function on_notify_data(name, info) {
 			libraryfilter_state.value=info;	
 		break;
 		case "showFiltersTogglerBtn":
-			properties.showFiltersTogglerBtn=info;	
-			window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
-			window.Repaint();
+			if(main_panel_state.isEqual(0) && properties.ParentName=="Library"){
+				properties.showFiltersTogglerBtn=info;	
+				window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
+				window.Repaint();
+			}
 		break;
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
