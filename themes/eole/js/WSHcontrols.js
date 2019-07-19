@@ -494,14 +494,14 @@ function build_buttons(){
 	
 	buttons = {
 		Prev: new SimpleButton(button_left_m, button_top_m, 41, 41, "Prev",false, function () {
-			fb.Prev();
+			fb_play_from_playing(-1) //fb.Prev();
 		},false,prev_img,prev_img_hover),
 		Pause: new SimpleButton(button_sep_value+button_left_m, button_top_m, 41, 41, "Play",false, function () {
 			if(!fb.IsPlaying) fb.Play();
 			else fb.Pause();
 		},false,play_img,play_img_hover),
 		Next: new SimpleButton(button_sep_value*2+button_left_m, button_top_m, 41, 41, "Next",false, function () {
-			fb.Next();
+			fb_play_from_playing(1) //fb.Next();
 		},false,next_img,next_img_hover)  	
 	} 
 	buttons_mini = {
@@ -509,14 +509,14 @@ function build_buttons(){
 			showVolumeSlider();
 		},false,mini_volume_img,mini_volume_img_hover),	*/	
 		Prev: new SimpleButton(-75-mini_btns.button_width-2, mini_btns.button_top_m, 21, 21, "Prev",false, function () {
-			fb.Prev();
+			fb_play_from_playing(-1) //fb.Prev();
 		},false,mini_prev_img,mini_prev_img_hover),
 		/*Pause: new SimpleButton(mini_btns.button_width*2+mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Playmini",false, function () {
 			if(!fb.IsPlaying) fb.Play();
 			else fb.Pause();
 		},false,mini_play_img,mini_play_img_hover),*/
 		Next: new SimpleButton(-75, mini_btns.button_top_m, 21, 21, "Next",false, function () {
-			fb.Next();
+			fb_play_from_playing(1) //fb.Next();
 		},false,mini_next_img,mini_next_img_hover)
 		
 	} 	
@@ -605,7 +605,7 @@ function build_buttons(){
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);				
 			} else if(plman.PlaybackOrder==1) {
 				plman.PlaybackOrder=2;
-			} else if(plman.PlaybackOrder==2) {
+			} else if(plman.PlaybackOrder==2 || plman.PlaybackOrder==4) {
 				plman.PlaybackOrder=0;		
 			} else {
 				plman.PlaybackOrder=1;					
@@ -3068,8 +3068,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.onDbleClick = function () {
 		if(this.fonDbleClick) {this.fonDbleClick();}
 		else {
-			this.fonDown && this.fonDown();
-			this.changeState(ButtonStates.down);					
+			this.onMouse('lbtn_up',x,y);				
 		}	
     }    
     this.onMouse = function (state,x,y) {    
@@ -3085,6 +3084,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 			break;
 			case 'dble_click':
 				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
 			break;
 		}
         

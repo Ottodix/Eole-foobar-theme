@@ -611,6 +611,31 @@ var SettingsPath = data_global_path+"\\"+theme_name+"-settings\\";
 if (!g_files.FolderExists(SettingsPath)) 
 g_files.CreateFolder(SettingsPath);
 
+// Foobar commands -------------------------------------------------------
+let playing_item_location = false;
+let playing_item_location_old_index = false;
+function fb_play_from_playing(offset){
+	var playing_item_location_old = playing_item_location;
+	playing_item_location = plman.GetPlayingItemLocation();
+	if (playing_item_location.IsValid) {
+		if(playing_item_location.PlaylistItemIndex+offset<0 || playing_item_location.PlaylistItemIndex+offset>=plman.PlaylistItemCount(playing_item_location.PlaylistIndex)) offset=0;
+		plman.FlushPlaybackQueue();							
+		plman.SetPlaylistFocusItem(playing_item_location.PlaylistIndex,playing_item_location.PlaylistItemIndex+offset);	
+		plman.AddPlaylistItemToPlaybackQueue(playing_item_location.PlaylistIndex, playing_item_location.PlaylistItemIndex+offset);
+		playing_item_location_old_index = playing_item_location.PlaylistItemIndex + offset;
+		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
+		else fb.Play();			
+	} else if(playing_item_location_old.IsValid){
+		if(playing_item_location_old_index+offset<0 || playing_item_location_old_index+offset<plman.PlaylistItemCount(playing_item_location_old.PlaylistIndex)) offset=0;
+		plman.FlushPlaybackQueue();						
+		playing_item_location_old.PlaylistItemIndex = Number(playing_item_location_old.PlaylistItemIndex);
+		plman.SetPlaylistFocusItem(playing_item_location_old.PlaylistIndex,playing_item_location_old_index+offset);	
+		plman.AddPlaylistItemToPlaybackQueue(playing_item_location_old.PlaylistIndex, playing_item_location_old_index+offset);
+		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
+		else fb.Play();			
+	}
+}
+
 // Tooltips ---------------------------------------------------------------
 oTooltip = function (varName) {
 	this.tooltip  = window.CreateTooltip();
