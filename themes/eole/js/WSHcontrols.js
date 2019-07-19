@@ -595,18 +595,21 @@ function build_buttons(){
 			Randomize=!Randomize		
 		},shuffle_img_active,shuffle_img_hover),
 		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat",false, function () {
+			
 			if(plman.PlaybackOrder==0 && !properties.playandrandom && properties.repeatRandom) {
 				properties.playandrandom = true;
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);
 			} else if(plman.PlaybackOrder==0) {
-				plman.PlaybackOrder=1;				
+				plman.PlaybackOrder=1;		
 				properties.playandrandom = false;
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);				
 			} else if(plman.PlaybackOrder==1) {
-				plman.PlaybackOrder=2;	
+				plman.PlaybackOrder=2;
 			} else if(plman.PlaybackOrder==2) {
-				plman.PlaybackOrder=0;					
-			}	
+				plman.PlaybackOrder=0;		
+			} else {
+				plman.PlaybackOrder=1;					
+			}
 			this.changeState(ButtonStates.hoverinactive);		
 		},false,repeat_img,repeat_img_hover),   		
 		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume",false, function () {
@@ -2945,7 +2948,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
         if (this.state == ButtonStates.hide || this.hide) return;
         b_img=this.N_img;
         if(this.text=="Repeat"){
-            if(plman.PlaybackOrder==1){
+            if(plman.PlaybackOrder==1 || plman.PlaybackOrder==4){
 				this.N_img=repeat_all;
 				this.H_img=repeat_all_hover;				
 			} else if(plman.PlaybackOrder==2) {
