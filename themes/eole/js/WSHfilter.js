@@ -2650,7 +2650,7 @@ oBrowser = function(name) {
 									if(properties.displayMode == 3) {
 										if(i == this.selectedIndex) {
 											if(properties.displayModeGridNoText)
-												gr.DrawRect(ax + Math.round((aw - im_w) / 2)+2, coverTop+2, im_w-4, coverWidth-4, 4, colors.gridselected_rect);//gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop, im_w, coverWidth,colors.gridselected_bg);
+												gr.DrawRect(ax + Math.round((aw - im_w) / 2)+2, coverTop+2, im_w-4, coverWidth-4, 4, colors.gridselected_rect);
 											else
 												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
 										} else if(!properties.displayModeGridNoText) gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
