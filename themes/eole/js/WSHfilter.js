@@ -2647,10 +2647,13 @@ oBrowser = function(name) {
 										if(!properties.circleMode || properties.displayMode != 1) gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 									};
 									// grid text background rect
-									if(properties.displayMode == 3 && !properties.displayModeGridNoText) {
+									if(properties.displayMode == 3) {
 										if(i == this.selectedIndex) {
-											gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
-										} else gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
+											if(properties.displayModeGridNoText)
+												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop, im_w, coverWidth,colors.gridselected_bg);
+											else
+												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
+										} else if(!properties.displayModeGridNoText) gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
 									};									
 								} else {
 									var im_w = coverWidth;
