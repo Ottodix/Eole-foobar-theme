@@ -2650,7 +2650,7 @@ oBrowser = function(name) {
 									if(properties.displayMode == 3) {
 										if(i == this.selectedIndex) {
 											if(properties.displayModeGridNoText)
-												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop, im_w, coverWidth,colors.gridselected_bg);
+												gr.DrawRect(ax + Math.round((aw - im_w) / 2)+2, coverTop+2, im_w-4, coverWidth-4, 4, colors.gridselected_rect);//gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop, im_w, coverWidth,colors.gridselected_bg);
 											else
 												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
 										} else if(!properties.displayModeGridNoText) gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
@@ -4716,7 +4716,8 @@ function get_colors() {
 		colors.grid_bg = GetGrey(200,190)		
 		colors.gridselected_txt = GetGrey(0)	
 		colors.gridselected_bg = GetGrey(255,155)	
-
+		colors.gridselected_rect = GetGrey(255,245)	
+		
 		colors.btn_inactive_opacity = 130;
 		colors.btn_inactive_txt = GetGrey(140);	
 		
@@ -4730,6 +4731,7 @@ function get_colors() {
 		colors.grid_bg = GetGrey(0,190)		
 		colors.gridselected_txt = GetGrey(0)	
 		colors.gridselected_bg = GetGrey(255,155)		
+		colors.gridselected_rect = GetGrey(255,245)
 		
 		colors.btn_inactive_opacity = 110;
 		colors.btn_inactive_txt = colors.faded_txt;	
