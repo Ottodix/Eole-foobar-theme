@@ -621,30 +621,44 @@ g_files.CreateFolder(SettingsPath);
 // Foobar commands -------------------------------------------------------
 let playing_item_location = false;
 let playing_item_location_old_index = false;
+let ignore_playback_queue = false;
+let timer_ignore_queue = false;
 function fb_play_from_playing(offset){
 	var playing_item_location_old = playing_item_location;
 	playing_item_location = plman.GetPlayingItemLocation();
 	let queue_content = plman.GetPlaybackQueueHandles();
-	if(offset>0 && offset<=queue_content.Count){
+	if(offset>0 && offset<=queue_content.Count && !ignore_playback_queue){
 		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
 		else fb.Play();		
 	} else if (playing_item_location.IsValid) {
 		if(playing_item_location.PlaylistItemIndex+offset<0) offset=0; //|| playing_item_location.PlaylistItemIndex+offset>=plman.PlaylistItemCount(playing_item_location.PlaylistIndex)) offset=0;
-		plman.FlushPlaybackQueue();
+		plman.FlushPlaybackQueue();	
 		if(offset>0) offset += queue_content.Count;
 		plman.SetPlaylistFocusItem(playing_item_location.PlaylistIndex,playing_item_location.PlaylistItemIndex+offset);	
 		plman.AddPlaylistItemToPlaybackQueue(playing_item_location.PlaylistIndex, playing_item_location.PlaylistItemIndex+offset);
 		playing_item_location_old_index = playing_item_location.PlaylistItemIndex + offset;
 		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
-		else fb.Play();			
-	} else if(playing_item_location_old.IsValid){
+		else fb.Play();	
+		ignore_playback_queue = true;
+		timer_ignore_queue = setTimeout(function(){
+			ignore_playback_queue = false;
+			clearTimeout(timer_ignore_queue);
+			timer_ignore_queue = false;
+		},150);			
+	} else if(playing_item_location_old.IsValid){	
 		if(playing_item_location_old_index+offset<0) offset=0; //|| playing_item_location_old_index+offset>=plman.PlaylistItemCount(playing_item_location_old.PlaylistIndex)) offset=0;
 		plman.FlushPlaybackQueue();						
 		playing_item_location_old.PlaylistItemIndex = Number(playing_item_location_old.PlaylistItemIndex);
 		plman.SetPlaylistFocusItem(playing_item_location_old.PlaylistIndex,playing_item_location_old_index+offset);	
 		plman.AddPlaylistItemToPlaybackQueue(playing_item_location_old.PlaylistIndex, playing_item_location_old_index+offset);
 		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
-		else fb.Play();			
+		else fb.Play();	
+		ignore_playback_queue = true;
+		timer_ignore_queue = setTimeout(function(){
+			ignore_playback_queue = false;
+			clearTimeout(timer_ignore_queue);
+			timer_ignore_queue = false;
+		},150);			
 	} else if(offset<0){
 		fb.Prev();
 	} else {
