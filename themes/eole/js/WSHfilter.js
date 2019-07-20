@@ -779,7 +779,7 @@ oFilterBox = function() {
 			gb.DrawEllipse(w-8, 2.8, 7, 7.2, 1, colors.full_txt);
 			gb.SetSmoothingMode(0);
 		this.images.search_icon.ReleaseGraphics(gb);*/
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter current items");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -805,7 +805,7 @@ oFilterBox = function() {
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
+        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt", "Reset filter");
 	};
 	//this.getImages();
     
@@ -1027,7 +1027,7 @@ oTagSwitcherBar = function() {
 			gb.FillPolygon(colors.normal_txt, 0, xpts3);
 			gb.FillPolygon(colors.normal_txt, 0, xpts4);			
 		this.hide_bt_ov.ReleaseGraphics(gb);		
-		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
+		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide this menu");
 	}	
     this.getImages = function() {
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
@@ -3382,7 +3382,7 @@ oBrowser = function(name) {
 						if(g_tooltip.activeZone!=this.activeIndex && g_tooltip.activeZone>-1){
 							g_tooltip.Deactivate();
 						}
-					} else if(g_tooltip.activeZone!=this.activeIndex){
+					} else if(g_tooltip.activeZone!=this.activeIndex && !isNaN(g_tooltip.getActiveZone())){
 							g_tooltip.Deactivate();
 					}
 				} else if(g_tooltip.activeZone>-1){

@@ -2379,7 +2379,7 @@ function TrackType(trkpath) {
 //}}
 
 //=================================================// Buttons objects
-button = function (normal, hover, down, name) {
+button = function (normal, hover, down, name, tooltip_text) {
     this.img = Array(normal, hover, down, down);
     this.w = this.img[0].Width;
     this.h = this.img[0].Height;
@@ -2387,7 +2387,9 @@ button = function (normal, hover, down, name) {
     this.hide = false;	
 	this.active = true;
 	this.cursor = IDC_ARROW;
-	this.name = name
+	this.name = name;
+	this.tooltip_text = tooltip_text ? tooltip_text : '';	
+	this.tooltip_activated = false;	
     this.update = function (normal, hover, down) {
         this.img = Array(normal, hover, down, down);
         this.w = this.img[0].Width;
@@ -2413,7 +2415,7 @@ button = function (normal, hover, down, name) {
 			this.cursor = IDC_ARROW;
 		}			
         return old_state;
-    }    	
+    };    	
     this.checkstate = function (event, x, y) {
         this.ishover = (x > this.x && x < this.x + this.w - 1 && y > this.y && y < this.y + this.h - 1);
         this.old = this.state;
@@ -2428,6 +2430,10 @@ button = function (normal, hover, down, name) {
 				this.isdown = true;
                 break;
             };
+			if(this.tooltip_activated){
+				this.tooltip_activated = false;
+				g_tooltip.Deactivate();
+			}						
             break;
          case "up":
             this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
@@ -2442,9 +2448,20 @@ button = function (normal, hover, down, name) {
                 this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
                 break;
             };
+			if(this.state == ButtonStates.hover && this.tooltip_text!='' && g_tooltip.activeZone != this.name){
+				g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.name);
+				this.tooltip_activated = true;
+			} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.name){
+				this.tooltip_activated = false;
+				g_tooltip.Deactivate();
+			}			
             break;
          case "leave":
             this.state = this.isdown ? ButtonStates.down : ButtonStates.normal;
+			if(this.tooltip_activated){
+				this.tooltip_activated = false;
+				g_tooltip.Deactivate();
+			}			
             break;
          case "hover":
             break;			

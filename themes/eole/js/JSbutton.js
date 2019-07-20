@@ -1,4 +1,4 @@
-function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, H_img, btn_index, state, hover_color, hover_bar_bottom) {
+function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDbleClick, N_img, H_img, btn_index, state, hover_color, hover_bar_bottom) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
@@ -17,6 +17,7 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
     this.btn_index = btn_index; 
 	this.calculate_size = true;	
     this.hover_color = hover_color ? hover_color : false;
+    this.tooltip_text = tooltip_text ? tooltip_text : false;	
 	this.label_uppercase = '';
     this.hover_bar_bottom = hover_bar_bottom ? hover_bar_bottom : false;
     this.display_label = true;
@@ -199,6 +200,10 @@ function JSButton(x, y, w, h, label, name, fonDown, fonUp, fonDbleClick, N_img, 
 			break;
 			case 'rbtn_down':
 			break;		
+			case 'leave':
+			break;			
+			case 'move':
+			break;				
 		}
     }  
 }
@@ -214,6 +219,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 	this.g_down = false;
 	this.w = -1;
 	this.adaptCursor = adaptCursor;
+	this.tooltip_activated = false;
 	this.addButton = function(btn_object, btn_margins){
 		this.buttons[button_object.name] = {
 			obj : btn_object,
@@ -348,16 +354,24 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 					}						
 					window.Repaint();
 				}
-			
+				if(this.cur_btn && this.cur_btn.tooltip_text && g_tooltip.activeZone != this.cur_btn.name){
+					g_tooltip.ActivateDelay(this.cur_btn.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, this.cur_btn.name);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && (!this.cur_btn || g_tooltip.activeZone != this.cur_btn.name)){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
 			break;
             case "leave":
 				this.g_down = false;  
 				if (this.cur_btn) {
-					this.cur_btn.changeState(ButtonStates.normal);
-					this.cur_btn=null;   
+					this.cur_btn.changeState(ButtonStates.normal);  
+					this.cur_btn.onMouse("leave",x,y);		
+					this.cur_btn=null; 					
 					g_cursor.setCursor(IDC_ARROW,2);
 					window.Repaint();					
 				}			
+				g_tooltip.Deactivate();
 			break;
             case "lbtn_up":
 				this.g_down = false;
@@ -379,6 +393,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				if (this.cur_btn) {
 					this.g_down = true;	
 					this.cur_btn.onMouse('lbtn_down');
+					g_tooltip.Deactivate();
 					window.Repaint();
 				}	
 				return (this.cur_btn != null && typeof this.cur_btn === 'object');

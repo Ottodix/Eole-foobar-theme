@@ -381,6 +381,9 @@ function on_mouse_lbtn_dblclk(x, y) {
 			case (properties.dble_click_action==3):
 				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
 			break;				
+			case (properties.dble_click_action==4):
+				window.NotifyOthers('toggleLayoutMode',true);
+			break;			
 		}
 	} 
 }
@@ -1042,7 +1045,8 @@ function draw_settings_menu(x,y){
 		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");		
 		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");			
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");	
-		_dble_click_menu.CheckMenuRadioItem(3, 6, 3+properties.dble_click_action);				
+		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");		
+		_dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);				
 		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");    
 		_menu.AppendMenuSeparator();
 		
@@ -1079,7 +1083,11 @@ function draw_settings_menu(x,y){
             case (idx == 6):
 				properties.dble_click_action = 3;
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;						
+                break;	
+            case (idx == 7):
+				properties.dble_click_action = 4;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+                break;					
             default:
 				return true;
         }

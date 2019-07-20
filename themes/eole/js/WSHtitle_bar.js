@@ -463,45 +463,45 @@ function build_buttons(){
 	} else {
 		btn_initialized = true;
 		buttons = {	 
-			Library: new JSButton(btn.left_m+btn.margin*0, btn.top_m, btn.width, btn.height, "Library", "Library", function () {
+			Library: new JSButton(btn.left_m+btn.margin*0, btn.top_m, btn.width, btn.height, "Library", "Library", "", function () {
 				main_panel_state.setValue(0);
 				get_colors();g_searchbox.adapt_look_to_layout();
 			}, false,false,images.library_img,images.library_img,0, false, false, true),
-			Playlists: new JSButton(btn.left_m+btn.width+btn.margin*1, btn.top_m, btn.width, btn.height, "Playlists", "Playlists", function () {
+			Playlists: new JSButton(btn.left_m+btn.width+btn.margin*1, btn.top_m, btn.width, btn.height, "Playlists", "Playlists", "", function () {
 				main_panel_state.setValue(1);	
 				get_colors();g_searchbox.adapt_look_to_layout();
 			}, false,false,images.playlist_img,images.playlist_img,1, false, false, true),		
-			Artist_Bio: new JSButton(btn.left_m+btn.width+btn.width+btn.margin*2, btn.top_m, btn.width, btn.height, "Now playing", "Now playing", function () {
+			Artist_Bio: new JSButton(btn.left_m+btn.width+btn.width+btn.margin*2, btn.top_m, btn.width, btn.height, "Now playing", "Now playing", "", function () {
 				main_panel_state.setValue(2);
 				get_colors();g_searchbox.adapt_look_to_layout();		
 			}, false,false,images.artist_bio_img,images.artist_bio_img,2, false, false, true),  
-			Visualization: new JSButton(btn.left_m+btn.width+btn.width+btn.width+btn.margin*3, btn.top_m, btn.width, btn.height, "Visualization", "Visualization", function () {
+			Visualization: new JSButton(btn.left_m+btn.width+btn.width+btn.width+btn.margin*3, btn.top_m, btn.width, btn.height, "Visualization", "Visualization", "", function () {
 				main_panel_state.setValue(3);
 				get_colors();g_searchbox.adapt_look_to_layout();	
 			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true),
-			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", function () {
+			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right playlist", function () {
 				toggleNowPlayingState();
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
-			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", function () {
+			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
 				Lightswitch();
 			}, false, false,images.lightswitch_img,images.lightswitch_img,-1, false, false, true),	
-			Fullscreen: new JSButton(-112, btn.top_m, btn.width_small_btns, btn.height, "", "fullscreen", function () {
+			Fullscreen: new JSButton(-112, btn.top_m, btn.width_small_btns, btn.height, "", "fullscreen", "Fullscreen", function () {
 				g_uihacks.toggleFullscreen();   
 			}, false,false,images.fullscreen_img,images.fullscreen_img,-1, false, false, true),					
-			Idle: new JSButton(-74, btn.top_m, btn.width_small_btns, btn.height, "", "idle", function () {
+			Idle: new JSButton(-74, btn.top_m, btn.width_small_btns, btn.height, "", "idle", "Show idle screen", function () {
 				screensaver_state.setValue(1);g_panel.on_size_changed();
 			}, false,false,images.idle_img,images.idle_img,-1, false, false, true),				
-			ShowSearch: new JSButton(-150, btn.top_m, btn.width_small_btns, btn.height, "", "search", function () {
+			ShowSearch: new JSButton(-150, btn.top_m, btn.width_small_btns, btn.height, "", "search", "Show search input", function () {
 				toggleSearch();
 				g_cursor.setCursor(IDC_ARROW,2);					
 			}, false,false,images.search_toggle_img,images.search_toggle_img,-1, false, false, true),				
-			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", function () {
+			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", "Main menu", function () {
 				draw_main_menu(0, 28);
 			}, false,false,images.global_settings_img,images.global_settings_img,-1, false, false, false),
-			Close: new JSButton(-45, 0, 45, 29, "", "close", false, function () { 
+			Close: new JSButton(-45, 0, 45, 29, "", "close", "", false, function () { 
 				fb.Exit();      
 			},false,images.nowplaying_on_hover_icon,images.nowplaying_on_hover_icon_hover,-1,false,RGB(232,17,35),true),
-			Max: new JSButton(-90, 0, 45, 29, "", "max", false, function () {
+			Max: new JSButton(-90, 0, 45, 29, "", "max", "Maximize / Main player", false, function () {
 				if(layout_state.isEqual(1)){
 					toggleLayoutMode();get_colors();g_searchbox.adapt_look_to_layout();
 					this.changeState(ButtonStates.normal);
@@ -512,10 +512,10 @@ function build_buttons(){
 						g_uihacks.setMainWindowState(WindowState.Normal);
 				}		
 			},false,images.max_icon,images.max_icon,-1,false,colors.titlebar_btn_hover_bg,true),	
-			Mini: new JSButton(-135, 0, 45, 29, "", "mini", false, function () {
+			Mini: new JSButton(-135, 0, 45, 29, "", "mini", "Mini player", false, function () {
 				toggleLayoutMode();get_colors();g_searchbox.adapt_look_to_layout();
 			},false,images.mini_icon,images.mini_icon,-1,false,colors.titlebar_btn_hover_bg,true),			
-			Reduce: new JSButton(-180, 0, 45, 29, "", "reduce", false, function () {
+			Reduce: new JSButton(-180, 0, 45, 29, "", "reduce", "", false, function () {
 				g_uihacks.setMainWindowState(WindowState.Minimized);
 			},false,images.reduce_icon,images.reduce_icon,-1,false,colors.titlebar_btn_hover_bg,true)		
 		}
@@ -1950,6 +1950,9 @@ function on_focus(is_focused) {
 }
 function on_notify_data(name, info) {
     switch(name) {	
+		case "toggleLayoutMode":
+			toggleLayoutMode();get_colors();g_searchbox.adapt_look_to_layout();
+		break;
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
 			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
@@ -2576,6 +2579,7 @@ function on_init(){
 		g_searchbox.on_size();		
 	});	
 	g_cursor = new oCursor();	
+	g_tooltip = new oTooltip();		
     g_searchbox = new oSearch();
 	g_searchHistory = new searchHistory;
 	g_searchHistory.readSearchHistoryIni();

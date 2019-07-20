@@ -394,7 +394,7 @@ oFilterBox = function() {
 		else icon_theme_subfolder = "";				
 		
 		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");		
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter those tracks");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -421,7 +421,7 @@ oFilterBox = function() {
         this.images.resetIcon_dn.ReleaseGraphics(gb);
                 
         if(typeof(this.reset_bt) == "undefined") {
-            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
+            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt", "Reset filter");
         } else {
             this.reset_bt.img[0] = this.images.resetIcon_off;
             this.reset_bt.img[1] = this.images.resetIcon_ov;
@@ -1342,13 +1342,13 @@ oShowList = function(parentPanelName) {
 	this.genre = '';
 	this.cursor = IDC_ARROW;
 	this.links = {
-		album : new SimpleButton(0, 0, 0, 0, "albumLink", function () {
+		album : new SimpleButton(0, 0, 0, 0, "albumLink", "Show this album", function () {
 			quickSearch(g_showlist.pl[0],"album");
 		},false,false,false,ButtonStates.normal,255),		
-		artist : new SimpleButton(0, 0, 0, 0, "artistLink", function () {
+		artist : new SimpleButton(0, 0, 0, 0, "artistLink", "Show all of this artist", function () {
 			quickSearch(g_showlist.pl[0],"artist");
 		},false,false,false,ButtonStates.normal,255),
-		genre : new SimpleButton(0, 0, 0, 0, "genreLink", function () {
+		genre : new SimpleButton(0, 0, 0, 0, "genreLink", "Show all of this genre", function () {
 			quickSearch(g_showlist.pl[0],"genre");
 		},false,false,false,ButtonStates.normal,255),		
 	}
@@ -1520,7 +1520,7 @@ oShowList = function(parentPanelName) {
 			this.closeTracklist_ov.ReleaseGraphics(gb);
 					
 			if(typeof(this.close_bt) == "undefined") {
-				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov,"showlist_close");
+				this.close_bt = new button(this.closeTracklist_off, this.closeTracklist_ov, this.closeTracklist_ov,"showlist_close","Close tracklist");
 			} else {
 				this.close_bt.img[0] = this.closeTracklist_off;
 				this.close_bt.img[1] = this.closeTracklist_ov;
@@ -1587,7 +1587,7 @@ oShowList = function(parentPanelName) {
 			this.prevColumn_ov.ReleaseGraphics(gb);
 
 			if(typeof(this.prev_bt) == "undefined") {
-				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov,"showlist_prev");
+				this.prev_bt = new button(this.prevColumn_off, this.prevColumn_ov, this.prevColumn_ov,"showlist_prev","Show previous tracks");
 			} else {
 				this.prev_bt.img[0] = this.prevColumn_off;
 				this.prev_bt.img[1] = this.prevColumn_ov;
@@ -1595,7 +1595,7 @@ oShowList = function(parentPanelName) {
 			}
 
 			if(typeof(this.next_bt) == "undefined") {
-				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov,"showlist_next");
+				this.next_bt = new button(this.nextColumn_off, this.nextColumn_ov, this.nextColumn_ov,"showlist_next","Show next tracks");
 			} else {
 				this.next_bt.img[0] = this.nextColumn_off;
 				this.next_bt.img[1] = this.nextColumn_ov;
@@ -1645,10 +1645,12 @@ oShowList = function(parentPanelName) {
 				for (var i in this.links) {
 					if (this.links[i].containXY(x, y) && this.links[i].state != ButtonStates.hide && !this.links[i].hide) {
 						this.links[i].changeState(ButtonStates.hover);
+						this.links[i].onMouse('move',x,y);
 						if(!this.isHoverLink) brw.repaint();
 						this.isHoverLink = true;						
 					} else {
 						this.links[i].changeState(ButtonStates.normal);
+						this.links[i].onMouse('leave',-1,-1);
 						if(this.isHoverLink) brw.repaint();
 					}
 				}
@@ -2433,7 +2435,7 @@ oHeaderBar = function(name) {
 			gb.FillPolygon(colors.normal_txt, 0, xpts2);			
 		this.hide_bt_ov.ReleaseGraphics(gb);	
 		if(typeof(this.hide_filters_bt) == "undefined") {
-			this.hide_filters_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
+			this.hide_filters_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide left menu");
 		} else {
 			this.hide_filters_bt.img[0] = this.hide_bt_off;
 			this.hide_filters_bt.img[1] = this.hide_bt_ov;
@@ -2463,7 +2465,7 @@ oHeaderBar = function(name) {
 		this.full_library_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.FullLibraryButton) == "undefined") {
-			this.FullLibraryButton = new button(this.full_library_off, this.full_library_hover, this.full_library_off,"fulllibrary");
+			this.FullLibraryButton = new button(this.full_library_off, this.full_library_hover, this.full_library_off,"fulllibrary","Show whole library");
 		} else {
 			this.FullLibraryButton.img[0] = this.full_library_off;
 			this.FullLibraryButton.img[1] = this.full_library_hover;
@@ -2527,11 +2529,11 @@ oHeaderBar = function(name) {
 		
 		if(typeof(this.GridModeButton) == "undefined") {
 			if(properties.CoverGridNoText)
-				this.GridModeButton = new button(this.grid_mode_on, this.grid_mode_on_hover, this.grid_mode_on,"gridmode");					
+				this.GridModeButton = new button(this.grid_mode_on, this.grid_mode_on_hover, this.grid_mode_on,"gridmode","Display mode");					
 			else if(properties.circleMode)
-				this.GridModeButton = new button(this.grid_mode_off, this.grid_mode_off_hover, this.grid_mode_off,"gridmode"); 
+				this.GridModeButton = new button(this.grid_mode_off, this.grid_mode_off_hover, this.grid_mode_off,"gridmode","Display mode"); 
 			else
-				this.GridModeButton = new button(this.grid_mode_off_circle, this.grid_mode_off_circle_hover, this.grid_mode_off_circle,"gridmode");	
+				this.GridModeButton = new button(this.grid_mode_off_circle, this.grid_mode_off_circle_hover, this.grid_mode_off_circle,"gridmode","Display mode");	
 		} else {
 			if(properties.CoverGridNoText){
 				this.GridModeButton.img[0] = this.grid_mode_on;
@@ -2575,7 +2577,7 @@ oHeaderBar = function(name) {
 		this.settings_hover.ReleaseGraphics(gb);
 				
 		if(typeof(this.SettingsButton) == "undefined") {
-			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off,"settings_bt");
+			this.SettingsButton = new button(this.settings_off, this.settings_hover, this.settings_off,"settings_bt","Settings...");
 		} else {
 			this.SettingsButton.img[0] = this.settings_off;
 			this.SettingsButton.img[1] = this.settings_hover;
@@ -5426,7 +5428,7 @@ oBrowser = function(name) {
         this.ResizeButton_hover.ReleaseGraphics(gb);
                 
         if(typeof(this.resize_bt) == "undefined") {
-            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover,"resize_bt");
+            this.resize_bt = new button(this.ResizeButton_off, this.ResizeButton_hover, this.ResizeButton_hover,"resize_bt","Resize covers");
         } else {
             this.resize_bt.img[0] = this.ResizeButton_off;
             this.resize_bt.img[1] = this.ResizeButton_hover;
@@ -5601,7 +5603,7 @@ function toggleLibraryFilterState(){
 	g_history.saveCurrent();
 	window.Repaint();
 }
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
+function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
@@ -5613,9 +5615,11 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.N_img = N_img;
     this.H_img = H_img;  
 	this.opacity = opacity;
-	this.cursor = IDC_ARROW;
+	this.cursor = IDC_ARROW;	
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
+	this.tooltip_activated = false;
+    this.tooltip_text = tooltip_text;
 	
 	this.setPosition = function(x,y,w,h){
 		this.x = x;
@@ -5672,6 +5676,38 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+			break;				
+			case 'lbtn_up':
+				this.fonUp && this.fonUp();
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
+					this.changeState(ButtonStates.hover);
+				}
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
+			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
+					g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
+		}
+    }  		
 }
 // ===================================================== Cover Images =====================================================
 function on_get_album_art_done(metadb, art_id, image, image_path) {

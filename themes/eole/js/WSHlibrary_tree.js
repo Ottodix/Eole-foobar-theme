@@ -148,7 +148,7 @@ oTagSwitcherBar = function() {
 			gb.FillPolygon(colors.normal_txt, 0, xpts3);
 			gb.FillPolygon(colors.normal_txt, 0, xpts4);			
 		this.hide_bt_ov.ReleaseGraphics(gb);		
-		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters");
+		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide this menu");
 	}		
     this.getImages = function() {
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
@@ -4766,7 +4766,7 @@ function get_images() {
 		gb.SetSmoothingMode(0);
 	images.resetIcon_dn.ReleaseGraphics(gb);
 
-	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn,"reset_bt");
+	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn,"reset_bt", "Reset filter");
 };
 function on_notify_data(name, info) {
     switch(name) {						

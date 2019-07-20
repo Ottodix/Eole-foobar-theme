@@ -493,30 +493,35 @@ function build_buttons(){
 	nb_of_buttons_right+= (properties.displayOpen)?1:0;	
 	
 	buttons = {
-		Prev: new SimpleButton(button_left_m, button_top_m, 41, 41, "Prev",false, function () {
+		Prev: new SimpleButton(button_left_m, button_top_m, 41, 41, "Prev", "Previous track" ,false, function () {
 			fb_play_from_playing(-1) //fb.Prev();
+			g_tooltip.Deactivate();
 		},false,prev_img,prev_img_hover),
-		Pause: new SimpleButton(button_sep_value+button_left_m, button_top_m, 41, 41, "Play",false, function () {
+		Pause: new SimpleButton(button_sep_value+button_left_m, button_top_m, 41, 41, "Play", "Play / pause",false, function () {
 			if(!fb.IsPlaying) fb.Play();
 			else fb.Pause();
+			g_tooltip.Deactivate();
 		},false,play_img,play_img_hover),
-		Next: new SimpleButton(button_sep_value*2+button_left_m, button_top_m, 41, 41, "Next",false, function () {
+		Next: new SimpleButton(button_sep_value*2+button_left_m, button_top_m, 41, 41, "Next", "Next track",false, function () {
 			fb_play_from_playing(1) //fb.Next();
+			g_tooltip.Deactivate();
 		},false,next_img,next_img_hover)  	
 	} 
 	buttons_mini = {
-		/*Volume: new SimpleButton(mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Next",false, function () {
+		/*Volume: new SimpleButton(mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Next", "",false, function () {
 			showVolumeSlider();
 		},false,mini_volume_img,mini_volume_img_hover),	*/	
-		Prev: new SimpleButton(-75-mini_btns.button_width-2, mini_btns.button_top_m, 21, 21, "Prev",false, function () {
+		Prev: new SimpleButton(-75-mini_btns.button_width-2, mini_btns.button_top_m, 21, 21, "Prev", "Previous track",false, function () {
 			fb_play_from_playing(-1) //fb.Prev();
+			g_tooltip.Deactivate();
 		},false,mini_prev_img,mini_prev_img_hover),
-		/*Pause: new SimpleButton(mini_btns.button_width*2+mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Playmini",false, function () {
+		/*Pause: new SimpleButton(mini_btns.button_width*2+mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Playmini", "",false, function () {
 			if(!fb.IsPlaying) fb.Play();
 			else fb.Pause();
 		},false,mini_play_img,mini_play_img_hover),*/
-		Next: new SimpleButton(-75, mini_btns.button_top_m, 21, 21, "Next",false, function () {
+		Next: new SimpleButton(-75, mini_btns.button_top_m, 21, 21, "Next", "Next track",false, function () {
 			fb_play_from_playing(1) //fb.Next();
+			g_tooltip.Deactivate();
 		},false,mini_next_img,mini_next_img_hover)
 		
 	} 	
@@ -524,13 +529,16 @@ function build_buttons(){
 	else schedulerPosition = 2;
 	displayed_button = 0;
 	buttons_right = {	
-		More: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "More", function () {
-				moreMenu(window.Width, 15);  
+		More: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "More", "Additional controls...", function () {
+				moreMenu(window.Width, 15);
+				g_tooltip.Deactivate();				
 		},false,false,more_img,more_img_hover),	
-		Scheduler: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Scheduler", function () {
-				schedulerMenu(window.Width-button_right_m-(button_width+button_padding)*(nb_of_buttons_right-schedulerPosition)-152, 15);  
+		Scheduler: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Scheduler", "Stop / shutdown scheduler...", function () {
+				schedulerMenu(window.Width-button_right_m-(button_width+button_padding)*(nb_of_buttons_right-schedulerPosition)-152, 15); 
+				g_tooltip.Deactivate();
 		},false,false,shutdown_img,shutdown_img_hover), 	
-		Rating: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "",false, function () {
+		Rating: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Rating", "Rate current song", false, function () {
+			g_tooltip.Deactivate();
 			if(fb.IsPlaying) {
 				//draw_rating_menu(window.Width-button_right_m-(button_width+button_padding)*2+9, 15);  
 				g_rating = Number(g_rating);
@@ -566,16 +574,20 @@ function build_buttons(){
 				}, 300);					
 			}
 		},rating0_img,rating0_img_hover),	
-		Equalizer: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "",false, function () {
+		Equalizer: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Equalizer", "Show equalizer",false, function () {
+			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),		
-		Open: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Open",false, function () {
+		Open: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Open", "Open files...",false, function () {
+			g_tooltip.Deactivate();
 			fb.AddFiles()
 		},false,open_img,open_img_hover),				
-		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", function () {
-				randomPlayMenu(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);  
+		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", "Play randomly a selection of tracks...", function () {
+			g_tooltip.Deactivate();
+			randomPlayMenu(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);  
 		},false,false,random_img,random_img_hover),    		
-		Shuffle: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Shuffle",false, function () {
+		Shuffle: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Shuffle", "Shuffle on/off"+"\n"+"(double click to randomize playing playlist)",false, function () {
+			g_tooltip.Deactivate();
 			old_playback_order = plman.PlaybackOrder;		
 			if(plman.PlaybackOrder!=4 && plman.PlaybackOrder!=3 && plman.PlaybackOrder!=5 && plman.PlaybackOrder!=6) plman.PlaybackOrder=4;
 			else plman.PlaybackOrder=0;
@@ -593,7 +605,8 @@ function build_buttons(){
 			else plman.SortByFormat(plman.PlayingPlaylist,sort_by_album_artist);
 			Randomize=!Randomize		
 		},shuffle_img_active,shuffle_img_hover),
-		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat",false, function () {
+		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat", "Repeat mode",false, function () {
+			g_tooltip.Deactivate();
 			if(plman.PlaybackOrder==0 && !properties.playandrandom && properties.repeatRandom) {
 				properties.playandrandom = true;
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);
@@ -608,8 +621,10 @@ function build_buttons(){
 			} else {
 				plman.PlaybackOrder=1;					
 			}
+			g_tooltip.ActivateDelay(get_repeat_tooltip(), g_cursor.x+10, g_cursor.y+20, globalProperties.tooltip_delay, 1200, false, 'Repeat');
 		},false,repeat_img,repeat_img_hover),   		
-		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume",false, function () {
+		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume", "Volume (click to mute)",false, function () {
+			g_tooltip.Deactivate();
 			fb.VolumeMute();
 		},false,volume1_img,volume1_img_hover),
 	}	
@@ -853,9 +868,9 @@ function is_hover_progress(x,y){
 }
 function is_hover_title(x,y){
 	if(!fb.IsPlaying) return false;
-    if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+g_panel.get_fullTitle_length() && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
+    if(properties.showTrackInfo && y>=progress_margin_top - 30 && y<=progress_margin_top-30+17 && x>progress_margin_left && x<progress_margin_left+Math.min(ww_progress-timeInfo_length,g_panel.get_fullTitle_length()) && !hoovervolume && !(layout_state.isEqual(1) && VolumeSliderActive)) 	return true;
     else {
-		//g_tooltip.Deactivate();
+		if(g_tooltip.getActiveZone()=='track_title') g_tooltip.Deactivate();
 		return false;    
 	}
 }
@@ -1071,17 +1086,20 @@ function on_mouse_move(x,y,m){
 		cur_btn = chooseButton(x, y);
 		
 		if (old == cur_btn) {
-		   // if (btn_down) return;
+		   cur_btn && cur_btn.onMouse('move',x,y);
 		} else if (btn_down && cur_btn && cur_btn.state != ButtonStates.down) {
 			cur_btn.changeState(ButtonStates.down);
+			cur_btn.onMouse('move',x,y);
 			repaint = true;
 			return;
 		} else {        
 			if(old){
-				old.changeState(ButtonStates.normal);		
+				old.changeState(ButtonStates.normal);
+				old.onMouse('move',x,y);
 			}
 			if(cur_btn){
-				cur_btn.changeState(ButtonStates.hover);		
+				cur_btn.changeState(ButtonStates.hover);	
+				cur_btn.onMouse('move',x,y);
 			}
 			repaint = true;			
 		}
@@ -1099,6 +1117,7 @@ function on_mouse_leave() {
     btn_down = false;    
     if (cur_btn) {
         cur_btn.changeState(ButtonStates.normal);
+		cur_btn.onMouse('leave', -1, -1);
 		repaint=true;
         cur_btn=null;
     }	
@@ -1481,7 +1500,7 @@ function on_notify_data(name, info) {
 				window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);				
 				get_colors();
 			}			
-		break; 				
+		break; 			
 		case "colorsControls": 
 			globalProperties.colorsControls = info; 
 			window.SetProperty("GLOBAL colorsControls", globalProperties.colorsControls);
@@ -2913,7 +2932,7 @@ function draw_settings_menu(x,y){
 }
 // ===================================================== // Buttons standard function
 
-function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_img, state) {
+function SimpleButton(x, y, w, h, text, tooltip_text, fonDown, fonUp, fonDbleClick, N_img, H_img, state) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
@@ -2921,6 +2940,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.h = h;
     this.hide = false;	
     this.text = text;
+    this.tooltip_text = tooltip_text;	
     this.fonDown = fonDown;
     this.fonUp = fonUp;		
     this.fonDbleClick = fonDbleClick;
@@ -2928,6 +2948,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.H_img = H_img;   
     this.D_img = H_img; 
 	this.cursor = IDC_ARROW;
+	this.tooltip_activated = false;
     this.containXY = function (x, y) {
 		if(this.x<0) return (window.Width+this.x <= x) && (x <= window.Width + this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
@@ -3086,11 +3107,49 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
 				else this.onMouse('lbtn_up',x,y);
 			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
+					if(this.text=='Repeat'){
+						var tooltip_text = get_repeat_tooltip();
+					} else var tooltip_text = this.tooltip_text;
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
 		}
-        
     }  	
 }
-
+function get_repeat_tooltip(){
+	if(plman.PlaybackOrder==0 && properties.playandrandom) {
+		var tooltip_text = 'Play tracks of the same genre at the end of playlist';										
+	} else if(plman.PlaybackOrder==0){
+		var tooltip_text = 'Default order';		
+	} else if(plman.PlaybackOrder==1) {
+		var tooltip_text = 'Repeat all';			
+	} else if(plman.PlaybackOrder==2) {
+		var tooltip_text = 'Repeat current';									
+	} else if(plman.PlaybackOrder==3) {
+		var tooltip_text = 'Random';									
+	} else if(plman.PlaybackOrder==4) {
+		var tooltip_text = 'Random';		
+	} else if(plman.PlaybackOrder==5) {
+		var tooltip_text = 'Random';	
+	} else if(plman.PlaybackOrder==6) {
+		var tooltip_text = 'Random';								
+	} else {
+		var tooltip_text = this.tooltip_text;				
+	}	
+	return tooltip_text;
+}
 function drawAllButtons(gr) {
     for (var i in buttons) {
         buttons[i].draw(gr);
