@@ -3038,19 +3038,12 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 			case ButtonStates.normal:
 				b_img=this.N_img;
 				break;
-				
 			case ButtonStates.hover:
 				b_img=this.H_img;
 				break;
-
-			case ButtonStates.hoverinactive:
-				b_img=this.N_img;
-				break;
-
 			case ButtonStates.down:
 				b_img=this.D_img;       
 				break;
-				
 			case ButtonStates.hide:
 				return;
         }
