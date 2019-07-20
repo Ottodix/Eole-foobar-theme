@@ -2652,7 +2652,7 @@ oBrowser = function(name) {
 									};
 									// grid text background rect
 									if(properties.displayMode == 3) {
-										if(i == this.selectedIndex) {
+										if(i == this.selectedIndex || i == this.tempSelectedItem || i == this.activeIndex || g_rightClickedIndex == i) {
 											if(properties.displayModeGridNoText)
 												gr.DrawRect(ax + Math.round((aw - im_w) / 2)+2, coverTop+2, im_w-4, coverWidth-4, 4, colors.gridselected_rect);
 											else
