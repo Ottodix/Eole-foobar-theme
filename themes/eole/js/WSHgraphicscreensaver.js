@@ -6154,7 +6154,7 @@ function on_notify_data(name, info) {
 			window.Reload();
             break;		
 		case "hereIsGenreList":  
-			g_genre_cache=info;
+			g_genre_cache=JSON_parse(info);
 			break;	 
 		case "avoid_on_playlists_changed":  
 			g_avoid_on_playlists_changed=info;
