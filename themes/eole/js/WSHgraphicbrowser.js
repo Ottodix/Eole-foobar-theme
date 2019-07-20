@@ -1020,18 +1020,20 @@ oRow = function(metadb,itemIndex) {
 				
         gr.GdiDrawText(this.title_text, g_font.normal, g_showlist.colorSchemeText, (this.x + this.tracknumber_w + 10), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10), this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title_text, g_font.normal);
-		
 
 		if(properties.showPlaycount || properties.showCodec || properties.showBitrate){	
 			this.playcount_text = "  ("+this.playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
 			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10) - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);		
+		} else {
+			this.playcount_length = 0;
+			this.playcount_text = '';
 		}
 		
-		if(properties.showToolTip && (this.title_length + this.playcount_length) > (this.w - this.tracknumber_w - length_w - 10 - this.rating_length)) {
+		if(properties.showToolTip && (this.title_length + this.playcount_length) > (this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10))) {
 			this.showToolTip = true;
 			this.ToolTipText = this.title_text + this.playcount_text;
-		}
+		} else this.showToolTip = false;
 		
         gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 

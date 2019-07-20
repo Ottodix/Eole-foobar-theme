@@ -579,7 +579,6 @@ function build_buttons(){
 			old_playback_order = plman.PlaybackOrder;		
 			if(plman.PlaybackOrder!=4 && plman.PlaybackOrder!=3 && plman.PlaybackOrder!=5 && plman.PlaybackOrder!=6) plman.PlaybackOrder=4;
 			else plman.PlaybackOrder=0;
-			this.changeState(ButtonStates.hoverinactive);
 		}, function () {
 			plman.PlaybackOrder = old_playback_order;			
 			wait_for_randomization=true;
@@ -595,7 +594,6 @@ function build_buttons(){
 			Randomize=!Randomize		
 		},shuffle_img_active,shuffle_img_hover),
 		Repeat: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Repeat",false, function () {
-			
 			if(plman.PlaybackOrder==0 && !properties.playandrandom && properties.repeatRandom) {
 				properties.playandrandom = true;
 				window.SetProperty("GLOBAL play and random",properties.playandrandom);
@@ -610,7 +608,6 @@ function build_buttons(){
 			} else {
 				plman.PlaybackOrder=1;					
 			}
-			this.changeState(ButtonStates.hoverinactive);		
 		},false,repeat_img,repeat_img_hover),   		
 		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume",false, function () {
 			fb.VolumeMute();
@@ -911,8 +908,8 @@ function on_mouse_lbtn_down(x,y,m){
     }	
     btn_down = true;    
     if (cur_btn) {
-        cur_btn.changeState(ButtonStates.down);	
-		cur_btn.onMouse('lbtn_down',x,y);		
+        cur_btn.changeState(ButtonStates.down);
+		cur_btn.onMouse('lbtn_down',x,y);
 		down_btn = cur_btn;
         window.Repaint();
     }	
@@ -2925,7 +2922,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.N_img = N_img;
     this.H_img = H_img;   
     this.D_img = H_img; 
-    
+	this.cursor = IDC_ARROW;
     this.containXY = function (x, y) {
 		if(this.x<0) return (window.Width+this.x <= x) && (x <= window.Width + this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
         else return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
@@ -2933,8 +2930,13 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND,this.text);	
-		else g_cursor.setCursor(IDC_ARROW,16);					
+		if(this.state==ButtonStates.hover && this.cursor != IDC_HAND) {
+			g_cursor.setCursor(IDC_HAND,this.text);
+			this.cursor = IDC_HAND;
+		} else if(this.cursor != IDC_ARROW && this.state!=ButtonStates.hover && this.state!=ButtonStates.down){
+			g_cursor.setCursor(IDC_ARROW,26);	
+			this.cursor = IDC_ARROW;
+		}							
         return old_state;
     }    
     this.Togglehide = function () {
@@ -3078,7 +3080,7 @@ function SimpleButton(x, y, w, h, text, fonDown, fonUp, fonDbleClick, N_img, H_i
 			break;				
 			case 'lbtn_up':
 				this.fonUp && this.fonUp();
-				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide) {
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
 					this.changeState(ButtonStates.hover);
 				}
 			break;
