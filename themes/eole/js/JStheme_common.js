@@ -276,7 +276,7 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 	function ok_callback(status, mem_solicitation, covercache_max_width) {
 		panels_reload = false;
 		if(status!="cancel"){
-			if(covercache_max_width!=globalProperties.coverCacheWidthMax){			
+			if(covercache_max_width!=globalProperties.coverCacheWidthMax){
 				setCoverCacheMaxWidthGlobally(Number(covercache_max_width));
 				panels_reload = true;
 				globalProperties.deleteDiskCache = true;
@@ -284,7 +284,8 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 			}		
 			if(mem_solicitation>=0 && mem_solicitation<=3 && mem_solicitation!=globalProperties.mem_solicitation && status!="cancel") {
 				setMemoryUsageGlobally(Number(mem_solicitation));
-			} else if(panels_reload){
+			} 
+			if(panels_reload){
 				window.NotifyOthers("WSH_panels_reload",true);
 			}
 		}		
