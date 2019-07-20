@@ -4008,6 +4008,8 @@ oBrowser = function(name) {
 	this.cover_shadow_hover = null;
 	this.isPlayingIdx = -1;
 	this.dontRetractOnMouseUp = false;
+	this.avoidDlbePlay = false;
+	
 	if(properties.showheaderbar)	
 		this.headerBarHeight = (properties.CoverGridNoText?39:43);
 	else
@@ -5087,7 +5089,7 @@ oBrowser = function(name) {
 					if(g_dragA || g_dragR) this.stopDragging(x, y);					
                     this.repaint();
                 }			
-				else if(this.activeIndexFirstClick > -1 && (!properties.expandInPlace || this.groups_draw.length==1)){
+				else if(this.activeIndexFirstClick > -1 && (!properties.expandInPlace || this.groups_draw.length==1) && !this.avoidDlbePlay){
 					//if(this.activeIndex > -1 && (!properties.expandInPlace)){
 					/*plman.FlushPlaybackQueue();
 					if(!this.followActivePlaylist){
@@ -5101,18 +5103,20 @@ oBrowser = function(name) {
 					fb.Play();*/
 					this.dontRetractOnMouseUp = true;
 					this.on_mouse("lbtn_dblclk", x, y);
+					this.avoidDlbePlay = true;
 				}				
                 break;
             case "lbtn_dblclk":
                 var a = this.activeIndexFirstClick;
-                if(a > -1){
+                if(a > -1 && !this.avoidDlbePlay){
 					plman.FlushPlaybackQueue();
 					var PlaybackPlaylist = this.getPlaybackPlaylist();
 					if(!nowplayinglib_state.isActive() || this.SourcePlaylistIdx==plman.PlayingPlaylist){
 						if(!this.followActivePlaylist){
-							plman.ActivePlaylist = this.SourcePlaylistIdx;
-							plman.PlayingPlaylist = this.SourcePlaylistIdx;						
+							plman.ActivePlaylist = this.SourcePlaylistIdx;													
 						}
+						plman.ActivePlaylist = this.SourcePlaylistIdx;
+						plman.PlayingPlaylist = this.SourcePlaylistIdx;
 						plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups[this.groups_draw[a]].pl[0]);
 						if(fb.IsPaused) fb.Stop();
 						plman.FlushPlaybackQueue();
@@ -5125,6 +5129,12 @@ oBrowser = function(name) {
 						plman.ExecutePlaylistDefaultAction(PlaybackPlaylist,0);
 						fb.Stop();fb.Play();
 					}
+					this.avoidDlbePlay = true;
+					timers.showItem = setTimeout(function(brw){
+						brw.avoidDlbePlay = false;
+						clearTimeout(timers.showItem);
+						timers.showItem=false;
+					}, 300, this);   					
                     //fb.RunContextCommandWithMetadb("Add to playlist and play", this.groups[this.groups_draw[a]].pl);
                 }
                 /*
@@ -7298,6 +7308,7 @@ function on_notify_data(name, info) {
 			if(nowplayinglib_state.isActive()) {
 				g_resizing.resizing_right = true;
 				properties.showInLibrary = properties.showInLibrary_RightPlaylistOn;
+				brw.calculateSourcePlaylist();
 				/*selection_idx = brw.getSelectionPlaylist();
 				if(plman.ActivePlaylist!=selection_idx) {
 					plman.ActivePlaylist = selection_idx;		

@@ -849,7 +849,6 @@ oFilterBox = function() {
             this.reset_bt.draw(gr, bx+1, by+1, 255);
         } else {
 			this.search_bt.draw(gr, bx-1, by-2, 255);
-			//gr.DrawImage(this.images.search_icon, bx, by+Math.round(this.inputbox.h/2-this.images.search_icon.Height/2), this.images.search_icon.Width, this.images.search_icon.Height, 0, 0, this.images.search_icon.Width, this.images.search_icon.Height, 0, 255);
         };
 		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+5, by, 0, 0);
     };
