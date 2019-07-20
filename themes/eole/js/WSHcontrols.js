@@ -28,7 +28,7 @@ var properties = {
 	playandrandom: window.GetProperty("GLOBAL play and random",false),
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
 	panelFontAdjustement: -1,
-	repeatRandom: false,
+	repeatRandom: true,
 }
 
 scheduler = {	
@@ -1264,7 +1264,7 @@ function on_playback_stop(reason) {
 			scheduler_timer = setTimeout(function() {
 				playAndRandom_triggered = false;
 			}, 2000);				
-			if(!playAndRandom_triggered) play_random(properties.random_function, true);
+			if(!playAndRandom_triggered) play_random("same_genre", true, current_played_track);
 			playAndRandom_triggered = true;
 		} else {
 			g_wallpaperImg = null;

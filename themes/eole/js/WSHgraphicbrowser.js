@@ -1185,7 +1185,7 @@ oRow = function(metadb,itemIndex) {
 						
 						plman.ClearPlaylist(PlaybackPlaylist);
 						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.groups[g_showlist.idx].pl);
-						plman.PlayingPlaylist = PlaybackPlaylist;
+						plman.PlayingPlaylist = plman.ActivePlaylist = PlaybackPlaylist;
 						plman.SetPlaylistFocusItemByHandle(PlaybackPlaylist, this.metadb);
 						if(fb.IsPaused) fb.Stop();
 						plman.FlushPlaybackQueue();

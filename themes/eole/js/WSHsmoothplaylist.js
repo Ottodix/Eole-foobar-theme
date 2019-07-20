@@ -1535,6 +1535,7 @@ oBrowser = function(name) {
 	this.drawLeftLine = false;
 	this.followNowPlaying = false;
 	this.playlist_on_next_populate = -1;
+	this.rating_rowId = -1;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -2143,6 +2144,7 @@ oBrowser = function(name) {
         this.scrollbar.updateScrollbar();
         this.repaint();
         g_first_populate_done = true;
+		this.rating_rowId = -1;
 		//console.log("populate Smoothplaylist time:"+gTime_covers.Time);			
 		//this.list = undefined;
 		if(Update_Required_function.indexOf("brw.populate(false")!=-1) Update_Required_function="";
@@ -3451,7 +3453,7 @@ oBrowser = function(name) {
 					// update if new rating <> current track rating
 					if (this.rows[this.activeRow].tracktype < 2) {
 						g_rating_updated = true;
-						g_rating_rowId = this.activeRow;
+						this.rating_rowId = this.activeRow;
 						if(l_rating!=this.rows[this.activeRow].rating) this.rows[this.activeRow].rating = rateSong(l_rating,this.rows[this.activeRow].rating, this.rows[this.activeRow].metadb);
 					};			
 				}
@@ -3714,6 +3716,7 @@ oBrowser = function(name) {
                     this.scrollbar && this.scrollbar.on_mouse(event, 0, 0);
                 };
 				if(properties.showToolTip) g_tooltip.Deactivate();
+				this.on_mouse("move",-1,-1);
                 break;
             case "drag_over":
                 g_dragndrop_bottom = false;
@@ -4701,7 +4704,6 @@ var g_last = 0;
 var g_wallpaperImg = null;
 
 var g_rating_updated = false;
-var g_rating_rowId = -1;
 var g_image_cache = false;
 
 // START
@@ -6203,11 +6205,13 @@ function on_metadb_changed(metadbs, fromhook) {
 		if(g_rating_updated) { // no repopulate if tag update is from rating click action in playlist
 			g_rating_updated = false;
 			// update track tags info to avoid a full populate
-			if(g_rating_rowId > -1) {
-				brw.rows[g_rating_rowId].infosraw = properties.tf_track.EvalWithMetadb(brw.rows[g_rating_rowId].metadb);
-				brw.rows[g_rating_rowId].infos = brw.rows[g_rating_rowId].infosraw.split(" ^^ ");
-				g_rating_rowId = -1;
-				window.Repaint();
+			if(brw.rating_rowId > -1) {
+				try{
+					brw.rows[brw.rating_rowId].infosraw = properties.tf_track.EvalWithMetadb(brw.rows[brw.rating_rowId].metadb);
+					brw.rows[brw.rating_rowId].infos = brw.rows[brw.rating_rowId].infosraw.split(" ^^ ");
+					brw.rating_rowId = -1;
+					brw.repaint();
+				} catch(e){brw.rating_rowId = -1;}
 			};			
 		} else {
 			if(!(metadbs.Count == 1 && metadbs[0].Length < 0)) {
@@ -6229,10 +6233,10 @@ function on_metadb_changed(metadbs, fromhook) {
 		if(g_rating_updated) { // no repopulate if tag update is from rating click action in playlist
 			g_rating_updated = false;
 			// update track tags info to avoid a full populate
-			if(g_rating_rowId > -1) {
-				brw.rows[g_rating_rowId].infosraw = properties.tf_track.EvalWithMetadb(brw.rows[g_rating_rowId].metadb);
-				brw.rows[g_rating_rowId].infos = brw.rows[g_rating_rowId].infosraw.split(" ^^ ");
-				g_rating_rowId = -1;
+			if(brw.rating_rowId > -1) {
+				brw.rows[brw.rating_rowId].infosraw = properties.tf_track.EvalWithMetadb(brw.rows[brw.rating_rowId].metadb);
+				brw.rows[brw.rating_rowId].infos = brw.rows[brw.rating_rowId].infosraw.split(" ^^ ");
+				brw.rating_rowId = -1;
 				window.Repaint();
 			};			
 		} else {		

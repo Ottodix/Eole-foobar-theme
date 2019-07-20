@@ -1086,35 +1086,41 @@ function setPlaybackPlaylist(){
 			
 	}	
 }
-function sendandplayPlaybackPlaylist(items){
-
-		window.NotifyOthers("avoid_on_playlists_changed",true);			
-		var found_playingPlaylist = false;
-		var total = plman.PlaylistCount;
-		var pidx_selection = plman.PlayingPlaylist;
-		var pidx_playing = getPlaybackPlaylist();
-		if(pidx_playing>-1) {
-			plman.ClearPlaylist(pidx_playing);
-			plman.InsertPlaylistItems(pidx_playing, 0, items);
-			
-			plman.FlushPlaybackQueue();	
-			plman.PlayingPlaylist = pidx_playing;								
-			plman.SetPlaylistFocusItem(pidx_playing,0);	
+function sendandplayPlaybackPlaylist(items, play_metadb){
+	play_metadb = typeof play_metadb !== 'undefined' ? play_metadb : null;
+	window.NotifyOthers("avoid_on_playlists_changed",true);			
+	var found_playingPlaylist = false;
+	var total = plman.PlaylistCount;
+	var pidx_selection = plman.PlayingPlaylist;
+	var pidx_playing = getPlaybackPlaylist();
+	if(pidx_playing>-1) {
+		plman.ClearPlaylist(pidx_playing);
+		plman.InsertPlaylistItems(pidx_playing, 0, items);
+		
+		plman.FlushPlaybackQueue();	
+		plman.PlayingPlaylist = pidx_playing;		
+		if(play_metadb)		
+			plman.SetPlaylistFocusItem(pidx_playing, play_metadb);	
+		else
+			plman.SetPlaylistFocusItem(pidx_playing, 0);		
+		if(play_metadb)				
+			fb.RunContextCommandWithMetadb("Add to playback queue", play_metadb); 
+		else
 			plman.AddPlaylistItemToPlaybackQueue(pidx_playing, 0);
-			if(fb.IsPaused || fb.IsPlaying) fb.Next();	
-			else fb.Play();	
-			
-			//plman.MovePlaylist(pidx_playing, pidx_selection);
-			//plman.MovePlaylist(pidx_selection-1, pidx_playing);			
-		};
-		if(!setPlaybackPlaylist_timer) {
-			setPlaybackPlaylist_timer = setTimeout(function() {
-				window.NotifyOthers("avoid_on_playlists_changed",false);
-				//window.NotifyOthers("rePopulate",false);
-				setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
-				setPlaybackPlaylist_timer = false;
-			}, 125);
-		};			
+		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
+		else fb.Play();	
+		
+		//plman.MovePlaylist(pidx_playing, pidx_selection);
+		//plman.MovePlaylist(pidx_selection-1, pidx_playing);			
+	};
+	if(!setPlaybackPlaylist_timer) {
+		setPlaybackPlaylist_timer = setTimeout(function() {
+			window.NotifyOthers("avoid_on_playlists_changed",false);
+			//window.NotifyOthers("rePopulate",false);
+			setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
+			setPlaybackPlaylist_timer = false;
+		}, 125);
+	};			
 }
 function getPlaybackPlaylist(){
 	var total = plman.PlaylistCount;
@@ -2027,18 +2033,24 @@ function pickRandom(metadb_list, nb_of_items){
 	}	
 	return tracks_list;
 }
-function play_random(random_function, addAtTheEnd){
+function play_random(random_function, addAtTheEnd, current_played_track){
 	var random_function = typeof random_function !== 'undefined' ? random_function : '200_tracks';	
 	var addAtTheEnd = typeof addAtTheEnd !== 'undefined' ? addAtTheEnd : false;	
-
+	var current_played_track = typeof current_played_track !== 'undefined' ? current_played_track : false;	
+	
 	switch(random_function) {
 		case '20_albums':
 			var number_of_items = addAtTheEnd?1:25;
 			break;  	
 		case '1_genre':
+		case 'same_genre':		
 			var number_of_items = addAtTheEnd?25:0;
+			if(current_played_track)
+				var current_genre = g_genre_cache.tf_genre.EvalWithMetadb(current_played_track);
+			else random_function == '1_genre';
 			break;  	
 		case '1_artist':
+		case 'same_artist':		
 			var number_of_items = addAtTheEnd?25:0;
 			break;  	
 		case '200_tracks':
@@ -2066,6 +2078,7 @@ function play_random(random_function, addAtTheEnd){
 	}
     plman.PlayingPlaylist=playlist_index;	
 	if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
+
 	switch(random_function) {
 		case '20_albums':
 			var library_items = fb.GetLibraryItems();
@@ -2091,14 +2104,19 @@ function play_random(random_function, addAtTheEnd){
 			library_items = undefined;		
 			break;  	
 		case '1_genre':	
-			try{
-				var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
+		case 'same_genre':		
+			//try{console.log("-"+random_function)
+				if(random_function=="same_genre"){console.log("-"+random_function)
+					console.log(current_genre)
+					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+current_genre);					
+				} else
+					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
 				if(number_of_items>0) genre_item_list = pickRandom(genre_item_list, number_of_items)
 				else shuffleList(genre_item_list)
 				plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
 				plman.ExecutePlaylistDefaultAction(playlist_index,start_index);	
 				genre_item_list = undefined;		
-			} catch(e) {}					
+			//} catch(e) {}					
 			break; 		
 		case '1_artist':	
 			var library_items = fb.GetLibraryItems();
