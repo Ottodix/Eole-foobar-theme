@@ -844,7 +844,7 @@ function on_paint(gr) {
 
 }
 function on_playback_new_track(metadb){
-	setPlaybackPlaylist();
+	//setPlaybackPlaylist();
 	eval_caption_title(metadb);
 	if(properties.showwallpaper && properties.wallpapermode == 0) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);

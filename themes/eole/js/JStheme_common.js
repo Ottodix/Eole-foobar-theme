@@ -60,6 +60,12 @@ var globalProperties = {
 }	
 
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
+globalProperties.tf_genre = fb.TitleFormat("%genre%");
+globalProperties.tf_album = fb.TitleFormat("%album%");
+globalProperties.tf_date = fb.TitleFormat("%date%");
+globalProperties.tf_time = fb.TitleFormat("%time%");
+globalProperties.tf_artist = fb.TitleFormat("%artist%");
+globalProperties.tf_order = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");		
 globalProperties.coverCacheWidthMax = Math.max(50,Math.min(2000,Number(globalProperties.coverCacheWidthMax)));
 if(isNaN(globalProperties.coverCacheWidthMax)) globalProperties.coverCacheWidthMax = 200;
 globalProperties.thumbnailWidthMax = Math.max(50,globalProperties.coverCacheWidthMax);
@@ -1479,7 +1485,7 @@ function RGB2HSL(RGB_colour) {
 
 oGenreCache = function () {
     this.genreList = Array();
-	this.tf_genre = fb.TitleFormat("%genre%");
+	this.tf_genre = globalProperties.tf_genre;
     this.initialized = false;
     this.genreExist = function (genre) {		
 		for (var i = 0; i < this.genreList.length; i++) {
@@ -1934,13 +1940,12 @@ function quickSearch(start,search_function){
 		main_panel_state.setValue(0);
 	}
 	switch(search_function) {
-		case 'artist':
-			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
-			var arr = fb.TitleFormat("%artist%").EvalWithMetadb(start);	
+		case 'artist':	
+			var arr = globalProperties.tf_artist.EvalWithMetadb(start);	
 			try{			
 				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr));
 				if(artist_items.Count>0){
-					artist_items.OrderByFormat(tfo, 1);
+					artist_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(artist_items,false,false);
 				} else {
 					return false;
@@ -1948,13 +1953,12 @@ function quickSearch(start,search_function){
 				artist_items = undefined;
 			} catch(e) {return false;}
 			break;  	
-		case 'album':	
-			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
-			var arr = fb.TitleFormat("%album%").EvalWithMetadb(start);		
+		case 'album':		
+			var arr = globalProperties.tf_album.EvalWithMetadb(start);		
 			try{			
 				album_items = fb.GetQueryItems(fb.GetLibraryItems(), "%album% IS "+trim1(arr));
 				if(album_items.Count>0){				
-					album_items.OrderByFormat(tfo, 1);
+					album_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(album_items,false,false);
 				} else {
 					return false;
@@ -1962,13 +1966,12 @@ function quickSearch(start,search_function){
 				album_items = undefined;				
 			} catch(e) {return false;}			
 			break; 		
-		case 'genre':	
-			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
-			var arr = fb.TitleFormat("%genre%").EvalWithMetadb(start);		
+		case 'genre':		
+			var arr = globalProperties.tf_genre.EvalWithMetadb(start);		
 			try{			
 				genre_items = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+trim1(arr));
 				if(genre_items.Count>0){				
-					genre_items.OrderByFormat(tfo, 1);
+					genre_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(genre_items,false,false);
 				} else {
 					return false;
@@ -1976,13 +1979,12 @@ function quickSearch(start,search_function){
 				genre_items = undefined;				
 			} catch(e) {return false;}			
 			break; 	
-		case 'date':	
-			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
-			var arr = fb.TitleFormat("%date%").EvalWithMetadb(start);	
+		case 'date':		
+			var arr = globalProperties.tf_date.EvalWithMetadb(start);	
 			try{
 				date_items = fb.GetQueryItems(fb.GetLibraryItems(), "%date% IS "+trim1(arr));
 				if(date_items.Count>0){				
-					date_items.OrderByFormat(tfo, 1);
+					date_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(date_items,false,false);
 				} else {
 					return false;
@@ -1990,13 +1992,12 @@ function quickSearch(start,search_function){
 				date_items = undefined;				
 			} catch(e) {return false;}			
 			break; 	
-		case 'title':	
-			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");			
-			var arr = fb.TitleFormat("%title%").EvalWithMetadb(start);	
+		case 'title':		
+			var arr = globalProperties.tf_title.EvalWithMetadb(start);	
 			try{
 				title_items = fb.GetQueryItems(fb.GetLibraryItems(), "%title% IS "+trim1(arr));
 				if(title_items.Count>0){				
-					title_items.OrderByFormat(tfo, 1);
+					title_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(title_items,false,false);
 				} else {
 					return false;
@@ -2046,7 +2047,7 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 		case 'same_genre':		
 			var number_of_items = addAtTheEnd?25:0;
 			if(current_played_track)
-				var current_genre = g_genre_cache.tf_genre.EvalWithMetadb(current_played_track);
+				var current_genre = globalProperties.tf_genre.EvalWithMetadb(current_played_track);
 			else random_function == '1_genre';
 			break;  	
 		case '1_artist':

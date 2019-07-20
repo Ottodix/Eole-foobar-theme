@@ -1625,7 +1625,6 @@ oShowList = function(parentPanelName) {
 				if(this.ishover || brw.activeIndex < 0) changed = this.clearSelection();
 				for (var i in this.links) {
 					if (this.links[i].state == ButtonStates.hover) {
-						
 						this.links[i].onClick();
 					}
 				}
@@ -7047,7 +7046,7 @@ function on_playlist_items_selection_change() {
 function on_playlist_items_added(playlist) {	
 	source_playlist_idx = brw.calculateSourcePlaylist();
 	if(brw.followActivePlaylist || source_playlist_idx==playlist){	
-		if(!g_avoid_on_items_added){		
+		if(!g_avoid_on_items_added && !g_avoid_on_playlists_changed){		
 			g_avoid_on_items_removed=true;
 			g_avoid_on_playlist_switch=true;			
 			//brw.calculateSourcePlaylist();	
@@ -7073,7 +7072,7 @@ function on_playlist_items_removed(playlist) {
 	source_playlist_idx = brw.calculateSourcePlaylist();
 	if(brw.followActivePlaylist || source_playlist_idx==playlist){
 		//console.log(brw.followActivePlaylist);
-		if(!g_avoid_on_items_removed){	
+		if(!g_avoid_on_items_removed && !g_avoid_on_playlists_changed){	
 			g_avoid_on_items_added=true;
 			g_avoid_on_playlist_switch=true;
 			if(playlist==source_playlist_idx && !brw.external_dragging) {
