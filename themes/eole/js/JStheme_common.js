@@ -12,7 +12,6 @@ var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
 var sort_by_date_added = "%added%|%album artist%|%date%|%album%";
-var sort_by_genre = "%genre%";
 var randomBtnTimer = false;
 
 var PlaylistExclude = Array("Whole Library");
@@ -1550,7 +1549,7 @@ oGenreCache = function () {
 		//gTime.Reset();
 		//console.log("Genre list started time:"+gTime.Time);
 		var libraryList = fb.GetLibraryItems();		
-		libraryList.OrderByFormat(fb.TitleFormat(sort_by_genre), 1);	
+		libraryList.OrderByFormat(globalProperties.tf_genre, 1);	
 		var i = 0;
 		var previous = "123456789";	
 		var total = libraryList.Count;
