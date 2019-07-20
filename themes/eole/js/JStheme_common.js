@@ -624,9 +624,14 @@ let playing_item_location_old_index = false;
 function fb_play_from_playing(offset){
 	var playing_item_location_old = playing_item_location;
 	playing_item_location = plman.GetPlayingItemLocation();
-	if (playing_item_location.IsValid) {
+	let queue_content = plman.GetPlaybackQueueHandles();
+	if(offset>0 && offset<=queue_content.Count){
+		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
+		else fb.Play();		
+	} else if (playing_item_location.IsValid) {
 		if(playing_item_location.PlaylistItemIndex+offset<0) offset=0; //|| playing_item_location.PlaylistItemIndex+offset>=plman.PlaylistItemCount(playing_item_location.PlaylistIndex)) offset=0;
-		plman.FlushPlaybackQueue();							
+		plman.FlushPlaybackQueue();
+		if(offset>0) offset += queue_content.Count;
 		plman.SetPlaylistFocusItem(playing_item_location.PlaylistIndex,playing_item_location.PlaylistItemIndex+offset);	
 		plman.AddPlaylistItemToPlaybackQueue(playing_item_location.PlaylistIndex, playing_item_location.PlaylistItemIndex+offset);
 		playing_item_location_old_index = playing_item_location.PlaylistItemIndex + offset;
@@ -640,6 +645,11 @@ function fb_play_from_playing(offset){
 		plman.AddPlaylistItemToPlaybackQueue(playing_item_location_old.PlaylistIndex, playing_item_location_old_index+offset);
 		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
 		else fb.Play();			
+	} else if(offset<0){
+		fb.Prev();
+	} else {
+		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
+		else fb.Play();				
 	}
 }
 

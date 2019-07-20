@@ -2183,6 +2183,8 @@ function moreMenu(x, y){
 			_playbackOrder.AppendMenuSeparator();
 			_playbackOrder.AppendMenuItem(MF_STRING, 3024, "Randomize playing playlist");	
 			_playbackOrder.AppendTo(_controlsMenu, MF_STRING, "Order");
+		_controlsMenu.AppendMenuSeparator();
+		_controlsMenu.AppendMenuItem(MF_STRING, 3006, "Flush playback queue");	
 		_controlsMenu.AppendTo(_moreMenu, MF_STRING, "Playback");
 		
 		if(!properties.displayOpen || !properties.displayPlayRandom) _moreMenu.AppendMenuSeparator();
@@ -2372,6 +2374,9 @@ function moreMenu(x, y){
             case (idx == 3005):
                 fb.Random();
                 break; 							
+            case (idx == 3006):
+                plman.FlushPlaybackQueue();
+                break; 				
             case (idx >= 3007 && idx <= 3013):
                 plman.PlaybackOrder=idx-3007;				
                 break; 	
