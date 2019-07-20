@@ -2428,7 +2428,7 @@ oBrowser = function(name) {
 											this.groups[i].cover_type = 1;
 											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);							
 										}
-									} else {
+									} else if(properties.albumArtId == 4){
 										this.groups[i].cover_type = 1;										
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);	
 									}
