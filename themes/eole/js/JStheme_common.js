@@ -2960,9 +2960,9 @@ oImageCache = function () {
     this.addToCache = function (image, cachekey) {
 		if(cachekey!="undefined") this.cachelist[cachekey] = image;
 	}
-    this.hit = function (metadb, albumIndex, direct_return, cachekey, resize) {	
+    this.hit = function (metadb, albumIndex, direct_return, cachekey, artist_name) {	
 		var cachekey = typeof cachekey !== 'undefined' ? cachekey : brw.groups[albumIndex].cachekey;
-		var resize = typeof resize !== 'undefined' ? resize : true;		
+		var artist_name = typeof artist_name !== 'undefined' ? artist_name : '';		
 		var img = this.cachelist[cachekey];
         if (typeof img == "undefined" || img==null) { // if image not in cache, we load it asynchronously
 			if(globalProperties.enableDiskCache && albumIndex>-1) brw.groups[albumIndex].cover_filename = check_cache(metadb, albumIndex, cachekey);
@@ -2985,6 +2985,7 @@ oImageCache = function () {
 											img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename);
 											g_image_cache.cachelist[cachekey] = img;
 											brw.groups[albumIndex].load_requested = 0;
+											brw.groups[albumIndex].cover_img = img;
 										} else {
 											brw.groups[albumIndex].tid = load_image_from_cache(brw.groups[albumIndex].cover_filename);
 											brw.groups[albumIndex].load_requested = 1;
@@ -3004,7 +3005,21 @@ oImageCache = function () {
 					}		
 			} else {
 				if(!isScrolling) this.cover_load_timer = Array();
-				if(!direct_return){				
+				if(artist_name!=''){
+					var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
+					var filepath = '';
+					var all_files = utils.Glob(path + "\\*");
+					for (var j = 0; j < all_files.length; j++) {
+						if ((/(?:jpe?g|gif|png|bmp)$/i).test(g_files.GetExtensionName(all_files[j]))) {
+							filepath = all_files[j];
+							break;
+						}
+					}
+					if(g_files.FileExists(filepath)) {
+						img = gdi.Image(filepath);
+						save_image_to_cache(img, 0, cachekey);
+					}
+				} else if(!direct_return){				
 					if(albumIndex<0) {
 						try{
 							get_albumArt_async(metadb,-1, cachekey);

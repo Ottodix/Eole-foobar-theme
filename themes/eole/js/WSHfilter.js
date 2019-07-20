@@ -2417,24 +2417,28 @@ oBrowser = function(name) {
 						} else {					
 							if(this.groups[i].cover_type == null) {								
 								if(this.groups[i].load_requested == 0) {
-									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false);
-									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {										
-										this.groups[i].cover_type = 1;
-										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w+(properties.displayMode==3?0:0));
-									} else if(properties.AlbumArtFallback && properties.albumArtId != 4){
+									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');
+									if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {		
+										this.groups[i].cover_type = 1;										
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w);
+									} else if(properties.AlbumArtFallback){
 										this.groups[i].save_requested = true;
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
 											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);							
 										}
+									} else {
+										this.groups[i].cover_type = 1;										
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);	
 									}
 								} 
 							} else if(this.groups[i].cover_type == 0 && !this.groups[i].cover_img) {
 								if(properties.albumArtId == 4){
 									//var arr = this.groups[i].groupkey.split(" ^^ ");
-									var artist_name = this.groups[i].artist_name.sanitise();
-									var path = ProfilePath+"\wsh-data\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
+									console.log("eeeeeee "+this.groups[i].groupkey)
+									var artist_name = this.groups[i].groupkey.sanitise();
+									var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 									var filepath = '';
 									var all_files = utils.Glob(path + "\\*");
 									for (var j = 0; j < all_files.length; j++) {
