@@ -1859,7 +1859,6 @@ function populate() {
 		if(hover) {
 			if(g_cursor.getCursor()!=IDC_HAND) {
 				g_cursor.setCursor(IDC_HAND, "node");
-				g_tooltip.ActivateDelay("Toggle node", x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, "Toggle node");
 				pop.cursor = IDC_HAND;
 				pop.setCursor = IDC_HAND;	
 			}
@@ -2526,6 +2525,7 @@ function populate() {
 				this.lclick_action_done = true;			
 			}
 		}
+		g_tooltip.Deactivate();		
     }
 
     this.lbtn_dblclk = function(x, y) {
@@ -2644,13 +2644,18 @@ function populate() {
         if (ix != -1) {
             m_i = ix;
 			try{
-			hover_node = x < Math.round(ui.pad * this.tree[ix].tr) + ui.symbol_w + ui.margin;
+				hover_node = x < Math.round(ui.pad * this.tree[ix].tr) + ui.symbol_w + ui.margin;
 			} catch(e){hover_node = false;}
             get_pos = ix;
-            if (p.tooltip && typeof this.tree[ix] !== "undefined"  && tt_id != ix && Math.round(ui.pad * this.tree[ix].tr + ui.margin) + (ui.node_style==0 && this.tree[ix].track ? 0 : ui.symbol_w) + this.tree[ix].w > ui.w - p.r_mg && !(sbar.hover || sbar.b_is_dragging)) {
+            if (p.tooltip && typeof this.tree[ix] !== "undefined"  && tt_id != ix && Math.round(ui.pad * this.tree[ix].tr + ui.margin) + (ui.node_style==0 && this.tree[ix].track ? 0 : ui.symbol_w) + this.tree[ix].w > ui.w - p.r_mg && !(sbar.hover || sbar.b_is_dragging) && !hover_node) {
                 var row = Math.round((y - p.s_h - ui.row_h * 0.5) / ui.row_h);
                 this.activate_tooltip(ix, row, x, y);
-            }
+            } else if(hover_node){
+				if(g_tooltip.getActiveZone()!='Toggle node'+ix){
+					g_tooltip.Deactivate();
+					g_tooltip.ActivateDelay((this.tree[ix].child.length < 1?"Open node":"Close node"), x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, "Toggle node"+ix);
+				}				
+			}
         } else get_pos = this.get_ix(x, y, true, false);
         if (ix == ix_o && old_hover_node==hover_node) return;
         tt_id = -1;
