@@ -1542,6 +1542,7 @@ oBrowser = function(name) {
 	this.followNowPlaying = false;
 	this.playlist_on_next_populate = -1;
 	this.rating_rowId = -1;
+	this.dont_scroll_to_focus = false;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -1760,6 +1761,7 @@ oBrowser = function(name) {
     
     this.getOffsetFocusItem = function(fid) { // fixed!
         var row_idx = 0;
+
         if(fid > -1) {
             if(properties.showGroupHeaders) {
                 // fid = no item dans la playlist (focus id)
@@ -2121,7 +2123,12 @@ oBrowser = function(name) {
 		this.source_idx = g_active_playlist;
         this.init_groups();
         if(properties.autocollapse) this.setList();
-        g_focus_row = brw.getOffsetFocusItem(g_focus_id);
+		
+        if(!this.dont_scroll_to_focus) g_focus_row = brw.getOffsetFocusItem(g_focus_id);
+		else {
+			g_focus_row = 0;
+			this.dont_scroll_to_focus = false;
+		}
         if(g_focus_id < 0) { // focused item not set
             if(is_first_populate) {
                 scroll = scroll_ = 0;
@@ -3978,6 +3985,9 @@ oBrowser = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 1036, "Artist / Album / Tracknumber");  
 			SortMenu.AppendMenuItem(MF_STRING, 1037, "Title");
 			SortMenu.AppendMenuItem(MF_STRING, 1038, "Tracknumber");	
+			SortMenu.AppendMenuItem(MF_STRING, 1040, "Date");	
+			SortMenu.AppendMenuItem(MF_STRING, 1041, "Shortest to longest");				
+			SortMenu.AppendMenuItem(MF_STRING, 1042, "Longest to shortest");			
 			SortMenu.AppendMenuSeparator();	
 			SortMenu.AppendMenuItem(MF_STRING, 1039, "Randomize");		
 		}
@@ -4105,17 +4115,40 @@ oBrowser = function(name) {
 				removeItems(false,g_active_playlist);			
 				break;	
 			case 1036:
-				plman.SortByFormat(g_active_playlist,sort_by_album_artist); 
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_album_artist); 
+				this.scroll = this.offset = 0;
 				break;	
 			case 1037:
-				plman.SortByFormat(g_active_playlist,sort_by_title);
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_title);
+				this.scroll = this.offset = 0;
 				break;		
 			case 1038:
-				plman.SortByFormat(g_active_playlist,sort_by_tracknumber); 
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_tracknumber); 
+				this.scroll = this.offset = 0;
 				break;	
-			case 1039:				
-				plman.SortByFormat(g_active_playlist,""); 
+			case 1039:			
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,"");
+				this.scroll = this.offset = 0;				
 				break;					
+			case 1040:		
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_date); 
+				this.scroll = this.offset = 0;				
+				break;			
+			case 1041:
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_time,1);
+				this.scroll = this.offset = 0;
+				break;			
+			case 1042:
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_time,-1);
+				this.scroll = this.offset = 0;
+				break;				
 			case 2000:
 				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);

@@ -12,6 +12,7 @@ var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
 var sort_by_date_added = "%added%|%album artist%|%date%|%album%";
+var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
 var PlaylistExclude = Array("Whole Library");
@@ -1712,7 +1713,12 @@ function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
     
 	//Append first song path
 	//var firstFile=g_browser.groups_draw[check__].pl[0]; 
-
+	try {
+		if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
+	} catch (e) {
+		g_genre_cache = new oGenreCache();
+		g_genre_cache.build_from_library();
+	}		
 	if(firstFile){
 		var firstFileGenre = g_genre_cache.tf_genre.EvalWithMetadb(firstFile);
 		//var firstFilePath=firstFile.Path.replace("D:\\Musique\\Tout\\","");

@@ -915,7 +915,7 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
 			
 	var genrePopupMenu = window.CreatePopupMenu();	
-	if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
+
 	createGenrePopupMenu(false, -1, genrePopupMenu);
 	genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");	
 	

@@ -2090,12 +2090,7 @@ function randomPlayMenu(x, y){
 		_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
 				
 		var genrePopupMenu = window.CreatePopupMenu();	
-		try {
-			if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
-		} catch (e) {
-			g_genre_cache = new oGenreCache();
-			g_genre_cache.build_from_library();
-		}		
+
 		createGenrePopupMenu(false, -1, genrePopupMenu);
 		
 		genrePopupMenu.AppendTo(_menu, MF_STRING, "A specific genre");	

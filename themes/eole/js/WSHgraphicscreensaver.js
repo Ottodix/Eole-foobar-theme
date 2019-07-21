@@ -5136,13 +5136,7 @@ function on_mouse_rbtn_down(x, y){
 			quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");	
 			quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");			
 			quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search for...");	
-			
-			try {
-				if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
-			} catch (e) {
-				g_genre_cache = new oGenreCache();
-				g_genre_cache.build_from_library();
-			}
+
 			var genrePopupMenu = createGenrePopupMenu(brw.groups_draw[check__].pl[0]);
 			genrePopupMenu.AppendTo(_menu, MF_STRING, "Edit Genre");
 			_menu.AppendMenuSeparator();
