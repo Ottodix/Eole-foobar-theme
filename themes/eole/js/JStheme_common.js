@@ -1785,16 +1785,12 @@ function showNowPlaying(force){
 	var force = typeof force !== 'undefined' ? force : false;
 	if(layout_state.isEqual(0) && (!main_panel_state.isEqual(1) || (getNowPlayingState()!=1 && !filters_panel_state.isMaximumValue()))){
 		if(main_panel_state.isEqual(1) && getNowPlayingState()==0)  {
-
 			plman.ActivePlaylist = plman.PlayingPlaylist;
 			fb.RunMainMenuCommand('View/ElPlaylist/Show Now Playing'); 
 		}			
 		//window.NotifyOthers("albumView_showItem",fb.GetNowPlaying());
 		if(!force) window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 		else window.NotifyOthers("FocusOnNowPlayingForce",fb.GetNowPlaying());
-		//p_item=plman.GetPlayingItemLocation();
-		//if(p_item.IsValid && !main_panel_state.isEqual(0)) 
-			//fb.RunMainMenuCommand("View/Columns playlist/Activate now playing");
 	} else {		
 		if(!force) window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 		else window.NotifyOthers("FocusOnNowPlayingForce",fb.GetNowPlaying());

@@ -2458,17 +2458,17 @@ function get_images() {
 		images_array.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"external_files_icon.png");	
 		images_array.search_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"search_icon.png");	
 		
-		if(properties.emphasisOnActive){
-			images_array.now_playing_1 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_off.png");
-			images_array.now_playing_0 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_on.png");
-		} else {
-			if(!properties.darklayout || adapted_color_theme){
+		if(!properties.emphasisOnActive){
+			if(!properties.darklayout){
 				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png");
 				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track0.png");
 			} else {
 				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress1.png");
 				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress0.png");			
-			}
+			}			
+		} else {
+			images_array.now_playing_1 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_off.png");
+			images_array.now_playing_0 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_on.png");
 		}
 		return images_array;
 	};

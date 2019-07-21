@@ -9,7 +9,7 @@ var properties_big = {
     minimumRowsNumberPerGroup: window.GetProperty("BIG:minimumRowsNumberPerGroup", 0),
     groupHeaderRowsNumber: window.GetProperty("BIG:groupHeaderRowsNumber", 2),
     groupHeaderRowsNumberDouble: window.GetProperty("BIG:groupHeaderRowsNumberDouble", 1),	
-    showHeaderBar: window.GetProperty("showHeaderBar", true),
+    showHeaderBar: window.GetProperty("BIG:showHeaderBar", true),
 	showToolTip: window.GetProperty("BIG:showToolTip", true),
 	darklayout: window.GetProperty("BIG:darklayout", false),		
     expandBySingleClick: window.GetProperty("BIG:expandBySingleClick", true),	
@@ -1802,11 +1802,12 @@ oBrowser = function(name) {
 			}
 		}
 		else if(fb.IsPlaying && properties.lockOnNowPlaying) g_active_playlist_new = plman.PlayingPlaylist;
-		else if(properties.lockOnNowPlaying && !properties.displayActiveOnPlaybackStopped) g_active_playlist_new = -1;
+		else if(properties.lockOnNowPlaying && !properties.displayActiveOnPlaybackStopped) g_active_playlist_new = g_active_playlist;
 		else g_active_playlist_new = plman.ActivePlaylist;
 		
 		if(g_active_playlist!=g_active_playlist_new) changed = true;
 		else changed = false;
+
 		g_active_playlist = g_active_playlist_new;
 		return changed;
 	};
@@ -3223,7 +3224,7 @@ oBrowser = function(name) {
 					gr.GdiDrawText("Playlist viewer", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
             };
 			
-			this.drawLeftLine = layout_state.isEqual(0); //&& (main_panel_state.isEqual(0) || main_panel_state.isEqual(2) || main_panel_state.isEqual(3)))
+			this.drawLeftLine = layout_state.isEqual(0) && !(main_panel_state.isEqual(1) && window.Name=='BottomPlaylist'); //&& (main_panel_state.isEqual(0) || main_panel_state.isEqual(2) || main_panel_state.isEqual(3)))
 
             // draw header
             if(properties.showHeaderBar) {
@@ -3531,7 +3532,7 @@ oBrowser = function(name) {
 								timers.showPlaylistManager = setInterval(pman.showPanel, 25);
 							};
 							var items = plman.GetPlaylistSelectedItems(g_active_playlist);
-							if(this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
+							if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
 								album_info=this.rows[this.activeRow].groupkeysplit;
 								if(items.Count>1) {
 									var line1 = "Dragging";	
@@ -3540,7 +3541,7 @@ oBrowser = function(name) {
 									var line1 = album_info[0];
 									var line2 = album_info[1];
 								}																			
-							} else if(this.rows[this.activeRow].type==0){
+							} else if(this.activeRow>-1 && this.rows[this.activeRow].type==0){
 								track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
 								if(items.Count>1) {
 									var line1 = "Dragging";	
@@ -3566,7 +3567,7 @@ oBrowser = function(name) {
 								g_tooltip.Deactivate();
 								on_drag_over(null, x, y, null);		
 								var items = plman.GetPlaylistSelectedItems(g_active_playlist);
-								if(this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
+								if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
 									album_info=this.rows[this.activeRow].groupkeysplit;
 									if(items.Count>1) {
 										var line1 = "Dragging";	
@@ -3575,7 +3576,7 @@ oBrowser = function(name) {
 										var line1 = album_info[0];
 										var line2 = album_info[1];
 									}																			
-								} else if(this.rows[this.activeRow].type==0){
+								} else if(this.activeRow>-1 && this.rows[this.activeRow].type==0){
 									track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
 									if(items.Count>1) {
 										var line1 = "Dragging";	
@@ -3734,7 +3735,6 @@ oBrowser = function(name) {
                         g_dragndrop_rowId = rowId;						
 					}					
                     else if(y > limit || g_dragndrop_trackId==-1) {
-						console.log("g_dragndrop_bottom")
                         g_dragndrop_bottom = true;
                         g_dragndrop_trackId = this.rows[rowId].playlistTrackId;
                         g_dragndrop_rowId = rowId;
@@ -6385,7 +6385,7 @@ function on_notify_data(name, info) {
 		break;		
         case "FocusOnNowPlayingForce":		
         case "FocusOnNowPlaying":
-			if(window.IsVisible && !avoidShowNowPlaying) {
+			if(window.IsVisible && !avoidShowNowPlaying && !(window.Name=="BottomPlaylist" && nowplayingplaylist_state.isActive() && name!="FocusOnNowPlayingForce")) {
 				brw.setDisplayedPlaylistProperties(false);				
 				brw.showNowPlaying();
 				avoidShowNowPlaying = true;
@@ -6809,7 +6809,7 @@ function on_drag_drop(action, x, y, mask) {
             action.Effect = 1;
 			plman.UndoBackup(g_active_playlist);
 			action.Playlist = g_active_playlist;
-			brw.playlist_on_next_populate = g_active_playlist;
+			brw.playlist_on_next_populate = g_active_playlist;			
             action.ToSelect = false;
 			g_avoid_playlist_displayed_switch = true;
 			action.Base = g_dragndrop_total_before;
