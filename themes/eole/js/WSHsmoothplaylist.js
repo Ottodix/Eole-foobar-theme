@@ -6005,7 +6005,7 @@ function on_playback_new_track(metadb) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}		
 		};		
-		if((fb.CursorFollowPlayback || properties.FollowNowPlaying) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) {	
+		if(((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) {	
 			brw.dontFlashNowPlaying=true;
 			brw.showNowPlaying();
 		}		
@@ -6540,38 +6540,40 @@ function on_notify_data(name, info) {
 			}
 		break; 		
 		case "layout_state":  
-			layout_state.value=info;
-			brw.setDisplayedPlaylistProperties(true);		
-			get_metrics(true);
-			if(properties.autocollapse && properties.showGroupHeaders) {
-				brw.collapseAll(true);
-			}						
-			on_colours_changed(true);
-			brw.refreshThumbnails(); 
-			if(layout_state.isEqual(0) && window.IsVisible) window.NotifyOthers("playlist_height",window.Height);		
-			if(layout_state.isEqual(1) && g_active_playlist==plman.PlayingPlaylist){
-				brw.showNowPlaying(false);
+			if(window.name!="BottomPlaylist"){
+				layout_state.value=info;
+				brw.setDisplayedPlaylistProperties(true);		
+				get_metrics(true);
+				if(properties.autocollapse && properties.showGroupHeaders) {
+					brw.collapseAll(true);
+				}						
+				on_colours_changed(true);
+				brw.refreshThumbnails(); 
+				if(layout_state.isEqual(0) && window.IsVisible) window.NotifyOthers("playlist_height",window.Height);		
+				if(layout_state.isEqual(1) && g_active_playlist==plman.PlayingPlaylist){
+					brw.showNowPlaying(false);
+				}
 			}
 		break; 
-		case "main_panel_state":  
-			main_panel_state.value = info;
-			if(properties.enableAutoSwitchPlaylistMode){
-				var old_properties_lockOnNowPlaying = properties.lockOnNowPlaying;
-				if(main_panel_state.isEqual(1)){
-					if(filters_panel_state.isMaximumValue()) properties.lockOnNowPlaying=false;
-					else properties.lockOnNowPlaying=true;	
-					properties.lockOnPlaylistNamed="";				
-				} else if(properties.lockOnNowPlaying!=true){
-					properties.lockOnNowPlaying=true;	
-					properties.lockOnPlaylistNamed="";									
-				}		
-				if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying){
-					setOneProperty("lockOnPlaylistNamed","");
-					setOneProperty("lockOnNowPlaying",properties.lockOnNowPlaying);
-					brw.populate(true,22);					
-				}					
-			}			
-			if(properties.ParentName=="MainPanel") {
+		case "main_panel_state": 
+			if(window.name!="BottomPlaylist"){
+				main_panel_state.value = info;
+				if(properties.enableAutoSwitchPlaylistMode){
+					var old_properties_lockOnNowPlaying = properties.lockOnNowPlaying;
+					if(main_panel_state.isEqual(1)){
+						if(filters_panel_state.isMaximumValue()) properties.lockOnNowPlaying=false;
+						else properties.lockOnNowPlaying=true;	
+						properties.lockOnPlaylistNamed="";				
+					} else if(properties.lockOnNowPlaying!=true){
+						properties.lockOnNowPlaying=true;	
+						properties.lockOnPlaylistNamed="";									
+					}		
+					if(old_properties_lockOnNowPlaying != properties.lockOnNowPlaying){
+						setOneProperty("lockOnPlaylistNamed","");
+						setOneProperty("lockOnNowPlaying",properties.lockOnNowPlaying);
+						brw.populate(true,22);					
+					}					
+				}			
 				on_colours_changed();
 			}
 		break;		
