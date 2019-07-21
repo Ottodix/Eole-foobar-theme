@@ -3082,12 +3082,15 @@ oImageCache = function () {
 					} else if(properties.AlbumArtFallback){
 						//console.log("fallback "+i+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey_album)
 						brw.groups[albumIndex].cover_img = g_image_cache.hit(metadb, albumIndex, false, brw.groups[albumIndex].cachekey_album);
-						if(brw.groups[albumIndex].cover_img=='loading') return 'loading';
-						brw.groups[albumIndex].load_requested = 2;
-						brw.groups[albumIndex].cover_type = null;
-						brw.groups[albumIndex].cover_img = img;
-						brw.groups[albumIndex].cover_img_mask = false;
-						brw.groups[albumIndex].cover_formated = false;					
+						if(brw.groups[albumIndex].cover_img=='loading') {
+							brw.groups[albumIndex].load_requested = 2;
+							brw.groups[albumIndex].cover_type = 1;
+							brw.groups[albumIndex].cover_img = img;
+							brw.groups[albumIndex].cover_img_mask = false;
+							brw.groups[albumIndex].cover_formated = false;	
+							return 'loading';
+						}
+												
 					}
 				} else if(!direct_return){				
 					if(albumIndex<0) {
