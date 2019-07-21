@@ -779,7 +779,7 @@ oFilterBox = function() {
 			gb.DrawEllipse(w-8, 2.8, 7, 7.2, 1, colors.full_txt);
 			gb.SetSmoothingMode(0);
 		this.images.search_icon.ReleaseGraphics(gb);*/
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter current items");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter items");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -976,7 +976,7 @@ oTagSwitcherBar = function() {
 		this.items_width = new Array(0, 0, 0, 0);		
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");		
-
+		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");	
 		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
 			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();			
 		}
@@ -1111,6 +1111,7 @@ oTagSwitcherBar = function() {
 					this.hide_bt.checkstate("leave", -1, -1);
 					libraryfilter_state.toggleValue();
 				}
+				g_tooltip.Deactivate();
 				break;		
             case "lbtn_up":			
                 break;
@@ -1120,7 +1121,12 @@ oTagSwitcherBar = function() {
                 break;
             case "move":
 				changed_state = this.setHoverStates(x,y);
-				if(changed_state) {
+				if(changed_state) {					
+					if(this.hoverItem>-1){
+						g_tooltip.Deactivate();
+						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.items_tooltips[this.hoverItem]);
+					} else
+						g_tooltip.Deactivate();
 					brw.repaint();
 				}
 				if(properties.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);
@@ -1576,6 +1582,7 @@ oBrowser = function(name) {
 	this.secondRowHeight = false;	
 	this.draw_right_line = false;
 	this.customGroups = false;
+	this.tooltip_activated = false;
     this.launch_populate = function() {
 		brw.populate(is_first_populate = true,0);
 		pman.populate(exclude_active = false, reset_scroll = true);
@@ -2435,7 +2442,6 @@ oBrowser = function(name) {
 							} else if(this.groups[i].cover_type == 0 && !this.groups[i].cover_img) {
 								if(properties.albumArtId == 4){
 									//var arr = this.groups[i].groupkey.split(" ^^ ");
-									console.log("eeeeeee "+this.groups[i].groupkey)
 									var artist_name = this.groups[i].groupkey.sanitise();
 									var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 									var filepath = '';
@@ -3377,16 +3383,20 @@ oBrowser = function(name) {
 						if(this.groups[this.activeIndex].showToolTip){
 							new_tooltip_text=this.groups[this.activeIndex].tooltipText; 
 							if(g_tooltip.activeZone!='') g_tooltip.Deactivate();
+							this.tooltip_activated = true;
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.activeIndex);
 						}
 						if(g_tooltip.activeZone!=this.activeIndex && g_tooltip.activeZone>-1){
 							g_tooltip.Deactivate();
+							this.tooltip_activated = false;
 						}
 					} else if(g_tooltip.activeZone!=this.activeIndex && !isNaN(g_tooltip.getActiveZone())){
 							g_tooltip.Deactivate();
+							this.tooltip_activated = false;
 					}
 				} else if(g_tooltip.activeZone>-1){
 					g_tooltip.Deactivate();
+					this.tooltip_activated = false;
 				}
                 if(this.drag_moving && !timers.hidePlaylistManager && !timers.showPlaylistManager) {
                     pman.on_mouse("move", x, y);
@@ -3403,7 +3413,10 @@ oBrowser = function(name) {
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     this.scrollbar && this.scrollbar.on_mouse(event, x, y);
                 };
-				if(properties.showToolTip) g_tooltip.Deactivate();				
+				if(properties.showToolTip && this.tooltip_activated) {
+					g_tooltip.Deactivate();		
+					this.tooltip_activated = false;					
+				}
                 break;
         };
     };
@@ -4457,14 +4470,23 @@ function on_mouse_move(x, y, m) {
 			cur_btn = chooseButton(x, y);
 			
 			if (old == cur_btn) {
+				cur_btn && cur_btn.onMouse('move',x,y);
 				if (g_down) return;
 			} else if (g_down && cur_btn && cur_btn.state != ButtonStates.down) {
 				cur_btn.changeState(ButtonStates.down);
+				cur_btn.onMouse('move',x,y);				
 				return;
 			} else {
-				old && old.changeState(ButtonStates.normal);
-				cur_btn && cur_btn.changeState(ButtonStates.hover);
-				window.Repaint();
+				if(old){
+					old.changeState(ButtonStates.normal);
+					old.onMouse('move',x,y);
+					brw.repaint();					
+				}
+				if(cur_btn){
+					cur_btn.changeState(ButtonStates.hover);
+					cur_btn.onMouse('move',x,y);
+					brw.repaint();
+				} else g_tooltip.Deactivate();
 			}		
 		}   
 		
@@ -4562,10 +4584,12 @@ function on_mouse_leave() {
 		g_down = false;    
 		if (cur_btn) {
 			cur_btn.changeState(ButtonStates.normal);
-			 window.Repaint();
+			cur_btn.onMouse("leave", -1, -1);	
+			window.Repaint();
 			cur_btn=null;        
 		} 
 	}	
+	g_tooltip.Deactivate();
 };
 function on_drag_enter(action, x, y, mask) {
 	if(brw.drag_moving) {
@@ -5570,7 +5594,7 @@ function updateIndividualFilterState(){
 var cur_btn = null;
 var g_down = false;
 
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
+function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
@@ -5584,7 +5608,8 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 	this.opacity = opacity;
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
-	
+	this.tooltip_activated = false;
+    this.tooltip_text = tooltip_text;	
     this.containXY = function (x, y) {
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
@@ -5629,6 +5654,40 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+			break;				
+			case 'lbtn_up':
+				this.fonUp && this.fonUp();
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
+					this.changeState(ButtonStates.hover);
+				}
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
+			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+			
+				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
+					var tooltip_text = this.tooltip_text;
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
+		}
+    }  		
 }
 function drawAllButtons(gr) {
     for (var i in buttons) {
@@ -5655,7 +5714,7 @@ function toggleFilterState(new_filters_state, save_previous_state){
 }
 function setButtons(){
 	buttons = { 
-		filtersToggle: new SimpleButton(18, 7, 35, 40, "filtersToggle", function () {
+		filtersToggle: new SimpleButton(18, 7, 35, 40, "filtersToggle", "Reduce Filters", function () {
 			if(properties.savedFilterState>0 && properties.savedFilterState < filters_panel_state.max_value && !properties.displayToggleBtns) toggleFilterState(properties.savedFilterState);
 			else toggleFilterState((!filters_panel_state.isActive())?1:filters_panel_state.value-1);
 		},false,images.filters_decrease_icon,images.filters_decrease_hover_icon,ButtonStates.normal,255),	

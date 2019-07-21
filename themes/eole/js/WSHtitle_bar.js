@@ -496,6 +496,7 @@ function build_buttons(){
 				g_cursor.setCursor(IDC_ARROW,2);					
 			}, false,false,images.search_toggle_img,images.search_toggle_img,-1, false, false, true),				
 			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", "Main menu", function () {
+				g_tooltip.Deactivate();
 				draw_main_menu(0, 28);
 			}, false,false,images.global_settings_img,images.global_settings_img,-1, false, false, false),
 			Close: new JSButton(-45, 0, 45, 29, "", "close", "", false, function () { 

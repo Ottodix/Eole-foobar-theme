@@ -31,7 +31,8 @@ var properties = {
 	customColorHightlight: window.GetProperty("CUSTOM COLOR: highlight", "235-235-235"),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
-	panelFontAdjustement: -1	
+	panelFontAdjustement: -1,	
+	emphasisOnActive: false,		
 };
 var cover = {
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
@@ -98,7 +99,8 @@ cColumns = {
 images = {
     path: theme_img_path + "\\"
 };
-            
+images_inverse = {}
+
 blink = {
     x: 0,
     y: 0,
@@ -226,7 +228,8 @@ oPlaylist = function(idx, rowId, name) {
 		this.item_count = plman.PlaylistItemCount(idx);			
 	}
 	this.setIcon = function() {
-		this.icon = playlistName2icon(this.name, this.isAutoPlaylist);			
+		this.icon = playlistName2icon(this.name, this.isAutoPlaylist, images);
+		this.icon_inverse = playlistName2icon(this.name, this.isAutoPlaylist, images_inverse);		
 	}
 	this.setIcon();
 };
@@ -247,7 +250,7 @@ oFilterBox = function() {
 		} else {
 			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\search_icon.png");			
 		}
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter playlists");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -1029,7 +1032,7 @@ oBrowser = function(name) {
             if(this.rows.length > 0) {
 				headerBarFix = (properties.showHeaderBar)?1:0;            
                 for(var i = g_start_;i <= g_end_;i++){
-                    
+                    var is_active = false;
                     ay = Math.floor(this.y + (i * ah) - scroll_);
                     this.rows[i].x = ax;
                     this.rows[i].y = ay;
@@ -1051,7 +1054,9 @@ oBrowser = function(name) {
 							}
 							//bottom
 							gr.FillSolidRect(ax, ay+ah-1, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
-							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);						
+							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);	
+							
+							is_active = true;
                         }; 
 						
                         // hover item
@@ -1097,8 +1102,11 @@ oBrowser = function(name) {
                         if(ay >= (0 - ah) && ay < this.y + this.h) {     
 	
 							if(fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist && this.rows[i].idx>=0) {
-                                var font = g_font.boldplus1;								
-								var playlist_icon = (g_seconds%2==0)?images.now_playing_0:images.now_playing_1;	
+                                var font = g_font.boldplus1;
+								if(is_active && properties.emphasisOnActive)								
+									var playlist_icon = (g_seconds%2==0)?images_inverse.now_playing_0:images_inverse.now_playing_1;	
+								else
+									var playlist_icon = (g_seconds%2==0)?images.now_playing_0:images.now_playing_1;	
 								icon_x = ax+this.paddingLeft+1;
 								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-2;	
 								icon_w = playlist_icon.Width;		
@@ -1109,7 +1117,10 @@ oBrowser = function(name) {
 								this.playing_icon_h = icon_h;
                             } else {
                                 var font = g_font.plus1;
-								var playlist_icon = this.rows[i].icon;
+								if(is_active && properties.emphasisOnActive)
+									var playlist_icon = this.rows[i].icon_inverse;
+								else
+									var playlist_icon = this.rows[i].icon;
 								icon_x = ax+this.paddingLeft;
 								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-1;	
 								icon_w = playlist_icon.Width;		
@@ -1118,6 +1129,9 @@ oBrowser = function(name) {
 							
                             // playlist icon
 							if(properties.showPlaylistIcons){
+								if(is_active && properties.emphasisOnActive) {
+									gr.FillSolidRect(icon_x, icon_y, icon_w, icon_h, colors.marker_hover_item);
+								}
 								var rh = this.rows[i].icon.Width;
 								gr.DrawImage(playlist_icon, icon_x, icon_y, icon_w, icon_h, 0, 0, icon_w, icon_h, 0, 255);
 							} else var rh = 0;
@@ -1131,8 +1145,11 @@ oBrowser = function(name) {
 								cColumns.track_total_part = gr.CalcTextWidth(track_total_part, font);
 							else cColumns.track_total_part = 0;
 							
-                            var tx = ax + rh + this.paddingLeft + 4;
-                            var tw = aw;
+							if(is_active && properties.emphasisOnActive)
+								var tx = ax + rh + this.paddingLeft + 10;
+                            else
+								var tx = ax + rh + this.paddingLeft + 4;
+							var tw = aw;
                             
                             if(this.inputboxID == i) {
                                 this.inputbox.draw(gr, tx+2, ay+5);
@@ -2396,64 +2413,76 @@ function get_metrics() {
     };
 };
 
-function playlistName2icon(name, auto_playlist){
-	if(name==globalProperties.selection_playlist) return images.library_icon;	
-	if(name==globalProperties.playing_playlist) return images.library_playback_icon;	
-	if(name==globalProperties.whole_library) return images.whole_library_icon;	
-	if(name=="Newly Added") return images.newly_added_icon;
-	if(name=="Create Playlist") return images.create_playlist;	
-	if(name=="History") return images.history_icon;	
-	if(name=="Top Rated") return images.top_rated;		
-	if(name=="Radios") return images.radios_icon;		
-	if(name=="Most Played") return images.most_played_icon;		
-	if(name=="Podcasts") return images.podcasts_icon;		
-	if(name=="External Files") return images.external_files_icon;		
-	if(name=="Search" || name=="Search Results") return images.search_icon;	
+function playlistName2icon(name, auto_playlist, images_array){
+	var inverse = '';
+	if(name==globalProperties.selection_playlist) return images_array.library_icon;	
+	if(name==globalProperties.playing_playlist) return images_array.library_playback_icon;	
+	if(name==globalProperties.whole_library) return images_array.whole_library_icon;	
+	if(name=="Newly Added") return images_array.newly_added_icon;
+	if(name=="Create Playlist") return images_array.create_playlist;	
+	if(name=="History") return images_array.history_icon;	
+	if(name=="Top Rated") return images_array.top_rated;		
+	if(name=="Radios") return images_array.radios_icon;		
+	if(name=="Most Played") return images_array.most_played_icon;		
+	if(name=="Podcasts") return images_array.podcasts_icon;		
+	if(name=="External Files") return images_array.external_files_icon;		
+	if(name=="Search" || name=="Search Results") return images_array.search_icon;	
 	if(auto_playlist) {
-		//gr.DrawImage(images.icon_auto_pl.Resize(rh,rh,2) , ax, ay+5, rh, rh, 0, 0, rh, rh, 0, 255);
-		return images.icon_auto_pl;
+		return images_array.icon_auto_pl;
 	} else {
-		//gr.DrawImage(images.icon_normal_pl.Resize(rh,rh,2) , ax, ay+5, rh, rh, 0, 0, rh, rh, 0, 255);
-		return images.icon_normal_pl;
+		return images_array.icon_normal_pl;
 	};
 }
 
 function get_images() {
-    var gb;
-    
-	if(properties.darklayout) color_theme="white\\";
-	else color_theme="";
+    function get_images_from_colors_theme(images_array,adapted_color_theme){
+		images_array.icon_normal_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon2.png");
+		images_array.icon_normal_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon2.png");
+		images_array.icon_normal_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
+		images_array.icon_normal_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
+		images_array.icon_auto_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");	
+		images_array.icon_auto_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");	
+		images_array.icon_auto_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");		
+		images_array.icon_auto_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");	
+		
+		images_array.create_playlist = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"create_playlist.png");	
+		images_array.newly_added_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"newly_added_icon.png");	
+		images_array.top_rated = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"fav_icon.png");	
+		images_array.history_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"history_icon.png");	
+		images_array.whole_library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"whole_library_icon.png");		
+		images_array.library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_icon.png");	
+		images_array.library_playback_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_playback_icon.png");		
+		images_array.radios_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"radios_icon.png");
+		images_array.most_played_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"most_played_icon.png");	
+		images_array.podcasts_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"podcasts_icon.png");
+		images_array.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"external_files_icon.png");	
+		images_array.search_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"search_icon.png");	
+		
+		if(properties.emphasisOnActive){
+			images_array.now_playing_1 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_off.png");
+			images_array.now_playing_0 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_on.png");
+		} else {
+			if(!properties.darklayout || adapted_color_theme){
+				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png");
+				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track0.png");
+			} else {
+				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress1.png");
+				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress0.png");			
+			}
+		}
+		return images_array;
+	};
 	
-    // normal playlist icon
-	images.icon_normal_pl = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"playlist_icon2.png");
-	images.icon_normal_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"playlist_icon2.png");
-	images.icon_normal_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"auto_playlist_icon.png");
-	images.icon_normal_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"auto_playlist_icon.png");
-	images.icon_auto_pl = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"playlist_icon.png");	
-	images.icon_auto_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"playlist_icon.png");	
-	images.icon_auto_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"auto_playlist_icon.png");		
-	images.icon_auto_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"auto_playlist_icon.png");	
-	
-	images.create_playlist = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"create_playlist.png");	
-	images.newly_added_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"newly_added_icon.png");	
-	images.top_rated = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"fav_icon.png");	
-	images.history_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"history_icon.png");	
-	images.whole_library_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"whole_library_icon.png");		
-	images.library_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"library_icon.png");	
-	images.library_playback_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"library_playback_icon.png");		
-	images.radios_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"radios_icon.png");
-	images.most_played_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"most_played_icon.png");	
-	images.podcasts_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"podcasts_icon.png");
-	images.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"external_files_icon.png");	
-	images.search_icon = gdi.Image(theme_img_path + "\\icons\\"+color_theme+"search_icon.png");		
-	
-	if(!properties.darklayout){
-	images.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png");
-	images.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track0.png");
+	if(properties.darklayout) {
+		color_theme="white\\";
+		color_theme_inverse="";		
 	} else {
-	images.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress1.png");
-	images.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress0.png");			
-	}	
+		color_theme="";
+		color_theme_inverse="white\\";		
+	}
+	
+	images = get_images_from_colors_theme(images,color_theme);
+	images_inverse = get_images_from_colors_theme(images_inverse,color_theme_inverse);
 };
 
 
@@ -3152,6 +3181,7 @@ function on_init() {
 	g_cursor = new oCursor();	
     g_active_playlist = plman.ActivePlaylist;
 	g_resizing = new Resizing("playlistmanager",false,true);	
+	g_tooltip = new oTooltip();
 	
     brw = new oBrowser("brw");
 	brw.startTimer();	

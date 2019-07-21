@@ -394,7 +394,7 @@ oFilterBox = function() {
 		else icon_theme_subfolder = "";				
 		
 		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");		
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter those tracks");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter groups"+(properties.filterBox_filter_tracks?" & tracks":''));
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -2435,7 +2435,7 @@ oHeaderBar = function(name) {
 			gb.FillPolygon(colors.normal_txt, 0, xpts2);			
 		this.hide_bt_ov.ReleaseGraphics(gb);	
 		if(typeof(this.hide_filters_bt) == "undefined") {
-			this.hide_filters_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide left menu");
+			this.hide_filters_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Show left menu");
 		} else {
 			this.hide_filters_bt.img[0] = this.hide_bt_off;
 			this.hide_filters_bt.img[1] = this.hide_bt_ov;
@@ -3330,6 +3330,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 50):		
 			properties.filterBox_filter_tracks = !properties.filterBox_filter_tracks;
 			window.SetProperty("MAINPANEL filter tracks", properties.filterBox_filter_tracks);
+			g_filterbox.getImages();
 			break;	
 		case (idx == 51):		
 			properties.showInLibrary_RightPlaylistOn = true;

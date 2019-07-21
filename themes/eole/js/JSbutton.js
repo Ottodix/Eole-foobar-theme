@@ -355,6 +355,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 					window.Repaint();
 				}
 				if(this.cur_btn && this.cur_btn.tooltip_text && g_tooltip.activeZone != this.cur_btn.name){
+					if(g_tooltip.activated) g_tooltip.Deactivate();
 					g_tooltip.ActivateDelay(this.cur_btn.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, this.cur_btn.name);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && (!this.cur_btn || g_tooltip.activeZone != this.cur_btn.name)){

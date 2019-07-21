@@ -97,7 +97,8 @@ oTagSwitcherBar = function() {
 		this.items_width = new Array(0, 0, 0, 0);		
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");		
-
+		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
+		
 		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
 			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();			
 		}
@@ -226,6 +227,7 @@ oTagSwitcherBar = function() {
 					this.hide_bt.checkstate("leave", -1, -1);
 					libraryfilter_state.toggleValue();
 				}				
+				g_tooltip.Deactivate();
 				break;		
             case "lbtn_up":			
                 break;
@@ -235,13 +237,20 @@ oTagSwitcherBar = function() {
                 break;
             case "move":
 				changed_state = this.setHoverStates(x,y);
-				if(changed_state) window.Repaint();
-				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);				
+				if(changed_state) {					
+					if(this.hoverItem>-1){
+						g_tooltip.Deactivate();
+						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.items_tooltips[this.hoverItem]);
+					} else
+						g_tooltip.Deactivate();
+					window.Repaint();
+				}
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);
                 break;
             case "leave":
 				changed_state = this.setHoverStates(-1,-1);
-				if(changed_state) window.Repaint();	
-				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);				
+				if(changed_state) window.Repaint();		
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);
                 break;				
         };
     };
@@ -1850,6 +1859,7 @@ function populate() {
 		if(hover) {
 			if(g_cursor.getCursor()!=IDC_HAND) {
 				g_cursor.setCursor(IDC_HAND, "node");
+				g_tooltip.ActivateDelay("Toggle node", x+10, y+20, globalProperties.tooltip_delay, 1200, false, "Toggle node");
 				pop.cursor = IDC_HAND;
 				pop.setCursor = IDC_HAND;	
 			}
@@ -3371,7 +3381,7 @@ function button_manager() {
         return true;
     }
     this.leave = function() {
-        if (this.b) this.btns[this.b].changestate("normal");
+        if (this.b) this.btns[this.b].changestate("normal",-1,-1);
         this.b = null;
     }
 
@@ -3434,8 +3444,8 @@ function button_manager() {
             if ((i == "scrollUp" || i == "scrollDn") && this.btns[i].trace(x, y)) b = i;
         }
         if (this.b == b) return this.b;
-        if (b) this.btns[b].changestate("hover");
-        if (this.b) this.btns[this.b].changestate("normal");
+        if (b) this.btns[b].changestate("hover",x,y);
+        if (this.b) this.btns[this.b].changestate("normal",x,y);
         this.b = b;
 
         return this.b;
@@ -3469,19 +3479,21 @@ function button_manager() {
             this.l_up && this.l_up(x, y);
         }
 
-        this.changestate = function(state) {
+        this.changestate = function(state, x, y) {
             if (state == "hover") {
                 this.img = this.img_hover;
 				if(g_cursor.getCursor()!=IDC_HAND) {
-					g_cursor.setCursor(IDC_HAND, this.tooltext);
+					g_cursor.setCursor(IDC_HAND, this.tooltext);					
 					this.cursor = IDC_HAND;
-				}				
+				}		
+				if(!g_tooltip.activated) g_tooltip.ActivateDelay(this.tooltext, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.tooltext);
             } else {
                 this.img = this.img_normal;
 				if(this.cursor!=IDC_ARROW){
-					g_cursor.setCursor(IDC_ARROW,38);
+					g_cursor.setCursor(IDC_ARROW,38);					
 					this.cursor = IDC_ARROW;
 				}
+				if(g_tooltip.activated) g_tooltip.Deactivate();
             }			
             window.RepaintRect(this.x, this.y, this.w, this.h);
         }
@@ -3521,26 +3533,26 @@ function button_manager() {
                 hover: images.search_icon
             }, function() {
 				sL.activate(0,0);				
-            }, "", "");
+            }, "", "Filter tree");
             this.btns.cross1 = new btn(qx-4, qy, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
                 if(!sL.lbtn_down) sL.clear();
-            }, "");
+            }, "Reset filter");
             this.btns.cross2 = new btn(qx-1, qy-1, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
                 if(!sL.lbtn_down) sL.clear();
-            }, "");
+            }, "Reset filter");
             this.btns.filter = new btn(p.f_x1 - 12, sL.y, fw, p.s_sp, 5, ui.font, "", "", {
                 normal: images.settings_off,
                 hover: images.settings_hover
             }, "", function() {
                 if(!sL.lbtn_down) men.button(p.f_x1, p.s_h);
                 but.refresh(true)
-            }, "");
+            }, "Settings...");
         }
 
     }

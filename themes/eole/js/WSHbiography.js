@@ -4017,8 +4017,8 @@ function SimpleButtonManager(){
 	this.cur_btn = null;
 	this.cur_btn_down = null;	
 	this.g_down = false;	
-	this.addButton = function(name, x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity){
-		this.buttons[name] = new SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity);
+	this.addButton = function(name, x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity){
+		this.buttons[name] = new SimpleButton(name, x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity);
 	};
 	this.chooseButton = function(x, y){
 		for (var i in this.buttons) {
@@ -4041,14 +4041,26 @@ function SimpleButtonManager(){
 				var old = this.cur_btn;
 				this.cur_btn = this.chooseButton(x, y);
 				if (old == this.cur_btn) {
+					this.cur_btn && this.cur_btn.onMouse("move", x, y);		
 					if (this.g_down) return;
 				} else if (this.g_down && this.cur_btn && this.cur_btn.state != ButtonStates.down) {
+					this.cur_btn.onMouse("move", x, y);
 					this.cur_btn.changeState(ButtonStates.down);
 					return;
 				} else {
-					old && old.changeState(ButtonStates.normal);
-					this.cur_btn && this.cur_btn.changeState(ButtonStates.hover);
-					window.Repaint();
+					var repaint = false;
+					if(old){
+						old.changeState(ButtonStates.normal);
+						old.onMouse("move", x, y);
+						repaint = true;
+					}
+					if(this.cur_btn){
+						this.cur_btn.changeState(ButtonStates.hover);
+						this.cur_btn.onMouse("move", x, y);
+						repaint = true;
+					}	
+					else g_tooltip.Deactivate();
+					if(repaint) window.Repaint();
 				}				
 			break;
             case "leave":
@@ -4063,6 +4075,7 @@ function SimpleButtonManager(){
 				this.g_down = false;      
 				if (this.cur_btn_down != null && typeof this.cur_btn_down === 'object') {
 					this.cur_btn_down.onClick();
+					this.cur_btn_down.onMouse("leave", x, y);
 				}
 				return (this.cur_btn_down != null && typeof this.cur_btn_down === 'object');				
 			break;
@@ -4078,20 +4091,23 @@ function SimpleButtonManager(){
 		}
 	}	
 }
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
+function SimpleButton(name, x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
+    this.name = name;	
     this.text = text;
+	console.log(this.text);
+    this.tooltip_text = tooltip_text;		
     this.fonClick = fonClick;
     this.fonDbleClick = fonDbleClick;
     this.N_img = N_img;
     this.H_img = H_img;   
 	this.opacity = opacity;
 	this.first_draw=true;	
-	
+	this.tooltip_activated = false;
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
 	
@@ -4158,6 +4174,39 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+			break;				
+			case 'lbtn_up':
+				this.fonUp && this.fonUp();
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
+					this.changeState(ButtonStates.hover);
+				}
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
+			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+				if(this.text=='' && this.tooltip_text!='' && g_tooltip.activeZone != this.name){
+					var tooltip_text = this.tooltip_text;
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.name);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.name){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
+		}
+    }  	
 }
 var on_size_2Call = false;
 var lyrics_off_icon = gdi.Image(theme_img_path + "\\icons\\nowplaying_off.png");   
@@ -4170,15 +4219,18 @@ var lyrics_on_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplayin
 var lyrics_on_hover_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_on_hover.png"); 	
 var lyrics_off_icon_white = gdi.Image(theme_img_path + "\\icons\\white\\nowplaying_off.png");  
 var g_cursor = new oCursor();
+var g_tooltip = new oTooltip();
 var btns_manager = new SimpleButtonManager();
-btns_manager.addButton("lyricsReduce",-20, 8, 15, lyrics_off_icon.Height, "Show Lyrics", function () {
+btns_manager.addButton("lyricsReduce",-20, 8, 15, lyrics_off_icon.Height, "Reduce Lyrics", "Reduce Lyrics width", function () {
 		lyrics_state.decrement(1);
 		positionButtons();
+		g_tooltip.Deactivate();
 		window.Repaint();		
     },false,lyrics_off_icon,lyrics_off_hover_icon,ButtonStates.normal,255);
-btns_manager.addButton("lyricsIncrease",-45, 8, 15, lyrics_off_icon.Height, "Show Lyrics", function () {
+btns_manager.addButton("lyricsIncrease",-45, 8, 15, lyrics_off_icon.Height, "Extend Lyrics", "Extend Lyrics width", function () {
 		lyrics_state.increment(1);
 		positionButtons();
+		g_tooltip.Deactivate();
 		window.Repaint();		
     },false,lyrics_on_icon,lyrics_on_hover_icon,ButtonStates.normal,255);	
 	

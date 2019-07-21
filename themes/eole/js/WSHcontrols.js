@@ -2282,6 +2282,25 @@ function moreMenu(x, y){
 		if(!properties.displayEqualizer)
 			_moreMenu.AppendMenuItem(MF_STRING, 3017, "Equalizer");
 		
+		var _menu_button = window.CreatePopupMenu();
+		_moreMenu.AppendMenuSeparator();
+		_menu_button.AppendMenuItem(MF_STRING, 4022, "Repeat");
+		_menu_button.CheckMenuItem(4022, properties.displayRepeat);		
+		_menu_button.AppendMenuItem(MF_STRING, 4021, "Shuffle");
+		_menu_button.CheckMenuItem(4021, properties.displayShuffle);	
+		_menu_button.AppendMenuItem(MF_STRING, 4023, "Open");
+		_menu_button.CheckMenuItem(4023, properties.displayOpen);			
+		_menu_button.AppendMenuItem(MF_STRING, 4020, "Play randomly");
+		_menu_button.CheckMenuItem(4020, properties.displayPlayRandom);			
+		_menu_button.AppendMenuItem(MF_STRING, 4017, "Equalizer");
+		_menu_button.CheckMenuItem(4017, properties.displayEqualizer);	
+		_menu_button.AppendMenuItem(MF_STRING, 4018, "Rating");
+		_menu_button.CheckMenuItem(4018, properties.displayRating);		
+		_menu_button.AppendMenuItem(MF_STRING, 4019, "Scheduler");
+		_menu_button.CheckMenuItem(4019, properties.displayScheduler);		
+		
+		_menu_button.AppendTo(_moreMenu,MF_STRING, "Visible buttons");	
+		
         idx = _moreMenu.TrackPopupMenu(x,y,0x0008 | 0x0020);
 		
         switch(true) {	
@@ -2438,7 +2457,63 @@ function moreMenu(x, y){
                 break; 	
             case (idx == 3029):
 				fb.RunMainMenuCommand("File/Add location...");
-                break; 					
+                break; 		
+            case (idx == 4017):
+				properties.displayEqualizer = !properties.displayEqualizer;
+				window.SetProperty("_DISPLAY equalizer", properties.displayEqualizer);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;			
+            case (idx == 4018):
+				properties.displayRating = !properties.displayRating;
+				window.SetProperty("_DISPLAY rating", properties.displayRating);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;		
+            case (idx == 4019):
+				properties.displayScheduler = !properties.displayScheduler;
+				window.SetProperty("_DISPLAY scheduler", properties.displayScheduler);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;	  
+            case (idx == 4020):
+				properties.displayPlayRandom = !properties.displayPlayRandom;
+				window.SetProperty("_DISPLAY play random btn", properties.displayPlayRandom);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;	
+            case (idx == 4021):
+				properties.displayShuffle = !properties.displayShuffle;
+				window.SetProperty("_DISPLAY shuffle btn", properties.displayShuffle);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;			
+            case (idx == 4022):
+				properties.displayRepeat = !properties.displayRepeat;
+				window.SetProperty("_DISPLAY repeat btn", properties.displayRepeat);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;			
+            case (idx == 4023):
+				properties.displayOpen = !properties.displayOpen;
+				window.SetProperty("_DISPLAY open btn", properties.displayOpen);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);					
+				window.Repaint();				
+                break;	
             case (idx == 100):
                 window.ShowProperties();
                 break;  
@@ -2463,6 +2538,7 @@ function moreMenu(x, y){
 		_controlsMenu = undefined;	
 		_openMenu = undefined;			
         _schedulerMenu = undefined;
+		_menu_button = undefined;
         return true;
 }	
 function schedulerMenu(x, y){
@@ -2751,7 +2827,7 @@ function draw_settings_menu(x,y){
 		_menu_button.AppendMenuItem(MF_STRING, 3019, "Scheduler");
 		_menu_button.CheckMenuItem(3019, properties.displayScheduler);		
 		
-		_menu_button.AppendTo(_menu,MF_STRING, "Buttons");	
+		_menu_button.AppendTo(_menu,MF_STRING, "Visible buttons");	
 		
 		_menu3.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu3.CheckMenuItem(200, properties.showwallpaper);

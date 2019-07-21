@@ -2448,6 +2448,7 @@ button = function (normal, hover, down, name, tooltip_text) {
                 this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
                 break;
             };
+
 			if(this.state == ButtonStates.hover && this.tooltip_text!='' && g_tooltip.activeZone != this.name){
 				g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.name);
 				this.tooltip_activated = true;

@@ -78,10 +78,10 @@ function get_colors() {
 	setSettingsBtn();
 } get_colors();
 buttons = { 
-    Settings: new SimpleButton(0, 8, 21, 21, "", function () {
+    Settings: new SimpleButton(0, 8, 21, 21, "Settings", "Settings...", function () {
         if(plman.PlaylistItemCount(plman.ActivePlaylist)>0) draw_menu(buttons.Settings.x+25,buttons.Settings.y+25);
     },false,settings_off,settings_hover,ButtonStates.normal),
-    filtersToggle: new SimpleButton(18, 8, 50, 21, "filtersToggle", function () {
+    filtersToggle: new SimpleButton(18, 8, 50, 21, "filtersToggle", "Extend filters", function () {
 		if(filters_panel_state.isMaximumValue()) filters_panel_state.decrement(1);
 		else filters_panel_state.increment(1);
 		positionButtons();
@@ -161,13 +161,14 @@ var timers = {
 var cur_btn = null;
 var g_down = false;
 
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
+function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state,opacity) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
     this.text = text;
+    this.tooltip_text = tooltip_text;		
     this.fonClick = fonClick;
     this.fonDbleClick = fonDbleClick;
     this.N_img = N_img;
@@ -175,7 +176,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
 	this.opacity = opacity;
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
-        
+	this.tooltip_activated = false;
     this.containXY = function (x, y) {
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
@@ -219,6 +220,39 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }    
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+			break;				
+			case 'lbtn_up':
+				this.fonUp && this.fonUp();
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
+					this.changeState(ButtonStates.hover);
+				}
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
+			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
+					var tooltip_text = this.tooltip_text;
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
+		}
+    }  	
 }
 function draw_settings_menu(x, y) {
     var basemenu = window.CreatePopupMenu();
@@ -862,14 +896,26 @@ function on_mouse_move(x, y, m) {
 	}	
 	
     if (old == cur_btn) {
+		cur_btn && cur_btn.onMouse("move", x, y);		
         if (g_down) return;
     } else if (g_down && cur_btn && cur_btn.state != ButtonStates.down) {
+		cur_btn.onMouse("move", x, y);
         cur_btn.changeState(ButtonStates.down);
         return;
     } else if(plman.PlaylistItemCount(plman.ActivePlaylist)>0) {
-        old && old.changeState(ButtonStates.normal);
-        cur_btn && cur_btn.changeState(ButtonStates.hover);
-        window.Repaint();
+		var repaint = false;
+        if(old){
+			old.changeState(ButtonStates.normal);
+			old.onMouse("move", x, y);
+			repaint = true;
+		}
+        if(cur_btn){
+			cur_btn.changeState(ButtonStates.hover);
+			cur_btn.onMouse("move", x, y);
+			repaint = true;
+		}
+		else g_tooltip.Deactivate();
+        if(repaint) window.Repaint();
     }
 }
 function is_hover_title(x,y){
@@ -881,6 +927,7 @@ function on_mouse_leave() {
 	g_tooltip.Deactivate();
     if (cur_btn) {
         cur_btn.changeState(ButtonStates.normal);
+		cur_btn.onMouse("leave", -1, -1);		
         window.Repaint();
         cur_btn=null;        
     } 

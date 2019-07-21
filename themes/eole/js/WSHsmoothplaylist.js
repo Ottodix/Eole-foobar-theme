@@ -856,7 +856,7 @@ oFilterBox = function() {
 		} else {
 			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\search_icon.png");			
 		}
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt","Filter tracks");
 		
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -3658,7 +3658,7 @@ oBrowser = function(name) {
 					} else if((g_tooltip.activeZone!=this.activeRow) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 						g_tooltip.Deactivate();				
 					}
-				} else if((g_tooltip.activeZone!=this.activeRow && g_tooltip.activeZone!='') || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
+				} else if((g_tooltip.activeZone!=this.activeRow && g_tooltip.activeZone!='' && !isNaN(g_tooltip.activeZone)) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 						g_tooltip.Deactivate();						
 				}
                 break;
