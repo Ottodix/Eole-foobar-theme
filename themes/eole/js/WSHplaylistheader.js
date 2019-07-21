@@ -244,7 +244,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 			case 'move':
 				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
 					var tooltip_text = this.tooltip_text;
-					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.text);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
 					this.tooltip_activated = false;

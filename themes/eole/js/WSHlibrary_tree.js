@@ -240,7 +240,7 @@ oTagSwitcherBar = function() {
 				if(changed_state) {					
 					if(this.hoverItem>-1){
 						g_tooltip.Deactivate();
-						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.items_tooltips[this.hoverItem]);
+						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.items_tooltips[this.hoverItem]);
 					} else
 						g_tooltip.Deactivate();
 					window.Repaint();
@@ -1859,7 +1859,7 @@ function populate() {
 		if(hover) {
 			if(g_cursor.getCursor()!=IDC_HAND) {
 				g_cursor.setCursor(IDC_HAND, "node");
-				g_tooltip.ActivateDelay("Toggle node", x+10, y+20, globalProperties.tooltip_delay, 1200, false, "Toggle node");
+				g_tooltip.ActivateDelay("Toggle node", x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, "Toggle node");
 				pop.cursor = IDC_HAND;
 				pop.setCursor = IDC_HAND;	
 			}
@@ -2020,7 +2020,7 @@ function populate() {
             return;
         }
 		new_tooltip_text = this.tree[ix].name //+ (((this.tree[ix].track && p.show_tracks) || !pop.show_counts) ? ("") : (" (" + this.tree[ix].item.length + ")"));
-		g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, ix);
+		g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 0, false, ix);
 		return;		
     }
 
@@ -3486,7 +3486,7 @@ function button_manager() {
 					g_cursor.setCursor(IDC_HAND, this.tooltext);					
 					this.cursor = IDC_HAND;
 				}		
-				if(!g_tooltip.activated) g_tooltip.ActivateDelay(this.tooltext, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.tooltext);
+				if(!g_tooltip.activated) g_tooltip.ActivateDelay(this.tooltext, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.tooltext);
             } else {
                 this.img = this.img_normal;
 				if(this.cursor!=IDC_ARROW){

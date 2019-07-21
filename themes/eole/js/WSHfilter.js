@@ -1124,7 +1124,7 @@ oTagSwitcherBar = function() {
 				if(changed_state) {					
 					if(this.hoverItem>-1){
 						g_tooltip.Deactivate();
-						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.items_tooltips[this.hoverItem]);
+						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.items_tooltips[this.hoverItem]);
 					} else
 						g_tooltip.Deactivate();
 					brw.repaint();
@@ -3384,7 +3384,7 @@ oBrowser = function(name) {
 							new_tooltip_text=this.groups[this.activeIndex].tooltipText; 
 							if(g_tooltip.activeZone!='') g_tooltip.Deactivate();
 							this.tooltip_activated = true;
-							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.activeIndex);
+							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeIndex);
 						}
 						if(g_tooltip.activeZone!=this.activeIndex && g_tooltip.activeZone>-1){
 							g_tooltip.Deactivate();
@@ -5679,7 +5679,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 			
 				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
 					var tooltip_text = this.tooltip_text;
-					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.text);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
 					this.tooltip_activated = false;

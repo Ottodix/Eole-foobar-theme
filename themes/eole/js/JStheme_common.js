@@ -31,6 +31,7 @@ var globalProperties = {
 	miniMode_minwidth: 150,
 	minMode_minheight:200,	
 	tooltip_delay:500,	
+	tooltip_button_delay:500,		
 	fontAdjustement_min:-5,	
 	fontAdjustement_max:5,	
     fontAdjustement: window.GetProperty("GLOBAL Font Adjustement", 0),	
@@ -2450,7 +2451,7 @@ button = function (normal, hover, down, name, tooltip_text) {
             };
 
 			if(this.state == ButtonStates.hover && this.tooltip_text!='' && g_tooltip.activeZone != this.name){
-				g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.name);
+				g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.name);
 				this.tooltip_activated = true;
 			} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.name){
 				this.tooltip_activated = false;

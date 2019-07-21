@@ -3651,7 +3651,7 @@ oBrowser = function(name) {
 								if(properties.doubleRowText) new_tooltip_text=track_info[1]+"\n"+track_info[0];	
 								else  new_tooltip_text=track_info[1]+" - "+track_info[0];	
 							}
-							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.activeRow);
+							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeRow);
 						} else if((g_tooltip.activeZone!=this.activeRow) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 							g_tooltip.Deactivate();					
 						}

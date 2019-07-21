@@ -4198,7 +4198,7 @@ function SimpleButton(name, x, y, w, h, text, tooltip_text, fonClick, fonDbleCli
 			case 'move':
 				if(this.text=='' && this.tooltip_text!='' && g_tooltip.activeZone != this.name){
 					var tooltip_text = this.tooltip_text;
-					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.name);
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.name);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.name){
 					this.tooltip_activated = false;

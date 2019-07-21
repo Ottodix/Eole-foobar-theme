@@ -621,7 +621,7 @@ function build_buttons(){
 			} else {
 				plman.PlaybackOrder=1;					
 			}
-			g_tooltip.ActivateDelay(get_repeat_tooltip(), g_cursor.x+10, g_cursor.y+20, globalProperties.tooltip_delay, 1200, false, 'Repeat');
+			g_tooltip.ActivateDelay(get_repeat_tooltip(), g_cursor.x+10, g_cursor.y+20, globalProperties.tooltip_button_delay, 1200, false, 'Repeat');
 		},false,repeat_img,repeat_img_hover),   		
 		Volume: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Volume", "Volume (click to mute)",false, function () {
 			g_tooltip.Deactivate();
@@ -3194,7 +3194,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonDown, fonUp, fonDbleCli
 					if(this.text=='Repeat'){
 						var tooltip_text = get_repeat_tooltip();
 					} else var tooltip_text = this.tooltip_text;
-					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, this.text);
+					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.text);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
 					this.tooltip_activated = false;
