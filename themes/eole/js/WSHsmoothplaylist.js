@@ -2278,6 +2278,20 @@ oBrowser = function(name) {
 		Mimg.ReleaseGraphics(gb);
 		this.coverMask = Mimg;	
 	}		
+	this.getAdditionalFields = function(arr_t){
+		var add_infos = "";
+		if(properties.showPlaycount){
+			add_infos+=arr_t[4];
+		}
+		if(properties.showCodec){
+			add_infos+=(add_infos!=""?" - ":"")+arr_t[6]+"";
+		}								
+		if(properties.showBitrate){
+			add_infos+=(add_infos!=""?" - ":"")+arr_t[5]+"k";
+		}
+		if(add_infos!="") add_infos = "  ("+add_infos+")";	
+		return add_infos		
+	}
     this.draw = function(gr) {
         var coverWidth, coverTop;
         var arr_groupinfo = [];
@@ -2602,17 +2616,7 @@ oBrowser = function(name) {
                                 // fields
                                 var track_num = arr_t[0] == "?" ? this.rows[i].albumTrackId+1 : arr_t[0];
                                 var track_num_part = parseInt(track_num,10)+"    ";
-								var add_infos = "";
-								if(properties.showPlaycount){
-									add_infos+=arr_t[4];
-								}
-								if(properties.showCodec){
-									add_infos+=(add_infos!=""?" - ":"")+arr_t[6]+"";
-								}								
-								if(properties.showBitrate){
-									add_infos+=(add_infos!=""?" - ":"")+arr_t[5]+"k";
-								}
-								if(add_infos!="") add_infos = "  ("+add_infos+")";
+								var add_infos = this.getAdditionalFields(arr_t);
 
 								
                                 if(properties.showArtistAlways || !properties.showGroupHeaders || arr_e[0].toLowerCase() != arr_groupinfo[1].toLowerCase() || properties.doubleRowText) {
@@ -3667,8 +3671,9 @@ oBrowser = function(name) {
 								new_tooltip_text=album_info[0]+"\n"+album_info[1];									
 							} else if(this.rows[this.activeRow].type==0){
 								track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
-								if(properties.doubleRowText) new_tooltip_text=track_info[1]+"\n"+track_info[0];	
-								else  new_tooltip_text=track_info[1]+" - "+track_info[0];	
+								var add_fields = this.getAdditionalFields(this.rows[this.activeRow].infos);
+								if(properties.doubleRowText) new_tooltip_text=track_info[1]+"\n"+track_info[0]+add_fields;	
+								else  new_tooltip_text=track_info[1]+" - "+track_info[0]+add_fields;	
 							}
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeRow);
 						} else if((g_tooltip.activeZone!=this.activeRow) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
