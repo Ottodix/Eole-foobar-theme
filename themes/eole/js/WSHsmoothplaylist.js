@@ -30,6 +30,9 @@ var properties_big = {
     doubleRowText: window.GetProperty("BIG:doubleRowText", true),	
     doubleRowShowCover: window.GetProperty("BIG:doubleRowShowCover", true),	
     showArtistAlways: window.GetProperty("BIG:showArtistAlways", true),
+    showPlaycount: window.GetProperty("BIG:showPlaycount", false),
+    showBitrate: window.GetProperty("BIG:showBitrate", false),		
+    showCodec: window.GetProperty("BIG:showCodec", false),		
     showRating: window.GetProperty("BIG:showRating", true),
     showRatingSelected: window.GetProperty("BIG:showRatingSelected", true),	
     showRatingRated: window.GetProperty("BIG:showRatingRated", true),			
@@ -81,6 +84,9 @@ var properties_mini = {
     doubleRowText: window.GetProperty("MINI:doubleRowText", true),	
     doubleRowShowCover: window.GetProperty("MINI:doubleRowShowCover", true),	
     showArtistAlways: window.GetProperty("MINI:showArtistAlways", true),
+    showPlaycount: window.GetProperty("BIG:showPlaycount", false),		
+    showBitrate: window.GetProperty("BIG:showBitrate", false),	
+    showCodec: window.GetProperty("BIG:showCodec", false),		
     showRating: window.GetProperty("MINI:showRating", true),
     showRatingSelected: window.GetProperty("MINI:showRatingSelected", true),	
     showRatingRated: window.GetProperty("MINI:showRatingRated", true),			
@@ -105,7 +111,7 @@ var properties_common = {
     tf_artist: fb.TitleFormat("%artist%"),
     tf_albumartist: fb.TitleFormat("%album artist%"),
     tf_groupkey: fb.TitleFormat("$if2(%album%[' - Disc '%discnumber%],$if(%length%,'?',%path%)) ^^ $if2(%album artist%,$if(%length%,'Unknown artist(s)',%title%)) ^^ %discnumber% ## $if2(%artist%,$if(%length%,'Unknown artist',%path%)) ^^ %title% ^^ [%genre%] ^^ [%date%]"),
-    tf_track: fb.TitleFormat("%tracknumber% ^^ $if(%length%,%length%,ON AIR) ^^ $if2(%rating%,0) ^^ %mood%"),
+    tf_track: fb.TitleFormat("%tracknumber% ^^ $if(%length%,%length%,ON AIR) ^^ $if2(%rating%,0) ^^ %mood% ^^ %play_count% ^^ %bitrate% ^^ %codec%"),
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
     tf_time_remaining: fb.TitleFormat("$if(%length%,-%playback_time_remaining%,'ON AIR')"),
     tf_elapsed_seconds: fb.TitleFormat("$if(%length%,%playback_time_seconds%,'ON AIR')"),	
@@ -2587,22 +2593,37 @@ oBrowser = function(name) {
                             // text
                             // =====
                             if(ay >= (0 - ah) && ay < this.y + this.h) {
-                                
+
                                 var track_type = this.groups[this.rows[i].albumId].tracktype;
-                                
+
                                 var nbc = this.groups[this.rows[i].albumId].count.toString().length;
                                 if(nbc == 1) nbc++;
-                                
+
                                 // fields
                                 var track_num = arr_t[0] == "?" ? this.rows[i].albumTrackId+1 : arr_t[0];
                                 var track_num_part = parseInt(track_num,10)+"    ";
-                                if(properties.showArtistAlways || !properties.showGroupHeaders || arr_e[0].toLowerCase() != arr_groupinfo[0].toLowerCase() || properties.doubleRowText) {
-                                    var track_artist_part = arr_e[0];
+								var add_infos = "";
+								if(properties.showPlaycount){
+									add_infos+=arr_t[4];
+								}
+								if(properties.showCodec){
+									add_infos+=(add_infos!=""?" - ":"")+arr_t[6]+"";
+								}								
+								if(properties.showBitrate){
+									add_infos+=(add_infos!=""?" - ":"")+arr_t[5]+"k";
+								}
+								if(add_infos!="") add_infos = "  ("+add_infos+")";
+
+								
+                                if(properties.showArtistAlways || !properties.showGroupHeaders || arr_e[0].toLowerCase() != arr_groupinfo[1].toLowerCase() || properties.doubleRowText) {
+                                    var track_artist_part = (properties.doubleRowText?"":" - ")+arr_e[0]+add_infos;
                                 } else {
-                                    var track_artist_part = "";
+                                    var track_artist_part = " "+add_infos;
                                 };
+
                                 var track_title_part = arr_e[1];
                                 var track_time_part = arr_t[1];
+
                                 // rating tag fixing & formatting
                                 if(this.rows[i].rating == -1) {
                                     if(isNaN(arr_t[2])) {
@@ -2979,9 +3000,9 @@ oBrowser = function(name) {
                                         } else {
 											if(properties.showGroupHeaders){
 												 track_part1 = track_title_part;
-												 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1 + " - ", g_font.normal) + 5 : 5;
+												 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1, g_font.normal) + 5 : 5;
 												 track_part1 = track_title_part
-												 track_part2 = track_artist_part;
+												 track_part2 = track_artist_part
 												 track_part1_color = colors.normal_txt
 												 if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;												 
 												 if(properties.showToolTip) {												 
@@ -2990,10 +3011,10 @@ oBrowser = function(name) {
 													 } else this.rows[i].tooltip = false;
 												 }
 											} else{
-												if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part + " - ", g_font.normal) + 5 : 5;	
-												track_part1 = track_artist_part;
-												track_part2 = track_title_part;
-												track_part1_color = colors.normal_txt;
+												track_part1 = track_title_part;
+												track_part2 = track_artist_part;
+												track_part1_color = colors.normal_txt;												
+												if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1 + " - ", g_font.normal) + 5 : 5;	
 												if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;		 												
 											}												
                                             if(!isDefined(this.rows[i].artist_part_w)) this.rows[i].artist_part_w = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part + " - ", g_font.normal) +3: 0;
@@ -3004,8 +3025,7 @@ oBrowser = function(name) {
 											}
                                         };		
 										
-										show_track_part2 = (tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5)>13);
-										if(show_track_part2 && track_part2!="" && track_part1!="") track_part1 = track_part1 + " - ";										
+										show_track_part2 = (tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5)>13);									
                                         if(this.rows[i].track_part1 > 0) {
                                             if(track_time_part == "ON AIR") {
                                                 gr.GdiDrawText(g_radio_title, g_font.normal, colors.normal_txt, tx+10, ay, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -3122,8 +3142,7 @@ oBrowser = function(name) {
 											 track_part2_color = colors.fadedsmall_txt											
 										} else if(properties.showGroupHeaders){
 											 track_part1 = track_title_part;
-											 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1 + " - ", g_font.normal) + 5 : 5;
-											 track_part1 = track_title_part;
+											 if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1, g_font.normal) + 5 : 5;
 											 track_part2 = track_artist_part;
 											 track_part2_color = colors.fadedsmall_txt;
 											 if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;											 
@@ -3133,9 +3152,9 @@ oBrowser = function(name) {
 												} else this.rows[i].tooltip = false;
 											}											
 										} else{
-											if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part + " - ", g_font.normal) + 5 : 5;
-											track_part1 = track_artist_part;
-											track_part2 = track_title_part;
+											track_part1 = track_title_part;
+											track_part2 = track_artist_part;											
+											if(!isDefined(this.rows[i].track_part1)) this.rows[i].track_part1 = track_part1.length > 0 ? gr.CalcTextWidth(track_part1, g_font.normal) + 5 : 5;
 											if(!isDefined(this.rows[i].track_part2)) this.rows[i].track_part2 = track_part2.length > 0 ? gr.CalcTextWidth(track_part2, g_font.normal) : 0;
 											if(track_part1.length>0) track_part2_color = colors.fadedsmall_txt
 											else  track_part2_color = colors.normal_txt
@@ -3147,12 +3166,11 @@ oBrowser = function(name) {
 										}
 										
 										show_track_part2 = (tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5)>13);
-										if(show_track_part2 && track_part2!="" && track_part1!="") track_part1 = track_part1 + " - ";
                                         if(this.rows[i].track_part1 > 0) {
                                             gr.GdiDrawText(track_part1, g_font.normal, colors.normal_txt, tx+13, ay, tw-cColumns.track_time_part-20-this.rows[i].rating_length, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
                                         if(show_track_part2)
-										gr.GdiDrawText(track_part2, g_font_light, track_part2_color, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+										gr.GdiDrawText(track_part2, g_font_lightmin1, track_part2_color, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         // rating Stars
 										try {
@@ -4193,7 +4211,14 @@ oBrowser = function(name) {
 			
             _menu.AppendMenuItem(MF_STRING, 905, "Show a tooltip for long track titles");		
 			_menu.CheckMenuItem(905, properties.showToolTip);
-            _menu.AppendMenuItem((!properties.doubleRowText ? (!properties.showGroupHeaders ? MF_GRAYED | MF_DISABLED : MF_STRING) : MF_GRAYED | MF_DISABLED), 111, "Append Artist to title");
+            _menu.AppendMenuItem(MF_STRING, 906, "Show playcount");		
+			_menu.CheckMenuItem(906, properties.showPlaycount);
+            _menu.AppendMenuItem(MF_STRING, 908, "Show codec");
+			_menu.CheckMenuItem(908, properties.showCodec);				
+            _menu.AppendMenuItem(MF_STRING, 907, "Show bitrate");
+			_menu.CheckMenuItem(907, properties.showBitrate);			
+			
+            _menu.AppendMenuItem((!properties.doubleRowText ? (!properties.showGroupHeaders ? MF_GRAYED | MF_DISABLED : MF_STRING) : MF_GRAYED | MF_DISABLED), 111, "Always append artist to title");
             _menu.CheckMenuItem(111, properties.showArtistAlways);	
 			
 			_menu1.AppendMenuItem(MF_STRING, 914, "No progress bar");
@@ -4378,7 +4403,22 @@ oBrowser = function(name) {
                 case (idx == 905):
                     setOneProperty("showToolTip",!properties.showToolTip);
                     brw.repaint();
-                    break;									
+                    break;		
+                case (idx == 906):
+                    setOneProperty("showPlaycount",!properties.showPlaycount);
+					g_var_cache.resetAll();
+                    brw.repaint();
+                    break;	
+                case (idx == 907):
+                    setOneProperty("showBitrate",!properties.showBitrate);
+					g_var_cache.resetAll();
+                    brw.repaint();
+                    break;		
+                case (idx == 908):
+                    setOneProperty("showCodec",!properties.showCodec);
+					g_var_cache.resetAll();
+                    brw.repaint();
+                    break;					
                 case (idx == 910):
                     setOneProperty("showHeaderBar",!properties.showHeaderBar);
                     get_metrics();

@@ -2740,10 +2740,12 @@ function get_font() {
 	g_font.nowplaying_title = gdi.Font(g_fname_light_italic, g_fsize+14, 0);
 	g_font.nowplaying_subtitle = gdi.Font(g_fname_light_italic, g_fsize+14, 0);
 	
-	if(properties.darklayout) 
+	if(properties.darklayout) {
 		g_font_light = gdi.Font(g_fname_light, g_fsize, g_fstyle_light);
-	else {
+		g_font_lightmin1 = gdi.Font(g_fname_light, g_fsize-1, g_fstyle_light);		
+	} else {
 		g_font_light = g_font.normal;
+		g_font_lightmin1 = g_font.min1;		
 		g_fname_light = g_fname_light;
         g_fstyle_light = 0;			
     }
