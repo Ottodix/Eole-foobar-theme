@@ -2170,11 +2170,11 @@ oSearch = function() {
 		var gb;
         var button_size = 18;
 		this.images.search_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_icon.png");
-		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt");
+		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt","Search whole library");
 
 		this.images.search_history_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history.png");
 		this.images.search_history_hover_icon = gdi.Image(theme_img_path  + "\\icons\\"+colors.icons_folder+"\\search_history_hover.png");
-		this.search_history_bt = new button(this.images.search_history_icon, this.images.search_history_hover_icon, this.images.search_history_hover_icon,"search_history_bt");
+		this.search_history_bt = new button(this.images.search_history_icon, this.images.search_history_hover_icon, this.images.search_history_hover_icon,"search_history_bt","Search history");
 		
         this.images.resetIcon_off = gdi.CreateImage(button_size, button_size);
         gb = this.images.resetIcon_off.GetGraphics();
@@ -2203,7 +2203,7 @@ oSearch = function() {
             gb.SetSmoothingMode(0);
         this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt");
+        this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt","Reset search");
 	};
 	this.getImages();    
     this.reset_colors = function() {
@@ -2353,9 +2353,10 @@ oSearch = function() {
 				this.isHoverHistoryOld = this.isHoverHistory;
 				this.checkHover(x,y);
 				if(!this.hide) this.inputbox.check("move", x, y);
-				this.search_bt.checkstate("move", x, y);	
+				
 				this.search_history_bt.checkstate("move", x, y);
                 if((this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) && !this.hide) this.reset_bt.checkstate("move", x, y);
+				else this.search_bt.checkstate("move", x, y);	
 				
 				/*//if(x > this.x+this.w-cSearchBox.paddingRight && x<this.x+this.w && y>cSearchBox.marginTop && !this.hide) this.isHoverHistory = true;
 				var x_start =this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2)-5;

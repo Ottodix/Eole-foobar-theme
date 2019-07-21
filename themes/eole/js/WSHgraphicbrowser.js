@@ -499,7 +499,7 @@ oFilterBox = function() {
 				if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && this.inputbox.text.length > 0) {
 					this.clearInputbox();
                 } 
-				this.search_bt.checkstate("up", x, y)
+				this.search_bt.checkstate("up", x, y);
 				/*if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 					this.inputbox.activate(x,y);
 					this.inputbox.repaint();				
@@ -513,9 +513,9 @@ oFilterBox = function() {
 				this.inputbox.check("right", x, y);
                 break;
             case "move":
-				this.inputbox.check("move", x, y);
-				this.search_bt.checkstate("move", x, y);				
+				this.inputbox.check("move", x, y);				
                 if(this.inputbox.text.length > 0) this.reset_bt.checkstate("move", x, y);
+				else this.search_bt.checkstate("move", x, y);
                 break;
         }
     }
