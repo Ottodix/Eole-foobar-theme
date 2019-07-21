@@ -2757,9 +2757,9 @@ function FormatCover(image, w, h, rawBitmap, callID) {
 	if(rawBitmap) {
 		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
 	} else {
-		try {
+		//try {
 			return image.Resize(w, h, globalProperties.ResizeQLY);
-		} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image+", callID:"+callID); return null;}
+		//} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image+", callID:"+callID+"\n"+e); return null;}
 	}
 };
 function isImage(variable){
@@ -3014,30 +3014,44 @@ oImageCache = function () {
 					if(!isScrolling){
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename);
 						this.cachelist[cachekey] = img;
+						brw.groups[albumIndex].cover_type = 1;
+						brw.groups[albumIndex].cover_img = img;
+						brw.groups[albumIndex].cover_img_mask = false;
+						brw.groups[albumIndex].cover_formated = false;
+						//console.log("ehh0 "+albumIndex+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey+" - "+brw.groups[albumIndex].cover_filename)
 						brw.groups[albumIndex].load_requested = 2;
 						brw.repaint();
 						this.cover_load_timer = Array();
 					} else if(!direct_return){
+						
 						if(this.cover_load_timer.length<10) {
-							this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(albumIndex, cachekey){
+							this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(albumIndex, cachekey, filename){
 								if(brw.groups[albumIndex].load_requested == 0){
 									try {							
 										if(properties.load_image_from_cache_direct) {
-											img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename);
+											img = load_image_from_cache_direct(filename);
 											g_image_cache.cachelist[cachekey] = img;
-											brw.groups[albumIndex].load_requested = 0;
+											//console.log("ehh2 "+albumIndex+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey+" - "+filename)
+											brw.groups[albumIndex].load_requested = 2;
+											brw.groups[albumIndex].cover_type = 1;
 											brw.groups[albumIndex].cover_img = img;
+											brw.groups[albumIndex].cover_img_mask = false;
+											brw.groups[albumIndex].cover_formated = false;
+											brw.repaint();
 										} else {
-											brw.groups[albumIndex].tid = load_image_from_cache(brw.groups[albumIndex].cover_filename);
+											brw.groups[albumIndex].tid = load_image_from_cache(filename);
 											brw.groups[albumIndex].load_requested = 1;
 										}										
-									} catch(e) {console.log("timers.coverLoad line 5133 failed")};
+									} catch(e) {//console.log("timers.coverLoad line 5133 failed")
+									};
 									g_image_cache.cover_load_timer.pop();
 									brw.repaint();	
 								}
-							}, 5, albumIndex, cachekey);
-						}	
-					} else {
+							}, 5, albumIndex, cachekey, brw.groups[albumIndex].cover_filename);
+							//console.log("ehh1 "+albumIndex+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey+" - "+brw.groups[albumIndex].cover_filename)
+						}
+						if(artist_name != '') return 'loading';
+					} else {//console.log("maiskeskisepasse")
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename)
 						if(img) {
 							this.cachelist[cachekey] = img
@@ -3059,6 +3073,15 @@ oImageCache = function () {
 					if(g_files.FileExists(filepath)) {
 						img = gdi.Image(filepath);
 						save_image_to_cache(img, 0, cachekey);
+					} else if(properties.AlbumArtFallback){
+						//console.log("fallback "+i+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey_album)
+						brw.groups[albumIndex].cover_img = g_image_cache.hit(metadb, albumIndex, false, brw.groups[albumIndex].cachekey_album);
+						if(brw.groups[albumIndex].cover_img=='loading') return 'loading';
+						brw.groups[albumIndex].load_requested = 2;
+						brw.groups[albumIndex].cover_type = null;
+						brw.groups[albumIndex].cover_img = img;
+						brw.groups[albumIndex].cover_img_mask = false;
+						brw.groups[albumIndex].cover_formated = false;					
 					}
 				} else if(!direct_return){				
 					if(albumIndex<0) {
