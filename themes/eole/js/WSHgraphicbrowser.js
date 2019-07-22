@@ -1341,6 +1341,7 @@ oShowList = function(parentPanelName) {
 	this.track_rated = false;
 	this.genre = '';
 	this.cursor = IDC_ARROW;
+	this.odd_tracks_count = false;
 	this.links = {
 		album : new SimpleButton(0, 0, 0, 0, "albumLink", "Show this album", function () {
 			quickSearch(g_showlist.pl[0],"album");
@@ -1364,8 +1365,9 @@ oShowList = function(parentPanelName) {
 			this.marginBot = 15;
 			this.coverMarginTop = 35;
 			this.paddingTop = g_fsize*5+22;
-			this.paddingBot = 10;			
+			this.paddingBot = 12;			
 		}
+		this.margins_plus_paddings = this.paddingTop + this.paddingBot + (this.marginTop+this.marginBot);
 	}			
 	this.onFontChanged = function(){
 		this.textHeight = Math.ceil(g_fsize * 1.8)+this.textBot;
@@ -2081,6 +2083,7 @@ oShowList = function(parentPanelName) {
 		if(update_tracks){
 			this.isPlaying = false;	
 			this.totaltracks = this.pl.Count;
+			this.odd_tracks_count = this.totaltracks%2==1;
 			this.rows_.splice(0, this.rows_.length);
 			this.totalHeight = 0;			
 			var playing_track = fb.GetNowPlaying();
@@ -2093,35 +2096,33 @@ oShowList = function(parentPanelName) {
 					brw.isPlayingIdx = brw.groups_draw[drawn_idx];
 				}
 			}
-			if(this.pl.Count%2==1 && this.totalColsVisMax>1)
+			if(this.odd_tracks_count && this.totalColsVisMax>1)
 				this.totalHeight += this.textHeight;				
 		} else {
-			if(this.pl.Count%2==1 && this.totalColsVisMax>1 && totalColsVisMax_old<=1)
+			if(this.odd_tracks_count && this.totalColsVisMax>1 && totalColsVisMax_old<=1)
 				this.totalHeight += this.textHeight;
-			else if(!(this.pl.Count%2==1 && this.totalColsVisMax>1) && (this.pl.Count%2==1 && totalColsVisMax_old>1))
+			else if(!(this.odd_tracks_count && this.totalColsVisMax>1) && (this.odd_tracks_count && totalColsVisMax_old>1))
 				this.totalHeight -= this.textHeight;				
 		}
 		
         var a = Math.ceil(this.totalHeight / this.totalColsVisMax);
-		if(this.totaltracks%2==1) {a+=this.textHeight;}
+		if(this.odd_tracks_count) {a+=this.textHeight;}
         switch(true) {
-        case (this.totalHeight < this.heightMin - this.paddingTop - this.paddingBot - (this.marginTop+this.marginBot)) :
+        case (this.totalHeight < this.heightMin - this.margins_plus_paddings):
             this.h = this.heightMin;
             this.totalColsVis = 1;
             this.totalCols = 1;
             break;
-        case (a <= this.heightMin - this.paddingTop - this.paddingBot - (this.marginTop+this.marginBot)) :
+        case (a <= this.heightMin - this.margins_plus_paddings):
             this.h = this.heightMin;
             this.totalColsVis = this.totalColsVisMax;
             this.totalCols = this.totalColsVisMax;
             break;
         default:
-            if(a > this.heightMax - this.paddingTop - this.paddingBot - (this.marginTop+this.marginBot)) {
-                this.h = this.heightMax - ((this.pl.Count%2==1)?this.textHeight:0);
-				this.h = this.h - this.h%this.textHeight;
-            } else {
-                this.h = a + this.paddingTop + this.paddingBot + (this.marginTop+this.marginBot) - ((this.pl.Count%2==1)?this.textHeight:0);
-            }
+			var heightMax = this.heightMax - this.margins_plus_paddings
+            if(a > heightMax) 
+				while(a>heightMax) a-=this.textHeight;
+            this.h = a + this.margins_plus_paddings - (this.odd_tracks_count?this.textHeight:0);
             this.totalColsVis = this.totalColsVisMax;
             this.totalCols = Math.ceil(this.totalHeight / a);
         }
@@ -2143,10 +2144,10 @@ oShowList = function(parentPanelName) {
         this.columns.splice(0, this.columns.length);
         this.totaltracks = this.rows_.length;
 		
-		var h_max = this.h - this.paddingTop - this.paddingBot - (this.marginTop+this.marginBot);
+		var h_max = this.h - this.margins_plus_paddings;
 		
         if(this.totalHeight > h_max) {
-            var a = Math.ceil((this.totalHeight + (15 + 8)) / this.totalColsVisMax) + 8;
+            var a = Math.ceil((this.totalHeight + 23) / this.totalColsVisMax) + 8;
         } else {
             var a = h_max;
         }
@@ -2170,7 +2171,7 @@ oShowList = function(parentPanelName) {
         }       
         this.totalCols = this.columns.length;
 		if(this.totalCols>this.totalColsVis) {
-			this.h += this.hscr_height-(properties.CoverGridNoText?10:10);
+			this.h += this.hscr_height;
 		}
     }
 	this.isHover_hscrollbar = function(x,y){	
@@ -2267,7 +2268,7 @@ oShowList = function(parentPanelName) {
 						//Line above scrollbar
 						gr.FillGradRect(this.x, this.hscr_y-1, this.w, 1, 0, this.scrollbar_border_color, this.scrollbar_border_color, 1.0);									
 						this.prev_bt.draw(gr, this.x, this.hscr_y-1, this.columnsOffset > 0 ? 255 : 55);
-						this.next_bt.draw(gr, this.x+50+(this.prev_bt.w+15) + this.hscr_width, this.hscr_y-1, this.columnsOffset < this.totalCols - this.totalColsVis ? 255 : 55);						
+						this.next_bt.draw(gr, this.x+50+(this.prev_bt.w+15) + this.hscr_width, this.hscr_y-1, this.columnsOffset < this.totalCols - this.totalColsVis ? 255 : 55);		
 					} else {
 						//bottom line
 						gr.FillSolidRect(this.x, this.y+this.marginTop+slh, this.w, 1, this.border_color);
