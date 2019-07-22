@@ -2486,7 +2486,7 @@ oBrowser = function(name) {
 									width = this.groups[g].cover_img.Width;
 									height = this.groups[g].cover_img.Height;
 									coverMask = this.coverMask.Resize(width, height, 7);
-									if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height) 									
+									if(this.groups[g].is_fallback || properties.AlbumArtProgressbar) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height);									
 									this.groups[g].cover_img.ApplyMask(coverMask);
 									this.groups[g].mask_applied = true;
 								};
@@ -2743,7 +2743,7 @@ oBrowser = function(name) {
 												pt = playingText.GetGraphics();
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.normal_bg)
 													pt.SetTextRenderingHint(5);
-													if(typeof(this.groups[this.rows[i].albumId].g_wallpaperImg) == "undefined" || !this.groups[this.rows[i].albumId].g_wallpaperImg) {	
+													if(typeof(this.groups[this.rows[i].albumId].g_wallpaperImg) == "undefined" || !this.groups[this.rows[i].albumId].g_wallpaperImg){	
 														this.groups[this.rows[i].albumId].g_wallpaperImg = setWallpaperImgV2(undefined, this.groups[this.rows[i].albumId].metadb, true, ww, ah*16);
 													};						
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
@@ -2823,7 +2823,7 @@ oBrowser = function(name) {
 													width = this.groups[g].cover_img.Width;
 													height = this.groups[g].cover_img.Height;
 													coverMask = this.coverMask.Resize(width, height, 7);
-													if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height); 
+													if(this.groups[g].is_fallback || properties.AlbumArtProgressbar) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height); 
 													this.groups[g].cover_img.ApplyMask(coverMask);
 													this.groups[g].mask_applied = true;
 												}													
@@ -2893,7 +2893,7 @@ oBrowser = function(name) {
 													width = this.groups[g].cover_img.Width;
 													height = this.groups[g].cover_img.Height;
 													coverMask = this.coverMask.Resize(width, height, 7);
-													if(this.groups[g].is_fallback) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height) 													
+													if(this.groups[g].is_fallback || properties.AlbumArtProgressbar) this.groups[g].cover_img = this.groups[g].cover_img.Clone(0, 0, width, height);
 													this.groups[g].cover_img.ApplyMask(coverMask);
 													this.groups[g].mask_applied = true;
 												}													

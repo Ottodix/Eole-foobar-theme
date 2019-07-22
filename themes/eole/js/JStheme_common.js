@@ -3250,17 +3250,16 @@ function setWallpaperImgV2(image, metadb, progressbar_art, width, height, blur_v
 	width = typeof width !== 'undefined' ? width : ww;	
 	height = typeof height !== 'undefined' ? height : wh;
 	blur_value = typeof blur_value !== 'undefined' ? blur_value : properties.wallpaperblurvalue;	
-	
     if(isImage(image)) {
 		var tmp_img = image;
     } else if(metadb && (properties.wallpapermode == 0 || progressbar_art)) {
 		cachekey = process_cachekey(metadb);
 		var tmp_img = get_albumArt(metadb, cachekey);
-    };
+    }
 	
     if(!tmp_img) {
         tmp_img = gdi.Image(globalProperties.default_wallpaper);
-    };
+    }
 
     if(!progressbar_art) {
 		if(metadb!==null) g_wallpaperImg = null;
