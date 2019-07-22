@@ -4236,8 +4236,8 @@ oBrowser = function(name) {
             _menu3.CheckMenuItem(300, properties.showGroupHeaders);
             _menu3.AppendMenuItem((properties.showGroupHeaders ? MF_STRING : MF_GRAYED | MF_DISABLED), 310, "Autocollapse");
             _menu3.CheckMenuItem(310, properties.autocollapse);
-			var _menu_header_size = window.CreatePopupMenu();
-			/*_menu_header_size.AppendMenuItem(MF_STRING, 301, "Normal");
+			/*var _menu_header_size = window.CreatePopupMenu();
+			_menu_header_size.AppendMenuItem(MF_STRING, 301, "Normal");
 			_menu_header_size.AppendMenuItem(MF_STRING, 302, "Big");
 			_menu_header_size.AppendMenuItem(MF_STRING, 303, "Bigger");			
 			_menu_header_size.AppendTo(_menu3,MF_STRING, "Size");*/	
@@ -4252,17 +4252,18 @@ oBrowser = function(name) {
 			
             _menu.AppendMenuSeparator();
 			
-            _menu.AppendMenuItem(MF_STRING, 905, "Show a tooltip for long track titles");		
-			_menu.CheckMenuItem(905, properties.showToolTip);
-            _menu.AppendMenuItem(MF_STRING, 906, "Show playcount");		
-			_menu.CheckMenuItem(906, properties.showPlaycount);
-            _menu.AppendMenuItem(MF_STRING, 908, "Show codec");
-			_menu.CheckMenuItem(908, properties.showCodec);				
-            _menu.AppendMenuItem(MF_STRING, 907, "Show bitrate");
-			_menu.CheckMenuItem(907, properties.showBitrate);			
-			
-            _menu.AppendMenuItem((!properties.doubleRowText ? (!properties.showGroupHeaders ? MF_GRAYED | MF_DISABLED : MF_STRING) : MF_GRAYED | MF_DISABLED), 111, "Always append artist to title");
-            _menu.CheckMenuItem(111, properties.showArtistAlways);	
+			var _menu_title = window.CreatePopupMenu();
+            _menu_title.AppendMenuItem(MF_STRING, 905, "Show a tooltip for long track titles");		
+			_menu_title.CheckMenuItem(905, properties.showToolTip);
+            _menu_title.AppendMenuItem(MF_STRING, 906, "Show playcount");		
+			_menu_title.CheckMenuItem(906, properties.showPlaycount);
+            _menu_title.AppendMenuItem(MF_STRING, 908, "Show codec");
+			_menu_title.CheckMenuItem(908, properties.showCodec);				
+            _menu_title.AppendMenuItem(MF_STRING, 907, "Show bitrate");
+			_menu_title.CheckMenuItem(907, properties.showBitrate);
+            _menu_title.AppendMenuItem((!properties.doubleRowText ? (!properties.showGroupHeaders ? MF_GRAYED | MF_DISABLED : MF_STRING) : MF_GRAYED | MF_DISABLED), 111, "Always append artist to title");
+            _menu_title.CheckMenuItem(111, properties.showArtistAlways);	
+			_menu_title.AppendTo(_menu,MF_STRING, "Track title");	
 			
 			_menu1.AppendMenuItem(MF_STRING, 914, "No progress bar");
 			_menu1.AppendMenuItem(MF_STRING, 916, "White Progress bar");			
