@@ -435,7 +435,7 @@ function get_colors_global(){
 
 		colors.sidesline = GetGrey(255,25);		
 		colors.border = GetGrey(255,50);	
-		colors.border_dark = GetGrey(0,60);		
+		colors.border_dark = GetGrey(0,40);		
 		colors.border_light = colors.border;			
 		colors.border_0 = GetGrey(255,50);
 		
@@ -512,7 +512,7 @@ function get_colors_global(){
 		
 		colors.sidesline = GetGrey(0,37);
 		colors.border = GetGrey(0,50);
-		colors.border_dark = GetGrey(0,35);	
+		colors.border_dark = GetGrey(0,40);	
 		colors.border_light = GetGrey(255,50);
 		colors.border_0 = GetGrey(0,0);
 		
