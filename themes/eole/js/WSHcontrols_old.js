@@ -21,7 +21,6 @@ var properties = {
     displayShuffle: window.GetProperty("_DISPLAY shuffle btn", true),	
     displayRepeat: window.GetProperty("_DISPLAY repeat btn", true),
     displayOpen: window.GetProperty("_DISPLAY open btn", true),		
-    displayStop: window.GetProperty("_DISPLAY stop btn", false),			
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", false),		
     bio_dark_theme: window.GetProperty("BIO dark theme", false),	
     bio_stick_to_dark_theme: window.GetProperty("BIO stick to dark theme", false),		
@@ -192,8 +191,6 @@ function build_images(){
 	prev_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\prev.png");
 	next_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\next_hover.png");
 	next_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\next.png");
-	stop_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\stop_hover.png");
-	stop_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\stop.png");
 	
 	mini_play_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\play_mini_hover.png");
 	mini_play_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\play_mini.png");
@@ -352,9 +349,8 @@ function adapt_display_to_layout(){
 		for (var i in buttons_right) {
 			buttons_right[i].changeState(ButtonStates.hide)
 		}	
-		buttons.Prev.changeState(ButtonStates.hide);
-		buttons.Next.changeState(ButtonStates.hide);	
-		buttons.Stop.changeState(ButtonStates.hide);		
+		buttons.Prev.changeState(ButtonStates.hide)
+		buttons.Next.changeState(ButtonStates.hide)		
 		if(properties.showTrackInfo) {
 			global_top_m=2;
 			buttons.Pause.y = global_top_m+2;				
@@ -391,14 +387,6 @@ function adapt_display_to_layout(){
 		font_adjusted_italic = g_font.normal;				
 		time_font = g_font.normal;		
 	} else {
-		if(!properties.displayStop || !fb.IsPlaying){ 
-			buttons.Stop.changeState(ButtonStates.hide);console.log("stop hide")
-			buttons.Stop.hide = true;
-		} else {
-			buttons.Stop.changeState(ButtonStates.normal);	
-			buttons.Stop.hide = false;
-		}
-		
 		hideProgressWhenVolumeChange = false;	
 		if(mini_controlbar.isActive()) {
 			font_adjusted = g_font.plus1;
@@ -435,7 +423,8 @@ function adapt_display_to_layout(){
 			for (var i in buttons_right) {
 				buttons_right[i].y = buttons_right_top_m;
 			}					
-			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
+
+			progress_margin_left = button_left_m + 180;
 			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5;	
 			
 			volume_vars.margin_top = global_top_m+20;
@@ -516,11 +505,11 @@ function build_buttons(){
 		Next: new SimpleButton(button_sep_value*2+button_left_m, button_top_m, 41, 41, "Next", "Next track",false, function () {
 			fb_play_from_playing(1) //fb.Next();
 			g_tooltip.Deactivate();
-		},false,next_img,next_img_hover),  	
-		Stop: new SimpleButton(button_sep_value*3+button_left_m, button_top_m, 41, 41, "Stop", "Stop playback",false, function () {
+		},false,next_img,next_img_hover)  	
+		Next: new SimpleButton(button_sep_value*2+button_left_m, button_top_m, 41, 41, "Next", "Next track",false, function () {
 			fb.Stop();
 			g_tooltip.Deactivate();
-		},false,stop_img,stop_img_hover)  		
+		},false,next_img,next_img_hover)  		
 	} 
 	buttons_mini = {
 		/*Volume: new SimpleButton(mini_btns.button_left_m, mini_btns.button_top_m, 15, 15, "Next", "",false, function () {
@@ -741,19 +730,17 @@ function on_size(w, h) {
     ww = Math.max(w,globalProperties.miniMode_minwidth-50);
     wh = h;
 	
-	calculate_onsize_vars(w, h);
+	//Volume
+	if(layout_state.isEqual(0)) volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+	else volume_vars.width = window.Width-volume_vars.margin_right-volume_vars.margin_left
+	calculateVolumeSize();
+	
+	//Progress   
+    ww_progress = window.Width-progress_margin_left-progress_margin_right;
 
 	if (fb.IsPlaying) {on_playback_time(fb.PlaybackTime);} 
 
 }  
-function calculate_onsize_vars(w, h){
-	if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
-	else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left
-	calculateVolumeSize();
-	
-	//Progress   
-    ww_progress = w-progress_margin_left-progress_margin_right;
-}
 
 function on_paint(gr) {	
 	gr.SetTextRenderingHint(globalProperties.TextRendering);
@@ -802,7 +789,7 @@ function on_paint(gr) {
 			gr.FillSolidRect(progress_margin_left, progress_margin_top-Math.round(progress_vars.height/2)+1, ww_progress, progress_vars.height,progressOffcolor); 
 		} else {
 			var dot_x = progress_margin_left + ww_progress;
-			while (dot_x >= progress_margin_left + g_pos_progress + (fb.IsPlaying && g_length_progress > 0?ellipse_radius:0)) {
+			while (dot_x >= progress_margin_left + g_pos_progress + (fb.IsPlaying?ellipse_radius:0)) {
 				gr.FillSolidRect(dot_x, progress_margin_top+1, 1, 1, colors.dotted_progress);
 				dot_x = dot_x-3;
 			}
@@ -1248,11 +1235,7 @@ function on_playback_new_track(metadb) {
 	g_pos_progress = 0;
 	progress_vars.drag = false;
 	current_played_track = metadb;
-	get_text();
-	if(properties.displayStop) {
-		adapt_display_to_layout();
-		calculate_onsize_vars(ww, wh);
-	}
+	get_text();	
 	if(properties.showwallpaper && properties.wallpapermode == 0) {
 		old_cachekey = nowplaying_cachekey;
 		nowplaying_cachekey = process_cachekey(metadb);
@@ -1311,11 +1294,7 @@ function on_playback_stop(reason) {
 			nowplaying_cachekey = null;
 			evalTimeDisplayed();
 			get_text();	
-		}	
-		if(properties.displayStop){
-			adapt_display_to_layout();
-			calculate_onsize_vars(ww, wh);
-		}
+		}		
 		break;
 	case 2: // starting_another (only called on user action, i.e. click on next button)
 		break;
@@ -2304,8 +2283,6 @@ function moreMenu(x, y){
 		
 		var _menu_button = window.CreatePopupMenu();
 		_moreMenu.AppendMenuSeparator();
-		_menu_button.AppendMenuItem(MF_STRING, 4016, "Stop button");
-		_menu_button.CheckMenuItem(4016, properties.displayStop);		
 		_menu_button.AppendMenuItem(MF_STRING, 4022, "Repeat");
 		_menu_button.CheckMenuItem(4022, properties.displayRepeat);		
 		_menu_button.AppendMenuItem(MF_STRING, 4021, "Shuffle");
@@ -2536,14 +2513,6 @@ function moreMenu(x, y){
 				on_size(window.Width, window.Height);					
 				window.Repaint();				
                 break;	
-            case (idx == 4016):
-				properties.displayStop = !properties.displayStop;
-				window.SetProperty("_DISPLAY stop btn", properties.displayStop);
-				build_buttons();
-				adapt_display_to_layout();
-				on_size(window.Width, window.Height);					
-				window.Repaint();				
-                break;				
             case (idx == 100):
                 window.ShowProperties();
                 break;  
@@ -2839,8 +2808,26 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(3015, properties.showTrackInfo);
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
 		_menu.CheckMenuItem(3016, coverpanel_state.isActive());		
-		
+
 		_menu.AppendMenuSeparator();
+		
+		_menu_button.AppendMenuItem(MF_STRING, 3022, "Repeat");
+		_menu_button.CheckMenuItem(3022, properties.displayRepeat);		
+		_menu_button.AppendMenuItem(MF_STRING, 3021, "Shuffle");
+		_menu_button.CheckMenuItem(3021, properties.displayShuffle);	
+		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
+		_menu_button.CheckMenuItem(3023, properties.displayOpen);			
+		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
+		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);			
+		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
+		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	
+		_menu_button.AppendMenuItem(MF_STRING, 3018, "Rating");
+		_menu_button.CheckMenuItem(3018, properties.displayRating);		
+		_menu_button.AppendMenuItem(MF_STRING, 3019, "Scheduler");
+		_menu_button.CheckMenuItem(3019, properties.displayScheduler);		
+		
+		_menu_button.AppendTo(_menu,MF_STRING, "Visible buttons");	
+		
 		_menu3.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu3.CheckMenuItem(200, properties.showwallpaper);
 		_menu3.AppendMenuItem(MF_STRING, 220, "Blur");
@@ -2863,27 +2850,7 @@ function draw_settings_menu(x,y){
 		_menu_slider.AppendMenuItem(MF_STRING, 3026, "Plain disk only on hover");
 		_menu_slider.CheckMenuItem(3026, properties.cursor_style==2);
 		_menu_slider.AppendTo(_menu,MF_STRING, "Sliders cursor");
-		
-		_menu.AppendMenuSeparator();
-		_menu_button.AppendMenuItem(MF_STRING, 3028, "Stop button");
-		_menu_button.CheckMenuItem(3028, properties.displayStop);	
-		_menu_button.AppendMenuItem(MF_STRING, 3022, "Repeat");
-		_menu_button.CheckMenuItem(3022, properties.displayRepeat);		
-		_menu_button.AppendMenuItem(MF_STRING, 3021, "Shuffle");
-		_menu_button.CheckMenuItem(3021, properties.displayShuffle);	
-		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
-		_menu_button.CheckMenuItem(3023, properties.displayOpen);			
-		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
-		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);			
-		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
-		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	
-		_menu_button.AppendMenuItem(MF_STRING, 3018, "Rating");
-		_menu_button.CheckMenuItem(3018, properties.displayRating);		
-		_menu_button.AppendMenuItem(MF_STRING, 3019, "Scheduler");
-		_menu_button.CheckMenuItem(3019, properties.displayScheduler);		
-		
-		_menu_button.AppendTo(_menu,MF_STRING, "Visible buttons");	
-		
+
 		idx = _menu.TrackPopupMenu(x,y,0x0020);
         switch(true) {
 			case (idx == 200):
@@ -3027,15 +2994,7 @@ function draw_settings_menu(x,y){
 				adapt_display_to_layout();
 				on_size(window.Width, window.Height);					
 				window.Repaint();			
-                break;		
-            case (idx == 3028):
-				properties.displayStop = !properties.displayStop;
-				window.SetProperty("_DISPLAY stop btn", properties.displayStop);
-				build_buttons();
-				adapt_display_to_layout();
-				on_size(window.Width, window.Height);					
-				window.Repaint();				
-                break;					
+                break;								
             default: 
 				return true;
         }
