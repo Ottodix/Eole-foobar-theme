@@ -4099,7 +4099,6 @@ function SimpleButton(name, x, y, w, h, text, tooltip_text, fonClick, fonDbleCli
     this.h = h;
     this.name = name;	
     this.text = text;
-	console.log(this.text);
     this.tooltip_text = tooltip_text;		
     this.fonClick = fonClick;
     this.fonDbleClick = fonDbleClick;
