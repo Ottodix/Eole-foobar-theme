@@ -4236,6 +4236,11 @@ oBrowser = function(name) {
             _menu3.CheckMenuItem(300, properties.showGroupHeaders);
             _menu3.AppendMenuItem((properties.showGroupHeaders ? MF_STRING : MF_GRAYED | MF_DISABLED), 310, "Autocollapse");
             _menu3.CheckMenuItem(310, properties.autocollapse);
+			var _menu_header_size = window.CreatePopupMenu();
+			/*_menu_header_size.AppendMenuItem(MF_STRING, 301, "Normal");
+			_menu_header_size.AppendMenuItem(MF_STRING, 302, "Big");
+			_menu_header_size.AppendMenuItem(MF_STRING, 303, "Bigger");			
+			_menu_header_size.AppendTo(_menu3,MF_STRING, "Size");*/	
             _menu3.AppendMenuSeparator();
             _menu3.AppendMenuItem((properties.showGroupHeaders && !properties.autocollapse ? MF_STRING : MF_GRAYED | MF_DISABLED), 320, "Collapse All");
             _menu3.AppendMenuItem((properties.showGroupHeaders && !properties.autocollapse ? MF_STRING : MF_GRAYED | MF_DISABLED), 330, "Expand All");
@@ -4405,6 +4410,39 @@ oBrowser = function(name) {
 					brw.populate(is_first_populate = false,3, false);
                     brw.repaint();
                     break;
+                case (idx == 301):
+					if(properties.groupHeaderRowsNumberSimple!=2 || properties.groupHeaderRowsNumberDouble!=1) {
+						setOneProperty("groupHeaderRowsNumber",2);
+						setOneProperty("groupHeaderRowsNumberSimple",properties.groupHeaderRowsNumber);						
+						setOneProperty("groupHeaderRowsNumberDouble",1);						
+						get_metrics();
+						get_images();
+						brw.ratingImages = false;
+						brw.repaint();
+					}
+                    break;	
+                case (idx == 302):
+					if(properties.groupHeaderRowsNumberSimple!=3 || properties.groupHeaderRowsNumberDouble!=2) {
+						setOneProperty("groupHeaderRowsNumber",3);
+						setOneProperty("groupHeaderRowsNumberSimple",properties.groupHeaderRowsNumber);
+						setOneProperty("groupHeaderRowsNumberDouble",2);
+						get_metrics();
+						get_images();
+						brw.ratingImages = false;
+						brw.repaint();
+					}
+                    break;		
+                case (idx == 303):
+					if(properties.groupHeaderRowsNumberSimple!=4 || properties.groupHeaderRowsNumberDouble!=2) {
+						setOneProperty("groupHeaderRowsNumber",4);
+						setOneProperty("groupHeaderRowsNumberSimple",properties.groupHeaderRowsNumber);						
+						setOneProperty("groupHeaderRowsNumberDouble",2);
+						get_metrics();
+						get_images();
+						brw.ratingImages = false;
+						brw.repaint();
+					}
+                    break;						
                 case (idx == 310):
 					setOneProperty("autocollapse",!properties.autocollapse);
                     brw.populate(false,4, false);
