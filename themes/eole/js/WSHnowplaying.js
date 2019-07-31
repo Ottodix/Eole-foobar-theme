@@ -380,7 +380,7 @@ function on_mouse_lbtn_down(x, y, m) {
 			if(fb.IsPlaying) {
 				window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 				on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
-			} else window.NotifyOthers("FocusOnTrack",g_cover.metadb);      
+			} else if(g_cover.metadb) window.NotifyOthers("FocusOnTrack",g_cover.metadb);        
 		}  
 	}
 }
