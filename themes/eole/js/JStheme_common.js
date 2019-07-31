@@ -8,6 +8,8 @@ var theme_img_path = skin_global_path + "\\img";
 var search_results_order = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 var sort_by_default = "%album artist%|%date%|%album%|%discnumber%|%tracknumber%";
 var sort_by_album_artist = "%album artist%|%date%|%album%|%discnumber%|%tracknumber%";
+var sort_by_album = "%album%|%date%|%discnumber%|%tracknumber%";
+var sort_by_path = "%path%|%album%|%date%|%discnumber%|%tracknumber%";
 var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
@@ -140,6 +142,7 @@ var oCursor = function () {
 	this.first_y = -10;	
 	this.active_zone = "";
 	this.timer = false;
+	this.cursor = IDC_ARROW;
     this.onMouse = function (state, x, y, m) {    
 		switch(state){
 			case 'lbtn_down':
@@ -172,6 +175,7 @@ var oCursor = function () {
 				this.first_x = -10;
 				this.first_y = -10;					
 				this.active_zone = "";
+				this.cursor = IDC_ARROW;
 			break;			
 		}
     }
@@ -205,6 +209,14 @@ var oCursor = function () {
 	this.getActiveZone = function(){
 		return this.active_zone;
 	}	
+}
+function setFocusOnIndex(playlist_id,item_index){
+	plman.ActivePlaylist = playlist_id;
+	plman.SetPlaylistFocusItem(playlist_id, item_index);
+}
+function SetPlaylistFocusItemByHandle(playlist_id,metadb){
+	plman.ActivePlaylist = playlist_id;
+	plman.SetPlaylistFocusItem(playlist_id, metadb);
 }
 // HTML dialogs ---------------------------------------------------------------------
 function get_windows_version() {
@@ -363,7 +375,7 @@ var colors = {};
 var darkcolors = {};
 
 function get_colors_global(){
-	darkcolors.normal_txt = GetGrey(240);
+	darkcolors.normal_txt = GetGrey(240);	
 	if(properties.darklayout || properties.stick2darklayout){
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.normal_bg = GetGrey(30);
@@ -427,6 +439,10 @@ function get_colors_global(){
 		colors.dragimage_gradline2 = GetGrey(255,200);
 		colors.dragcover_overlay = GetGrey(0,85);	
 		colors.dragcover_rectline = GetGrey(255,40);	
+		
+		colors.rating_icon_on = GetGrey(255);
+		colors.rating_icon_off = GetGrey(255,60);
+		colors.rating_icon_border = GetGrey(255,0);	
 		
 		colors.reseticon_down = RGB(255,50,50);	
 		colors.keyboard_search_bg = GetGrey(0,205);
@@ -501,7 +517,11 @@ function get_colors_global(){
 		colors.dragimage_text = GetGrey(255);
 		colors.dragimage_gradline1 = GetGrey(255,100);
 		colors.dragimage_gradline2 = GetGrey(255,200);
-		
+
+		colors.rating_icon_on = GetGrey(0);	
+		colors.rating_icon_off = GetGrey(0,30);	
+		colors.rating_icon_border = GetGrey(0,0);
+
 		colors.dragcover_overlay = GetGrey(0,85);	
 		colors.dragcover_rectline = GetGrey(0,105);		
 
@@ -626,7 +646,7 @@ let playing_item_location_old_index = false;
 let ignore_playback_queue = false;
 let timer_ignore_queue = false;
 function fb_play_from_playing(offset){
-	var playing_item_location_old = playing_item_location;
+	/*var playing_item_location_old = playing_item_location;
 	playing_item_location = plman.GetPlayingItemLocation();
 	let queue_content = plman.GetPlaybackQueueHandles();
 	if(offset>0 && offset<=queue_content.Count && !ignore_playback_queue){
@@ -661,7 +681,7 @@ function fb_play_from_playing(offset){
 			clearTimeout(timer_ignore_queue);
 			timer_ignore_queue = false;
 		},150);			
-	} else if(offset<0){
+	} else */if(offset<0){
 		fb.Prev();
 	} else {
 		if(fb.IsPaused || fb.IsPlaying) fb.Next();	
@@ -940,8 +960,10 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 	this.over_resizing_right = false;
 	this.resizing_left_active = false;
 	this.resizing_right_active = false;	
-	this.resizing_x = 0;	
-	this.enableSizing = function(m){
+	this.resizing_x = 0;
+	this.resizing_activate_x = -1;
+	this.show_resize_border = false;
+	this.enableWindowSizing = function(m){
 		g_uihacks.EnableSizing(m);
 	}	
 	this.draw = function(gr){
@@ -949,74 +971,82 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 	this.isResizing = function(){
 		return (this.resizing_left_active || this.resizing_right_active);
 	}
-	this.disableSizing = function(m){
+	this.showResizeBorder = function(){
+		return (this.isResizing() || this.show_resize_border);
+	}	
+	this.disableWindowSizing = function(m){
 		g_uihacks.DisableSizing(m);
+	}
+	this.deactivatePanelSizing = function(){
+		if(globalProperties.enableResizableBorders){
+			if(this.resizing_left_active) window.NotifyOthers("resizingleft_"+this.panelName,false);
+			if(this.resizing_right_active) window.NotifyOthers("resizingright_"+this.panelName,false);
+			this.resizing_left_active = false;
+			this.resizing_right_active = false;
+			this.over_resizing_left = false;
+			this.over_resizing_right = false;
+			this.resizing_x = 0;
+			window.Repaint();
+			if(g_cursor.getActiveZone()==this.panelName) g_cursor.setCursor(IDC_ARROW,2);
+		}						
 	}
 	this.on_mouse = function(event, x, y, m, resizing){
 		var resizing = typeof resizing !== 'undefined' ? resizing : true;
 		switch(event){
 			case "move":
 				if(globalProperties.enableResizableBorders){
-					this.over_resizing_right = this.over_resizing_right = false;
+					this.over_resizing_right = this.over_resizing_left = false;
 					if(resizing){
 						if(this.resizing_right && x>ww-10 && y>this.y_min && y<wh-this.y_max){
 							this.over_resizing_right = true;
+							this.resizing_activate_x = x;
 							this.over_resizing_left = false;
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);				
 						} else if(this.resizing_left && x<10 && y>this.y_min && y<wh-this.y_max){
 							this.over_resizing_left = true;
-							this.over_resizing_right = false;
+							this.resizing_activate_x = x;							
+							this.over_resizing_right = false; 
+							console.log("activate resizing left")
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);
 						} else if(g_cursor.getActiveZone()==this.panelName && !this.resizing_left_active){
 							g_cursor.setCursor(IDC_ARROW,'1');
 							this.over_resizing_left = false;
+							this.resizing_activate_x = -1;
 							this.over_resizing_right = false;							
 						} else {
 							this.over_resizing_left = false;
+							this.resizing_activate_x = -1;
 							this.over_resizing_right = false;								
 						}
 					}
 				}
 				return (this.resizing_left_active || this.resizing_right_active);
-				//this.enableSizing(m);
+				//this.enableWindowSizing(m);
 			break;
 			case "lbtn_down":
-				if(globalProperties.enableResizableBorders && resizing){			
+				if(globalProperties.enableResizableBorders && resizing && this.resizing_activate_x==x){			
 					if(this.over_resizing_left){
 						this.resizing_left_active = true;
+						window.NotifyOthers("resizingleft_"+this.panelName,true);									
 						this.resizing_x = x;
-						/*var options = {
-							show_text : false,	
-							use_album_art : false,
-							use_theming : false,
-							custom_image : createDragText("sd", "sd", 220),
-						}		
-						var items = new FbMetadbHandleList(fb.GetFocusItem(true));
-						fb.DoDragDrop(window.ID, items, g_drop_effect.link, options);*/
+						window.Repaint();
 					}
 					else if(this.over_resizing_right){
 						this.resizing_right_active = true;
+						window.NotifyOthers("resizingright_"+this.panelName,true);
 						this.resizing_x = x;
+						window.Repaint();
 					}				
 					if(typeof g_tooltip == 'object') g_tooltip.Deactivate();
 				}
-				this.disableSizing(m);
+				this.disableWindowSizing(m);
 				return (this.resizing_left_active || this.resizing_right_active);
 			break;
 			case "lbtn_up":
 				var return_var = (this.resizing_left_active || this.resizing_right_active);
-				if(globalProperties.enableResizableBorders){					
-					this.resizing_left_active = false;
-					this.resizing_right_active = false;
-					this.over_resizing_left = false;
-					this.over_resizing_right = false;
-					this.resizing_x = 0;
-					window.Repaint();
-					if(g_cursor.getActiveZone()==this.panelName) g_cursor.setCursor(IDC_ARROW,2);
-				}				
-				this.enableSizing(m);
+				this.deactivatePanelSizing();			
+				this.enableWindowSizing(m);
 				return return_var;
-				
 			break;
 			case "leave":
 				g_cursor.setCursor(IDC_ARROW,3); 
@@ -1026,13 +1056,13 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 	this.on_drag = function(event, x, y, m){
 		switch(event){
 			case "move":
-				//this.enableSizing(m);
+				//this.enableWindowSizing(m);
 			break;
 			case "lbtn_down":
-				this.disableSizing(m);
+				this.disableWindowSizing(m);
 			break;
 			case "lbtn_up":
-				this.enableSizing(m);
+				this.enableWindowSizing(m);
 			break;
 			case "leave":
 				this.on_mouse("lbtn_up", x, y, m);
@@ -1720,7 +1750,7 @@ function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 		g_genre_cache.build_from_library();
 	}		
 	if(firstFile){
-		var firstFileGenre = g_genre_cache.tf_genre.EvalWithMetadb(firstFile);
+		var firstFileGenre = globalProperties.tf_genre.EvalWithMetadb(firstFile);
 		//var firstFilePath=firstFile.Path.replace("D:\\Musique\\Tout\\","");
 		var firstFilePath = firstFile.Path.substring(0,firstFile.Path.lastIndexOf("\\")+1)
 		//var firstFilePathGenre=firstFilePath.substring(0, firstFilePath.indexOf('\\'));	
@@ -1790,13 +1820,14 @@ function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 function showNowPlaying(force){
 	var force = typeof force !== 'undefined' ? force : false;
 	if(layout_state.isEqual(0) && (!main_panel_state.isEqual(1) || (getNowPlayingState()!=1 && !filters_panel_state.isMaximumValue()))){
-		if(main_panel_state.isEqual(1) && getNowPlayingState()==0)  {
+		/*if(main_panel_state.isEqual(1) && getNowPlayingState()==0)  {
 			plman.ActivePlaylist = plman.PlayingPlaylist;
 			fb.RunMainMenuCommand('View/ElPlaylist/Show Now Playing'); 
-		}			
+		}*/		
 		//window.NotifyOthers("albumView_showItem",fb.GetNowPlaying());
 		if(!force) window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 		else window.NotifyOthers("FocusOnNowPlayingForce",fb.GetNowPlaying());
+		on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying());
 	} else {		
 		if(!force) window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 		else window.NotifyOthers("FocusOnNowPlayingForce",fb.GetNowPlaying());
@@ -2695,7 +2726,7 @@ function get_font() {
     // adjust font size if extra zoom activated
 	globalProperties.fontAdjustement = Math.min(globalProperties.fontAdjustement_max,Math.max(globalProperties.fontAdjustement_min,globalProperties.fontAdjustement));
     g_fsize += globalProperties.fontAdjustement+properties.panelFontAdjustement;
-	
+
 	g_font.normal = gdi.Font(g_fname, g_fsize, g_fstyle);
 	g_font.min1 = gdi.Font(g_fname, g_fsize-1, g_fstyle);
 	g_font.min2 = gdi.Font(g_fname, g_fsize-2, g_fstyle);	
@@ -2887,7 +2918,7 @@ function get_fallbackCover(metadb, tracktype){
 		return globalProperties.stream_img;
 	}
 }
-const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_embed, no_load) =>
+const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_embed, no_load, addArgs) =>
 {
 	need_stub = true;
 	only_embed = false;
@@ -2900,12 +2931,13 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 		if(isImage(result.image)) {
 			save_image_to_cache(result.image, albumIndex, cachekey);
 			if (typeof g_cover == "object") {
-				g_cover.setArtwork(result.image,true,false);
+				g_cover.setArtwork(result.image,true,false,undefined,metadb);
 				window.Repaint();     	
 			}		
 		} else if (typeof brw == "object" && albumIndex>=0) {			
 			if(typeof brw.groups[albumIndex] == "undefined" || brw.groups[albumIndex].cachekey!= cachekey){
-				g_image_cache.addToCache(get_fallbackCover(metadb,undefined),cachekey);		
+				var img = get_fallbackCover(metadb,undefined);
+				g_image_cache.addToCache(img,cachekey);				
 			} else {
 				brw.groups[albumIndex].cover_img = get_fallbackCover(metadb,(brw.groups[albumIndex].tracktype<0?undefined:brw.groups[albumIndex].tracktype));
 				brw.groups[albumIndex].is_fallback = true;
@@ -2914,6 +2946,10 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				brw.groups[albumIndex].load_requested = 2;
 				brw.repaint();
 			}
+		} else if (typeof g_cover == "object") {
+			img = get_fallbackCover(metadb,undefined);		
+			g_cover.setArtwork(img,true,false,addArgs.isplaying,metadb);
+			window.Repaint();     	
 		}
 	} catch(e){
 		/*fb.ShowPopupMessage("albumIndex "+albumIndex+" brw.groups.length:"+brw.groups.length+" "+isImage(result.image)+"\n"+e, "Error");
@@ -2949,7 +2985,8 @@ function save_image_to_cache(image, albumIndex, cachekey){
 			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = image;
 			else brw.groups[albumIndex].cover_img = image;
 			g_image_cache.cachelist[cachekey] = image;
-			brw.groups[albumIndex].load_requested = 2;	
+			brw.groups[albumIndex].load_requested = 2;
+			brw.groups[albumIndex].mask_applied = false;
 			brw.repaint();
 		} catch(e){}
 	}

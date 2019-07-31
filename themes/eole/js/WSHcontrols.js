@@ -1027,7 +1027,7 @@ function on_mouse_move(x,y,m){
 			setVolume(x);
 		}
 	}
-	if(is_hover_time_elapsed(x,y)){
+	if(is_hover_time_elapsed(x,y) && TimeTotalSeconds!="ON AIR"){
 		if(g_cursor.getCursor!=IDC_HAND){
 			g_cursor.setCursor(IDC_HAND,"time");
 		}		
@@ -1048,7 +1048,7 @@ function on_mouse_move(x,y,m){
 	}
 	//Progress
 	m_pos_progress = clamp(x-progress_margin_left, 0, ww_progress);	
-	if(is_hover_progress(x,y)){
+	if(is_hover_progress(x,y) && TimeTotalSeconds!="ON AIR"){
 		g_cursor.setCursor(IDC_HAND,"progress");
 		hooverprogress=true;        
 		if(!repaint_progress) {
@@ -1663,10 +1663,14 @@ function on_notify_data(name, info) {
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
 		break; 			
-	   case "coverpanel_state":
-			coverpanel_state.value = info;			
+	   case "coverpanel_state_big":
+			coverpanel_state_big.value = info;			
 			window.Repaint(); 
-		break;		
+		break;	
+	   case "coverpanel_state_mini":
+			coverpanel_state_mini.value = info;			
+			window.Repaint(); 
+		break;				
 		case "bio_dark_theme":
 			properties.bio_dark_theme = info;
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);	
@@ -2838,7 +2842,7 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
 		_menu.CheckMenuItem(3015, properties.showTrackInfo);
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
-		_menu.CheckMenuItem(3016, coverpanel_state.isActive());		
+		_menu.CheckMenuItem(3016, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));		
 		
 		_menu.AppendMenuSeparator();
 		_menu3.AppendMenuItem(MF_STRING, 200, "Enable");
@@ -2945,7 +2949,8 @@ function draw_settings_menu(x,y){
 				window.Repaint(); 
                 break; 	
             case (idx == 3016):
-				coverpanel_state.toggleValue();
+				if(layout_state.isEqual(0)) coverpanel_state_big.toggleValue();
+				else coverpanel_state_mini.toggleValue();
                 break;			
             case (idx == 3017):
 				properties.displayEqualizer = !properties.displayEqualizer;

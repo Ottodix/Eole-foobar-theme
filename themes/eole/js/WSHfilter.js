@@ -2216,6 +2216,13 @@ oBrowser = function(name) {
 		var playlistToInsert = -1;
 		var positionToInsert = -1;
 		
+		/*if(fb.IsPlaying) {
+			var playing_item = plman.GetPlayingItemLocation();
+			if(playing_item.IsValid){
+				window.NotifyOthers("trigger_on_focus_change",Array(playing_item.PlaylistIndex,playing_item.PlaylistItemIndex));
+			}
+		} */
+		//window.NotifyOthers("g_avoid_on_focus_change",true);
         if(index_to>-1 && index_to>index){
             // initialize properties.selectionPlaylist playlist
             if(this.pfound_selectionPlaylist) {
@@ -2316,7 +2323,8 @@ oBrowser = function(name) {
                 //plman.InsertPlaylistItems(this.pidx_selection, 0, this.groups[index].pl, false);
 				inserted = true;
             };
-        
+			
+			
             plman.ActivePlaylist = this.pidx_selection;
         };
 		if(inserted) {
@@ -2329,6 +2337,11 @@ oBrowser = function(name) {
 			} 
 			plman.InsertPlaylistItems(playlistToInsert, positionToInsert, toInsert, false);
 			toInsert = undefined;
+			
+			/*if(clearPlaylist && !fb.IsPlaying){
+				window.NotifyOthers("trigger_on_focus_change",Array(playlistToInsert,0));
+			}*/
+			
 			window.NotifyOthers("refresh_filters",properties.filterOrder);
 			this.repaint();
 		}
@@ -3226,13 +3239,14 @@ oBrowser = function(name) {
 			this.activateItem(this.activeIndex);												
 			if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 				g_avoid_on_playlist_items_removed = true;
-				this.save_sendItemToPlaylist(this.activeIndex);					
+				this.save_sendItemToPlaylist(this.activeIndex);		
+				//if(getNowPlayingState()==1 && getTrackInfosState()==1) plman.SetPlaylistFocusItem(g_active_playlist, 0);
 			} else {
 				plman.ClearPlaylistSelection(g_active_playlist);
 				//plman.SetPlaylistSelectionSingle(g_active_playlist, this.groups[this.activeIndex].start, true);
 				this.selectAtoB(this.groups[this.activeIndex].start, this.groups[this.activeIndex].start )//+ this.groups[this.activeIndex].count - 1);
 				g_avoid_on_item_focus_change = true;
-				plman.SetPlaylistFocusItem(g_active_playlist, this.groups[this.activeIndex].start);
+				//if(getTrackInfosState()==1 && getNowPlayingState()==1) plman.SetPlaylistFocusItem(g_active_playlist, this.groups[this.activeIndex].start);
 				//*/
 				//this.focusItemToPlaylist(this.groups[this.activeIndex].metadb);
 			};
@@ -5548,7 +5562,19 @@ function on_notify_data(name, info) {
 		break; 
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
-		break; 		
+		break; 	
+		case "trackinfoslib_state":
+			trackinfoslib_state.value=info;
+		break; 
+		case "trackinfosplaylist_state":
+			trackinfosplaylist_state.value=info;
+		break; 
+		case "trackinfosbio_state":
+			trackinfosbio_state.value=info;
+		break; 
+		case "trackinfosvisu_state":
+			trackinfosvisu_state.value=info;
+		break; 			
 		case "main_panel_state":  
 			main_panel_state.value = info;
 		break;				

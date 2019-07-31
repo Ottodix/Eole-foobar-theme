@@ -1263,6 +1263,7 @@ oBrowser = function(name) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 				} else {				
 					if(!cTouch.down && !timers.mouseDown && this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
+						window.NotifyOthers("g_avoid_on_focus_change",true);
 						this.selectedRow = this.activeRow;
 						if(properties.showNewPlaylistButton && this.rows[this.activeRow].idx ==-1 && !avoidDbleClick){						
 							avoidDbleClick = true;
@@ -1488,6 +1489,7 @@ oBrowser = function(name) {
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     this.scrollbar && this.scrollbar.on_mouse(event, 0, 0);
                 };
+				g_tooltip.Deactivate();
                 break;
             case "drag_over":
 				if(timers.movePlaylist) {

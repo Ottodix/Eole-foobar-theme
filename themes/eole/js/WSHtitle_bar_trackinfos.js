@@ -40,6 +40,7 @@ var properties = {
 	tracktitle_ontop: window.GetProperty("_DISPLAY: Track title", true),	
 	tracktitle_format: window.GetProperty("_DISPLAY: Track title format", "[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]"),	
 	showIdleScreenBtn: window.GetProperty("_DISPLAY: show idle screen btn", true),	
+	showRightSidebarBtn: window.GetProperty("_DISPLAY: show right sidebar btn", true),		
 	showLightswitchBtn: window.GetProperty("_DISPLAY: show light switch btn", true),
 	showPanelBtnText: window.GetProperty("_DISPLAY: show panels btn text", true),		
 	showNowPlayingBtn: window.GetProperty("_DISPLAY: show now playing btn", true),	
@@ -394,6 +395,47 @@ function toggleNowPlayingState(switch_all,new_state){
 	build_buttons();
 	window.Repaint();	
 }
+function toggleTrackInfosState(switch_all,new_state){
+	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
+	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	
+	if(getNowPlayingState()==0) toggleNowPlayingState();
+	
+	if(switch_all){
+		if(new_state===false) {
+			trackinfoslib_state.toggleValue();
+			trackinfosplaylist_state.toggleValue();
+			trackinfosbio_state.toggleValue();
+			trackinfosvisu_state.toggleValue();
+		} else {
+			trackinfoslib_state.setValue(new_state);
+			trackinfosplaylist_state.setValue(new_state);
+			trackinfosbio_state.setValue(new_state);
+			trackinfosvisu_state.setValue(new_state);
+		}
+	} else {
+		switch(main_panel_state.value){
+			case 0:
+				if(new_state!==false) trackinfoslib_state.setValue(new_state);
+				else trackinfoslib_state.toggleValue();
+			break;
+			case 1:
+				if(new_state!==false) trackinfosplaylist_state.setValue(new_state);
+				else trackinfosplaylist_state.toggleValue();
+			break;
+			case 2:
+				if(new_state!==false) trackinfosbio_state.setValue(new_state);			
+				else trackinfosbio_state.toggleValue();
+			break;
+			case 3:
+				if(new_state!==false) trackinfosvisu_state.setValue(new_state);			
+				else trackinfosvisu_state.toggleValue();
+			break;		
+		}
+	}
+	build_buttons();
+	window.Repaint();	
+}
 function saveFilterState(){
 	properties.savedFilterState = filters_panel_state.value;		
 	window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
@@ -429,6 +471,15 @@ function build_buttons(){
 		buttons.Idle.H_img = images.idle_img;
 		buttons.Idle.N_img = images.idle_img;
 		buttons.Idle.D_img = buttons.Idle.H_img;	
+		
+		if(getTrackInfosState()==1) {
+			buttons.RightSidebar.H_img = images.playlist_img;
+			buttons.RightSidebar.N_img = images.playlist_img;
+		} else {
+			buttons.RightSidebar.H_img = images.visualization_img;
+			buttons.RightSidebar.N_img = images.visualization_img;			
+		}
+		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 		
 		buttons.ShowSearch.H_img = images.search_toggle_img;
 		buttons.ShowSearch.N_img = images.search_toggle_img;
@@ -479,8 +530,15 @@ function build_buttons(){
 				main_panel_state.setValue(3);
 				get_colors();g_searchbox.adapt_look_to_layout();	
 			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true),
-			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right playlist", function () {
+			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right sidebar", function () {
 				toggleNowPlayingState();
+			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
+			RightSidebar: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "rightsidebar", "Hide/show track infos", function () {
+				if(getNowPlayingState()==1) {
+					toggleTrackInfosState();
+				} else {
+					toggleNowPlayingState();
+				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
 			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
 				Lightswitch();
@@ -536,10 +594,10 @@ function build_buttons(){
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
 		
 		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m, 'additional_btns', true);
-		additional_btns.addButtons([buttons.NowPlaying,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);	
+		additional_btns.addButtons([buttons.NowPlaying,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);	
 		
 		compact_btns = new JSButtonGroup("top-left", 0, -1, 'compact_btns', true);
-		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);	
+		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.RightSidebar,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);	
 		compact_btns.addButtons([buttons.Library], [0,0,0,btn.margin+5]);	
 		compact_btns.addButtons([buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,0,0,btn.margin]);		
 	}	
@@ -609,7 +667,8 @@ function adapt_buttons_to_layout(){
 		buttons.Fullscreen.setVisibility(false);
 		buttons.Idle.setVisibility(false);
 		buttons.Mini.setVisibility(false);
-		buttons.NowPlaying.setVisibility(false);			
+		buttons.NowPlaying.setVisibility(false);
+		buttons.RightSidebar.setVisibility(false);		
 		buttons.Settings.calculate_size = true;
 		
 		g_searchbox.toggleVisibility(true);
@@ -653,7 +712,11 @@ function adapt_buttons_to_layout(){
 		
 		if(!properties.showIdleScreenBtn) 
 			buttons.Idle.setVisibility(false);
-		else buttons.Idle.setVisibility(true);
+		else buttons.Idle.setVisibility(true);		
+		
+		if(!properties.showRightSidebarBtn || !getNowPlayingState())
+			buttons.RightSidebar.setVisibility(false);
+		else buttons.RightSidebar.setVisibility(true);
 		
 		if(!properties.showLightswitchBtn) 
 			buttons.Lightswitch.setVisibility(false);
@@ -692,10 +755,10 @@ function adapt_buttons_to_layout(){
 		}
 		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true) - (!properties.alwaysShowSearch?buttons.ShowSearch.w+5:0);
 		
-		if(!properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
+		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
 			cSearchBoxMainLight.marginRight -= 10;
 			cSearchBoxMainDark.marginRight -= 10;
-		}		
+		}	
 		main_panel_btns.txtYAdjust(1);		
 		if(properties.toUpperCase) main_panel_btns.toUpperCase(true);
 		if(!properties.showPanelBtnText) main_panel_btns.displayLabel(false);		
@@ -1079,8 +1142,12 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(1901, !properties.show_visualization)
 		
 		_menu.AppendMenuSeparator();
-		_menu_button.AppendMenuItem(MF_STRING, 1806, "Now playing");
+		_menu_button.AppendMenuItem(MF_STRING, 1806, "Right sidebar visibility");
 		_menu_button.CheckMenuItem(1806, properties.showNowPlayingBtn);		
+		_menu_button.AppendMenuItem(MF_STRING, 1807, "Right sidebar function");
+		_menu_button.CheckMenuItem(1807, properties.showRightSidebarBtn);		
+		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
+		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);			
 		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
 		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);			
 		_menu_button.AppendMenuItem(MF_STRING, 1803, "Light switch");
@@ -1151,6 +1218,12 @@ function draw_settings_menu(x,y){
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;
+			case (idx == 1807):
+				properties.showRightSidebarBtn = !properties.showRightSidebarBtn;
+				window.SetProperty("_DISPLAY: show now right sidebar btn", properties.showRightSidebarBtn);		
+				adapt_buttons_to_layout();
+				window.Repaint();
+				break;				
 			case (idx == 1809):
 				try {
 					new_caption_format = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom windows title", properties.tracktitle_format, true);
@@ -2218,8 +2291,8 @@ oSearch = function() {
         this.inputbox.setSize(w-this.images.search_history_icon.Width*4.5, h-cSearchBox.paddingTop-cSearchBox.paddingBottom, font_size);
     };
 	this.on_size = function() {
-		if(layout_state.isEqual(0) && compact_titlebar.isActive()){
-			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showIdleScreenBtn)?buttons.Idle.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
+		if(layout_state.isEqual(0) && compact_titlebar.isActive()){	
+			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showIdleScreenBtn)?buttons.Idle.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
 			this.setSize(ww - window_btns.getWidth() - buttons.Settings.w - 10 - btns_width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);		
 		} else if(layout_state.isEqual(0)){		
 			this.setSize(cSearchBox.width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);		

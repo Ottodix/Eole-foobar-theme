@@ -4069,7 +4069,8 @@ function SimpleButtonManager(){
 					this.cur_btn.changeState(ButtonStates.normal);
 					window.Repaint();
 					this.cur_btn=null;        
-				}			
+				}
+				g_tooltip.Deactivate();
 			break;
             case "lbtn_up":
 				this.g_down = false;      

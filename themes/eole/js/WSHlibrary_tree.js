@@ -8,13 +8,21 @@ var properties = {
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),	
     genre_customGroup_label: window.GetProperty("_DISPLAY: genre customGroup name", ""),	
     artist_customGroup_label: window.GetProperty("_DISPLAY: artist customGroup name", ""),
-    album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),		
+    album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
+    showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),		
+    showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),		
 	headerbar_height:35,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
 	showLibraryTreeSwitch:true,
 	DropInplaylist: true
 };
+
+function setShowInLibrary(){
+	if(getRightPlaylistState()) properties.showInLibrary = properties.showInLibrary_RightPlaylistOn;
+	else properties.showInLibrary = properties.showInLibrary_RightPlaylistOff;
+}
+setShowInLibrary();
 
 var g_wallpaperImg = null;
 var update_wallpaper = false;
@@ -2223,7 +2231,7 @@ function populate() {
 	this.clearSelectedItem = function(){
 		for (var k = 0; k < this.tree.length; k++) this.tree[k].sel = false;		
 	}
-	this.showNowPlaying = function(){
+	this.showNowPlaying = function(load){
 		var now_playing = fb.GetNowPlaying();
 		var np_item = np_node = -1;
 		var dont_scroll = false;
@@ -2244,7 +2252,7 @@ function populate() {
 					if (v.item.includes(np_item)) {
 						np_node = i;
 						if(!this.show_aggregate_item || np_node>0) {
-							if(!first_node_loaded && nowplayinglib_state.isActive()) {
+							if(!first_node_loaded && properties.showInLibrary) {
 								pop.load(v.item, true, false, false, pop.gen_pl, false);first_node_loaded=true;
 								//window.NotifyOthers("seek_nowplaying_in_current",now_playing);
 							}
@@ -2267,6 +2275,12 @@ function populate() {
 		p.tree_paint();
 	}
     this.load = function(list, type, add, send, def_pl, insert) {
+		/*if(fb.IsPlaying) {
+			var playing_item = plman.GetPlayingItemLocation();
+			if(playing_item.IsValid){
+				window.NotifyOthers("trigger_on_focus_change",Array(playing_item.PlaylistIndex,playing_item.PlaylistItemIndex));
+			}
+		} */
         var i = 0,
             np_item = -1,
             pid = -1;
@@ -2320,6 +2334,9 @@ function populate() {
             plman.UndoBackup(this.pln);
             plman.ClearPlaylist(this.pln);
             plman.InsertPlaylistItems(this.pln, 0, items);
+			//if(!fb.IsPlaying){
+			//	window.NotifyOthers("trigger_on_focus_change",Array(this.pln,0));
+			//}
         } else {
             plman.UndoBackup(this.pln);
             plman.InsertPlaylistItems(this.pln, !insert ? plman.PlaylistItemCount(this.pln) : plman.GetPlaylistFocusItemIndex(this.pln)+1, items, true);
@@ -3844,7 +3861,7 @@ function menu_object() {
 			pop.branch_chg(pop.tree[0]);
 			pop.buildTree(lib.root, 0, true, true);
 		} else if(idx==7006){
-			pop.showNowPlaying();		
+			pop.showNowPlaying(true);		
 		} else if(idx==9999){
 			if(pop.show_aggregate_item && ix==0) openFolder(first_item,-1);
 			else openFolder(first_item,pop.tree[ix].tr);		
@@ -4786,14 +4803,23 @@ function get_images() {
 	reset_bt = new button(images.resetIcon_off, images.resetIcon_ov, images.resetIcon_dn,"reset_bt", "Reset filter");
 };
 function on_notify_data(name, info) {
-    switch(name) {						
+    switch(name) {		
+		case "showInLibrary_RightPlaylistOn":
+			properties.showInLibrary_RightPlaylistOn = info;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist on", properties.showInLibrary_RightPlaylistOn);
+			setShowInLibrary();
+		break; 		
+		case "showInLibrary_RightPlaylistOff":
+			properties.showInLibrary_RightPlaylistOff = info;
+			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist off", properties.showInLibrary_RightPlaylistOff);
+			setShowInLibrary();
+		break; 	
 		case "album_customGroup_label":
 			properties.album_customGroup_label = info;
 			window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
 			g_tagswitcherbar.on_init();
 		break; 		
 		case "genre_customGroup_label":
-		console.log()
 			properties.genre_customGroup_label = info;
 			window.SetProperty("_DISPLAY: album customGroup name", properties.genre_customGroup_label);
 			g_tagswitcherbar.on_init();
@@ -4824,7 +4850,7 @@ function on_notify_data(name, info) {
 			window.Repaint();
 		break;		
         case "FocusOnNowPlayingForce":				
-			if(window.IsVisible) pop.showNowPlaying();	
+			if(window.IsVisible) pop.showNowPlaying(false);	
         break;				
 		case "set_font":
 			globalProperties.fontAdjustement = info;
@@ -4860,6 +4886,7 @@ function on_notify_data(name, info) {
 		break;			
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
+			setShowInLibrary();
 		break; 
 		case "nowplayingplaylist_state":
 			nowplayingplaylist_state.value=info;
@@ -4869,6 +4896,18 @@ function on_notify_data(name, info) {
 		break; 
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
+		break; 	
+		case "trackinfoslib_state":
+			trackinfoslib_state.value=info;
+		break; 
+		case "trackinfosplaylist_state":
+			trackinfosplaylist_state.value=info;
+		break; 
+		case "trackinfosbio_state":
+			trackinfosbio_state.value=info;
+		break; 
+		case "trackinfosvisu_state":
+			trackinfosvisu_state.value=info;
 		break; 		
 		case "main_panel_state":  
 			main_panel_state.value = info;

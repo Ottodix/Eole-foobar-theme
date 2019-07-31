@@ -141,7 +141,8 @@ var darkplaylist_state = new oPanelSetting("darkplaylist_state", "DARKPLAYLIST_"
 var showtrackinfo_big = new oPanelSetting("showtrackinfo_big", "SHOWTRACKINFOBIG_", 1, 0, 1);
 var showtrackinfo_small = new oPanelSetting("showtrackinfo_small", "SHOWTRACKINFOSMALL_", 0, 0, 1);
 
-var coverpanel_state = new oPanelSetting("coverpanel_state", "COVERPANEL_", 1, 0, 1);
+var coverpanel_state_mini = new oPanelSetting("coverpanel_state", "COVERPANELMINI_", 1, 0, 1);
+var coverpanel_state_big = new oPanelSetting("coverpanel_state", "COVERPANELBIG_", 1, 0, 1);
 var filters_panel_state = new oPanelSetting("filters_panel_state", "FILTERSPANEL_", 1, 0, 3);
 var libraryfilter_state = new oPanelSetting("libraryfilter_state", "LIBRARYFILTER_", 1, 0, 1);
 var screensaver_state = new oPanelSetting("screensaver_state", "SCREENSAVER_", 0, 0, 1);
@@ -160,6 +161,12 @@ var nowplayinglib_state = new oPanelSetting("nowplayinglib_state", "NOWPLAYINGLI
 var nowplayingplaylist_state = new oPanelSetting("nowplayingplaylist_state", "NOWPLAYINGPLAYLIST_", 1, 0, 1);
 var nowplayingbio_state = new oPanelSetting("nowplayingbio_state", "NOWPLAYINGBIO_", 1, 0, 1);
 var nowplayingvisu_state = new oPanelSetting("nowplayingvisu_state", "NOWPLAYINGVISU_", 1, 0, 1);
+
+//Track infos switch for each main panels
+var trackinfoslib_state = new oPanelSetting("trackinfoslib_state", "TRACKINFOSLIB_", 0, 0, 1);
+var trackinfosplaylist_state = new oPanelSetting("trackinfosplaylist_state", "TRACKINFOSPLAYLIST_", 0, 0, 1);
+var trackinfosbio_state = new oPanelSetting("trackinfosbio_state", "TRACKINFOSBIO_", 1, 0, 1);
+var trackinfosvisu_state = new oPanelSetting("trackinfosvisu_state", "TRACKINFOSVISU_", 1, 0, 1);
 
 //Panels width
 var libraryfilter_width = new oPanelSetting("libraryfilter_width", "LIBRARYFILTERWIDTH_", 210, 100, 900);
@@ -186,7 +193,27 @@ function getNowPlayingState(){
 		break;		
 	}	
 }
-
+//Get Track Infos state according to main panel
+function getTrackInfosState(){
+	switch(main_panel_state.value){
+		case 0:
+			return trackinfoslib_state.value;
+		break;
+		case 1:
+			return trackinfosplaylist_state.value;
+		break;
+		case 2:
+			return trackinfosbio_state.value;
+		break;
+		case 3:
+			return trackinfosvisu_state.value;
+		break;		
+	}	
+}
+function getRightPlaylistState(){
+	return (nowplayinglib_state.isActive());
+	//return (!trackinfoslib_state.isActive() && nowplayinglib_state.isActive());
+}
 // console.log("pss_switch 2 time:"+gTime_covers.Time);	
 // Example of use in a PSS :
 // The first line set a panel stack global variable according to the panel current state, the second line switch the visibility of a panel named library, it show the panel when the current state is 3
