@@ -171,7 +171,7 @@ var trackinfosvisu_state = new oPanelSetting("trackinfosvisu_state", "TRACKINFOS
 //Panels width
 var libraryfilter_width = new oPanelSetting("libraryfilter_width", "LIBRARYFILTERWIDTH_", 210, 100, 900);
 var playlistpanel_width = new oPanelSetting("playlistpanel_width", "PLAYLISTPANELWIDTH_", 180, 100, 900);
-var rightplaylist_width = new oPanelSetting("rightplaylist_width", "RIGHTPLAYLISTWIDTH_", 270, 100, 900);
+var rightplaylist_width = new oPanelSetting("rightplaylist_width", "RIGHTPLAYLISTWIDTH_", 210, 100, 900);
 
 //Theme version
 var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", ".", 0, 0, false, false);
