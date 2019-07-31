@@ -2680,8 +2680,17 @@ oBrowser = function(name) {
 									};									
 								} else {
 									var im_w = coverWidth;
-									var im_h = coverWidth;
-									if(!properties.circleMode || properties.displayMode != 1) gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
+									var im_h = coverWidth;									
+									//if(!properties.circleMode)
+										gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          
+									//else {
+										//gr.SetSmoothingMode(2);
+										//gr.DrawEllipse(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          		
+										//gr.SetSmoothingMode(0);
+									//}									
+									//var im_w = coverWidth;
+									//var im_h = coverWidth;
+									//if(!properties.circleMode || properties.displayMode != 1) gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 									//gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
 								};
 								
@@ -2846,8 +2855,15 @@ oBrowser = function(name) {
 										var im_w = coverWidth;
 										var im_h = coverWidth;
 										var deltaY = Math.floor((ah - im_h)/2);
-										var deltaX = Math.floor((coverWidth - im_w)/2);
-										gr.DrawImage(images.loading_draw, ax+this.coverMarginLeft+deltaX, coverTop + deltaY, coverWidth, coverWidth, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
+										var deltaX = Math.floor((coverWidth - im_w)/2);										
+										if(!properties.circleMode)
+											gr.DrawRect(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          
+										else {
+											gr.SetSmoothingMode(2);
+											gr.DrawEllipse(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          		
+											gr.SetSmoothingMode(0);
+										}
+										//gr.DrawImage(images.loading_draw, ax+this.coverMarginLeft+deltaX, coverTop + deltaY, coverWidth, coverWidth, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
 									};
 								};
 
