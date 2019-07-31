@@ -859,7 +859,7 @@ oCover = function() {
 				this.down_y = y;				
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.playlistIndex>0 && g_cover.metadb){
+				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
 					if(!this.isHover){
 						this.isHover = true;
