@@ -5564,6 +5564,7 @@ oBrowser = function(name) {
 	}
 	this.focus_on_track = function (track){		
 		FocusOnNowPlaying = true;
+		if(!track) return;
 		var isFound = this.seek_track(track);
 		if(!isFound) {
 			this.searched_track_rawpath = track.RawPath;
@@ -5580,6 +5581,7 @@ oBrowser = function(name) {
 	}		
 	this.focus_on_nowplaying = function (track){		
 		FocusOnNowPlaying = true;
+		if(!track) return;
 		if(this.getSourcePlaylist()!=plman.PlayingPlaylist){	
 			if(this.followActivePlaylist || this.followActivePlaylist_temp){
 				plman.ActivePlaylist = plman.PlayingPlaylist;

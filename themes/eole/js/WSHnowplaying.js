@@ -217,7 +217,7 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;
         } else if(this.text=='Play'){
-            if(g_cover.isPlaying() || !g_cover.isHover || Randomsetfocus){
+            if(g_cover.isPlaying() || !g_cover.isHover || Randomsetfocus || g_cover.playlistIndex<0 || !g_cover.metadb){
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;
         } else if(this.text=='Pause'){
@@ -859,7 +859,7 @@ oCover = function() {
 				this.down_y = y;				
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h){
+				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.playlistIndex>0 && g_cover.metadb){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
 					if(!this.isHover){
 						this.isHover = true;
