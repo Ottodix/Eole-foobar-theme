@@ -428,8 +428,30 @@ function on_mouse_lbtn_up(x, y, m) {
 }
 function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
-	else intern_step = stepstrait/delta;
-	cycle_infos();
+	else intern_step = stepstrait/delta;		
+	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+		var zoomStep = 1;
+		var previous = globalProperties.fontAdjustement;
+		if(!timers.mouseWheel) {
+			if(intern_step > 0) {
+				globalProperties.fontAdjustement += zoomStep;
+				if(globalProperties.fontAdjustement > globalProperties.fontAdjustement_max) globalProperties.fontAdjustement = globalProperties.fontAdjustement_max;
+			} else {
+				globalProperties.fontAdjustement -= zoomStep;
+				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
+			};
+			if(previous != globalProperties.fontAdjustement) {
+				timers.mouseWheel = setTimeout(function() {
+					on_notify_data('set_font',globalProperties.fontAdjustement);
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					timers.mouseWheel && clearTimeout(timers.mouseWheel);
+					timers.mouseWheel = false;
+				}, 100);
+			};
+		};	
+	} else {	
+		cycle_infos(); 
+	}	
 }
 function on_mouse_lbtn_dblclk(x, y) {
 	if (g_metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("Properties", g_metadb);
