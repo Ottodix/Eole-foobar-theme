@@ -707,7 +707,7 @@ function on_notify_data(name, info) {
 	case "FocusOnNowPlaying":
 		focus_on_now_playing = true;	
 		var track = new FbMetadbHandleList(info);	
-		if(fb.IsPlaying && track.length>0) on_playback_new_track(track[0]);		
+		if(fb.IsPlaying && track.Count>0) on_playback_new_track(track[0]);		
 		focus_on_now_playing = false;
 	break;			
 	case "set_font":
