@@ -1006,7 +1006,6 @@ function Resizing(panelName, resizing_left,resizing_right, y_min, y_max) {
 							this.over_resizing_left = true;
 							this.resizing_activate_x = x;							
 							this.over_resizing_right = false; 
-							console.log("activate resizing left")
 							if(g_cursor.getCursor()!=IDC_SIZEWE) g_cursor.setCursor(IDC_SIZEWE,this.panelName,5);
 						} else if(g_cursor.getActiveZone()==this.panelName && !this.resizing_left_active){
 							g_cursor.setCursor(IDC_ARROW,'1');

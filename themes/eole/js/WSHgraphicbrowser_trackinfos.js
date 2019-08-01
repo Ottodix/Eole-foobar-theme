@@ -2048,9 +2048,10 @@ oShowList = function(parentPanelName) {
 		}
 		this.pl = playlist;
 	}
-    this.calcHeight = function(playlist, drawn_idx, columnsOffset, update_tracks) {		
+    this.calcHeight = function(playlist, drawn_idx, columnsOffset, update_tracks, send_albums_info) {		
 		columnsOffset = typeof columnsOffset !== 'undefined' ? columnsOffset : 0;		
 		update_tracks = typeof update_tracks !== 'undefined' ? update_tracks : true;		
+		send_albums_info = typeof send_albums_info !== 'undefined' ? send_albums_info : true;
 		
 		if(update_tracks){
 			var playlist = brw.groups[brw.groups_draw[drawn_idx]].pl;		
@@ -2063,7 +2064,7 @@ oShowList = function(parentPanelName) {
 			this.pl = playlist;	
 			if(properties.filterBox_filter_tracks && g_filterbox.isActive) this.setFilteredPlaylist();
 			
-			this.album_info_sent = false;			
+			this.album_info_sent = !send_albums_info;			
 			//plman.SetPlaylistFocusItem(brw.getSourcePlaylist(), brw.groups[brw.groups_draw[drawn_idx]].trackIndex);
 		}
 			
@@ -4725,7 +4726,7 @@ oBrowser = function(name) {
 			
 			//Force showlist if there is only one group
 			if(this.groups_draw.length==1 && g_showlist.idx<0 && properties.expandInPlace) {
-				g_showlist.calcHeight(this.groups[this.groups_draw[0]].pl, 0);
+				g_showlist.calcHeight(this.groups[this.groups_draw[0]].pl, 0, 0, true, false);
 				g_showlist.reset(this.groups_draw[0], 0);				
 			}
             if(this.groups_draw.length <= this.totalRowsVis*this.totalColumns) {

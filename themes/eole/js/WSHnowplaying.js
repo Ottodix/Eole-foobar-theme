@@ -927,7 +927,6 @@ function on_layout_change() {
 	adaptButtons();
 }	
 function on_notify_data(name, info) {
-	console.log("name"+name)
     switch(name) {
 		case "g_avoid_on_focus_change":
 			g_avoid_on_focus_change = info;

@@ -3036,7 +3036,7 @@ function Images() {
 		nhh = ppt.style < 4 || !t.text || ppt.img_only ? nh : p.imgs;
 		this.bar.gripOffset = Math.round((this.bar.grip_h - this.bar.h) / 2) + Math.ceil(ui.l_h / 2);
 		
-		this.dots_seekbar = true;
+		this.dots_seekbar = false;
 		if(this.dots_seekbar)
 			this.bar.w1 = artImages.length*20;	
 		else
