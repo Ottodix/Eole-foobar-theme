@@ -252,9 +252,10 @@ function on_paint(gr) {
 		if(double_row)
 		gr.GdiDrawText(txt_line3, g_font.min2, colors.faded_txt, left_padding*2, line2_y+9*zdpi, line2_w-left_padding, 29*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);			
 	}
-	var line_w = Math.round(ww / 2);
-	gr.FillGradRect(0, wh - 1, line_w, 1, 0, RGBA(0, 0, 0, 0), colors.border, 1.0);
-	gr.FillGradRect(line_w, wh - 1, line_w, 1, 0, colors.border, RGBA(0, 0, 0, 0), 1.0);
+	var line_w = Math.round(ww / 2);show_shadow = true
+	var line_padding = 10;
+	gr.FillGradRect(line_padding, wh - 1, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), colors.border, 1.0);
+	gr.FillGradRect(line_w, wh - 1, line_w-line_padding, 1, 0, colors.border, RGBA(0, 0, 0, 0), 1.0);
 	gr.FillSolidRect(line_w, wh - 1, 1, 1, colors.border);
 	
 	if (fb.IsPlaying) {
@@ -266,18 +267,6 @@ function on_paint(gr) {
 			for (var i = 1; i < l_count + 1; i++)
 			gr.DrawLine(0, wh - spec_grid_spacing*i, ww, wh - spec_grid_spacing*i, 1, col_grid);
 		}
-	}
-
-	//gr.DrawLine(0, 0, 0, wh, 1, RGBA(0, 0, 0, 80));//100));
-	//gr.DrawLine(1, 0, 1, wh, 1, RGBA(0, 0, 0, 60));
-	//gr.DrawLine(2, 0, 2, wh, 1, RGBA(0, 0, 0, 30));
-	//gr.DrawLine(3, 0, 3, wh, 1, RGBA(0, 0, 0, 15));
-
-	if(show_shadow){
-		gr.DrawLine(0, wh - 1, ww, wh - 1, 1, RGBA(0, 0, 0, 100));
-		gr.DrawLine(0, wh - 2, ww, wh - 2, 1, RGBA(0, 0, 0, 60));
-		gr.DrawLine(0, wh - 3, ww, wh - 3, 1, RGBA(0, 0, 0, 30));
-		gr.DrawLine(0, wh - 4, ww, wh - 4, 1, RGBA(0, 0, 0, 15));
 	}
 	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
 	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
@@ -683,7 +672,7 @@ function on_notify_data(name, info) {
 	case "FocusOnNowPlaying":
 		focus_on_now_playing = true;	
 		var track = new FbMetadbHandleList(info);	
-		if(fb.IsPlaying) on_playback_new_track(track[0]);		
+		if(fb.IsPlaying && track.length>0) on_playback_new_track(track[0]);		
 		focus_on_now_playing = false;
 	break;			
 	case "set_font":
