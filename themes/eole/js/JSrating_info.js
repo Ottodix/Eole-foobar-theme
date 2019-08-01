@@ -67,6 +67,7 @@ if (spec_grid_spacing <= 0) spec_grid_spacing = 20;
 var spec_h = Math.floor(g_fsize * 3 / 12) * 20;
 if (spec_h > 300) spec_h = 300;
 if (spec_h < 5) spec_h = 5;
+var Update_Required_function = "";
 spec_grid_spacing = Math.min(spec_grid_spacing, spec_h);
 if (spec_h < 6 || !foo_spec) {
 	spec_show_bg = false;
@@ -235,7 +236,10 @@ function on_size() {
 var line2_y = top_padding + imgh + 24*zdpi;
 
 function on_paint(gr) {
-	get_font();
+	if(Update_Required_function!="") {
+		eval(Update_Required_function);
+		Update_Required_function = "";
+	}   	
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	if (g_metadb) {
 		for (var i = 1; i < rbutton.length + 1; i++) {
@@ -575,39 +579,48 @@ function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
 	}
 }*/
 function on_metadb_changed(metadbs, fromhook) {
-	if(!g_metadb) return;
-	var current_track = false;
-	try{
-		for(var i=0; i < metadbs.Count; i++) {
-			if(metadbs[i].Compare(g_metadb)) {	
-				current_track = true; 
-			} 			
-		}
-	} catch(e){}
-	if(!current_track) return;	
-	
-	allinfos = g_tfo.allinfos.EvalWithMetadb(g_metadb);
-	allinfos = allinfos.split(" ^^ ");
+	if(window.IsVisible) {
+		if(!g_metadb) return;
+		var current_track = false;
+		try{
+			for(var i=0; i < metadbs.Count; i++) {
+				if(metadbs[i].Compare(g_metadb)) {	
+					current_track = true; 
+				} 			
+			}
+		} catch(e){}
+		if(!current_track) return;	
+		
+		allinfos = g_tfo.allinfos.EvalWithMetadb(g_metadb);
+		allinfos = allinfos.split(" ^^ ");
 
-	rating = allinfos[0];
-	if (rating == "?") {
-		rating = 0;
-	} else rating++;
-	txt_title = allinfos[1];
-	txt_info = allinfos[2] + allinfos[3];
-	var _playcount = allinfos[6];
-	if(foo_playcount) txt_profile = allinfos[5] + allinfos[7] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-	else txt_profile = allinfos[5] + allinfos[7] + "K";
-	var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
-	if (l_mood != null && l_mood != "?") {
-		mood = true;
-	} else mood = 0;
-	show_info = true;
-	
-	txt_line1 = txt_title;
-	txt_line2 = txt_info;
-	txt_line3 = txt_profile;
-	window.RepaintRect(0, 0, ww, text_bottom);
+		rating = allinfos[0];
+		if (rating == "?") {
+			rating = 0;
+		} else rating++;
+		txt_title = allinfos[1];
+		txt_info = allinfos[2] + allinfos[3];
+		var _playcount = allinfos[6];
+		if(foo_playcount) txt_profile = allinfos[5] + allinfos[7] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else txt_profile = allinfos[5] + allinfos[7] + "K";
+		var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
+		if (l_mood != null && l_mood != "?") {
+			mood = true;
+		} else mood = 0;
+		show_info = true;
+		
+		txt_line1 = txt_title;
+		txt_line2 = txt_info;
+		txt_line3 = txt_profile;
+		window.RepaintRect(0, 0, ww, text_bottom);
+	} else {
+		set_update_function('on_metadb_changed(g_metadb,'+fromhook+')');	    	
+	}
+}
+function set_update_function(string){
+	if(string=="") Update_Required_function=string;
+	else if( Update_Required_function.indexOf("on_metadb_changed(g_metadb,false")!=-1) return;
+	else Update_Required_function=string;
 }
 function update_infos(row1, row2, row3) {
 	txt_line1 = row1;
@@ -676,12 +689,11 @@ function on_notify_data(name, info) {
 		focus_on_now_playing = false;
 	break;			
 	case "set_font":
-		fbx_set[13] = info[0];
-		fbx_set[14] = info[1];
-		fbx_set[15] = info[2];
-		//get_font();
-		window.Reload();
-		break;
+		globalProperties.fontAdjustement = info;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
+		on_font_changed();
+		window.Repaint();
+	break; 	
 	case "Right_panel_follow_cursor":
 		properties.follow_cursor = info;
 		window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
@@ -714,17 +726,6 @@ function on_notify_data(name, info) {
 		break;
 	case "random_color_mode":
 		random_color = info;
-		break;
-	case "set_eslfont_auto":
-		esl_font_auto = info;
-		get_font();
-		break;
-	case "set_eslfont_bold":
-		esl_font_bold = info;
-		get_font();
-		break;
-	case "set_rating_2_tag":
-		rating_to_tag = info;
 		break;
 	case "panel_show_shadow":
 		show_shadow = info;
@@ -781,7 +782,9 @@ function setTimerCycle(){
 	}, time_circle);
 }
 setTimerCycle();
-
+function on_font_changed(){
+	get_font();
+}
 /****************************************
  * DEFINE CLASS ButtonUI  for RATING
  *****************************************/

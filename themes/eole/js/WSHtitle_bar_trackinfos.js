@@ -1147,9 +1147,7 @@ function draw_settings_menu(x,y){
 		_menu_button.AppendMenuItem(MF_STRING, 1807, "Right sidebar function");
 		_menu_button.CheckMenuItem(1807, properties.showRightSidebarBtn);		
 		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
-		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);			
-		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
-		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);			
+		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);					
 		_menu_button.AppendMenuItem(MF_STRING, 1803, "Light switch");
 		_menu_button.CheckMenuItem(1803, properties.showLightswitchBtn);		
 		_menu_button.AppendMenuItem(MF_STRING, 1804, "Fullscreen");
