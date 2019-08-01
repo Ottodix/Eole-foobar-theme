@@ -1138,7 +1138,7 @@ oRow = function(metadb,itemIndex) {
 							if(l_rating!=this.rating) this.rating = rateSong(l_rating,this.rating, this.metadb);
 							g_showlist.track_rated = true;
 						};
-						if(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())
+						if(trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor)
 							window.NotifyOthers("trigger_on_focus_change",Array(brw.getSourcePlaylist(),playlistTrackId));
 					}
 					brw.repaint();					
@@ -1744,7 +1744,7 @@ oShowList = function(parentPanelName) {
 			if(properties.TFgrouping.indexOf("%album%")==-1) this.firstRow = TF.grouping.EvalWithMetadb(this.pl[0]);
 			if(properties.TFgrouping.indexOf("artist%")==-1) this.secondRow = this.total_tracks;			
 		}
-		if(!this.album_info_sent && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && !avoidShowNowPlaying) {
+		if(!this.album_info_sent && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
 				trackIndex:brw.groups[this.idx].trackIndex,
