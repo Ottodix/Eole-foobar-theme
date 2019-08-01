@@ -241,7 +241,7 @@ function on_paint(gr) {
 		for (var i = 1; i < rbutton.length + 1; i++) {
 			rbutton[i - 1].Paint(gr, i);
 		}
-		if (is_mood) btn_mood.Paint(gr);
+		//if (is_mood) btn_mood.Paint(gr);
 		
 		var double_row = false;
 		if(properties.doubleRowText && txt_info !="") var double_row = true;
@@ -681,8 +681,9 @@ function on_notify_data(name, info) {
 		break;		
 	case "FocusOnNowPlayingForce":		
 	case "FocusOnNowPlaying":
-		focus_on_now_playing = true;			
-		if(fb.IsPlaying) on_playback_new_track(info);		
+		focus_on_now_playing = true;	
+		var track = new FbMetadbHandleList(info);	
+		if(fb.IsPlaying) on_playback_new_track(track[0]);		
 		focus_on_now_playing = false;
 	break;			
 	case "set_font":
