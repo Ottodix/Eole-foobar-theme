@@ -191,7 +191,9 @@ function setScheduler(schedulerState, dontNotify){
 var images = {}
 function build_images(){
 	if(properties.darklayout) colors.icons_folder = "white"; else colors.icons_folder = "";	
-
+	
+	images.track_infos_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\track_infos_icon.png");
+	
 	images.artist_bio_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\artist_bio_icon.png");
 	
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
@@ -357,79 +359,81 @@ function Lightswitch(switch_all,new_state){
 	}
 	if(switch_all) window.Repaint();
 }
-function toggleNowPlayingState(switch_all,new_state){
+function toggleNowPlayingState(switch_all,new_state, refresh_panel){
 	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
-	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	new_state = typeof new_state !== 'undefined' ? new_state : false;
+	refresh_panel = typeof refresh_panel !== 'undefined' ? refresh_panel : true;		
 	if(switch_all){
 		if(new_state===false) {
-			nowplayinglib_state.toggleValue();
-			nowplayingplaylist_state.toggleValue();
-			nowplayingbio_state.toggleValue();
-			nowplayingvisu_state.toggleValue();
+			nowplayinglib_state.toggleValue(refresh_panel);
+			nowplayingplaylist_state.toggleValue(refresh_panel);
+			nowplayingbio_state.toggleValue(refresh_panel);
+			nowplayingvisu_state.toggleValue(refresh_panel);
 		} else {
-			nowplayinglib_state.setValue(new_state);
-			nowplayingplaylist_state.setValue(new_state);
-			nowplayingbio_state.setValue(new_state);
-			nowplayingvisu_state.setValue(new_state);
+			nowplayinglib_state.setValue(new_state,refresh_panel);
+			nowplayingplaylist_state.setValue(new_state,refresh_panel);
+			nowplayingbio_state.setValue(new_state,refresh_panel);
+			nowplayingvisu_state.setValue(new_state,refresh_panel);
 		}
 	} else {
 		switch(main_panel_state.value){
 			case 0:
-				if(new_state!==false) nowplayinglib_state.setValue(new_state);
-				else nowplayinglib_state.toggleValue();
+				if(new_state!==false) nowplayinglib_state.setValue(new_state,refresh_panel);
+				else nowplayinglib_state.toggleValue(refresh_panel);
 			break;
 			case 1:
-				if(new_state!==false) nowplayingplaylist_state.setValue(new_state);
-				else nowplayingplaylist_state.toggleValue();
+				if(new_state!==false) nowplayingplaylist_state.setValue(new_state,refresh_panel);
+				else nowplayingplaylist_state.toggleValue(refresh_panel);
 			break;
 			case 2:
-				if(new_state!==false) nowplayingbio_state.setValue(new_state);			
-				else nowplayingbio_state.toggleValue();
+				if(new_state!==false) nowplayingbio_state.setValue(new_state,refresh_panel);			
+				else nowplayingbio_state.toggleValue(refresh_panel);
 			break;
 			case 3:
-				if(new_state!==false) nowplayingvisu_state.setValue(new_state);			
-				else nowplayingvisu_state.toggleValue();
+				if(new_state!==false) nowplayingvisu_state.setValue(new_state,refresh_panel);			
+				else nowplayingvisu_state.toggleValue(refresh_panel);
 			break;		
 		}
 	}
 	build_buttons();
 	window.Repaint();	
 }
-function toggleTrackInfosState(switch_all,new_state){
+function toggleTrackInfosState(switch_all,new_state, refresh_panel){
 	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
 	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	refresh_panel = typeof refresh_panel !== 'undefined' ? refresh_panel : true;
 	
-	if(getNowPlayingState()==0) toggleNowPlayingState();
+	//if(getNowPlayingState()==0) toggleNowPlayingState();
 	
 	if(switch_all){
 		if(new_state===false) {
-			trackinfoslib_state.toggleValue();
-			trackinfosplaylist_state.toggleValue();
-			trackinfosbio_state.toggleValue();
-			trackinfosvisu_state.toggleValue();
+			trackinfoslib_state.toggleValue(refresh_panel);
+			trackinfosplaylist_state.toggleValue(refresh_panel);
+			trackinfosbio_state.toggleValue(refresh_panel);
+			trackinfosvisu_state.toggleValue(refresh_panel);
 		} else {
-			trackinfoslib_state.setValue(new_state);
-			trackinfosplaylist_state.setValue(new_state);
-			trackinfosbio_state.setValue(new_state);
-			trackinfosvisu_state.setValue(new_state);
+			trackinfoslib_state.setValue(new_state,refresh_panel);
+			trackinfosplaylist_state.setValue(new_state,refresh_panel);
+			trackinfosbio_state.setValue(new_state,refresh_panel);
+			trackinfosvisu_state.setValue(new_state,refresh_panel);
 		}
 	} else {
 		switch(main_panel_state.value){
 			case 0:
-				if(new_state!==false) trackinfoslib_state.setValue(new_state);
-				else trackinfoslib_state.toggleValue();
+				if(new_state!==false) trackinfoslib_state.setValue(new_state,refresh_panel);
+				else trackinfoslib_state.toggleValue(refresh_panel);
 			break;
 			case 1:
-				if(new_state!==false) trackinfosplaylist_state.setValue(new_state);
-				else trackinfosplaylist_state.toggleValue();
+				if(new_state!==false) trackinfosplaylist_state.setValue(new_state,refresh_panel);
+				else trackinfosplaylist_state.toggleValue(refresh_panel);
 			break;
 			case 2:
-				if(new_state!==false) trackinfosbio_state.setValue(new_state);			
-				else trackinfosbio_state.toggleValue();
+				if(new_state!==false) trackinfosbio_state.setValue(new_state,refresh_panel);			
+				else trackinfosbio_state.toggleValue(refresh_panel);
 			break;
 			case 3:
-				if(new_state!==false) trackinfosvisu_state.setValue(new_state);			
-				else trackinfosvisu_state.toggleValue();
+				if(new_state!==false) trackinfosvisu_state.setValue(new_state,refresh_panel);			
+				else trackinfosvisu_state.toggleValue(refresh_panel);
 			break;		
 		}
 	}
@@ -473,8 +477,8 @@ function build_buttons(){
 		buttons.Idle.D_img = buttons.Idle.H_img;	
 		
 		if(getTrackInfosState()==1) {
-			buttons.RightSidebar.H_img = images.playlist_img;
-			buttons.RightSidebar.N_img = images.playlist_img;
+			buttons.RightSidebar.H_img = images.visualization_img;
+			buttons.RightSidebar.N_img = images.visualization_img;
 		} else {
 			buttons.RightSidebar.H_img = images.visualization_img;
 			buttons.RightSidebar.N_img = images.visualization_img;			
@@ -537,7 +541,13 @@ function build_buttons(){
 				if(getNowPlayingState()==1) {
 					toggleTrackInfosState();
 				} else {
+					if(getTrackInfosState()==0) toggleTrackInfosState(false,undefined,false);
 					toggleNowPlayingState();
+					/*trigger_refresh_PSS = setTimeout(function(){
+						RefreshPSS();
+						clearTimeout(trigger_refresh_PSS);
+						trigger_refresh_PSS = false;
+					}, 100);*/
 				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
 			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
@@ -714,7 +724,7 @@ function adapt_buttons_to_layout(){
 			buttons.Idle.setVisibility(false);
 		else buttons.Idle.setVisibility(true);		
 		
-		if(!properties.showRightSidebarBtn || !getNowPlayingState())
+		if(!properties.showRightSidebarBtn)
 			buttons.RightSidebar.setVisibility(false);
 		else buttons.RightSidebar.setVisibility(true);
 		

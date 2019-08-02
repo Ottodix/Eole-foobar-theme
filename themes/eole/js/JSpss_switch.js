@@ -52,7 +52,8 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	this.getNumberOfState = function () {
 		return (this.max_value-this.min_value);
 	}	
-	this.setValue = function (new_value) {	
+	this.setValue = function (new_value, refresh_panel) {	
+		refresh_panel = typeof refresh_panel !== 'undefined' ? refresh_panel : true;	
 		if(new_value==this.value) return;
 		if(new_value>this.max_value) new_value = this.max_value;
 		else if(new_value<this.min_value) new_value = this.min_value;		
@@ -64,14 +65,14 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		window.NotifyOthers("g_avoid_on_metadb_changed",true);			
 		window.NotifyOthers(this.name,this.value);	
 		
-		RefreshPSS();
+		if(refresh_panel!==false) RefreshPSS();
 	}
 	this.setDefault = function () {
 		this.setValue(this.default_value);
 	}	
-	this.toggleValue = function () {
-		if(this.value==0) this.setValue(1);
-		else this.setValue(0);
+	this.toggleValue = function (refresh_panel) {
+		if(this.value==0) this.setValue(1, refresh_panel);
+		else this.setValue(0, refresh_panel);
 	}
 	this.isEqual = function (test_value) {
 		return (this.value==test_value);
@@ -103,6 +104,7 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	this.getFileValue();
 }
 function RefreshPSS() {
+	//console.log("RefreshPSS")
 	if (fb.IsPlaying || fb.IsPaused) {
 		let handle = fb.GetNowPlaying();
 		handle.RefreshStats();

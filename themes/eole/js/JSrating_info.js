@@ -56,6 +56,9 @@ false,
 true];
 //font
 get_font();
+var txt_line1 = "";
+var txt_line2 = "";
+var txt_line3 = "";
 var random_color = 0;
 var foo_spec = utils.CheckComponent("foo_uie_vis_channel_spectrum", true);
 var is_mood = window.GetProperty("Display.Mood", false);
@@ -74,6 +77,7 @@ if (spec_h < 6 || !foo_spec) {
 	spec_show_grid = false;
 }
 var g_metadb;
+var album_infos = false;
 var top_padding = 10,
 	left_padding = 15;
 var zdpi = fbx_set[9];
@@ -242,9 +246,11 @@ function on_paint(gr) {
 	}   	
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	if (g_metadb) {
-		for (var i = 1; i < rbutton.length + 1; i++) {
-			rbutton[i - 1].Paint(gr, i);
-		}
+		//if(!album_infos){
+			for (var i = 1; i < rbutton.length + 1; i++) {
+				rbutton[i - 1].Paint(gr, i);
+			}
+		//}
 		//if (is_mood) btn_mood.Paint(gr);
 		
 		var double_row = false;
@@ -613,6 +619,8 @@ function on_metadb_changed(metadbs, fromhook) {
 		} catch(e){}
 		if(!current_track) return;	
 		
+		album_infos = false;
+		
 		allinfos = g_tfo.allinfos.EvalWithMetadb(g_metadb);
 		allinfos = allinfos.split(" ^^ ");
 
@@ -648,6 +656,7 @@ function update_infos(row1, row2, row3) {
 	txt_line1 = row1;
 	txt_line2 = row2;
 	txt_line3 = row3;
+	album_infos = true;
 	window.RepaintRect(0, 0, ww, text_bottom);	
 }
 function on_playback_new_track(metadb) {
