@@ -24,6 +24,7 @@ var properties = {
 	rawBitmap: false,
 	refreshRate: 50,	
 }
+if(properties.single_click_action>1) properties.single_click_action=1;
 
 var visu_margin_left = 0;
 var g_genre_cache = null;
@@ -1433,9 +1434,8 @@ function draw_settings_menu(x,y){
 		
 		var _single_click_menu = window.CreatePopupMenu();
 		_single_click_menu.AppendMenuItem(MF_STRING, 14, "Play");
-		_single_click_menu.AppendMenuItem(MF_STRING, 15, "Show now playing");		
-		_single_click_menu.AppendMenuItem(MF_STRING, 16, "Focus on track");				
-		_single_click_menu.CheckMenuRadioItem(14, 16, 14+properties.single_click_action);				
+		_single_click_menu.AppendMenuItem(MF_STRING, 15, "Show now playing");				
+		_single_click_menu.CheckMenuRadioItem(14, 15, 14+properties.single_click_action);				
 		_single_click_menu.AppendTo(_menu, MF_STRING, "Single click action");   
 		
 		var _dble_click_menu = window.CreatePopupMenu();
@@ -1519,7 +1519,7 @@ function draw_settings_menu(x,y){
 				adaptButtons(); 
 				window.Repaint();
 				break;	
-            case (idx >= 14 && idx<=16):
+            case (idx >= 14 && idx<=15):
 				properties.single_click_action = idx-14;
 				window.SetProperty("PROPERTY single_click_action", properties.single_click_action);
                 break;							
