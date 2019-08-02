@@ -60,6 +60,7 @@ var txt_line1 = "";
 var txt_line2 = "";
 var txt_line3 = "";
 var random_color = 0;
+var first_populate_done = false;
 var foo_spec = utils.CheckComponent("foo_uie_vis_channel_spectrum", true);
 var is_mood = window.GetProperty("Display.Mood", false);
 var spec_show_bg = window.GetProperty("Spectrum Background: Show bgcolor", true);
@@ -607,7 +608,7 @@ function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
 	}
 }*/
 function on_metadb_changed(metadbs, fromhook) {
-	if(window.IsVisible) {
+	if(window.IsVisible || !first_populate_done) {
 		if(!g_metadb) return;
 		var current_track = false;
 		try{
@@ -643,6 +644,7 @@ function on_metadb_changed(metadbs, fromhook) {
 		txt_line2 = txt_info;
 		txt_line3 = txt_profile;
 		window.RepaintRect(0, 0, ww, text_bottom);
+		first_populate_done = true;
 	} else {
 		set_update_function('on_metadb_changed(g_metadb,'+fromhook+')');	    	
 	}
