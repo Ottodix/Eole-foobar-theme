@@ -3410,6 +3410,7 @@ oBrowser = function(name) {
 									trackIndex:playlistTrackId,
 									totalTracks:this.groups[groupId].count+(this.groups[groupId].count > 1 ? " tracks" : " track"),
 									genre:this.groups[groupId].genre,
+									metadb:this.groups[groupId].metadb,									
 									date:this.groups[groupId].date,										
 									length:this.groups[groupId].TimeString,						
 									firstRow: this.groups[groupId].group_header_row_1,
@@ -6596,6 +6597,9 @@ function on_notify_data(name, info) {
 			stopFlashNowPlaying();
 			brw.repaint();
 		break;  
+		case "rating_album_updated": 		
+			g_rating_updated=true;	
+		break;				
 		case "rating_updated": 		
 			g_rating_updated=true;
 			if(properties.showRating){

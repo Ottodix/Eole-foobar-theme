@@ -5630,6 +5630,7 @@ function on_notify_data(name, info) {
 			librarytree.value=info;
 		break;			
 		case "rating_updated": 
+		case "rating_album_updated": 		
 			g_avoid_on_metadb_changed=true;
 		break;				
 		case "filter1_state": 

@@ -1833,6 +1833,18 @@ function showNowPlaying(force){
 		else window.NotifyOthers("FocusOnNowPlayingForce",fb.GetNowPlaying());
 	}
 }
+function rateAlbum(new_rating, old_rating, metadbs){
+	let arr = [];
+	//for (let i = 0; i < metadbs.Count; ++i) {
+		arr.push({
+			'rating_album' : new_rating, 
+		});
+	//}
+	g_avoid_metadb_updated = true;
+	metadbs.UpdateFileInfoFromJSON(JSON.stringify(arr));
+	window.NotifyOthers('rating_album_updated',metadbs);
+	return new_rating;
+}
 function rateSong(new_rating, old_rating, metadb){
 	var new_rating = Number(new_rating);
 	var old_rating = Number(old_rating);
@@ -1865,9 +1877,8 @@ function rateSong(new_rating, old_rating, metadb){
 				arr.push({
 					"rating" : new_rating,
 				});
-				var str = JSON_stringify(arr);
 
-				metadbList.UpdateFileInfoFromJSON(str);
+				metadbList.UpdateFileInfoFromJSON(JSON_stringify(arr));
 				metadbList = undefined;			
 				return new_rating;				
 			};
@@ -1883,9 +1894,8 @@ function rateSong(new_rating, old_rating, metadb){
 			arr.push({
 				"rating" : "",
 			});
-			var str = JSON_stringify(arr);
 
-			metadbList.UpdateFileInfoFromJSON(str);
+			metadbList.UpdateFileInfoFromJSON(JSON_stringify(arr));
 			metadbList = undefined;			
 			return 0;
 		};

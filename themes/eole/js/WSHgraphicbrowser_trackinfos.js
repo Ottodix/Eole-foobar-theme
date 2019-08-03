@@ -1747,6 +1747,7 @@ oShowList = function(parentPanelName) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
 				trackIndex:brw.groups[this.idx].trackIndex,
+				metadb:this.pl[0],
 				totalTracks:this.total_tracks,
 				genre:this.genre,			
 				length:this.length,						
@@ -7380,8 +7381,11 @@ function on_notify_data(name, info) {
 			}
 			brw.repaint();
 		break; 		
+		case "rating_album_updated": 		
+			g_rating_updated=true;	
+		break;			
 		case "rating_updated": 
-			g_avoid_on_metadb_changed=true;
+			g_rating_updated=true;
 			if(properties.showRating && g_showlist.idx > -1){
 				if(window.IsVisible && !timers.ratingUpdate){
 					timers.ratingUpdate = setTimeout(function(){

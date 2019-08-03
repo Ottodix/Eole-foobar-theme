@@ -61,6 +61,7 @@ var txt_line2 = "";
 var txt_line3 = "";
 var random_color = 0;
 var first_populate_done = false;
+var g_avoid_metadb_updated = false;
 var foo_spec = utils.CheckComponent("foo_uie_vis_channel_spectrum", true);
 var is_mood = window.GetProperty("Display.Mood", false);
 var spec_show_bg = window.GetProperty("Spectrum Background: Show bgcolor", true);
@@ -95,6 +96,7 @@ var text_bottom = Math.floor(80*zdpi);
 var g_avoid_on_focus_change = false;
 g_tfo = {
 	rating: fb.TitleFormat("%rating%"),
+	rating_album: fb.TitleFormat("%rating_album%"),	
 	title: fb.TitleFormat("$if2(%title%,)"),
 	artist: fb.TitleFormat("$if2(%artist%,)"),
 	album: fb.TitleFormat("$if(%album%,  |  %album%,)"),
@@ -609,7 +611,11 @@ function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
 }*/
 function on_metadb_changed(metadbs, fromhook) {
 	if(window.IsVisible || !first_populate_done) {
-		if(!g_metadb) return;
+		if(!g_metadb || g_avoid_metadb_updated) {
+			g_avoid_metadb_updated = false;
+			return;
+		}
+		
 		var current_track = false;
 		try{
 			for(var i=0; i < metadbs.Count; i++) {
@@ -654,11 +660,16 @@ function set_update_function(string){
 	else if( Update_Required_function.indexOf("on_metadb_changed(g_metadb,false")!=-1) return;
 	else Update_Required_function=string;
 }
-function update_infos(row1, row2, row3) {
+function update_infos(row1, row2, row3, metadb) {
 	txt_line1 = row1;
 	txt_line2 = row2;
 	txt_line3 = row3;
 	album_infos = true;
+	g_metadb = metadb[0];
+	rating = g_tfo.rating_album.EvalWithMetadb(g_metadb);
+	if (rating == "?") {
+		rating = 0;
+	} else rating++;	
 	window.RepaintRect(0, 0, ww, text_bottom);	
 }
 function on_playback_new_track(metadb) {
@@ -696,7 +707,8 @@ function on_notify_data(name, info) {
 		break;				
 	case "trigger_on_focus_change_album":		
 		if(properties.follow_cursor || !fb.IsPlaying){
-			update_infos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre)
+			metadb = new FbMetadbHandleList(info.metadb);
+			update_infos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb)
 			g_avoid_on_focus_change = true;			
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;				
@@ -861,13 +873,17 @@ function ButtonUI_R() {
 					//if (foo_playcount) {
 						//if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
 						//fb.RunContextCommandWithMetadb("Rating" + "/" + "<not set>", g_metadb);
-						rateSong(0,rating-1, g_metadb);
+						if(album_infos) {
+							rating = rateAlbum(0,rating-1, new FbMetadbHandleList(g_metadb))+1;
+						} else rateSong(0,rating-1, g_metadb);
 					//} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
 				} else {
 				//	if (foo_playcount) {
 						//if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
 						//fb.RunContextCommandWithMetadb("Rating" + "/" + i, g_metadb);
-						rateSong(i-1,rating-1, g_metadb);
+						if(album_infos) {
+							rating = rateAlbum(i-1,rating-1, new FbMetadbHandleList(g_metadb))+1;
+						} else rateSong(i-1,rating-1, g_metadb);
 					//} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
 				}
 			}
