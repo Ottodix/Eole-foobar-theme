@@ -665,13 +665,17 @@ oCover = function() {
 		return this.filler;
 	}	
 	this.setPlaying = function(state, metadb) {
+		if(state==this.is_playing) return;
 		if(state===false){
 			this.is_playing = false;
+			//console.log("notisplaying!")
 		} else {
 			this.is_playing = true;
+			//console.log("isplaying!")
 			this.playing_metadb = metadb;
 			this.playing_cachekey = nowPlaying_cachekey;
 		}
+		window.NotifyOthers("sidebar_isplaying",this.is_playing);
 	}
 	this.setArtwork = function(image, resize, filler, is_playing, metadb) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;	

@@ -2011,9 +2011,9 @@ oBrowser = function(name) {
 		else this.populate_sourceMode = this.current_sourceMode;
 				
         console.log("--> populate Filter order:"+properties.filterOrder+" parent panel:"+properties.ParentName+" call_id:"+call_id);
-		gTime_pop = fb.CreateProfiler();			
-		gTime_pop.Reset();
-		console.log("Filter populate started time:"+gTime_pop.Time);	
+		//gTime_pop = fb.CreateProfiler();			
+		//gTime_pop.Reset();
+		//console.log("Filter populate started time:"+gTime_pop.Time);	
 		this.sourcePlaylistIdx = -1;
         if(this.list) this.list = undefined;
         if(this.list_unsorted) this.list_unsorted = undefined;
@@ -2106,7 +2106,7 @@ oBrowser = function(name) {
         this.scrollbar.updateScrollbar();
         this.repaint();
         g_first_populate_done = true;
-		console.log("Filter populate finished time:"+gTime_pop.Time);
+		//console.log("Filter populate finished time:"+gTime_pop.Time);
     };
 	
     this.clearSelectedItem = function() {

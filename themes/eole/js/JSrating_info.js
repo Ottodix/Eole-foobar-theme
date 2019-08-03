@@ -112,7 +112,7 @@ var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 1
 if (time_circle < 3000) time_circle = 3000;
 if (time_circle > 60000) time_circle = 60000;
 var rbutton = Array();
-var esl_bg, esl_txt_normal, esl_txt_hight, fontcolor, fontcolor2, linecolor, icocolor;
+var esl_bg, esl_txt_hight;
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var tracktype;
 var img_rating_on, img_rating_off, btn_mood, mood_img;
@@ -120,7 +120,7 @@ var col_spec, col_grid;
 
 function on_layout_change(){
 	if(properties.forcedarklayout) properties.darklayout = true;
-	else if(layout_state.isEqual(0)) {
+	else {
 		switch(main_panel_state.value){
 			case 0:
 				properties.darklayout = properties.library_dark_theme;
@@ -135,24 +135,11 @@ function on_layout_change(){
 				properties.darklayout = properties.visualization_dark_theme;
 			break;
 		}
-	} else properties.darklayout = properties.minimode_dark_theme;	
+	} //else properties.darklayout = properties.minimode_dark_theme;	
 	get_colors();
 	get_images();
 }
 on_layout_change();
-get_colors();
-
-/*var timer_esl_1 = window.SetTimeout(function() {
-	set_esl_color();
-	timer_esl_1 && window.ClearTimeout(timer_esl_1);
-	timer_esl_1 = false;
-}, 200); 
-
-var timer_esl_2 = window.SetTimeout(function() {
-	set_esl_color();
-	timer_esl_2 && window.ClearTimeout(timer_esl_2);
-	timer_esl_2 = false;
-}, ESL_color_delay);*/
 
 
 var pointArr = {}
@@ -290,53 +277,31 @@ function get_colors() {
 	case (1):
 		esl_bg = RGB(255,255,255);
 		esl_txt_hight = GetGrey(0);
-		esl_txt_normal = RGB(75, 75, 75);
-		fontcolor = RGB(36, 36, 36);
-		fontcolor2 = RGB(100, 100, 100);
-		icocolor = RGBA(0,0,0,40);
 		col_spec = RGBA(0,0,0,10);
 		col_grid = RGBA(0,0,0,30);
 		break;
 	case (2):
 		esl_bg = fbx_set[4];
 		esl_txt_hight = fbx_set[6];
-		esl_txt_normal = RGB(75, 75, 75);
-		fontcolor = RGB(36, 36, 36);
-		fontcolor2 = RGB(100, 100, 100);
-		icocolor = RGBA(0,0,0,40);
 		col_spec = RGBA(0,0,0,10);
 		col_grid = RGBA(0,0,0,30);
 		break;
 	case (3):
 		esl_bg = fbx_set[1];
 		esl_txt_hight = fbx_set[5];
-		esl_txt_normal = RGB(200, 200, 200);
-		fontcolor = RGB(235, 235, 235);
-		fontcolor2 = RGB(200, 200, 200);
-		icocolor = RGBA(255,255,255,40);
 		col_spec = RGBA(0,0,0,20);
 		col_grid = RGBA(0,0,0,40);
 		break;
 	case (4):
 		esl_bg = fbx_set[8];
 		esl_txt_hight = fbx_set[5];
-		esl_txt_normal = RGB(200, 200, 200);
-		fontcolor = RGB(235, 235, 235);
-		fontcolor2 = RGB(200, 200, 200);
-		icocolor = RGBA(255,255,255,40);
 		col_spec = RGBA(0,0,0,40);
 		col_grid = RGBA(2,0,0,60);
 		break;
 	}
-	linecolor = blendColors(esl_bg, RGB(0,0,0), 0.255);
 	get_colors_global();
 }
 
-function set_esl_color() {
-	//window.NotifyOthers("_eslyric_set_background_color_", esl_bg);
-	//window.NotifyOthers("_eslyric_set_text_color_normal_", esl_txt_normal);
-	//window.NotifyOthers("_eslyric_set_text_color_highlight_", esl_txt_hight);
-}
 var pointArr = {}
 function setPointArr(zdpi){
 	pointArr = {
@@ -748,7 +713,6 @@ function on_notify_data(name, info) {
 	case "set_ui_mode":
 		ui_mode = info;
 		get_colors();
-		set_esl_color();
 		get_images();
 		btn_mood.resetImg();
 		window.Repaint();
@@ -764,7 +728,6 @@ function on_notify_data(name, info) {
 		fbx_set[7] = info[7];
 		fbx_set[8] = info[8];
 		get_colors();
-		set_esl_color();
 		get_images();
 		btn_mood.resetImg();
 		window.Repaint();
@@ -809,7 +772,6 @@ function on_notify_data(name, info) {
 	case "main_panel_state": 
 		main_panel_state.value = info;
 		on_layout_change();
-		get_colors();
 		window.Repaint();	
 	break;		
 	}
@@ -898,7 +860,6 @@ function on_script_unload() {
 function on_init(){
 	g_cursor = new oCursor();	
 	g_resizing = new Resizing("rightsidebar",true,false);	
-	get_colors();
 	on_layout_change();
 	if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 	else on_item_focus_change_custom(-1,-1,-1,fb.GetFocusItem()); //g_cover.getArtwork(fb.GetFocusItem(), false);	

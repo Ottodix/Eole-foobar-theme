@@ -161,7 +161,7 @@ function startAnimation(){
 						startAnimation();				
 					}	
 				}catch(e){}		
-				if(properties.showVisualization) {
+				if(properties.showVisualization && (!g_cover.sidebar_isplaying || layout_state.isEqual(1))) {
 					if(height_bar_1>height_bar_max) {direction_bar_1=-1;} else if(height_bar_1<bar_height_min) direction_bar_1=1;
 					height_bar_1=height_bar_1+(coef_bar_1*direction_bar_1);
 				
@@ -302,7 +302,7 @@ function on_paint(gr) {
 	
 	if(fb.IsPlaying){
 		gr.FillGradRect(0,-1, ww, wh+1, 270, colors.grad_bottom, colors.grad_top,1); 		
-		if(properties.showVisualization && !fb.IsPaused && !Randomsetfocus) {
+		if(properties.showVisualization && !fb.IsPaused && !Randomsetfocus && (!g_cover.sidebar_isplaying || layout_state.isEqual(1))) {
 			gr.FillGradRect(0,0, ww, wh, 0, colors.visu_grad_borders, colors.visu_grad_middle, 0.5);		
 			gr.FillSolidRect(visu_margin_left, wh/2-height_bar_1+global_vertical_fix+Visualization_top_m, bar_width, height_bar_1, colors.animation);	
 			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, wh/2-height_bar_3+global_vertical_fix+Visualization_top_m, bar_width, height_bar_3, colors.animation);			
@@ -495,6 +495,7 @@ oCover = function() {
 	this.x = 0;
 	this.y = 0;		
 	this.resized = false;
+	this.sidebar_isplaying = false;
 	this.artwork = null;
 	this.tintDrawed = false;
 	this.filler = false;	
@@ -812,6 +813,10 @@ function on_notify_data(name, info) {
 			}
 			window.Repaint();
 		break; 	
+		case "sidebar_isplaying":
+			g_cover.sidebar_isplaying = info;
+			window.Repaint();
+		break;
 		case "layout_state":
 			layout_state.value = info;
 			on_layout_change();
