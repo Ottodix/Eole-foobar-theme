@@ -75,8 +75,8 @@ var properties = {
     tf_albumartist: fb.TitleFormat("%album artist%"),
     tf_groupkey_genre: window.GetProperty("_PROPERTY Genre TitleFormat", "$if2($meta(genre,0),?)"),	
     tf_groupkey_genre_default: "$if2($meta(genre,0),?)",			
-    tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta(artist),?)"),
-    tf_groupkey_artist_default: "$if2($meta(artist),?)",		
+    tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta_sep(artist, ** ),?)"),
+    tf_groupkey_artist_default: "$if2($meta_sep(artist, ** ),?)",		
     tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album%"),	
     tf_groupkey_album_default: "%album artist% ^^ %album%",	
     tf_groupkey_album_addinfos: " ## %title% ## %date%",	
@@ -1544,7 +1544,11 @@ oGroup = function(index, start, handle, groupkey) {
         this.pl = handles.Clone();
         this.count = count;
     };
-    
+    this.addTrack = function(tr, handle) {
+		this.tra.push(tr);
+		this.pl.Add(handle);
+		this.count++;
+	}
     //this.totalPreviousRows = 0
 };
 
@@ -1889,6 +1893,7 @@ oBrowser = function(name) {
         var tr_all = [];
         var pl_all = new FbMetadbHandleList();
         var flag = [];
+		var itemkey_all = [];
 		var default_grouping = false;
 		this.groups.splice(0, this.groups.length);
 				
@@ -1923,6 +1928,7 @@ oBrowser = function(name) {
             };
             if(toAdd) {
                 if(current != previous && !flag["#"+current]) {
+				
                     if(this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 						flag["#"+current] = true;
 					}
@@ -1943,8 +1949,33 @@ oBrowser = function(name) {
                         };
                         t_all++;
                         t++;
-                        this.groups.push(new oGroup(g+1, i, handle, arr[0]));
-                        g++;
+						if(properties.tagMode==2 && !this.customGroups){
+							multivalues = current.split(" ** ");
+							for(var m=0;m<multivalues.length;m++) {
+								//multivalues[m] = multivalues[m].toLowerCase();
+								if(!itemkey_all[multivalues[m]]) {
+									itemkey_all[multivalues[m]] = {
+										index:g+1,
+										handles: new FbMetadbHandleList(handle),
+										groupkey: multivalues[m]
+									};
+									//if(m==0) {
+										this.groups.push(new oGroup(g+1, i, handle, multivalues[m]));
+										g++;
+									//}
+									console.log("itemkey_all[multivalues[m]1 "+multivalues[m]+" index:"+(g))
+								} else {
+									console.log("itemkey_all[multivalues[m]2 "+multivalues[m])
+									//if(m==0) 
+										this.groups[itemkey_all[multivalues[m]].index-1].addTrack(arr[1],handle);
+									//else itemkey_all[multivalues[m]].handles.Add(handle);									
+								}
+							}
+							//if(m>1) alert(1);
+						} else {
+							 this.groups.push(new oGroup(g+1, i, handle, arr[0]));
+							 g++;
+						}							
 						this.groups[g-1].date = arr[2];
 						if(properties.tagMode==1){
 							if(default_grouping){
@@ -1997,6 +2028,7 @@ oBrowser = function(name) {
         tr.splice(0, tr.length);
         tr_all.splice(0, tr_all.length);
         flag.splice(0, flag.length);
+		itemkey_all.splice(0, itemkey_all.length);
         pl.RemoveAll();
         pl_all.RemoveAll();
     };

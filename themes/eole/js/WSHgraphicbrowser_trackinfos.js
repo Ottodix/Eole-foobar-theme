@@ -139,7 +139,6 @@ var properties = {
 	TFshowlistReduced: "[%discnumber%]",
     TFgroupinfos: "%genre% ^^ %date% ^^ %discnumber%",	
     TFgroupinfoscustom: "%album artist% ^^ %album% ^^ %genre% ^^ %date% ^^ %discnumber%",		
-    tf_crc_artist: fb.TitleFormat("$crc32('artists'$meta(artist,0))"),	
     smooth_scroll_value: window.GetProperty("MAINPANEL Smooth Scroll value (0 to disable)", 0.5),
     smooth_expand_value: window.GetProperty("TRACKLIST Smooth Expand value (0 to disable)", 0.3),
 	smooth_expand_default_value:0.3,

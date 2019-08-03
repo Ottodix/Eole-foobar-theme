@@ -53,6 +53,7 @@ var globalProperties = {
 	colorsMiniPlayer: window.GetProperty("GLOBAL colorsMiniPlayer",0),		
 	record_move_every_x_ms:3000,	
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
+	crc_artist: "$crc32('artists'$meta(artist))",
 	selection_playlist : "Library Selection",
 	playing_playlist : "Library Playback",
 	whole_library : "Whole Library",
