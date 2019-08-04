@@ -1138,7 +1138,7 @@ oRow = function(metadb,itemIndex) {
 							g_showlist.track_rated = true;
 						};
 						if(trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor)
-							window.NotifyOthers("trigger_on_focus_change",Array(brw.getSourcePlaylist(),playlistTrackId));
+							window.NotifyOthers("trigger_on_focus_change",Array(brw.getSourcePlaylist(),playlistTrackId,this.metadb));
 					}
 					brw.repaint();					
 					

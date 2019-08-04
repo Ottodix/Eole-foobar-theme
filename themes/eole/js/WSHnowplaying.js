@@ -991,7 +991,8 @@ function on_notify_data(name, info) {
 			}, 150);		
 			break;
 		case "trigger_on_focus_change":
-			on_item_focus_change_custom(info[0], -1, info[1]);
+			metadb = new FbMetadbHandleList(info[2]);
+			on_item_focus_change_custom(info[0], -1, info[1], metadb[0]);
 			g_avoid_on_focus_change = true;			
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;				

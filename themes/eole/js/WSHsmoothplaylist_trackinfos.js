@@ -3458,14 +3458,14 @@ oBrowser = function(name) {
 										if(g_focus_id!=playlistTrackId || this.sentTrackId != playlistTrackId) {
 											this.sentTrackId = playlistTrackId;
 											this.sentAlbumId = -1;
-											window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId));
+											window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));
 											plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
 										}
                                     } else {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-										window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId));										
+										window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));										
                                     };
                                     this.SHIFT_start_id = null;
                                 };
