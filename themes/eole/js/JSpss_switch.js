@@ -212,6 +212,22 @@ function getTrackInfosState(){
 		break;		
 	}	
 }
+function getTrackInfosVisibility(){
+	switch(main_panel_state.value){
+		case 0:
+			return (trackinfoslib_state.value==1 && nowplayinglib_state.value==1);
+		break;
+		case 1:
+			return (trackinfosplaylist_state.value==1 && nowplayingbio_state.value==1);
+		break;
+		case 2:
+			return (trackinfosbio_state.value==1 && nowplayinglib_state.value==1);
+		break;
+		case 3:
+			return (trackinfosvisu_state.value==1 && nowplayingvisu_state.value==1);
+		break;		
+	}	
+}
 function getRightPlaylistState(){
 	return (nowplayinglib_state.isActive());
 	//return (!trackinfoslib_state.isActive() && nowplayinglib_state.isActive());

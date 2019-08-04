@@ -161,7 +161,7 @@ function startAnimation(){
 						startAnimation();				
 					}	
 				}catch(e){}		
-				if(properties.showVisualization>0 && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2)) {
+				if(properties.showVisualization>0 && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2 || !getTrackInfosVisibility())) {
 					if(height_bar_1>height_bar_max) {direction_bar_1=-1;} else if(height_bar_1<bar_height_min) direction_bar_1=1;
 					height_bar_1=height_bar_1+(coef_bar_1*direction_bar_1);
 				
@@ -302,7 +302,7 @@ function on_paint(gr) {
 	
 	if(fb.IsPlaying){
 		gr.FillGradRect(0,-1, ww, wh+1, 270, colors.grad_bottom, colors.grad_top,1); 		
-		if(properties.showVisualization>0 && !fb.IsPaused && !Randomsetfocus && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2)) {
+		if(properties.showVisualization>0 && !fb.IsPaused && !Randomsetfocus && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2 || !getTrackInfosVisibility())) {
 			gr.FillGradRect(0,0, ww, wh, 0, colors.visu_grad_borders, colors.visu_grad_middle, 0.5);		
 			gr.FillSolidRect(visu_margin_left, wh/2-height_bar_1+global_vertical_fix+Visualization_top_m, bar_width, height_bar_1, colors.animation);	
 			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, wh/2-height_bar_3+global_vertical_fix+Visualization_top_m, bar_width, height_bar_3, colors.animation);			
@@ -750,16 +750,36 @@ function on_notify_data(name, info) {
 		break; 	
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
 		break; 
 		case "nowplayingplaylist_state":
 			nowplayingplaylist_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
 		break; 
 		case "nowplayingbio_state":
 			nowplayingbio_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
 		break; 
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
 		break; 	
+		case "trackinfoslib_state":
+			trackinfoslib_state.value=info;	
+			if(properties.showVisualization==1) window.Repaint();
+		break; 
+		case "trackinfosplaylist_state":
+			trackinfosplaylist_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
+		break; 
+		case "trackinfosbio_state":
+			trackinfosbio_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
+		break; 
+		case "trackinfosvisu_state":
+			trackinfosvisu_state.value=info;
+			if(properties.showVisualization==1) window.Repaint();
+		break; 			
 		case "minimode_dark_theme":
 			properties.minimode_dark_theme=info;
 			window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);

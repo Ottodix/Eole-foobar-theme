@@ -1112,7 +1112,7 @@ function on_notify_data(name, info) {
 		break; 
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
-		break; 	
+		break; 			
 		case "minimode_dark_theme":
 			properties.minimode_dark_theme=info;
 			window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
