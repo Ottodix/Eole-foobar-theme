@@ -536,15 +536,15 @@ function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
 	g_metadb_old = g_metadb;
 	if (!properties.follow_cursor && (fb.IsPlaying || fb.IsPaused)) g_metadb = fb.GetNowPlaying();
 	else {	
-		if (to>-1 && playlistIndex>-1){
+		if(metadb){
+			g_metadb = metadb;		
+		} else if (to>-1 && playlistIndex>-1){
 			g_metadb = plman.GetPlaylistItems(playlistIndex)[to];
-		} else {
-			g_metadb = metadb;
-			if(!g_metadb){
-				g_metadb = g_metadb_old;
-				window.Repaint();
-			}
-		}		
+		}
+		if(!g_metadb){
+			g_metadb = g_metadb_old;
+			window.Repaint();
+		}	
 	}
 	if (g_metadb) {
 		setTimerCycle();
@@ -683,7 +683,12 @@ function on_notify_data(name, info) {
 		}
 		break;		
 	case "trigger_on_focus_change":
-		on_item_focus_change_custom(info[0],-1,info[1]);
+		try{
+			metadb = new FbMetadbHandleList(info[2]);
+			on_item_focus_change_custom(info[0], -1, info[1], metadb[0]);
+		} catch(e){
+			on_item_focus_change_custom(info[0], -1, info[1]);
+		}
 		g_avoid_on_focus_change = true;			
 		timers.on_focus_change = setTimeout(function() {
 			g_avoid_on_focus_change = false;				

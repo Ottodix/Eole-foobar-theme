@@ -3465,6 +3465,8 @@ oBrowser = function(name) {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+										this.sentTrackId = playlistTrackId;
+										this.sentAlbumId = -1;										
 										window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));										
                                     };
                                     this.SHIFT_start_id = null;
