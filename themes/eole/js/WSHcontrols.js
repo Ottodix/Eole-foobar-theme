@@ -1668,7 +1668,7 @@ function on_notify_data(name, info) {
 			window.Repaint(); 
 		break;	
 	   case "coverpanel_state_mini":
-			coverpanel_state_mini.value = info;			
+			coverpanel_state_mini.value = info;
 			window.Repaint(); 
 		break;				
 		case "bio_dark_theme":

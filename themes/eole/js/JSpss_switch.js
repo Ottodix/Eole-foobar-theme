@@ -143,8 +143,8 @@ var darkplaylist_state = new oPanelSetting("darkplaylist_state", "DARKPLAYLIST_"
 var showtrackinfo_big = new oPanelSetting("showtrackinfo_big", "SHOWTRACKINFOBIG_", 1, 0, 1);
 var showtrackinfo_small = new oPanelSetting("showtrackinfo_small", "SHOWTRACKINFOSMALL_", 0, 0, 1);
 
-var coverpanel_state_mini = new oPanelSetting("coverpanel_state", "COVERPANELMINI_", 1, 0, 1);
-var coverpanel_state_big = new oPanelSetting("coverpanel_state", "COVERPANELBIG_", 1, 0, 1);
+var coverpanel_state_mini = new oPanelSetting("coverpanel_state_mini", "COVERPANELMINI_", 1, 0, 1);
+var coverpanel_state_big = new oPanelSetting("coverpanel_state_big", "COVERPANELBIG_", 1, 0, 1);
 var filters_panel_state = new oPanelSetting("filters_panel_state", "FILTERSPANEL_", 1, 0, 3);
 var libraryfilter_state = new oPanelSetting("libraryfilter_state", "LIBRARYFILTER_", 1, 0, 1);
 var screensaver_state = new oPanelSetting("screensaver_state", "SCREENSAVER_", 0, 0, 1);

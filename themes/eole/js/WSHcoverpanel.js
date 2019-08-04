@@ -2,7 +2,7 @@ var colors = {};
 var properties = {
 	panelName: 'WSHcoverpanel',		
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
-	showVisualization: window.GetProperty("Show Visualization", true),
+	showVisualization: window.GetProperty("Show Visualization", 1), // 0: Never 1: Only when track info panel isn't showing it // 2: Always
 	showTrackInfo: window.GetProperty("Show track info", false),	
     random_function: window.GetProperty("Random function", "default"),	
 	maindarklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),		
@@ -144,7 +144,7 @@ function startAnimation(){
 		animationStartTime = Date.now();
 	}catch(e){}
 	animationCounter = 0;
-	if(properties.showVisualization || globalProperties.enable_screensaver){
+	if(properties.showVisualization>0 || globalProperties.enable_screensaver){
 		animationTimer = setInterval(function() {
 			animationCounter++;
 			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0) && !main_panel_state.isEqual(3)){
@@ -161,7 +161,7 @@ function startAnimation(){
 						startAnimation();				
 					}	
 				}catch(e){}		
-				if(properties.showVisualization && (!g_cover.sidebar_isplaying || layout_state.isEqual(1))) {
+				if(properties.showVisualization>0 && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2)) {
 					if(height_bar_1>height_bar_max) {direction_bar_1=-1;} else if(height_bar_1<bar_height_min) direction_bar_1=1;
 					height_bar_1=height_bar_1+(coef_bar_1*direction_bar_1);
 				
@@ -265,7 +265,7 @@ function chooseButton(x, y) {
     return null;
 }
 function calculate_visu_margin_left(){
-	if(properties.showVisualization) {
+	if(properties.showVisualization>0) {
 		if(properties.showTrackInfo)
 			visu_margin_left = 29 + bar_margin;
 		else visu_margin_left = ww/2 - 3 - bar_margin;
@@ -302,7 +302,7 @@ function on_paint(gr) {
 	
 	if(fb.IsPlaying){
 		gr.FillGradRect(0,-1, ww, wh+1, 270, colors.grad_bottom, colors.grad_top,1); 		
-		if(properties.showVisualization && !fb.IsPaused && !Randomsetfocus && (!g_cover.sidebar_isplaying || layout_state.isEqual(1))) {
+		if(properties.showVisualization>0 && !fb.IsPaused && !Randomsetfocus && (!g_cover.sidebar_isplaying || layout_state.isEqual(1) || properties.showVisualization==2)) {
 			gr.FillGradRect(0,0, ww, wh, 0, colors.visu_grad_borders, colors.visu_grad_middle, 0.5);		
 			gr.FillSolidRect(visu_margin_left, wh/2-height_bar_1+global_vertical_fix+Visualization_top_m, bar_width, height_bar_1, colors.animation);	
 			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, wh/2-height_bar_3+global_vertical_fix+Visualization_top_m, bar_width, height_bar_3, colors.animation);			
@@ -333,7 +333,7 @@ function on_size(w, h) {
     wh = h;
 	calculate_visu_margin_left();
 	text_height=wh-8;	
-	if(properties.showVisualization || globalProperties.enable_screensaver) startAnimation();
+	if(properties.showVisualization>0 || globalProperties.enable_screensaver) startAnimation();
     positionButtons();
 	g_cover.setSize(ww,wh);
 }
@@ -618,13 +618,13 @@ function on_playback_new_track(metadb) {
 	if (metadb)	{
 		//current_played_track = metadb;
 		g_cover.getArtwork(metadb);		
-		if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver)) startAnimation();
+		if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) startAnimation();
 		//setRatingBtn(metadb);		
 	}
 	window.Repaint();     
 } 
 function on_playback_time() {
-	if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver)) {startAnimation();}
+	if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) {startAnimation();}
 }	
 function on_layout_change() {
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
@@ -943,14 +943,7 @@ function on_mouse_rbtn_up(x, y){
 			break;
 		case (idx == 102):
 			window.Reload();
-			break;       
-		case (idx == 103):
-			properties.showVisualization = !properties.showVisualization;
-			window.SetProperty("Show Visualization", properties.showVisualization);
-			if(!globalProperties.enable_screensaver) resetAnimation();
-			calculate_visu_margin_left();
-			window.Repaint();
-			break;  				
+			break;       		
 		case (idx == 1):
 			showNowPlayingCover();
 			break;				
@@ -1057,21 +1050,22 @@ function draw_settings_menu(x,y){
 		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");    
 		_menu.AppendMenuSeparator();
 		
-		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");		
-		_menu.CheckMenuItem(1,properties.showVisualization);
+		var _visu_menu = window.CreatePopupMenu();
+		_visu_menu.AppendMenuItem(MF_STRING, 8, "Always show");
+		_visu_menu.CheckMenuItem(8,properties.showVisualization==2);
+		_visu_menu.AppendMenuItem(MF_STRING, 9, "Only when main panel animation isn't visible");
+		_visu_menu.CheckMenuItem(9,properties.showVisualization==1);
+		_visu_menu.AppendMenuItem(MF_STRING, 10, "Never");
+		_visu_menu.CheckMenuItem(10,properties.showVisualization==0);		
+		_visu_menu.AppendTo(_menu, MF_STRING, "Animation on playback");   
+		
+		
 		_menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
 		_menu.CheckMenuItem(2, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));		
-
+		
 		
         idx = _menu.TrackPopupMenu(x,y,0x0020);
         switch(true) {
-			case (idx == 1):
-                properties.showVisualization = !properties.showVisualization;
-                window.SetProperty("Show Visualization", properties.showVisualization);
-				calculate_visu_margin_left();
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				window.Repaint();
-				break;	
             case (idx == 2):
 				if(layout_state.isEqual(0)) coverpanel_state_big.toggleValue();
 				else coverpanel_state_mini.toggleValue();		
@@ -1095,7 +1089,28 @@ function draw_settings_menu(x,y){
             case (idx == 7):
 				properties.dble_click_action = 4;
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;					
+                break;		
+			case (idx == 8):
+				properties.showVisualization = 2;
+				window.SetProperty("Show Visualization", properties.showVisualization);
+				if(!globalProperties.enable_screensaver) resetAnimation();
+				calculate_visu_margin_left();
+				window.Repaint();
+				break;  	
+			case (idx == 9):
+				properties.showVisualization = 1;
+				window.SetProperty("Show Visualization", properties.showVisualization);
+				if(!globalProperties.enable_screensaver) resetAnimation();
+				calculate_visu_margin_left();
+				window.Repaint();
+				break;  
+			case (idx == 10):
+				properties.showVisualization = 0;
+				window.SetProperty("Show Visualization", properties.showVisualization);
+				if(!globalProperties.enable_screensaver) resetAnimation();
+				calculate_visu_margin_left();
+				window.Repaint();
+			break;  					
             default:
 				return true;
         }
