@@ -1742,26 +1742,28 @@ let window = {
     /**
      * @param {number} type See Flags.js > Used in window.GetColourXXX()
      * @param {string=} client_guid See Flags.js > Used in GetColourCUI() as client_guid.
-     * @return {number}
+     * @return {number} returns black colour if the requested one is not available.
      */
     GetColourCUI: function (type, client_guid) { }, // (uint) [, client_guid]
 
     /**
      * @param {number} type
-     * @return {number}
+     * @return {number} returns black colour if the requested one is not available.
      */
     GetColourDUI: function (type) { }, // (uint)
 
     /**
+     * Note: see the example in {@link window.GetFontDUI}.
+     * 
      * @param {number} type See Flags.js > Used in window.GetFontXXX()
      * @param {string=} client_guid See Flags.js > Used in GetFontCUI() as client_guid.
-     * @return {GdiFont} null if the component was unable to determine your font.
+     * @return {?GdiFont} returns null if the requested font was not found.
      */
     GetFontCUI: function (type, client_guid) { }, // (GdiFont) [, client_guid]
 
     /**
      * @param {number} type See Flags.js > Used in window.GetFontXXX()
-     * @return {GdiFont} null if the component was unable to determine your font.
+     * @return {?GdiFont} returns null if the requested font was not found.
      *
      * @example
      * // To avoid errors when trying to use the font or access its properties, you

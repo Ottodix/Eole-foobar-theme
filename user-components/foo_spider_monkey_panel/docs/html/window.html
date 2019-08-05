@@ -2655,6 +2655,8 @@ directly in the panel Configure menu.
 
 
 
+- returns black colour if the requested one is not available.
+
 
 
 
@@ -2809,6 +2811,8 @@ directly in the panel Configure menu.
 
 
 
+- returns black colour if the requested one is not available.
+
 
 
 
@@ -2864,12 +2868,12 @@ directly in the panel Configure menu.
     
         <h4 class="name" id=".GetFontCUI">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>GetFontCUI<span class="signature">(type, client_guid<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="GdiFont.html">GdiFont</a>}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>GetFontCUI<span class="signature">(type, client_guid<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; <span class="icon green">nullable</span> {<a href="GdiFont.html">GdiFont</a>}</span>
                 
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1760">line 1760</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1762">line 1762</a></code>
             </div>
             
         </h4>
@@ -2879,6 +2883,10 @@ directly in the panel Configure menu.
 </dt>
 <dd>
 
+    
+    <div class="description">
+        Note: see the example in <a href="window.html#.GetFontDUI">window.GetFontDUI</a>.
+    </div>
     
 
     
@@ -3006,7 +3014,7 @@ directly in the panel Configure menu.
 
 
 
-- null if the component was unable to determine your font.
+- returns null if the requested font was not found.
 
 
 
@@ -3063,12 +3071,12 @@ directly in the panel Configure menu.
     
         <h4 class="name" id=".GetFontDUI">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>GetFontDUI<span class="signature">(type)</span><span class="type-signature"> &rarr; {<a href="GdiFont.html">GdiFont</a>}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>GetFontDUI<span class="signature">(type)</span><span class="type-signature"> &rarr; <span class="icon green">nullable</span> {<a href="GdiFont.html">GdiFont</a>}</span>
                 
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1775">line 1775</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1777">line 1777</a></code>
             </div>
             
         </h4>
@@ -3162,7 +3170,7 @@ directly in the panel Configure menu.
 
 
 
-- null if the component was unable to determine your font.
+- returns null if the requested font was not found.
 
 
 
@@ -3235,7 +3243,7 @@ if (!font) {
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1788">line 1788</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1790">line 1790</a></code>
             </div>
             
         </h4>
@@ -3440,7 +3448,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1796">line 1796</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1798">line 1798</a></code>
             </div>
             
         </h4>
@@ -3602,7 +3610,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1802">line 1802</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1804">line 1804</a></code>
             </div>
             
         </h4>
@@ -3691,7 +3699,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1811">line 1811</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1813">line 1813</a></code>
             </div>
             
         </h4>
@@ -3852,7 +3860,7 @@ thus reducing the amount of <a href="module-callbacks.html#~on_paint">on_paint</
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1826">line 1826</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1828">line 1828</a></code>
             </div>
             
         </h4>
@@ -4155,7 +4163,7 @@ Performance note: see Performance note in <a href="window.html#.Repaint">window.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1834">line 1834</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1836">line 1836</a></code>
             </div>
             
         </h4>
@@ -4295,7 +4303,7 @@ Use -1 if you want to hide the cursor.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1844">line 1844</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1846">line 1846</a></code>
             </div>
             
         </h4>
@@ -4476,7 +4484,7 @@ Use -1 if you want to hide the cursor.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1857">line 1857</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1859">line 1859</a></code>
             </div>
             
         </h4>
@@ -4663,7 +4671,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1867">line 1867</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1869">line 1869</a></code>
             </div>
             
         </h4>
@@ -4844,7 +4852,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1873">line 1873</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1875">line 1875</a></code>
             </div>
             
         </h4>
@@ -4933,7 +4941,7 @@ Note: leading and trailing whitespace are removed from property name.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line1879">line 1879</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line1881">line 1881</a></code>
             </div>
             
         </h4>
