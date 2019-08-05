@@ -132,7 +132,9 @@ function adaptButtons(){
 	buttons.Play.N_img = images.play_img;
 	buttons.Play.H_img = images.play_img;	
 	buttons.Play.D_img = images.play_img;	
-	//if(typeof g_rating !== 'undefined') setRatingBtn();	
+	buttons.NowPlaying.N_img = images.nowplaying_img;
+	buttons.NowPlaying.H_img = images.nowplaying_img;	
+	buttons.NowPlaying.D_img = images.nowplaying_img;	
 }
 function positionButtons(){
     for (var i in buttons) {
