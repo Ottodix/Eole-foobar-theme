@@ -2937,7 +2937,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 		if(isImage(result.image)) {
 			save_image_to_cache(result.image, albumIndex, cachekey);
 			if (typeof g_cover == "object") {
-				g_cover.setArtwork(result.image,true,false,undefined,metadb);
+				g_cover.setArtwork(result.image,true,false,addArgs.isplaying,metadb);
 				window.Repaint();     	
 			}		
 		} else if (typeof brw == "object" && albumIndex>=0) {			
