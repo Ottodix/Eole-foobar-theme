@@ -679,7 +679,7 @@ oCover = function() {
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
-	this.metadb = null;
+	this.metadb = false;
 	this.playlistIndex = -1;	
 	this.itemIndex = -1;		
 	this.playing_metadb = false;
@@ -701,6 +701,9 @@ oCover = function() {
 	this.isFiller = function() {
 		return this.filler;
 	}	
+	this.isActive = function() {
+		return (this.metadb!=null && this.metadb!==false);
+	}		
 	this.setPlaying = function(state, metadb) {
 		if(state==this.is_playing) return;
 		if(state===false){
@@ -931,7 +934,7 @@ oCover = function() {
 				this.down_y = y;				
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h){
+				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.isActive()){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
 					var repaint = false;			
 					if(!this.isHover){
