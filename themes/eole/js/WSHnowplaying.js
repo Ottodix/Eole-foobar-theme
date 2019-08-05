@@ -1444,31 +1444,31 @@ function on_mouse_rbtn_up(x, y){
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
 			}	
-			quickSearch(fb.GetNowPlaying(),"artist");
+			quickSearch(g_cover.metadb,"artist");
 			break;	
 		case (idx == 31):
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
 			}
-			quickSearch(fb.GetNowPlaying(),"album");		
+			quickSearch(g_cover.metadb,"album");		
 			break;			
 		case (idx == 32):
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
 			}				
-			quickSearch(fb.GetNowPlaying(),"genre");		
+			quickSearch(g_cover.metadb,"genre");		
 			break;		
 		case (idx == 33):
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
 			}				
-			quickSearch(fb.GetNowPlaying(),"date");		
+			quickSearch(g_cover.metadb,"date");		
 			break;	
 		case (idx == 34):
 			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
 				main_panel_state.setValue(0)
 			}				
-			quickSearch(fb.GetNowPlaying(),"title");		
+			quickSearch(g_cover.metadb,"title");		
 			break;		
 		case (idx == 35):
 			draw_settings_menu(x,y);			
