@@ -701,7 +701,7 @@ oCover = function() {
 	this.isFiller = function() {
 		return this.filler;
 	}	
-	this.isActive = function() {
+	this.isValid = function() {
 		return (this.metadb!=null && this.metadb!==false);
 	}		
 	this.setPlaying = function(state, metadb) {
@@ -934,7 +934,7 @@ oCover = function() {
 				this.down_y = y;				
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.isActive()){
+				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.isValid()){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
 					var repaint = false;			
 					if(!this.isHover){
@@ -1296,7 +1296,7 @@ function on_mouse_rbtn_up(x, y){
 	
 	main_menu.AppendMenuItem(MF_STRING, 35, "Settings...");	
 	main_menu.AppendMenuSeparator();
-	if(fb.IsPlaying){
+	if(g_cover.isValid()){
 		var now_playing_track = fb.GetNowPlaying();
 		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");		
 		main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");			
@@ -1434,8 +1434,8 @@ function on_mouse_rbtn_up(x, y){
 			fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
 			break;	
 		case (idx == 8):
-			g_cover.refresh(now_playing_track, true);
-			window.NotifyOthers("RefreshImageCover",now_playing_track);
+			window.NotifyOthers("RefreshImageCover",g_cover.metadb);		
+			g_cover.refresh(g_cover.metadb, true);
 			break;		
 		case (idx == 9):
 			showNowPlaying(true); 
