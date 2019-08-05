@@ -10,8 +10,8 @@ var properties = {
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", true),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", true),	
     screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", true),	
-    visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", false),	
-    playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", true),
+    visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", true),	
+    playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", true),	
     single_click_action: window.GetProperty("PROPERTY single_click_action", 0),	
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),	
@@ -78,25 +78,25 @@ timers = {
 };
 function setButtons(){
 	buttons = {
-		Pause: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "Pause", function () {
+		Pause: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "Pause", "Resume Playback", function () {
 			if(fb.IsPaused) fb.Pause();
 		},function () {
 			fb.Pause();
 		},images.pause_img,images.pause_img),
-		Play: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "Play", function () {
+		Play: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "Play", "Play from there", function () {
 			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
 			if(fb.IsPaused) fb.Stop();
 			plman.FlushPlaybackQueue();
 			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
 			fb.Play();
 		},function () {},images.play_img,images.play_img),		
-		NowPlaying: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "NowPlaying", function () {
+		NowPlaying: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "NowPlaying", "Show now playing", function () {
 			window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 			on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
 		},function () {
 			showNowPlaying(true); 
 		},images.nowplaying_img,images.nowplaying_img),		
-		Random: new SimpleButton( ww/2-images.pause_img.Width/2, wh/2-images.pause_img.Height/2+global_vertical_fix, 74, 74, "Random", function () {
+		Random: new SimpleButton( ww/2-images.pause_img.Width/2, wh/2-images.pause_img.Height/2+global_vertical_fix, 74, 74, "Random", "Play randomly", function () {
 			play_random(properties.random_function);
 		},null,images.random_img_mini,images.random_img_mini)         
 	}  
@@ -197,7 +197,7 @@ function startAnimation(){
 	}
 }
 
-function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state) {
+function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
     this.y = y;
@@ -208,7 +208,9 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.fonDbleClick = fonDbleClick;   
     this.N_img = N_img;
     this.H_img = H_img;   
-        
+	this.tooltip_activated = false;
+    this.tooltip_text = tooltip_text;
+	
     this.containXY = function (x, y) {
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }    
@@ -276,6 +278,38 @@ function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, st
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
     }        
+    this.onMouse = function (state,x,y) {    
+		switch(state){
+			case 'lbtn_down':
+				this.fonDown && this.fonDown();
+			break;				
+			case 'lbtn_up':
+				this.fonUp && this.fonUp();
+				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
+					this.changeState(ButtonStates.hover);
+				}
+			break;
+			case 'dble_click':
+				if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
+				else this.onMouse('lbtn_up',x,y);
+			break;
+			case 'leave':
+				if(this.tooltip_activated){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;			
+			case 'move':
+				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
+					g_tooltip.ActivateDelay(this.tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.text);
+					this.tooltip_activated = true;
+				} else if(this.tooltip_activated && this.state!=ButtonStates.hover && g_tooltip.activeZone == this.text){
+					this.tooltip_activated = false;
+					g_tooltip.Deactivate();
+				}
+			break;					
+		}
+    }  	
 }
 
 function drawAllButtons(gr) {
@@ -657,6 +691,7 @@ oCover = function() {
 	this.visuY = global_vertical_fix+Visualization_top_m;
 	this.resize_ratio = 0;
 	this.btn_shadow = false;
+	this.isHoverBtn = false;
 	this.isSetArtwork = function() {
 		return isImage(this.artwork);
 	}
@@ -755,7 +790,6 @@ oCover = function() {
 		window.Repaint();
 	}
 	this.refreshCurrent = function (is_playing) {
-		console.log("refreshCurrent")
 		this.refresh(this.metadb, false, this.playing_cachekey, false, is_playing);	
 	}	
 	this.resize = function(w,h) {
@@ -899,24 +933,43 @@ oCover = function() {
 			case 'move':
 				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
+					var repaint = false;			
 					if(!this.isHover){
 						this.isHover = true;
 						if(properties.tintOnHover && !this.tintDrawed){
-							window.Repaint();
+							repaint = true; 
 						}
 					}
+					
+					for (var i in buttons) {
+						if (buttons[i].containXY(x, y) && buttons[i].state != ButtonStates.hide && !buttons[i].hide) {
+							buttons[i].changeState(ButtonStates.hover);
+							buttons[i].onMouse('move',x,y);
+							if(!this.isHoverBtn) repaint = true;			
+							this.isHoverBtn = buttons[i];						
+						} else {
+							buttons[i].changeState(ButtonStates.normal);
+							buttons[i].onMouse('leave',-1,-1);
+							if(this.isHoverBtn) repaint = true;			
+						}
+					}					
 				} else if(g_cursor.getActiveZone()=="coverpanel") {
 					g_cursor.setCursor(IDC_ARROW,17);
 					this.isHover = false;
 					this.tintDrawed = false;
-					window.Repaint();					
+					if(this.isHoverBtn) this.isHoverBtn.onMouse('leave',-1,-1);
+					this.isHoverBtn = false;
+					repaint = true;			
 				}
+				if(repaint) window.Repaint();
 			break;
 			case 'leave':
 				if(this.isHover){
-					g_cursor.setCursor(IDC_ARROW,18);					
+					g_cursor.setCursor(IDC_ARROW,18);						
 					this.isHover = false;
 					this.tintDrawed = false;
+					if(this.isHoverBtn) this.isHoverBtn.onMouse('leave',-1,-1);
+					this.isHoverBtn = false;
 					window.Repaint();					
 				}
 			break;			
@@ -1664,6 +1717,7 @@ function on_init(){
 	g_cover = new oCover();
 	g_resizing = new Resizing("rightsidebar",true,false);		
 	g_cursor = new oCursor();	
+	g_tooltip = new oTooltip();	
 	setDarkLayout();
 	get_colors();		
 	get_images();	
