@@ -686,7 +686,7 @@ function oInfos() {
 	this.tooltipVisibility = function(){
 		this.tooltip_line1 = (this.line1_width>0 && this.line1_width<this.txt_width);		
 		this.tooltip_line2 = (this.line2_width>0 && this.line2_width<this.txt_width);		
-		this.tooltip_line3 = (this.line3_width>0 && double_row && this.line3_width<this.txt_width);		
+		this.tooltip_line3 = (this.line3_width>0 && properties.doubleRowText && this.txt_line3 !="" && this.line3_width<this.txt_width);		
 	}
 	this.draw = function(gr, x, y) {
 		if(!this.metadb) return
