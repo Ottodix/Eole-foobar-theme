@@ -571,12 +571,7 @@ oFileSystObject = function () {
 		}
     };
     this.DeleteFile = function (path) {
-		try {
-           return this.fileObject.DeleteFile(path);
-        } catch (e) {
-			fb.ShowPopupMessage('Oupppppsssss, it look like an error\n\n'+"DeleteFile call, "+path+"\n"+e, "Error");
-			console.log(e);
-		}
+        return this.fileObject.DeleteFile(path);
     };
     this.FolderExists = function (path) {
         try {
@@ -2843,6 +2838,7 @@ function delete_file_cache(metadb, albumIndex, crc, delete_at_startup){
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
     if(g_files.FileExists(filename)) {
 		try {
+			console.log("delete "+filename)
 			g_files.DeleteFile(filename);
 		} catch(e) {
 			already_asked_to_delete = false;			

@@ -497,6 +497,7 @@ oCover = function() {
 	this.resized = false;
 	this.sidebar_isplaying = false;
 	this.artwork = null;
+	this.artwork_resized = null;
 	this.tintDrawed = false;
 	this.filler = false;	
 	this.repaint = function() {window.Repaint()}  
@@ -725,8 +726,8 @@ function on_notify_data(name, info) {
 		break;				
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
-			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
-				g_cover.refresh(fb.GetNowPlaying());
+			if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
+				g_cover.refresh(fb.GetNowPlaying(),true);
 		break;  					
 		case "cover_cache_finalized": 
 			//g_image_cache.cachelist = cloneImgs(info);
