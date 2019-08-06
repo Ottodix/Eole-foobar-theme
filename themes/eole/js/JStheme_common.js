@@ -2002,6 +2002,7 @@ function process_string(str){
 function quickSearch(start,search_function){
 	if(layout_state.isEqual(0) && (main_panel_state.isEqual(2) || main_panel_state.isEqual(3))){
 		main_panel_state.setValue(0);
+		on_notify_data("main_panel_state_force",main_panel_state.value);
 	}
 	switch(search_function) {
 		case 'artist':	

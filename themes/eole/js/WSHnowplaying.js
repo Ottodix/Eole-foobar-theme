@@ -1152,8 +1152,9 @@ function on_notify_data(name, info) {
 			properties.random_function = info;
 			window.SetProperty("Random function", properties.random_function);  
 		break; 		
+		case "main_panel_state_force":		
 		case "main_panel_state":
-			if(main_panel_state!=info) {
+			if(main_panel_state.value!=info || name=="main_panel_state_force") {
 				main_panel_state.value = info;
 				on_layout_change();
 				window.Repaint();
@@ -1441,33 +1442,18 @@ function on_mouse_rbtn_up(x, y){
 			showNowPlaying(true); 
 			break;				
 		case (idx == 30):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}	
 			quickSearch(g_cover.metadb,"artist");
 			break;	
 		case (idx == 31):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
 			quickSearch(g_cover.metadb,"album");		
 			break;			
-		case (idx == 32):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}				
+		case (idx == 32):		
 			quickSearch(g_cover.metadb,"genre");		
 			break;		
-		case (idx == 33):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}				
+		case (idx == 33):		
 			quickSearch(g_cover.metadb,"date");		
 			break;	
-		case (idx == 34):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}				
+		case (idx == 34):			
 			quickSearch(g_cover.metadb,"title");		
 			break;		
 		case (idx == 35):

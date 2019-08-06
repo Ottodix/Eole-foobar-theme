@@ -43,7 +43,7 @@ g_tfo = {
 	codec: fb.TitleFormat("%codec%"),
 	playcount: fb.TitleFormat("$if2(%play_count%,0)"),
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
-	allinfos: fb.TitleFormat("%rating% ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
+	allinfos: fb.TitleFormat("%rating% ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
 }
 var rating, rating_hover, mood = false,
 	txt_title, txt_info, txt_profile, show_info = true;
@@ -416,10 +416,10 @@ function on_metadb_changed(metadbs, fromhook) {
 			rating = 0;
 		} else rating++;
 		txt_title = allinfos[1];
-		txt_info = allinfos[2] + allinfos[3];
-		var _playcount = allinfos[6];
-		if(foo_playcount) txt_profile = allinfos[5] + allinfos[7] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-		else txt_profile = allinfos[5] + allinfos[7] + "K";
+		txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
+		var _playcount = allinfos[7];
+		if(foo_playcount) txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else txt_profile = allinfos[6] + allinfos[8] + "K";
 		/*var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
 		if (l_mood != null && l_mood != "?") {
 			mood = true;

@@ -5,7 +5,9 @@ var padding_right = 35;
 var header_height = 35;
 var ww = 0;
 var wh = 0;	
-//var esl = new ActiveXObject("ESLyric");
+var esl = new ActiveXObject("ESLyric");
+esl.SetLyricCallback(lyrics_callback);
+var Update_Required_function= "";
 var properties = {
 	panelName: 'WSHlyrics_title',		
 	panelFontAdjustement: window.GetProperty("MAINPANEL: Panel font Adjustement", 0),		
@@ -25,6 +27,10 @@ function on_size(w, h) {
     wh = h;	
 }
 function on_paint(gr) {
+	if(Update_Required_function!="") {
+		eval(Update_Required_function);
+		Update_Required_function = "";
+	}    	
 	gr.SetTextRenderingHint(globalProperties.TextRendering);	
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, padding_top, ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
@@ -36,11 +42,11 @@ function get_colors() {
 	} else {	         
 		colors.highlight_txt = RGB(215,155,0);		
 	}	
-	/*esl.SetPanelTextNormalColor(colors.normal_txt);
+	esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);	
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);	
 	esl.ShowDesktopLyric = false;	
-	esl.DesktopLyricAlwaysOnTop = false;*/	
+	esl.DesktopLyricAlwaysOnTop = false;
 };
 
 function on_mouse_rbtn_up(x, y){
@@ -69,6 +75,33 @@ function on_mouse_rbtn_up(x, y){
         }
         _menu = undefined;
         return true;
+}
+var searching_img = gdi.CreateImage(50, 50);
+gb = searching_img.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.DrawLine(5, 5, 50-5, 50-5, 1.0, colors.normal_txt);
+	gb.DrawLine(5, 50-5, 50-5, 5, 1.0, colors.normal_txt);
+	gb.SetSmoothingMode(0);
+searching_img.ReleaseGraphics(gb);
+
+function on_playback_new_track(){
+	if(window.IsVisible) {
+		//esl.SetPanelTextNormalColor(colors.normal_bg);
+		//esl.SetPanelBackgroundType(1);
+		//esl.SetPanelBackgroundSource(1);
+		//esl.SetPanelBackgroundPos(3);
+		//esl.SetPanelBackgroundImagePath(globalProperties.default_wallpaper);			
+		esl.RunPanelContextMenu("Reload Lyric");
+	} else set_update_function("on_playback_new_track()");
+}
+function lyrics_callback(){
+	//esl.SetPanelBackgroundType(0);
+	//esl.SetPanelTextNormalColor(colors.normal_txt);
+}
+function set_update_function(string){
+	if(string=="") Update_Required_function=string;
+	else if( Update_Required_function.indexOf("on_playback_new_track")!=-1) return;
+	else Update_Required_function=string;
 }
 function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
