@@ -115,15 +115,25 @@ function get_colors() {
 function on_mouse_rbtn_up(x, y){
         var _menu = window.CreatePopupMenu();	
         var idx;
-				
+		
+		_menu.AppendMenuItem(MF_STRING, 99, "Stick to dark layout");
+		_menu.CheckMenuItem(99,properties.stick2darklayout);
+		
 		if(utils.IsKeyPressed(VK_SHIFT)) {	
+			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
 			_menu.AppendMenuItem(MF_STRING, 101, "Configure...");	
             _menu.AppendMenuSeparator();                  
 			_menu.AppendMenuItem(MF_STRING, 102, "Reload");            
 		}
         idx = _menu.TrackPopupMenu(x,y);
-        switch(true) {						
+        switch(true) {		
+            case (idx == 99):
+				properties.stick2darklayout=!properties.stick2darklayout;
+				window.SetProperty("_DISPLAY: stick to Dark layout", properties.stick2darklayout);			
+				get_colors();
+				window.Repaint();
+                break	
             case (idx == 100):
                 window.ShowProperties();
                 break;  
