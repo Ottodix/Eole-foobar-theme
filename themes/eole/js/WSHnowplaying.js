@@ -32,7 +32,6 @@ var cover_path="";
 var text_height=wh-8;	        
 var global_vertical_fix=0;
 var Visualization_top_m=18;
-var nowPlaying_cachekey = "";
 var height_bar_1,height_bar_2,height_bar_3;
 var coef_bar_1, coef_bar_2, coef_bar_3;
 var direction_bar_1,direction_bar_2,direction_bar_3;
@@ -348,16 +347,16 @@ function on_paint(gr) {
 	/*if(!fb.IsPlaying){
 		if(layout_state.isEqual(0) && mini_controlbar.isActive() && showtrackinfo_big.isActive()) {
 			g_cover.setArtwork(images.nothing_played_compact,true,true);
-			nowPlaying_cachekey = null;	
+			g_cover.cachekey = null;	
 		} else if(layout_state.isEqual(0) && mini_controlbar.isActive()){
 			g_cover.setArtwork(images.nothing_played_supercompact,true,true);
-			nowPlaying_cachekey = null;	
+			g_cover.cachekey = null;	
 		} else if(layout_state.isEqual(0)) {
 			g_cover.setArtwork(images.nothing_played,true,true);
-			nowPlaying_cachekey = null;			
+			g_cover.cachekey = null;			
 		} else {
 			g_cover.setArtwork(images.nothing_played_mini,true,true);
-			nowPlaying_cachekey = null;			
+			g_cover.cachekey = null;			
 		} 
 	}*/
 	if(!g_cover.isSetArtwork()) {
@@ -636,17 +635,17 @@ oImageCache = function () {
     this.cachelist = Array();
     this.hit = function (metadb, is_playing) {	
 		var img;
-		old_cachekey = nowPlaying_cachekey;
-		nowPlaying_cachekey = process_cachekey(metadb);				
-		if(nowPlaying_cachekey==old_cachekey) return "unchanged";	
-		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
+		old_cachekey = g_cover.cachekey;
+		g_cover.cachekey = process_cachekey(metadb);				
+		if(g_cover.cachekey==old_cachekey) return "unchanged";	
+		try{img = this.cachelist[g_cover.cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
-			cache_filename = check_cache(metadb, 0, nowPlaying_cachekey);	
+			cache_filename = check_cache(metadb, 0, g_cover.cachekey);	
 			// load img from cache	
 			if(cache_filename) {	
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
-			} else get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey, false, false, false, {isplaying:is_playing});
+			} else get_albumArt_async(metadb,AlbumArtId.front, g_cover.cachekey, false, false, false, {isplaying:is_playing});
 		} 
 		return img;
     };	
@@ -705,7 +704,7 @@ oCover = function() {
 		return (this.metadb!=null && this.metadb!==false);
 	}		
 	this.setPlaying = function(state, metadb) {
-		if(state==this.is_playing) return;
+		//if(state==this.is_playing) return;
 		if(state===false){
 			this.is_playing = false;
 			//console.log("notisplaying!")
@@ -713,7 +712,7 @@ oCover = function() {
 			this.is_playing = true;
 			//console.log("isplaying!")
 			this.playing_metadb = metadb;
-			this.playing_cachekey = nowPlaying_cachekey;
+			this.playing_cachekey = this.cachekey;
 		}
 		window.NotifyOthers("sidebar_isplaying",this.is_playing);
 	}
@@ -750,18 +749,21 @@ oCover = function() {
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
 		
-		//console.log("getArtwork metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_old"+is_playing_old);
+		//console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
 		
 		if(this.is_playing!=is_playing_old) this.ResetMask();				
 		if(this.metadb && this.metadb.Compare(metadb)) {
-			//console.log("getArtwork metadb "+metadb.RawPath+" this.metadb "+this.metadb.RawPath+"");
+			//console.log("getArtwork2 metadb "+metadb.RawPath+" this.metadb "+this.metadb.RawPath+"");
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;
 		}
 		this.metadb = metadb;
 		var img = g_image_cache.hit(metadb,this.is_playing);
 		if(img=="unchanged") {
-			//console.log("unchanged "+this.playing_cachekey+" - "+nowPlaying_cachekey);
+			//if(this.playing_cachekey!="" && this.playing_cachekey == this.cachekey) {
+				//this.setPlaying(true, this.metadb);
+			//}
+			//console.log("getArtwork3 "+this.playing_cachekey+" - "+this.cachekey);
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;	
 		}
@@ -787,7 +789,7 @@ oCover = function() {
 			g_image_cache.resetMetadb(metadb);
 		}
 		this.reset(reset_artwork);
-		nowPlaying_cachekey = "";
+		this.cachekey = "";
 		this.getArtwork(metadb, is_playing);
 		if(isImage(this.artwork)) this.resize();
 		window.Repaint();
@@ -1278,7 +1280,7 @@ function on_notify_data(name, info) {
 }
 function showNowPlayingCover(){
 	if (globalProperties.enableDiskCache) {	
-		cache_filename = check_cache(fb.GetNowPlaying(), 0, nowPlaying_cachekey);	
+		cache_filename = check_cache(fb.GetNowPlaying(), 0, g_cover.cachekey);	
 		// load img from cache				
 		if(cache_filename) {	
 			cover_path = cache_filename;

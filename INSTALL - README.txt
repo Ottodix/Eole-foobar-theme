@@ -1,3 +1,5 @@
+# Eole Foobar theme
+
 This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 
 THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
@@ -6,7 +8,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 0. Close foobar.
 
-1. Copy everything into your foobar profile directory (so the 3 folders: user-components, themes and plugins).
+1. Download this [github repository](https://github.com/Ottodix/Eole-foobar-theme/zipball/master/) and copy everything into your foobar profile directory (so the 3 folders: user-components, themes and plugins).
    - STANDARD foobar2000 installation: your foobar profile directory is there: %AppData%/foobar2000
    - PORTABLE foobar2000 installation: your foobar profile directory is the same than you installation directory.
 
@@ -21,6 +23,14 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 That's it! Enjoy your sound.
 
 WARNING : The visualization tab is powered by shpeck, which can be unstable. So if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: hold SHIFT and right click the visualisation tab at the top and select Properties. In the properties window, turn the value of "_PROPERTY show visualisation tab" to false. And remove the speck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout).
+
+## USEFUL TO KNOW
+
+- Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display. This cache is based on the %album artist% & %album% tags. After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.
+
+- The library browser panel have an option to load every covers from the image cache at startup which is enabled by default and allow to browse your library without waiting for the covers to load. Foobar memory usage is higher when this option is enabled, because all the covers are loaded into the memory. This option work only once the image cache is already built: the image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.
+
+- Most panels have a settings menu, do a right click over them for that, or look for the hamburger icons. And if you want to get your hands dirty and edit a panel, press SHIFT and do a right click, you will then have a configure option, and you will see from the code which file contains the related script.
 
 ## Credits
 - [TheQwertiest](https://github.com/TheQwertiest): Spider Monkey Panel, which powers most of this theme [foo_spider_monkey_panel](https://github.com/TheQwertiest/foo_spider_monkey_panel)

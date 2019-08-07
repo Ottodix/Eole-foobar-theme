@@ -6,7 +6,7 @@ var header_height = 35;
 var ww = 0;
 var wh = 0;	
 var esl = new ActiveXObject("ESLyric");
-esl.SetLyricCallback(lyrics_callback);
+//esl.SetLyricCallback(lyrics_callback);
 var Update_Required_function= "";
 var properties = {
 	panelName: 'WSHlyrics_title',		
