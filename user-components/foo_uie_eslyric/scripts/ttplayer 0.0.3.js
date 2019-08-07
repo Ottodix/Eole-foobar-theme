@@ -49,7 +49,7 @@ function start_search(info, callback)
 		return;
     }
 
-	var _new_lyric = callback.CreateLyric();
+	var _new_lyric = fb.CreateLyric();
 	
 	//parse XML
 	xmlDoc.loadXML(xml_text);

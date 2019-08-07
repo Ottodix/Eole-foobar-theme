@@ -73,7 +73,7 @@ function start_search (info, callback) {
 
   console(jsonText)
 
-  var newLyric = callback.CreateLyric()
+  var newLyric = fb.CreateLyric()
   var id
 
   // get lyrics

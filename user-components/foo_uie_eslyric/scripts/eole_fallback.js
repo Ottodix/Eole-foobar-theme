@@ -17,7 +17,7 @@ function get_author() {
 
 function start_search(info, callback) {
 	var http_client = utils.CreateHttpClient();
-	var new_lyric = callback.CreateLyric();
+	var new_lyric = fb.CreateLyric();
 	new_lyric.Title = info.Title;
 	new_lyric.Artist = info.Artist;
 	new_lyric.Source = get_my_name();
