@@ -960,7 +960,6 @@ function on_mouse_leave() {
 	window_btns.on_mouse("leave");
 	compact_btns.on_mouse("leave");	
 	all_btns.on_mouse("leave");
-	window.Repaint();
 }
 
 function on_mouse_lbtn_down(x,y){

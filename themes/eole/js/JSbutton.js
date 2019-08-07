@@ -175,9 +175,9 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
             gr.DrawImage(b_img, btn_x, this.y+Math.floor((this.h-b_img.Height)/2)+this.img_y_adjustement, b_img.Width, b_img.Height, 0, 0, b_img.Width, b_img.Height,0,btn_opacity);
             break;            
         }   
-		
+
 		if(this.display_label && this.label!="") {
-			var text2_draw = (this.upperCase) ? this.label_uppercase : this.label;	
+			var text2_draw = (this.upperCase) ? this.label_uppercase : this.label;
 			gr.GdiDrawText(text2_draw, g_font.normal, text_color, padding_x+b_img.Width+this.txt_x_adjustement, this.y+this.txt_y_adjustement, this.w, this.h, DT_LEFT| DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 		}
     }

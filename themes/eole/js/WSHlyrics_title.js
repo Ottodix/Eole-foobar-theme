@@ -1,13 +1,17 @@
 var padding_top = 27;
+var padding_top_nobio = 17;
 var padding_bottom = 5;
 var padding_left = 35;
 var padding_right = 35;
 var header_height = 35;
 var ww = 0;
 var wh = 0;	
+var lyricsText_Width = -1;
 var esl = new ActiveXObject("ESLyric");
 //esl.SetLyricCallback(lyrics_callback);
 var Update_Required_function= "";
+var btn_initialized = false;
+var images = {};
 var properties = {
 	panelName: 'WSHlyrics_title',		
 	panelFontAdjustement: window.GetProperty("MAINPANEL: Panel font Adjustement", 0),		
@@ -18,9 +22,50 @@ var properties = {
 	stick2darklayout: window.GetProperty("_DISPLAY: stick to Dark layout", true),		
     album_review: window.GetProperty("_SYSTEM: Display album review", false)
 }
+function build_buttons(){	
+	if(btn_initialized){		
+		buttons.LyricsWidth.N_img = images.lyrics_off_icon;
+		buttons.LyricsWidth.H_img = images.lyrics_off_hover_icon;		
+		buttons.LyricsWidth.D_img = buttons.LyricsWidth.H_img;	
+	} else {
+		btn_initialized = true;
+		buttons = {	 
+			LyricsWidth: new JSButton(0, 0, 40, images.lyrics_off_icon.Height, "Bio", "Bio", "Show biography", function () {
+				lyrics_state.decrement(1);
+				positionButtons();
+				window.Repaint();		
+			}, false, false,images.lyrics_off_icon,images.lyrics_off_hover_icon,-1, false, false, true)	
+		}
+		
+		all_btns = new JSButtonGroup("top-left", padding_left, padding_top+10, 'all_btns', true);
+		all_btns.addButtons(buttons, [0,0,0,0]);
+	}	
+}
+function positionButtons(){
+	all_btns.x = padding_left + lyricsText_Width;
+	all_btns.y = (lyrics_state.isEqual(5)?padding_top_nobio:padding_top)+10;	
+	all_btns.setVisibility(lyrics_state.isEqual(5));
+}
+
+function drawAllButtons(gr) {
+	all_btns.draw(gr);
+}
 function on_mouse_move(x,y,m){
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);	
+	all_btns.on_mouse("move",x,y);	
+}
+function on_mouse_leave() {
+	all_btns.on_mouse("leave");
+}
+function on_mouse_lbtn_down(x,y){
+	all_btns.on_mouse("lbtn_down",x, y);
+}
+function on_mouse_lbtn_up(x,y){
+	all_btns.on_mouse("lbtn_up",x, y);
+}
+function on_mouse_lbtn_dblclk(x, y) {
+	all_btns.on_mouse("dble_click",x, y);
 }
 function on_size(w, h) {   
     ww = w;
@@ -33,22 +78,40 @@ function on_paint(gr) {
 	}    	
 	gr.SetTextRenderingHint(globalProperties.TextRendering);	
 	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, padding_top, ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+	if(lyricsText_Width<0) {
+		lyricsText_Width = gr.CalcTextWidth("Lyrics", font_title)+10;
+		positionButtons();
+	}
+	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, (lyrics_state.isEqual(5)?padding_top_nobio:padding_top), ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+	drawAllButtons(gr);
 }
+function on_font_changed() {
+	lyricsText_Width = -1;
+    all_btns.calculateSize(true);
+	window.Repaint();	
+};
+
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout || properties.stick2darklayout){
 		colors.highlight_txt = RGB(255,193,0);	
+		colors.icons_folder = "white";
+		colors.btn_inactive_opacity = 255;
+		colors.inactive_txt = colors.normal_txt;
 	} else {	         
-		colors.highlight_txt = RGB(215,155,0);		
+		colors.highlight_txt = RGB(215,155,0);	
+		colors.icons_folder = "";	
+		colors.btn_inactive_opacity = 255;
+		colors.inactive_txt = colors.normal_txt;
 	}	
+	images.lyrics_off_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_on.png");
+	images.lyrics_off_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_on_hover.png"); 	
 	esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);	
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);	
 	esl.ShowDesktopLyric = false;	
 	esl.DesktopLyricAlwaysOnTop = false;
 };
-
 function on_mouse_rbtn_up(x, y){
         var _menu = window.CreatePopupMenu();	
         var idx;
@@ -150,6 +213,10 @@ function on_notify_data(name, info) {
 		break; 		
 		case "cover_cache_finalized": 
 			window.Repaint();
+		break;	
+		case "lyrics_state": 
+			lyrics_state.value = info;
+			positionButtons();
 		break;			
 		case "bio_dark_theme":
 			properties.darklayout = info;
@@ -168,7 +235,10 @@ function on_notify_data(name, info) {
 function on_init(){
 	get_font();
 	get_colors();
-	g_cursor = new oCursor();		
+	build_buttons();
+	positionButtons();
+	g_cursor = new oCursor();
+	g_tooltip = new oTooltip();	
 	font_title = g_font.nowplaying_title;
 }
 on_init();
