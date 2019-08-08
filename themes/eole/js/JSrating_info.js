@@ -25,8 +25,6 @@ if (spec_h > 300) spec_h = 300;
 if (spec_h < 5) spec_h = 5;
 var Update_Required_function = "";
 
-var g_metadb;
-var album_infos = false;
 var zdpi = 1.0833333333333332;
 var rating_x, imgw = Math.floor(18*zdpi),
 	imgh = imgw, mood_h = Math.floor(20*zdpi);
@@ -45,7 +43,7 @@ g_tfo = {
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
 	allinfos: fb.TitleFormat("%rating% ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
 }
-var rating, rating_hover, mood = false,
+var rating_hover, mood = false,
 	txt_title, txt_info, txt_profile, show_info = true;
 
 var rbutton = Array();
@@ -108,16 +106,16 @@ obtn_mood = function(){
 		this.x = x;
 	}
 	this.OnClick = function() {
-		if (!g_metadb) {
+		if (!g_infos.metadb) {
 			mood = 0;
 			return;
 		}
 		if (tracktype < 2){
 			if (!mood) {
-				if(g_metadb.UpdateFileInfoSimple("MOOD", getTimestamp()))
+				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", getTimestamp()))
 				mood = true;
 			} else {
-				if(g_metadb.UpdateFileInfoSimple("MOOD", ""))
+				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", ""))
 				mood = false;
 			}
 		}
@@ -292,7 +290,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 	}	
 }
 function on_mouse_lbtn_dblclk(x, y) {
-	if (g_metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("Properties", g_metadb);
+	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
 }
 
 function on_mouse_rbtn_up(x, y) {
@@ -326,7 +324,7 @@ function on_mouse_rbtn_up(x, y) {
 			}
 			break;
 		case 2:
-			if (g_metadb) fb.RunContextCommandWithMetadb("Properties", g_metadb);
+			if (g_infos.metadb) fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
 			break;
 		case 3:
 			is_mood = !is_mood;
@@ -336,7 +334,7 @@ function on_mouse_rbtn_up(x, y) {
 			break;
 		case 4:
 			var WshShell = new ActiveXObject("WScript.Shell");
-			var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_metadb);
+			var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_infos.metadb);
 			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
 			break;
 		case 5:
@@ -366,32 +364,31 @@ function on_mouse_rbtn_up(x, y) {
 	return true;
 }
 function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
-	//console.log("on_item_focus_change_custom rating: "+playlistIndex+" from:"+from+" to:"+to)
 	if (g_avoid_on_focus_change || (to<0 && !metadb)) {
 		g_avoid_on_focus_change = false;
 		return;
 	}		
-	g_metadb_old = g_metadb;
-	if (!properties.follow_cursor && (fb.IsPlaying || fb.IsPaused)) g_metadb = fb.GetNowPlaying();
+	g_metadb_old = g_infos.metadb;
+	if (!properties.follow_cursor && (fb.IsPlaying || fb.IsPaused)) g_infos.metadb = fb.GetNowPlaying();
 	else {	
 		if(metadb){
-			g_metadb = metadb;		
+			g_infos.metadb = metadb;		
 		} else if (to>-1 && playlistIndex>-1){
-			g_metadb = plman.GetPlaylistItems(playlistIndex)[to];
+			g_infos.metadb = plman.GetPlaylistItems(playlistIndex)[to];
 		}
-		if(!g_metadb){
-			g_metadb = g_metadb_old;
+		if(!g_infos.metadb){
+			g_infos.metadb = g_metadb_old;
 			window.Repaint();
 		}	
 	}
-	if (g_metadb) {
+	if (g_infos.metadb) {
 		g_infos.setTimerCycle();
-		on_metadb_changed(new FbMetadbHandleList(g_metadb));
+		on_metadb_changed(new FbMetadbHandleList(g_infos.metadb));
 	}
 }
 function on_metadb_changed(metadbs, fromhook) {
 	if(window.IsVisible || !first_populate_done) {
-		if(!g_metadb || g_avoid_metadb_updated) {
+		if(!g_infos.metadb || g_avoid_metadb_updated) {
 			g_avoid_metadb_updated = false;
 			return;
 		}
@@ -399,43 +396,23 @@ function on_metadb_changed(metadbs, fromhook) {
 		var current_track = false;
 		try{
 			for(var i=0; i < metadbs.Count; i++) {
-				if(metadbs[i].Compare(g_metadb)) {	
+				if(metadbs[i].Compare(g_infos.metadb)) {	
 					current_track = true; 
 				} 			
 			}
 		} catch(e){}
 		if(!current_track) return;	
 		
-		album_infos = false;
-		
-		allinfos = g_tfo.allinfos.EvalWithMetadb(g_metadb);
-		allinfos = allinfos.split(" ^^ ");
+		g_infos.getTrackInfos();
 
-		rating = allinfos[0];
-		if (rating == "?") {
-			rating = 0;
-		} else rating++;
-		txt_title = allinfos[1];
-		txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
-		var _playcount = allinfos[7];
-		if(foo_playcount) txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-		else txt_profile = allinfos[6] + allinfos[8] + "K";
-		/*var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
-		if (l_mood != null && l_mood != "?") {
-			mood = true;
-		} else mood = 0;*/
-		show_info = true;
-		
-		g_infos.updateInfos(txt_title, txt_info, txt_profile, g_metadb, false);
-		
 		first_populate_done = true;
 	} else {
-		set_update_function('on_metadb_changed(g_metadb,'+fromhook+')');	    	
+		set_update_function('on_metadb_changed(g_infos.metadb,'+fromhook+')');	    	
 	}
 }
 function set_update_function(string){
 	if(string=="") Update_Required_function=string;
-	else if( Update_Required_function.indexOf("on_metadb_changed(g_metadb,false")!=-1) return;
+	else if( Update_Required_function.indexOf("on_metadb_changed(g_infos.metadb,false")!=-1) return;
 	else Update_Required_function=string;
 }
 
@@ -567,14 +544,14 @@ function ButtonUI_R() {
 	}
 
 	this.Paint = function(gr, button_n) {
-		var rating_to_draw = (rating_hover!==false?rating_hover:rating);
+		var rating_to_draw = (rating_hover!==false?rating_hover:g_infos.rating);
 		this.img = ((rating_to_draw - button_n) >= 0) ? img_rating_on : img_rating_off;
 		if(button_n!=1)
 		gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, 0, this.width, this.height, 0);
 	}
 
 	this.MouseMove = function(x, y, i) {
-		if (g_metadb) {
+		if (g_infos.metadb) {
 			var half_rating_space = Math.ceil(rating_spacing/2)+1;
 			if (x > this.x - half_rating_space && x < this.x + this.width + half_rating_space && y > this.y && y < this.y + this.height) {
 				rating_hover = i; 
@@ -589,19 +566,26 @@ function ButtonUI_R() {
 		return false;
 	}
 	this.MouseUp = function(x, y, i) {
-		if (g_metadb) {
+		if (g_infos.metadb) {
 			var half_rating_space = Math.ceil(rating_spacing/2)+1;
 			if (x > this.x - half_rating_space && x < this.x + this.width + half_rating_space && y > this.y && y < this.y + this.height) {
-				var derating_flag = (i == rating ? true : false);
+				var derating_flag = (i == g_infos.rating ? true : false);
+				g_avoid_metadb_updated = true;
+				//console.log("before rate album:"+g_infos.album_infos+" derating_flag:"+derating_flag+" rating:"+(g_infos.rating));	
 				if (derating_flag) {
-					if(album_infos) {
-						rating = rateAlbum(0,rating-1, new FbMetadbHandleList(g_metadb))+1;
-					} else rateSong(0,rating-1, g_metadb);
+					if(g_infos.album_infos) {
+						g_infos.rating = rateAlbum(0,g_infos.rating-1, new FbMetadbHandleList(g_infos.metadb))+1;
+					} else {
+						g_infos.rating = rateSong(0,g_infos.rating-1, g_infos.metadb)+1;
+					}
 				} else {
-					if(album_infos) {
-						rating = rateAlbum(i-1,rating-1, new FbMetadbHandleList(g_metadb))+1;
-					} else rateSong(i-1,rating-1, g_metadb);
+					if(g_infos.album_infos) {
+						g_infos.rating = rateAlbum(i-1,g_infos.rating-1, new FbMetadbHandleList(g_infos.metadb))+1;
+					} else {
+						g_infos.rating = rateSong(i-1,g_infos.rating-1, g_infos.metadb)+1;
+					}
 				}
+				//console.log("after rate album:"+g_infos.album_infos+" derating_flag:"+derating_flag+" rating:"+(g_infos.rating)+" - "+g_infos.metadb.RawPath);				
 			}
 		}
 	}
@@ -644,20 +628,40 @@ function oInfos() {
 			this.playing_metadb = metadb;
 		}
 	}
-	this.updateInfos = function(row1, row2, row3, metadb, album_infos){
+	this.getTrackInfos = function(){		
+		var allinfos = g_tfo.allinfos.EvalWithMetadb(g_infos.metadb);
+		allinfos = allinfos.split(" ^^ ");
+
+		this.rating = allinfos[0];
+		
+		txt_title = allinfos[1];
+		txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
+		var _playcount = allinfos[7];
+		if(foo_playcount) txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else txt_profile = allinfos[6] + allinfos[8] + "K";
+		/*var l_mood = g_tfo.mood.EvalWithMetadb(g_infos.metadb);
+		if (l_mood != null && l_mood != "?") {
+			mood = true;
+		} else mood = 0;*/
+		show_info = true;		
+		this.updateInfos(txt_title, txt_info, txt_profile, g_infos.metadb, false, this.rating);
+	}
+	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating){
 		this.txt_line1 = row1;
 		this.txt_line2 = row2;
 		this.txt_line3 = row3;
 		this.line1_width = this.line2_width = this.line3_width = -1;
 		this.tooltip_line1 = this.tooltip_line2 = this.tooltip_line3 = false;	
 		this.album_infos = album_infos;
+
 		if(this.album_infos) {
 			this.metadb = metadb[0];
-			this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
+			if(typeof rating == "undefined") this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
 		} else {
 			this.metadb = metadb;
-			this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
+			if(typeof rating == "undefined")this.rating = g_tfo.rating.EvalWithMetadb(this.metadb);
 		}
+		if(typeof rating != "undefined") this.rating = rating;
 		
 		if (this.rating == "?") {
 			this.rating = 0;
