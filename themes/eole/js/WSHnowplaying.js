@@ -715,7 +715,7 @@ oCover = function() {
 			this.playing_metadb = metadb;
 			this.playing_cachekey = this.cachekey;
 		}
-		window.NotifyOthers("sidebar_isplaying",this.is_playing);
+		window.NotifyOthers("sidebar_isplaying",properties.showVisualization && this.is_playing);
 	}
 	this.setArtwork = function(image, resize, filler, is_playing, metadb) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;	
@@ -1389,14 +1389,7 @@ function on_mouse_rbtn_up(x, y){
 			break;
 		case (idx == 102):
 			window.Reload();
-			break;       
-		case (idx == 103):
-			properties.showVisualization = !properties.showVisualization;
-			window.SetProperty("Show Visualization", properties.showVisualization);
-			if(!globalProperties.enable_screensaver) resetAnimation();
-			calculate_visu_margin_left();
-			window.Repaint();
-			break;  				
+			break;       			
 		case (idx == 1):
 			showNowPlayingCover();
 			break;				
@@ -1518,6 +1511,7 @@ function draw_settings_menu(x,y){
 			case (idx == 1):
                 properties.showVisualization = !properties.showVisualization;
                 window.SetProperty("Show Visualization", properties.showVisualization);
+				window.NotifyOthers("sidebar_isplaying",properties.showVisualization && g_cover.is_playing);				
 				calculate_visu_margin_left();
 				if(!globalProperties.enable_screensaver) resetAnimation();
 				window.Repaint();
