@@ -2808,6 +2808,13 @@ function FormatCover(image, w, h, rawBitmap, callID) {
 function isImage(variable){
 	return (typeof variable == 'object' && variable!=null)
 }
+function isValidHandle(variable){
+	try{
+		return (typeof variable.RawPath=='string');
+	} catch(e){
+		return false;
+	}
+}
 function process_cachekey(metadb, titleformat, str){
 	var titleformat = typeof titleformat !== 'undefined' ? titleformat : globalProperties.tf_crc;
 	try{

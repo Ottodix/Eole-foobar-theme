@@ -502,7 +502,8 @@ function on_mouse_leave() {
     if (cur_btn) {
         cur_btn.changeState(ButtonStates.normal);
         window.Repaint();
-    }    
+    }
+	g_tooltip.Deactivate();    
 }
 function on_playback_new_track(metadb) {
 	if (metadb)	{ 
@@ -535,7 +536,7 @@ function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
 			}
 		}
 	}
-	if (metadb) {
+	if (isValidHandle(metadb)) {
 		g_cover.getArtwork(metadb, undefined, playlistIndex, itemIndex);
 		window.Repaint();
 	}
@@ -731,7 +732,7 @@ oCover = function() {
 		this.visuY = this.h/2 + global_vertical_fix+Visualization_top_m+Math.round((this.h_resized-this.h)/2)+12;
 		positionButtons();
 	}
-	this.getArtwork = function(metadb,is_playing, playlistIndex, itemIndex) {		
+	this.getArtwork = function(metadb, is_playing, playlistIndex, itemIndex) {		
 		var is_playing_old = this.is_playing;
 		this.playlistIndex = playlistIndex;	
 		this.itemIndex = itemIndex;		
@@ -749,7 +750,7 @@ oCover = function() {
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
 		
-		//console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
+		console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
 		
 		if(this.is_playing!=is_playing_old) this.ResetMask();				
 		if(this.metadb && this.metadb.Compare(metadb)) {
@@ -1041,8 +1042,10 @@ function on_notify_data(name, info) {
 			if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());		
 			focus_on_now_playing = false;
 			break;	
-		case "trigger_on_focus_change_album":	
-			on_item_focus_change_custom(info.playlist, -1, info.trackIndex);
+		case "trigger_on_focus_change_album":
+			metadb = new FbMetadbHandleList(info.metadb);
+			on_item_focus_change_custom(info.playlist, -1, info.trackIndex, metadb[0]);
+			//on_item_focus_change_custom(info.playlist, -1, info.trackIndex);
 			g_avoid_on_focus_change = true;			
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;				
