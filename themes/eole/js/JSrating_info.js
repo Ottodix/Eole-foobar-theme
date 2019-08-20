@@ -11,26 +11,23 @@ var properties = {
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),	
 	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),		
 	follow_cursor: window.GetProperty("_DISPLAY: cover follow cursor", false),		
-	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),		
+	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),
+	display_mood: window.GetProperty("Display.Mood", false),	
 	panelFontAdjustement: 0,	
 }
 
-//font
-get_font();
-var first_populate_done = false;
-var g_avoid_metadb_updated = false;
-var is_mood = window.GetProperty("Display.Mood", false);
-var spec_h = Math.floor(g_fsize * 3 / 12) * 20;
-if (spec_h > 300) spec_h = 300;
-if (spec_h < 5) spec_h = 5;
 var Update_Required_function = "";
-
-var zdpi = 1.0833333333333332;
-var rating_x, imgw = Math.floor(18*zdpi),
-	imgh = imgw, mood_h = Math.floor(20*zdpi);
+var rating_x, imgw = 19.5,
+	imgh = imgw, mood_h = 21;
 var is_hover_rating = false;
 var rating_hover = false;
 var g_avoid_on_focus_change = false;
+var g_avoid_metadb_updated = false;
+	
+var rbutton = Array();
+var img_rating_on, img_rating_off, btn_mood, mood_img;
+var ww = 0, wh = 0, rating_spacing = 0;
+
 g_tfo = {
 	rating: fb.TitleFormat("%rating%"),
 	rating_album: fb.TitleFormat("%rating_album%"),	
@@ -43,13 +40,129 @@ g_tfo = {
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
 	allinfos: fb.TitleFormat("%rating% ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
 }
-var rating_hover, mood = false,
-	txt_title, txt_info, txt_profile, show_info = true;
 
-var rbutton = Array();
-var tracktype;
-var img_rating_on, img_rating_off, btn_mood, mood_img;
 
+TextBtn = function() {
+	this.setSize = function (x, y , w, h){
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+	}
+	this.isXYInButton = function(x, y) {
+		return (x >= this.x && x <= (this.x + this.w) && y > this.y && y <= (this.y + this.h)) ? true : false;
+	}
+}
+
+var TextBtn_info = new TextBtn();
+
+obtn_mood = function(){
+	this.y = 0;
+	this.w = 20;
+	this.h = mood_h;
+	this.mood = false;
+	this.img = mood_img;
+	this.isXYInButton = function(x, y) {
+		return (x >= this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h) ? true : false;
+	}
+	this.Paint = function(gr) {
+		gr.DrawImage(this.img, this.x, this.y, this.w, this.h, 0, this.mood ? 0 : this.h, this.w, this.h, 0);
+	}
+	this.resetImg = function(){
+		this.img = mood_img;
+	}
+	this.setx= function(x){
+		this.x = x;
+	}
+	this.OnClick = function() {
+		if (!g_infos.metadb) {
+			this.mood = 0;
+			return;
+		}
+		if (tracktype < 2){
+			if (!this.mood) {
+				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", getTimestamp()))
+				this.mood = true;
+			} else {
+				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", ""))
+				this.mood = false;
+			}
+		}
+	}
+}
+var btn_mood = new obtn_mood();
+
+
+function on_size(w,h) {
+	ww = window.Width;
+	wh = window.Height;
+	
+	g_infos.setSize(w,h);
+	
+	if(properties.display_mood) {
+		rating_spacing = Math.min(15, ww / 25);
+	}else{
+		rating_spacing = Math.min(10, (ww-imgw*5) / 5);
+	}
+	var img_rating_w = imgw * 5 + rating_spacing * 4;
+	rating_x = (ww - img_rating_w) / 2;
+	if(properties.display_mood) btn_mood.setx(rating_x - btn_mood.w - rating_spacing);
+	for(var i = 0; i < rbutton.length; i++){
+		index=i-1;
+		rbutton[i].setx(rating_x + imgw * index + rating_spacing * index);
+	}
+	TextBtn_info.setSize(0, rbutton[0].height + 10, ww, wh);
+}
+
+function on_paint(gr) {
+	if(Update_Required_function!="") {
+		eval(Update_Required_function);
+		Update_Required_function = "";
+	}   	
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
+	
+	g_infos.draw(gr, 0, 0);			
+
+	var side_padding = 10;
+	gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
+	
+	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
+	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
+}
+function get_colors() {
+	get_colors_global();
+}
+function get_images() {
+	var gb;
+	
+	pointArr = {
+		p1: Array(9, 1, 6.4, 6, 1, 6.6, 4.6, 10.6, 4, 16.2, 9, 13.4, 14, 16.2, 13.6, 10.6, 17, 6.6, 11.6, 6),
+		p2: Array(2,1,2,16,8,12,14,16,14,1),
+		p3: Array(2,1+mood_h,2,16+mood_h,8,12+mood_h,14,16+mood_h,14,1+mood_h)
+	}
+
+	img_rating_on = gdi.CreateImage(imgw, imgh);
+	gb = img_rating_on.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.FillPolygon(colors.rating_icon_on, 0, pointArr.p1);
+		gb.SetSmoothingMode(0);
+	img_rating_on.ReleaseGraphics(gb);
+
+	img_rating_off = gdi.CreateImage(imgw, imgh);
+	gb = img_rating_off.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.FillPolygon(colors.rating_icon_off, 0, pointArr.p1);
+		gb.SetSmoothingMode(0);
+	img_rating_off.ReleaseGraphics(gb);
+	
+	mood_img = gdi.CreateImage(imgw, mood_h*2);
+	gb = mood_img.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.DrawPolygon(colors.rating_icon_on, 2, pointArr.p2);
+		gb.DrawPolygon(colors.rating_icon_off, 2, pointArr.p3);
+		gb.SetSmoothingMode(0);
+	mood_img.ReleaseGraphics(gb);
+}
 function on_layout_change(){
 	if(properties.forcedarklayout) properties.darklayout = true;
 	else {
@@ -70,139 +183,6 @@ function on_layout_change(){
 	} //else properties.darklayout = properties.minimode_dark_theme;	
 	get_colors();
 	get_images();
-}
-on_layout_change();
-
-TextBtn = function() {
-	this.setSize = function (x, y , w, h){
-		this.x = x;
-		this.y = y;
-		this.w = w;
-		this.h = h;
-	}
-	this.isXYInButton = function(x, y) {
-		return (x >= this.x && x <= (this.x + this.w) && y > this.y && y <= (this.y + this.h)) ? true : false;
-	}
-}
-
-var TextBtn_info = new TextBtn();
-var TextBtn_spec = new TextBtn();
-
-obtn_mood = function(){
-	this.y = 0;
-	this.w = imgw;
-	this.h = mood_h;
-	this.img = mood_img;
-	this.isXYInButton = function(x, y) {
-		return (x >= this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h) ? true : false;
-	}
-	this.Paint = function(gr) {
-		gr.DrawImage(this.img, this.x, this.y, this.w, this.h, 0, mood ? 0 : this.h, this.w, this.h, 0);
-	}
-	this.resetImg = function(){
-		this.img = mood_img;
-	}
-	this.setx= function(x){
-		this.x = x;
-	}
-	this.OnClick = function() {
-		if (!g_infos.metadb) {
-			mood = 0;
-			return;
-		}
-		if (tracktype < 2){
-			if (!mood) {
-				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", getTimestamp()))
-				mood = true;
-			} else {
-				if(g_infos.metadb.UpdateFileInfoSimple("MOOD", ""))
-				mood = false;
-			}
-		}
-	}
-}
-var btn_mood = new obtn_mood();
-
-initbutton();
-
-var ww = 0, wh = 0, rating_spacing = 0;
-function on_size(w,h) {
-	ww = window.Width;
-	wh = window.Height;
-	
-	g_infos.setSize(w,h);
-	
-	if(is_mood) {
-		rating_spacing = Math.min(15, ww / 25);
-	}else{
-		rating_spacing = Math.min(10, (ww-imgw*5) / 5);
-		//var rating_spacing = imgw;
-	}
-	var img_rating_w = imgw * 5 + rating_spacing * 4;
-	rating_x = (ww - img_rating_w) / 2;
-	if(is_mood) btn_mood.setx(rating_x - btn_mood.w - rating_spacing);
-	for(var i = 0; i < rbutton.length; i++){
-		index=i-1;
-		rbutton[i].setx(rating_x + imgw * index + rating_spacing * index);
-	}
-	TextBtn_info.setSize(0, rbutton[0].height + 10, ww, 60*zdpi);
-	TextBtn_spec.setSize(0, wh - spec_h, ww, spec_h);
-}
-
-function on_paint(gr) {
-	if(Update_Required_function!="") {
-		eval(Update_Required_function);
-		Update_Required_function = "";
-	}   	
-	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	
-	g_infos.draw(gr, 0, 0);			
-
-	var side_padding = 10;
-	gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
-	
-	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
-	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
-}
-
-function get_colors() {
-	get_colors_global();
-}
-function get_images() {
-	var gb;
-	
-	pointArr = {
-		p1: Array(9, 1, 6.4, 6, 1, 6.6, 4.6, 10.6, 4, 16.2, 9, 13.4, 14, 16.2, 13.6, 10.6, 17, 6.6, 11.6, 6),
-		p2: Array(2,1,2,16,8,12,14,16,14,1),
-		p3: Array(2,1+mood_h,2,16+mood_h,8,12+mood_h,14,16+mood_h,14,1+mood_h)
-	}
-	polystar = false;
-
-	img_rating_on = gdi.CreateImage(imgw, imgh);
-	gb = img_rating_on.GetGraphics();
-		if(!polystar){
-			gb.SetSmoothingMode(2);
-			gb.FillPolygon(colors.rating_icon_on, 0, pointArr.p1);
-			gb.SetSmoothingMode(0);
-		} else DrawPolyStar(gb, 0, 0, 16, 2.2, 10, 0, colors.rating_icon_border, colors.rating_icon_on);
-	img_rating_on.ReleaseGraphics(gb);
-
-	img_rating_off = gdi.CreateImage(imgw, imgh);
-	gb = img_rating_off.GetGraphics();
-		if(!polystar){
-			gb.SetSmoothingMode(2);
-			gb.FillPolygon(colors.rating_icon_off, 0, pointArr.p1);
-			gb.SetSmoothingMode(0);
-		} else DrawPolyStar(gb, 0, 0, 17, 2.2, 10, 0, colors.rating_icon_border, colors.rating_icon_off);
-	img_rating_off.ReleaseGraphics(gb);
-	
-	mood_img = gdi.CreateImage(imgw, mood_h*2);
-	gb = mood_img.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(colors.rating_icon_on, 2, pointArr.p2);
-	gb.DrawPolygon(colors.rating_icon_off, 2, pointArr.p3);
-	gb.SetSmoothingMode(0);
-	mood_img.ReleaseGraphics(gb);
 }
 
 function initbutton() {
@@ -260,7 +240,7 @@ function on_mouse_lbtn_up(x, y, m) {
 			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying())
 		}
 	}
-	if (is_mood && btn_mood.isXYInButton(x, y)) btn_mood.OnClick();
+	if (properties.display_mood && btn_mood.isXYInButton(x, y)) btn_mood.OnClick();
 }
 function on_mouse_wheel(step, stepstrait, delta){
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
@@ -294,141 +274,82 @@ function on_mouse_lbtn_dblclk(x, y) {
 }
 
 function on_mouse_rbtn_up(x, y) {
-	if (TextBtn_info.isXYInButton(x, y)) {
-		var rMenu = window.CreatePopupMenu();
-		rMenu.AppendMenuItem(MF_STRING, 7, "Cover always follow cursor");		
-		rMenu.CheckMenuItem(7,properties.follow_cursor);		
-		//rMenu.AppendMenuItem(MF_STRING, 3, "Show Mood");
-		//rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
-		rMenu.AppendMenuItem(MF_STRING, 8, "Show infos on 2 rows");
-		rMenu.CheckMenuItem(8, properties.doubleRowText);		
+	var rMenu = window.CreatePopupMenu();
+	rMenu.AppendMenuItem(MF_STRING, 7, "Cover always follow cursor");		
+	rMenu.CheckMenuItem(7,properties.follow_cursor);		
+	//rMenu.AppendMenuItem(MF_STRING, 3, "Show Mood");
+	//rMenu.CheckMenuItem(3, properties.display_mood ? 1 : 0);
+	rMenu.AppendMenuItem(MF_STRING, 8, "Show infos on 2 rows");
+	rMenu.CheckMenuItem(8, properties.doubleRowText);		
+	rMenu.AppendMenuSeparator();
+	rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
+	rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
+	if(utils.IsKeyPressed(VK_SHIFT)){
 		rMenu.AppendMenuSeparator();
-		rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
-		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (tracktype < 2) && (properties.follow_cursor || !fb.IsPlaying))
-			rMenu.AppendMenuItem(MF_STRING, 4, "Edit with Mp3tag");
-		rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
-		if(utils.IsKeyPressed(VK_SHIFT)){
-			rMenu.AppendMenuSeparator();
-			rMenu.AppendMenuItem(MF_STRING, 5, "Properties");
-			rMenu.AppendMenuItem(MF_STRING, 9, "Configure");	
-			rMenu.AppendMenuSeparator();			
-			rMenu.AppendMenuItem(MF_STRING, 6, "Reload");	
-		}		
-		var a = rMenu.TrackPopupMenu(x, y);
-		switch (a) {
-		case 1:
-			if (fb.IsPlaying) {
-				window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
-				on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying());
-			}
-			break;
-		case 2:
-			if (g_infos.metadb) fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
-			break;
-		case 3:
-			is_mood = !is_mood;
-			window.SetProperty("Display.Mood", is_mood);
-			on_size(window.Width,window.Height);
-			window.RepaintRect(0, top_padding, ww, top_padding + mood_h);
-			break;
-		case 4:
-			var WshShell = new ActiveXObject("WScript.Shell");
-			var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_infos.metadb);
-			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
-			break;
-		case 5:
-			window.ShowProperties();
-			break;
-		case 6:
-			window.Reload();
-			break;		
-		case 9:
-			window.ShowConfigure();
-			break;				
-		case 7:
-			properties.follow_cursor = !properties.follow_cursor;
-			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-			on_item_focus_change_custom(-1,-1,-1,fb.GetFocusItem());
-			window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
-			window.Repaint();
-			break;	
-		case 8:
-			properties.doubleRowText = !properties.doubleRowText;
-			window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
-			window.Repaint();
-			break;				
+		rMenu.AppendMenuItem(MF_STRING, 5, "Properties");
+		rMenu.AppendMenuItem(MF_STRING, 9, "Configure");	
+		rMenu.AppendMenuSeparator();			
+		rMenu.AppendMenuItem(MF_STRING, 6, "Reload");	
+	}		
+	var a = rMenu.TrackPopupMenu(x, y);
+	switch (a) {
+	case 1:
+		if (fb.IsPlaying) {
+			window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
+			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying());
 		}
-		rMenu = undefined;
+		break;
+	case 2:
+		if (g_infos.metadb) fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
+		break;
+	case 3:
+		properties.display_mood = !properties.display_mood;
+		window.SetProperty("Display.Mood", properties.display_mood);
+		on_size(window.Width,window.Height);
+		window.RepaintRect(0, top_padding, ww, top_padding + mood_h);
+		break;
+	case 4:
+		var WshShell = new ActiveXObject("WScript.Shell");
+		var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_infos.metadb);
+		WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+		break;
+	case 5:
+		window.ShowProperties();
+		break;
+	case 6:
+		window.Reload();
+		break;		
+	case 9:
+		window.ShowConfigure();
+		break;				
+	case 7:
+		properties.follow_cursor = !properties.follow_cursor;
+		window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
+		g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
+		window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
+		window.Repaint();
+		break;	
+	case 8:
+		properties.doubleRowText = !properties.doubleRowText;
+		window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
+		window.Repaint();
+		break;				
 	}
+	rMenu = undefined;
 	return true;
 }
-function on_item_focus_change_custom(playlistIndex, from, to, metadb) {
-	if (g_avoid_on_focus_change || (to<0 && !metadb)) {
-		g_avoid_on_focus_change = false;
-		return;
-	}		
-	g_metadb_old = g_infos.metadb;
-	if (!properties.follow_cursor && (fb.IsPlaying || fb.IsPaused)) g_infos.metadb = fb.GetNowPlaying();
-	else {	
-		if(metadb){
-			g_infos.metadb = metadb;		
-		} else if (to>-1 && playlistIndex>-1){
-			g_infos.metadb = plman.GetPlaylistItems(playlistIndex)[to];
-		}
-		if(!g_infos.metadb){
-			g_infos.metadb = g_metadb_old;
-			window.Repaint();
-		}	
-	}
-	if (g_infos.metadb) {
-		g_infos.setTimerCycle();
-		on_metadb_changed(new FbMetadbHandleList(g_infos.metadb));
-	}
-}
-function on_metadb_changed(metadbs, fromhook) {
-	if(window.IsVisible || !first_populate_done) {
-		if(!g_infos.metadb || g_avoid_metadb_updated) {
-			g_avoid_metadb_updated = false;
-			return;
-		}
-		
-		var current_track = false;
-		try{
-			for(var i=0; i < metadbs.Count; i++) {
-				if(metadbs[i].Compare(g_infos.metadb)) {	
-					current_track = true; 
-				} 			
-			}
-		} catch(e){}
-		if(!current_track) return;	
-		
-		g_infos.getTrackInfos();
 
-		first_populate_done = true;
-	} else {
-		set_update_function('on_metadb_changed(g_infos.metadb,'+fromhook+')');	    	
-	}
+function on_metadb_changed(metadbs, fromhook) {
+	g_infos.on_metadb_changed(metadbs, fromhook);
 }
 function set_update_function(string){
 	if(string=="") Update_Required_function=string;
-	else if( Update_Required_function.indexOf("on_metadb_changed(g_infos.metadb,false")!=-1) return;
+	else if( Update_Required_function.indexOf("g_infos.on_metadb_changed(g_infos.metadb,false")!=-1) return;
 	else Update_Required_function=string;
 }
 
 function on_playback_new_track(metadb) {
-	on_item_focus_change_custom(plman.PlayingPlaylist,-1,-1,metadb);
-}
-
-function on_playback_stop(reason) {
-	switch(reason) {
-	case 0: // user stop
-	case 1: // eof (e.g. end of playlist)
-		//on_item_focus_change_custom(plman.ActivePlaylist);
-		break;
-	case 2: // starting_another (only called on user action, i.e. click on next button)
-		break;
-	};	
+	g_infos.on_item_focus_change(plman.PlayingPlaylist,-1,-1,metadb);
 }
 
 function on_notify_data(name, info) {
@@ -460,9 +381,9 @@ function on_notify_data(name, info) {
 	case "trigger_on_focus_change":
 		try{
 			metadb = new FbMetadbHandleList(info[2]);
-			on_item_focus_change_custom(info[0], -1, info[1], metadb[0]);
+			g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
 		} catch(e){
-			on_item_focus_change_custom(info[0], -1, info[1]);
+			g_infos.on_item_focus_change(info[0], -1, info[1]);
 		}
 		g_avoid_on_focus_change = true;			
 		timers.on_focus_change = setTimeout(function() {
@@ -487,7 +408,7 @@ function on_notify_data(name, info) {
 	case "Right_panel_follow_cursor":
 		properties.follow_cursor = info;
 		window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-		if(properties.follow_cursor) on_item_focus_change_custom(-1,-1,-1,fb.GetFocusItem());
+		if(properties.follow_cursor) g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
 		else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 	break;
 	case "minimode_dark_theme":
@@ -613,6 +534,8 @@ function oInfos() {
 	if (this.time_circle > 60000) this.time_circle = 60000;	
 	this.tooltip_activated = false;
 	this.isHover = false;
+	this.first_populate_done = false;
+	this.show_info = false;
 	this.isPlaying = function() {
 		return this.is_playing;
 	}	
@@ -628,23 +551,70 @@ function oInfos() {
 			this.playing_metadb = metadb;
 		}
 	}
+	this.on_item_focus_change = function(playlistIndex, from, to, metadb) {
+		if (g_avoid_on_focus_change || (to<0 && !metadb)) {
+			g_avoid_on_focus_change = false;
+			return;
+		}		
+		g_metadb_old = this.metadb;
+		if (!properties.follow_cursor && (fb.IsPlaying || fb.IsPaused)) this.metadb = fb.GetNowPlaying();
+		else {	
+			if(metadb){
+				this.metadb = metadb;		
+			} else if (to>-1 && playlistIndex>-1){
+				this.metadb = plman.GetPlaylistItems(playlistIndex)[to];
+			}
+			if(!this.metadb){
+				this.metadb = g_metadb_old;
+				window.Repaint();
+			}	
+		}
+		if (this.metadb) {
+			this.setTimerCycle();
+			on_metadb_changed(new FbMetadbHandleList(this.metadb));
+		}
+	}	
+	this.on_metadb_changed = function(metadbs, fromhook) {
+		if(window.IsVisible || !this.first_populate_done) {
+			if(!this.metadb || g_avoid_metadb_updated) {
+				g_avoid_metadb_updated = false;
+				return;
+			}
+			
+			var current_track = false;
+			try{
+				for(var i=0; i < metadbs.Count; i++) {
+					if(metadbs[i].Compare(this.metadb)) {	
+						current_track = true; 
+					} 			
+				}
+			} catch(e){}
+			if(!current_track) return;	
+			
+			this.getTrackInfos();
+
+			this.first_populate_done = true;
+		} else {
+			set_update_function('g_infos.on_metadb_changed(g_infos.metadb,'+fromhook+')');	    	
+		}
+	}	
 	this.getTrackInfos = function(){		
-		var allinfos = g_tfo.allinfos.EvalWithMetadb(g_infos.metadb);
+		var allinfos = g_tfo.allinfos.EvalWithMetadb(this.metadb);
 		allinfos = allinfos.split(" ^^ ");
 
 		this.rating = allinfos[0];
 		
-		txt_title = allinfos[1];
-		txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
+		var txt_title = allinfos[1];
+		var txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
 		var _playcount = allinfos[7];
-		if(foo_playcount) txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-		else txt_profile = allinfos[6] + allinfos[8] + "K";
-		/*var l_mood = g_tfo.mood.EvalWithMetadb(g_infos.metadb);
+		if(foo_playcount) var txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else var txt_profile = allinfos[6] + allinfos[8] + "K";
+		/*var l_mood = g_tfo.mood.EvalWithMetadb(this.metadb);
 		if (l_mood != null && l_mood != "?") {
-			mood = true;
-		} else mood = 0;*/
-		show_info = true;		
-		this.updateInfos(txt_title, txt_info, txt_profile, g_infos.metadb, false, this.rating);
+			btn_mood.mood = true;
+		} else btn_mood.mood = 0;*/
+		this.show_info = true;		
+		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
 	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating){
 		this.txt_line1 = row1;
@@ -669,8 +639,8 @@ function oInfos() {
 		window.Repaint();	
 	};	
 	this.cycle_infos = function() {
-		show_info = !show_info;
-		window.RepaintRect(this.padding[1], rbutton[0].height +10, ww-this.padding[1]-this.padding[3], 28*zdpi);	
+		this.show_info = !this.show_info;
+		window.RepaintRect(this.x, rbutton[0].height +10, ww-this.padding[1]-this.padding[3], this.h);	
 	};
     this.setTimerCycle = function() {
 		if (this.timer_cycle) clearInterval(this.timer_cycle)
@@ -697,7 +667,7 @@ function oInfos() {
 		for (var i = 1; i < rbutton.length + 1; i++) {
 			rbutton[i - 1].Paint(gr, i);
 		}
-		//if (is_mood) btn_mood.Paint(gr);
+		//if (properties.display_mood) btn_mood.Paint(gr);
 		
 		var double_row = (properties.doubleRowText && this.txt_line3 !="");
 
@@ -705,21 +675,21 @@ function oInfos() {
 			this.line1_width = gr.CalcTextWidth(this.txt_line1, g_font.italicplus5);
 			this.tooltip_line1 = (this.line1_width>this.txt_width);				
 		}
-		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + rbutton[0].height + (properties.doubleRowText?0:1.8)*zdpi, this.txt_width, 32*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + rbutton[0].height + (properties.doubleRowText?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		
-		var line2 = ((this.txt_line2 !="" && show_info) || double_row) ? this.txt_line2 : this.txt_line3;
+		var line2 = ((this.txt_line2 !="" && this.show_info) || double_row) ? this.txt_line2 : this.txt_line3;
 		if(this.line2_width<0) {
 			this.line2_width = gr.CalcTextWidth(line2, g_font.min1);
 			this.tooltip_line2 = (this.line2_width>this.txt_width);			
 		}
-		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, rbutton[0].height+10+(double_row?20*zdpi:0), this.txt_width, 29*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, rbutton[0].height+(double_row?32:38), this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		
 		if(double_row) {
 			if(this.line3_width<0) {
 				this.line3_width = gr.CalcTextWidth(this.txt_line3, g_font.min2);
 				this.tooltip_line3 = (this.line3_width>this.txt_width);
 			}
-			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, rbutton[0].height+10+33*zdpi, this.txt_width, 29*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, rbutton[0].height+45, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		}			
     };
     this.onMouse = function (state, x, y, m) {    
@@ -737,7 +707,7 @@ function oInfos() {
 				this.down_y = y;				
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y + rbutton[0].height + (properties.doubleRowText?0:1.8)*zdpi && y<this.y+this.h){
+				if(x>this.x && x<this.x+this.w && y>this.y + rbutton[0].height + (properties.doubleRowText?0:2) && y<this.y+this.h){
 					this.isHover = true;
 					if(this.tooltip_line1 || this.tooltip_line2 || this.tooltip_line3){
 						this.tooltip_activated = true;
@@ -771,9 +741,11 @@ function on_init(){
 	g_cursor = new oCursor();	
 	g_resizing = new Resizing("rightsidebar",true,false);	
 	g_tooltip = new oTooltip();
+	get_font();
 	g_infos = new oInfos();
 	on_layout_change();
+	initbutton();
 	if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-	else on_item_focus_change_custom(-1,-1,-1,fb.GetFocusItem()); //g_cover.getArtwork(fb.GetFocusItem(), false);	
+	else g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem()); //g_cover.getArtwork(fb.GetFocusItem(), false);	
 }
 on_init();

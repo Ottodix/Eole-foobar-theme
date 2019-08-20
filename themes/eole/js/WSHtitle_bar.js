@@ -968,6 +968,7 @@ function on_mouse_rbtn_up(x, y){
 			_menu.AppendMenuItem(MF_STRING, 7, "Switch to Main player");			
 		}
 
+
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();		
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");

@@ -1315,7 +1315,7 @@ oShowList = function(parentPanelName) {
     this.columnWidthMin = 230;
     this.columnWidth = 0;
     this.columnsOffset = 0;
-    
+    this.avoid_sending_album_infos = false;
     this.playing_row_x = 0;
     this.playing_row_y = 0;
     this.playing_row_w = 0;
@@ -1743,7 +1743,7 @@ oShowList = function(parentPanelName) {
 			if(properties.TFgrouping.indexOf("%album%")==-1) this.firstRow = TF.grouping.EvalWithMetadb(this.pl[0]);
 			if(properties.TFgrouping.indexOf("artist%")==-1) this.secondRow = this.total_tracks;			
 		}
-		if(!this.album_info_sent && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
+		if(!this.album_info_sent && !this.avoid_sending_album_infos && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
 				trackIndex:brw.groups[this.idx].trackIndex,
@@ -1754,7 +1754,7 @@ oShowList = function(parentPanelName) {
 				firstRow: this.firstRow,
 				secondRow: this.secondRow}); 
 			this.album_info_sent = true;
-		}
+		} else this.avoid_sending_album_infos = false;
 	}
 	this.setColors = function(){		
 		this.color_showlist_arrow = this.colorSchemeBack;
@@ -7224,6 +7224,7 @@ function on_metadb_changed(metadbs, fromhook) {
 			return;			
 		};	
 		//if(brw.SourcePlaylistIdx==plman.ActivePlaylist){
+			g_showlist.avoid_sending_album_infos = true;
 			timer.brw_populate('on_metadb_changed',false,true);			
 			//brw.populate(32,false,true);		
 			return;
@@ -7252,7 +7253,7 @@ function on_metadb_changed(metadbs, fromhook) {
 		var idx = g_showlist.idx;
 		if(idx > -1) {
 			var playlist = brw.groups[idx].pl;
-			g_showlist.calcHeight(playlist, idx);
+			g_showlist.calcHeight(playlist, idx, undefined, true, false);
 			g_showlist.setColumnsOffset(columnsOffset_saved);
 			g_showlist.getHeaderInfos(true);	
 		}

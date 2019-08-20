@@ -470,11 +470,13 @@ oImageCache = function () {
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {			
 			cache_filename = check_cache(metadb, 0, nowPlaying_cachekey);	
-			// load img from cache	
+			
 			if(cache_filename) {	
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
-			} else get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey, {isplaying:true});
+			} else {
+				get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey, {isplaying:true});
+			}
 		} 
 		return img;
     };	

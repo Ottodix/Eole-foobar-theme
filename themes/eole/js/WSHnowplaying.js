@@ -78,7 +78,7 @@ timers = {
 function setButtons(){
 	buttons = {
 		Pause: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "Pause", "Resume Playback", function () {
-			if(fb.IsPaused) fb.Pause();
+			fb.PlayOrPause();			
 		},function () {
 			fb.Pause();
 		},images.pause_img,images.pause_img),
@@ -230,16 +230,18 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;
         } else if(this.text=='NowPlaying'){
-            if(g_cover.isPlaying() || !g_cover.isHover || Randomsetfocus || g_cover.playlistIndex<0 || !g_cover.metadb || properties.single_click_action!=1 || !fb.IsPlaying){
+            if((g_cover.isPlaying()) || (!g_cover.isPlaying() && properties.single_click_action!=1) || !g_cover.isHover  || Randomsetfocus || g_cover.playlistIndex<0 || !g_cover.metadb || !fb.IsPlaying){
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;			
         } else if(this.text=='Pause'){
-            if(!fb.IsPaused || Randomsetfocus || !g_cover.isPlaying()){
+			this.tooltip_text = fb.IsPaused?"Resume Playback":"Pause playback";
+			var play_pause = (fb.IsPaused || (g_cover.isPlaying() && g_cover.isHover));
+            if(!play_pause || Randomsetfocus || !g_cover.isPlaying()){
                 this.state = ButtonStates.hide;return;
             } else {
 				if(this.state!=ButtonStates.hover)
 					this.state = ButtonStates.normal;				
-				if(!fb.IsPaused){
+				if(!play_pause){
 					opacity=0;
                     this.state = ButtonStates.normal;
 				}                    
@@ -247,7 +249,6 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
         }
         if (this.state == ButtonStates.hide) return;
 
-            
         switch (this.state)
         {
 			case ButtonStates.normal:
@@ -273,6 +274,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 
     this.onClick = function () {
         this.fonClick && this.fonClick();
+		if(this.tooltip_activated) g_tooltip.Deactivate();
     }
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
@@ -370,7 +372,7 @@ function on_paint(gr) {
 	g_cover.draw(gr,0,0);
 	
 	if(fb.IsPlaying){
-		if(properties.showVisualization && g_cover.isPlaying() && !fb.IsPaused && !Randomsetfocus) {
+		if(properties.showVisualization && g_cover.isPlaying() && !fb.IsPaused && !Randomsetfocus && !g_cover.isHover) {
 			if(!properties.innerCircle){
 				if(!g_cover.cover_shadow_btn || g_cover.cover_shadow_btn==null) g_cover.cover_shadow_btn = createCoverShadowStack(g_cover.w+40, g_cover.w+40, GetGrey(0,160),90, true);
 				gr.DrawImage(g_cover.cover_shadow_btn, g_cover.x, g_cover.y, g_cover.w, g_cover.h, -20, -20, g_cover.cover_shadow_btn.Width+40, g_cover.cover_shadow_btn.Height+40);				
@@ -739,7 +741,7 @@ oCover = function() {
 		
 		if(typeof is_playing == "undefined"){
 			var is_playing_new = false;
-			if(this.playing_metadb && metadb.Compare(this.playing_metadb) && fb.IsPlaying) {
+			if(isValidHandle(this.playing_metadb) && isValidHandle(metadb) && metadb.Compare(this.playing_metadb) && fb.IsPlaying) {
 				 var is_playing_new = true;
 			}
 			else if(this.playing_cachekey!=""){
@@ -750,7 +752,7 @@ oCover = function() {
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
 		
-		console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
+		//console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
 		
 		if(this.is_playing!=is_playing_old) this.ResetMask();				
 		if(this.metadb && this.metadb.Compare(metadb)) {
@@ -900,7 +902,7 @@ oCover = function() {
 			} else gr.FillSolidRect(this.x, this.y, this.drawn_w, this.drawn_h, colors.overlay_on_hover);
 			this.tintDrawed = true;
 		}
-		if((g_cover.isPlaying() || (Randomsetfocus && fb.IsPlaying) || this.isHover) && !(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && !properties.showVisualization)) {
+		if(((g_cover.isPlaying() || (Randomsetfocus && fb.IsPlaying)) && !(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && !properties.showVisualization)) || this.isHover) {
 			this.circle_inner_padding = Math.round(this.drawn_w*0.7);
 			this.inner_circle_size = this.drawn_w-this.circle_inner_padding-2;
 
@@ -1142,7 +1144,7 @@ function on_notify_data(name, info) {
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
 			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
-				g_cover.refresh(info);
+				g_cover.refresh(metadb[0]);
 		break;  					
 		case "cover_cache_finalized": 
 			//g_image_cache.cachelist = cloneImgs(info);

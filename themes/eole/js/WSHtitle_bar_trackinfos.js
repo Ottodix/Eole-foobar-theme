@@ -1039,7 +1039,7 @@ function on_mouse_rbtn_up(x, y){
 		} else {
 			_menu.AppendMenuItem(MF_STRING, 7, "Switch to Main player");			
 		}
-
+		
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();		
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -1612,6 +1612,8 @@ function draw_main_menu(x,y){
 	} else {
 		skin_settings_menu.AppendMenuItem(MF_STRING, 4011, "Main player");			
 	}
+	skin_settings_menu.AppendMenuSeparator(); 
+	skin_settings_menu.AppendMenuItem(MF_GRAYED, 0, "Eole v"+globalProperties.theme_version);
 	
 	skin_settings_menu.AppendTo(basemenu, MF_STRING, "Skin settings");	
 	
