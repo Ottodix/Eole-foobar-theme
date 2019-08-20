@@ -285,6 +285,17 @@ if(properties.deleteSpecificImageCache!="") {
 	properties.deleteSpecificImageCache = "";
 	window.SetProperty("COVER cachekey of covers to delete on next startup", "");		
 }
+
+var play_img = gdi.CreateImage(41, 41);
+gb = play_img.GetGraphics();
+	var xpos = 15;
+	var ypos = 11;
+	gb.FillSolidRect(xpos,ypos+0.5,1,15,GetGrey(255));
+	gb.SetSmoothingMode(2);
+	gb.FillSolidRect(xpos,ypos,1,16,GetGrey(255));
+	gb.FillPolygon(GetGrey(255), 0, Array(xpos, ypos, 14+xpos, 8+ypos, xpos, 16+ypos));
+	gb.SetSmoothingMode(0);
+play_img.ReleaseGraphics(gb);
 var cover = {
     margin: 0,
     max_w: 0,
@@ -293,7 +304,8 @@ var cover = {
     load_img: gdi.Image(imgFolderPath+"load.png"),
     extend_img: gdi.Image(imgFolderPath+"cover_extend2.png"),
     retract_img: gdi.Image(imgFolderPath+"cover_retract2.png"),	
-    btn_play: gdi.Image(imgFolderPath+"btn_play.png"),	
+   // btn_play: gdi.Image(imgFolderPath+"btn_play.png"),
+	btn_play: play_img,
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
 	marginSide:5,
