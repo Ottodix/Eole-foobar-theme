@@ -571,7 +571,7 @@ function oInfos() {
 		}
 		if (this.metadb) {
 			this.setTimerCycle();
-			on_metadb_changed(new FbMetadbHandleList(this.metadb));
+			this.on_metadb_changed(new FbMetadbHandleList(this.metadb));
 		}
 	}	
 	this.on_metadb_changed = function(metadbs, fromhook) {
