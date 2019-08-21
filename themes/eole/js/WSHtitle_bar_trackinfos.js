@@ -1227,7 +1227,7 @@ function draw_settings_menu(x,y){
 				break;
 			case (idx == 1807):
 				properties.showRightSidebarBtn = !properties.showRightSidebarBtn;
-				window.SetProperty("_DISPLAY: show now right sidebar btn", properties.showRightSidebarBtn);		
+				window.SetProperty("_DISPLAY: show right sidebar btn", properties.showRightSidebarBtn);		
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;				
