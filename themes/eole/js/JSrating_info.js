@@ -492,7 +492,6 @@ function ButtonUI_R() {
 			if (x > this.x - half_rating_space && x < this.x + this.width + half_rating_space && y > this.y && y < this.y + this.height) {
 				var derating_flag = (i == g_infos.rating ? true : false);
 				g_avoid_metadb_updated = true;
-				//console.log("before rate album:"+g_infos.album_infos+" derating_flag:"+derating_flag+" rating:"+(g_infos.rating));	
 				if (derating_flag) {
 					if(g_infos.album_infos) {
 						g_infos.rating = rateAlbum(0,g_infos.rating-1, new FbMetadbHandleList(g_infos.metadb))+1;
@@ -505,8 +504,7 @@ function ButtonUI_R() {
 					} else {
 						g_infos.rating = rateSong(i-1,g_infos.rating-1, g_infos.metadb)+1;
 					}
-				}
-				//console.log("after rate album:"+g_infos.album_infos+" derating_flag:"+derating_flag+" rating:"+(g_infos.rating)+" - "+g_infos.metadb.RawPath);				
+				}			
 			}
 		}
 	}
@@ -576,11 +574,11 @@ function oInfos() {
 	}	
 	this.on_metadb_changed = function(metadbs, fromhook) {
 		if(window.IsVisible || !this.first_populate_done) {
+			
 			if(!this.metadb || g_avoid_metadb_updated) {
 				g_avoid_metadb_updated = false;
 				return;
 			}
-			
 			var current_track = false;
 			try{
 				for(var i=0; i < metadbs.Count; i++) {
@@ -590,12 +588,11 @@ function oInfos() {
 				}
 			} catch(e){}
 			if(!current_track) return;	
-			
 			this.getTrackInfos();
 
 			this.first_populate_done = true;
 		} else {
-			set_update_function('g_infos.on_metadb_changed(g_infos.metadb,'+fromhook+')');	    	
+			set_update_function('g_infos.on_metadb_changed(new FbMetadbHandleList(g_infos.metadb),'+fromhook+')');	    	
 		}
 	}	
 	this.getTrackInfos = function(){		
