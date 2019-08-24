@@ -56,11 +56,7 @@ var ww = 0,
 var cur_btn = null;
 var g_down = false;
 var g_dble_click = false;
-var animationStartTime = 0;
-var animationCounter = 0;
-var Pause_width = 34;
-var current_played_track = null;
-var g_rating = 0;
+
 var g_dragndrop_x = 0;
 var g_dragndrop_y = 0;
 var g_dragndrop_timer = false;
@@ -84,7 +80,7 @@ function setButtons(){
 			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
 			fb.Play();
 		},function () {},images.play_img,images.play_img),		
-		NowPlaying: new SimpleButton(ww/2-Pause_width/2,wh/2-images.pause_img.Height/2+global_vertical_fix, Pause_width, 74, "NowPlaying", "Show now playing", function () {
+		NowPlaying: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "NowPlaying", "Show now playing", function () {
 			window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 			on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
 		},function () {
