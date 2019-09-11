@@ -2477,7 +2477,9 @@ oBrowser = function(name) {
                                 if(this.groups[g].cover_type == null) {
                                     if(this.groups[g].load_requested == 0) {
 										//this.group_unrequested_loading=true;								
-                                        this.groups[g].cover_img = g_image_cache.hit(this.rows[i].metadb, g, false);
+                                        //this.groups[g].cover_img = g_image_cache.hit(this.rows[i].metadb, g, false);
+										img = g_image_cache.hit(this.rows[i].metadb, g, false);
+										if(img!="loading") this.groups[g].cover_img = img; 											
 										if (typeof this.groups[g].cover_img !== "undefined" && this.groups[g].cover_img!==null) {	
 											this.groups[g].cover_img = g_image_cache.getit(this.rows[i].metadb, g, this.groups[g].cover_img);
 											this.groups[g].cover_type = 1;
@@ -2809,7 +2811,8 @@ oBrowser = function(name) {
 											g = this.rows[i].albumId;
 											if(this.groups[g].cover_type == null) {
 												if(this.groups[g].load_requested == 0 && this.groups[g].start==this.rows[i].playlistTrackId) {							
-													this.groups[g].cover_img = g_image_cache.hit(this.rows[i].metadb, g, false);
+													img = g_image_cache.hit(this.rows[i].metadb, g, false);
+													if(img!="loading") this.groups[g].cover_img = img; 														
 													if (typeof this.groups[g].cover_img !== "undefined" && this.groups[g].cover_img!==null) {	
 														this.groups[g].cover_img = g_image_cache.getit(this.rows[i].metadb, g, this.groups[g].cover_img);													
 														this.groups[g].cover_type = 1;														
@@ -2876,7 +2879,8 @@ oBrowser = function(name) {
 											g = this.rows[i].albumId;											
 											if(this.groups[g].cover_type == null) {
 												if(this.groups[g].load_requested == 0) {							
-													this.groups[g].cover_img = g_image_cache.hit(this.rows[i].metadb, g, false);
+													img = g_image_cache.hit(this.rows[i].metadb, g, false);
+													if(img!="loading") this.groups[g].cover_img = img; 														
 													if (typeof this.groups[g].cover_img !== "undefined" && this.groups[g].cover_img!==null) {
 														this.groups[g].cover_img = g_image_cache.getit(this.rows[i].metadb, g, this.groups[g].cover_img);														
 														this.groups[g].cover_type = 1;
