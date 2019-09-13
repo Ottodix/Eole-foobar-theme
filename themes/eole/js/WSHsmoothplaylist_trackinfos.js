@@ -2488,11 +2488,15 @@ oBrowser = function(name) {
                                 } else if(this.groups[g].cover_type == 0) {
                                     this.groups[g].cover_img = globalProperties.nocover_img;
 									this.groups[g].mask_applied = false;
-									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.addToCache(image,this.groups[g].cachekey);
+									//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 } else if(this.groups[g].cover_type == 3) {
 									this.groups[g].cover_img = globalProperties.stream_img;
 									this.groups[g].mask_applied = false;
-									g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									g_image_cache.addToCache(image,this.groups[g].cachekey);									
+									//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
                                 };															
                                 if(isImage(this.groups[g].cover_img) && properties.circleMode && !this.groups[g].mask_applied) {
 									if(!this.coverMask) this.DefineCircleMask(GroupCover_w);
@@ -2820,10 +2824,14 @@ oBrowser = function(name) {
 												}
 											} else if(this.groups[g].cover_type == 0) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};									
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -2888,10 +2896,14 @@ oBrowser = function(name) {
 												}
 											} else if(this.groups[g].cover_type == 0) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
-												g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};										
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){

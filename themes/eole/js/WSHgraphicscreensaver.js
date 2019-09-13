@@ -3505,7 +3505,7 @@ oBrowser = function(name) {
 		this.groups[albumIndex].cover_img=null;
 		this.groups[albumIndex].tid=-1;
 		this.groups[albumIndex].load_requested = 0;
-		g_image_cache.cachelist[this.groups[albumIndex].cachekey] = null;
+		g_image_cache.reset(this.groups[albumIndex].cachekey);
 	}		
     this.refresh_all_images = function () {
 		this.coverMask = false;		
@@ -3516,7 +3516,7 @@ oBrowser = function(name) {
 			this.groups[i].cover_img=null;
 			this.groups[i].mask_applied=false;
 			this.groups[i].tid=-1;
-			g_image_cache.cachelist[this.groups[i].cachekey] = null;
+			g_image_cache.reset(this.groups[i].cachekey);
 			//this.hit(metadb, albumIndex, false);
 		}
 	}
@@ -4627,27 +4627,28 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 	if(i<0){
 		cachekey = process_cachekey(metadb);
 		if(image) {							
-			g_image_cache.cachelist[cachekey] = image;
+			g_image_cache.addToCache(image,cachekey); 
 			if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-				g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-			}
+				g_image_cache.addToCache(image,cachekey,globalProperties.thumbnailWidthMax); 
+			} else g_image_cache.addToCache(image,cachekey); 
 		} else {
-			g_image_cache.cachelist[cachekey] = globalProperties.nocover_img				
+			g_image_cache.addToCache(globalProperties.nocover_img,cachekey);		
 		}			
     } else if(i < brw.groups.length && i>=0) {
         if(brw.groups[i].metadb) {
 				if(image) {							
-					g_image_cache.cachelist[brw.groups[i].cachekey] = image;
 					if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-						g_image_cache.cachelist[brw.groups[i].cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-					}									
+						g_image_cache.addToCache(image,brw.groups[i].cachekey,globalProperties.thumbnailWidthMax); 
+						//g_image_cache.cachelist[brw.groups[i].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
+					} else g_image_cache.addToCache(image,brw.groups[i].cachekey); // g_image_cache.cachelist[brw.groups[i].cachekey] = image;									
 				} else {
 					if(brw.groups[i].tracktype == 3 ) {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.stream_img;
+						g_image_cache.addToCache(globalProperties.stream_img,brw.groups[i].cachekey);		
 					} else {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.nocover_img	
-					}						
-				}						
+						g_image_cache.addToCache(globalProperties.nocover_img,brw.groups[i].cachekey);			
+					}		
+					brw.groups[i].save_requested = true;					
+				}					
 				// save img to cache
 				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img != "string" && image) {					
 					if(!timers.saveCover) {
@@ -4680,11 +4681,10 @@ function on_load_image_done(tid, image){
 				
 				brw.groups[k].load_requested = 2;
 		
-				g_image_cache.cachelist[brw.groups[k].cachekey] = image;
-				//if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					//g_image_cache.cachelist[brw.groups[k].cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-				//}				
-				//brw.groups[k].cover_img = g_image_cache.cachelist[brw.groups[k].cachekey];
+				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax); 
+				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
+
 				if(k <= g_end) {
 					if(!timers.coverDone) {
 						timers.coverDone = setTimeout(function() {

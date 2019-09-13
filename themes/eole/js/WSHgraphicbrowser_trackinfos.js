@@ -1056,7 +1056,7 @@ oRow = function(metadb,itemIndex) {
 				pt = playingText.GetGraphics();
 					pt.SetTextRenderingHint(5);
 					if(typeof(g_showlist.g_wallpaperImg) == "undefined" || !g_showlist.g_wallpaperImg) {		
-						g_showlist.g_wallpaperImg = setWallpaperImgV2(g_showlist.cover_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+						g_showlist.g_wallpaperImg = setWallpaperImgV2(g_showlist.showlist_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 						//g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 					};						
 					pt.DrawImage(g_showlist.g_wallpaperImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.g_wallpaperImg.Width, this.h);
@@ -1391,25 +1391,25 @@ oShowList = function(parentPanelName) {
 	}
 	this.onFontChanged();
 	this.setCover = function(){
-		if(!isImage(brw.groups[this.idx].cover_img_full)) {
+		if(!isImage(brw.groups[this.idx].cover_img)) {
 			brw.GetAlbumCover(this.idx);
 		}
-		this.cover_img = FormatCover(brw.groups[this.idx].cover_img_full, this.coverRealSize, this.coverRealSize, false, "setCover");
+		this.showlist_img = FormatCover(brw.groups[this.idx].cover_img, this.coverRealSize, this.coverRealSize, false, "setCover");
 
 		this.setShowListArrow();
 		this.setColumnsButtons(false);
 		this.setCloseButton(false);						
 	}	
 	this.getColorSchemeFromImage = function() {	
-        if(!isImage(this.cover_img)) this.setCover();
-		if(!isImage(this.cover_img)) return;
+        if(!isImage(this.showlist_img)) this.setCover();
+		if(!isImage(this.showlist_img)) return;
 
 		if(properties.circleMode && !properties.CoverGridNoText)
-			image = brw.groups[this.idx].cover_img_full; 
-		else
 			image = brw.groups[this.idx].cover_img; 
+		else
+			image = brw.groups[this.idx].cover_img_thumb; 
 		
-		image = this.cover_img;
+		image = this.showlist_img;
 		
 		var colorScheme_array = image.GetColourScheme(1);
 		
@@ -1878,7 +1878,7 @@ oShowList = function(parentPanelName) {
 		
 		delete this.firstRowLength;
 		delete this.secondRowLength;		
-		delete this.cover_img;
+		delete this.showlist_img;
 		for (var i in this.links) {
 			this.links[i].positioned = false;
 			this.links[i].changeState(ButtonStates.normal);			
@@ -1908,7 +1908,7 @@ oShowList = function(parentPanelName) {
 		
 		if(update_static_infos){
 			this.getColorSchemeFromImageDone = false;			
-			if(!isImage(this.cover_img)){
+			if(!isImage(this.showlist_img)){
 				this.setCover();
 			}
 			if(properties.showListColoredOneColor && properties.showListColored) {
@@ -2223,7 +2223,7 @@ oShowList = function(parentPanelName) {
     this.draw = function(gr) {
 	
 		if(this.idx < 0) return;
-		if(!isImage(this.cover_img)){
+		if(!isImage(this.showlist_img)){
 			this.setCover();
 		}		
 		if((properties.showListColoredMixedColor || properties.showListColoredOneColor)  && properties.showListColored && !this.getColorSchemeFromImageDone){
@@ -2382,12 +2382,12 @@ oShowList = function(parentPanelName) {
                 }
 				
 				//draw album cover								
-				if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.cover_img) && (this.h-this.delta_)<40){
+				if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.showlist_img) && (this.h-this.delta_)<40){
 					if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 						if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealSize, this.coverRealSize, colors.cover_shadow,10);
 						gr.DrawImage(this.cover_shadow, this.x+this.w-this.CoverSize+this.marginCover-8, this.y+this.marginTop+this.marginCover-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
 					}
-					gr.DrawImage(this.cover_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.coverRealSize, this.coverRealSize, 0, 0, this.cover_img.Width, this.cover_img.Height);					
+					gr.DrawImage(this.showlist_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.coverRealSize, this.coverRealSize, 0, 0, this.showlist_img.Width, this.showlist_img.Height);					
 				}
 				
                 // draw columns & tracks
@@ -4616,9 +4616,9 @@ oBrowser = function(name) {
 		this.coverMask = false;		
 		this.dateCircleBG = false;		
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img_full=null;
-			g_showlist.cover_img=null;
 			this.groups[i].cover_img=null;
+			g_showlist.showlist_img=null;
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;			
 			this.groups[i].tid=-1;
 			this.groups[i].load_requested = 0;			
@@ -4628,7 +4628,7 @@ oBrowser = function(name) {
 		this.coverMask = false;
 		this.dateCircleBG = false;	
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img=null;
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;			
 			this.groups[i].tid=-1;
 		}
@@ -4639,21 +4639,21 @@ oBrowser = function(name) {
 		this.cover_shadow_hover = null;
 	}
     this.refresh_one_image = function (albumIndex) {
-		this.groups[albumIndex].cover_img_full=null;
-		if(g_showlist.idx == albumIndex) g_showlist.cover_img=null;	
-		this.groups[albumIndex].mask_applied=false;
 		this.groups[albumIndex].cover_img=null;
+		if(g_showlist.idx == albumIndex) g_showlist.showlist_img=null;	
+		this.groups[albumIndex].mask_applied=false;
+		this.groups[albumIndex].cover_img_thumb=null;
 		this.groups[albumIndex].tid=-1;
 		this.groups[albumIndex].load_requested = 0;
-		g_image_cache.cachelist[this.groups[albumIndex].cachekey] = null;
+		g_image_cache.reset(this.groups[albumIndex].cachekey);
 	}	
     this.refresh_all_images = function () {
 		this.coverMask = false;
 		this.dateCircleBG = false;			
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img_full=null;
-			g_showlist.cover_img=null;			
 			this.groups[i].cover_img=null;
+			g_showlist.showlist_img=null;			
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;
 			this.groups[i].tid=-1;
 			this.groups[i].load_requested = 0;				
@@ -4671,23 +4671,23 @@ oBrowser = function(name) {
 		else return brw.groups[idx].pl;
 	}	
 	this.GetAlbumCover = function(idx){	
-		var img_final = null;
+		var img_thumb = null;
 		var img_full = null;
 
-		if (isImage(this.groups[idx].cover_img_full)) {
-			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover1");
+		if (isImage(this.groups[idx].cover_img)) {
+			img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover1");
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
 			if (isImage(img_full)) {
-				this.groups[idx].cover_img_full = img_full;
-				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover2");
+				this.groups[idx].cover_img = img_full;
+				img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover2");
 			}
 		}
-		this.groups[idx].cover_img = img_final;
+		this.groups[idx].cover_img_thumb = img_thumb;
 	}		
 	this.SetAlbumCoverColorScheme = function(idx){
-		if (typeof this.groups[idx].cover_img !== "undefined" && this.groups[idx].cover_img!=null) {
-			main_color = this.groups[idx].cover_img.GetColourScheme(1);
+		if (isImage(this.groups[idx].cover_img_thumb)) {
+			main_color = this.groups[idx].cover_img_thumb.GetColourScheme(1);
 
 			var tmp_HSL_colour = RGB2HSL(main_color[0]);
 			if(tmp_HSL_colour.L>30){
@@ -4806,7 +4806,7 @@ oBrowser = function(name) {
 				}
 
                 // get cover
-				if(this.groups[this.groups_draw[i]].cover_img==null) {
+				if(this.groups[this.groups_draw[i]].cover_img_thumb==null) {
 					this.GetAlbumCover(this.groups_draw[i]);
 				}
 
@@ -4815,7 +4815,7 @@ oBrowser = function(name) {
 					coverTop = ay + this.CoverMarginTop;
 
 					// cover
-					if(this.groups[this.groups_draw[i]].cover_img!=null && typeof this.groups[this.groups_draw[i]].cover_img != "string") {
+					if(this.groups[this.groups_draw[i]].cover_img_thumb!=null && typeof this.groups[this.groups_draw[i]].cover_img_thumb != "string") {
 						
 						//Show now playing animation
 						/*if(this.groups[this.groups_draw[i]].isPlaying){
@@ -4843,14 +4843,14 @@ oBrowser = function(name) {
 						
 						if(!this.groups[this.groups_draw[i]].mask_applied && (properties.circleMode && !properties.CoverGridNoText)){
 							if(!this.coverMask) this.DefineCircleMask(this.coverRealWith);
-							width = this.groups[this.groups_draw[i]].cover_img.Width;
-							height = this.groups[this.groups_draw[i]].cover_img.Height;
+							width = this.groups[this.groups_draw[i]].cover_img_thumb.Width;
+							height = this.groups[this.groups_draw[i]].cover_img_thumb.Height;
 							coverMask = this.coverMask.Resize(width, height, 7);
-							this.groups[this.groups_draw[i]].cover_img.ApplyMask(coverMask);
+							this.groups[this.groups_draw[i]].cover_img_thumb.ApplyMask(coverMask);
 							this.groups[this.groups_draw[i]].mask_applied = true;
-							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
+							image_to_draw = this.groups[this.groups_draw[i]].cover_img_thumb;
 						} else {
-							image_to_draw = this.groups[this.groups_draw[i]].cover_img;
+							image_to_draw = this.groups[this.groups_draw[i]].cover_img_thumb;
 						}					
 			
 						if(properties.CoverGridNoText)
@@ -4932,7 +4932,7 @@ oBrowser = function(name) {
 							g_cursor.setCursor(IDC_ARROW,25);
 						}
 		
-					} else if (this.groups[this.groups_draw[i]].cover_img=="no_cover") {
+					} else if (this.groups[this.groups_draw[i]].cover_img_thumb=="no_cover") {
 						gr.DrawImage(globalProperties.nocover_img, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, globalProperties.nocover_img.Width, globalProperties.nocover_img.Height);		
 						if(!(properties.circleMode && !properties.CoverGridNoText))
 							gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_nocover_rectline);
@@ -5776,29 +5776,30 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 	if(i<0){
 		cachekey = process_cachekey(metadb);
 		if(image) {							
-			g_image_cache.cachelist[cachekey] = image;
+			g_image_cache.addToCache(image,cachekey); 
 			if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-				g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-			}
+				g_image_cache.addToCache(image,cachekey,globalProperties.thumbnailWidthMax); 
+			} else g_image_cache.addToCache(image,cachekey); 
 		} else {
-			g_image_cache.cachelist[cachekey] = globalProperties.nocover_img				
+			g_image_cache.addToCache(globalProperties.nocover_img,cachekey);		
 		}			
     } else if(i < brw.groups.length && i>=0) {
         if(brw.groups[i].metadb) {
 				if(image) {							
 					if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-					} else g_image_cache.cachelist[brw.groups[i].cachekey] = image;									
+						g_image_cache.addToCache(image,brw.groups[i].cachekey,globalProperties.thumbnailWidthMax); 
+						//g_image_cache.cachelist[brw.groups[i].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
+					} else g_image_cache.addToCache(image,brw.groups[i].cachekey); // g_image_cache.cachelist[brw.groups[i].cachekey] = image;									
 				} else {
 					if(brw.groups[i].tracktype == 3 ) {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.stream_img;
+						g_image_cache.addToCache(globalProperties.stream_img,brw.groups[i].cachekey);		
 					} else {
-						g_image_cache.cachelist[brw.groups[i].cachekey] = globalProperties.nocover_img;					
+						g_image_cache.addToCache(globalProperties.nocover_img,brw.groups[i].cachekey);			
 					}		
 					brw.groups[i].save_requested = true;					
 				}						
 				// save img to cache
-				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img != "string" && image) {					
+				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img_thumb != "string" && image) {					
 					if(!timers.saveCover) {
 						brw.groups[i].save_requested = true;
 						save_image_to_cache(image, i); 
@@ -5830,8 +5831,8 @@ function on_load_image_done(tid, image){
 				brw.groups[k].load_requested = 2;
 
 				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					g_image_cache.cachelist[brw.groups[k].cachekey] = image.Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);
-				} else g_image_cache.cachelist[brw.groups[k].cachekey] = image;	
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax); 
+				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
 				
 				if(k <= g_end) {
 					if(!timers.coverDone) {
@@ -5873,13 +5874,13 @@ function populate_with_library_covers(start_items, str_comp_items){
 				if(globalProperties.load_covers_at_startup && cachekey_album!='undefined') {
 					current_item_filename_album = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_album);
 					if(current_item_filename_album) {				
-						g_image_cache.cachelist[cachekey_album] = load_image_from_cache_direct(current_item_filename_album);		
+						g_image_cache.addToCache(load_image_from_cache_direct(current_item_filename_album),cachekey_album);
 					}	
 				}	
 				if(globalProperties.load_artist_img_at_startup && cachekey_artist!='undefined') {				
 					current_item_filename_artist = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_artist);
 					if(current_item_filename_artist) {				
-						g_image_cache.cachelist[cachekey_artist] = load_image_from_cache_direct(current_item_filename_artist);		
+						g_image_cache.addToCache(load_image_from_cache_direct(current_item_filename_artist),cachekey_artist);
 					}
 				}
 			} else {
@@ -6645,7 +6646,7 @@ function on_mouse_move(x, y, m) {
 					show_text : false,	
 					use_album_art : false,
 					use_theming : false,
-					custom_image : createDragImg(brw.groups[brw.groups_draw[brw.clicked_id]].cover_img_full, 80, brw.groups[brw.groups_draw[brw.clicked_id]].pl.Count),
+					custom_image : createDragImg(brw.groups[brw.groups_draw[brw.clicked_id]].cover_img, 80, brw.groups[brw.groups_draw[brw.clicked_id]].pl.Count),
 				}
 				var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);
 				// nothing happens here until the mouse button is released	
@@ -6660,7 +6661,7 @@ function on_mouse_move(x, y, m) {
 				for(var i = 0; i < g_showlist.rows_.length; i++) {
 					if(g_showlist.rows_[i].isSelected) showlist_selected_count++;
 				}			
-				if(showlist_selected_count==items.Count) var drag_img = createDragImg(brw.groups[g_showlist.idx].cover_img_full, 80,items.Count);
+				if(showlist_selected_count==items.Count) var drag_img = createDragImg(brw.groups[g_showlist.idx].cover_img, 80,items.Count);
 				else drag_img = createDragText("Dragging", items.Count+" tracks", 220);
 				brw.external_dragging = true;	
 				var options = {

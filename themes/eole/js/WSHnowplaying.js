@@ -925,8 +925,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 		cachekey = process_cachekey(metadb);
 		save_image_to_cache(image, -1, cachekey);	
 		g_cover.setArtwork(image,true,false);
-		g_image_cache.cachelist[cachekey] = image;
-		g_image_cache.cachelist[cachekey].Resize(globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax,globalProperties.ResizeQLY);				
+		g_image_cache.addToCache(image,cachekey,globalProperties.thumbnailWidthMax);			
 	}
 	else g_cover.reset();
     window.Repaint();
