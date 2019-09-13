@@ -2987,8 +2987,7 @@ function save_image_to_cache(image, albumIndex, cachekey){
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
 		try{
-			if(properties.panelName=="WSHgraphicbrowser") brw.groups[albumIndex].cover_img_full = image;
-			else brw.groups[albumIndex].cover_img = image;
+			brw.groups[albumIndex].cover_img = image;
 			g_image_cache.addToCache(image,cachekey); //g_image_cache.cachelist[cachekey] = image;
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
