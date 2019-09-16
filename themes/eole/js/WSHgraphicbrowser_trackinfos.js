@@ -5874,13 +5874,13 @@ function populate_with_library_covers(start_items, str_comp_items){
 				if(globalProperties.load_covers_at_startup && cachekey_album!='undefined') {
 					current_item_filename_album = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_album);
 					if(current_item_filename_album) {				
-						g_image_cache.addToCache(load_image_from_cache_direct(current_item_filename_album),cachekey_album);
+						g_image_cache.addToCache(g_image_cache.load_image_from_cache_direct(current_item_filename_album),cachekey_album);
 					}	
 				}	
 				if(globalProperties.load_artist_img_at_startup && cachekey_artist!='undefined') {				
 					current_item_filename_artist = check_cache(covers_FullLibraryList[covers_current_item], 0, cachekey_artist);
 					if(current_item_filename_artist) {				
-						g_image_cache.addToCache(load_image_from_cache_direct(current_item_filename_artist),cachekey_artist);
+						g_image_cache.addToCache(g_image_cache.load_image_from_cache_direct(current_item_filename_artist),cachekey_artist);
 					}
 				}
 			} else {
