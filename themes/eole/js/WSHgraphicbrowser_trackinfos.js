@@ -5137,17 +5137,6 @@ oBrowser = function(name) {
                     this.repaint();
                 }			
 				else if(this.activeIndexFirstClick > -1 && (!properties.expandInPlace || this.groups_draw.length==1) && !this.avoidDlbePlay){
-					//if(this.activeIndex > -1 && (!properties.expandInPlace)){
-					/*plman.FlushPlaybackQueue();
-					if(!this.followActivePlaylist){
-						plman.ActivePlaylist = this.SourcePlaylistIdx;
-						plman.PlayingPlaylist = this.SourcePlaylistIdx;						
-					}
-					plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups[this.groups_draw[this.activeIndex]].pl[0]);
-					if(fb.IsPaused) fb.Stop();
-					plman.FlushPlaybackQueue();	
-					fb.RunContextCommandWithMetadb("Add to playback queue", this.groups[this.groups_draw[this.activeIndex]].pl[0]);
-					fb.Play();*/
 					this.dontRetractOnMouseUp = true;
 					this.on_mouse("lbtn_dblclk", x, y);
 					this.avoidDlbePlay = true;
@@ -5182,13 +5171,7 @@ oBrowser = function(name) {
 						clearTimeout(timers.showItem);
 						timers.showItem=false;
 					}, 300, this);   					
-                    //fb.RunContextCommandWithMetadb("Add to playlist and play", this.groups[this.groups_draw[a]].pl);
                 }
-                /*
-                var a = this.activeIndex;
-                apply_playlist(this.groups[this.groups_draw[a]].pl);
-                fb.RunContextCommandWithMetadb("Play", this.groups[this.groups_draw[a]].metadb);
-                */
                 break;
             case "mbtn_down":
                 if(this.activeIndex > -1){
