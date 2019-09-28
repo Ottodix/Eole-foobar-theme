@@ -841,7 +841,9 @@ oCover = function() {
 			this.circle_inner_padding = Math.round(this.drawn_w*0.7);
 			this.inner_circle_size = this.drawn_w-this.circle_inner_padding-2;
 
-			if(properties.innerCircle){
+			if(properties.innerCircle && !properties.circleMode){
+				gr.FillSolidRect(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
+			} else if(properties.innerCircle){
 				gr.SetSmoothingMode(2);
 				gr.FillEllipse(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
 				gr.SetSmoothingMode(0);
@@ -1405,7 +1407,7 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(10,properties.follow_cursor);
 		_menu.AppendMenuItem(MF_STRING, 11, "Circle artwork");	
 		_menu.CheckMenuItem(11,properties.circleMode);
-		_menu.AppendMenuItem(MF_STRING, 13, "Circle under buttons");	
+		_menu.AppendMenuItem(MF_STRING, 13, "Background under buttons");	
 		_menu.CheckMenuItem(13,properties.innerCircle);		
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion");	
 		_menu.CheckMenuItem(12,properties.keepProportion);
@@ -1553,6 +1555,7 @@ function get_colors(){
 		colors.btn_grad_middle = GetGrey(0,180);
 		colors.border_right = GetGrey(0,100);		
 		colors.border_covers = GetGrey(255,50);
+		colors.btn_bg_inverse = GetGrey(255,220);			
 		colors.btn_bg = GetGrey(0,220);		
 	} else {
 		colors.grad_bottom = GetGrey(0,20);
@@ -1565,6 +1568,7 @@ function get_colors(){
 		colors.border_right = GetGrey(0,10);	
 		colors.border_covers = GetGrey(0,50);
 		colors.btn_bg = GetGrey(255,220);
+		colors.btn_bg_inverse = GetGrey(0,220);			
 	}
 	colors.border_light = GetGrey(255,20);
 	colors.border_dark = GetGrey(0,50);
