@@ -1114,9 +1114,9 @@ oShowList = function(parentPanelName) {
         if(!image) {
 			brw.GetAlbumCover(this.idx);
 			if(properties.circleMode)
-				image = brw.groups_draw[this.idx].cover_img_full; 
-			else
 				image = brw.groups_draw[this.idx].cover_img; 
+			else
+				image = brw.groups_draw[this.idx].cover_img_thumb; 
 		}
 		if(!image) {
 			this.setShowListArrow();
@@ -1497,14 +1497,14 @@ oShowList = function(parentPanelName) {
 				
 		if(properties.showListColoredOneColor) {
 			if(properties.circleMode)
-				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_full);	
-			else
 				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img);	
+			else
+				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_thumb);	
 		} else if(properties.showListColoredMixedColor) {
 			if(properties.circleMode)
-				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_full);	
+				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img);	
 			else
-				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img);		
+				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_thumb);		
 			if(typeof(this.g_wallpaperImg) == "undefined" || !this.g_wallpaperImg) {
 				this.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, this.pl[0], true, this.w + g_scrollbar.w, this.h+100, 0.8, false, 2);
 			}			
@@ -1755,9 +1755,9 @@ oShowList = function(parentPanelName) {
 		
 		if((properties.showListColoredMixedColor || properties.showListColoredOneColor) && !this.getColorSchemeFromImageDone){
 			if(properties.circleMode)
-				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_full);	
-			else
 				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img);	
+			else
+				this.getColorSchemeFromImage(brw.groups_draw[this.idx].cover_img_thumb);	
 		}
         if(this.delta > 0) {
             this.y = Math.round(eval(this.parentPanelName+".y") + ((this.rowIdx + 1) * eval(this.parentPanelName+".rowHeight")) + eval(this.parentPanelName+".marginTop") - scroll_);
@@ -1880,11 +1880,11 @@ oShowList = function(parentPanelName) {
                 }
 				
 				//draw album cover								
-				if(properties.showlistShowCover && this.idx > -1 && brw.groups_draw[this.idx].cover_img && (this.h-this.delta_)<40){
-					if(brw.groups_draw[this.idx].cover_img==null) brw.GetAlbumCover(this.idx);
+				if(properties.showlistShowCover && this.idx > -1 && brw.groups_draw[this.idx].cover_img_thumb && (this.h-this.delta_)<40){
+					if(brw.groups_draw[this.idx].cover_img_thumb==null) brw.GetAlbumCover(this.idx);
 					
-					if(typeof this.cover_img == 'undefined' || !this.cover_img) this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img_full, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, false);
-					gr.DrawImage(this.cover_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, 0, 0, this.cover_img.Width, this.cover_img.Height);					
+					if(!isImage(this.cover_img_thumb)) this.cover_img_thumb = FormatCover(brw.groups_draw[this.idx].cover_img, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, false);
+					gr.DrawImage(this.cover_img_thumb, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, 0, 0, this.cover_img_thumb.Width, this.cover_img_thumb.Height);					
 				}
 				
                 // draw columns & tracks
@@ -3482,9 +3482,9 @@ oBrowser = function(name) {
 		this.coverMask = false;
 		this.dateCircleBG = false;		
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img_full=null;
-			g_showlist.cover_img=null;
 			this.groups[i].cover_img=null;
+			g_showlist.cover_img=null;
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;			
 			this.groups[i].tid=-1;
 		}
@@ -3493,16 +3493,16 @@ oBrowser = function(name) {
 		this.coverMask = false;
 		this.dateCircleBG = false;			
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img=null;
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;			
 			this.groups[i].tid=-1;
 		}
 	}		
     this.refresh_one_image = function (albumIndex) {
-		this.groups[albumIndex].cover_img_full=null;
+		this.groups[albumIndex].cover_img=null;
 		if(g_showlist.idx == albumIndex) g_showlist.cover_img=null;	
 		this.groups[albumIndex].mask_applied=false;
-		this.groups[albumIndex].cover_img=null;
+		this.groups[albumIndex].cover_img_thumb=null;
 		this.groups[albumIndex].tid=-1;
 		this.groups[albumIndex].load_requested = 0;
 		g_image_cache.reset(this.groups[albumIndex].cachekey);
@@ -3511,9 +3511,9 @@ oBrowser = function(name) {
 		this.coverMask = false;		
 		this.dateCircleBG = false;			
 		for(var i = 0;i < this.groups.length;i++){	
-			this.groups[i].cover_img_full=null;
-			g_showlist.cover_img=null;			
 			this.groups[i].cover_img=null;
+			g_showlist.cover_img=null;			
+			this.groups[i].cover_img_thumb=null;
 			this.groups[i].mask_applied=false;
 			this.groups[i].tid=-1;
 			g_image_cache.reset(this.groups[i].cachekey);
@@ -3522,10 +3522,10 @@ oBrowser = function(name) {
 	}
 	this.GetAlbumCover_fast = function(idx){
 		idx = this.groups_draw[idx].idx;
-		this.groups[idx].cover_img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
-		if (typeof this.groups[idx].cover_img_full !== "undefined" || this.groups[idx].cover_img_full!=null) {
+		this.groups[idx].cover_img = g_image_cache.hit(this.groups[idx].metadb, idx, false);
+		if (typeof this.groups[idx].cover_img !== "undefined" || this.groups[idx].cover_img!=null) {
 			var gb;			
-			var img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);			
+			var img = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);			
 			var cover_img = gdi.CreateImage(this.coverRealWith, this.coverRealWith);
 			gb = cover_img.GetGraphics();
 				gb.SetSmoothingMode(0);
@@ -3539,36 +3539,51 @@ oBrowser = function(name) {
 					gb.GdiDrawText(this.groups_draw[idx].date, this.fontDate, colors.cover_date_txt_fast, 0, 0, dateWidth, 15, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 				}					
 			cover_img.ReleaseGraphics(gb);		
-			this.groups[idx].cover_img = cover_img;
+			this.groups[idx].cover_img_thumb = cover_img;
 			//this.SetAlbumCoverColorScheme(idx);
 		}
 	}
 	this.GetAlbumCover_old = function(idx){	
 		idx = this.groups_draw[idx].idx;
-		this.groups[idx].cover_img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
-		if (typeof this.groups[idx].cover_img_full !== "undefined" || this.groups[idx].cover_img_full!=null) {
-			this.groups[idx].cover_img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+		this.groups[idx].cover_img = g_image_cache.hit(this.groups[idx].metadb, idx, false);
+		if (typeof this.groups[idx].cover_img !== "undefined" || this.groups[idx].cover_img!=null) {
+			this.groups[idx].cover_img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);
 			//this.SetAlbumCoverColorScheme(idx);
 		}
 	}	
-	this.GetAlbumCover = function(idx){	
+	this.GetAlbumCover_reold = function(idx){	
 		var img_final = null;
 		var img_full = null;
 
-		if (isImage(this.groups[idx].cover_img_full)) {
-			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+		if (isImage(this.groups[idx].cover_img)) {
+			img_final = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);
 		} else {		
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
 			if (isImage(img_full)) {
-				this.groups[idx].cover_img_full = img_full;
-				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+				this.groups[idx].cover_img = img_full;
+				img_final = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);
 			}
 		}
-		this.groups[idx].cover_img = img_final;
+		this.groups[idx].cover_img_thumb = img_final;
+	}
+	this.GetAlbumCover = function(idx){	
+		var img_thumb = null;
+		var img_full = null;
+
+		if (isImage(this.groups[idx].cover_img)) {
+			img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);
+		} else {		
+			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
+			if (isImage(img_full)) {
+				this.groups[idx].cover_img = img_full;
+				img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith, this.coverRealWith, false);
+			}
+		}
+		this.groups[idx].cover_img_thumb = img_thumb;
 	}		
 	this.SetAlbumCoverColorScheme = function(idx){
-		if (typeof this.groups[idx].cover_img !== "undefined" && this.groups[idx].cover_img!=null) {
-			main_color = this.groups[idx].cover_img.GetColourScheme(1);
+		if (typeof this.groups[idx].cover_img_thumb !== "undefined" && this.groups[idx].cover_img_thumb!=null) {
+			main_color = this.groups[idx].cover_img_thumb.GetColourScheme(1);
 
 			var tmp_HSL_colour = RGB2HSL(main_color[0]);
 			if(tmp_HSL_colour.L>30){
@@ -3688,7 +3703,7 @@ oBrowser = function(name) {
 				}
 
                 // get cover
-				if(this.groups_draw[i].cover_img==null) {
+				if(this.groups_draw[i].cover_img_thumb==null) {
 					this.GetAlbumCover(i);
 				}
 
@@ -3697,7 +3712,7 @@ oBrowser = function(name) {
 					coverTop = ay + this.CoverMarginTop;
 
 					// cover
-					if(this.groups_draw[i].cover_img!=null && typeof this.groups_draw[i].cover_img != "string") {
+					if(this.groups_draw[i].cover_img_thumb!=null && typeof this.groups_draw[i].cover_img_thumb != "string") {
 						//Shadow
 						if(properties.CoverShadowOpacity>0 && !properties.circleMode && this.groups_draw[i].position_from_playing<=0) {
 							if(!cover_shadow || cover_shadow==null) cover_shadow = createCoverShadow(this.coverRealWith,colors.cover_shadow);
@@ -3711,14 +3726,14 @@ oBrowser = function(name) {
 						
 						if(!this.groups_draw[i].mask_applied && properties.circleMode){
 							if(!this.coverMask) this.DefineCircleMask(this.coverRealWith);
-							width = this.groups_draw[i].cover_img.Width;
-							height = this.groups_draw[i].cover_img.Height;
+							width = this.groups_draw[i].cover_img_thumb.Width;
+							height = this.groups_draw[i].cover_img_thumb.Height;
 							coverMask = this.coverMask.Resize(width, height, 7);
-							this.groups_draw[i].cover_img.ApplyMask(coverMask);
+							this.groups_draw[i].cover_img_thumb.ApplyMask(coverMask);
 							this.groups_draw[i].mask_applied = true;
-							image_to_draw = this.groups_draw[i].cover_img;
+							image_to_draw = this.groups_draw[i].cover_img_thumb;
 						} else {
-							image_to_draw = this.groups_draw[i].cover_img;
+							image_to_draw = this.groups_draw[i].cover_img_thumb;
 						}	
 						
 						if(this.groups_draw[i].position_from_playing<0 && !(i == this.activeIndex && this.activeRow>-1)){
@@ -3857,7 +3872,7 @@ oBrowser = function(name) {
 
 						} catch(e) {}						
 						
-					} else if (this.groups_draw[i].cover_img=="no_cover") {
+					} else if (this.groups_draw[i].cover_img_thumb=="no_cover") {
 						if(!properties.circleMode)
 							gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_nocover_rectline);
 						else
@@ -3895,8 +3910,8 @@ oBrowser = function(name) {
             
             // dragged album draw
             if(properties.DragToPlaylist && g_dragA && g_ishover) {
-				if(this.groups_draw[g_dragA_idx].cover_img!=null && typeof this.groups_draw[g_dragA_idx].cover_img != "string") {
-                    gr.DrawImage(this.groups_draw[g_dragA_idx].cover_img, g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, 0, 0, this.groups_draw[g_dragA_idx].cover_img.Width, this.groups_draw[g_dragA_idx].cover_img.Height, 0, 150);
+				if(this.groups_draw[g_dragA_idx].cover_img_thumb!=null && typeof this.groups_draw[g_dragA_idx].cover_img_thumb != "string") {
+                    gr.DrawImage(this.groups_draw[g_dragA_idx].cover_img_thumb, g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, 0, 0, this.groups_draw[g_dragA_idx].cover_img_thumb.Width, this.groups_draw[g_dragA_idx].cover_img_thumb.Height, 0, 150);
 					gr.FillSolidRect(g_cursor.x - Math.floor(80 / 2), g_cursor.y - Math.floor(80 / 2), 80, 80, colors.dragcover_overlay);
 				} else {
 					gr.DrawImage(globalProperties.nocover_img, g_cursor.x - Math.floor(cover.load_img.Width / 2), g_cursor.y - Math.floor(cover.load_img.Height / 2), cover.load_img.Width, cover.load_img.Height, 0, 0, cover.load_img.Width, cover.load_img.Height, 0, 150);		
@@ -4665,7 +4680,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 					brw.groups[i].save_requested = true;					
 				}					
 				// save img to cache
-				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img != "string" && image) {					
+				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img_thumb != "string" && image) {					
 					if(!timers.saveCover) {
 						brw.groups[i].save_requested = true;
 						save_image_to_cache(image, i); 
