@@ -3543,13 +3543,28 @@ oBrowser = function(name) {
 			//this.SetAlbumCoverColorScheme(idx);
 		}
 	}
-	this.GetAlbumCover = function(idx){	
+	this.GetAlbumCover_old = function(idx){	
 		idx = this.groups_draw[idx].idx;
 		this.groups[idx].cover_img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
 		if (typeof this.groups[idx].cover_img_full !== "undefined" || this.groups[idx].cover_img_full!=null) {
 			this.groups[idx].cover_img = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
 			//this.SetAlbumCoverColorScheme(idx);
 		}
+	}	
+	this.GetAlbumCover = function(idx){	
+		var img_final = null;
+		var img_full = null;
+
+		if (isImage(this.groups[idx].cover_img_full)) {
+			img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+		} else {		
+			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false);
+			if (isImage(img_full)) {
+				this.groups[idx].cover_img_full = img_full;
+				img_final = FormatCover(this.groups[idx].cover_img_full, this.coverRealWith, this.coverRealWith, false);
+			}
+		}
+		this.groups[idx].cover_img = img_final;
 	}		
 	this.SetAlbumCoverColorScheme = function(idx){
 		if (typeof this.groups[idx].cover_img !== "undefined" && this.groups[idx].cover_img!=null) {
