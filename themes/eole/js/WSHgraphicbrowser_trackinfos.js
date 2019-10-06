@@ -1842,7 +1842,7 @@ oShowList = function(parentPanelName) {
 		} else {
 			this.colorSchemeBgScrollbar = this.colorSchemeBack;				
 		}
-		if(!((properties.showListColoredOneColor || properties.showListColoredMixedColor) && properties.showListColored)){
+		if(!((properties.showListColoredOneColor || properties.showListColoredMixedColor || properties.showListColoredBlurred) && properties.showListColored)){
 			this.colorSchemeBack = colors.showlist_bg;
 			this.color_showlist_arrow = colors.showlist_arrow;
 		}		
