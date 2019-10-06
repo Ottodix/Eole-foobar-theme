@@ -4697,7 +4697,7 @@ function on_load_image_done(tid, image){
 				brw.groups[k].load_requested = 2;
 		
 				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax); 
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,globalProperties.thumbnailWidthMax); 
 				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
 
 				if(k <= g_end) {
