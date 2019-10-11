@@ -2386,7 +2386,9 @@ oSearch = function() {
 		
 		this.inputbox.draw(gr, this.x+cSearchBox.paddingLeft, this.y+cSearchBox.paddingTop, 0, 0);
 		if(layout_state.isEqual(0)){	
+			//gr.FillSolidRect(this.x, this.y-2, this.w, 1, colors.search_line); //top line
 			gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
+			//gr.FillSolidRect(this.x, this.y, 1, this.h-1, colors.search_line); //left line
 			gr.FillSolidRect(this.x+this.w-1, this.y, 1, this.h-1, colors.search_line); //right line
 		}			
     };
