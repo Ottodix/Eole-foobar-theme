@@ -40,6 +40,7 @@ var properties = {
 	tracktitle_ontop: window.GetProperty("_DISPLAY: Track title", true),	
 	tracktitle_format: window.GetProperty("_DISPLAY: Track title format", "[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]"),	
 	showIdleScreenBtn: window.GetProperty("_DISPLAY: show idle screen btn", true),	
+	showRightSidebarBtn: window.GetProperty("_DISPLAY: show right sidebar btn", true),		
 	showLightswitchBtn: window.GetProperty("_DISPLAY: show light switch btn", true),
 	showPanelBtnText: window.GetProperty("_DISPLAY: show panels btn text", true),		
 	showNowPlayingBtn: window.GetProperty("_DISPLAY: show now playing btn", true),	
@@ -72,8 +73,8 @@ var cSearchBoxMainLight = {
 	width:270,
 	marginRight:128,	
 	marginLeft:5,
-	marginTop:32,	
-	marginBottom:4,	
+	marginTop:35,	
+	marginBottom:0,	
 	paddingLeft:37,
 	paddingRight:40,
 	paddingTop:5,
@@ -94,8 +95,8 @@ var cSearchBoxMainDark = {
 	width:270,
 	marginRight:128,	
 	marginLeft:5,
-	marginTop:33,	
-	marginBottom:3,	
+	marginTop:35,	
+	marginBottom:0,	
 	paddingLeft:37,
 	paddingRight:40,
 	paddingTop:5,
@@ -190,7 +191,9 @@ function setScheduler(schedulerState, dontNotify){
 var images = {}
 function build_images(){
 	if(properties.darklayout) colors.icons_folder = "white"; else colors.icons_folder = "";	
-
+	
+	images.track_infos_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\track_infos_icon.png");
+	
 	images.artist_bio_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\artist_bio_icon.png");
 	
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
@@ -356,38 +359,81 @@ function Lightswitch(switch_all,new_state){
 	}
 	if(switch_all) window.Repaint();
 }
-function toggleNowPlayingState(switch_all,new_state){
+function toggleNowPlayingState(switch_all,new_state, refresh_panel){
 	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
-	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	new_state = typeof new_state !== 'undefined' ? new_state : false;
+	refresh_panel = typeof refresh_panel !== 'undefined' ? refresh_panel : true;		
 	if(switch_all){
 		if(new_state===false) {
-			nowplayinglib_state.toggleValue();
-			nowplayingplaylist_state.toggleValue();
-			nowplayingbio_state.toggleValue();
-			nowplayingvisu_state.toggleValue();
+			nowplayinglib_state.toggleValue(refresh_panel);
+			nowplayingplaylist_state.toggleValue(refresh_panel);
+			nowplayingbio_state.toggleValue(refresh_panel);
+			nowplayingvisu_state.toggleValue(refresh_panel);
 		} else {
-			nowplayinglib_state.setValue(new_state);
-			nowplayingplaylist_state.setValue(new_state);
-			nowplayingbio_state.setValue(new_state);
-			nowplayingvisu_state.setValue(new_state);
+			nowplayinglib_state.setValue(new_state,refresh_panel);
+			nowplayingplaylist_state.setValue(new_state,refresh_panel);
+			nowplayingbio_state.setValue(new_state,refresh_panel);
+			nowplayingvisu_state.setValue(new_state,refresh_panel);
 		}
 	} else {
 		switch(main_panel_state.value){
 			case 0:
-				if(new_state!==false) nowplayinglib_state.setValue(new_state);
-				else nowplayinglib_state.toggleValue();
+				if(new_state!==false) nowplayinglib_state.setValue(new_state,refresh_panel);
+				else nowplayinglib_state.toggleValue(refresh_panel);
 			break;
 			case 1:
-				if(new_state!==false) nowplayingplaylist_state.setValue(new_state);
-				else nowplayingplaylist_state.toggleValue();
+				if(new_state!==false) nowplayingplaylist_state.setValue(new_state,refresh_panel);
+				else nowplayingplaylist_state.toggleValue(refresh_panel);
 			break;
 			case 2:
-				if(new_state!==false) nowplayingbio_state.setValue(new_state);			
-				else nowplayingbio_state.toggleValue();
+				if(new_state!==false) nowplayingbio_state.setValue(new_state,refresh_panel);			
+				else nowplayingbio_state.toggleValue(refresh_panel);
 			break;
 			case 3:
-				if(new_state!==false) nowplayingvisu_state.setValue(new_state);			
-				else nowplayingvisu_state.toggleValue();
+				if(new_state!==false) nowplayingvisu_state.setValue(new_state,refresh_panel);			
+				else nowplayingvisu_state.toggleValue(refresh_panel);
+			break;		
+		}
+	}
+	build_buttons();
+	window.Repaint();	
+}
+function toggleTrackInfosState(switch_all,new_state, refresh_panel){
+	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;	
+	new_state = typeof new_state !== 'undefined' ? new_state : false;		
+	refresh_panel = typeof refresh_panel !== 'undefined' ? refresh_panel : true;
+	
+	//if(getNowPlayingState()==0) toggleNowPlayingState();
+	
+	if(switch_all){
+		if(new_state===false) {
+			trackinfoslib_state.toggleValue(refresh_panel);
+			trackinfosplaylist_state.toggleValue(refresh_panel);
+			trackinfosbio_state.toggleValue(refresh_panel);
+			trackinfosvisu_state.toggleValue(refresh_panel);
+		} else {
+			trackinfoslib_state.setValue(new_state,refresh_panel);
+			trackinfosplaylist_state.setValue(new_state,refresh_panel);
+			trackinfosbio_state.setValue(new_state,refresh_panel);
+			trackinfosvisu_state.setValue(new_state,refresh_panel);
+		}
+	} else {
+		switch(main_panel_state.value){
+			case 0:
+				if(new_state!==false) trackinfoslib_state.setValue(new_state,refresh_panel);
+				else trackinfoslib_state.toggleValue(refresh_panel);
+			break;
+			case 1:
+				if(new_state!==false) trackinfosplaylist_state.setValue(new_state,refresh_panel);
+				else trackinfosplaylist_state.toggleValue(refresh_panel);
+			break;
+			case 2:
+				if(new_state!==false) trackinfosbio_state.setValue(new_state,refresh_panel);			
+				else trackinfosbio_state.toggleValue(refresh_panel);
+			break;
+			case 3:
+				if(new_state!==false) trackinfosvisu_state.setValue(new_state,refresh_panel);			
+				else trackinfosvisu_state.toggleValue(refresh_panel);
 			break;		
 		}
 	}
@@ -429,6 +475,15 @@ function build_buttons(){
 		buttons.Idle.H_img = images.idle_img;
 		buttons.Idle.N_img = images.idle_img;
 		buttons.Idle.D_img = buttons.Idle.H_img;	
+		
+		if(getTrackInfosState()==1) {
+			buttons.RightSidebar.H_img = images.visualization_img;
+			buttons.RightSidebar.N_img = images.visualization_img;
+		} else {
+			buttons.RightSidebar.H_img = images.visualization_img;
+			buttons.RightSidebar.N_img = images.visualization_img;			
+		}
+		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 		
 		buttons.ShowSearch.H_img = images.search_toggle_img;
 		buttons.ShowSearch.N_img = images.search_toggle_img;
@@ -479,8 +534,21 @@ function build_buttons(){
 				main_panel_state.setValue(3);
 				get_colors();g_searchbox.adapt_look_to_layout();	
 			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true),
-			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right playlist", function () {
+			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right sidebar", function () {
 				toggleNowPlayingState();
+			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
+			RightSidebar: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "rightsidebar", "Hide/show track infos", function () {
+				if(getNowPlayingState()==1) {
+					toggleTrackInfosState();
+				} else {
+					if(getTrackInfosState()==0) toggleTrackInfosState(false,undefined,false);
+					toggleNowPlayingState();
+					/*trigger_refresh_PSS = setTimeout(function(){
+						RefreshPSS();
+						clearTimeout(trigger_refresh_PSS);
+						trigger_refresh_PSS = false;
+					}, 100);*/
+				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),			
 			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
 				Lightswitch();
@@ -536,10 +604,10 @@ function build_buttons(){
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
 		
 		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m, 'additional_btns', true);
-		additional_btns.addButtons([buttons.NowPlaying,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);	
+		additional_btns.addButtons([buttons.NowPlaying,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);	
 		
 		compact_btns = new JSButtonGroup("top-left", 0, -1, 'compact_btns', true);
-		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);	
+		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.RightSidebar,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);	
 		compact_btns.addButtons([buttons.Library], [0,0,0,btn.margin+5]);	
 		compact_btns.addButtons([buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,0,0,btn.margin]);		
 	}	
@@ -609,7 +677,8 @@ function adapt_buttons_to_layout(){
 		buttons.Fullscreen.setVisibility(false);
 		buttons.Idle.setVisibility(false);
 		buttons.Mini.setVisibility(false);
-		buttons.NowPlaying.setVisibility(false);			
+		buttons.NowPlaying.setVisibility(false);
+		buttons.RightSidebar.setVisibility(false);		
 		buttons.Settings.calculate_size = true;
 		
 		g_searchbox.toggleVisibility(true);
@@ -653,7 +722,11 @@ function adapt_buttons_to_layout(){
 		
 		if(!properties.showIdleScreenBtn) 
 			buttons.Idle.setVisibility(false);
-		else buttons.Idle.setVisibility(true);
+		else buttons.Idle.setVisibility(true);		
+		
+		if(!properties.showRightSidebarBtn)
+			buttons.RightSidebar.setVisibility(false);
+		else buttons.RightSidebar.setVisibility(true);
 		
 		if(!properties.showLightswitchBtn) 
 			buttons.Lightswitch.setVisibility(false);
@@ -692,10 +765,10 @@ function adapt_buttons_to_layout(){
 		}
 		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true) - (!properties.alwaysShowSearch?buttons.ShowSearch.w+5:0);
 		
-		if(!properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
+		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
 			cSearchBoxMainLight.marginRight -= 10;
 			cSearchBoxMainDark.marginRight -= 10;
-		}		
+		}	
 		main_panel_btns.txtYAdjust(1);		
 		if(properties.toUpperCase) main_panel_btns.toUpperCase(true);
 		if(!properties.showPanelBtnText) main_panel_btns.displayLabel(false);		
@@ -887,7 +960,6 @@ function on_mouse_leave() {
 	window_btns.on_mouse("leave");
 	compact_btns.on_mouse("leave");	
 	all_btns.on_mouse("leave");
-	window.Repaint();
 }
 
 function on_mouse_lbtn_down(x,y){
@@ -967,8 +1039,7 @@ function on_mouse_rbtn_up(x, y){
 		} else {
 			_menu.AppendMenuItem(MF_STRING, 7, "Switch to Main player");			
 		}
-
-
+		
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();		
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -1080,10 +1151,12 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(1901, !properties.show_visualization)
 		
 		_menu.AppendMenuSeparator();
-		_menu_button.AppendMenuItem(MF_STRING, 1806, "Now playing");
+		_menu_button.AppendMenuItem(MF_STRING, 1806, "Right sidebar visibility");
 		_menu_button.CheckMenuItem(1806, properties.showNowPlayingBtn);		
+		_menu_button.AppendMenuItem(MF_STRING, 1807, "Right sidebar function");
+		_menu_button.CheckMenuItem(1807, properties.showRightSidebarBtn);		
 		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
-		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);			
+		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);					
 		_menu_button.AppendMenuItem(MF_STRING, 1803, "Light switch");
 		_menu_button.CheckMenuItem(1803, properties.showLightswitchBtn);		
 		_menu_button.AppendMenuItem(MF_STRING, 1804, "Fullscreen");
@@ -1152,6 +1225,12 @@ function draw_settings_menu(x,y){
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;
+			case (idx == 1807):
+				properties.showRightSidebarBtn = !properties.showRightSidebarBtn;
+				window.SetProperty("_DISPLAY: show right sidebar btn", properties.showRightSidebarBtn);		
+				adapt_buttons_to_layout();
+				window.Repaint();
+				break;				
 			case (idx == 1809):
 				try {
 					new_caption_format = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom windows title", properties.tracktitle_format, true);
@@ -1533,6 +1612,8 @@ function draw_main_menu(x,y){
 	} else {
 		skin_settings_menu.AppendMenuItem(MF_STRING, 4011, "Main player");			
 	}
+	skin_settings_menu.AppendMenuSeparator(); 
+	skin_settings_menu.AppendMenuItem(MF_GRAYED, 0, "Eole v"+globalProperties.theme_version);
 	
 	skin_settings_menu.AppendTo(basemenu, MF_STRING, "Skin settings");	
 	
@@ -2219,8 +2300,8 @@ oSearch = function() {
         this.inputbox.setSize(w-this.images.search_history_icon.Width*4.5, h-cSearchBox.paddingTop-cSearchBox.paddingBottom, font_size);
     };
 	this.on_size = function() {
-		if(layout_state.isEqual(0) && compact_titlebar.isActive()){
-			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showIdleScreenBtn)?buttons.Idle.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
+		if(layout_state.isEqual(0) && compact_titlebar.isActive()){	
+			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showIdleScreenBtn)?buttons.Idle.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
 			this.setSize(ww - window_btns.getWidth() - buttons.Settings.w - 10 - btns_width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);		
 		} else if(layout_state.isEqual(0)){		
 			this.setSize(cSearchBox.width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);		
@@ -2295,7 +2376,7 @@ oSearch = function() {
 		} else {
 			gr.DrawImage(this.images.search_history_icon, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), this.images.search_history_icon.Width, this.images.search_history_icon.Height, 0, 0, this.images.search_history_icon.Width, this.images.search_history_hover_icon.Height,0,255);			
 		}*/
-		this.search_history_bt.draw(gr, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), 255);		
+		this.search_history_bt.draw(gr, this.x+this.w-Math.round(cSearchBox.paddingRight/2 + this.images.search_history_icon.Width/2), this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2)-2, 255);		
 		
         if(this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) {
             this.reset_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-1, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.reset_bt.img[0].Height/2)+2 + (compact_titlebar.isActive()?1:0), 255);
@@ -2305,7 +2386,9 @@ oSearch = function() {
 		
 		this.inputbox.draw(gr, this.x+cSearchBox.paddingLeft, this.y+cSearchBox.paddingTop, 0, 0);
 		if(layout_state.isEqual(0)){	
-			gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
+			//gr.FillSolidRect(this.x, this.y-2, this.w, 1, colors.search_line); //top line
+			//gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
+			//gr.FillSolidRect(this.x, this.y, 1, this.h-1, colors.search_line); //left line
 			gr.FillSolidRect(this.x+this.w-1, this.y, 1, this.h-1, colors.search_line); //right line
 		}			
     };
@@ -2596,7 +2679,7 @@ function on_init(){
 	if(fb.IsPlaying) caption_title = fb.TitleFormat("[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]").Eval();
 	if(settings_file_not_found){
 		var welcome_msg_timer = setTimeout(function(){
-			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','MemoryDialog','You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much.');		
+			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it. If you don't understand all this, I advice to keep the default settings.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','MemoryDialog','You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much.');		
 			theme_version.setValue(globalProperties.theme_version);
 			clearTimeout(welcome_msg_timer);
 			welcome_msg_timer=false;
@@ -2604,7 +2687,7 @@ function on_init(){
 		RefreshPSS();	
 	} else if(theme_version.getValue()<globalProperties.lastest_breaking_version) {
 		var welcome_msg_timer = setTimeout(function(){
-			NoticeBox(" ","<div class='titleBig'>Import fcl file, Eole v"+(globalProperties.lastest_breaking_version)+" and after</div><div class='separator'></div><br/>Looks like your column UI configuration file is out of date, you need to import the new configuration file. You may loose some of the customizations you did to this theme, but you'll be able to set them back quickly.<br/><br/>On the preferences page, go to<br/>Display > column UI > Main tab > Import configuration...<br/><br/>And then import this file: [YOUR_FOOBAR_DIRECTORY]/themes/eole/columnsUI_eole.fcl", "Got it, open the preferences","Not now",'fb.RunMainMenuCommand("File/Preferences")');
+			NoticeBox(" ","<div class='titleBig'>Import fcl file, Eole v"+(globalProperties.lastest_breaking_version)+" and after</div><div class='separator'></div><br/>Looks like your column UI configuration file is out of date, you need to import the new configuration file. You may loose some of the customizations you did to this theme, but you'll be able to set them back quickly.<br/><br/>On the preferences page (Foobar > File > Preferences), go to<br/>Display > column UI > Main tab > Import configuration...<br/><br/>And then import this file: [YOUR_FOOBAR_DIRECTORY]/themes/eole/columnsUI_eole.fcl", "Got it, open the preferences","Not now",'fb.RunMainMenuCommand("File/Preferences")');
 			clearTimeout(welcome_msg_timer);
 			welcome_msg_timer=false;
 		}, 200); 
