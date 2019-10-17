@@ -2381,7 +2381,7 @@ oSearch = function() {
         if(this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) {
             this.reset_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-1, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.reset_bt.img[0].Height/2)+2 + (compact_titlebar.isActive()?1:0), 255);
         } else {
-			this.search_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-4, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.images.search_icon.Height/2)+3, 255);					
+			this.search_bt.draw(gr, this.x+cSearchBox.paddingLeft-this.images.search_icon.Width-4, this.y+Math.floor((this.h-cSearchBox.paddingBottom)/2-this.images.search_icon.Height/2)+2, 255);					
         };
 		
 		this.inputbox.draw(gr, this.x+cSearchBox.paddingLeft, this.y+cSearchBox.paddingTop, 0, 0);
@@ -2389,7 +2389,7 @@ oSearch = function() {
 			//gr.FillSolidRect(this.x, this.y-2, this.w, 1, colors.search_line); //top line
 			//gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
 			//gr.FillSolidRect(this.x, this.y, 1, this.h-1, colors.search_line); //left line
-			gr.FillSolidRect(this.x+this.w-1, this.y, 1, this.h-1, colors.search_line); //right line
+			gr.FillSolidRect(this.x+this.w-1, this.y+1, 1, this.h-2, colors.search_line); //right line
 		}			
     };
     
