@@ -2389,7 +2389,10 @@ oSearch = function() {
 			//gr.FillSolidRect(this.x, this.y-2, this.w, 1, colors.search_line); //top line
 			//gr.FillSolidRect(this.x, this.y+this.h - 1, this.w, 1, colors.search_line); //bottom line
 			//gr.FillSolidRect(this.x, this.y, 1, this.h-1, colors.search_line); //left line
-			gr.FillSolidRect(this.x+this.w-1, this.y+1, 1, this.h-2, colors.search_line); //right line
+			var grad_width = 10;
+			var grad_hadd = 2;
+			gr.FillSolidRect(this.x+this.w-1, this.y+1+grad_width-grad_hadd, 1, this.h-2-grad_width+grad_hadd, colors.search_line); //right line
+			gr.FillGradRect(this.x+this.w-1, this.y+1-grad_hadd, 1, grad_width, 90, colors.normal_bg, colors.search_line, 1.0); //right line
 		}			
     };
     
