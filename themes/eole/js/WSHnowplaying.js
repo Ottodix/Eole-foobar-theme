@@ -75,6 +75,9 @@ function setButtons(){
 		},images.pause_img,images.pause_img),
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
 			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
+			console.log(g_cover.playlistIndex);
+			//plman.ActivePlaylist = this.SourcePlaylistIdx;
+			plman.PlayingPlaylist = g_cover.playlistIndex;			
 			if(fb.IsPaused) fb.Stop();
 			plman.FlushPlaybackQueue();
 			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
@@ -661,7 +664,7 @@ oCover = function() {
 		var is_playing_old = this.is_playing;
 		this.playlistIndex = playlistIndex;	
 		this.itemIndex = itemIndex;		
-		
+		console.log("getArtwork"+playlistIndex)
 		if(typeof is_playing == "undefined"){
 			var is_playing_new = false;
 			if(isValidHandle(this.playing_metadb) && isValidHandle(metadb) && metadb.Compare(this.playing_metadb) && fb.IsPlaying) {
@@ -706,8 +709,8 @@ oCover = function() {
 		this.artwork_mask = null;
 		this.mask_applied = false;
 	}  		
-    this.refresh = function (metadb, call_delete_file_cache, cachekey, reset_artwork, is_playing) {
-		cachekey = typeof cachekey !== 'undefined' ? cachekey : process_cachekey(metadb);
+    this.refresh = function (metadb, call_delete_file_cache, cachekey, reset_artwork, is_playing, playlistIndex) {
+		playlistIndex = typeof playlistIndex !== 'undefined' ? playlistIndex : this.playlistIndex;
 		reset_artwork = typeof reset_artwork !== 'undefined' ? reset_artwork : true;		
 		call_delete_file_cache = typeof call_delete_file_cache !== 'undefined' ? call_delete_file_cache : false;		
 		if(globalProperties.enableDiskCache && call_delete_file_cache) {
@@ -716,7 +719,7 @@ oCover = function() {
 		}
 		this.reset(reset_artwork);
 		this.cachekey = "";
-		this.getArtwork(metadb, is_playing);
+		this.getArtwork(metadb, is_playing, playlistIndex);
 		if(isImage(this.artwork)) this.resize();
 		window.Repaint();
 	}
