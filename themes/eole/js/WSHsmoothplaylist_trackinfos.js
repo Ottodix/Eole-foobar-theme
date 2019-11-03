@@ -5210,6 +5210,18 @@ function on_mouse_mbtn_down(x, y, mask) {
 		brw.repaint();
 	}
 }
+function on_mouse_mbtn_up(x, y, mask) {
+    // emulate a selection click
+	brw.on_mouse("down", x, y);
+    brw.on_mouse("up", x, y);
+
+    // add playlist selection to queue
+    let selection = plman.GetPlaylistSelectedItems(g_active_playlist);
+    for (let i = 0; i < selection.Count; ++i) {
+        let item = selection[i];
+        plman.AddItemToPlaybackQueue(item);
+    }
+}
 function on_mouse_rbtn_up(x, y){
     g_rbtn_click = false;
 
