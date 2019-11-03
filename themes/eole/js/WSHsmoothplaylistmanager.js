@@ -1988,10 +1988,10 @@ oBrowser = function(name) {
                 window.ShowConfigure();
                 break;
 			case (idx == 1000):
-				this.setRowHeight(-2);
+				this.setRowHeight(2);
 				break;
 			case (idx == 1001):
-				this.setRowHeight(2);
+				this.setRowHeight(-2);
 				break;
 			case (idx == 1030):
 				playlistpanel_width.increment(10);
