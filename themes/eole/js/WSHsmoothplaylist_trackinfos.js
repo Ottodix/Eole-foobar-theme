@@ -6882,11 +6882,14 @@ function on_drag_over(action, x, y, mask) {
 
     if(x == g_dragndrop_x && y == g_dragndrop_y) return true;
 
-    if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist)) {
+    if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist) && (pman.state == 0 || !pman._isHover(x, y))) {
         g_dragndrop_drop_forbidden = true;
+        pman.on_mouse("move", x, y);
         window.Repaint();
         return true;
-    };
+    } else
+        g_dragndrop_drop_forbidden = false;
+
 	if(properties.DropInplaylist && pman.state == 1) {
 		pman.on_mouse("move", x, y);
 		try{
@@ -6983,7 +6986,9 @@ function on_drag_drop(action, x, y, mask) {
 	}
 	if(pman.state == 1) {
 		action.Effect = 0;
-		pman.on_mouse("up", x, y);
+        pman.on_mouse("up", x, y);
+        g_dragndrop_drop_forbidden = false;
+        window.Repaint();
 		return;
 	}
     if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist)) {
