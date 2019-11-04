@@ -6611,10 +6611,11 @@ function on_notify_data(name, info) {
                 break;
             }
             let current_playing_loc = plman.GetPlayingItemLocation();
-            if (name!="FocusOnNowPlayingForce" && window.Name == "BottomPlaylist" && (!nowplayingplaylist_state.isActive() || !current_playing_loc.IsValid || current_playing_loc.PlaylistIndex != g_active_playlist)) {
-                avoidShowNowPlaying = false;
+            if (name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid)
                 break;
-            }
+
+            if (current_playing_loc.PlaylistIndex > 0 && current_playing_loc.PlaylistIndex < plman.PlaylistCount)
+                plman.ActivePlaylist = current_playing_loc.PlaylistIndex;
 
             brw.setDisplayedPlaylistProperties(false);
             brw.showNowPlaying();
