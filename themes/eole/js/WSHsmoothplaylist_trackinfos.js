@@ -6606,17 +6606,26 @@ function on_notify_data(name, info) {
 		break;
         case "FocusOnNowPlayingForce":
         case "FocusOnNowPlaying":
-			if(window.IsVisible && !avoidShowNowPlaying && !(window.Name=="BottomPlaylist" && nowplayingplaylist_state.isActive() && name!="FocusOnNowPlayingForce")) {
-				brw.setDisplayedPlaylistProperties(false);
-				brw.showNowPlaying();
-				avoidShowNowPlaying = true;
-				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
-				timers.avoidShowNowPlaying = setTimeout(function() {
-					avoidShowNowPlaying = false;
-					clearTimeout(timers.avoidShowNowPlaying);
-					timers.avoidShowNowPlaying = false;
-				}, 500);
-			} else avoidShowNowPlaying = false;
+			if (!window.IsVisible && avoidShowNowPlaying) {
+                avoidShowNowPlaying = false;
+                break;
+            }
+            let current_playing_loc = plman.GetPlayingItemLocation();
+            if (name!="FocusOnNowPlayingForce" && window.Name == "BottomPlaylist" && (!nowplayingplaylist_state.isActive() || !current_playing_loc.IsValid || current_playing_loc.PlaylistIndex != g_active_playlist)) {
+                avoidShowNowPlaying = false;
+                break;
+            }
+
+            brw.setDisplayedPlaylistProperties(false);
+            brw.showNowPlaying();
+            avoidShowNowPlaying = true;
+            if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
+            timers.avoidShowNowPlaying = setTimeout(function() {
+                avoidShowNowPlaying = false;
+                clearTimeout(timers.avoidShowNowPlaying);
+                timers.avoidShowNowPlaying = false;
+            }, 500);
+
             break;
 		case"stopFlashNowPlaying":
 			stopFlashNowPlaying();
