@@ -6279,7 +6279,7 @@ var callback_items_removed=false;
 var callback_avoid_populate=false
 function on_playlist_items_added(playlist_idx) {
 	if(!callback_avoid_populate){
-		if(window.IsVisible) brw.setActivePlaylist(4);
+	//	if(window.IsVisible) brw.setActivePlaylist(4);
 		if(playlist_idx == g_active_playlist && !pman.drop_done) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
@@ -6295,7 +6295,7 @@ function on_playlist_items_added(playlist_idx) {
 
 function on_playlist_items_removed(playlist_idx, new_count) {
 	if(!callback_avoid_populate){
-		if(window.IsVisible) brw.setActivePlaylist(5);
+	//	if(window.IsVisible) brw.setActivePlaylist(5);
 		if(playlist_idx == g_active_playlist && new_count == 0) scroll = scroll_ = 0;
 		if(playlist_idx == g_active_playlist) {
 			g_focus_id = getFocusId(g_active_playlist);
