@@ -2,7 +2,7 @@ var properties_big = {
     ParentName:  window.GetProperty("BIG:ParentName", "MainPanel"),
     lockOnNowPlaying: window.GetProperty("BIG:lockOnNowPlaying", true),
     lockOnPlaylistNamed: window.GetProperty("BIG:lockOnPlaylistNamed", ""),
-    FollowNowPlaying: window.GetProperty("MINI:FollowNowPlaying", true),
+    FollowNowPlaying: window.GetProperty("BIG:FollowNowPlaying", true),
     defaultRowHeight: window.GetProperty("BIG:defaultRowHeight", 30),
     drawAlternateBG: window.GetProperty("BIG:drawAlternateBG", false),
     extraRowsNumber: window.GetProperty("BIG:extraRowsNumber", 1),
