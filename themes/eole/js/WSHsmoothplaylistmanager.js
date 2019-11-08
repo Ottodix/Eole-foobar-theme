@@ -1,29 +1,29 @@
 var properties = {
-	panelName: 'WSHsmoothplaylistmanager',			
+	panelName: 'WSHsmoothplaylistmanager',
     defaultRowHeight: window.GetProperty("PROPERTY: Row Height", 46),
-    enableDiskCache: window.GetProperty("COVER Disk Cache", true),		
+    enableDiskCache: window.GetProperty("COVER Disk Cache", true),
     rowHeight: window.GetProperty("PROPERTY: Row Height", 42),
     rowScrollStep: 3,
-    drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", true), 		
+    drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", true),
     scrollSmoothness: 3.0,
     refreshRate: 40,
     showHeaderBar: window.GetProperty("DISPLAY: Show Top Bar", false),
-    showNewPlaylistButton: window.GetProperty("DISPLAY: Show new playlist button", true),	
+    showNewPlaylistButton: window.GetProperty("DISPLAY: Show new playlist button", true),
     defaultHeaderBarHeight: 40,
     headerBarHeight: 40,
-    headerBarPaddingTop: 0,		
-    paddingTopDefault: 45,	
+    headerBarPaddingTop: 0,
+    paddingTopDefault: 45,
     showFilterBox: window.GetProperty("PROPERTY: Enable Playlist Filterbox in Top Bar", true),
     drawUpAndDownScrollbar: window.GetProperty("PROPERTY: Draw Up and Down Scrollbar Buttons", false),
-    drawItemsCounter: window.GetProperty("PROPERTY: Show numbers of items", true),			
-	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),	    
-	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),	
+    drawItemsCounter: window.GetProperty("PROPERTY: Show numbers of items", true),
+	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
+	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
-    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
-    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),		
+    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
+    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
     enableTouchControl: window.GetProperty("PROPERTY: Touch control", false),
-    enableCustomColors: window.GetProperty("CUSTOM COLOR: enable", true),	
+    enableCustomColors: window.GetProperty("CUSTOM COLOR: enable", true),
 	customColorTextNormal: window.GetProperty("CUSTOM COLOR: text normal", "0-0-0"),
 	customColorTextSelected: window.GetProperty("CUSTOM COLOR: text selected", "0-0-0"),
 	customColorBgNormal: window.GetProperty("CUSTOM COLOR: background normal", "250-250-250"),
@@ -31,11 +31,11 @@ var properties = {
 	customColorHightlight: window.GetProperty("CUSTOM COLOR: highlight", "235-235-235"),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
-	panelFontAdjustement: -1,	
-	emphasisOnActive: false,		
+	panelFontAdjustement: -1,
+	emphasisOnActive: false,
 };
 var cover = {
-    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),	
+    nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
 };
 
@@ -69,7 +69,7 @@ cTouch = {
     y_prev: 0,
     y_move: 0,
     scroll_delta: 0,
-    t1: null, 
+    t1: null,
     timer: false,
     multiplier: 0,
     delta: 0
@@ -131,7 +131,7 @@ function renamePlaylist() {
     };
     brw.inputboxID = -1;
 };
-function CreatePlaylist(pl_place, pl_name){      
+function CreatePlaylist(pl_place, pl_name){
 	try {
 		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Playlist", "New Playlist", true);
 		if (result){
@@ -140,28 +140,28 @@ function CreatePlaylist(pl_place, pl_name){
 			} else plman.CreatePlaylist(pl_place, result);
 			//on_playlist_switch();
 			return true;
-		} else return false;			   
+		} else return false;
 	} catch(e) {
-	}	
+	}
 }
-function CreateAutoPlaylist(pl_place, pl_name, query){    
+function CreateAutoPlaylist(pl_place, pl_name, query){
 	try {
 		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Autoplaylist", "New Autoplaylist", true);
 		if (result){
 			if (result == "") {
 				plman.CreateAutoPlaylist(pl_place, "New Autoplaylist", query);
 			} else plman.CreateAutoPlaylist(pl_place, result, query);
-			on_playlist_switch();	
-			plman.ShowAutoPlaylistUI(plman.PlaylistCount-1);			
+			on_playlist_switch();
+			plman.ShowAutoPlaylistUI(plman.PlaylistCount-1);
 		}
 	} catch(e) {
-	}	  
+	}
 }
 
 function DeletePlaylist(delete_pid){
 	this.delete_pid = delete_pid;
     var parent = this;
-	
+
 	function delete_confirmation(status, confirmed) {
 		if(confirmed){
 			if(plman.ActivePlaylist == parent.delete_pid){
@@ -188,13 +188,13 @@ function DeletePlaylist(delete_pid){
 				} else if(row > 0) {
 					plman.ActivePlaylist = parent.delete_pid - 1;
 				};
-			};  	
-		}		
-	}	
-	parsed_tabname = plman.GetPlaylistName(delete_pid);		
-	HtmlDialog("Delete this playlist", "Delete the playlist '"+parsed_tabname+"' ?", 'Yes', 'No', delete_confirmation);	
+			};
+		}
+	}
+	parsed_tabname = plman.GetPlaylistName(delete_pid);
+	HtmlDialog("Delete this playlist", "Delete the playlist '"+parsed_tabname+"' ?", 'Yes', 'No', delete_confirmation);
 }
-/* 
+/*
 ===================================================================================================
     Objects
 ===================================================================================================
@@ -223,13 +223,13 @@ oPlaylist = function(idx, rowId, name) {
 		else this.item_count = 0;
 	} catch(e){
 		this.item_count = 0;
-	}	
+	}
 	this.update_count = function() {
-		this.item_count = plman.PlaylistItemCount(idx);			
+		this.item_count = plman.PlaylistItemCount(idx);
 	}
 	this.setIcon = function() {
 		this.icon = playlistName2icon(this.name, this.isAutoPlaylist, images);
-		this.icon_inverse = playlistName2icon(this.name, this.isAutoPlaylist, images_inverse);		
+		this.icon_inverse = playlistName2icon(this.name, this.isAutoPlaylist, images_inverse);
 	}
 	this.setIcon();
 };
@@ -244,14 +244,14 @@ oFilterBox = function() {
     this.getImages = function() {
 		var gb;
         var w = Math.round(18 * g_zoom_percent / 100);
-        
+
 		if(properties.darklayout){
-			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\white\\search_icon.png");	
+			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\white\\search_icon.png");
 		} else {
-			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\search_icon.png");			
+			this.images.search_icon = gdi.Image(theme_img_path + "\\icons\\search_icon.png");
 		}
 		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter playlists");
-		
+
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
             gb.SetSmoothingMode(2);
@@ -279,7 +279,7 @@ oFilterBox = function() {
         this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt","Reset filter");
 	};
 	this.getImages();
-    
+
 	this.on_init = function() {
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Playlists...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
@@ -305,7 +305,7 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-    
+
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
@@ -313,18 +313,18 @@ oFilterBox = function() {
         if(this.inputbox.text.length > 0) {
             this.reset_bt.draw(gr, bx+2, by+1, 255);
         } else {
-			this.search_bt.draw(gr, bx, by-2, 255);			
+			this.search_bt.draw(gr, bx, by-2, 255);
 			//gr.DrawImage(this.images.search_icon, bx, by+Math.round(this.inputbox.h/2-this.images.search_icon.Height/2), this.images.search_icon.Width, this.images.search_icon.Height, 0, 0, this.images.search_icon.Width, this.images.search_icon.Height, 0, 255);
         };
 		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+7, by, 0, 0);
     };
-    
+
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
 				this.inputbox.check("down", x, y);
                 if(this.inputbox.text.length > 0) this.reset_bt.checkstate("down", x, y);
-				else this.search_bt.checkstate("down", x, y);				
+				else this.search_bt.checkstate("down", x, y);
                 break;
             case "lbtn_up":
                 if(this.inputbox.text.length > 0) {
@@ -337,9 +337,9 @@ oFilterBox = function() {
 					if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 						this.inputbox.activate(x,y);
 						this.inputbox.repaint();
-					};					
+					};
 				}
-				this.inputbox.check("up", x, y);				
+				this.inputbox.check("up", x, y);
                 break;
             case "lbtn_dblclk":
 				this.inputbox.check("dblclk", x, y);
@@ -354,7 +354,7 @@ oFilterBox = function() {
                 break;
         };
     };
-    
+
     this.on_key = function(event, vkey) {
         switch(event) {
             case "down":
@@ -362,11 +362,11 @@ oFilterBox = function() {
                 break;
         };
     };
-    
+
     this.on_char = function(code) {
         this.inputbox.on_char(code);
     };
-    
+
 	this.on_focus = function(is_focused) {
 		this.inputbox.on_focus(is_focused);
 	};
@@ -382,16 +382,16 @@ oScrollbar = function(themed) {
     this.cursorDrag = false;
     this.color_bg = colors.lightgrey_bg;
     this.color_txt = colors.normal_txt;
-    
+
     if(this.themed) {
         this.theme = window.CreateThemeManager("scrollbar");
     } else {
         this.theme = false;
     };
-    
+
     this.setNewColors = function() {
         this.color_bg = colors.lightgrey_bg;
-        this.color_txt = colors.normal_txt;  
+        this.color_txt = colors.normal_txt;
         this.setButtons();
         this.setCursorButton();
     };
@@ -504,7 +504,7 @@ oScrollbar = function(themed) {
             DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, colors.normal_txt, blendColors(this.color_txt, this.color_bg, 0.05), 180, 255);
         };
         this.downImage_down.ReleaseGraphics(gb);
-        
+
         for(i = 1; i < this.buttons.length; i++) {
             switch(i) {
             case this.buttonType.cursor:
@@ -525,10 +525,10 @@ oScrollbar = function(themed) {
         this.cursorImage_normal = gdi.CreateImage(this.cursorw, this.cursorh);
         var gb = this.cursorImage_normal.GetGraphics();
 		//gb.FillSolidRect(1, 0, this.cursorw-2, this.cursorh, blendColors(this.color_txt, this.color_bg, 0.5) & 0x88ffffff);
-		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);		
+		//gb.DrawRect(1, 0, this.cursorw-2 - 1, this.cursorh - 1, 1.0, this.color_txt & 0x44ffffff);
 		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);
         this.cursorImage_normal.ReleaseGraphics(gb);
-        
+
         // hover cursor Image
         this.cursorImage_hover = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_hover.GetGraphics();
@@ -550,7 +550,7 @@ oScrollbar = function(themed) {
 			gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,colors.scrollbar_hover_cursor);
         };
         this.cursorImage_hover.ReleaseGraphics(gb);
-		
+
         // down cursor Image
         this.cursorImage_down = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_down.GetGraphics();
@@ -572,13 +572,13 @@ oScrollbar = function(themed) {
 			gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,colors.scrollbar_down_cursor);
         };
         this.cursorImage_down.ReleaseGraphics(gb);
-		
+
         // create/refresh cursor Button in buttons array
         this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
         this.buttons[this.buttonType.cursor].x = this.x;
         this.buttons[this.buttonType.cursor].y = this.cursory;
     };
-    
+
     this.draw = function(gr) {
         // scrollbar background
         if(this.themed) {
@@ -600,7 +600,7 @@ oScrollbar = function(themed) {
             this.buttons[this.buttonType.down].draw(gr, this.x, this.areay + this.areah, 255);
         };
     };
-       
+
     this.updateScrollbar = function() {
         var prev_cursorh = this.cursorh;
         this.total = (brw.rowsCount+properties.addedRows_end);
@@ -613,7 +613,7 @@ oScrollbar = function(themed) {
         if(this.total > 0) {
             this.cursorh = Math.round((brw.h / this.totalh) * this.areah);
             if(this.cursorh < cScrollBar.minCursorHeight) this.cursorh = cScrollBar.minCursorHeight;
-			if(this.cursorh > cScrollBar.maxCursorHeight) this.cursorh = cScrollBar.maxCursorHeight;			
+			if(this.cursorh > cScrollBar.maxCursorHeight) this.cursorh = cScrollBar.maxCursorHeight;
         } else {
             this.cursorh = cScrollBar.minCursorHeight;
         };
@@ -621,16 +621,16 @@ oScrollbar = function(themed) {
         this.setCursorY();
         if(this.cursorh != prev_cursorh) this.setCursorButton();
     };
-    
+
     this.setCursorY = function() {
         // set cursor y pos
         var ratio = scroll / (this.totalh - brw.h);
         this.cursory = this.areay + Math.round((this.areah - this.cursorh) * ratio);
     };
-    
+
     this.setSize = function() {
         if(properties.drawUpAndDownScrollbar) this.buttonh = cScrollBar.width;
-		else this.buttonh = 0;		
+		else this.buttonh = 0;
         this.x = brw.x + brw.w-cScrollBar.activeWidth;
         this.y = brw.y - properties.headerBarHeight*0;
         this.w = cScrollBar.activeWidth;
@@ -644,7 +644,7 @@ oScrollbar = function(themed) {
         };
         this.setButtons();
     };
-    
+
     this.setScrollFromCursorPos = function() {
         // calc ratio of the scroll cursor to calc the equivalent item for the full list (with gh)
         var ratio = (this.cursory - this.areay) / (this.areah - this.cursorh);
@@ -700,7 +700,7 @@ oScrollbar = function(themed) {
 			break;
         };
     };
-    
+
     this._isHover = function(x, y) {
         return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
     };
@@ -719,7 +719,7 @@ oScrollbar = function(themed) {
         this.isHoverCursor = this._isHoverCursor(x, y);
         this.isHoverButtons = this.isHover && !this.isHoverCursor && !this.isHoverArea;
         this.isHoverEmptyArea = this.isHoverArea && !this.isHoverCursor;
-        
+
         var scroll_step = properties.rowHeight;
         var scroll_step_page = brw.h;
 
@@ -728,7 +728,7 @@ oScrollbar = function(themed) {
             case "dblclk":
                 if((this.isHoverCursor || this.cursorDrag) && !this.buttonClick && !this.isHoverEmptyArea) {
                     this.cursorCheck(event, x, y);
-                } else {					
+                } else {
                     // buttons events
                     var bt_state = ButtonStates.normal;
                     for(var i = 1; i < 3; i++) {
@@ -814,14 +814,14 @@ oScrollbar = function(themed) {
                     cScrollBar.timerID = false;
                 };
                 cScrollBar.timerCounter = -1;
-                
+
                 this.cursorCheck(event, x, y);
                 for(var i = 1; i < 3; i++) {
                     this.buttons[i].checkstate(event, x, y);
                 };
                 this.buttonClick = false;
                 break;
-            case "move":			
+            case "move":
                 this.cursorCheck(event, x, y);
                 for(var i = 1; i < 3; i++) {
                     this.buttons[i].checkstate(event, x, y);
@@ -853,8 +853,8 @@ oBrowser = function(name) {
     this.inputboxID = -1;
     this.selectedRow = plman.ActivePlaylist;
 	this.playing_icon_x = 0;
-	this.playing_icon_y = 0;	
-	this.playing_icon_w = 0;		
+	this.playing_icon_y = 0;
+	this.playing_icon_w = 0;
 	this.playing_icon_h = 0;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
@@ -863,43 +863,43 @@ oBrowser = function(name) {
             launch_timer = false;
         }, 50);
     };
-    
+
     this.repaint = function() {
         if(!window.IsVisible) return;
         repaint_main1 = repaint_main2;
     };
-    
+
     this.setSize = function(x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.marginLR = 0;
-        this.paddingLeft = 8;		
-        this.paddingRight = 12;			
+        this.paddingLeft = 8;
+        this.paddingRight = 12;
         this.totalRows = Math.ceil(this.h / properties.rowHeight);
         this.totalRowsVis = Math.floor(this.h / properties.rowHeight);
-        
+
         this.getlimits();
-        
+
         g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
-        
+
         if(this.inputboxID > -1) {
             var rh = properties.rowHeight - 10;
             var tw = this.w - rh - 10;
             this.inputbox && this.inputbox.setSize(tw, rh, g_fsize+1);
         };
-        
+
         this.scrollbar.setSize();
-       
+
         scroll = Math.round(scroll / properties.rowHeight) * properties.rowHeight;
         scroll = check_scroll(scroll);
         scroll_ = scroll;
-        
-        // scrollbar update       
+
+        // scrollbar update
         this.scrollbar.updateScrollbar();
     };
-          
+
     this.init_groups = function() {
         var rowId = 0;
         var name = "";
@@ -907,21 +907,21 @@ oBrowser = function(name) {
         this.previous_playlistCount = total;
 		this.rows.splice(0, this.rows.length);
         var str_filter = process_string(filter_text);
-		
+
 		// draw Create playlist Button
 		 if(properties.showNewPlaylistButton) {
 			this.rows.push(new oPlaylist(-1, rowId, "Create Playlist"));
 			rowId++;
 		 }
-		
+
 		for(var i = 0; i < total; i++) {
 			name = plman.GetPlaylistName(i);
 			if(ExcludePlaylist(name)){
-				var toAdd = false;  
+				var toAdd = false;
 			} else if(str_filter.length > 0) {
 				var toAdd = match(name, str_filter);
 			} else {
-				var toAdd = true;  
+				var toAdd = true;
 			};
 			if(toAdd) {
 				this.rows.push(new oPlaylist(i, rowId, name));
@@ -948,9 +948,9 @@ oBrowser = function(name) {
         g_start_ = start_;
         g_end_ = end_;
     };
-      
+
     this.populate = function(is_first_populate, call_id, reset_scroll) {
-		console.log("--> populate smoothPlaylistManager call_id:"+call_id)				
+		console.log("--> populate smoothPlaylistManager call_id:"+call_id)
         this.init_groups();
         if(reset_scroll) scroll = scroll_ = 0;
         this.scrollbar.updateScrollbar();
@@ -958,7 +958,7 @@ oBrowser = function(name) {
         g_first_populate_done = true;
 		Update_Required_function = "";
     };
-       
+
     this.getRowIdFromIdx = function(idx) {
         var total = this.rows.length;
         var rowId = -1;
@@ -984,13 +984,13 @@ oBrowser = function(name) {
         if(offset_active_pl < scroll || offset_active_pl + properties.rowHeight > scroll + this.h) {
             return false;
         } else {
-            return true;  
+            return true;
         };
     };
-    
+
     this.showSelectedPlaylist = function() {
         var rowId = this.getRowIdFromIdx(brw.selectedRow);
-        
+
         if(!this.isVisiblePlaylist(brw.selectedRow)) {
             scroll = (rowId - Math.floor(this.totalRowsVis / 2)) * properties.rowHeight;
             scroll = check_scroll(scroll);
@@ -1000,7 +1000,7 @@ oBrowser = function(name) {
 
     this.showActivePlaylist = function() {
         var rowId = this.getRowIdFromIdx(plman.ActivePlaylist);
-        
+
         if(!this.isVisiblePlaylist(plman.ActivePlaylist)) {
             scroll = (rowId - Math.floor(this.totalRowsVis / 2)) * properties.rowHeight;
             scroll = check_scroll(scroll);
@@ -1012,58 +1012,58 @@ oBrowser = function(name) {
 		this.PlayingPlaylist = this.getRowIdFromIdx(plman.PlayingPlaylist);
 	}
     this.draw = function(gr) {
-        
+
         if(cPlaylistManager.playlist_switch_pending) {
             g_cursor.setCursor(IDC_ARROW,39);
             cPlaylistManager.playlist_switch_pending = false;
         };
-        
+
         if(repaint_main || !repaintforced){
             repaint_main = false;
             repaintforced = false;
-            						
+
 			var ax = this.marginLR;
 			var ay = 0;
 			var aw = this.w;
 			var ah = properties.rowHeight;
-			var g = 0;			
+			var g = 0;
 			gr.SetTextRenderingHint(globalProperties.TextRendering);
-			
+
             if(this.rows.length > 0) {
-				headerBarFix = (properties.showHeaderBar)?1:0;            
+				headerBarFix = (properties.showHeaderBar)?1:0;
                 for(var i = g_start_;i <= g_end_;i++){
                     var is_active = false;
                     ay = Math.floor(this.y + (i * ah) - scroll_);
                     this.rows[i].x = ax;
                     this.rows[i].y = ay;
-					if(ay > this.y - properties.headerBarHeight - ah && ay < this.y + this.h) {						
+					if(ay > this.y - properties.headerBarHeight - ah && ay < this.y + this.h) {
                         // =========
                         // row bg
                         // =========
 						if(i % 2 == 0 && properties.drawAlternateBG && !(this.rows[i].idx == plman.ActivePlaylist)) {
 							gr.FillSolidRect(ax, ay, aw, ah, colors.alternate_row);
 						};
-						
+
                         // active playlist row bg
                         if(this.rows[i].idx == plman.ActivePlaylist || (i==g_rightClickedIndex && g_rightClickedIndex > -1)) {
                             gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);
 							//top
 							if(i>0 ){
-							gr.FillSolidRect(ax, ay, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);	
-							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);				
+							gr.FillSolidRect(ax, ay, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
+							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
 							}
 							//bottom
 							gr.FillSolidRect(ax, ay+ah-1, aw-1-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
-							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);	
-							
+							if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient-1, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
+
 							is_active = true;
-                        }; 
-						
+                        };
+
                         // hover item
                         if((((g_rightClickedIndex > -1 && g_rightClickedIndex == i) || i == this.activeRow) && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover) && !g_dragndrop_status && !(cPlaylistManager.drag_clicked && cPlaylistManager.drag_source_id!=i)) ||  (cPlaylistManager.drag_clicked && cPlaylistManager.drag_source_id==i && !g_dragndrop_status)) {
-							gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
+							gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);
                         };
-                        
+
                         // target location mark
                         if(cPlaylistManager.drag_target_id == i) {
                             if(cPlaylistManager.drag_target_id > cPlaylistManager.drag_source_id) {
@@ -1072,48 +1072,48 @@ oBrowser = function(name) {
                                 gr.FillSolidRect(ax, ay + 1, aw-1, 2, colors.dragdrop_marker_line);
                             };
                         };
-                        
+
                         if(g_dragndrop_status && i == g_dragndrop_targetPlaylistId) {
 							if(!this.rows[i].isAutoPlaylist){
 								gr.FillSolidRect(ax, ay, aw, ah, colors.dragdrop_bg_selected_item);
 								//top
-								gr.FillSolidRect(ax, ay, aw, 1, colors.dragdrop_line_selected_item);	
+								gr.FillSolidRect(ax, ay, aw, 1, colors.dragdrop_line_selected_item);
 								//bottom
-								gr.FillSolidRect(ax, ay+ah-1, aw, 1, colors.dragdrop_line_selected_item);		
+								gr.FillSolidRect(ax, ay+ah-1, aw, 1, colors.dragdrop_line_selected_item);
 							} else {
 								gr.FillSolidRect(ax, ay, aw, ah, colors.dragdrop_disabled_item);
-							}								
+							}
                         }
-                        
+
                         // draw blink rectangle after an external drag'n drop files
                         if(blink.counter > -1) {
                             if(i == blink.id && !this.rows[i].isAutoPlaylist) {
                                 if(blink.counter <= 7 && blink.counter % 2 == 0) {
 									gr.FillSolidRect(ax, ay, aw, ah, colors.dragdrop_bg_selected_item);
-									gr.FillSolidRect(ax, ay, aw, 1, colors.dragdrop_line_selected_item);	
-									gr.FillSolidRect(ax, ay+ah-1, aw, 1, colors.dragdrop_line_selected_item);		
+									gr.FillSolidRect(ax, ay, aw, 1, colors.dragdrop_line_selected_item);
+									gr.FillSolidRect(ax, ay+ah-1, aw, 1, colors.dragdrop_line_selected_item);
                                 };
                             };
                         };
-                        
+
                         // =====
                         // text
                         // =====
-                        if(ay >= (0 - ah) && ay < this.y + this.h) {     
-	
+                        if(ay >= (0 - ah) && ay < this.y + this.h) {
+
 							if(fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist && this.rows[i].idx>=0) {
                                 var font = g_font.boldplus1;
-								if(is_active && properties.emphasisOnActive)								
-									var playlist_icon = (g_seconds%2==0)?images_inverse.now_playing_0:images_inverse.now_playing_1;	
+								if(is_active && properties.emphasisOnActive)
+									var playlist_icon = (g_seconds%2==0)?images_inverse.now_playing_0:images_inverse.now_playing_1;
 								else
-									var playlist_icon = (g_seconds%2==0)?images.now_playing_0:images.now_playing_1;	
+									var playlist_icon = (g_seconds%2==0)?images.now_playing_0:images.now_playing_1;
 								icon_x = ax+this.paddingLeft+1;
-								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-2;	
-								icon_w = playlist_icon.Width;		
-								icon_h = playlist_icon.Height;	
+								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-2;
+								icon_w = playlist_icon.Width;
+								icon_h = playlist_icon.Height;
 								this.playing_icon_x = icon_x;
-								this.playing_icon_y = icon_y;	
-								this.playing_icon_w = icon_w;		
+								this.playing_icon_y = icon_y;
+								this.playing_icon_w = icon_w;
 								this.playing_icon_h = icon_h;
                             } else {
                                 var font = g_font.plus1;
@@ -1122,11 +1122,11 @@ oBrowser = function(name) {
 								else
 									var playlist_icon = this.rows[i].icon;
 								icon_x = ax+this.paddingLeft;
-								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-1;	
-								icon_w = playlist_icon.Width;		
-								icon_h = playlist_icon.Height;									
+								icon_y = ay+Math.round(ah/2-playlist_icon.Height/2)-1;
+								icon_w = playlist_icon.Width;
+								icon_h = playlist_icon.Height;
                             };
-							
+
                             // playlist icon
 							if(properties.showPlaylistIcons){
 								if(is_active && properties.emphasisOnActive) {
@@ -1139,18 +1139,18 @@ oBrowser = function(name) {
                             // fields
                             var track_name_part = this.rows[i].name;
                             var track_total_part = this.rows[i].item_count;
-                            
+
                             cColumns.track_name_part = gr.CalcTextWidth(track_name_part, font) + 15;
 							if(properties.drawItemsCounter && this.rows[i].idx !=-1)
 								cColumns.track_total_part = gr.CalcTextWidth(track_total_part, font);
 							else cColumns.track_total_part = 0;
-							
+
 							if(is_active && properties.emphasisOnActive)
 								var tx = ax + rh + this.paddingLeft + 10;
                             else
 								var tx = ax + rh + this.paddingLeft + 4;
 							var tw = aw;
-                            
+
                             if(this.inputboxID == i) {
                                 this.inputbox.draw(gr, tx+2, ay+5);
                             } else {
@@ -1161,38 +1161,38 @@ oBrowser = function(name) {
                         };
                     };
                 };
-			} 
+			}
 			if((properties.showNewPlaylistButton && this.rows.length <= 1) || (!properties.showNewPlaylistButton && this.rows.length == 0)) {
 				if(g_first_populate_done){ // no playlist, manager panel is empty
 						var px = 0;
-						var line_width = Math.min(150,Math.round(this.w-40));					
+						var line_width = Math.min(150,Math.round(this.w-40));
 						var py = this.y + properties.rowHeight + Math.round(this.h  / 2)-1 - wh * 0.1;
 						if(g_filterbox.inputbox.text!='') {
 							var text1 = "No items";
-							var text2 = "matching";											
+							var text2 = "matching";
 						} else {
 							var text1 = "";
-							var text2 = "Nothing seleted";											
+							var text2 = "Nothing seleted";
 						}
 						if(text1!='') {
 							gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 							gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						} else {
-							gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);						
+							gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						}
 				} else { // no track, playlist is empty
 						var px = 0;
 						var line_width = Math.min(150,Math.round(this.w-40));
 						var py = this.y + Math.round(this.h  / 2)-1;
 						gr.GdiDrawText("Loading...", g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);						
+						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 						gr.GdiDrawText("Playlists manager", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 				}
 			}
 			// draw bottom gradient
-			gr.FillGradRect(0, wh-colors.fading_bottom_height+2, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);				 
-			 
+			gr.FillGradRect(0, wh-colors.fading_bottom_height+2, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);
+
             // draw header
             if(properties.showHeaderBar) {
                 if(globalProperties.fontAdjustement>=globalProperties.fontAdjustement_max-2) var boxText = this.rows.length;
@@ -1200,12 +1200,12 @@ oBrowser = function(name) {
 
                 gr.FillSolidRect(this.x, 0, this.w - this.x -1, properties.headerBarHeight, colors.headerbar_bg);
                 gr.FillSolidRect(this.x, properties.headerBarHeight, this.w - this.x -1, 1, colors.headerbar_line);
-				
+
 				if(g_filterbox.inputbox.text.length==0) {
 					if(g_filterbox.empty_txt_width < 0) g_filterbox.empty_txt_width = gr.CalcTextWidth(g_filterbox.inputbox.empty_text, g_filterbox.inputbox.font_empty);
 					var text_width = gr.CalcTextWidth(boxText,g_font.plus1)
 					var tx = cFilterBox.x + g_filterbox.empty_txt_width;
-					
+
 					var tw = this.w - tx - 12;
 					try {
 						gr.GdiDrawText(boxText, g_font.min1, colors.faded_txt, tx, properties.headerBarPaddingTop, tw, properties.headerBarHeight-properties.headerBarPaddingTop, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
@@ -1215,38 +1215,38 @@ oBrowser = function(name) {
 					if(g_filterbox.inputbox.visible) {
 						g_filterbox.draw(gr, cFilterBox.x, Math.round(properties.headerBarHeight/2-cFilterBox.h/2)-2);
 					};
-				};				
+				};
             };
-			
-			
+
+
 			// draw scrollbar
 			if(cScrollBar.enabled)  {
 				brw.scrollbar && brw.scrollbar.draw(gr);
-			};		
-			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);	 
-			else gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);			
-			
+			};
+			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);
+			else gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
+
         };
     };
-        
+
     this._isHover = function(x, y) {
         return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
     };
-	
+
     this.activateItem = function(index) {
         if(this.groups.length == 0) return;
         this.selectedIndex = index;
-    };    
-	
+    };
+
     this.on_mouse = function(event, x, y) {
         this.ishover = this._isHover(x, y);
 		this.is_hover_scrollbar = this.scrollbar._isHover(x, y);
         // get hover row index (mouse cursor hover)
-        this.activeRow = -1;	
+        this.activeRow = -1;
 		//isHoverCreatePlaylist = (y>properties.headerBarHeight && y<properties.headerBarHeight+properties.rowHeight && properties.showNewPlaylistButton);
-		if(this.ishover && !this.is_hover_scrollbar) {				 
+		if(this.ishover && !this.is_hover_scrollbar) {
 			if(y > this.y && y < this.y + this.h) {
-				this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);	
+				this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);
 				if(this.activeRow >= this.rows.length) this.activeRow = -1;
 			}
 		}
@@ -1254,31 +1254,31 @@ oBrowser = function(name) {
             brw.activeRowSaved = brw.activeRow;
 			//isHoverCreatePlaylistSaved = isHoverCreatePlaylist;
             this.repaint();
-        };                
+        };
 
         switch(event) {
             case "down":
 				this.down = true;
 				if(cScrollBar.enabled && cScrollBar.visible && this.scrollbar._isHover(x, y)) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-				} else {				
+				} else {
 					if(!cTouch.down && !timers.mouseDown && this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
 						window.NotifyOthers("g_avoid_on_focus_change",true);
 						this.selectedRow = this.activeRow;
-						if(properties.showNewPlaylistButton && this.rows[this.activeRow].idx ==-1 && !avoidDbleClick){						
+						if(properties.showNewPlaylistButton && this.rows[this.activeRow].idx ==-1 && !avoidDbleClick){
 							avoidDbleClick = true;
 							var total = plman.PlaylistCount;
 							if(CreatePlaylist(total, "")){
 								plman.MovePlaylist(total, total);
 								plman.ActivePlaylist = total;
 								brw.selectedRow = total;
-							}	
+							}
 							g_cursor.setCursor(IDC_ARROW,40);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
-							}, 200);						
-						}							
+							}, 200);
+						}
 						else if(plman.ActivePlaylist != this.rows[this.activeRow].idx) {
 							if(this.inputboxID > -1) this.inputboxID = -1;
 							this.repaint();
@@ -1300,18 +1300,18 @@ oBrowser = function(name) {
 						};
 						this.repaint();
 					} else {
-						/*if(isHoverCreatePlaylist && !avoidDbleClick){						
+						/*if(isHoverCreatePlaylist && !avoidDbleClick){
 							avoidDbleClick = true;
 							var total = plman.PlaylistCount;
 							if(CreatePlaylist(total, "")){
 								plman.MovePlaylist(total, total);
 								plman.ActivePlaylist = total;
-							}	
+							}
 							g_cursor.setCursor(IDC_ARROW,41);
 							avoidDbleClickTimer = setTimeout(function() {
 								clearTimeout(avoidDbleClickTimer);
 								avoidDbleClick = false;
-							}, 200);						
+							}, 200);
 						}	*/
 						if(this.inputboxID > -1) this.inputboxID = -1;
 						// scrollbar
@@ -1329,7 +1329,7 @@ oBrowser = function(name) {
                     if(cScrollBar.enabled && cScrollBar.visible) {
                         brw.scrollbar && brw.scrollbar.on_mouse(event, x, y);
                     };
-                    
+
                     if(this.inputboxID >= 0) {
                         this.inputbox.check("up", x, y);
                     } else {
@@ -1346,17 +1346,17 @@ oBrowser = function(name) {
                             this.selectedRow = cPlaylistManager.drag_target_id;
                         };
                     };
-                    
+
                     if(timers.movePlaylist) {
                         timers.movePlaylist && window.ClearInterval(timers.movePlaylist);
                         timers.movePlaylist = false;
                     };
                 };
-                
+
                 this.down = false;
-                
+
                 if(cPlaylistManager.drag_moved) g_cursor.setCursor(IDC_ARROW,42);
-                
+
                 cPlaylistManager.drag_clicked = false;
                 cPlaylistManager.drag_moved = false;
                 cPlaylistManager.drag_source_id = -1;
@@ -1365,7 +1365,7 @@ oBrowser = function(name) {
                 cPlaylistManager.drag_y = -1;
                 break;
             case "dblclk":  //browser dblclk
-			
+
                 if(this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
 					plman.ExecutePlaylistDefaultAction(this.rows[this.activeRow].idx,0);
                 } else {
@@ -1375,7 +1375,7 @@ oBrowser = function(name) {
                     } else {
 						var total = plman.PlaylistCount;
 						if(CreatePlaylist(total, "")){
-							plman.ActivePlaylist = total;	
+							plman.ActivePlaylist = total;
 							brw.selectedRow = total;
 						}
 						g_cursor.setCursor(IDC_ARROW,43);
@@ -1393,7 +1393,7 @@ oBrowser = function(name) {
                     };
                     if(cPlaylistManager.drag_moved) {
                         if(this.activeRow > -1) {
-							if(properties.showNewPlaylistButton && this.rows[this.activeRow].idx ==-1) this.activeRow=this.activeRow+1							
+							if(properties.showNewPlaylistButton && this.rows[this.activeRow].idx ==-1) this.activeRow=this.activeRow+1
                             if(timers.movePlaylist) {
                                 timers.movePlaylist && window.ClearInterval(timers.movePlaylist);
                                 timers.movePlaylist = false;
@@ -1406,8 +1406,8 @@ oBrowser = function(name) {
                                 cPlaylistManager.drag_target_id = this.rowsCount;
                             } else {
                                 cPlaylistManager.drag_target_id = -1;
-                            };						
-                        } else {						
+                            };
+                        } else {
                             if(y < this.y) {
                                 if(!timers.movePlaylist) {
                                     timers.movePlaylist = setInterval(function() {
@@ -1416,7 +1416,7 @@ oBrowser = function(name) {
 										if(properties.showNewPlaylistButton)
 											cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > 1 ? cPlaylistManager.drag_target_id - 1 : 1;
 										else
-											cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > 0 ? cPlaylistManager.drag_target_id - 1 : 0;											
+											cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > 0 ? cPlaylistManager.drag_target_id - 1 : 0;
                                     }, 100);
                                 }
                             } else if (y > this.y + this.h) {
@@ -1449,7 +1449,7 @@ oBrowser = function(name) {
                         this.inputbox.check("right", x, y);
                     };
                 } else {
-				
+
                     if(this.ishover) {
                         if(this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
                             if(!utils.IsKeyPressed(VK_SHIFT)) {
@@ -1495,7 +1495,7 @@ oBrowser = function(name) {
 				if(timers.movePlaylist) {
 					timers.movePlaylist && window.ClearInterval(timers.movePlaylist);
 					timers.movePlaylist = false;
-				}			
+				}
                 if(this.rows.length > 0) {
                     if(y > brw.y) {
                         if(this.activeRow > -1) {
@@ -1514,7 +1514,7 @@ oBrowser = function(name) {
 							if(!timers.movePlaylist) {
 								timers.movePlaylist = setInterval(function() {
 									scroll -= properties.rowHeight;
-									scroll = check_scroll(scroll);										
+									scroll = check_scroll(scroll);
 								}, 100);
 							}
 						} else if (y > this.y + this.h-drag_scroll_zone_height) {
@@ -1524,7 +1524,7 @@ oBrowser = function(name) {
 									scroll = check_scroll(scroll);
 								}, 100);
 							}
-						};			
+						};
 					}
                 } else {
                     g_dragndrop_bottom = true;
@@ -1534,7 +1534,7 @@ oBrowser = function(name) {
                 break;
         }
     }
-    this.setRowHeight = function(step){	
+    this.setRowHeight = function(step){
 		var zoomStep = 1;
 		var previous = properties.defaultRowHeight;
 		step = step*-1;
@@ -1568,33 +1568,33 @@ oBrowser = function(name) {
 		this.g_time = setInterval(function() {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
-			try{				
+			try{
 				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
 					brw.startTimer();
-				}	
-			}catch(e){}							
+				}
+			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);	
+		}, properties.refreshRate);
 	}
     this.timerScript = function() {
-		
+
         if(!window.IsVisible) {
             window_visible = false;
             return;
         };
         var repaint_1 = false;
 
-		
+
         if(!window_visible){
             window_visible = true;
         };
-        
+
         if(!g_first_populate_launched) {
             g_first_populate_launched = true;
             brw.launch_populate();
         };
-        		
-		
+
+
         // get hover row index (mouse cursor hover)
         /* if(g_cursor.y > brw.y && g_cursor.y < brw.y + brw.h) {
             brw.activeRow = Math.ceil((g_cursor.y + scroll_ - brw.y ) / properties.rowHeight - 1);
@@ -1629,7 +1629,7 @@ oBrowser = function(name) {
             repaint_main = true;
             window.Repaint();
         };
-        
+
         scroll_prev = scroll;
     }
 
@@ -1645,11 +1645,11 @@ oBrowser = function(name) {
         var add_mode = (id == null || id < 0 || (this.rows[id] && this.rows[id].idx<0));
         var total = plman.PlaylistCount;
 
-		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");	
-		_menu.AppendMenuSeparator();		
-		
+		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
+		_menu.AppendMenuSeparator();
+
         if(!add_mode) {
-            var pl_idx = this.rows[id].idx; 
+            var pl_idx = this.rows[id].idx;
             _newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "Insert ...");
         } else {
             id = this.rowsCount;
@@ -1661,10 +1661,10 @@ oBrowser = function(name) {
         _autoplaylist.AppendTo(_newplaylist, MF_STRING, "Preset Playlists");
         //_autoplaylist.AppendMenuItem(MF_STRING, 200, "Media Library (full)");
         _autoplaylist.AppendMenuItem(MF_STRING, 205, "History (tracks played in the last weeks)");
-        _autoplaylist.AppendMenuItem(MF_STRING, 206, "Most Played tracks");    
-        _autoplaylist.AppendMenuItem(MF_STRING, 207, "Top Rated tracks");   		
+        _autoplaylist.AppendMenuItem(MF_STRING, 206, "Most Played tracks");
+        _autoplaylist.AppendMenuItem(MF_STRING, 207, "Top Rated tracks");
         _autoplaylist.AppendMenuItem(MF_STRING, 210, "Newly added tracks");
-		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");		
+		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
         _autoplaylist.AppendMenuItem(MF_STRING, 211, "Radios");
         _autoplaylist.AppendMenuItem(MF_STRING, 212, "External Files");
         _autoplaylist.AppendMenuItem(MF_STRING, 213, "Podcasts");
@@ -1688,21 +1688,21 @@ oBrowser = function(name) {
             };
 
         };
-	
+
         idx = _menu.TrackPopupMenu(x, y);
 
         switch (true) {
 		case (idx==1):
 			//window.ShowProperties();
 			this.settings_context_menu(x, y);
-			break;	
+			break;
         case (idx==100):
 			if(CreatePlaylist(total, "")){
 				plman.MovePlaylist(total, pl_idx);
 				plman.ActivePlaylist = pl_idx;
 				brw.selectedRow = total;
-			}	
-			g_cursor.setCursor(IDC_ARROW,44);				
+			}
+			g_cursor.setCursor(IDC_ARROW,44);
             this.repaint();
             break;
         case (idx==101):
@@ -1712,11 +1712,11 @@ oBrowser = function(name) {
 			var new_label = plman.GetPlaylistName(total);
 			plman.RemovePlaylist(total);
             g_avoid_on_playlists_changed = false;
-			
+
 			if(CreateAutoPlaylist(total, new_label, "enter your query here")){
 				plman.MovePlaylist(total, pl_idx);
 				plman.ActivePlaylist = pl_idx;
-			}						
+			}
 			g_cursor.setCursor(IDC_ARROW,45);
             this.repaint();
             break;
@@ -1730,9 +1730,9 @@ oBrowser = function(name) {
 				if (playlistname.length > 1 || (playlistname.length == 1 && (playlistname >= "a" && playlistname <= "z") || (playlistname >= "A" && playlistname <= "Z") || (playlistname >= "0" && playlistname <= "9"))) {
 					plman.RenamePlaylist(pl_idx, playlistname);
 					window.Repaint();
-				}	
+				}
 			} catch(e) {
-			}			
+			}
             this.repaint();
             break;
         case (idx==4):
@@ -1784,56 +1784,56 @@ oBrowser = function(name) {
             //p.playlistManager.inputboxID = -1;
             plman.CreateAutoPlaylist(total, "Media Library", "ALL", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 0);
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==205):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
             plman.CreateAutoPlaylist(total, "History", "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "",1);
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==206):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
             plman.CreateAutoPlaylist(total, "Most Played", "%play_count% GREATER 2 SORT DESCENDING BY %play_count%", "", 1);
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==207):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "Top Rated", "%rating% GREATER 1 SORT DESCENDING BY %rating%", "", 1);
+            plman.CreateAutoPlaylist(total, "Top Rated", (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 1 SORT DESCENDING BY " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%"), "", 1);
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
-            break;			
+            plman.ActivePlaylist = pl_idx;
+            break;
         case (idx==210):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
             plman.CreateAutoPlaylist(total, "Newly Added", "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "",1);
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==211):
             var total = plman.PlaylistCount;
             //brw.inputboxID = -1;
             plman.CreatePlaylist(total, "Radios");
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==212):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
             plman.CreatePlaylist(total, "External Files");
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==213):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
             plman.CreatePlaylist(total, "Podcasts");
             plman.MovePlaylist(total, pl_idx);
-            plman.ActivePlaylist = pl_idx;  
+            plman.ActivePlaylist = pl_idx;
             break;
         case (idx==250):
             var total = plman.PlaylistCount;
@@ -1844,118 +1844,118 @@ oBrowser = function(name) {
             break;
         };
         _autoplaylist = undefined;
-        _newplaylist = undefined;    
+        _newplaylist = undefined;
 		_menu = undefined;
         g_rbtn_click = false;
         brw.repaint();
 		return true;
 	};
-    
+
     this.settings_context_menu = function(x, y) {
         var _menu = window.CreatePopupMenu();
         var _menu1 = window.CreatePopupMenu();
         var _menu2 = window.CreatePopupMenu();
 		var _menu2A = window.CreatePopupMenu();
         var _menu3 = window.CreatePopupMenu();
-        var _rowHeight = window.CreatePopupMenu();		
-		
+        var _rowHeight = window.CreatePopupMenu();
+
         var idx;
-		
-        _menu.AppendMenuItem(MF_GRAYED, 0, "Display :");				
+
+        _menu.AppendMenuItem(MF_GRAYED, 0, "Display :");
         _menu.AppendMenuSeparator();
 
         _menu.AppendMenuItem(MF_STRING, 910, "Search bar");
-        _menu.CheckMenuItem(910, properties.showHeaderBar);           
+        _menu.CheckMenuItem(910, properties.showHeaderBar);
         _menu.AppendMenuItem(MF_STRING, 911, "Create Playlist Button");
-        _menu.CheckMenuItem(911, properties.showNewPlaylistButton);   		
-		
+        _menu.CheckMenuItem(911, properties.showNewPlaylistButton);
+
 		_menu.AppendMenuItem(MF_STRING, 912, "Items count");
-		_menu.CheckMenuItem(912, properties.drawItemsCounter);	
-		
+		_menu.CheckMenuItem(912, properties.drawItemsCounter);
+
 		_menu.AppendMenuItem(MF_STRING, 913, "Playlists Icons");
-		_menu.CheckMenuItem(913, properties.showPlaylistIcons);			
-		
+		_menu.CheckMenuItem(913, properties.showPlaylistIcons);
+
 		_menu.AppendMenuSeparator();
-		
+
 		_rowHeight.AppendMenuItem(MF_STRING, 1000, "Increase");
-		_rowHeight.AppendMenuItem(MF_STRING, 1001, "Decrease");	
+		_rowHeight.AppendMenuItem(MF_STRING, 1001, "Decrease");
 		_rowHeight.AppendMenuSeparator();
 		_rowHeight.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold SHIFT and use your");
-		_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");			
-		_rowHeight.AppendTo(_menu,MF_STRING, "Row height");		
-		
+		_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");
+		_rowHeight.AppendTo(_menu,MF_STRING, "Row height");
+
 		var _panelWidth = window.CreatePopupMenu();
-		_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
-		_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");	
-		_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
-		_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");			
-		_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");		
-		
+		_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");
+		_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");
+		_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");
+		_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");
+		_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
+
 		_menu2.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu2.CheckMenuItem(200, properties.showwallpaper);
 		_menu2.AppendMenuItem(MF_STRING, 220, "Blur");
 		_menu2.CheckMenuItem(220, properties.wallpaperblurred);
-		
+
 		_menu2A.AppendMenuItem(MF_STRING, 221, "Filling");
-		_menu2A.CheckMenuItem(221, properties.wallpaperdisplay==0);	
+		_menu2A.CheckMenuItem(221, properties.wallpaperdisplay==0);
 		_menu2A.AppendMenuItem(MF_STRING, 222, "Adjust");
 		_menu2A.CheckMenuItem(222, properties.wallpaperdisplay==1);
 		_menu2A.AppendMenuItem(MF_STRING, 223, "Stretch");
 		_menu2A.CheckMenuItem(223, properties.wallpaperdisplay==2);
-		_menu2A.AppendTo(_menu2,MF_STRING, "Wallpaper size");		
+		_menu2A.AppendTo(_menu2,MF_STRING, "Wallpaper size");
 		//_menu2.AppendMenuSeparator();
 		//_menu2.AppendMenuItem((!properties.showwallpaper ? MF_GRAYED | MF_DISABLED : MF_STRING), 210, "Default");
 		//_menu2.AppendMenuItem((!properties.showwallpaper ? MF_GRAYED | MF_DISABLED : MF_STRING), 211, "Playing Album Cover");
 		//_menu2.CheckMenuRadioItem(210, 211, properties.wallpapermode == 0 ? 211 : 210);
 
-		_menu2.AppendTo(_menu,MF_STRING, "Background Wallpaper");		
-		
+		_menu2.AppendTo(_menu,MF_STRING, "Background Wallpaper");
+
         //_menu.AppendMenuSeparator();
         //_menu.AppendMenuItem(MF_STRING, 991, "Panel Properties");
         //_menu.AppendMenuItem(MF_STRING, 992, "Configure...");
-        
+
         idx = _menu.TrackPopupMenu(x,y);
-        
+
         switch(true) {
 			case (idx == 200):
 				toggleWallpaper();
 				break;
 			case (idx == 210):
-				properties.wallpapermode = 99;on_colours_changed();		
+				properties.wallpapermode = 99;on_colours_changed();
 				window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
 				if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
 				break;
 			case (idx == 211):
-				properties.wallpapermode = 0;on_colours_changed();		
+				properties.wallpapermode = 0;on_colours_changed();
 				window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
 				if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
 				break;
 			case (idx == 220):
-				properties.wallpaperblurred = !properties.wallpaperblurred;on_colours_changed();		
+				properties.wallpaperblurred = !properties.wallpaperblurred;on_colours_changed();
 				window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
-				break;		
+				break;
 			case (idx == 221):
 				properties.wallpaperdisplay = 0;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
-				break;	
+				break;
 			case (idx == 222):
 				properties.wallpaperdisplay = 1;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
-				break;		
+				break;
 			case (idx == 223):
 				properties.wallpaperdisplay = 2;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 				brw.repaint();
-				break;					
+				break;
             case (idx == 910):
                 properties.showHeaderBar = !properties.showHeaderBar;
                 window.SetProperty("DISPLAY: Show Top Bar", properties.showHeaderBar);
@@ -1968,19 +1968,19 @@ oBrowser = function(name) {
 				brw.populate(true, 3);
                 get_metrics();
                 brw.repaint();
-                break;				
+                break;
             case (idx == 912):
                 properties.drawItemsCounter = !properties.drawItemsCounter;
                 window.SetProperty("PROPERTY: Show numbers of items", properties.drawItemsCounter);
                 get_metrics();
                 brw.repaint();properties.showPlaylistIcons
-                break;	
+                break;
             case (idx == 913):
                 properties.showPlaylistIcons = !properties.showPlaylistIcons;
                 window.SetProperty("_PROPERTY: show an icon before the playlist name", properties.showPlaylistIcons);
                 get_metrics();
                 brw.repaint();
-                break;					
+                break;
             case (idx == 991):
                 window.ShowProperties();
                 break;
@@ -1989,35 +1989,35 @@ oBrowser = function(name) {
                 break;
 			case (idx == 1000):
 				this.setRowHeight(-2);
-				break;	
+				break;
 			case (idx == 1001):
 				this.setRowHeight(2);
-				break;		
+				break;
 			case (idx == 1030):
 				playlistpanel_width.increment(10);
-				break;		
+				break;
 			case (idx == 1031):
 				playlistpanel_width.decrement(10);
-				break;	
+				break;
 			case (idx == 1032):
-				playlistpanel_width.setDefault();		
+				playlistpanel_width.setDefault();
 				break;
 			case (idx == 1033):
 				playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
-				break;					
+				break;
         };
         _menu2 = undefined;
 		_menu2A = undefined;
         _menu1 = undefined;
         _menu = undefined;
-		_rowHeight = undefined;		
-		_panelWidth = undefined;			
+		_rowHeight = undefined;
+		_panelWidth = undefined;
         g_rbtn_click = false;
         return true;
     };
 };
 
-/* 
+/*
 ===================================================================================================
     Main
 ===================================================================================================
@@ -2077,30 +2077,30 @@ var g_start_ = 0, g_end_ = 0;
 var g_last = 0;
 var g_seconds = 0;
 // START
-function on_size(w, h) {   
+function on_size(w, h) {
     window.DlgCode = 0x0004;
-    
+
     ww = w;
     wh = h;
-    
+
     if(!ww || !wh) {
         ww = 1;
         wh = 1;
-    };	
+    };
 	if(window.IsVisible || first_on_size){
 		window.MinWidth = 1;
 		window.MinHeight = 1;
-		
+
 		// set wallpaper
 		if(properties.showwallpaper){
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		} else update_wallpaper = true;
-		
+
 		// set Size of browser
 		brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop));
 		update_size = false;
-		first_on_size = false;		
-	} else update_size = true;		
+		first_on_size = false;
+	} else update_size = true;
 };
 function set_update_function(string){
 	if( Update_Required_function.indexOf("brw.populate(true")!=-1) return;
@@ -2109,7 +2109,7 @@ function set_update_function(string){
 	}
 	else if(Update_Required_function.indexOf("playlists_changed")!=-1) {
 		if(string.indexOf("brw.populate")!=-1) Update_Required_function=string;
-	}	
+	}
 	else Update_Required_function=string;
 }
 function get_update_function(){
@@ -2118,17 +2118,17 @@ function get_update_function(){
 	return to_return;
 }
 function on_paint(gr) {
-	if(update_size) on_size(window.Width, window.Height);	
+	if(update_size) on_size(window.Width, window.Height);
 	if(Update_Required_function!="") {
 		eval(get_update_function());
-	}      
+	}
     if(!ww) return;
-    
+
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-	}		
-	
-    if(!g_1x1) {		
+	}
+
+    if(!g_1x1) {
         // draw background under playlist
 		gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg)
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
@@ -2143,8 +2143,8 @@ function on_paint(gr) {
                 gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg);
             }
         }
-		
-        brw && brw.draw(gr);	
+
+        brw && brw.draw(gr);
     };
 
 };
@@ -2152,9 +2152,9 @@ function on_paint(gr) {
 function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
-	
+
 	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !brw.scrollbar.cursorHover);
-	if(!isResizing){	
+	if(!isResizing){
 		// stop inertia
 		if(cTouch.timer) {
 			window.ClearInterval(cTouch.timer);
@@ -2165,7 +2165,7 @@ function on_mouse_lbtn_down(x, y, m) {
 				scroll = check_scroll(scroll);
 			};
 		};
-		
+
 		var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
 		if(properties.enableTouchControl && is_scroll_enabled) {
 			if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
@@ -2193,24 +2193,24 @@ function on_mouse_lbtn_down(x, y, m) {
 		} else {
 			brw.on_mouse("down", x, y);
 		};
-		
+
 		// inputBox
 		if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
 			g_filterbox.on_mouse("lbtn_down", x, y);
-		};	
-	};		
+		};
+	};
 };
 
 function on_mouse_lbtn_up(x, y, m) {
 	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
-	if(!isResizing){	
+	if(!isResizing){
 		// inputBox
 		if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
 			g_filterbox.on_mouse("lbtn_up", x, y);
 		};
-		
+
 		brw.on_mouse("up", x, y);
-		
+
 		if(timers.mouseDown) {
 			clearTimeout(timers.mouseDown);
 			timers.mouseDown = false;
@@ -2242,22 +2242,22 @@ function on_mouse_lbtn_up(x, y, m) {
 				}, 75);
 			};
 		};
-		
+
 		g_lbtn_click = false;
 	};
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
-    if(y >= brw.y) {    
-        brw.on_mouse("dblclk", x, y);	
+    if(y >= brw.y) {
+        brw.on_mouse("dblclk", x, y);
     } else if(x > brw.x && x < brw.x + brw.w) {
-        brw.showActivePlaylist();	
-    } 	
+        brw.showActivePlaylist();
+    }
 };
 
 function on_mouse_rbtn_down(x, y, mask) {
     g_rbtn_click = true;
-    
+
     if(!utils.IsKeyPressed(VK_SHIFT)) {
         // inputBox
         if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
@@ -2270,7 +2270,7 @@ function on_mouse_rbtn_down(x, y, mask) {
 
 function on_mouse_rbtn_up(x, y){
     g_rbtn_click = false;
-    
+
     if(!utils.IsKeyPressed(VK_SHIFT)) {
         return;
     };
@@ -2278,32 +2278,32 @@ function on_mouse_rbtn_up(x, y){
 
 function on_mouse_move(x, y, m) {
 	if(g_cursor.x==x && g_cursor.y==y) return;
-	g_cursor.onMouse("move", x, y, m);	
+	g_cursor.onMouse("move", x, y, m);
 	var isResizing = g_resizing.on_mouse("move", x, y, m, !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
 	if(isResizing){
 		if(g_resizing.resizing_x>x+5){
 			g_resizing.resizing_x = x;
 			playlistpanel_width.decrement(5);
 		} else if(g_resizing.resizing_x<x-5){
-			g_resizing.resizing_x = x;			
+			g_resizing.resizing_x = x;
 			playlistpanel_width.increment(5);
 		}
-	} else {	
+	} else {
 		// inputBox
 		if(!cPlaylistManager.drag_moved) {
 			if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
 				g_filterbox.on_mouse("move", x, y);
 			};
 		};
-		
-		g_resizing.on_mouse("move", x, y, m);	
-		
+
+		g_resizing.on_mouse("move", x, y, m);
+
 		if(g_dragndrop_status){
 			if(y < brw.y) {
 				if(!timers.movePlaylist) {
 					timers.movePlaylist = setInterval(function() {
 						scroll -= properties.rowHeight;
-						scroll = check_scroll(scroll);										
+						scroll = check_scroll(scroll);
 					}, 100);
 				}
 			} else if (y > brw.y + brw.h) {
@@ -2313,9 +2313,9 @@ function on_mouse_move(x, y, m) {
 						scroll = check_scroll(scroll);
 					}, 100);
 				}
-			};			
+			};
 		}
-		
+
 		if(cTouch.down) {
 			cTouch.y_current = y;
 			cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
@@ -2327,20 +2327,20 @@ function on_mouse_move(x, y, m) {
 			};
 		} else {
 			brw.on_mouse("move", x, y);
-		};					
+		};
 	};
 };
 
 function on_mouse_wheel(step){
-	
+
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;
-	
+
     if(cTouch.timer) {
         window.ClearInterval(cTouch.timer);
         cTouch.timer = false;
     };
-    
+
 	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
 		var zoomStep = 1;
 		var previous = globalProperties.fontAdjustement;
@@ -2355,7 +2355,7 @@ function on_mouse_wheel(step){
 			if(previous != globalProperties.fontAdjustement) {
 				timers.mouseWheel = setTimeout(function() {
 					on_notify_data('set_font',globalProperties.fontAdjustement);
-					window.NotifyOthers('set_font',globalProperties.fontAdjustement);					
+					window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 					timers.mouseWheel && clearTimeout(timers.mouseWheel);
 					timers.mouseWheel = false;
 				}, 100);
@@ -2369,11 +2369,11 @@ function on_mouse_wheel(step){
         scroll = check_scroll(scroll);
         brw.on_mouse("wheel", g_cursor.x, g_cursor.y, intern_step);
     };
-    
+
 };
 
 function on_mouse_leave() {
-	g_resizing.on_mouse("leave", -1, -1);	
+	g_resizing.on_mouse("leave", -1, -1);
     // inputBox
     if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
         g_filterbox.on_mouse("leave", 0, 0);
@@ -2394,16 +2394,16 @@ function get_metrics() {
     properties.rowHeight = Math.round(_defaultRowHeight * g_zoom_percent / 100) + g_fsize - 11;
     cScrollBar.width = Math.floor(cScrollBar.defaultWidth * g_zoom_percent / 100);
     cScrollBar.minCursorHeight = Math.round(cScrollBar.defaultMinCursorHeight * g_zoom_percent / 100);
-    
+
     cFilterBox.w = Math.floor(cFilterBox.default_w * g_zoom_percent / 100);
     cFilterBox.h = Math.round(cFilterBox.default_h * g_zoom_percent / 100);
-	
+
     properties.addedRows_end = properties.addedRows_end_default;
-	
+
 	/*if(properties.showNewPlaylistButton) {
 		properties.paddingTop = properties.rowHeight;
 	} else */
-	properties.paddingTop = 0;	
+	properties.paddingTop = 0;
     if(brw) {
         if(cScrollBar.enabled)  {
             //brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww - cScrollBar.width, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
@@ -2417,18 +2417,18 @@ function get_metrics() {
 
 function playlistName2icon(name, auto_playlist, images_array){
 	var inverse = '';
-	if(name==globalProperties.selection_playlist) return images_array.library_icon;	
-	if(name==globalProperties.playing_playlist) return images_array.library_playback_icon;	
-	if(name==globalProperties.whole_library) return images_array.whole_library_icon;	
+	if(name==globalProperties.selection_playlist) return images_array.library_icon;
+	if(name==globalProperties.playing_playlist) return images_array.library_playback_icon;
+	if(name==globalProperties.whole_library) return images_array.whole_library_icon;
 	if(name=="Newly Added") return images_array.newly_added_icon;
-	if(name=="Create Playlist") return images_array.create_playlist;	
-	if(name=="History") return images_array.history_icon;	
-	if(name=="Top Rated") return images_array.top_rated;		
-	if(name=="Radios") return images_array.radios_icon;		
-	if(name=="Most Played") return images_array.most_played_icon;		
-	if(name=="Podcasts") return images_array.podcasts_icon;		
-	if(name=="External Files") return images_array.external_files_icon;		
-	if(name=="Search" || name=="Search Results") return images_array.search_icon;	
+	if(name=="Create Playlist") return images_array.create_playlist;
+	if(name=="History") return images_array.history_icon;
+	if(name=="Top Rated") return images_array.top_rated;
+	if(name=="Radios") return images_array.radios_icon;
+	if(name=="Most Played") return images_array.most_played_icon;
+	if(name=="Podcasts") return images_array.podcasts_icon;
+	if(name=="External Files") return images_array.external_files_icon;
+	if(name=="Search" || name=="Search Results") return images_array.search_icon;
 	if(auto_playlist) {
 		return images_array.icon_auto_pl;
 	} else {
@@ -2442,47 +2442,47 @@ function get_images() {
 		images_array.icon_normal_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon2.png");
 		images_array.icon_normal_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
 		images_array.icon_normal_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
-		images_array.icon_auto_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");	
-		images_array.icon_auto_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");	
-		images_array.icon_auto_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");		
-		images_array.icon_auto_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");	
-		
-		images_array.create_playlist = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"create_playlist.png");	
-		images_array.newly_added_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"newly_added_icon.png");	
-		images_array.top_rated = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"fav_icon.png");	
-		images_array.history_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"history_icon.png");	
-		images_array.whole_library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"whole_library_icon.png");		
-		images_array.library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_icon.png");	
-		images_array.library_playback_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_playback_icon.png");		
+		images_array.icon_auto_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");
+		images_array.icon_auto_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");
+		images_array.icon_auto_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
+		images_array.icon_auto_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
+
+		images_array.create_playlist = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"create_playlist.png");
+		images_array.newly_added_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"newly_added_icon.png");
+		images_array.top_rated = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"fav_icon.png");
+		images_array.history_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"history_icon.png");
+		images_array.whole_library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"whole_library_icon.png");
+		images_array.library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_icon.png");
+		images_array.library_playback_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_playback_icon.png");
 		images_array.radios_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"radios_icon.png");
-		images_array.most_played_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"most_played_icon.png");	
+		images_array.most_played_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"most_played_icon.png");
 		images_array.podcasts_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"podcasts_icon.png");
-		images_array.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"external_files_icon.png");	
-		images_array.search_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"search_icon.png");	
-		
+		images_array.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"external_files_icon.png");
+		images_array.search_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"search_icon.png");
+
 		if(!properties.emphasisOnActive){
 			if(!properties.darklayout){
 				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png");
 				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track0.png");
 			} else {
 				images_array.now_playing_1 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress1.png");
-				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress0.png");			
-			}			
+				images_array.now_playing_0 = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress0.png");
+			}
 		} else {
 			images_array.now_playing_1 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_off.png");
 			images_array.now_playing_0 = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"now_playing_on.png");
 		}
 		return images_array;
 	};
-	
+
 	if(properties.darklayout) {
 		color_theme="white\\";
-		color_theme_inverse="";		
+		color_theme_inverse="";
 	} else {
 		color_theme="";
-		color_theme_inverse="white\\";		
+		color_theme_inverse="white\\";
 	}
-	
+
 	images = get_images_from_colors_theme(images,color_theme);
 	images_inverse = get_images_from_colors_theme(images_inverse,color_theme_inverse);
 };
@@ -2490,33 +2490,33 @@ function get_images() {
 
 function get_colors() {
 	get_colors_global();
-	if(properties.darklayout){				
-		colors.dragdrop_bg_selected_item = GetGrey(0,190);	
-		colors.dragdrop_line_selected_item = GetGrey(255,45);	
+	if(properties.darklayout){
+		colors.dragdrop_bg_selected_item = GetGrey(0,190);
+		colors.dragdrop_line_selected_item = GetGrey(255,45);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60)
-		
+
 		colors.grad_bottom_1 = GetGrey(0,70);
-		colors.grad_bottom_2 = GetGrey(0,0);		
+		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 50;
-	} else {	
-		colors.dragdrop_bg_selected_item = GetGrey(220);	
+	} else {
+		colors.dragdrop_bg_selected_item = GetGrey(220);
 		colors.dragdrop_line_selected_item = GetGrey(205);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60);
-		
+
 		colors.grad_bottom_1 = GetGrey(0,10);
-		colors.grad_bottom_2 = GetGrey(0,0);			
+		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 39;
-		
+
 		if(properties.showwallpaper) {
 			colors.headerbar_line = GetGrey(0,40);
 		}
-	}		
+	}
 };
 
 function on_font_changed() {
     get_font();
 	g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+2);
-	g_filterbox.onFontChanged();	
+	g_filterbox.onFontChanged();
     get_metrics();
     brw.repaint();
 };
@@ -2544,7 +2544,7 @@ function on_key_up(vkey) {
         if(properties.showFilterBox && g_filterbox.inputbox.visible) {
             g_filterbox.on_key("up", vkey);
         };
-        
+
         // scroll keys up and down RESET (step and timers)
         brw.keypressed = false;
         cScrollBar.timerCounter = -1;
@@ -2560,7 +2560,7 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-    
+
     if(cSettings.visible) {
 
     } else {
@@ -2569,7 +2569,7 @@ function on_key_down(vkey) {
                 switch (vkey) {
                 case VK_ESCAPE:
 					if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
-					break;					
+					break;
                 case 222:
                     brw.inputboxID = -1;
                     brw.repaint();
@@ -2578,7 +2578,7 @@ function on_key_down(vkey) {
                     brw.inputbox.on_key_down(vkey);
                 };
             };
-            
+
         } else {
 
             // inputBox
@@ -2587,7 +2587,7 @@ function on_key_down(vkey) {
             };
 
             var act_pls = g_active_playlist;
-            
+
             if (mask == KMask.none) {
                 switch (vkey) {
                 case VK_F2:
@@ -2632,7 +2632,7 @@ function on_key_down(vkey) {
                     break;
                 case VK_ESCAPE:
 					if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
-					break;					
+					break;
                 case 222:
                     brw.inputboxID = -1;
                     break;
@@ -2707,7 +2707,7 @@ function on_key_down(vkey) {
                         if(brw.selectedRow > -1 && brw.selectedRow < brw.rowsCount && brw.rowsCount > 0) {
 							var id = brw.selectedRow;
                             DeletePlaylist(brw.rows[id].idx);
-                            //brw.delete_pending = true;							
+                            //brw.delete_pending = true;
 							/*
                             timers.deletePlaylist = setTimeout(function(){
                                 timers.deletePlaylist && clearTimeout(timers.deletePlaylist);
@@ -2832,13 +2832,13 @@ function on_char(code) {
 };
 
 //=================================================// Playback Callbacks
-function on_playback_stop(reason) { 
-	g_seconds = 0;	
-  	if(window.IsVisible) {		
+function on_playback_stop(reason) {
+	g_seconds = 0;
+  	if(window.IsVisible) {
 		switch(reason) {
 		case 0: // user stop
 		case 1: // eof (e.g. end of playlist)
-			brw.PlayingPlaylist = -1;		
+			brw.PlayingPlaylist = -1;
 			// update wallpaper
 			if(properties.showwallpaper && properties.wallpapermode == 0) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
@@ -2848,19 +2848,19 @@ function on_playback_stop(reason) {
 		case 2: // starting_another (only called on user action, i.e. click on next button)
 			break;
 		};
-	} else set_update_function('on_playback_stop('+reason+')');		
+	} else set_update_function('on_playback_stop('+reason+')');
 };
 
 function on_playback_new_track(metadb) {
 	g_seconds = 0;
 	brw.FindPlayingPlaylist();
 	if(window.IsVisible) {
-		g_metadb = metadb;		
+		g_metadb = metadb;
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_metadb);
-		};		
+		};
 		brw.repaint();
-	} else if(properties.wallpapermode == 0) update_wallpaper = true;	
+	} else if(properties.wallpapermode == 0) update_wallpaper = true;
 };
 function on_playback_time(time) {
 	g_seconds = time;
@@ -2868,54 +2868,54 @@ function on_playback_time(time) {
 }
 //=================================================// Playlist Callbacks
 function on_playlists_changed() {
-	if(!g_avoid_on_playlists_changed && g_first_populate_done && window.IsVisible){	
+	if(!g_avoid_on_playlists_changed && g_first_populate_done && window.IsVisible){
 		if(cPlaylistManager.drag_droped) {
 			g_cursor.setCursor(IDC_ARROW,46);
 		} else {
 			if(brw.previous_playlistCount != plman.PlaylistCount) g_filterbox.clearInputbox();
 		};
 		brw.populate(is_first_populate = false, 4, reset_scroll = false);
-		
+
 		if(brw.selectedRow > brw.rowsCount) brw.selectedRow = plman.ActivePlaylist;
 
 		brw.repaint();
-		brw.delete_pending = false;		
-	} else set_update_function('on_playlists_changed()');	
+		brw.delete_pending = false;
+	} else set_update_function('on_playlists_changed()');
 };
 
-function on_playlist_switch() { 
-	if(window.IsVisible) {	  
+function on_playlist_switch() {
+	if(window.IsVisible) {
 		g_active_playlist = plman.ActivePlaylist;
 		brw.showActivePlaylist();
 		if(brw.selectedRow > brw.rowsCount) brw.selectedRow = plman.ActivePlaylist;
 		brw.repaint();
-	} else set_update_function('on_playlist_switch()');	
+	} else set_update_function('on_playlist_switch()');
 };
 
 function on_playlist_items_added(playlist_idx) {
-	if(window.IsVisible) {	
+	if(window.IsVisible) {
 		try{
 			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
 		} catch(e){
 			console.log('on_playlist_items_added failed');
-		}	
+		}
 		brw.repaint();
-	} else set_update_function('on_playlist_items_added('+playlist_idx+')');		
+	} else set_update_function('on_playlist_items_added('+playlist_idx+')');
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if(window.IsVisible) {	
+	if(window.IsVisible) {
 		try{
 			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
 		} catch(e){
 			console.log('on_playlist_items_removed failed');
-		}	
+		}
 		brw.repaint();
-	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');	
+	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');
 };
 
 
-function on_focus(is_focused) {   
+function on_focus(is_focused) {
     g_focus = is_focused;
     if(!is_focused && g_filterbox.inputbox.edit) {
 		g_filterbox.inputbox.on_focus(is_focused)
@@ -2926,7 +2926,7 @@ function on_focus(is_focused) {
 //=================================================// Custom functions
 function checkMediaLibrayPlaylist() {
     g_avoid_on_playlists_changed = true;
-    
+
     // check if library playlist is present
     var isMediaLibraryFound = false;
     var total = plman.PlaylistCount;
@@ -2950,7 +2950,7 @@ function checkMediaLibrayPlaylist() {
         // Always move it to the top
         plman.MovePlaylist(mediaLibraryIndex, 0);
     };
-    
+
     g_avoid_on_playlists_changed = false;
 };
 
@@ -2975,7 +2975,7 @@ function g_sendResponse() {
     } else {
 	    filter_text = g_filterbox.inputbox.text;
     };
-       
+
     // filter in current panel
     brw.populate(true, 1);
     if(brw.selectedRow < 0 || brw.selectedRow > brw.rowsCount - 1) brw.selectedRow = 0;
@@ -2983,61 +2983,66 @@ function g_sendResponse() {
 
 function on_notify_data(name, info) {
     switch(name) {
+        case "use_ratings_file_tags":
+            globalProperties.use_ratings_file_tags = info;
+            window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
+            window.Reload();
+		break;
 		case "colors":
 			globalProperties.colorsMainPanel = info;
 			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
 			on_colours_changed();
-		break; 						
+		break;
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
-			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
-		break; 			
-		case "avoid_on_playlists_changed":  
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);
+		break;
+		case "avoid_on_playlists_changed":
 			g_avoid_on_playlists_changed=info;
 			//if(!g_avoid_on_playlists_changed) on_playlists_changed();
-			break;	
+			break;
 		case "UpdatePlaylists":
 			on_playlists_changed();
 		break;
-		case "enable_screensaver":		
+		case "enable_screensaver":
 			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	
-		break;				
+			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
+		break;
 		case "set_font":
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
 			on_font_changed();
-		break; 			
-		case "rePopulate": 
+		break;
+		case "rePopulate":
 			if(window.IsVisible){
 				brw.populate(true, 16, true);
 			} else {set_update_function("brw.populate(true, 16, true)");}
-			break;			
+			break;
 		case "playlistpanel_width":
 			playlistpanel_width.value = info;
-			break;				
+			break;
 		case "layout_state":
 			layout_state.value = info;
 			if(layout_state.isEqual(1)) window.NotifyOthers("pmanager_height",window.Height);
-			break;		
-		case "wallpaperVisibilityGlobal":		
+			break;
+		case "wallpaperVisibilityGlobal":
 		case "wallpaperVisibility":
 			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
-		break; 			
-		case "wallpaperBlurGlobal":		
+		break;
+		case "wallpaperBlurGlobal":
 		case "wallpaperBlur":
 			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
-		break; 					
-		case"playlists_dark_theme":			
+		break;
+		case"playlists_dark_theme":
 			properties.darklayout = info;
 			window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
-			on_colours_changed();				
+			on_colours_changed();
 			if(properties.darklayout) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 			brw.repaint();
-		break;		
+		break;
 		case "WSH_panels_reload":
 			window.Reload();
-		break; 			
+		break;
     };
 };
 
@@ -3047,7 +3052,7 @@ function on_drag_enter() {
 };
 
 function on_drag_leave() {
-	g_resizing.on_drag("leave", 0, 0, null);	
+	g_resizing.on_drag("leave", 0, 0, null);
     g_dragndrop_status = false;
     g_dragndrop_trackId = -1;
     g_dragndrop_rowId = -1;
@@ -3060,7 +3065,7 @@ function on_drag_leave() {
 };
 
 function on_drag_over(action, x, y, mask) {
-    
+
     if(x == g_dragndrop_x && y == g_dragndrop_y) return true;
 
     g_dragndrop_trackId = -1;
@@ -3070,10 +3075,10 @@ function on_drag_over(action, x, y, mask) {
 
     brw.on_mouse("drag_over", x, y);
     brw.repaint();
-	
+
 	try{
 		if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].isAutoPlaylist) {
-			//action.Effect = 0;  
+			//action.Effect = 0;
 			return;
 		} else if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].idx>-1) {
 			action.Text = "Insert";
@@ -3081,7 +3086,7 @@ function on_drag_over(action, x, y, mask) {
 			action.Text = "New playlist";
 		}
 	} catch(e){}
-	
+
     g_dragndrop_x = x;
     g_dragndrop_y = y;
 };
@@ -3095,18 +3100,18 @@ function on_drag_drop(action, x, y, mask) {
 			if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].isAutoPlaylist) {
 				action.Effect = 0;
 				HtmlMsg("Error", "'"+plman.GetPlaylistName(g_dragndrop_targetPlaylistId)+"' is an playlist generated automatically (autoplaylist).\nYou can't manually add tracks into an autoplaylist", "Ok");
-            } else if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].idx>-1) {		
+            } else if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].idx>-1) {
                 action.Effect = 1;
                 action.Playlist = brw.rows[g_dragndrop_targetPlaylistId].idx;
 				action.Base = plman.PlaylistItemCount(g_dragndrop_targetPlaylistId);
                 action.ToSelect = false;
-            } else {			
+            } else {
 				drop_done = true;
 				var total_pl = plman.PlaylistCount;
 				plman.CreatePlaylist(total_pl, "Dropped Items");
 				action.Effect = 1;
 				action.Playlist = total_pl;
-				action.ToSelect = false;	
+				action.ToSelect = false;
 				rename_playlist = true;
 			}
         } else {
@@ -3115,9 +3120,9 @@ function on_drag_drop(action, x, y, mask) {
             plman.CreatePlaylist(total_pl, "Dropped Items");
             action.Effect = 1;
             action.Playlist = total_pl;
-            action.ToSelect = false;	
-			rename_playlist = true;			
-        };	
+            action.ToSelect = false;
+			rename_playlist = true;
+        };
 		if(rename_playlist){
 			try {
 				playlistname = utils.InputBox(window.ID, "Give your playlist a name ?", "Rename a playlist", plman.GetPlaylistName(total_pl), true);
@@ -3125,13 +3130,13 @@ function on_drag_drop(action, x, y, mask) {
 				if (playlistname.length > 1 || (playlistname.length == 1 && (playlistname >= "a" && playlistname <= "z") || (playlistname >= "A" && playlistname <= "Z") || (playlistname >= "0" && playlistname <= "9"))) {
 					plman.RenamePlaylist(total_pl, playlistname);
 					window.Repaint();
-				}	
+				}
 			} catch(e) {
-			}				
+			}
 		}
         if(drop_done) {
             // create a timer to blink the playlist item where tracks have been droped!
-            if(!blink.timer) { 
+            if(!blink.timer) {
                 blink.x = x;
                 blink.y = y;
                 blink.totaltracks = 1;
@@ -3149,24 +3154,24 @@ function on_drag_drop(action, x, y, mask) {
                 }, 125);
             };
         };
-    } 	
+    }
     g_dragndrop_status = false;
     brw.repaint();
 };
 
 function toggleWallpaper(wallpaper_state){
-	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
+	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
 	properties.showwallpaper = wallpaper_state;
 	window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
-	on_colours_changed();				
+	on_colours_changed();
 	if(properties.showwallpaper) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 	}
-	brw.repaint();	
+	brw.repaint();
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
-	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;	
-	properties.wallpaperblurred = wallpaper_blur_state; on_colours_changed();		
+	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;
+	properties.wallpaperblurred = wallpaper_blur_state; on_colours_changed();
 	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 	if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	brw.repaint();
@@ -3174,20 +3179,20 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 
 function on_init() {
     window.DlgCode = 0x0004;
-    
+
     get_font();
     get_colors();
     get_metrics();
 	get_images();
-	
-	g_cursor = new oCursor();	
+
+	g_cursor = new oCursor();
     g_active_playlist = plman.ActivePlaylist;
-	g_resizing = new Resizing("playlistmanager",false,true);	
+	g_resizing = new Resizing("playlistmanager",false,true);
 	g_tooltip = new oTooltip();
-	
+
     brw = new oBrowser("brw");
-	brw.startTimer();	
-	
+	brw.startTimer();
+
     g_filterbox = new oFilterBox();
     g_filterbox.inputbox.visible = true;
 };

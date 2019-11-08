@@ -12,109 +12,109 @@ var browser_refresh_required=false;
 var playing_track_playcount = 0;
 var cur_btn_down = false;
 var g_avoid_on_library_items_added=false;
-var g_avoid_on_library_items_removed=false;	
-var g_avoid_on_metadb_changed=false;	
+var g_avoid_on_library_items_removed=false;
+var g_avoid_on_metadb_changed=false;
 var g_on_mouse_lbtn_dblclk = false;
 var update_size = true;
 var first_on_size = true;
 var properties = {
-	panelName: 'WSHfilter',		
-    ParentName:  window.GetProperty("_PROPERTY: Parent Panel", ""),	
+	panelName: 'WSHfilter',
+    ParentName:  window.GetProperty("_PROPERTY: Parent Panel", ""),
     followFocusChange: window.GetProperty("_PROPERTY: Follow focus change", false), // only in source mode = Playlist
     sourceMode: window.GetProperty("_PROPERTY: Source Mode", 0), // 0 = Library, 1 = Playlist, 2 = Playlist named like below, 3 = Filter selection from a lower filter order
     sourcePlaylist: globalProperties.selection_playlist,//window.GetProperty("_PROPERTY: Source Playlist", globalProperties.selection_playlist),
-    selectionPlaylist: globalProperties.selection_playlist,//window.GetProperty("_PROPERTY: Selection Playlist", globalProperties.selection_playlist),		
-    playingPlaylist: globalProperties.playing_playlist,	
-    filterOrder: window.GetProperty("_PROPERTY: filter Order", 0),			
+    selectionPlaylist: globalProperties.selection_playlist,//window.GetProperty("_PROPERTY: Selection Playlist", globalProperties.selection_playlist),
+    playingPlaylist: globalProperties.playing_playlist,
+    filterOrder: window.GetProperty("_PROPERTY: filter Order", 0),
     tagMode: window.GetProperty("_PROPERTY: Tag Mode", 3), // 1 = album, 2 = artist, 3 = genre
     albumArtId: 0, // 0 = front
     tagModedisplay1: window.GetProperty("_PROPERTY: Display Mode for tag mode 1", 2),
-    tagModedisplay2: window.GetProperty("_PROPERTY: Display Mode for tag mode 2", 0),	
-    tagModedisplay3: window.GetProperty("_PROPERTY: Display Mode for tag mode 3", 0),	
+    tagModedisplay2: window.GetProperty("_PROPERTY: Display Mode for tag mode 2", 0),
+    tagModedisplay3: window.GetProperty("_PROPERTY: Display Mode for tag mode 3", 0),
     circleDisplay1: window.GetProperty("_PROPERTY: Circle Mode for tag mode 1", false),
-    circleDisplay2: window.GetProperty("_PROPERTY: Circle Mode for tag mode 2", false),	
-    circleDisplay3: window.GetProperty("_PROPERTY: Circle Mode for tag mode 3", false),	
+    circleDisplay2: window.GetProperty("_PROPERTY: Circle Mode for tag mode 2", false),
+    circleDisplay3: window.GetProperty("_PROPERTY: Circle Mode for tag mode 3", false),
     displayMode: window.GetProperty("_PROPERTY: Display Mode", 0), // 0 = text, 1 = stamps + text, 2 = lines + text, 3 = grid + text
     displayModeGridNoText: window.GetProperty("_PROPERTY: Display Mode Grid No Text", false), // 3 = grid, without text
     drawItemsCounter: window.GetProperty("_PROPERTY: Show numbers of items in group", false), // Available in display mode 0 = text, 2 = lines + text
     drawItemsCounter1: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 1", true),
-    drawItemsCounter2: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 2", true),	
-    drawItemsCounter3: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 3", true),		
-    drawAlternateBG: window.GetProperty("_PROPERTY: Alternate row background", true), 	
+    drawItemsCounter2: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 2", true),
+    drawItemsCounter3: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 3", true),
+    drawAlternateBG: window.GetProperty("_PROPERTY: Alternate row background", true),
     albumsTFsortingdefault: window.GetProperty("Sort Order - ALBUM", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
     artistsTFsortingdefault: "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%",//window.GetProperty("Sort Order - ARTIST", "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
     genresTFsortingdefault: window.GetProperty("Sort Order - GENRE", "$meta(genre,0) | %album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
-	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),		
+	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
     showAllItem: window.GetProperty("_PROPERTY: Show ALL item", true),
     showAllItem1: window.GetProperty("_PROPERTY: Show ALL item for tag mode 1", true),
-    showAllItem2: window.GetProperty("_PROPERTY: Show ALL item for tag mode 2", true),	
-    showAllItem3: window.GetProperty("_PROPERTY: Show ALL item for tag mode 3", true),	
-	AlbumArtFallback: window.GetProperty("COVER Fallback to album art", false),		
-	AlbumArtFallback1: window.GetProperty("COVER Fallback to album art for tag mode 1", false),	
-	AlbumArtFallback2: window.GetProperty("COVER Fallback to album art for tag mode 2", false),	
-	AlbumArtFallback3: window.GetProperty("COVER Fallback to album art for tag mode 3", false),		
+    showAllItem2: window.GetProperty("_PROPERTY: Show ALL item for tag mode 2", true),
+    showAllItem3: window.GetProperty("_PROPERTY: Show ALL item for tag mode 3", true),
+	AlbumArtFallback: window.GetProperty("COVER Fallback to album art", false),
+	AlbumArtFallback1: window.GetProperty("COVER Fallback to album art for tag mode 1", false),
+	AlbumArtFallback2: window.GetProperty("COVER Fallback to album art for tag mode 2", false),
+	AlbumArtFallback3: window.GetProperty("COVER Fallback to album art for tag mode 3", false),
 	MinNumberOfColumns: window.GetProperty("COVER Minimum number of columns", 1),
     thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 20),
-    thumbnailWidth: window.GetProperty("COVER Width", 75),	
+    thumbnailWidth: window.GetProperty("COVER Width", 75),
     thumbnailWidth1: window.GetProperty("COVER Width for tag mode 1", 75),
-    thumbnailWidth2: window.GetProperty("COVER Width for tag mode 2", 75),	
-    thumbnailWidth3: window.GetProperty("COVER Width for tag mode 3", 75),	
-    drawUpAndDownScrollbar: window.GetProperty("_PROPERTY: Draw Up and Down Scrollbar Buttons", false),	
+    thumbnailWidth2: window.GetProperty("COVER Width for tag mode 2", 75),
+    thumbnailWidth3: window.GetProperty("COVER Width for tag mode 3", 75),
+    drawUpAndDownScrollbar: window.GetProperty("_PROPERTY: Draw Up and Down Scrollbar Buttons", false),
     default_lineHeightMin: window.GetProperty("SYSTEM Minimal Line Height", 34),
-    default_lineHeightMin1: window.GetProperty("SYSTEM Minimal Line Height for tag mode 1", 34),	
-    default_lineHeightMin2: window.GetProperty("SYSTEM Minimal Line Height for tag mode 2", 34),	
+    default_lineHeightMin1: window.GetProperty("SYSTEM Minimal Line Height for tag mode 1", 34),
+    default_lineHeightMin2: window.GetProperty("SYSTEM Minimal Line Height for tag mode 2", 34),
     default_lineHeightMin3: window.GetProperty("SYSTEM Minimal Line Height for tag mode 3", 34),
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
-	savedFilterState: window.GetProperty("_PROPERTY: Saved filter state", -1),	
+	savedFilterState: window.GetProperty("_PROPERTY: Saved filter state", -1),
     lineHeightMin: 0,
 	first_item_top_margin_default: window.GetProperty("_DISPLAY first item top margin", 0),
-    load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),		
+    load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),
     enableDiskCache: window.GetProperty("COVER Disk Cache", true),
     scrollRowDivider: window.GetProperty("SYSTEM Scroll Row Divider", 1),
     tf_artist: fb.TitleFormat("%artist%"),
     tf_albumartist: fb.TitleFormat("%album artist%"),
-    tf_groupkey_genre: window.GetProperty("_PROPERTY Genre TitleFormat", "$if2($meta(genre,0),?)"),	
-    tf_groupkey_genre_default: "$if2($meta(genre,0),?)",			
+    tf_groupkey_genre: window.GetProperty("_PROPERTY Genre TitleFormat", "$if2($meta(genre,0),?)"),
+    tf_groupkey_genre_default: "$if2($meta(genre,0),?)",
     tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta_sep(artist, ** ),?)"),
-    tf_groupkey_artist_default: "$if2($meta_sep(artist, ** ),?)",		
-    tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album%"),	
-    tf_groupkey_album_default: "%album artist% ^^ %album%",	
-    tf_groupkey_album_addinfos: " ## %title% ## %date%",	
-    genre_customGroup_label: window.GetProperty("_DISPLAY: genre customGroup name", ""),	
+    tf_groupkey_artist_default: "$if2($meta_sep(artist, ** ),?)",
+    tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album%"),
+    tf_groupkey_album_default: "%album artist% ^^ %album%",
+    tf_groupkey_album_addinfos: " ## %title% ## %date%",
+    genre_customGroup_label: window.GetProperty("_DISPLAY: genre customGroup name", ""),
     artist_customGroup_label: window.GetProperty("_DISPLAY: artist customGroup name", ""),
-    album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),	
+    album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
     tf_path_artist: fb.TitleFormat(window.GetProperty("_PROPERTY: Artist Images Folder (for disk cache)", "X:\\XPS2720\\MP3\\artists\\$meta(artist,0).jpg")),
     tf_path_genre: fb.TitleFormat(images.path+"genres\\$meta(genre,0).jpg"),
     tf_crc_artist: fb.TitleFormat(globalProperties.crc_artist),
     tf_crc_genre: fb.TitleFormat("$crc32('genres'$meta(genre,0))"),
     tf_time_remaining: fb.TitleFormat("$if(%length%,-%playback_time_remaining%,'0:00')"),
-    showPanelToggleButtons: window.GetProperty("_PROPERTY: showPanelToggleButtons", false),	
+    showPanelToggleButtons: window.GetProperty("_PROPERTY: showPanelToggleButtons", false),
     showTagSwitcherBar: window.GetProperty("_PROPERTY: show buttons on top to change the source tag", false),
 	showFiltersTogglerBtn: window.GetProperty("_PROPERTY: show filters toggler btn", false),
-    showHeaderBar: window.GetProperty("_DISPLAY: Show Top Bar", true),	
+    showHeaderBar: window.GetProperty("_DISPLAY: Show Top Bar", true),
     showHeaderBar1: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 1", true),
-    showHeaderBar2: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 2", true),	
-    showHeaderBar3: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 3", true),	
+    showHeaderBar2: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 2", true),
+    showHeaderBar3: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 3", true),
 	showToolTip: window.GetProperty("_PROPERTY: Show tooltips", true),
-	showLibraryTreeSwitch: window.GetProperty("_PROPERTY: Show library tree switch", false),	
+	showLibraryTreeSwitch: window.GetProperty("_PROPERTY: Show library tree switch", false),
     rowHeight: 22,
     rowScrollStep: 1,
     scrollSmoothness: 2.5,
     refreshRate: 40,
     refreshRateCover: 2,
     TagSwitcherBarHeight: 30,
-    headerBarHeight: 40,	
+    headerBarHeight: 40,
     defaultHeaderBarHeight: 40,
-    headerBarPaddingTop: 0,		
+    headerBarPaddingTop: 0,
     enableCustomColors: window.GetProperty("_PROPERTY: Custom Colors", true),
-	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),		
+	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
-    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),	
-    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),		
-    DropInplaylist: window.GetProperty("_SYSTEM: Allow to drag items into a playlist", true),	
+    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
+    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
+    DropInplaylist: window.GetProperty("_SYSTEM: Allow to drag items into a playlist", true),
     enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", false),
     default_botStampHeight: 16,
     botStampHeight: 0,
@@ -124,15 +124,15 @@ var properties = {
     botTextRowHeight: 0,
     default_textLineHeight: 10,
     textLineHeight: 0,
-    DrawRightLine: window.GetProperty("_PROPERTY: Draw a line on the right side", true),	
+    DrawRightLine: window.GetProperty("_PROPERTY: Draw a line on the right side", true),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
 	panelFontAdjustement: -1,
-	load_image_from_cache_direct: true	
+	load_image_from_cache_direct: true
 };
 
 var TF = {
-	genre: fb.TitleFormat('%genre%'),		
-	albumartist: fb.TitleFormat("%album artist%"),	
+	genre: fb.TitleFormat('%genre%'),
+	albumartist: fb.TitleFormat("%album artist%"),
 	album: fb.TitleFormat("%album%"),
 	date: fb.TitleFormat("%date%"),
 	play_count: fb.TitleFormat("%play_count%"),
@@ -148,7 +148,7 @@ if(properties.deleteSpecificImageCache!="") {
 		delete_file_cache(null, -1, crc_array[i],true);
 	}
 	properties.deleteSpecificImageCache = "";
-	window.SetProperty("COVER cachekey of covers to delete on next startup", "");		
+	window.SetProperty("COVER cachekey of covers to delete on next startup", "");
 }
 
 var g_wallpaperImg = null;
@@ -161,7 +161,7 @@ cTouch = {
     y_prev: 0,
     y_move: 0,
     scroll_delta: 0,
-    t1: null, 
+    t1: null,
     timer: false,
     multiplier: 0,
     delta: 0
@@ -230,7 +230,7 @@ timers = {
 	avoid_on_library_items_removed: false,
 };
 
-/* 
+/*
 ===================================================================================================
     Images cache
 ===================================================================================================
@@ -334,7 +334,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
     };
 };
 
-/* 
+/*
 ===================================================================================================
     Objects
 ===================================================================================================
@@ -366,8 +366,8 @@ oPlaylistManager = function(name) {
         var target_total_rows = Math.floor((this.default_h - cPlaylistManager.topbarHeight) / cPlaylistManager.rowHeight);
         if(this.rowTotal != -1 && this.rowTotal < target_total_rows) target_total_rows = this.rowTotal;
         this.h = cPlaylistManager.topbarHeight + (target_total_rows * cPlaylistManager.rowHeight);
-        this.y = this.default_y + Math.floor((this.default_h - this.h) / 2);       
-       
+        this.y = this.default_y + Math.floor((this.default_h - this.h) / 2);
+
         this.totalRows = Math.floor((this.h - cPlaylistManager.topbarHeight) / cPlaylistManager.rowHeight);
         this.max = (this.rowTotal > this.totalRows ? this.totalRows : this.rowTotal);
     };
@@ -376,17 +376,17 @@ oPlaylistManager = function(name) {
         this.default_x = x;
         this.default_y = y;
         this.default_w = w;
-        this.default_h = h;  
+        this.default_h = h;
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.totalRows = Math.floor((this.h - cPlaylistManager.topbarHeight) / cPlaylistManager.rowHeight);
-        
+
         // adjust panel height / rowHeight + rowTotal (! refresh must have been executed once to have a valide rowTotal)
         this.adjustPanelHeight();
     };
-    
+
     this.showPanel = function() {
 		if(brw.drag_clicked){
 			if(pman.offset < pman.w) {
@@ -414,13 +414,13 @@ oPlaylistManager = function(name) {
         if(pman.offset < 1) {
             pman.offset = 0;
             pman.state = 0;
-			pman.scroll	= 0;			
+			pman.scroll	= 0;
             window.ClearInterval(timers.hidePlaylistManager);
             timers.hidePlaylistManager = false;
             brw.repaint();
         };
     };
-    
+
     this.populate = function(exclude_active, reset_scroll) {
 		reset_scroll = typeof reset_scroll !== 'undefined' ? reset_scroll : true;
         this.playlists.splice(0, this.playlists.length);
@@ -448,10 +448,10 @@ oPlaylistManager = function(name) {
             };
         };
         this.rowTotal = rowId;
-        
+
         // adjust panel height / rowHeight + rowTotal
         this.adjustPanelHeight();
-        
+
         if(reset_scroll || this.rowTotal <= this.totalRows) {
             this.scroll = 0;
         } else {
@@ -461,13 +461,13 @@ oPlaylistManager = function(name) {
             };
         };
     };
-    
-        
+
+
     this.draw = function(gr) {
         if(this.offset > 0) {
-			
+
 			if(this.refresh_required) this.populate(exclude_active = false, reset_scroll = false);
-			
+
             // metrics
             var cx = this.x - this.offset;
             var ch = cPlaylistManager.rowHeight;
@@ -490,17 +490,17 @@ oPlaylistManager = function(name) {
             };
 
 			//Overlay
-			height_top_fix = (properties.showHeaderBar ? (properties.showTagSwitcherBar ? properties.TagSwitcherBarHeight+properties.headerBarHeight : properties.headerBarHeight) : 0)	
+			height_top_fix = (properties.showHeaderBar ? (properties.showTagSwitcherBar ? properties.TagSwitcherBarHeight+properties.headerBarHeight : properties.headerBarHeight) : 0)
             gr.FillSolidRect(0, height_top_fix+1, ww, wh-height_top_fix-1, colors.pm_overlay);
-			
+
 			//Shadows
 			gr.FillGradRect(cx,this.y-gradient_size,ww-(brw.draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,0)
 			gr.FillGradRect(cx,this.y + this.h + cPlaylistManager.botbarHeight,ww-(brw.draw_right_line?1:0),gradient_size,90,colors.pm_shadow_on,colors.pm_shadow_off,1.0)
 			//Main BG
 			gr.FillSolidRect(cx, this.y, this.w, this.h + cPlaylistManager.botbarHeight + 1, colors.pm_bg);
 			gr.FillSolidRect(cx, this.y, ww-(brw.draw_right_line?1:0), 1, colors.pm_border);
-			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(brw.draw_right_line?1:0), 1, colors.pm_border);			
-            
+			gr.FillSolidRect(cx, this.y + this.h + cPlaylistManager.botbarHeight, ww-(brw.draw_right_line?1:0), 1, colors.pm_border);
+
             // ** items **
             var rowIdx = 0;
             var totalp = this.playlists.length;
@@ -510,10 +510,10 @@ oPlaylistManager = function(name) {
             for(var i = start_; i < end_; i++) {
                 cy = this.y + cPlaylistManager.topbarHeight + rowIdx*ch;
                 this.playlists[i].y = cy;
-                
+
                 // ** item bg **
                 gr.FillSolidRect(cx + bg_margin_left+5, cy + bg_margin_top-3, cw - bg_margin_left*2-10 - this.scr_w, 1, colors.pm_item_separator_line);
-                
+
                 // ** item text **
                 // playlist total items
                 if(cPlaylistManager.showTotalItems) {
@@ -523,21 +523,21 @@ oPlaylistManager = function(name) {
                 } else {
                     tw = 0;
                 };
-				
+
 				//draw playing playlist icon
 				if(fb.IsPlaying && this.playlists[i].idx == plman.PlayingPlaylist){
 					gr.DrawImage(images.playing_playlist, cx + bg_margin_left + txt_margin - 9, cy+6, images.playing_playlist.Width, images.playing_playlist.Height, 0, 0, images.playing_playlist.Width, images.playing_playlist.Height,0,255);
 					playlistname_padding_left = images.playing_playlist.Width - 6;
 				} else playlistname_padding_left = 0;
-				
+
                 // draw playlist name
                 if((this.activeIndex == i + 1 && cPlaylistManager.blink_counter < 0) || (cPlaylistManager.blink_id == i + 1 && cPlaylistManager.blink_row != 0)) {
                     gr.GdiDrawText("+ " + this.playlists[i].name , g_font.boldplus1, txt_color, cx + playlistname_padding_left + bg_margin_left + txt_margin, cy, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
                 } else {
                     gr.GdiDrawText(this.playlists[i].name , g_font.normal, txt_color, cx + playlistname_padding_left + bg_margin_left + txt_margin, cy, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
                 };
-                
-				
+
+
                 // draw flashing item on lbtn_up after a drag'n drop
                 if(cPlaylistManager.blink_counter > -1) {
                     if(cPlaylistManager.blink_row != 0) {
@@ -548,18 +548,18 @@ oPlaylistManager = function(name) {
                         };
                     };
                 };
-                
+
                 rowIdx++;
             };
-            			
+
             // top bar
             // draw flashing top bar item on lbtn_up after a drag'n drop
             if(cPlaylistManager.blink_counter > -1) {
                 if(cPlaylistManager.blink_row == 0) {
 					gr.GdiDrawText("+ Sent to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
-                    if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {                        
+                    if(cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {
 						gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
-						gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);							
+						gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
                     };
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -567,15 +567,15 @@ oPlaylistManager = function(name) {
             } else {
                 if(this.activeRow == 0) {
                     gr.GdiDrawText("+ Send to a new Playlist" , g_font.boldplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
-					
+
 					gr.FillSolidRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w, ch+1, colors.pm_blink);
-					gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);	
-					
+					gr.DrawRect(cx + bg_margin_left, this.y +(cPlaylistManager.topbarHeight-31), cw - bg_margin_left*2 - this.scr_w - 1, ch, 1.0, colors.pm_blink_rectline);
+
                 } else {
                     gr.GdiDrawText("Send to ..." , g_font.italicplus1, txt_color, cx + bg_margin_left + txt_margin, this.y + cPlaylistManager.topbarHeight - 30, cw - bg_margin_left*2 - txt_margin*2 - tw - this.scr_w, ch, DT_LEFT | DT_CALCRECT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
                 };
             };
-            
+
             // draw activeIndex hover frame
             if(cPlaylistManager.blink_counter > -1 && cPlaylistManager.blink_row > 0) {
                 cy_ = this.y + cPlaylistManager.blink_row * ch;
@@ -589,7 +589,7 @@ oPlaylistManager = function(name) {
                     };
                 };
             };
-            
+
             // scrollbar
             if(this.scr_w > 0) {
                 this.scr_cursor_h = (this.scr_h / (ch * this.rowTotal)) * this.scr_h;
@@ -597,23 +597,23 @@ oPlaylistManager = function(name) {
                 // set cursor y pos
                 var ratio = (this.scroll * ch) / (this.rowTotal * ch - this.scr_h);
                 this.scr_cursor_y = this.scr_y + Math.round((this.scr_h - this.scr_cursor_h) * ratio);
-                
+
                 gr.FillSolidRect(cx + cw - this.scr_w , this.scr_cursor_y, this.scr_w - 8, this.scr_cursor_h, colors.pm_scrollbar);
             };
         };
     };
-    
+
     this._isHover = function(x, y) {
         return (x >= this.x - this.offset && x <= this.x - this.offset + this.w && y >= this.y && y <= this.y + this.h - 1);
     };
-    
-    
+
+
     this.on_mouse = function(event, x, y, delta) {
         this.ishover = this._isHover(x, y);
-        
+
         switch(event) {
             case "move":
-			
+
                 // get active item index at x,y coords...
                 this.activeIndex = -1;
                 if(this.ishover) {
@@ -660,7 +660,7 @@ oPlaylistManager = function(name) {
                     };
                 };
                 break;
-            case "up":			
+            case "up":
                 brw.drag_clicked = false;
                 if(brw.drag_moving) {
                     this.drop_done = false;
@@ -670,7 +670,7 @@ oPlaylistManager = function(name) {
                             // send to a new playlist
                             this.drop_done = true;
                             fb.RunMainMenuCommand("File/New playlist");
-                            plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, brw.metadblist_selection, false);  
+                            plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, brw.metadblist_selection, false);
                         } else {
                             // send to selected (hover) playlist
                             this.drop_done = true;
@@ -716,7 +716,7 @@ oPlaylistManager = function(name) {
                         brw.drag_moving = false;
                     };
                     brw.drag_moving = false;
-                }; 
+                };
                 break;
             case "right":
                 brw.drag_clicked = false;
@@ -764,13 +764,13 @@ oFilterBox = function() {
     this.getImages = function() {
 		var gb;
         var w = Math.round(18 * g_zoom_percent / 100);
-        
+
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
-		else icon_theme_subfolder = "";					
-	
-		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");		
-        
-		
+		else icon_theme_subfolder = "";
+
+		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");
+
+
 		/*this.images.search_icon = gdi.CreateImage(w, w);
 		gb = this.images.search_icon.GetGraphics();
 			gb.SetSmoothingMode(2);
@@ -780,7 +780,7 @@ oFilterBox = function() {
 			gb.SetSmoothingMode(0);
 		this.images.search_icon.ReleaseGraphics(gb);*/
 		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter items");
-		
+
         this.images.resetIcon_off = gdi.CreateImage(w, w);
         gb = this.images.resetIcon_off.GetGraphics();
             gb.SetSmoothingMode(2);
@@ -808,7 +808,7 @@ oFilterBox = function() {
         this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt", "Reset filter");
 	};
 	//this.getImages();
-    
+
 	this.on_init = function() {
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
@@ -820,11 +820,11 @@ oFilterBox = function() {
     this.reset_layout = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
-		
+
 		var item_txt = new Array("", "Albums...", "Artists...", "Genres...");
-		if(!properties.showTagSwitcherBar) var boxText = item_txt[properties.tagMode];	
+		if(!properties.showTagSwitcherBar) var boxText = item_txt[properties.tagMode];
 		else var boxText = "Filter...";
-		this.inputbox.empty_text = boxText;		
+		this.inputbox.empty_text = boxText;
     };
 
     this.setSize = function(w, h, font_size) {
@@ -839,12 +839,12 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-    
+
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
         var bw = this.inputbox.w + Math.round(44 * g_zoom_percent / 100);
-        
+
         if(this.inputbox.text.length > 0) {
             this.reset_bt.draw(gr, bx+1, by+1, 255);
         } else {
@@ -852,7 +852,7 @@ oFilterBox = function() {
         };
 		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+5, by, 0, 0);
     };
-    
+
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
@@ -870,9 +870,9 @@ oFilterBox = function() {
                     };
                 } else if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 					this.inputbox.activate(x,y);
-					this.inputbox.repaint();				
+					this.inputbox.repaint();
 				}
-				this.inputbox.check("up", x, y);				
+				this.inputbox.check("up", x, y);
                 break;
             case "lbtn_dblclk":
 				this.inputbox.check("dblclk", x, y);
@@ -887,7 +887,7 @@ oFilterBox = function() {
                 break;
         };
     };
-    
+
     this.on_key = function(event, vkey) {
         switch(event) {
             case "down":
@@ -895,29 +895,29 @@ oFilterBox = function() {
                 break;
         };
     };
-    
+
     this.on_char = function(code) {
         this.inputbox.on_char(code);
     };
-    
+
 	this.on_focus = function(is_focused) {
 		this.inputbox.on_focus(is_focused);
 	};
 };
 
 oTagSwitcherBar = function() {
-    this.setItems_infos = function(){	
+    this.setItems_infos = function(){
 		this.items_functions = new Array(
 			function() {
 				librarytree.toggleValue();
-				window.NotifyOthers("left_filter_state","library_tree");		
+				window.NotifyOthers("left_filter_state","library_tree");
 			}
-		, 
+		,
 			function() {
 				g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 				properties.tagMode = 1;
 				window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
-				window.NotifyOthers("left_filter_state","album");			
+				window.NotifyOthers("left_filter_state","album");
 				switch(properties.tagMode) {
 					case 1:
 						properties.albumArtId = 0;
@@ -928,16 +928,16 @@ oTagSwitcherBar = function() {
 					case 3:
 						properties.albumArtId = 5;
 						break;
-				};				
+				};
 				get_metrics();
-				brw.populate(true,1);			
+				brw.populate(true,1);
 			}
-		, 
+		,
 			function() {
 				g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 				properties.tagMode = 2;
 				window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
-				window.NotifyOthers("left_filter_state","artist");			
+				window.NotifyOthers("left_filter_state","artist");
 				switch(properties.tagMode) {
 					case 1:
 						properties.albumArtId = 0;
@@ -948,16 +948,16 @@ oTagSwitcherBar = function() {
 					case 3:
 						properties.albumArtId = 5;
 						break;
-				};			
+				};
 				get_metrics();
-				brw.populate(true,1);			
+				brw.populate(true,1);
 			}
-		, 
+		,
 			function() {
 				g_tagswitcherbar.activeItem = g_tagswitcherbar.hoverItem;
 				properties.tagMode = 3;
 				window.SetProperty("_PROPERTY: Tag Mode", properties.tagMode);
-				window.NotifyOthers("left_filter_state","genre");			
+				window.NotifyOthers("left_filter_state","genre");
 				switch(properties.tagMode) {
 					case 1:
 						properties.albumArtId = 0;
@@ -968,70 +968,70 @@ oTagSwitcherBar = function() {
 					case 3:
 						properties.albumArtId = 5;
 						break;
-				};			
+				};
 				get_metrics();
-				brw.populate(true,1);			
+				brw.populate(true,1);
 			}
-		);		
-		this.items_width = new Array(0, 0, 0, 0);		
+		);
+		this.items_width = new Array(0, 0, 0, 0);
 		this.items_x = new Array(0, 0, 0, 0);
-		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");		
-		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");	
+		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");
+		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
 		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
-			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();			
+			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
 		}
 		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
-			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();			
+			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
 		}
 		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
-			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();			
+			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
 		}
-		
+
 		properties.album_label = this.items_txt[1];
 		properties.artist_label = this.items_txt[2];
 		properties.genre_label = this.items_txt[3];
-		
+
 		if(!properties.showLibraryTreeSwitch){
 			this.items_txt.shift();
 			this.items_width.shift();
 			this.items_x.shift();
 			this.items_functions.shift();
-		}		
+		}
 	}
-	
+
 	this.setItems_infos();
-	this.hoverItem = -1;	
+	this.hoverItem = -1;
 	this.txt_top_margin = 0;
 	this.margin_right = 2;
-	this.margin_left = 6;	
+	this.margin_left = 6;
 	this.images = {};
 	this.hide_bt = false;
-	
+
     this.setHideButton = function(){
 		this.hscr_btn_w = 18
-		var xpts_mtop = Math.ceil((this.h-9)/2);	
-		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);			
+		var xpts_mtop = Math.ceil((this.h-9)/2);
+		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);
 		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_off.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts3);
-			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts4);			
+			gb.FillPolygon(colors.btn_inactive_txt, 0, xpts4);
 		this.hide_bt_off.ReleaseGraphics(gb);
 		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_ov.GetGraphics();
-			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);	
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);
 			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
 			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
 			gb.FillPolygon(colors.normal_txt, 0, xpts3);
-			gb.FillPolygon(colors.normal_txt, 0, xpts4);			
-		this.hide_bt_ov.ReleaseGraphics(gb);		
+			gb.FillPolygon(colors.normal_txt, 0, xpts4);
+		this.hide_bt_ov.ReleaseGraphics(gb);
 		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide this menu");
-	}	
+	}
     this.getImages = function() {
 		if(properties.darklayout) icon_theme_subfolder = "\\white";
-		else icon_theme_subfolder = "";					
+		else icon_theme_subfolder = "";
 		this.images.library_tree = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\icon_tree.png");
 		if(this.hide_bt) this.setHideButton();
 	};
@@ -1052,11 +1052,11 @@ oTagSwitcherBar = function() {
 		this.x = x;
 		this.y = y;
 		var prev_text_width=0;
-		
+
 		// draw background part above playlist (headerbar)
 		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
 		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x -((brw.draw_right_line)?1:0), 1, colors.headerbar_line);
-		
+
 		//Calculate text size
 		total_txt_size = 0
 		for(i = this.items_txt.length-1; i >= 0; i--) {
@@ -1068,10 +1068,10 @@ oTagSwitcherBar = function() {
 
 		//Draw texts
 		for(i = this.items_txt.length-1; i >= 0; i--) {
-			this.items_width[i] += txt_padding_sides;			
+			this.items_width[i] += txt_padding_sides;
 			if(i<this.items_txt.length-1) tx = tx + this.items_width[i+1];
 			this.items_x[i] = tx;
-			
+
 			brw.margin_left = 5;
 			if(this.items_txt[i].length==1){
 				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
@@ -1080,16 +1080,16 @@ oTagSwitcherBar = function() {
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
-		if(properties.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);	
+		if(properties.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);
     };
     this.setHoverStates = function(x, y){
 		var prev_hover_item = this.hoverItem;
-		this.hoverItem = -1;		
+		this.hoverItem = -1;
 		for(i = 0; i < this.items_txt.length; i++) {
 			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
 		}
 		if(prev_hover_item!=this.hoverItem){
-			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW,20);			
+			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW,20);
 			else g_cursor.setCursor(IDC_HAND,this.items_txt[this.hoverItem]);
 		}
 		return (prev_hover_item!=this.hoverItem);
@@ -1097,14 +1097,14 @@ oTagSwitcherBar = function() {
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
-				if(this.hoverItem != properties.tagMode-((properties.showLibraryTreeSwitch)?0:1) && this.hoverItem>-1) {				
+				if(this.hoverItem != properties.tagMode-((properties.showLibraryTreeSwitch)?0:1) && this.hoverItem>-1) {
 					this.items_functions[this.hoverItem]();
 					if(g_filterbox.inputbox.text.length > 0) {
 						g_filterbox.inputbox.text = "";
 						g_filterbox.inputbox.offset = 0;
 						filter_text = "";
 						g_sendResponse();
-					}						
+					}
 				}
 				if(properties.showFiltersTogglerBtn && this.hide_bt.checkstate("hover", x, y)){
 					this.hide_bt.checkstate("up", -1, -1);
@@ -1112,8 +1112,8 @@ oTagSwitcherBar = function() {
 					libraryfilter_state.toggleValue();
 				}
 				g_tooltip.Deactivate();
-				break;		
-            case "lbtn_up":			
+				break;
+            case "lbtn_up":
                 break;
             case "lbtn_dblclk":
                 break;
@@ -1121,7 +1121,7 @@ oTagSwitcherBar = function() {
                 break;
             case "move":
 				changed_state = this.setHoverStates(x,y);
-				if(changed_state) {					
+				if(changed_state) {
 					if(this.hoverItem>-1){
 						g_tooltip.Deactivate();
 						g_tooltip.ActivateDelay( this.items_tooltips[this.hoverItem], x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.items_tooltips[this.hoverItem]);
@@ -1134,10 +1134,10 @@ oTagSwitcherBar = function() {
             case "leave":
 				changed_state = this.setHoverStates(-1,-1);
 				if(changed_state) {
-					brw.repaint();	
-				}		
+					brw.repaint();
+				}
 				if(properties.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);
-                break;				
+                break;
         };
     };
 };
@@ -1148,19 +1148,19 @@ oScrollbar = function(themed) {
     this.buttonType = {cursor: 0, up: 1, down: 2};
     this.buttonClick = false;
     this.cursorHover = false;
-    this.cursorDrag = false;	
+    this.cursorDrag = false;
     this.color_bg = colors.lightgrey_bg;
     this.color_txt = colors.normal_txt;
-    
+
     if(this.themed) {
         this.theme = window.CreateThemeManager("scrollbar");
     } else {
         this.theme = false;
     };
-    
+
     this.setNewColors = function() {
         this.color_bg = colors.lightgrey_bg;
-        this.color_txt = colors.normal_txt;  
+        this.color_txt = colors.normal_txt;
         this.setButtons();
         this.setCursorButton();
     };
@@ -1224,27 +1224,27 @@ oScrollbar = function(themed) {
 		gb.FillSolidRect(this.cursorw-cScrollBar.normalWidth-1, cScrollBar.marginTop, cScrollBar.normalWidth-2, this.cursorh-cScrollBar.marginTop-cScrollBar.marginBottom, colors.scrollbar_normal_cursor);
 
         this.cursorImage_normal.ReleaseGraphics(gb);
-        
+
         // hover cursor Image
         this.cursorImage_hover = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_hover.GetGraphics();
         // Draw Themed Scrollbar (lg/col)
 		gb.FillSolidRect(this.cursorw-cScrollBar.hoverWidth, 0, cScrollBar.hoverWidth, this.cursorh,colors.scrollbar_hover_cursor);
         this.cursorImage_hover.ReleaseGraphics(gb);
-		
+
         // down cursor Image
         this.cursorImage_down = gdi.CreateImage(this.cursorw, this.cursorh);
         gb = this.cursorImage_down.GetGraphics();
 		gb.FillSolidRect(this.cursorw-cScrollBar.downWidth, 0, cScrollBar.downWidth, this.cursorh,colors.scrollbar_down_cursor);
 
         this.cursorImage_down.ReleaseGraphics(gb);
-		
+
         // create/refresh cursor Button in buttons array
         this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down,"scrollbarcursor");
         this.buttons[this.buttonType.cursor].x = this.x;
         this.buttons[this.buttonType.cursor].y = this.cursory;
     };
-    
+
     this.draw = function(gr) {
 
 	   // gr.FillSolidRect(this.x, this.y, this.w, this.h, this.color_bg & 0x25ffffff);
@@ -1257,7 +1257,7 @@ oScrollbar = function(themed) {
             this.buttons[this.buttonType.down].draw(gr, this.x, this.areay + this.areah, 255);
         };
     };
-       
+
     this.updateScrollbar = function() {
         var prev_cursorh = this.cursorh;
         this.total = (brw.rowsCount+properties.addedRows_end);
@@ -1278,13 +1278,13 @@ oScrollbar = function(themed) {
         this.setCursorY();
         if(this.cursorh != prev_cursorh) this.setCursorButton();
     };
-    
+
     this.setCursorY = function() {
         // set cursor y pos
         var ratio = scroll / (this.totalh - brw.h);
         this.cursory = this.areay + Math.round((this.areah - this.cursorh) * ratio);
     };
-    
+
     this.setSize = function() {
         if(properties.drawUpAndDownScrollbar) this.buttonh = cScrollBar.width;
 		else this.buttonh = 0;
@@ -1301,7 +1301,7 @@ oScrollbar = function(themed) {
         };
         this.setButtons();
     };
-    
+
     this.setScrollFromCursorPos = function() {
         // calc ratio of the scroll cursor to calc the equivalent item for the full list (with gh)
         var ratio = (this.cursory - this.areay) / (this.areah - this.cursorh);
@@ -1358,7 +1358,7 @@ oScrollbar = function(themed) {
 			break;
         };
     };
-    
+
     this._isHover = function(x, y) {
         return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
     };
@@ -1377,7 +1377,7 @@ oScrollbar = function(themed) {
         this.isHoverCursor = this._isHoverCursor(x, y);
         this.isHoverButtons = this.isHover && !this.isHoverCursor && !this.isHoverArea;
         this.isHoverEmptyArea = this.isHoverArea && !this.isHoverCursor;
-        
+
         var scroll_step = properties.rowHeight;
         var scroll_step_page = brw.h;
 
@@ -1472,7 +1472,7 @@ oScrollbar = function(themed) {
                     cScrollBar.timerID = false;
                 };
                 cScrollBar.timerCounter = -1;
-                
+
                 this.cursorCheck(event, x, y);
                 for(var i = 1; i < 3; i++) {
                     this.buttons[i].checkstate(event, x, y);
@@ -1488,7 +1488,7 @@ oScrollbar = function(themed) {
 				/*if(this.isHoverArea) {
 					this.buttons[this.buttonType.cursor].state = ButtonStates.hover;
 				} else {
-					this.buttons[this.buttonType.cursor].state = ButtonStates.normal;									
+					this.buttons[this.buttonType.cursor].state = ButtonStates.normal;
 				}*/
                 break;
             case "wheel":
@@ -1513,7 +1513,7 @@ oGroup = function(index, start, handle, groupkey) {
 	this.count = 1;
     this.metadb = handle;
     this.groupkey = groupkey;
-    this.cover_img_mask = null;	
+    this.cover_img_mask = null;
     if(handle) {
         switch(properties.tagMode) {
             case 1:
@@ -1521,11 +1521,11 @@ oGroup = function(index, start, handle, groupkey) {
                 break;
             case 2:
                 this.cachekey = process_cachekey(handle,properties.tf_crc_artist);
-                this.cachekey_album = process_cachekey(handle);				
+                this.cachekey_album = process_cachekey(handle);
                 break;
             case 3:
                 this.cachekey = process_cachekey(handle,properties.tf_crc_genre);
-                this.cachekey_album = process_cachekey(handle);					
+                this.cachekey_album = process_cachekey(handle);
                 break;
         }
         this.tracktype = TrackType(handle.RawPath.substring(0, 4));
@@ -1538,7 +1538,7 @@ oGroup = function(index, start, handle, groupkey) {
     this.cover_type = null;
     this.load_requested = 0;
     this.save_requested = false;
-	this.cover_formated = false;			
+	this.cover_formated = false;
     this.finalize = function(count, tracks, handles) {
         this.tra = tracks.slice(0);
         this.pl = handles.Clone();
@@ -1562,7 +1562,7 @@ oBrowser = function(name) {
     this.keypressed = false;
     this.selectedIndex = -1;
     this.margin_left = 5;
-    this.margin_right = 3;	
+    this.margin_right = 3;
 	this.textMarginRight = 10;
     this.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
 	this.sourceIdx = -1;
@@ -1575,15 +1575,15 @@ oBrowser = function(name) {
 	this.clearSelectedItemsOnNextClick = false;
 	this.drag_clicked = false;
 	this.drag_clicked_x = 0;
-	this.drag_clicked_y = 0;	
+	this.drag_clicked_y = 0;
 	this.saved_send_index = -1;
-	this.saved_send_index_to = -1;	
-	this.timer_populate_id = 0;	
-	this.timer_populate_is_first = false;	
+	this.saved_send_index_to = -1;
+	this.timer_populate_id = 0;
+	this.timer_populate_is_first = false;
 	this.drag_moving = false;
 	this.tempSelectedItem = -1;
 	this.firstRowHeight = false;
-	this.secondRowHeight = false;	
+	this.secondRowHeight = false;
 	this.draw_right_line = false;
 	this.customGroups = false;
 	this.tooltip_activated = false;
@@ -1606,7 +1606,7 @@ oBrowser = function(name) {
     this.repaint = function() {
         repaint_main1 = repaint_main2;
     };
-    
+
 	this.get_metrics = function() {
         switch(properties.displayMode) {
             case 1:
@@ -1621,21 +1621,21 @@ oBrowser = function(name) {
                     this.marginBot = 0;
                     this.marginSide = 0;
                     this.marginCover = 10;
-					this.marginLR = 0;					
+					this.marginLR = 0;
                 } else if(properties.displayMode == 3 && properties.displayModeGridNoText){
                     this.marginTop = 0;
                     this.marginBot = 0;
                     this.marginSide = 0;
                     this.marginCover = 0;
-					this.marginLR = 0;					
+					this.marginLR = 0;
                 } else {
                     this.marginTop = 0;
                     this.marginBot = 0;
                     this.marginSide = 0;
                     this.marginCover = 0;
-					this.marginLR = 2;					
+					this.marginLR = 2;
                 };
-                // Adjust Column 
+                // Adjust Column
                 this.totalColumns = Math.floor((this.w - this.marginLR * 2) / this.thumb_w);
                 if(this.totalColumns < properties.MinNumberOfColumns) this.totalColumns = properties.MinNumberOfColumns;
                 // count total of rows for the whole library
@@ -1649,7 +1649,7 @@ oBrowser = function(name) {
                 // calc size of the cover art
                 cover.max_w = (this.thumbnailWidth - (this.marginSide * 2) - (this.marginCover * 2));
 				try {
-					images.loading_draw = images.loading.Resize(cover.max_w, cover.max_w, 7);	
+					images.loading_draw = images.loading.Resize(cover.max_w, cover.max_w, 7);
 				} catch (e) {
 				}
                 // Adjust Row & showList bloc Height
@@ -1670,7 +1670,7 @@ oBrowser = function(name) {
                 this.marginBot = (properties.displayMode > 0 ? 0 : 0);
                 this.marginSide = 0;
                 this.marginCover = (properties.displayMode > 0 ? 7 : 5);
-                // Adjust Column 
+                // Adjust Column
                 this.totalColumns = 1;
                 // count total of rows for the whole library
                 this.rowsCount = this.groups.length;
@@ -1691,17 +1691,17 @@ oBrowser = function(name) {
                         break;
                 }
                 // calc size of the cover art
-                cover.max_w = (this.rowHeight - (this.marginCover * 2));			
+                cover.max_w = (this.rowHeight - (this.marginCover * 2));
                 break;
-        };		
+        };
 	}
     this.update = function() {
-		
+
 		this.get_metrics();
-		
+
 		this.cover_img_all_finished = false;
 		this.cover_img_all_mask = false;
-		this.cover_img_all = false;		
+		this.cover_img_all = false;
         this.totalRows = Math.ceil(this.h / this.rowHeight);
         this.totalRowsVis = Math.floor(this.h / this.rowHeight);
         properties.rowHeight = this.rowHeight;
@@ -1711,43 +1711,43 @@ oBrowser = function(name) {
         scroll = check_scroll(scroll);
         //scroll_ = scroll + (this.rowHeight / properties.scrollRowDivider);
         scroll_ = scroll;
-        
-        // scrollbar update       
+
+        // scrollbar update
         this.scrollbar.updateScrollbar();
-        
+
         this.repaint();
     };
-    
+
     this.setSize = function(x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-		
-        if(properties.showTagSwitcherBar) g_tagswitcherbar.setSize(ww, properties.TagSwitcherBarHeight, g_fsize-1);		
+
+        if(properties.showTagSwitcherBar) g_tagswitcherbar.setSize(ww, properties.TagSwitcherBarHeight, g_fsize-1);
         if(properties.showHeaderBar) g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
 
         this.scrollbar.setSize();
-       
+
         scroll = Math.round(scroll / properties.rowHeight) * properties.rowHeight;
         scroll = check_scroll(scroll);
         scroll_ = scroll;
-        
-        // scrollbar update       
+
+        // scrollbar update
         this.scrollbar.updateScrollbar();
-        
+
         this.update();
-        
+
         if(properties.DropInplaylist) pman.setSize(ww, y + 45, ww, h - 90);
     };
     this.setList = function() {
         var end = this.groups.length;
         for(var i = 0; i < end; i++) {
             this.groups[i].load_requested = 0;
-			this.groups[i].cover_formated = false;		
+			this.groups[i].cover_formated = false;
         };
     };
-    
+
     this.showItemFromItemHandle = function(metadb, showItemTemporary) {
         var total = this.groups.length;
         var total_tracks = 0;
@@ -1764,7 +1764,7 @@ oBrowser = function(name) {
         };
 
         if(found) { // scroll to item
-		
+
             if(properties.showAllItem && this.groups.length>1 && a == 0) a += 1;
             switch(properties.displayMode) {
                 case 1:
@@ -1847,7 +1847,7 @@ oBrowser = function(name) {
         };
         this.activateItem(index);
     };
-       
+
     this.getItemIndexFromTrackIndex = function(tid) {
         var mediane = 0; var deb = 0; var fin = this.groups.length - 1;
         while(deb <= fin){
@@ -1862,16 +1862,16 @@ oBrowser = function(name) {
         };
         return -1;
     };
-    
+
     this.selectAtoB = function(start_id, end_id) {
         var affectedItems = Array();
-        
+
         if(start_id < end_id) {
             var deb = start_id;
             var fin = end_id;
         } else {
             var deb = end_id;
-            var fin = start_id;        
+            var fin = start_id;
         };
 
         for(var i = deb; i <= fin ;i++) {
@@ -1879,7 +1879,7 @@ oBrowser = function(name) {
         };
         plman.SetPlaylistSelection(g_active_playlist, affectedItems, true);
     };
-    
+
     this.init_groups = function() {
 		var handle = null;
 		var current = "";
@@ -1896,14 +1896,14 @@ oBrowser = function(name) {
 		var itemkey_all = [];
 		var default_grouping = false;
 		this.groups.splice(0, this.groups.length);
-				
+
         switch(properties.tagMode) {
             case 1: // album
 				if(properties.tf_groupkey_album==properties.tf_groupkey_album_default){
 					default_grouping = true;
 					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos);
 				} else
-					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos+" ## "+properties.tf_groupkey_album_default);					
+					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos+" ## "+properties.tf_groupkey_album_default);
                 break;
             case 2: // artist
                 var tf = fb.TitleFormat(properties.tf_groupkey_artist);
@@ -1912,23 +1912,23 @@ oBrowser = function(name) {
                 var tf = fb.TitleFormat(properties.tf_groupkey_genre);
                 break;
         };
-        var str_filter = process_string(filter_text); 
+        var str_filter = process_string(filter_text);
 		var previous_item_genre = "123456789";
 		for(var i = 0; i < total; i++) {
-							
+
 			handle = this.list[i];
-            arr = tf.EvalWithMetadb(handle).split(" ## ");			
+            arr = tf.EvalWithMetadb(handle).split(" ## ");
 			current = arr[0].toLowerCase();
-			
+
             if(str_filter.length > 0) {
                 var comp_str = (arr.length > 1 ? arr[0]+" "+arr[1] : arr[0]);
                 var toAdd = match(comp_str, str_filter);
             } else {
-                var toAdd = true;  
+                var toAdd = true;
             };
             if(toAdd) {
                 if(current != previous && !flag["#"+current]) {
-				
+
                     if(this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 						flag["#"+current] = true;
 					}
@@ -1938,7 +1938,7 @@ oBrowser = function(name) {
                         tr.splice(0, t);
                         pl.RemoveAll();
                         t = 0;
-                    }; 
+                    };
                     if(i < total) {
                         // add new group
                         tr.push(arr[1]);
@@ -1966,25 +1966,25 @@ oBrowser = function(name) {
 									console.log("itemkey_all[multivalues[m]1 "+multivalues[m]+" index:"+(g))
 								} else {
 									console.log("itemkey_all[multivalues[m]2 "+multivalues[m])
-									//if(m==0) 
+									//if(m==0)
 										this.groups[itemkey_all[multivalues[m]].index-1].addTrack(arr[1],handle);
-									//else itemkey_all[multivalues[m]].handles.Add(handle);									
+									//else itemkey_all[multivalues[m]].handles.Add(handle);
 								}
 							}
 							//if(m>1) alert(1);
 						} else {
 							 this.groups.push(new oGroup(g+1, i, handle, arr[0]));
 							 g++;
-						}							
+						}
 						this.groups[g-1].date = arr[2];
 						if(properties.tagMode==1){
 							if(default_grouping){
 								var artist_album = arr[0].split(" ^^ ");
 							} else {
-								var artist_album = arr[3].split(" ^^ ");								
+								var artist_album = arr[3].split(" ^^ ");
 							}
-							this.groups[g-1].artist_name = artist_album[0];  
-							this.groups[g-1].album = artist_album[1];						
+							this.groups[g-1].artist_name = artist_album[0];
+							this.groups[g-1].album = artist_album[1];
 						}
                         previous = current;
                     };
@@ -2004,26 +2004,26 @@ oBrowser = function(name) {
         if(g > 0) {
             // update last group properties
             this.groups[g-1].finalize(t, tr, pl);
-			this.groups[g-1].date = arr[2];   
+			this.groups[g-1].date = arr[2];
 
 			if(properties.tagMode==1){
 				if(default_grouping){
 					var artist_album = arr[0].split(" ^^ ");
 				} else {
-					var artist_album = arr[3].split(" ^^ ");								
+					var artist_album = arr[3].split(" ^^ ");
 				}
-				this.groups[g-1].artist_name = artist_album[0];  
-				this.groups[g-1].album = artist_album[1];						
+				this.groups[g-1].artist_name = artist_album[0];
+				this.groups[g-1].album = artist_album[1];
 			}
-			
-			//this.groups[g-1].artist_name = arr[4];  			
+
+			//this.groups[g-1].artist_name = arr[4];
             // add 1st group ("ALL" item)
             if(properties.showAllItem && g > 1) {
                 this.groups.unshift(new oGroup(0, 0, null, null));
                 this.groups[0].finalize(t_all, tr_all, pl_all);
             };
         };
-        
+
         // free memory
         tr.splice(0, tr.length);
         tr_all.splice(0, tr_all.length);
@@ -2032,26 +2032,26 @@ oBrowser = function(name) {
         pl.RemoveAll();
         pl_all.RemoveAll();
     };
-      
+
     this.populate = function(is_first_populate, call_id, force_sourceMode, force_playlist) {
-		
+
 		this.current_sourceMode = properties.sourceMode;
 		if((!filter1_state.isActive() && properties.filterOrder==1) || (!filter1_state.isActive() && !filter2_state.isActive() && properties.filterOrder==2))
-			this.current_sourceMode = 0;		
-		
+			this.current_sourceMode = 0;
+
 		if(typeof force_sourceMode !== 'undefined') this.populate_sourceMode = force_sourceMode;
 		else this.populate_sourceMode = this.current_sourceMode;
-				
+
         console.log("--> populate Filter order:"+properties.filterOrder+" parent panel:"+properties.ParentName+" call_id:"+call_id);
-		gTime_pop = fb.CreateProfiler();			
+		gTime_pop = fb.CreateProfiler();
 		gTime_pop.Reset();
-		console.log("Filter populate started time:"+gTime_pop.Time);	
+		console.log("Filter populate started time:"+gTime_pop.Time);
 		this.sourcePlaylistIdx = -1;
         if(this.list) this.list = undefined;
         if(this.list_unsorted) this.list_unsorted = undefined;
 		if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();
 		scroll = scroll_ = 0;
-		
+
         // define sort order
         switch(properties.tagMode) {
             case 1: // album
@@ -2060,7 +2060,7 @@ oBrowser = function(name) {
 					this.customGroups = false;
 				} else {
 					var TFsorting = properties.tf_groupkey_album + " | %date% | %album% | %discnumber% | %tracknumber% | %title%";
-					this.customGroups = true;					
+					this.customGroups = true;
                 }
 				break;
             case 2: // artist
@@ -2068,7 +2068,7 @@ oBrowser = function(name) {
 					var TFsorting = properties.artistsTFsortingdefault;
 					this.customGroups = false;
 				} else {
-					var TFsorting = properties.tf_groupkey_artist + " | %date% | %album% | %discnumber% | %tracknumber% | %title%";	
+					var TFsorting = properties.tf_groupkey_artist + " | %date% | %album% | %discnumber% | %tracknumber% | %title%";
 					this.customGroups = true;
 				}
                 break;
@@ -2082,7 +2082,7 @@ oBrowser = function(name) {
                 }
 				break;
         };
-        
+
 		if(force_playlist){
 			this.list = plman.GetPlaylistItems(force_playlist);
 			this.sourcePlaylistIdx = force_playlist;
@@ -2100,37 +2100,37 @@ oBrowser = function(name) {
 					pfound = true;
 				};
 				if(pfound) break;
-			};		
-			
+			};
+
             // populate library
             if(this.sourceIdx>-1) {
 				this.sourcePlaylistIdx = this.sourceIdx;
 				this.list = plman.GetPlaylistItems(this.sourceIdx);
 			} else {
 				this.list = fb.GetLibraryItems();
-			}	
+			}
         } else if(this.populate_sourceMode == 3) {
             // populate current playlist
 			if(!browser_refresh_required && !is_first_populate) return;
 			if(!g_first_populate_done) {
 				this.list = fb.GetLibraryItems();
             } else {
-				//this.list_unsorted = 
+				//this.list_unsorted =
 				this.list = plman.GetPlaylistItems(plman.ActivePlaylist);
 				this.sourcePlaylistIdx = plman.ActivePlaylist;
 			}
-            browser_refresh_required=false;		
+            browser_refresh_required=false;
         } else {
 			this.list = plman.GetPlaylistItems(plman.ActivePlaylist);
-			this.sourcePlaylistIdx = plman.ActivePlaylist;			
+			this.sourcePlaylistIdx = plman.ActivePlaylist;
         };
 		// sort the list
 		if(TFsorting.length > 0) {
 			this.list.OrderByFormat(fb.TitleFormat(TFsorting), 1);
-		};		
+		};
 		this.selectedIndex=-1;
-		this.tempSelectedItem = -1;		
-		this.MultipleSelectedIndex = [];		
+		this.tempSelectedItem = -1;
+		this.MultipleSelectedIndex = [];
         this.init_groups();
         get_metrics();
         this.setList();
@@ -2140,32 +2140,32 @@ oBrowser = function(name) {
         g_first_populate_done = true;
 		console.log("Filter populate finished time:"+gTime_pop.Time);
     };
-	
+
     this.clearSelectedItem = function() {
 		this.selectedIndex = -1;
 		this.MultipleSelectedIndex = [];
 	}
     this.clearMultipleSelectedItem = function() {
 		this.MultipleSelectedIndex = [];
-	}    
+	}
     this.activateItem = function(index, showItemTemporary) {
         if(this.groups.length == 0) return;
-		if(utils.IsKeyPressed(VK_CONTROL) && this.selectedIndex>-1) {	
+		if(utils.IsKeyPressed(VK_CONTROL) && this.selectedIndex>-1) {
 			if(!arrayContains(this.MultipleSelectedIndex,this.selectedIndex)){
-				this.MultipleSelectedIndex.push(this.selectedIndex);	
+				this.MultipleSelectedIndex.push(this.selectedIndex);
 			}
 		} else this.MultipleSelectedIndex = [];
         if(!showItemTemporary) {
 			this.selectedIndex = index;
-			this.tempSelectedItem = -1;			
+			this.tempSelectedItem = -1;
 		} else {
 			this.tempSelectedItem = index;
-			this.selectedIndex = -1;			
+			this.selectedIndex = -1;
 		}
     }
     this.focusItemToPlaylist = function(metadb) {
         if(this.groups.length == 0) return;
-        
+
         var affectedItems = [];
         var total = this.list_unsorted.Count;
         for(var a = 0; a < total; a++) {
@@ -2181,25 +2181,25 @@ oBrowser = function(name) {
         };
     };
 	this.save_sendItemToPlaylist = function(index,index_to) {
-		index_to = typeof index_to !== 'undefined' ? index_to : -1;		
+		index_to = typeof index_to !== 'undefined' ? index_to : -1;
 		this.saved_send_index = index;
-		this.saved_send_index_to = index_to;		
-	}	
+		this.saved_send_index_to = index_to;
+	}
 	this.sendSelectedItemsToPlaylist = function() {
 		if(this.saved_send_index>-1) {
-			this.sendItemToPlaylist(this.saved_send_index,this.saved_send_index_to);	
+			this.sendItemToPlaylist(this.saved_send_index,this.saved_send_index_to);
 		}
 	}
 	this.clearSaved_sendItemToPlaylist = function() {
 		this.saved_send_index = -1;
-		this.saved_send_index_to = -1;				
+		this.saved_send_index_to = -1;
 	}
 	this.searchPlaylists = function(){
         this.pfound_selectionPlaylist = false;
         this.pfound_playingPlaylist = false;
         this.pidx_selection = -1;
-        this.pidx_playing = -1;		
-        var total = plman.PlaylistCount;		
+        this.pidx_playing = -1;
+        var total = plman.PlaylistCount;
         for(var i = 0; i < total; i++) {
             if(!this.pfound_selectionPlaylist && plman.GetPlaylistName(i) == properties.selectionPlaylist) {
                 this.pidx_selection = i;
@@ -2214,7 +2214,7 @@ oBrowser = function(name) {
 	}
 	this.getSelectedItems = function() {
 		var selectedItems = new FbMetadbHandleList();
-		
+
 		if(this.selectedIndex>-1)
 			selectedItems.InsertRange(0,this.groups[this.selectedIndex].pl);
 		var total = this.MultipleSelectedIndex.length
@@ -2226,12 +2226,12 @@ oBrowser = function(name) {
 	}
     this.sendItemToPlaylist = function(index,index_to) {
 		index_to = typeof index_to !== 'undefined' ? index_to : -1;
-		
+
 		this.saved_send_index = -1;
-		this.saved_send_index_to = -1;			
-		
+		this.saved_send_index_to = -1;
+
         if(this.groups.length == 0) return;
-        
+
         // parse stored tags
         /*if(properties.showAllItem && index == 0 && this.groups.length > 1) {
             var arr = null;
@@ -2246,11 +2246,11 @@ oBrowser = function(name) {
 		var inserted = false;
 		var clearPlaylist = false;
 		this.clearSelectedItemsOnNextClick = false;
-		
+
 		var toInsert = new FbMetadbHandleList();
 		var playlistToInsert = -1;
 		var positionToInsert = -1;
-		
+
 		/*if(fb.IsPlaying) {
 			var playing_item = plman.GetPlayingItemLocation();
 			if(playing_item.IsValid){
@@ -2273,7 +2273,7 @@ oBrowser = function(name) {
 					this.MultipleSelectedIndex.push(i);
 					toInsert.InsertRange(toInsert.Count,this.groups[i].pl);
 					inserted = true;
-				}					
+				}
 				//from += this.groups[index].pl.Count;
 			}
 			playlistToInsert = this.pidx_selection;
@@ -2293,7 +2293,7 @@ oBrowser = function(name) {
             if(!arrayContains(this.MultipleSelectedIndex,index)) {
 				toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
 				playlistToInsert = this.pidx_selection;
-				positionToInsert = from;				
+				positionToInsert = from;
 				//plman.InsertPlaylistItems(this.pidx_selection, from, this.groups[index].pl, false);
 				inserted = true;
 			}
@@ -2313,8 +2313,8 @@ oBrowser = function(name) {
                     };
                     // *** insert tracks into this.pidx_playing playlist
 					playlistToInsert = this.pidx_playing;
-					positionToInsert = 0;		
-					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);					
+					positionToInsert = 0;
+					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
                     //plman.InsertPlaylistItems(this.pidx_playing, 0, this.groups[index].pl, false);
 					inserted = true;
 					var previous_pidx=this.pidx_selection;
@@ -2334,8 +2334,8 @@ oBrowser = function(name) {
                     };
                     // *** insert tracks into this.pidx_selection playlist
 					playlistToInsert = this.pidx_selection;
-					positionToInsert = 0;		
-					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);							
+					positionToInsert = 0;
+					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
                     //plman.InsertPlaylistItems(this.pidx_selection, 0, this.groups[index].pl, false);
 					inserted = true;
                 };
@@ -2353,13 +2353,13 @@ oBrowser = function(name) {
                 };
                 // *** insert tracks into this.pidx_selection playlist
 				playlistToInsert = this.pidx_selection;
-				positionToInsert = 0;		
-				toInsert.InsertRange(toInsert.Count,this.groups[index].pl);						
+				positionToInsert = 0;
+				toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
                 //plman.InsertPlaylistItems(this.pidx_selection, 0, this.groups[index].pl, false);
 				inserted = true;
             };
-			
-			
+
+
             plman.ActivePlaylist = this.pidx_selection;
         };
 		if(inserted) {
@@ -2368,22 +2368,22 @@ oBrowser = function(name) {
 				plman.ClearPlaylist(playlistToInsert);
 			} else if(items2remove.length>0){
 				plman.SetPlaylistSelection(playlistToInsert, items2remove, true);
-				plman.RemovePlaylistSelection(playlistToInsert, false);	
-			} 
+				plman.RemovePlaylistSelection(playlistToInsert, false);
+			}
 			plman.InsertPlaylistItems(playlistToInsert, positionToInsert, toInsert, false);
 			toInsert = undefined;
-			
+
 			/*if(clearPlaylist && !fb.IsPlaying){
 				window.NotifyOthers("trigger_on_focus_change",Array(playlistToInsert,0));
 			}*/
-			
+
 			window.NotifyOthers("refresh_filters",properties.filterOrder);
 			this.repaint();
 		}
     };
-    
+
     this.getlimits = function() {
-        
+
         // get visible stamps limits (start & end indexes)
         if(this.groups.length <= this.totalRowsVis * this.totalColumns) {
             var start_ = 0;
@@ -2399,7 +2399,7 @@ oBrowser = function(name) {
 
         // save limits calculated into globals var
         g_start_ = start_;
-        g_end_ = end_;	
+        g_end_ = end_;
     };
     this.DefineCircleMask = function(size){
 		var Mimg = gdi.CreateImage(size, size);
@@ -2408,7 +2408,7 @@ oBrowser = function(name) {
 		gb.FillSolidRect(0, 0, size, size, GetGrey(255));
 		gb.FillEllipse(1, 1, size-2, size-2, GetGrey(0));
 		Mimg.ReleaseGraphics(gb);
-		this.coverMask = Mimg;	
+		this.coverMask = Mimg;
 	}
 	this.onFontChanged = function(){
 		this.firstRowHeight = false;
@@ -2431,7 +2431,7 @@ oBrowser = function(name) {
         var coverImg = null;
 		if((properties.displayMode == 1 || properties.displayMode == 3) && (!this.firstRowHeight || !this.secondRowHeight)) {
 			if(!this.firstRowHeight) {
-				this.firstRowHeight = gr.CalcTextHeight("WcLrego9", g_font.normal);	
+				this.firstRowHeight = gr.CalcTextHeight("WcLrego9", g_font.normal);
 			}
 			if(!this.secondRowHeight) {
 				this.secondRowHeight = gr.CalcTextHeight("WcLrego9", g_font.italicmin1);
@@ -2443,10 +2443,10 @@ oBrowser = function(name) {
 		if(properties.displayMode == 3) var padding_covers = (!properties.displayModeGridNoText?6:0);
 		else var padding_covers = 0
 		var im_w = coverWidth;
-		var im_h = coverWidth;	
-		
+		var im_h = coverWidth;
+
         this.getlimits();
-        
+
         if(repaint_main || !repaintforced){
 			if(this.groups.length>0){
 				repaint_main = false;
@@ -2454,12 +2454,12 @@ oBrowser = function(name) {
 				gr.SetTextRenderingHint(globalProperties.TextRendering);
 				// draw visible stamps (loop)
 				for(var i = g_start_; i < g_end_; i++) {
-					
+
 					//if(i==0) ah=ah+properties.first_item_top_margin;
 					row = Math.floor(i / this.totalColumns);
 					ax = this.x + (cx * this.thumbnailWidth) + this.marginSide + this.marginLR;
 					ay = Math.floor(this.y + (row * this.rowHeight) + this.marginTop - scroll_)+properties.first_item_top_margin;
-									
+
 					this.groups[i].x = ax;
 					this.groups[i].y = ay;
 
@@ -2468,26 +2468,26 @@ oBrowser = function(name) {
 						// get cover
 						if(properties.showAllItem && i == 0 && total > 1) {
 							this.groups[i].cover_img = images.all;
-						} else {					
-							if(this.groups[i].cover_type == null) {								
+						} else {
+							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
 									this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');
-									if (isImage(this.groups[i].cover_img)) {		
-										this.groups[i].cover_type = 1;										
+									if (isImage(this.groups[i].cover_img)) {
+										this.groups[i].cover_type = 1;
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w);
 									} else if(properties.AlbumArtFallback && this.groups[i].cover_img!='loading'){
 										this.groups[i].save_requested = true;
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);							
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);
 										}
 										//console.log("fallback "+i+" "+this.groups[i].groupkey+" - "+this.groups[i].cachekey)
 									} else if(properties.albumArtId == 4 && this.groups[i].cover_img!='loading'){
-										this.groups[i].cover_type = (this.groups[i].cover_img=='loading'?null:1);										
-										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);	
+										this.groups[i].cover_type = (this.groups[i].cover_img=='loading'?null:1);
+										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);
 									} else if(this.groups[i].cover_img=='loading') this.groups[i].cover_img = null;
-								} 
+								}
 							} else if(this.groups[i].cover_type == 0 && !this.groups[i].cover_img) {
 								if(properties.albumArtId == 4){
 									//var arr = this.groups[i].groupkey.split(" ^^ ");
@@ -2500,7 +2500,7 @@ oBrowser = function(name) {
 											filepath = all_files[j];
 											break;
 										}
-										
+
 									}
 									if(g_files.FileExists(filepath)) {
 										this.groups[i].cover_img = gdi.Image(filepath);
@@ -2510,27 +2510,27 @@ oBrowser = function(name) {
 										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);							
+											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);
 										} else this.groups[i].cover_img = images.noartist;
 									}
 									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 									this.groups[i].cover_img = g_image_cache.cachelist[this.groups[i].cachekey];
 								} else {
-									this.groups[i].cover_img = globalProperties.noart;	
-									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);					
+									this.groups[i].cover_img = globalProperties.noart;
+									g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 								}
 
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
 								this.groups[i].cover_img = globalProperties.stream_img;
 								g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-							} 
+							}
 							if(!this.groups[i].cover_formated){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
 								this.groups[i].cover_formated = true;
 							}
 						};
-					};				
-					
+					};
+
 					if(ay >= (0 - this.rowHeight) && ay < this.y + this.h) { // if stamp visible, we have to draw it
 
 						// parse stored tags
@@ -2539,62 +2539,62 @@ oBrowser = function(name) {
 								var arr = this.groups[i].groupkey.split(" ^^ ");
 							};
 						};*/
-						
 
-											
+
+
 						if(this.stampDrawMode) {
 							// BG under cover
 							if((properties.displayMode == 0 || properties.displayMode == 2) && properties.drawAlternateBG) {
 								if(i % 2 == 0 && !(i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i))) {
-									if(i==0) gr.FillSolidRect(ax, ay-properties.first_item_top_margin, aw, ah+properties.first_item_top_margin, colors.alternate_row); 
+									if(i==0) gr.FillSolidRect(ax, ay-properties.first_item_top_margin, aw, ah+properties.first_item_top_margin, colors.alternate_row);
 									else gr.FillSolidRect(ax, ay, aw, ah, colors.alternate_row);
 								};
 							}
 							// background selection
 							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
-								
+
 								this.groups[i].selected = true;
-								
+
 								txt_color1 = colors.normal_txt;
-								txt_color2 = colors.faded_txt;														
-								
+								txt_color2 = colors.faded_txt;
+
 								hover_x = ax;
 								hover_y = ay;
 								hover_w = aw-1;
-								hover_h = ah-1;												
+								hover_h = ah-1;
 								if(ay<this.rowHeight) { //first row
 									hover_y = ay-1;
-									hover_h = ah;										
+									hover_h = ah;
 								} else if(ay>wh-this.rowHeight-10) { //first row
-									hover_h = ah;										
+									hover_h = ah;
 								}
 								if(ax<aw/2){ //first column
 									hover_x = ax-1;
-									hover_w = aw;												
+									hover_w = aw;
 								} else if(ax>aw*(this.totalColumns-2)+aw/2){ //last column
-									hover_w = aw+2;												
-								}			
-								
+									hover_w = aw+2;
+								}
+
 								if((properties.displayMode == 0 || properties.displayMode == 2)){
 									if(i==0)
 										gr.FillSolidRect(ax, ay-properties.first_item_top_margin-1, aw, ah+properties.first_item_top_margin+1, colors.selected_item_bg);
 									else
-										gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);								
+										gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);
 									//top
 									if(i!=0 && this.groups[i-1].selected != true){
-										gr.FillSolidRect(ax, ay, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);	
-										if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);		
-									}							
+										gr.FillSolidRect(ax, ay, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
+										if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
+									}
 									//bottom
-								
-									gr.FillSolidRect(ax, ay+ah-1, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);		
+
+									gr.FillSolidRect(ax, ay+ah-1, aw-colors.track_gradient_size-colors.padding_gradient, 1, colors.selected_item_line);
 									if(colors.track_gradient_size) gr.FillGradRect(ax+aw-colors.track_gradient_size-colors.padding_gradient, ay+ah-1, colors.track_gradient_size, 1, 0, colors.selected_item_line, colors.selected_item_line_off, 1.0);
 								} else if(properties.displayMode == 1)	{
-									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);																
+									gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);
 									gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0, colors.selected_item_line);
-								}								
-												
-											
+								}
+
+
 							} else {
 								this.groups[i].selected = false;
 								txt_color1 = colors.normal_txt;
@@ -2616,54 +2616,54 @@ oBrowser = function(name) {
 						switch(properties.displayMode) {
 							case 1:
 							case 3:
-								if(!properties.showAllItem || (properties.showAllItem && i > 0) || (properties.displayMode != 3)) { 
+								if(!properties.showAllItem || (properties.showAllItem && i > 0) || (properties.displayMode != 3)) {
 									if(g_rightClickedIndex > -1 && properties.displayMode != 1 && properties.displayMode != 3) {
 										if(g_rightClickedIndex == i && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 											if(this.stampDrawMode) {
-												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);
 											} else {
-												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);
 											};
 										};
 									} else {
 										if((i == this.activeIndex || (g_rightClickedIndex > -1 && g_rightClickedIndex == i)) && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)) {
 											if(properties.displayMode == 3) {
-		
+
 											} else if(this.stampDrawMode) {
-												
+
 												hover_x = ax;
 												hover_y = ay;
 												hover_w = aw-1;
-												hover_h = ah-1;												
+												hover_h = ah-1;
 												if(ay<this.rowHeight) { //first row
 													hover_y = ay-1;
-													hover_h = ah;										
+													hover_h = ah;
 												} else if(ay>wh-this.rowHeight-10) { //first row
-													hover_h = ah;										
+													hover_h = ah;
 												}
 												if(ax<aw/2){ //first column
 													hover_x = ax-1;
-													hover_w = aw;												
+													hover_w = aw;
 												} else if(ax>aw*(this.totalColumns-2)+aw/2){ //last column
-													hover_w = aw+2;												
-												}			
-												gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);												
-												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  colors.selected_item_line);	
-	
+													hover_w = aw+2;
+												}
+												gr.FillSolidRect(hover_x, hover_y, hover_w+1, hover_h+1, colors.selected_item_bg);
+												gr.DrawRect(hover_x, hover_y, hover_w, hover_h, 1.0,  colors.selected_item_line);
+
 											} else {
-												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);	
+												gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);
 											};
 										};
 									};
-								};						
+								};
 								coverTop = properties.displayMode == 1 ? ay + 10 : ay;
-								
+
 								// draw cover
 								if(typeof this.groups[i].cover_img == "string"){
 									this.groups[i].cover_img = globalProperties.nocover_img;
 								}
 								if(this.groups[i].cover_img) {
-									
+
 									if(!this.groups[i].cover_img_mask && properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)){
 										if(!this.coverMask) this.DefineCircleMask(this.groups[i].cover_img.Width);
 										width = this.groups[i].cover_img.Width;
@@ -2682,7 +2682,7 @@ oBrowser = function(name) {
 										var im_w = (rw * coverWidth);
 										var im_h = (rh * coverWidth);
 									};
-									
+
 									// save coords ALL cover image:
 									if(properties.showAllItem && i == 0 && total > 1) {
 										all_x = ax + Math.round((aw - im_w) / 2);
@@ -2693,11 +2693,11 @@ oBrowser = function(name) {
 											if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 												image_to_draw = this.cover_img_all_mask;
 											} else image_to_draw = this.cover_img_all;
-										}										
+										}
 										gr.DrawImage(image_to_draw, ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height, 0, 255);
 									} else {
 										try{
-											
+
 											gr.DrawImage(image_to_draw, ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height);
 										} catch (e) {
 											console.log("DrawImage: invalid image ");
@@ -2712,23 +2712,23 @@ oBrowser = function(name) {
 											else
 												gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight,colors.gridselected_bg);
 										} else if(!properties.displayModeGridNoText) gr.FillSolidRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - properties.botGridHeight, im_w, properties.botGridHeight, selbg_color);
-									};									
+									};
 								} else {
 									var im_w = coverWidth;
-									var im_h = coverWidth;									
+									var im_h = coverWidth;
 									//if(!properties.circleMode)
-										gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          
+										gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 									//else {
 										//gr.SetSmoothingMode(2);
-										//gr.DrawEllipse(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          		
+										//gr.DrawEllipse(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 										//gr.SetSmoothingMode(0);
-									//}									
+									//}
 									//var im_w = coverWidth;
 									//var im_h = coverWidth;
 									//if(!properties.circleMode || properties.displayMode != 1) gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 									//gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
 								};
-								
+
 								// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
 								if(properties.displayMode == 3 && im_h > im_w) {
 									var frame_w = coverWidth;
@@ -2737,11 +2737,11 @@ oBrowser = function(name) {
 									var frame_w = im_w;
 									var frame_h = im_h;
 								};
-								
+
 
 
 								if(properties.displayMode == 1) { // panelMode = 1 (Art + bottom labels)
-									// draw text									
+									// draw text
 									if(properties.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
 										try{
 											gr.GdiDrawText("All items", g_font.normal, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, this.firstRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -2764,27 +2764,27 @@ oBrowser = function(name) {
 										} else {
 											this.groups[i].firstRow = this.groups[i].groupkey;
 											this.groups[i].secondRow = this.groups[i].count+" item"+(this.groups[i].count>1?'s':'');
-										}										
+										}
 
 										try{
 											if(properties.tagMode == 1) {
 												this.groups[i].tooltipText = this.groups[i].firstRow+'\n'+this.groups[i].secondRow;
 												font1 = g_font.normal;
-												font2 = g_font.italicmin1;											
+												font2 = g_font.italicmin1;
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(this.groups[i].firstRow, font1);
-												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);											
+												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);
 												this.groups[i].showToolTip = (this.groups[i].text1Length > coverWidth || this.groups[i].text2Length > coverWidth);
 												gr.GdiDrawText(this.groups[i].firstRow, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.firstRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} else {
 											  this.groups[i].tooltipText = this.groups[i].groupkey;
 											  font1 = g_font.normal;
-											  font2 = g_font.italicmin1;												  
+											  font2 = g_font.italicmin1;
 											  font = g_font.normal;
 											  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 											  this.groups[i].showToolTip = (this.groups[i].textLength > coverWidth);
 											  gr.GdiDrawText(this.groups[i].groupkey, font1, colors.normal_txt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.secondRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);												  
+											  gr.GdiDrawText(''+this.groups[i].count+' tracks', font2, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth +  + this.firstRowHeight), coverWidth, this.secondRowHeight, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											};
 										} catch(e) {}
 									};
@@ -2810,17 +2810,17 @@ oBrowser = function(name) {
 										} else {
 											this.groups[i].firstRow = this.groups[i].groupkey;
 											this.groups[i].secondRow = this.groups[i].count+" item"+(this.groups[i].count>1?'s':'');
-										}	
+										}
 									};
 									try{
 										//if(properties.tagMode == 1) {
 											this.groups[i].tooltipText = this.groups[i].firstRow+'\n'+this.groups[i].secondRow;
 											font1 = g_font.bold;
-											font2 = g_font.min1;											
+											font2 = g_font.min1;
 											if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(this.groups[i].firstRow, font1);
-											if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);											
+											if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);
 											this.groups[i].showToolTip = (this.groups[i].text1Length > aw-20 || this.groups[i].text2Length > aw-20);
-											
+
 											if(!properties.displayModeGridNoText)gr.GdiDrawText(this.groups[i].firstRow, font1, txt_color1, ax+10, (coverTop + 5 + coverWidth) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											if(this.groups[i].tracktype != 3 && !properties.displayModeGridNoText) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, ax+10, (coverTop + 5 + coverWidth + properties.botTextRowHeight) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 										/*} else {
@@ -2828,7 +2828,7 @@ oBrowser = function(name) {
 										  font = (i == this.selectedIndex ? g_font.bold : g_font.normal);
 										  if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 										  this.groups[i].showToolTip = (this.groups[i].textLength > aw-20);
-										  
+
 										  gr.GdiDrawText(this.groups[i].groupkey, font, txt_color2, ax+10, (coverTop + 5 + coverWidth + 8) - properties.botGridHeight, aw-20, properties.botTextRowHeight + globalProperties.fontAdjustement, DT_LEFT | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 										};*/
 									} catch(e) {}
@@ -2842,9 +2842,9 @@ oBrowser = function(name) {
 									this.coverMarginLeft = this.marginCover;
 									if(typeof this.groups[i].cover_img == "string"){
 										this.groups[i].cover_img = globalProperties.nocover_img;
-									}								
+									}
 									if(this.groups[i].cover_img) {
-										
+
 										if(!this.groups[i].cover_img_mask && properties.circleMode){
 											if(!this.coverMask) this.DefineCircleMask(this.groups[i].cover_img.Width);
 											width = this.groups[i].cover_img.Width;
@@ -2856,7 +2856,7 @@ oBrowser = function(name) {
 										} else if(properties.circleMode) {
 											image_to_draw = this.groups[i].cover_img_mask;
 										} else image_to_draw = this.groups[i].cover_img;
-										
+
 										if(cover.keepaspectratio) {
 											var max = image_to_draw.Width > image_to_draw.Height ? image_to_draw.Width: image_to_draw.Height;
 											var rw = image_to_draw.Width / max;
@@ -2867,7 +2867,7 @@ oBrowser = function(name) {
 											var im_w = coverWidth;
 											var im_h = coverWidth;
 										};
-										
+
 										var deltaY = Math.floor((ah - im_h)/2);
 										var deltaX = Math.floor((coverWidth - im_w)/2);
 										// save coords ALL cover image:
@@ -2880,22 +2880,22 @@ oBrowser = function(name) {
 												if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 													image_to_draw = this.cover_img_all_mask;
 												} else image_to_draw = this.cover_img_all;
-											}															
+											}
 											gr.DrawImage(image_to_draw, Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height, 0, 255);
 										} else {
 											gr.DrawImage(image_to_draw, Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w, im_h, 0, 0, image_to_draw.Width, image_to_draw.Height);
-											if(!properties.circleMode) gr.DrawRect(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                                   
+											if(!properties.circleMode) gr.DrawRect(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 										};
 									} else {
 										var im_w = coverWidth;
 										var im_h = coverWidth;
 										var deltaY = Math.floor((ah - im_h)/2);
-										var deltaX = Math.floor((coverWidth - im_w)/2);										
+										var deltaX = Math.floor((coverWidth - im_w)/2);
 										if(!properties.circleMode)
-											gr.DrawRect(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          
+											gr.DrawRect(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 										else {
 											gr.SetSmoothingMode(2);
-											gr.DrawEllipse(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);                          		
+											gr.DrawEllipse(Math.round(this.margin_left/2) + ax+this.coverMarginLeft+deltaX, coverTop + deltaY, im_w - 1, im_h - 1, 1.0, colors.normal_txt & 0x25ffffff);
 											gr.SetSmoothingMode(0);
 										}
 										//gr.DrawImage(images.loading_draw, ax+this.coverMarginLeft+deltaX, coverTop + deltaY, coverWidth, coverWidth, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
@@ -2907,45 +2907,45 @@ oBrowser = function(name) {
 									if(i==0)
 										gr.FillSolidRect(ax, ay-properties.first_item_top_margin, colors.width_marker_hover_item, ah+properties.first_item_top_margin, colors.marker_hover_item);
 									else
-										gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);						
-									
+										gr.FillSolidRect(ax, ay, colors.width_marker_hover_item, ah, colors.marker_hover_item);
+
 								};
-								
+
 								if(properties.drawItemsCounter) {
 									items_counter_txt = this.groups[i].count;
 									items_counter_width = gr.CalcTextWidth(items_counter_txt,g_font.min1)+10;
 								} else items_counter_width=0;
-								
+
 								// draw text
 								if(properties.showAllItem && i==0 && total > 1) { // [ALL] item
 									switch(properties.tagMode) {
 										case 1: // album
 											try{
 												gr.GdiDrawText("All items", g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);													
+												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												gr.GdiDrawText("("+(total-1)+(!(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "")?' groups)':" albums)"), g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 										case 2: // artist
 											try{
 												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "")?' groups)':" artists)"), g_font.normal, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
+												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 										case 3: // genre
-											try{ 
+											try{
 												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "")?' groups)':" genres)"), g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
+												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
-									}; 
+									};
 								} else {
-									
+
 									if(properties.drawItemsCounter) {
 										items_counter_txt = this.groups[i].count;
 										if(typeof this.groups[i].items_counter_width == 'undefined') this.groups[i].items_counter_width = gr.CalcTextWidth(items_counter_txt,g_font.min1)+10;
 									} else this.groups[i].items_counter_width = 0;
-									
+
 									switch(properties.tagMode) {
 										case 1: // album
 											if(!this.customGroups){
@@ -2970,56 +2970,56 @@ oBrowser = function(name) {
 											}
 											try{
 												this.groups[i].tooltipText = this.groups[i].firstRow+'\n'+this.groups[i].secondRow;
-												
+
 												font1 = g_font.normal;
-												font2 = g_font.min1;	
+												font2 = g_font.min1;
 												if(properties.drawItemsCounter) available_width1 = aw - coverWidth - this.marginCover*3-this.textMarginRight - (this.w - (this.margin_left + ax + coverWidth + this.marginCover*2 +(aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right)));
 												else available_width1 = aw - coverWidth - this.marginCover*3-this.textMarginRight - this.groups[i].items_counter_width;
 												available_width2 = aw - coverWidth - this.marginCover*3-this.textMarginRight;
-												
+
 												if(typeof this.groups[i].text1Length == 'undefined') this.groups[i].text1Length = gr.CalcTextWidth(this.groups[i].firstRow, font1);
-												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);	
+												if(typeof this.groups[i].text2Length == 'undefined') this.groups[i].text2Length = gr.CalcTextWidth(this.groups[i].secondRow, font2);
 
 												this.groups[i].showToolTip = (this.groups[i].text1Length > available_width1 || this.groups[i].text2Length > available_width2);
-											  
+
 												gr.GdiDrawText(this.groups[i].firstRow, font1, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, available_width1, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
+												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay - properties.textLineHeight, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(this.groups[i].tracktype != 3) gr.GdiDrawText(this.groups[i].secondRow, font2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay + properties.textLineHeight, available_width2, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 										case 2: // artist
 											try{
 												this.groups[i].tooltipText = this.groups[i].groupkey;
-												
+
 												font = g_font.normal;
 												available_width = aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width;
 												if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
-												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);						
-												
+												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);
+
 												gr.GdiDrawText(this.groups[i].groupkey, font, txt_color1, this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												 if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 										case 3: // genre
-											try{			
+											try{
 												this.groups[i].tooltipText = this.groups[i].groupkey;
-												
+
 												font = g_font.normal;
 												available_width = aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width;
 												if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
-												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);		
-												
+												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);
+
 												gr.GdiDrawText(this.groups[i].groupkey, font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);											
+												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
 									};
 								};
 								break;
 						};
-						
+
 					};
-					
+
 					// set next column index
 					if(cx == this.totalColumns - 1) {
 						cx = 0;
@@ -3027,11 +3027,11 @@ oBrowser = function(name) {
 						cx++;
 					};
 				};
-		
+
 				//if(properties.darklayout) Draw bottom gradient
 				if(main_panel_state.isEqual(0))
 					gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_color2,  colors.grad_bottom_color_library_panel,1);
-				else			
+				else
 					gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_color2,  colors.grad_bottom_color1,1);
 				// Incremental Search Display
 				if(cList.search_string.length > 0) {
@@ -3044,7 +3044,7 @@ oBrowser = function(name) {
 						gr.GdiDrawText(cList.search_string, g_font.plus7, cList.inc_search_noresult?colors.keyboard_search_txtred:colors.keyboard_search_txt, brw.tt_x, brw.tt_y , brw.tt_w , brw.tt_h, DT_CENTER | DT_NOPREFIX | DT_CALCRECT | DT_VCENTER);
 					} catch(e) {};
 				};
-				
+
 				// fill ALL cover image with the 1st four cover art found
 				if(properties.displayMode > 0) {
 					// get cover
@@ -3069,7 +3069,7 @@ oBrowser = function(name) {
 												gb.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y1, ii_w, ii_h, 0, 0, this.groups[ii].cover_img.Width, this.groups[ii].cover_img.Height);
 											} catch (e) {
 												console.log("DrawImage: invalid image ");
-											}									
+											}
 											nb_of_drawn_cover++;
 											break;
 										case 2:
@@ -3077,30 +3077,30 @@ oBrowser = function(name) {
 												gb.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y1, ii_w, ii_h, 0, 0, this.groups[ii].cover_img.Width, this.groups[ii].cover_img.Height);
 											} catch (e) {
 												console.log("DrawImage: invalid image ");
-											}												
-											nb_of_drawn_cover++;								
+											}
+											nb_of_drawn_cover++;
 											break;
 										case 3:
 											try{
 												gb.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y2, ii_w, ii_h, 0, 0, this.groups[ii].cover_img.Width, this.groups[ii].cover_img.Height);
 											} catch (e) {
 												console.log("DrawImage: invalid image ");
-											}											
-											nb_of_drawn_cover++;								
+											}
+											nb_of_drawn_cover++;
 											break;
 										case 4:
 											try{
 												gb.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y2, ii_w, ii_h, 0, 0, this.groups[ii].cover_img.Width, this.groups[ii].cover_img.Height);
 											} catch (e) {
 												console.log("DrawImage: invalid image ");
-											}	
-											nb_of_drawn_cover++;								
+											}
+											nb_of_drawn_cover++;
 											break;
 									};
 								};
-							}; 
+							};
 							All_img.ReleaseGraphics(gb);
-							this.cover_img_all = All_img;	
+							this.cover_img_all = All_img;
 							if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)){
 								if(!this.coverMask) this.DefineCircleMask(this.cover_img_all.Width);
 								width = this.cover_img_all.Width;
@@ -3109,8 +3109,8 @@ oBrowser = function(name) {
 								this.cover_img_all_mask = this.cover_img_all.Clone(0, 0, width, height);
 								this.cover_img_all_mask.ApplyMask(coverMask);
 								image_to_draw = this.cover_img_all_mask;
-							} else image_to_draw = this.cover_img_all;	
-							
+							} else image_to_draw = this.cover_img_all;
+
 							if(nb_of_drawn_cover==lim-1) {
 								this.cover_img_all_finished = true;
 								brw.repaint();
@@ -3118,42 +3118,42 @@ oBrowser = function(name) {
 						} else {
 							if(properties.circleMode && (properties.displayMode == 1 || properties.displayMode == 2)) {
 								image_to_draw = this.cover_img_all_mask;
-							} else image_to_draw = this.cover_img_all;							
+							} else image_to_draw = this.cover_img_all;
 						}
-			
+
 						//gr.DrawImage(image_to_draw, all_x, all_y, all_w, all_h, 0, 0, all_w, all_h);
 					};
 				};
 			} else if(g_first_populate_done){ // no items, filter is empty
 					var px = 0;
-					var line_width = Math.min(130,Math.round(this.w-40));					
+					var line_width = Math.min(130,Math.round(this.w-40));
 					var py = this.y + Math.round(this.h  / 2)-1;
 					if(g_filterbox.inputbox.text!='' || properties.sourceMode==0) {
 						var text1 = "No items";
-						var text2 = "matching";											
+						var text2 = "matching";
 					} else {
 						var text1 = "";
-						var text2 = "Nothing seleted";											
+						var text2 = "Nothing seleted";
 					}
 					if(text1!='' || properties.sourceMode==0) {
 						gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 5, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else {
-						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);						
+						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					}
 			} else { // no track, playlist is empty
 					var px = 0;
 					var line_width = Math.min(130,Math.round(this.w-40));
 					var py = this.y + Math.round(this.h  / 2)-1;
 					gr.GdiDrawText("Loading...", g_font.plus4, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-					gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);						
+					gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 					gr.GdiDrawText("Filter", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			};
-			
+
 			//draw_right_line = (properties.DrawRightLine && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && properties.filterOrder==2) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && properties.filterOrder==1) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0));
 			this.draw_right_line = (properties.DrawRightLine && (!(properties.filterOrder==2) && !(!filter3_state.isActive() && properties.filterOrder==1) && !(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0) || main_panel_state.isEqual(0)));
-            // draw top header bar 
+            // draw top header bar
             if(properties.showHeaderBar) {
                 var item_txt = new Array("", "album", "artist", "genre");
                 var nb_groups = (properties.showAllItem && total > 1 ? total - 1 : total);
@@ -3162,39 +3162,39 @@ oBrowser = function(name) {
                 // draw background part above playlist (headerbar)
 				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.lightgrey_bg);
 				height_top_fix1 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight-1 : 0;
-				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;				
+				height_top_fix2 = (properties.showTagSwitcherBar) ? properties.TagSwitcherBarHeight : 0;
                 gr.FillSolidRect(this.x, height_top_fix1, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), properties.headerBarHeight+(properties.showTagSwitcherBar ? 1 : 0), colors.headerbar_bg);
                 gr.FillSolidRect(this.x, height_top_fix2+properties.headerBarHeight, this.w - this.x -((this.draw_right_line)?1:0), 1, colors.headerbar_line);
-                
+
 				if(g_filterbox.inputbox.text.length==0) {
 					var text_width = gr.CalcTextWidth(boxText,g_font.min1)
 					var tx = cFilterBox.x + cFilterBox.w + Math.round(22 * g_zoom_percent / 100) + 5 - text_width;
-					
+
 					var tw = this.w - tx - 7;
 					//this.x + (cx * this.thumbnailWidth) + this.marginSide + this.marginLR;
 					gr.GdiDrawText(boxText, g_font.min1,colors.faded_txt, tx, height_top_fix2, tw, properties.headerBarHeight, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
-				}	
+				}
             };
-			
-            // draw tag switcher bar 
+
+            // draw tag switcher bar
             if(properties.showTagSwitcherBar) {
-				g_tagswitcherbar.draw(gr,0,0);		
-			}	
-			
+				g_tagswitcherbar.draw(gr,0,0);
+			}
+
 			if(pman.offset > 0) {
 				pman.draw(gr);
-			};	
-			
-			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);	 
-			else if(this.draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);	
-						
+			};
+
+			if(g_resizing.isResizing()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);
+			else if(this.draw_right_line) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
+
             // draw scrollbar
             if(cScrollBar.enabled && pman.state !=1) {
                 this.scrollbar && this.scrollbar.draw(gr);
             };
 		};
     };
-        
+
     this._isHover = function(x, y) {
         return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
     };
@@ -3208,16 +3208,16 @@ oBrowser = function(name) {
 				var previous_totalColumns = this.totalColumns;
                 if(!timers.mouseWheel) {
 					if(step<0 && this.totalColumns <= properties.MinNumberOfColumns) return
-					
+
 					while(this.totalColumns==previous_totalColumns){
-						properties.thumbnailWidth -= step * zoomStep;					
+						properties.thumbnailWidth -= step * zoomStep;
 						if(properties.thumbnailWidth < properties.thumbnailWidthMin) {
 							properties.thumbnailWidth = properties.thumbnailWidthMin;
 							if(step>0) break;
 						}
 						if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) {
 							properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
-							if(step<0) break;							
+							if(step<0) break;
 						}
 						this.get_metrics();
 					}
@@ -3254,7 +3254,7 @@ oBrowser = function(name) {
                         timers.mouseWheel = setTimeout(function() {
                             window.SetProperty("SYSTEM Minimal Line Height", properties.default_lineHeightMin);
 							eval("properties.default_lineHeightMin"+properties.tagMode+" = "+properties.default_lineHeightMin);
-							window.SetProperty("SYSTEM Minimal Line Height for tag mode "+properties.tagMode, properties.default_lineHeightMin);							
+							window.SetProperty("SYSTEM Minimal Line Height for tag mode "+properties.tagMode, properties.default_lineHeightMin);
                             get_metrics();
                             brw.setList();
 							brw.refresh_all_covers();
@@ -3265,21 +3265,21 @@ oBrowser = function(name) {
                     };
                 };
                 break;
-        };		
-	}	
-    this.lclick_action = function(x, y) {  
+        };
+	}
+    this.lclick_action = function(x, y) {
 		if(utils.IsKeyPressed(VK_SHIFT) && this.selectedIndex>-1) {
 			if(this.activeIndex == this.selectedIndex) return;
-			if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {											
+			if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 				g_avoid_on_playlist_items_removed = true;
 				if(this.activeIndex > this.selectedIndex) {
 					this.save_sendItemToPlaylist(this.selectedIndex,this.activeIndex);
 				} else {
 					this.save_sendItemToPlaylist(this.activeIndex,this.selectedIndex);
 				}
-			};							
+			};
 		} else if(this.activeIndex == this.selectedIndex) {
-			this.activateItem(this.activeIndex);													
+			this.activateItem(this.activeIndex);
 			if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 				g_avoid_on_playlist_items_removed = true;
 				this.save_sendItemToPlaylist(this.activeIndex);
@@ -3287,10 +3287,10 @@ oBrowser = function(name) {
 				//this.focusItemToPlaylist(this.groups[this.activeIndex].metadb);
 			};
 		} else {
-			this.activateItem(this.activeIndex);												
+			this.activateItem(this.activeIndex);
 			if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {
 				g_avoid_on_playlist_items_removed = true;
-				this.save_sendItemToPlaylist(this.activeIndex);		
+				this.save_sendItemToPlaylist(this.activeIndex);
 				//if(getNowPlayingState()==1 && getTrackInfosState()==1) plman.SetPlaylistFocusItem(g_active_playlist, 0);
 			} else {
 				plman.ClearPlaylistSelection(g_active_playlist);
@@ -3301,15 +3301,15 @@ oBrowser = function(name) {
 				//*/
 				//this.focusItemToPlaylist(this.groups[this.activeIndex].metadb);
 			};
-		};	
-	}  	
-    this.on_mouse = function(event, x, y, delta) {       
+		};
+	}
+    this.on_mouse = function(event, x, y, delta) {
         this.ishover = this._isHover(x, y);
-        
+
         // get active item index at x,y coords...
         this.activeIndex = -1;
 		this.is_hover_scrollbar = this.scrollbar._isHover(x, y);
-        if(this.ishover && !this.is_hover_scrollbar) {			
+        if(this.ishover && !this.is_hover_scrollbar) {
             this.activeRow = Math.ceil((y + scroll_ - this.y) / this.rowHeight) - 1;
             if(y > this.y && x > this.x && x < this.x + this.w) {
                 this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
@@ -3321,16 +3321,16 @@ oBrowser = function(name) {
             brw.activeIndexSaved = brw.activeIndex;
             this.repaint();
         };
-        
+
         switch(event) {
             case "down":
 				this.items_sent = false;
 				this.drag_clicked_x = x;
-				this.drag_clicked_y = y;			
+				this.drag_clicked_y = y;
 				if(this.clearSelectedItemsOnNextClick) this.clearSelectedItem();
 				if(cScrollBar.enabled && cScrollBar.visible && this.scrollbar._isHover(x, y)) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-				}			
+				}
                 else if(this.ishover) {
                     if(this.activeIndex > -1) {
 						this.drag_clicked = true;
@@ -3362,7 +3362,7 @@ oBrowser = function(name) {
                         if(this.current_sourceMode == 0 || this.current_sourceMode == 2 || this.current_sourceMode == 1 || this.current_sourceMode == 3) {
                             // play first track of the selection
 							//if(main_panel_state.isEqual(0)) sendandplayPlaybackPlaylist(plman.GetPlaylistItems(g_active_playlist))
-                            //else 
+                            //else
 							g_active_playlist = plman.ActivePlaylist;
 							plman.ExecutePlaylistDefaultAction(g_active_playlist, 0);
                         } else {
@@ -3377,7 +3377,7 @@ oBrowser = function(name) {
                     };
                 };
                 break;
-            case "right":			
+            case "right":
                 g_rightClickedIndex = this.activeIndex;
 				this.clearMultipleSelectedItem();
 				//this.selectedIndex = g_rightClickedIndex;
@@ -3398,17 +3398,17 @@ oBrowser = function(name) {
                     };
                 };
                 break;
-            case "move":	
+            case "move":
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-                };			
+                };
 				if(!(this.scrollbar.cursorDrag || this.scrollbar.cursorHover) && !this.is_hover_scrollbar){
 					if(this.drag_clicked && !this.drag_moving) {
 						if((Math.abs(x - this.drag_clicked_x) > 10 || Math.abs(y - this.drag_clicked_y) > 10) && this.h > cPlaylistManager.rowHeight * 6) {
-							
+
 							this.drag_moving = true;
 							g_tooltip.Deactivate();
-							
+
 							if(properties.DropInplaylist) {
 								pman.state = 1;
 								if(timers.hidePlaylistManager) {
@@ -3419,35 +3419,35 @@ oBrowser = function(name) {
 									timers.showPlaylistManager = setInterval(pman.showPanel, 30);
 								};
 							}
-							var items = brw.getSelectedItems(); 
+							var items = brw.getSelectedItems();
 							if (typeof this.groups[this.selectedIndex].cover_img !== "undefined" && this.groups[this.selectedIndex].cover_img!==null) {
 								if(properties.showAllItem && this.selectedIndex == 0 && this.groups.length>1) var dragImage = this.cover_img_all;
 								else var dragImage = this.groups[this.selectedIndex].cover_img;
 								var options = {
-									show_text : false,	
+									show_text : false,
 									use_album_art : false,
 									use_theming : false,
 									custom_image : createDragImg(dragImage, 80, this.groups[this.selectedIndex].count),
-								}								
+								}
 							} else {
 								var options = {
-									show_text : false,	
+									show_text : false,
 									use_album_art : false,
 									use_theming : false,
 									custom_image : createDragText(this.groups[this.selectedIndex].tooltipText, this.groups[this.selectedIndex].count+" tracks", 220),
-								}								
+								}
 							}
 							var effect = fb.DoDragDrop(window.ID, items, g_drop_effect.copy | g_drop_effect.move | g_drop_effect.link, options);
-							// nothing happens here until the mouse button is released	
+							// nothing happens here until the mouse button is released
 							pman.on_mouse("leave", 0, 0);
-							items = undefined;							
+							items = undefined;
 						};
 					} else if(timers.showPlaylistManager && !this.drag_clicked && properties.DropInplaylist) {
 						pman.clearShowPlaylistManagerTimer();
-					}	
+					}
 					if(properties.showToolTip && this.activeIndex > -1 && g_tooltip.activeZone!=this.activeIndex && !this.drag_moving) {
 						if(this.groups[this.activeIndex].showToolTip){
-							new_tooltip_text=this.groups[this.activeIndex].tooltipText; 
+							new_tooltip_text=this.groups[this.activeIndex].tooltipText;
 							if(g_tooltip.activeZone!='') g_tooltip.Deactivate();
 							this.tooltip_activated = true;
 							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeIndex);
@@ -3472,21 +3472,21 @@ oBrowser = function(name) {
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     this.scrollbar.updateScrollbar();
                 };
-				g_tooltip.Deactivate();				
+				g_tooltip.Deactivate();
                 break;
             case "leave":
-				//this.drag_clicked = false;				
+				//this.drag_clicked = false;
                 if(cScrollBar.enabled && cScrollBar.visible) {
                     this.scrollbar && this.scrollbar.on_mouse(event, x, y);
                 };
 				if(properties.showToolTip && this.tooltip_activated) {
-					g_tooltip.Deactivate();		
-					this.tooltip_activated = false;					
+					g_tooltip.Deactivate();
+					this.tooltip_activated = false;
 				}
                 break;
         };
     };
-       
+
 	this.resetTimer = function(){
 		if(this.g_time) {
 			window.ClearInterval(this.g_time);
@@ -3502,13 +3502,13 @@ oBrowser = function(name) {
 		this.g_time = setInterval(function() {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
-			try{				
+			try{
 				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
 					brw.startTimer();
-				}	
-			}catch(e){}							
+				}
+			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);	
+		}, properties.refreshRate);
 	}
     this.timerScript = function() {
         if(!g_first_populate_launched) {
@@ -3517,45 +3517,45 @@ oBrowser = function(name) {
             };
             g_first_populate_launched = true;
             brw.launch_populate();
-        }		
+        }
         if(!window.IsVisible) {
             window_visible = false;
             return;
-        } 		
+        }
 		if(Update_Required_function!="") {
 			eval(Update_Required_function);
 			Update_Required_function = "";
-		}		
+		}
 
         var repaint_1 = false;
 
         if(!window_visible){
             window_visible = true;
-        };        
-		
+        };
+
         if(repaint_main1 == repaint_main2){
             repaint_main2 = !repaint_main1;
             repaint_1 = true;
         };
-        
+
         scroll = check_scroll(scroll);
         if(Math.abs(scroll - scroll_) >= 5){
             scroll_ += (scroll - scroll_) / properties.scrollSmoothness;
             isScrolling = true;
-            repaint_1 = true; 
+            repaint_1 = true;
             if(scroll_prev != scroll) brw.scrollbar.updateScrollbar();
         } else {
             if(scroll_ != scroll) {
                 scroll_ = scroll; // force to scroll_ value to fixe the 5.5 stop value for expanding album action
-                repaint_1 = true; 
+                repaint_1 = true;
             };
             if(isScrolling) {
                 if(scroll_< 1) scroll_ = 0;
                 isScrolling = false;
                 repaint_1 = true;
             };
-        };	
-		
+        };
+
         if(brw.group_unrequested_loading) {
 			brw.group_unrequested_loading=false;
 			repaint_1 = true;
@@ -3566,7 +3566,7 @@ oBrowser = function(name) {
             images.loading_angle = (images.loading_angle+30) % 360;
             window.Repaint();
         };
-        
+
         scroll_prev = scroll;
     }
 
@@ -3575,23 +3575,23 @@ oBrowser = function(name) {
 		var Context = fb.CreateContextMenuManager();
 		var _child01 = window.CreatePopupMenu();
 		var _child02 = window.CreatePopupMenu();
-        
+
         var crc = this.groups[albumIndex].cachekey;
-		
+
 		this.metadblist_selection = this.groups[albumIndex].pl.Clone();
-		
+
 		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
 		_menu.AppendMenuSeparator();
-		if(fb.IsPlaying && this.current_sourceMode==0){	
+		if(fb.IsPlaying && this.current_sourceMode==0){
 			_menu.AppendMenuItem(MF_STRING, 1011, "Locate now playing group");
 			_menu.AppendMenuSeparator();
 		}
-		if(properties.displayMode==1 || properties.displayMode==2 || properties.displayMode==3){	   
+		if(properties.displayMode==1 || properties.displayMode==2 || properties.displayMode==3){
 			_menu.AppendMenuItem(MF_STRING, 1010, "Refresh this image");
 		}
-		
+
 		_child02.AppendTo(_menu, MF_STRING, "Send to...");
-		_child02.AppendMenuItem(MF_STRING, 2000, "A new playlist...");		
+		_child02.AppendMenuItem(MF_STRING, 2000, "A new playlist...");
         var pl_count = plman.PlaylistCount;
 		if(pl_count > 1) {
 			_child02.AppendMenuItem(MF_SEPARATOR, 0, "");
@@ -3602,20 +3602,20 @@ oBrowser = function(name) {
 				if(playlist_name!=properties.selectionPlaylist) _child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
 			};
 		};
-		
+
 		Context.InitContext(this.metadblist_selection);
 
 		Context.BuildMenu(_menu, 2, -1);
 
-		
-		if(utils.IsKeyPressed(VK_SHIFT)) {	
+
+		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 1001, "Properties ");
-			_menu.AppendMenuItem(MF_STRING, 1002, "Configure...");		
+			_menu.AppendMenuItem(MF_STRING, 1002, "Configure...");
 			_menu.AppendMenuSeparator();
-			_menu.AppendMenuItem(MF_STRING, 1003, "Reload");				
-		}			
-		
+			_menu.AppendMenuItem(MF_STRING, 1003, "Reload");
+		}
+
 		var ret = _menu.TrackPopupMenu(x, y);
 		if(ret > 1 && ret < 800) {
 			Context.ExecuteByID(ret - 2);
@@ -3639,24 +3639,24 @@ oBrowser = function(name) {
                 this.groups[albumIndex].cover_img = null;
                 this.groups[albumIndex].cover_type = null;
                 this.repaint();
-				window.NotifyOthers("RefreshImageCover",this.groups[albumIndex].metadb)				
+				window.NotifyOthers("RefreshImageCover",this.groups[albumIndex].metadb)
 				break;
 			case 1011:
 				this.showNowPlaying();
-				break;				
+				break;
 			case 2000:
 				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);
 				break;
 			case 1001:
 				window.ShowProperties();
-				break;				
+				break;
 			case 1002:
-				 window.ShowConfigure();	
-				break;				 
+				 window.ShowConfigure();
+				break;
 			case 1003:
-				window.Reload();	
-				break;					
+				window.Reload();
+				break;
 			default:
 				var insert_index = plman.PlaylistItemCount(ret-2001);
 				plman.InsertPlaylistItems((ret-2001), insert_index, this.metadblist_selection, false);
@@ -3668,171 +3668,171 @@ oBrowser = function(name) {
         g_rbtn_click = false;
 		return true;
 	};
-    
+
     this.settings_context_menu = function(x, y) {
             var _menu = window.CreatePopupMenu();
             var _menu0 = window.CreatePopupMenu();
             var _menu1 = window.CreatePopupMenu();
-            var _menu11 = window.CreatePopupMenu();		
-            var _menu12 = window.CreatePopupMenu();		
-            var _menu13 = window.CreatePopupMenu();					
+            var _menu11 = window.CreatePopupMenu();
+            var _menu12 = window.CreatePopupMenu();
+            var _menu13 = window.CreatePopupMenu();
             var _menu2 = window.CreatePopupMenu();
             var _menu3 = window.CreatePopupMenu();
 			var _menu3A = window.CreatePopupMenu();
-			var _rowHeight = window.CreatePopupMenu();			
+			var _rowHeight = window.CreatePopupMenu();
             var idx;
-            
+
             /*_menu0.AppendMenuItem(MF_STRING, 50, "Library");
             _menu0.AppendMenuItem(MF_STRING, 51, "Playlist");
             _menu0.CheckMenuRadioItem(50, 51, 50 + this.current_sourceMode);
             _menu0.AppendTo(_menu,MF_STRING, "Source");
             _menu.AppendMenuSeparator();*/
-            
+
             //_menu.AppendMenuItem((this.current_sourceMode == 1 ? MF_STRING : MF_GRAYED | MF_DISABLED), 60, "Cursor follows Focus");
             //_menu.CheckMenuItem(60, properties.followFocusChange);
             //_menu.AppendMenuSeparator();
 
 
             _menu13.AppendMenuItem(MF_STRING, 113, "Default (%genre%)");
-            _menu13.CheckMenuItem(113, properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "");				
-            _menu13.AppendMenuItem(MF_STRING, 116, "Custom titleformat...");	
-            _menu13.CheckMenuItem(116, !(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == ""));	
-			
+            _menu13.CheckMenuItem(113, properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "");
+            _menu13.AppendMenuItem(MF_STRING, 116, "Custom titleformat...");
+            _menu13.CheckMenuItem(116, !(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == ""));
+
             _menu12.AppendMenuItem(MF_STRING, 112, "Default (%artist%)");
-            _menu12.CheckMenuItem(112, properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "");				
-            _menu12.AppendMenuItem(MF_STRING, 115, "Custom titleformat...");				
-            _menu12.CheckMenuItem(115, !(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == ""));	
-			
+            _menu12.CheckMenuItem(112, properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "");
+            _menu12.AppendMenuItem(MF_STRING, 115, "Custom titleformat...");
+            _menu12.CheckMenuItem(115, !(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == ""));
+
             _menu11.AppendMenuItem(MF_STRING, 111, "Default (%album%)");
-            _menu11.CheckMenuItem(111, properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "");				
-            _menu11.AppendMenuItem(MF_STRING, 114, "Custom titleformat...");			
-            _menu11.CheckMenuItem(114, !(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == ""));				
-			
+            _menu11.CheckMenuItem(111, properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "");
+            _menu11.AppendMenuItem(MF_STRING, 114, "Custom titleformat...");
+            _menu11.CheckMenuItem(114, !(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == ""));
+
 			if(properties.showLibraryTreeSwitch) {
 				_menu.AppendMenuItem(MF_STRING, 990, "Switch to library tree");
 				_menu.AppendMenuSeparator();
 			}
-            _menu13.AppendTo(_menu1,(properties.tagMode==3)?MF_CHECKED:MF_STRING, "Preset 1 ("+properties.genre_label+")");			
-            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Preset 2 ("+properties.artist_label+")");			
+            _menu13.AppendTo(_menu1,(properties.tagMode==3)?MF_CHECKED:MF_STRING, "Preset 1 ("+properties.genre_label+")");
+            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Preset 2 ("+properties.artist_label+")");
             _menu11.AppendTo(_menu1,(properties.tagMode==1)?MF_CHECKED:MF_STRING, "Preset 3 ("+properties.album_label+")");
 
             _menu1.AppendTo(_menu,MF_STRING, "Group by");
-			
+
             _menu2.AppendMenuItem(MF_STRING, 913, "Tag switcher bar");
             _menu2.CheckMenuItem(913, properties.showTagSwitcherBar);
 			if(main_panel_state.isEqual(0)){
 				_menu2.AppendMenuItem(MF_STRING, 914, "Hide menu button");
-				_menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);	
-			}			
+				_menu2.CheckMenuItem(914, properties.showFiltersTogglerBtn);
+			}
             _menu2.AppendMenuItem(MF_STRING, 910, "Search bar");
             _menu2.CheckMenuItem(910, properties.showHeaderBar);
-            _menu2.AppendMenuSeparator();			
-			
+            _menu2.AppendMenuSeparator();
+
             _menu2.AppendMenuItem(MF_STRING, 900, "Text only");
-            _menu2.AppendMenuItem(MF_STRING, 902, "Text (Album Art on right)");			
+            _menu2.AppendMenuItem(MF_STRING, 902, "Text (Album Art on right)");
             _menu2.AppendMenuItem(MF_STRING, 901, "Album Art (Text on bottom)");
             _menu2.AppendMenuItem(MF_STRING, 903, "Album Art Grid");
 			_menu2.AppendMenuItem(MF_STRING, 1806, "Album Art Grid (without Text)");
-			if (properties.displayModeGridNoText) _menu2.CheckMenuItem(1806, properties.showTagSwitcherBar);	
+			if (properties.displayModeGridNoText) _menu2.CheckMenuItem(1806, properties.showTagSwitcherBar);
 			else _menu2.CheckMenuRadioItem(900, 903, 900 + properties.displayMode);
             _menu2.AppendMenuSeparator();
 			if(properties.tagMode!=1){
 				_menu2.AppendMenuItem(MF_STRING, 918, "Album art Fallback");
-				_menu2.CheckMenuItem(918, properties.AlbumArtFallback);		
-			}			
+				_menu2.CheckMenuItem(918, properties.AlbumArtFallback);
+			}
 			_menu2.AppendMenuItem(MF_STRING, 904, "Circle artwork");
             _menu2.CheckMenuItem(904, properties.circleMode);
             _menu2.AppendMenuItem(MF_STRING, 911, "Aggregate Item");
             _menu2.CheckMenuItem(911, properties.showAllItem);
             _menu2.AppendMenuItem(MF_STRING, 912, "Items count (on Text displays)");
-            _menu2.CheckMenuItem(912, properties.drawItemsCounter);		
+            _menu2.CheckMenuItem(912, properties.drawItemsCounter);
             _menu2.AppendMenuItem(MF_STRING, 916, "Show Tooltips");
             _menu2.CheckMenuItem(916, properties.showToolTip);
 
-            _menu2.AppendTo(_menu,MF_STRING, "Display");            		
-			
+            _menu2.AppendTo(_menu,MF_STRING, "Display");
+
 			_rowHeight.AppendMenuItem(MF_STRING, 1001, "Increase");
-			_rowHeight.AppendMenuItem(MF_STRING, 1000, "Decrease");	
+			_rowHeight.AppendMenuItem(MF_STRING, 1000, "Decrease");
 			_rowHeight.AppendMenuSeparator();
 			_rowHeight.AppendMenuItem(MF_DISABLED, 0, "Tip: Hold SHIFT and use your");
-			_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");				
+			_rowHeight.AppendMenuItem(MF_DISABLED, 0, "mouse wheel over the panel!");
 			if(properties.displayMode==0 || properties.displayMode==2){
 				_rowHeight.AppendTo(_menu,MF_STRING, "Row height");
 			} else {
-				_rowHeight.AppendTo(_menu,MF_STRING, "Columns Width");				
-			}			
-			
+				_rowHeight.AppendTo(_menu,MF_STRING, "Columns Width");
+			}
+
 			if(properties.ParentName=='Library'){
 				var _panelWidth = window.CreatePopupMenu();
-				_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");	
-				_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");						
-				_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");	
-				_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");					
+				_panelWidth.AppendMenuItem(MF_STRING, 1030, "Increase width");
+				_panelWidth.AppendMenuItem(MF_STRING, 1031, "Decrease width");
+				_panelWidth.AppendMenuItem(MF_STRING, 1033, "Custom width...");
+				_panelWidth.AppendMenuItem(MF_STRING, 1032, "Reset");
 				_panelWidth.AppendTo(_menu,MF_STRING, "Panel width");
 			}
-			
+
             _menu3.AppendMenuItem(MF_STRING, 200, "Enable");
             _menu3.CheckMenuItem(200, properties.showwallpaper);
             _menu3.AppendMenuItem(MF_STRING, 220, "Blur");
             _menu3.CheckMenuItem(220, properties.wallpaperblurred);
-			
+
             _menu3A.AppendMenuItem(MF_STRING, 221, "Filling");
-            _menu3A.CheckMenuItem(221, properties.wallpaperdisplay==0);	
+            _menu3A.CheckMenuItem(221, properties.wallpaperdisplay==0);
             _menu3A.AppendMenuItem(MF_STRING, 222, "Adjust");
             _menu3A.CheckMenuItem(222, properties.wallpaperdisplay==1);
             _menu3A.AppendMenuItem(MF_STRING, 223, "Stretch");
             _menu3A.CheckMenuItem(223, properties.wallpaperdisplay==2);
 			_menu3A.AppendTo(_menu3,MF_STRING, "Wallpaper size");
-            
+
             _menu3.AppendTo(_menu,MF_STRING, "Background Wallpaper");
-            
+
             //_menu.AppendMenuSeparator();
             //_menu.AppendMenuItem(MF_STRING, 990, "Reload Library");
             //_menu.AppendMenuSeparator();
             //_menu.AppendMenuItem(MF_STRING, 991, "Panel Properties");
             //_menu.AppendMenuItem(MF_STRING, 992, "Configure...");
-            
+
 			//var FiltersMenu = window.CreatePopupMenu();
 			//FiltersMenu.AppendTo(_menu, MF_STRING, "Filters");
-			
+
             /*_menu.AppendMenuSeparator();
             _menu.AppendMenuItem(MF_STRING, 914, "Enable Disk Image Cache");
-            _menu.CheckMenuItem(914, globalProperties.enableDiskCache);				
+            _menu.CheckMenuItem(914, globalProperties.enableDiskCache);
             _menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 915, "Load all covers at startup");
-            _menu.CheckMenuItem(915, globalProperties.load_covers_at_startup);				
+            _menu.CheckMenuItem(915, globalProperties.load_covers_at_startup);
             _menu.AppendMenuItem((globalProperties.enableDiskCache)?MF_STRING:MF_GRAYED, 917, "Load all artist thumbnails at startup");
             _menu.CheckMenuItem(917, globalProperties.load_artist_img_at_startup);*/
-			
+
 			_menu.AppendMenuItem(MF_STRING, 2997, "Show playlist panel on drag and drop");
 			_menu.CheckMenuItem(2997, properties.DropInplaylist);
-			
+
 			if(main_panel_state.isEqual(1)) {
-				_menu.AppendMenuSeparator();			
-				_menu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 2993, "Enable 1st filter");  
+				_menu.AppendMenuSeparator();
+				_menu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 2993, "Enable 1st filter");
 				_menu.CheckMenuItem(2993, (filter1_state.isActive()));
 				_menu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 2994, "Enable 2nd filter");
 				_menu.CheckMenuItem(2994, (filter2_state.isActive()));
-				_menu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 2995, "Enable 3rd filter");		
-				_menu.CheckMenuItem(2995, (filter3_state.isActive()));	
+				_menu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 2995, "Enable 3rd filter");
+				_menu.CheckMenuItem(2995, (filter3_state.isActive()));
 				_menu.AppendMenuSeparator();
-				if(!filters_panel_state.isMaximumValue())				
+				if(!filters_panel_state.isMaximumValue())
 					_menu.AppendMenuItem(MF_STRING, 2992, "Hide filters");
-				else		
-					_menu.AppendMenuItem(MF_STRING, 2996, "Show bottom playlist");					
+				else
+					_menu.AppendMenuItem(MF_STRING, 2996, "Show bottom playlist");
 			}
 
-			
-			
-			if(utils.IsKeyPressed(VK_SHIFT)) {	
+
+
+			if(utils.IsKeyPressed(VK_SHIFT)) {
 				_menu.AppendMenuSeparator();
 				_menu.AppendMenuItem(MF_STRING, 991, "Properties ");
-				_menu.AppendMenuItem(MF_STRING, 992, "Configure...");		
+				_menu.AppendMenuItem(MF_STRING, 992, "Configure...");
 				_menu.AppendMenuSeparator();
-				_menu.AppendMenuItem(MF_STRING, 993, "Reload");				
-			}					
-			
+				_menu.AppendMenuItem(MF_STRING, 993, "Reload");
+			}
+
             idx = _menu.TrackPopupMenu(x,y);
-            
+
             switch(true) {
                 /*case (idx >= 50 && idx <= 51):
                     properties.sourceMode = idx - 50;
@@ -3850,22 +3850,22 @@ oBrowser = function(name) {
                         case 1:
                             properties.albumArtId = 0;
 							properties.tf_groupkey_album = properties.tf_groupkey_album_default;
-							window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);	
+							window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
 							properties.album_customGroup_label = "";
-							window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);	
-							window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);							
+							window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
+							window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);
                             break;
                         case 2:
-							properties.tf_groupkey_artist = properties.tf_groupkey_artist_default;	
-							window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);							
+							properties.tf_groupkey_artist = properties.tf_groupkey_artist_default;
+							window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);
                             properties.albumArtId = 4;
 							properties.artist_customGroup_label = "";
-							window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);			
-							window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);							
+							window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
+							window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);
                             break;
                         case 3:
-							properties.tf_groupkey_genre = properties.tf_groupkey_genre_default;						
-							window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);									
+							properties.tf_groupkey_genre = properties.tf_groupkey_genre_default;
+							window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);
                             properties.albumArtId = 5;
 							properties.genre_customGroup_label = "";
 							window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
@@ -3886,18 +3886,18 @@ oBrowser = function(name) {
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
-													,properties.album_label+'##'+properties.tf_groupkey_album);	
+													,properties.album_label+'##'+properties.tf_groupkey_album);
 								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Album grouping", properties.tf_groupkey_album, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined' || properties.tf_groupkey_album==new_TFgrouping)) {
 									properties.tf_groupkey_album = new_TFgrouping;
-									window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);	
-								}		
+									window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
+								}
 								properties.albumArtId = 0;
 								g_tagswitcherbar.on_init();
 								g_filterbox.reset_layout();
-								brw.populate(true,1);		*/								
+								brw.populate(true,1);		*/
 							} catch(e) {
-							}								
+							}
                             break;
                         case 2:
 							try {
@@ -3905,81 +3905,81 @@ oBrowser = function(name) {
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
-													,properties.artist_label+'##'+properties.tf_groupkey_artist);									
-								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Artist grouping", properties.tf_groupkey_artist, true);								
+													,properties.artist_label+'##'+properties.tf_groupkey_artist);
+								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Artist grouping", properties.tf_groupkey_artist, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
 									properties.tf_groupkey_artist = new_TFgrouping;
-									window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);	
-								}							
-								properties.albumArtId = 4;	
+									window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);
+								}
+								properties.albumArtId = 4;
 								g_tagswitcherbar.on_init();
 								g_filterbox.reset_layout();
-								brw.populate(true,1);*/					
+								brw.populate(true,1);*/
 							} catch(e) {
-							}									
+							}
                             break;
-                        case 3:					
+                        case 3:
 							try {
 								customFilterGrouping(properties.tagMode
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
 													,'Label (10 chars max):##Grouping pattern:'
-													,properties.genre_label+'##'+properties.tf_groupkey_genre);									
-								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Genre grouping", properties.tf_groupkey_genre, true);								
+													,properties.genre_label+'##'+properties.tf_groupkey_genre);
+								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Genre grouping", properties.tf_groupkey_genre, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
 									properties.tf_groupkey_genre = new_TFgrouping;
-									window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);	
-								}						
-								properties.albumArtId = 5;		
+									window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);
+								}
+								properties.albumArtId = 5;
 								g_tagswitcherbar.on_init();
 								g_filterbox.reset_layout();
-								brw.populate(true,1);*/							
+								brw.populate(true,1);*/
 							} catch(e) {
-							}								
+							}
                             break;
                     };
 
-                    break;					
+                    break;
                 case (idx == 200):
                     toggleWallpaper();
                     break;
                 case (idx == 210):
                     properties.wallpapermode = 99;
                     window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-					on_colours_changed();					
+					on_colours_changed();
                     break;
                 case (idx == 211):
                     properties.wallpapermode = 0;
                     window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-					on_colours_changed();					
+					on_colours_changed();
                     break;
                 case (idx == 220):
                     properties.wallpaperblurred = !properties.wallpaperblurred;
-                    window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);					
+                    window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 					on_colours_changed();
-                    break;		
+                    break;
                 case (idx == 221):
                     properties.wallpaperdisplay = 0;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
                     on_colours_changed();
-                    break;	
+                    break;
                 case (idx == 222):
                     properties.wallpaperdisplay = 1;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
                     on_colours_changed();
-                    break;		
+                    break;
                 case (idx == 223):
                     properties.wallpaperdisplay = 2;
                     window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
                     on_colours_changed();
-                    break;					
+                    break;
                 case (idx >= 900 && idx <= 903):
                     properties.displayModeGridNoText = false;
                     window.SetProperty("_PROPERTY: Display Mode Grid No Text", properties.displayModeGridNoText);
                     properties.displayMode = idx - 900;
                     window.SetProperty("_PROPERTY: Display Mode", properties.displayMode);
 					eval("properties.tagModedisplay"+properties.tagMode+" = "+idx+" - 900;");
-					window.SetProperty("_PROPERTY: Display Mode for tag mode "+properties.tagMode, properties.displayMode);				
+					window.SetProperty("_PROPERTY: Display Mode for tag mode "+properties.tagMode, properties.displayMode);
                     get_metrics();
 					brw.refresh_all_covers();
                     brw.setList();
@@ -3991,41 +3991,41 @@ oBrowser = function(name) {
                     properties.displayMode = 3;
                     window.SetProperty("_PROPERTY: Display Mode", properties.displayMode);
 					eval("properties.tagModedisplay"+properties.tagMode+" = "+903+" - 900;");
-					window.SetProperty("_PROPERTY: Display Mode for tag mode "+properties.tagMode, properties.displayMode);				
-                    get_metrics();
-					brw.refresh_all_covers();
-                    brw.setList();
-                    brw.update();				
-                    break;					
-                case (idx == 904):
-                    properties.circleMode = !properties.circleMode;
-                    window.SetProperty("_PROPERTY: Circle Mode", properties.circleMode);
-					eval("properties.circleDisplay"+properties.tagMode+" = "+properties.circleMode);
-					window.SetProperty("_PROPERTY: Circle Mode for tag mode "+properties.tagMode, properties.circleMode);				
+					window.SetProperty("_PROPERTY: Display Mode for tag mode "+properties.tagMode, properties.displayMode);
                     get_metrics();
 					brw.refresh_all_covers();
                     brw.setList();
                     brw.update();
-                    break;				
+                    break;
+                case (idx == 904):
+                    properties.circleMode = !properties.circleMode;
+                    window.SetProperty("_PROPERTY: Circle Mode", properties.circleMode);
+					eval("properties.circleDisplay"+properties.tagMode+" = "+properties.circleMode);
+					window.SetProperty("_PROPERTY: Circle Mode for tag mode "+properties.tagMode, properties.circleMode);
+                    get_metrics();
+					brw.refresh_all_covers();
+                    brw.setList();
+                    brw.update();
+                    break;
                 case (idx == 910):
                     properties.showHeaderBar = !properties.showHeaderBar;
                     window.SetProperty("_DISPLAY: Show Top Bar", properties.showHeaderBar);
 					eval("properties.showHeaderBar"+properties.tagMode+" = "+properties.showHeaderBar);
-					window.SetProperty("_PROPERTY: Show Top Bar for tag mode "+properties.tagMode, properties.showHeaderBar);						
+					window.SetProperty("_PROPERTY: Show Top Bar for tag mode "+properties.tagMode, properties.showHeaderBar);
                     get_metrics();
                     break;
                 case (idx == 911):
                     properties.showAllItem = !properties.showAllItem;
                     window.SetProperty("_PROPERTY: Show ALL item", properties.showAllItem);
 					eval("properties.showAllItem"+properties.tagMode+" = "+properties.showAllItem);
-					window.SetProperty("_PROPERTY: Show ALL item for tag mode "+properties.tagMode, properties.showAllItem);							
+					window.SetProperty("_PROPERTY: Show ALL item for tag mode "+properties.tagMode, properties.showAllItem);
                     brw.populate(false,2);
                     break;
                 case (idx == 912):
                     properties.drawItemsCounter = !properties.drawItemsCounter;
                     window.SetProperty("_PROPERTY: Show numbers of items in group", properties.drawItemsCounter);
 					eval("properties.drawItemsCounter"+properties.tagMode+" = "+properties.drawItemsCounter);
-					window.SetProperty("_PROPERTY: Show numbers of items for tag mode "+properties.tagMode, properties.drawItemsCounter);						
+					window.SetProperty("_PROPERTY: Show numbers of items for tag mode "+properties.tagMode, properties.drawItemsCounter);
                     break;
                 case (idx == 913):
                     properties.showTagSwitcherBar = !properties.showTagSwitcherBar;
@@ -4036,37 +4036,37 @@ oBrowser = function(name) {
                 case (idx == 914):
                     properties.showFiltersTogglerBtn = !properties.showFiltersTogglerBtn;
                     window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
-					window.NotifyOthers("showFiltersTogglerBtn",properties.showFiltersTogglerBtn);					
+					window.NotifyOthers("showFiltersTogglerBtn",properties.showFiltersTogglerBtn);
 					brw.repaint();
-                    break;					
+                    break;
                 /*case (idx == 914):
 					enableDiskCacheGlobally();
 					brw.repaint();
                     break;	*/
                 case (idx == 915):
 					enableCoversAtStartupGlobally();
-					break;		
+					break;
                 case (idx == 917):
 					enableArtistImgAtStartupGlobally();
-					break;			
+					break;
                 case (idx == 918):
                     properties.AlbumArtFallback = !properties.AlbumArtFallback;
                     window.SetProperty("COVER Fallback to album art", properties.AlbumArtFallback);
 					eval("properties.AlbumArtFallback"+properties.tagMode+" = "+properties.AlbumArtFallback);
-					window.SetProperty("COVER Fallback to album art for tag mode "+properties.tagMode, properties.AlbumArtFallback);						
+					window.SetProperty("COVER Fallback to album art for tag mode "+properties.tagMode, properties.AlbumArtFallback);
                     get_metrics();
 					var total = this.groups.length;
 					for(var i = 0; i < total; i++) {
 						g_image_cache.cachelist[this.groups[i].cachekey] = null;
-					};					
+					};
 					brw.refresh_all_covers();
                     brw.setList();
-                    brw.update();					
-					break;						
+                    brw.update();
+					break;
                 case (idx == 916):
                     properties.showToolTip = !properties.showToolTip;
-                    window.SetProperty("_PROPERTY: Show tooltips", properties.showToolTip);						
-					break;								
+                    window.SetProperty("_PROPERTY: Show tooltips", properties.showToolTip);
+					break;
                 case (idx == 990):
                     librarytree.toggleValue();
                     break;
@@ -4078,54 +4078,54 @@ oBrowser = function(name) {
                     break;
                 case (idx == 993):
                     window.Reload();
-                    break;	
+                    break;
                 case (idx == 1000):
                     this.setRowHeight(-2);
-                    break;	
+                    break;
                 case (idx == 1001):
                     this.setRowHeight(2);
-                    break;		
+                    break;
 				case (idx == 1030):
 					libraryfilter_width.increment(10);
-					break;		
+					break;
 				case (idx == 1031):
 					libraryfilter_width.decrement(10);
-					break;	
+					break;
 				case (idx == 1032):
 					libraryfilter_width.setDefault();
-					break;						
+					break;
 				case (idx == 1033):
 					libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
-					break;						
+					break;
 				case (idx == 2992):
 					if(filters_panel_state.isActive()) toggleFilterState(0,true);
 					else toggleFilterState(1);
-					break;	
+					break;
 				case (idx == 2993):
 					if(!filter2_state.isActive() && !filter3_state.isActive()) toggleFilterState(0);
 					else {
 						filter1_state.toggleValue();
 						updateIndividualFilterState();
 					}
-					break;	
+					break;
 				case (idx == 2994):
-					if(!filter1_state.isActive() && !filter3_state.isActive()) toggleFilterState(0);	
+					if(!filter1_state.isActive() && !filter3_state.isActive()) toggleFilterState(0);
 					else {
 						filter2_state.toggleValue();
-						updateIndividualFilterState();						
+						updateIndividualFilterState();
 					}
-					break;			
+					break;
 				case (idx == 2995):
-					if(!filter1_state.isActive() && !filter2_state.isActive()) toggleFilterState(0);	
+					if(!filter1_state.isActive() && !filter2_state.isActive()) toggleFilterState(0);
 					else {
 						filter3_state.toggleValue();
-						updateIndividualFilterState();						
+						updateIndividualFilterState();
 					}
-					break;						
+					break;
 				case (idx == 2996):
 					if(properties.savedFilterState>0 && properties.savedFilterState < filters_panel_state.getNumberOfState()-1 && !properties.displayToggleBtns) toggleFilterState(properties.savedFilterState);
 					else toggleFilterState(1);
-					break;	
+					break;
 				case (idx == 2997):
 					properties.DropInplaylist = !properties.DropInplaylist;
 					window.SetProperty("_SYSTEM: Allow to drag items into a playlist", properties.DropInplaylist);
@@ -4140,23 +4140,23 @@ oBrowser = function(name) {
 			_rowHeight = undefined;
             return true;
     };
-    
+
     this.incrementalSearch = function() {
         var count = 0;
         var groupkey;
         var chr;
         var gstart;
         var pid = -1;
-        
+
         // exit if no search string in cache
         if(cList.search_string.length <= 0) return true;
-        
+
         var total = this.groups.length;
-        
+
         // 1st char of the search string
-        var first_chr = cList.search_string.substring(0,1);  
+        var first_chr = cList.search_string.substring(0,1);
         var len = cList.search_string.length;
-        
+
         // which start point for the search
         if(total > 1000) {
             groupkey = this.groups[Math.floor(total / 2)].groupkey;
@@ -4169,21 +4169,21 @@ oBrowser = function(name) {
         } else {
             gstart = (properties.showAllItem ? 1 : 0);
         };
-        
+
         var format_str = "";
         for(var i = gstart; i < total; i++) {
             groupkey = this.groups[i].groupkey;
             if(len <= groupkey.length) {
                 format_str = groupkey.substring(0,len).toUpperCase();
             } else {
-                format_str = groupkey;  
+                format_str = groupkey;
             };
             if(format_str == cList.search_string) {
                 pid = i;
                 break;
             };
         };
-        
+
         if(pid >= 0) { // found
             g_focus_id = pid;
             plman.ClearPlaylistSelection(g_active_playlist);
@@ -4194,7 +4194,7 @@ oBrowser = function(name) {
             cList.inc_search_noresult = true;
             brw.repaint();
         };
-        
+
         cList.clear_incsearch_timer && clearTimeout(cList.clear_incsearch_timer);
         cList.clear_incsearch_timer = setTimeout(function () {
             // reset incremental search string after 1 seconds without any key pressed
@@ -4210,18 +4210,18 @@ oBrowser = function(name) {
 		for(var i = 0; i < total; i++) {
 			this.groups[i].tid = -1;
 			this.groups[i].load_requested = 0;
-			this.groups[i].cover_formated = false;			
-			this.groups[i].cover_img_mask = null;			
+			this.groups[i].cover_formated = false;
+			this.groups[i].cover_img_mask = null;
 			this.groups[i].save_requested = false;
 			this.groups[i].cover_img = null;
 			this.groups[i].cover_type = null;
 		};
-		this.repaint();			
+		this.repaint();
 	}
 
 };
 
-/* 
+/*
 ===================================================================================================
     Main
 ===================================================================================================
@@ -4231,7 +4231,7 @@ var g_1x1 = false;
 var g_last = 0;
 var isScrolling = false;
 var g_zoom_percent = 100;
-	
+
 var g_filterbox = null;
 var filter_text = "";
 
@@ -4277,11 +4277,11 @@ var g_rightClickedIndex = -1;
 
 var PanelToggleButtons_height=0;
 // START
-function on_size(w, h) {   
+function on_size(w, h) {
     window.DlgCode = 0x0004;
-    
+
     ww = Math.max(w,50);
-	
+
 	if(properties.showPanelToggleButtons && filters_panel_state.isActive())
 		wh = h-PanelToggleButtons_height;
     else wh = h;
@@ -4291,7 +4291,7 @@ function on_size(w, h) {
     };
 	if(window.IsVisible || first_on_size){
 		positionButtons();
-		
+
 		window.MinWidth = 1;
 		window.MinHeight = 1;
 
@@ -4299,12 +4299,12 @@ function on_size(w, h) {
 		if(properties.showwallpaper){
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		} else update_wallpaper = true;
-		
+
 		// set Size of browser
 		height_top_fix = (properties.showHeaderBar ? properties.headerBarHeight : 0) + (properties.showTagSwitcherBar ? properties.TagSwitcherBarHeight : 0);
 		brw.setSize(0, height_top_fix, ww, wh - height_top_fix);
 		update_size = false;
-		first_on_size = false;		
+		first_on_size = false;
 	} else update_size = true;
 };
 
@@ -4318,11 +4318,11 @@ function set_update_function(string){
 
 function on_paint(gr) {
     if(!ww || !wh || ww < 10 || wh < 10) return;
-	if(update_size) on_size(window.Width, window.Height);    
+	if(update_size) on_size(window.Width, window.Height);
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-	}	
-	
+	}
+
     if(!g_1x1) {
         // draw background under playlist
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
@@ -4335,14 +4335,14 @@ function on_paint(gr) {
             } else {
 				gr.FillSolidRect(0, 0, ww, wh+PanelToggleButtons_height, colors.lightgrey_bg);
 			}
-        }	
-		
+        }
+
         brw && brw.draw(gr);
-		
+
 		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
 			drawAllButtons(gr);
-		}		
-		
+		}
+
         if(properties.showHeaderBar) {
             // inputBox
             if(cFilterBox.enabled && g_filterbox) {
@@ -4360,28 +4360,28 @@ function on_paint(gr) {
 		var color = RGBA(0, 0, 0, 15);
 		gr.FillGradRect(line_padding, 0, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
 		gr.FillGradRect(line_w, 0, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 0, 1, 1, color);	
+		gr.FillSolidRect(line_w, 0, 1, 1, color);
 		var color = RGBA(0, 0, 0, 10);
 		gr.FillGradRect(line_padding, 1, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
 		gr.FillGradRect(line_w, 1, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 1, 1, 1, color);	
+		gr.FillSolidRect(line_w, 1, 1, 1, color);
 		var color = RGBA(0, 0, 0, 5);
 		gr.FillGradRect(0, 2, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
 		gr.FillGradRect(line_w, 2, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 2, 1, 1, color);	
+		gr.FillSolidRect(line_w, 2, 1, 1, color);
 		var color = RGBA(0, 0, 0, 0);
 		gr.FillGradRect(line_padding, 3, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
 		gr.FillGradRect(line_w, 3, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 3, 1, 1, color);			
-	}	
+		gr.FillSolidRect(line_w, 3, 1, 1, color);
+	}
 };
 
 function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
-	
+
 	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !brw.scrollbar.cursorHover && main_panel_state.isEqual(0));
-	if(!isResizing){	
+	if(!isResizing){
 		// stop inertia
 		if(cTouch.timer) {
 			window.ClearInterval(cTouch.timer);
@@ -4392,15 +4392,15 @@ function on_mouse_lbtn_down(x, y, m) {
 				scroll = check_scroll(scroll);
 			};
 		};
-		
+
 		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-			cur_btn_down = chooseButton(x, y);		
+			cur_btn_down = chooseButton(x, y);
 			if (cur_btn_down) {
-				g_down = true;	
+				g_down = true;
 				cur_btn_down.changeState(ButtonStates.down);
 				 window.Repaint();
 			}
-		}	
+		}
 		var is_scroll_enabled = brw.rowsCount > brw.totalRowsVis;
 		if(properties.enableTouchControl && is_scroll_enabled) {
 			if(brw._isHover(x, y) && !brw.scrollbar._isHover(x, y)) {
@@ -4428,28 +4428,28 @@ function on_mouse_lbtn_down(x, y, m) {
 		} else if(!cur_btn_down) {
 			brw.on_mouse("down", x, y);
 		};
-		   
+
 		// inputBox
 		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
 			g_filterbox.on_mouse("lbtn_down", x, y);
 		};
 		if(properties.showTagSwitcherBar) {
-			g_tagswitcherbar.on_mouse("lbtn_down", x, y);	
-		}						
-	};		
+			g_tagswitcherbar.on_mouse("lbtn_down", x, y);
+		}
+	};
 };
 
 function on_mouse_lbtn_up(x, y, m) {
 	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
-	if(!isResizing){	
+	if(!isResizing){
 		// inputBox
 		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
 			g_filterbox.on_mouse("lbtn_up", x, y);
 		};
 		if(properties.showTagSwitcherBar) {
-			g_tagswitcherbar.on_mouse("lbtn_up", x, y);	
-		}	
-		
+			g_tagswitcherbar.on_mouse("lbtn_up", x, y);
+		}
+
 		if(!g_on_mouse_lbtn_dblclk) {
 			if(pman.state == 1) {
 				pman.on_mouse("up", x, y);
@@ -4457,8 +4457,8 @@ function on_mouse_lbtn_up(x, y, m) {
 			} else {
 				brw.on_mouse("up", x, y);
 			};
-		} else g_on_mouse_lbtn_dblclk = false; 
-		
+		} else g_on_mouse_lbtn_dblclk = false;
+
 		if(timers.mouseDown) {
 			clearTimeout(timers.mouseDown);
 			timers.mouseDown = false;
@@ -4489,20 +4489,20 @@ function on_mouse_lbtn_up(x, y, m) {
 				}, 75);
 			};
 		};
-		
+
 		g_lbtn_click = false;
 		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-			g_down = false;      
+			g_down = false;
 			if (cur_btn_down != null && typeof cur_btn_down === 'object') {
 				cur_btn_down.onClick();
 			}
-		}		
-	};		
+		}
+	};
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
 	g_on_mouse_lbtn_dblclk = true;
-    if(y >= brw.y) {    
+    if(y >= brw.y) {
         brw.on_mouse("dblclk", x, y);
     } else if(x > brw.x && x < brw.x + brw.w) {
         brw.showNowPlaying();
@@ -4513,34 +4513,34 @@ function on_mouse_lbtn_dblclk(x, y, mask) {
 
 function on_mouse_rbtn_down(x, y, mask) {
     g_rbtn_click = true;
-    
+
     //if(!utils.IsKeyPressed(VK_SHIFT)) {
         // inputBox
         if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
             g_filterbox.on_mouse("rbtn_down", x, y);
         };
 		if(properties.showTagSwitcherBar) {
-			g_tagswitcherbar.on_mouse("rbtn_down", x, y);	
-		};				
+			g_tagswitcherbar.on_mouse("rbtn_down", x, y);
+		};
         if(pman.state == 1) {
             pman.on_mouse("right", x, y);
         };
-        
+
         brw.on_mouse("right", x, y);
     //};
 };
 
 function on_mouse_rbtn_up(x, y){
     g_rbtn_click = false;
-    
+
     if(!utils.IsKeyPressed(VK_SHIFT)) {
         return true;
     };
 };
 
-function on_mouse_move(x, y, m) {   
+function on_mouse_move(x, y, m) {
     if(g_cursor.x == x && g_cursor.y == y) return;
-	g_cursor.onMouse("move", x, y, m);		
+	g_cursor.onMouse("move", x, y, m);
 	var isResizing = g_resizing.on_mouse("move", x, y, m, main_panel_state.isEqual(0) && !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
 	if(isResizing){
 		if(g_resizing.resizing_x>x+5){
@@ -4554,28 +4554,28 @@ function on_mouse_move(x, y, m) {
 		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
 			var old = cur_btn;
 			cur_btn = chooseButton(x, y);
-			
+
 			if (old == cur_btn) {
 				cur_btn && cur_btn.onMouse('move',x,y);
 				if (g_down) return;
 			} else if (g_down && cur_btn && cur_btn.state != ButtonStates.down) {
 				cur_btn.changeState(ButtonStates.down);
-				cur_btn.onMouse('move',x,y);				
+				cur_btn.onMouse('move',x,y);
 				return;
 			} else {
 				if(old){
 					old.changeState(ButtonStates.normal);
 					old.onMouse('move',x,y);
-					brw.repaint();					
+					brw.repaint();
 				}
 				if(cur_btn){
 					cur_btn.changeState(ButtonStates.hover);
 					cur_btn.onMouse('move',x,y);
 					brw.repaint();
 				} else g_tooltip.Deactivate();
-			}		
-		}   
-		
+			}
+		}
+
 		if(cur_btn!=null && properties.showPanelToggleButtons && filters_panel_state.isActive()){
 			brw.on_mouse("leave", -1, -1);
 			return;
@@ -4585,7 +4585,7 @@ function on_mouse_move(x, y, m) {
 			g_filterbox.on_mouse("move", x, y);
 		};
 		if(properties.showTagSwitcherBar) {
-			g_tagswitcherbar.on_mouse("move", x, y);	
+			g_tagswitcherbar.on_mouse("move", x, y);
 		};
 		if(pman.state == 1) {
 			pman.on_mouse("move", x, y);
@@ -4606,16 +4606,16 @@ function on_mouse_move(x, y, m) {
 	};
 };
 
-function on_mouse_wheel(step, stepstrait, delta){  
+function on_mouse_wheel(step, stepstrait, delta){
 
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;
-	
+
     if(cTouch.timer) {
         window.ClearInterval(cTouch.timer);
         cTouch.timer = false;
     };
-    
+
     if(utils.IsKeyPressed(VK_SHIFT)) { // zoom cover size only
 		brw.setRowHeight(intern_step);
     } else {
@@ -4652,59 +4652,59 @@ function on_mouse_wheel(step, stepstrait, delta){
 };
 
 function on_mouse_leave() {
-	g_cursor.onMouse("leave", -1, -1);		
-	g_resizing.on_mouse("leave", -1, -1);	
+	g_cursor.onMouse("leave", -1, -1);
+	g_resizing.on_mouse("leave", -1, -1);
     // inputBox
     if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
         g_filterbox.on_mouse("leave", 0, 0);
     };
 	if(properties.showTagSwitcherBar) {
-		g_tagswitcherbar.on_mouse("leave", 0, 0);	
-	};	
+		g_tagswitcherbar.on_mouse("leave", 0, 0);
+	};
     brw.on_mouse("leave", 0, 0);
-    
+
     /*if(pman.state == 1) {
         pman.on_mouse("leave", 0, 0);
     };*/
 	if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-		g_down = false;    
+		g_down = false;
 		if (cur_btn) {
 			cur_btn.changeState(ButtonStates.normal);
-			cur_btn.onMouse("leave", -1, -1);	
+			cur_btn.onMouse("leave", -1, -1);
 			window.Repaint();
-			cur_btn=null;        
-		} 
-	}	
+			cur_btn=null;
+		}
+	}
 	g_tooltip.Deactivate();
 };
 function on_drag_enter(action, x, y, mask) {
 	if(brw.drag_moving) {
 		try{
 			action.Text = "Insert";
-		} catch(e){}		
-	}	
+		} catch(e){}
+	}
 }
 function on_drag_leave() {
     /*if(pman.state == 1) {
         pman.on_mouse("leave", 0, 0);
     };*/
-	g_resizing.on_drag("leave", 0, 0, null);		
+	g_resizing.on_drag("leave", 0, 0, null);
 	pman.on_mouse("move", 0, 0);
-	g_cursor.x = g_cursor.y = -1;	
+	g_cursor.x = g_cursor.y = -1;
 }
 
 function on_drag_drop(action, x, y, mask) {
-	action.Effect = 0;	
+	action.Effect = 0;
 	if(pman.state == 1) {
 		pman.on_mouse("up", x, y);
 		brw.clearSaved_sendItemToPlaylist();
 	} else {
 		brw.on_mouse("up", x, y);
-	};	
+	};
 }
 
 function on_drag_over(action, x, y, mask) {
-    if(x == g_cursor.x && y == g_cursor.y) return true;	
+    if(x == g_cursor.x && y == g_cursor.y) return true;
 	if(!brw.drag_moving){
 		action.Effect = 0;
 		return;
@@ -4713,7 +4713,7 @@ function on_drag_over(action, x, y, mask) {
 		pman.on_mouse("move", x, y);
 		try{
 			action.Text = "Insert";
-		} catch(e){}		
+		} catch(e){}
 	}
 
     g_cursor.x = x;
@@ -4722,13 +4722,13 @@ function on_drag_over(action, x, y, mask) {
 //=================================================// Metrics & Fonts & Colors & Images
 function get_metrics() {
     properties.displayMode = eval("properties.tagModedisplay"+properties.tagMode);
-    properties.circleMode = eval("properties.circleDisplay"+properties.tagMode);	
-    properties.showAllItem = eval("properties.showAllItem"+properties.tagMode);	
-    properties.drawItemsCounter = eval("properties.drawItemsCounter"+properties.tagMode);	
-    properties.showHeaderBar = eval("properties.showHeaderBar"+properties.tagMode);		
+    properties.circleMode = eval("properties.circleDisplay"+properties.tagMode);
+    properties.showAllItem = eval("properties.showAllItem"+properties.tagMode);
+    properties.drawItemsCounter = eval("properties.drawItemsCounter"+properties.tagMode);
+    properties.showHeaderBar = eval("properties.showHeaderBar"+properties.tagMode);
 	properties.thumbnailWidth = eval("properties.thumbnailWidth"+properties.tagMode);
 	properties.default_lineHeightMin = eval("properties.default_lineHeightMin"+properties.tagMode);
-	properties.AlbumArtFallback = eval("properties.AlbumArtFallback"+properties.tagMode);	
+	properties.AlbumArtFallback = eval("properties.AlbumArtFallback"+properties.tagMode);
     // scroll step
     switch(properties.displayMode) {
         case 0:
@@ -4740,13 +4740,13 @@ function get_metrics() {
             properties.rowScrollStep = 1;
             break;
     };
-    
+
     cPlaylistManager.width = Math.floor(cPlaylistManager.default_width * g_zoom_percent / 100);
     cPlaylistManager.topbarHeight = Math.floor(cPlaylistManager.default_topbarHeight * g_zoom_percent / 100);
     cPlaylistManager.botbarHeight = Math.floor(cPlaylistManager.default_botbarHeight * g_zoom_percent / 100);
     cPlaylistManager.rowHeight = Math.floor(cPlaylistManager.default_rowHeight * g_zoom_percent / 100);
     cPlaylistManager.scrollbarWidth = Math.floor(cPlaylistManager.default_scrollbarWidth * g_zoom_percent / 100);
-    
+
     properties.thumbnailWidth = Math.floor(properties.thumbnailWidth * (g_zoom_percent / 100));
     properties.lineHeightMin = Math.floor(properties.default_lineHeightMin * g_zoom_percent / 100) + g_fsize - 11;
 
@@ -4755,7 +4755,7 @@ function get_metrics() {
     properties.botTextRowHeight = Math.floor(properties.default_botTextRowHeight * g_zoom_percent / 100); // panelMode 1 || 3
     properties.textLineHeight = Math.floor(properties.lineHeightMin*0.28 * g_zoom_percent / 100); // panelMode 0 || 2
     if(properties.MinNumberOfColumns<1) properties.MinNumberOfColumns=1;
-    
+
     if(properties.showHeaderBar) {
         properties.headerBarHeight = Math.round(properties.defaultHeaderBarHeight * g_zoom_percent / 100);
         properties.headerBarHeight = Math.floor(properties.headerBarHeight / 2) != properties.headerBarHeight / 2 ? properties.headerBarHeight : properties.headerBarHeight - 1;
@@ -4769,7 +4769,7 @@ function get_metrics() {
 
     cFilterBox.w = Math.floor(cFilterBox.default_w * g_zoom_percent / 100);
     cFilterBox.h = Math.round(cFilterBox.default_h * g_zoom_percent / 100);
-	
+
 	if(properties.displayMode!=3 && properties.displayMode!=1) properties.addedRows_end = properties.addedRows_end_default;
 	else properties.addedRows_end=0
 
@@ -4788,78 +4788,78 @@ function get_metrics() {
 function get_images() {
     var gb;
     var txt = "";
-	
+
 	if(properties.darklayout) {
-		var theme_path = "white\\"; 
+		var theme_path = "white\\";
 		images.playing_playlist = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_progress1.png");
 	} else {
 		images.playing_playlist = gdi.Image(theme_img_path + "\\graphic_browser\\now_playing_track1.png");
-		var theme_path = "";	
+		var theme_path = "";
 	}
-	
+
     if(properties.showHeaderBar) g_filterbox.getImages();
 	if(properties.showTagSwitcherBar) g_tagswitcherbar.getImages();
-	
+
     images.all = gdi.CreateImage(150, 150);
     gb = images.all.GetGraphics();
     gb.FillSolidRect(0, 0, 150, 150, colors.normal_txt & 0x10ffffff);
     images.all.ReleaseGraphics(gb);
-    
+
     /*var img_loading = gdi.Image(images.path+"load.png");
     var iw = Math.round(properties.rowHeight-30);
     //images.loading_draw = img_loading.Resize(iw, iw, 7);
     images.loading_draw = img_loading;*/
-	
+
 	images.loading = gdi.Image(images.path+"load.png");
 	images.loading_draw = images.loading;
     images.noartist = gdi.Image(theme_img_path+"\\no_artist.png");
-	
-	images.filters_increase_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase.png");   
-	images.filters_increase_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase_hover.png");  
-	images.filters_decrease_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_decrease.png"); 
-	images.filters_decrease_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_decrease_hover.png"); 	
+
+	images.filters_increase_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase.png");
+	images.filters_increase_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_increase_hover.png");
+	images.filters_decrease_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_decrease.png");
+	images.filters_decrease_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+theme_path+"filters_decrease_hover.png");
 };
 
 
 function get_colors() {
 	get_colors_global();
-	if(properties.darklayout){		
+	if(properties.darklayout){
 
-		colors.grid_txt = GetGrey(255)	
-		colors.grid_bg = GetGrey(200,190)		
-		colors.gridselected_txt = GetGrey(0)	
-		colors.gridselected_bg = GetGrey(255,155)	
-		colors.gridselected_rect = GetGrey(255,245)	
-		
-		colors.btn_inactive_opacity = 130;
-		colors.btn_inactive_txt = GetGrey(140);	
-		
-		colors.grad_bottom_color1 = GetGrey(0,70);
-		colors.grad_bottom_color_library_panel = GetGrey(0,70);		
-		colors.grad_bottom_color2 = GetGrey(0,0);		
-		colors.fading_bottom_height = 50;
-	} else {		
-
-		colors.grid_txt = GetGrey(255)	
-		colors.grid_bg = GetGrey(0,190)		
-		colors.gridselected_txt = GetGrey(0)	
-		colors.gridselected_bg = GetGrey(255,155)		
+		colors.grid_txt = GetGrey(255)
+		colors.grid_bg = GetGrey(200,190)
+		colors.gridselected_txt = GetGrey(0)
+		colors.gridselected_bg = GetGrey(255,155)
 		colors.gridselected_rect = GetGrey(255,245)
-		
+
+		colors.btn_inactive_opacity = 130;
+		colors.btn_inactive_txt = GetGrey(140);
+
+		colors.grad_bottom_color1 = GetGrey(0,70);
+		colors.grad_bottom_color_library_panel = GetGrey(0,70);
+		colors.grad_bottom_color2 = GetGrey(0,0);
+		colors.fading_bottom_height = 50;
+	} else {
+
+		colors.grid_txt = GetGrey(255)
+		colors.grid_bg = GetGrey(0,190)
+		colors.gridselected_txt = GetGrey(0)
+		colors.gridselected_bg = GetGrey(255,155)
+		colors.gridselected_rect = GetGrey(255,245)
+
 		colors.btn_inactive_opacity = 110;
-		colors.btn_inactive_txt = colors.faded_txt;	
-		
+		colors.btn_inactive_txt = colors.faded_txt;
+
 		colors.grad_bottom_color1 = GetGrey(0,10);
-		colors.grad_bottom_color_library_panel = GetGrey(0,10);		
-		colors.grad_bottom_color2 = GetGrey(0,0);		
+		colors.grad_bottom_color_library_panel = GetGrey(0,10);
+		colors.grad_bottom_color2 = GetGrey(0,0);
 		colors.fading_bottom_height = 30;
-		
+
 		colors.headerbar_bg = GetGrey(255,240);
 		if(properties.showwallpaper) {
 			colors.headerbar_line = GetGrey(0,40);
 		}
 	}
-	colors.selected_txt = colors.normal_txt;	
+	colors.selected_txt = colors.normal_txt;
 	get_images();
 };
 
@@ -4867,7 +4867,7 @@ function on_font_changed() {
     get_font();
 	if(properties.showHeaderBar) {
 		g_filterbox.setSize(ww, cFilterBox.h+2, g_fsize+1);
-		g_filterbox.onFontChanged();	
+		g_filterbox.onFontChanged();
 	}
 	brw.onFontChanged();
     get_metrics();
@@ -4882,7 +4882,7 @@ function on_colours_changed() {
 
 	g_filterbox.getImages();
 	g_filterbox.reset_layout();
-	
+
 	if(properties.showwallpaper || properties.darklayout) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 	};
@@ -4902,7 +4902,7 @@ function on_key_up(vkey) {
         if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
             g_filterbox.on_key("up", vkey);
         };
-        
+
         // scroll keys up and down RESET (step and timers)
         brw.keypressed = false;
         cScrollBar.timerCounter = -1;
@@ -4919,7 +4919,7 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-    
+
     if(cSettings.visible) {
 
     } else {
@@ -4931,7 +4931,7 @@ function on_key_down(vkey) {
         };
 
         var act_pls = g_active_playlist;
-        
+
         if (mask == KMask.none) {
             switch (vkey) {
             case VK_F2:
@@ -4945,7 +4945,7 @@ function on_key_down(vkey) {
                 for(var i = 0; i < total; i++) {
                     brw.groups[i].tid = -1;
                     brw.groups[i].load_requested = 0;
-					brw.groups[i].cover_formated = false;			
+					brw.groups[i].cover_formated = false;
                     brw.groups[i].save_requested = false;
                     brw.groups[i].cover_img = null;
                     brw.groups[i].cover_type = null;
@@ -4979,7 +4979,7 @@ function on_key_down(vkey) {
                 break;
             case VK_ESCAPE:
 				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
-				break;				
+				break;
             case 222:
                 brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length*13)+(10*2)) / 2);
                 brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
@@ -4988,7 +4988,7 @@ function on_key_down(vkey) {
                 cList.search_string = "";
                 window.RepaintRect(0, brw.tt_y - 2, brw.w, brw.tt_h + 4);
                 break;
-            case VK_UP:          
+            case VK_UP:
                 if(brw.rowsCount > 0 && !cScrollBar.timerID) {
 					on_mouse_wheel(1);
                     brw.keypressed = true;
@@ -5024,7 +5024,7 @@ function on_key_down(vkey) {
                 break;
             case VK_HOME:
                 if(brw.rowsCount > 0) {
-					scroll = 0;					
+					scroll = 0;
                 };
                 break;
             case VK_DELETE:
@@ -5125,12 +5125,12 @@ function on_key_down(vkey) {
 };
 
 function on_char(code) {
-    
+
     // inputBox
     if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
         g_filterbox.on_char(code);
     };
-    
+
     if(cSettings.visible) {
 
     } else {
@@ -5167,12 +5167,12 @@ function on_playback_new_track(metadb){
 	if(window.IsVisible) {
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
-		};	
+		};
 		brw.repaint();
 	} else if(properties.wallpapermode == 0) update_wallpaper = true;
 	try{
 		playing_track_playcount = TF.play_count.Eval();
-	} catch(e){}		
+	} catch(e){}
 }
 function on_playback_stop(reason) {
     g_metadb = null;
@@ -5192,36 +5192,36 @@ function on_playback_stop(reason) {
 //=================================================// Library Callbacks
 function on_library_items_added() {
 	if(g_avoid_on_library_items_added) {
-		g_avoid_on_library_items_added=false;			
+		g_avoid_on_library_items_added=false;
 		return;
-	}	
+	}
 	g_avoid_on_library_items_removed=true;
     if(window.IsVisible && brw.current_sourceMode==0) brw.timer_populate(is_first_populate = true,4);
 	else if(brw.current_sourceMode==0) set_update_function("brw.populate(true,4)");
-	
+
 	if(timers.avoid_on_library_items_removed) clearTimeout(timers.avoid_on_library_items_removed);
 	timers.avoid_on_library_items_removed = setTimeout(function() {
 		g_avoid_on_library_items_removed = false;
 		clearTimeout(timers.avoid_on_library_items_removed);
 		timers.avoid_on_library_items_removed = false;
-	}, 200);		
+	}, 200);
 };
 
 function on_library_items_removed() {
 	if(g_avoid_on_library_items_removed) {
-		g_avoid_on_library_items_removed=false;			
+		g_avoid_on_library_items_removed=false;
 		return;
-	}	
+	}
 	g_avoid_on_library_items_added=true;
     if(window.IsVisible && brw.current_sourceMode==0) brw.timer_populate(is_first_populate = true,5);
 	else if(brw.current_sourceMode==0) set_update_function("brw.populate(true,5)");
-	
+
 	if(timers.avoid_on_library_items_added) clearTimeout(timers.avoid_on_library_items_added);
 	timers.avoid_on_library_items_added = setTimeout(function() {
 		g_avoid_on_library_items_added = false;
 		clearTimeout(timers.avoid_on_library_items_added);
 		timers.avoid_on_library_items_added = false;
-	}, 200);	
+	}, 200);
 };
 /*
 function on_library_items_changed() {
@@ -5237,23 +5237,23 @@ function on_playlists_changed() {
 		brw.searchPlaylists();
 		if(window.IsVisible) {
 			//g_avoid_on_playlist_switch = true;
-			
+
 			if(plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1) {
 				plman.ActivePlaylist = 0;
 			};
 			if(g_active_playlist != plman.ActivePlaylist) {
 				g_active_playlist = plman.ActivePlaylist;
 			};
-			
+
 			// refresh playlists list
 			pman.populate(exclude_active = false, reset_scroll = false);
 
-			//Update_Required_function="";		
+			//Update_Required_function="";
 		} else {
-			set_update_function('on_playlists_changed();');		
+			set_update_function('on_playlists_changed();');
 			if(properties.DropInplaylist) pman.refresh_required = true;
 		}
-	} 
+	}
 };
 
 function on_playlist_switch() {
@@ -5272,25 +5272,25 @@ function on_playlist_switch() {
 		g_active_playlist = plman.ActivePlaylist;
 		if(brw.pidx_selection != g_active_playlist){
 			brw.clearSelectedItem();
-		}				
+		}
 
 		if(brw.current_sourceMode == 1) {
 			scroll = scroll_ = 0;
 			brw.populate(false,7);
 		};
-		
+
 		// refresh playlists list
 		pman.populate(exclude_active = false, reset_scroll = false);
 		brw.repaint();
-		//Update_Required_function="";		
-	} else set_update_function('on_playlist_switch()');		
+		//Update_Required_function="";
+	} else set_update_function('on_playlist_switch()');
 };
 
 function on_playlist_items_added(playlist_idx) {
 	if(brw.sourcePlaylistIdx == playlist_idx) brw.sourcePlaylistIdx = -1;
-    if(window.IsVisible) {    
+    if(window.IsVisible) {
 		if(g_avoid_on_playlist_items_added) {
-			g_avoid_on_playlist_items_added=false;			
+			g_avoid_on_playlist_items_added=false;
 			return;
 		}
 		g_avoid_on_playlist_items_removed=true;
@@ -5300,15 +5300,15 @@ function on_playlist_items_added(playlist_idx) {
 				brw.populate(is_first_populate = false,8);
 			};
 		};
-		//Update_Required_function="";		
-	} else set_update_function('on_playlist_items_added('+playlist_idx+')');		
+		//Update_Required_function="";
+	} else set_update_function('on_playlist_items_added('+playlist_idx+')');
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if(brw.sourcePlaylistIdx == playlist_idx) brw.sourcePlaylistIdx = -1;	
-    if(window.IsVisible) {      
+	if(brw.sourcePlaylistIdx == playlist_idx) brw.sourcePlaylistIdx = -1;
+    if(window.IsVisible) {
 		if(g_avoid_on_playlist_items_removed)  {
-			g_avoid_on_playlist_items_removed=false;			
+			g_avoid_on_playlist_items_removed=false;
 			return;
 		}
 		g_avoid_on_playlist_items_added = true;
@@ -5320,29 +5320,29 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 				brw.populate(is_first_populate = false,9);
 			};
 		};
-		//Update_Required_function="";		
-	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');		
+		//Update_Required_function="";
+	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');
 };
 
 function on_playlist_items_reordered(playlist_idx) {
-    /*if(window.IsVisible) {  	
+    /*if(window.IsVisible) {
 		if(brw.current_sourceMode == 1) {
 			if(playlist_idx == g_active_playlist) {
 				brw.populate(is_first_populate = true,10);
 			};
 		};
-		//Update_Required_function="";		
-	} else Update_Required_function = 'on_playlist_items_reordered('+playlist_idx+')';	*/	
+		//Update_Required_function="";
+	} else Update_Required_function = 'on_playlist_items_reordered('+playlist_idx+')';	*/
 };
 
 /*
 function on_item_focus_change(playlist_idx, from, to) {
-    if(window.IsVisible) {      
+    if(window.IsVisible) {
 		if(g_avoid_on_item_focus_change) {
 			g_avoid_on_item_focus_change = false;
 			return;
 		};
-		
+
 		if(brw.list && brw.current_sourceMode == 1) {
 			if(playlist_idx == g_active_playlist) {
 				if(properties.followFocusChange) {
@@ -5355,17 +5355,17 @@ function on_item_focus_change(playlist_idx, from, to) {
 				};
 			};
 		};
-	}	    
+	}
 }; */
 
 
 function on_metadb_changed(metadbs, fromhook) {
 	playing_track_new_count = parseInt(playing_track_playcount,10)+1
 	try{
-		if(fb.IsPlaying && metadbs.Count==1 && metadbs[0].RawPath==fb.GetNowPlaying().RawPath && TF.play_count.Eval()==(playing_track_new_count)) {	
-			playing_track_playcount = playing_track_new_count;		
+		if(fb.IsPlaying && metadbs.Count==1 && metadbs[0].RawPath==fb.GetNowPlaying().RawPath && TF.play_count.Eval()==(playing_track_new_count)) {
+			playing_track_playcount = playing_track_new_count;
 			return;
-		} 		
+		}
 	} catch(e){}
 	if(g_avoid_on_metadb_changed || fromhook) {
 		g_avoid_on_metadb_changed = false;
@@ -5381,21 +5381,21 @@ function on_metadb_changed(metadbs, fromhook) {
 		if(filter_text.length > 0) {
 			if(!window.IsVisible) set_update_function('brw.populate(true,11)');
 			else brw.populate(is_first_populate = true,11);
-		} else { 
-			if(!window.IsVisible) set_update_function('brw.populate(false,12)');	
-			else brw.populate(is_first_populate = false,12);		
+		} else {
+			if(!window.IsVisible) set_update_function('brw.populate(false,12)');
+			else brw.populate(is_first_populate = false,12);
 		};
-	};		
+	};
 };
 
 function on_item_selection_change() {
-    /*if(window.IsVisible)	
+    /*if(window.IsVisible)
 		brw.repaint();
 	else Update_Required_function = 'on_item_selection_change()';	*/
 };
 
 function on_playlist_items_selection_change() {
-    /*if(window.IsVisible)	
+    /*if(window.IsVisible)
 		brw.repaint();
 	else Update_Required_function = 'on_playlist_items_selection_change()';	*/
 };
@@ -5407,7 +5407,7 @@ function on_focus(is_focused) {
         brw.repaint();
     };
 	if(!is_focused){
-		brw.clearSelectedItemsOnNextClick = true;		
+		brw.clearSelectedItemsOnNextClick = true;
 	}
 };
 
@@ -5432,48 +5432,53 @@ function g_sendResponse() {
     } else {
 	    filter_text = g_filterbox.inputbox.text;
     };
-       
+
     // filter in current panel
     brw.populate(true,13);
 };
 
 function on_notify_data(name, info) {
     switch(name) {
+		case "use_ratings_file_tags":
+			globalProperties.use_ratings_file_tags = info;
+			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
+			window.Reload();
+		break;
 		case "colors":
 			globalProperties.colorsMainPanel = info;
 			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);
 			on_colours_changed();
-		break; 					
+		break;
 		case "enableResizableBorders":
 			globalProperties.enableResizableBorders = info;
-			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);			
-		break; 			
+			window.SetProperty("GLOBAL enableResizableBorders", globalProperties.enableResizableBorders);
+		break;
 		case "libraryfilter_width":
-			libraryfilter_width.value=info;	
-		break;		
+			libraryfilter_width.value=info;
+		break;
 		case "libraryfilter_state":
-			libraryfilter_state.value=info;	
+			libraryfilter_state.value=info;
 		break;
 		case "showFiltersTogglerBtn":
 			if(main_panel_state.isEqual(0) && properties.ParentName=="Library"){
-				properties.showFiltersTogglerBtn=info;	
+				properties.showFiltersTogglerBtn=info;
 				window.SetProperty("_PROPERTY: show filters toggler btn", properties.showFiltersTogglerBtn);
 				window.Repaint();
 			}
 		break;
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
-			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);		
-			window.Reload();			
-		break; 	
+			window.SetProperty("GLOBAL memory solicitation", globalProperties.mem_solicitation);
+			window.Reload();
+		break;
 		case "thumbnailWidthMax":
-			globalProperties.thumbnailWidthMax = Number(info);			
-			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);	
-		break; 		
+			globalProperties.thumbnailWidthMax = Number(info);
+			window.SetProperty("GLOBAL thumbnail width max", globalProperties.thumbnailWidthMax);
+		break;
 		case "coverCacheWidthMax":
-			globalProperties.coverCacheWidthMax = Number(info);				
+			globalProperties.coverCacheWidthMax = Number(info);
 			window.SetProperty("GLOBAL cover cache width max", globalProperties.coverCacheWidthMax);
-		break; 			
+		break;
         case "FocusOnNowPlayingForce":
 			g_avoid_on_playlist_switch_callbacks = true;
 			if(window.IsVisible) brw.showNowPlaying();
@@ -5482,26 +5487,26 @@ function on_notify_data(name, info) {
 				g_avoid_on_playlist_switch_callbacks = false;
 				clearTimeout(timers.avoidPlaylistSwitch);
 				timers.avoidPlaylistSwitch = false;
-			}, 500);	
-        break;		
+			}, 500);
+        break;
         case "JSSmoothPlaylist->JSSmoothBrowser:avoid_on_playlist_switch_callbacks_on_sendItemToPlaylist":
             g_avoid_on_playlist_switch_callbacks = true;
             break;
-		case "enable_screensaver":		
+		case "enable_screensaver":
 			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);	
-		break;				
+			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
+		break;
 		case "set_font":
 			globalProperties.fontAdjustement = info;
-			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);		
+			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
 			on_font_changed();
-		break; 			
+		break;
 		case "display_toggle_buttons":
-			properties.displayToggleBtns = info;   
-			window.SetProperty("_DISPLAY: Toggle buttons", properties.displayToggleBtns);			
+			properties.displayToggleBtns = info;
+			window.SetProperty("_DISPLAY: Toggle buttons", properties.displayToggleBtns);
 			positionButtons();
 			brw.repaint();
-		break; 		
+		break;
         case "JSSmoothPlaylist->JSSmoothBrowser:show_item":
             brw.showItemFromItemHandle(info);
             break;
@@ -5520,9 +5525,9 @@ function on_notify_data(name, info) {
 					case 3:
 						properties.albumArtId = 5;
 						break;
-				};			
+				};
 				get_metrics();
-				brw.populate(true,1);	
+				brw.populate(true,1);
 			}
 			break;
         case "refresh_filters":
@@ -5532,10 +5537,10 @@ function on_notify_data(name, info) {
 					brw.populate(is_first_populate = false,15);
 				} else {
 					browser_refresh_required=true;
-					brw.populate(is_first_populate = false,16,1);				
+					brw.populate(is_first_populate = false,16,1);
 				}
 			} else if(!window.IsVisible) brw.clearSelectedItem();
-            break;			
+            break;
         case "reset_filters":
 			if(info<=properties.filterOrder){
 				if(brw.current_sourceMode == 0 && brw.populate_sourceMode != 0){
@@ -5543,15 +5548,15 @@ function on_notify_data(name, info) {
 					if(window.IsVisible) brw.populate(is_first_populate = false,14);
 					else set_update_function("brw.populate(false,14)");
 				}
-			} 
-            break;	
+			}
+            break;
 		case"RefreshImageCover":
 		if(properties.displayMode>=1) {
 			var total = brw.groups.length;
 			for(var i = 0; i < total; i++) {
 				brw.groups[i].tid = -1;
 				brw.groups[i].load_requested = 0;
-				brw.groups[i].cover_formated = false;			
+				brw.groups[i].cover_formated = false;
 				brw.groups[i].save_requested = false;
 				brw.groups[i].cover_img = null;
 				brw.groups[i].cover_type = null;
@@ -5560,53 +5565,53 @@ function on_notify_data(name, info) {
 			g_image_cache.resetMetadb(metadb[0])
 			brw.repaint();
 		}
-		break; 			
+		break;
 		case"DiskCacheState":
 			globalProperties.enableDiskCache = info;
-			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);			
+			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
 			brw.repaint();
-		break; 
-		case"UpdatePlaylists":		
-			brw.searchPlaylists();		
-		break;			
+		break;
+		case"UpdatePlaylists":
+			brw.searchPlaylists();
+		break;
 		case"LoadAllCoversState":
 			globalProperties.load_covers_at_startup = info;
-			window.SetProperty("COVER Load all at startup", globalProperties.load_covers_at_startup);	
-		break; 	
+			window.SetProperty("COVER Load all at startup", globalProperties.load_covers_at_startup);
+		break;
 		case"LoadAllArtistImgState":
 			globalProperties.load_artist_img_at_startup = info;
-			window.SetProperty("ARTIST IMG Load all at startup", globalProperties.load_artist_img_at_startup);	
-		break; 				
-		case"playlists_dark_theme":		
+			window.SetProperty("ARTIST IMG Load all at startup", globalProperties.load_artist_img_at_startup);
+		break;
+		case"playlists_dark_theme":
 			if(properties.ParentName=="Playlists"){
 				properties.darklayout = info;
 				window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
-				on_colours_changed();				
-			}	
-		break;			
+				on_colours_changed();
+			}
+		break;
 		case"library_dark_theme":
 			if(properties.ParentName=="Library"){
 				properties.darklayout = info;
 				window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
-				on_colours_changed();				
+				on_colours_changed();
 			}
-		break; 	
-		case "wallpaperVisibilityGlobal":		
+		break;
+		case "wallpaperVisibilityGlobal":
 		case "wallpaperVisibility":
 			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
-		break; 			
-		case "wallpaperBlurGlobal":		
+		break;
+		case "wallpaperBlurGlobal":
 		case "wallpaperBlur":
 			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
-		break; 					
+		break;
         case "WSH_panels_reload":
 			window.Reload();
             break;
-		case "avoid_on_playlists_changed":  
+		case "avoid_on_playlists_changed":
 			g_avoid_on_playlists_changed=info;
 			if(!info) brw.clearSelectedItem();
-			break;			
-		case "cover_cache_finalized": 	
+			break;
+		case "cover_cache_finalized":
 			//g_image_cache.cachelist = info.map( (arg)=>{ return (arg ? cloneImg(arg) : null); } );
 			//g_image_cache.cachelist = cloneImgs(info);
 			/*
@@ -5614,77 +5619,77 @@ function on_notify_data(name, info) {
 				g_image_cache.cachelist = new GdiBitmap(info[i]);
 			}
 			window.Repaint();*/
-		break;	
-		case "layout_state":  
-			layout_state.value=info;			
-		break;		
-		case "set_filter_text":  
+		break;
+		case "layout_state":
+			layout_state.value=info;
+		break;
+		case "set_filter_text":
 			g_filterbox.inputbox.text=info;
 			g_sendResponse();
-		break;			
+		break;
 		case "nowplayinglib_state":
 			nowplayinglib_state.value=info;
-		break; 
+		break;
 		case "nowplayingplaylist_state":
 			nowplayingplaylist_state.value=info;
-		break; 
+		break;
 		case "nowplayingbio_state":
 			nowplayingbio_state.value=info;
-		break; 
+		break;
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
-		break; 	
+		break;
 		case "trackinfoslib_state":
 			trackinfoslib_state.value=info;
-		break; 
+		break;
 		case "trackinfosplaylist_state":
 			trackinfosplaylist_state.value=info;
-		break; 
+		break;
 		case "trackinfosbio_state":
 			trackinfosbio_state.value=info;
-		break; 
+		break;
 		case "trackinfosvisu_state":
 			trackinfosvisu_state.value=info;
-		break; 			
-		case "main_panel_state":  
+		break;
+		case "main_panel_state":
 			main_panel_state.value = info;
-		break;				
-		case "filters_panel_state": 
+		break;
+		case "filters_panel_state":
 			filters_panel_state.value=info;
 			positionButtons();
-		break;	
-		case "save_filter_state": 
-			properties.savedFilterState = info;		
+		break;
+		case "save_filter_state":
+			properties.savedFilterState = info;
 			window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
 			positionButtons();
-		break;			
-		case "librarytree": 
+		break;
+		case "librarytree":
 			librarytree.value=info;
-		break;			
-		case "rating_updated": 
+		break;
+		case "rating_updated":
 			g_avoid_on_metadb_changed=true;
-		break;				
-		case "filter1_state": 
+		break;
+		case "filter1_state":
 			filter1_state.value=info;
-		break;	
-		case "filter2_state": 
+		break;
+		case "filter2_state":
 			filter2_state.value=info;
-		break;	
-		case "filter3_state": 
+		break;
+		case "filter3_state":
 			filter3_state.value=info;
-		break;			
+		break;
     };
 };
 
 function updateIndividualFilterState(){
 	if(!filter3_state.isActive() && properties.filterOrder==1) properties.showPanelToggleButtons=true
-	else if(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0 && main_panel_state.isEqual(1)) properties.showPanelToggleButtons=true	
+	else if(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0 && main_panel_state.isEqual(1)) properties.showPanelToggleButtons=true
 	else if (properties.filterOrder!=2) properties.showPanelToggleButtons=false
 	else properties.showPanelToggleButtons=true;
 	if((!filter1_state.isActive() && properties.filterOrder==1) || (!filter1_state.isActive() && !filter2_state.isActive() && properties.filterOrder==2)) {
 		browser_refresh_required=true;
-		brw.populate(is_first_populate = true,17);			
-	}		
+		brw.populate(is_first_populate = true,17);
+	}
 }
 
 // TOggle buttons -------------------------------------
@@ -5702,25 +5707,25 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
     this.fonClick = fonClick;
     this.fonDbleClick = fonDbleClick;
     this.N_img = N_img;
-    this.H_img = H_img;   
+    this.H_img = H_img;
 	this.opacity = opacity;
 	if (typeof opacity == "undefined") this.opacity = 255;
 	else this.opacity = opacity;
 	this.tooltip_activated = false;
-    this.tooltip_text = tooltip_text;	
+    this.tooltip_text = tooltip_text;
     this.containXY = function (x, y) {
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
-    }    
+    }
     this.changeState = function (state) {
         var old_state = this.state;
         this.state = state;
-		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);	
-		else g_cursor.setCursor(IDC_ARROW,21);					
+		if(old_state!=ButtonStates.hover && this.state==ButtonStates.hover) g_cursor.setCursor(IDC_HAND, this.text);
+		else g_cursor.setCursor(IDC_ARROW,21);
         return old_state;
     }
     this.draw = function (gr) {
         if (this.state == ButtonStates.hide) return;
-        b_img=this.N_img;        
+        b_img=this.N_img;
         switch (this.state)
         {
         case ButtonStates.normal:
@@ -5732,31 +5737,31 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
             break;
         case ButtonStates.down:
             break;
-            
+
         case ButtonStates.hide:
             return;
         }
         switch (this.state)
-        {    
-        case ButtonStates.hover: 
-        default: 
+        {
+        case ButtonStates.hover:
+        default:
 			gr.DrawImage(b_img, this.x, this.y, b_img.Width, b_img.Height, 0, 0, b_img.Width, b_img.Height,0,this.opacity);
-            break;            
-        }            
+            break;
+        }
 
     }
 
-    this.onClick = function () {        
+    this.onClick = function () {
         this.fonClick && this.fonClick();
     }
     this.onDbleClick = function () {
         if(this.fonDbleClick) {this.fonDbleClick && this.fonDbleClick();}
-    }    
-    this.onMouse = function (state,x,y) {    
+    }
+    this.onMouse = function (state,x,y) {
 		switch(state){
 			case 'lbtn_down':
 				this.fonDown && this.fonDown();
-			break;				
+			break;
 			case 'lbtn_up':
 				this.fonUp && this.fonUp();
 				if (this.containXY(x, y) && this.state != ButtonStates.hide && !this.hide){
@@ -5772,9 +5777,9 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 					this.tooltip_activated = false;
 					g_tooltip.Deactivate();
 				}
-			break;			
+			break;
 			case 'move':
-			
+
 				if(this.tooltip_text!='' && g_tooltip.activeZone != this.text){
 					var tooltip_text = this.tooltip_text;
 					g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.text);
@@ -5783,9 +5788,9 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 					this.tooltip_activated = false;
 					g_tooltip.Deactivate();
 				}
-			break;					
+			break;
 		}
-    }  		
+    }
 }
 function drawAllButtons(gr) {
     for (var i in buttons) {
@@ -5800,60 +5805,60 @@ function chooseButton(x, y) {
     return null;
 }
 
-function toggleFilterState(new_filters_state, save_previous_state){	
+function toggleFilterState(new_filters_state, save_previous_state){
 	if(save_previous_state===true) {
-		properties.savedFilterState = filters_panel_state.value;		
+		properties.savedFilterState = filters_panel_state.value;
 		window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
 		window.NotifyOthers("save_filter_state",properties.savedFilterState);
-	}		
+	}
 	filters_panel_state.setValue(new_filters_state);
 	positionButtons();
-	window.Repaint();	
+	window.Repaint();
 }
 function setButtons(){
-	buttons = { 
+	buttons = {
 		filtersToggle: new SimpleButton(18, 7, 35, 40, "filtersToggle", "Reduce Filters", function () {
 			if(properties.savedFilterState>0 && properties.savedFilterState < filters_panel_state.max_value && !properties.displayToggleBtns) toggleFilterState(properties.savedFilterState);
 			else toggleFilterState((!filters_panel_state.isActive())?1:filters_panel_state.value-1);
-		},false,images.filters_decrease_icon,images.filters_decrease_hover_icon,ButtonStates.normal,255),	
+		},false,images.filters_decrease_icon,images.filters_decrease_hover_icon,ButtonStates.normal,255),
 	}
 }
 function positionButtons(){
-	buttons.filtersToggle.x=ww-45;	
+	buttons.filtersToggle.x=ww-45;
 	buttons.filtersToggle.y=wh+PanelToggleButtons_height-30;
 	if(properties.displayToggleBtns || filters_panel_state.isMaximumValue()){
-		buttons.filtersToggle.changeState(ButtonStates.normal);		
+		buttons.filtersToggle.changeState(ButtonStates.normal);
 	} else {
 		buttons.filtersToggle.changeState(ButtonStates.hide);
-	}	
+	}
 }
 function toggleWallpaper(wallpaper_state){
-	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;	
+	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
 	properties.showwallpaper = wallpaper_state;
 	window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
-	on_colours_changed();					
+	on_colours_changed();
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
-	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;	
+	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;
 	properties.wallpaperblurred = wallpaper_blur_state;
-	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);	
+	window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 	on_colours_changed();
 }
 function on_init() {
     window.DlgCode = 0x0004;
-    
+
     get_font();
-	g_filterbox = new oFilterBox(); 
+	g_filterbox = new oFilterBox();
 	g_cursor = new oCursor();
-	g_tooltip = new oTooltip('brw');	
-	g_tagswitcherbar = new oTagSwitcherBar();	
+	g_tooltip = new oTooltip('brw');
+	g_tagswitcherbar = new oTagSwitcherBar();
     get_colors();
     get_metrics();
 	setButtons();
 	g_image_cache = new oImageCache();
-	g_filterbox.reset_layout();	
-    g_active_playlist = plman.ActivePlaylist;	
-	g_resizing = new Resizing("libraryfilter",false,true,properties.TagSwitcherBarHeight);	
+	g_filterbox.reset_layout();
+    g_active_playlist = plman.ActivePlaylist;
+	g_resizing = new Resizing("libraryfilter",false,true,properties.TagSwitcherBarHeight);
     switch(properties.tagMode) {
         case 1:
             properties.albumArtId = 0;
@@ -5867,9 +5872,9 @@ function on_init() {
     };
 
     brw = new oBrowser("brw");
-	brw.startTimer();	
+	brw.startTimer();
     pman = new oPlaylistManager("pman");
-		
+
     g_filterbox.inputbox.visible = true;
     if(fb.IsPlaying) playing_track_playcount = TF.play_count.Eval();
 

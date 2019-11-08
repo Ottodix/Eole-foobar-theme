@@ -966,6 +966,11 @@ function on_layout_change() {
 }	
 function on_notify_data(name, info) {
     switch(name) {
+		case "use_ratings_file_tags":
+			globalProperties.use_ratings_file_tags = info;
+			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
+			window.Reload();
+		break;		
 		case "g_avoid_on_focus_change":
 			g_avoid_on_focus_change = info;
 			timers.on_focus_change = setTimeout(function() {
