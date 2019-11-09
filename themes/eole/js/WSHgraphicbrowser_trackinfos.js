@@ -6062,6 +6062,25 @@ function on_mouse_mbtn_down(x, y, mask) {
 		brw.on_mouse("mbtn_down", x, y);
 	}
 }
+function on_mouse_mbtn_up(x, y, mask) {
+	// skip if hovering over an album in the browser
+	if(brw.activeIndex > -1)
+		return;
+
+	// emulate a selection click
+	on_mouse_lbtn_down(x, y);
+	on_mouse_lbtn_up(x, y);
+
+	if(g_showlist.haveSelectedRows()) {
+		var metadblist_selection = plman.GetPlaylistSelectedItems(brw.getSourcePlaylist());
+		// add playlist selection to queue
+		let selection = metadblist_selection;
+		for (let i = 0; i < selection.Count; ++i) {
+			let item = selection[i];
+			plman.AddItemToPlaybackQueue(item);
+		}
+	}
+}
 function on_mouse_lbtn_down(x, y, m) {
 	var isResizing = g_resizing.on_mouse("lbtn_down", x, y, m, !g_scrollbar.ishover && ((g_showlist.idx > -1 && g_showlist.prev_bt.state != ButtonStates.hover && g_showlist.next_bt.state != ButtonStates.hover) || (g_showlist.idx<=-1)));
 	if(!isResizing){
