@@ -191,7 +191,8 @@ var TF = {
 	play_count: fb.TitleFormat("%play_count%"),
 	playback_time_seconds: fb.TitleFormat("%playback_time_seconds%"),
 	title: fb.TitleFormat("%title%"),
-	radio_artist: fb.TitleFormat("$if2(%artist%,%bitrate%'K')"),
+	radio_artist:fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))"),
+	artist:fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
 }
 
 var gradient_w = 31;
@@ -3075,15 +3076,12 @@ oBrowser = function(name) {
                                             };
                                         };
 
-
                                         if(track_time_part == "ON AIR") {
                                             gr.GdiDrawText(g_radio_artist_final, g_font.normal, colors.fadedsmall_txt, tx+this.rows[i].artist_part_w+10, ay, tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         } else if(show_track_part2) {
                                             gr.GdiDrawText(track_part2, g_font_light, colors.fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-
-
 
 										if(properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)){
 											if(track_num_part>9) var select_start=4;
@@ -3117,9 +3115,8 @@ oBrowser = function(name) {
 
 												if(track_time_part == "ON AIR") {
 														gr.GdiDrawText(g_radio_title, g_font.normal, colors.albumartprogressbar_txt, tx+13, ay, Math.min(current_size-35,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-														gr.GdiDrawText(g_radio_artist, g_font_light, colors.albumartprogressbar_txt, tx+this.rows[i].artist_part_w+18, ay, Math.min(current_size-this.rows[i].artist_part_w-22,tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+														//gr.GdiDrawText(g_radio_artist, g_font_light, colors.albumartprogressbar_txt, tx+this.rows[i].artist_part_w+18, ay, Math.min(current_size-this.rows[i].artist_part_w-22,tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 												} else {
-
 														var margin_left = tx+13 - progress_x;
 
 														gr.GdiDrawText(track_part1, g_font.normal, colors.albumartprogressbar_txt, tx+13, ay, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
@@ -6157,7 +6154,14 @@ function on_playback_stop(reason) {
 		g_radio_artist = "";
 	}
 };
-
+function on_playback_dynamic_info_track() {
+	g_radio_title = TF.title.Eval(true);
+	g_radio_artist = TF.artist.Eval(true);
+	if(g_time_remaining=="ON AIR" || g_total_seconds=="ON AIR") {
+		g_radio_title = g_radio_title + ((g_radio_artist.length>0)?' - '+g_radio_artist:'');
+		g_radio_artist = "";
+	}
+}
 function on_playback_new_track(metadb) {
 	if(brw.isPlayingIdx>=0) try{brw.groups[brw.isPlayingIdx].isPlaying = false;} catch(e){}
 	try{
@@ -6183,12 +6187,16 @@ function on_playback_new_track(metadb) {
 			brw.showNowPlaying();
 		}
 		g_total_seconds =  properties.tf_total_seconds.Eval(true);
-		g_time_remaining = "-"+g_total_seconds.toHHMMSS();
+		if(g_total_seconds!="ON AIR") g_time_remaining = "-"+g_total_seconds.toHHMMSS();
+		else {
+			g_time_remaining = "ON AIR";
+			on_playback_dynamic_info_track();
+		}
 		g_elapsed_seconds = 0;
 		brw.repaint();
 	} else {
 		set_update_function("on_playback_new_track(fb.GetNowPlaying())");
-		g_total_seconds = null;
+		//g_total_seconds = null;
 		g_time_remaining = null;
 		g_elapsed_seconds = 0;
 		if(properties.wallpapermode == 0) update_wallpaper = true;
@@ -7153,7 +7161,9 @@ function on_init() {
 	brw.setActivePlaylist();
 	brw.startTimer();
     pman = new oPlaylistManager("pman");
-
+	
     if(fb.IsPlaying) playing_track_playcount = TF.play_count.Eval();
+	g_total_seconds =  properties.tf_total_seconds.Eval(true);
+	on_playback_dynamic_info_track();
 };
 on_init();

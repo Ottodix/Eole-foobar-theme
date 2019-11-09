@@ -38,7 +38,7 @@ g_tfo = {
 	codec: fb.TitleFormat("%codec%"),
 	playcount: fb.TitleFormat("$if2(%play_count%,0)"),
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
-	allinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
+	allinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %mood% ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile%)$if(%bitrate%, | %bitrate%K)"),
 }
 
 
@@ -610,12 +610,8 @@ function oInfos() {
 		var txt_title = allinfos[1];
 		var txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
 		var _playcount = allinfos[7];
-		if(foo_playcount) var txt_profile = allinfos[6] + allinfos[8] + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-		else var txt_profile = allinfos[6] + allinfos[8] + "K";
-		/*var l_mood = g_tfo.mood.EvalWithMetadb(this.metadb);
-		if (l_mood != null && l_mood != "?") {
-			btn_mood.mood = true;
-		} else btn_mood.mood = 0;*/
+		if(foo_playcount) var txt_profile = allinfos[6] + allinfos[8] + " | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else var txt_profile = allinfos[6] + allinfos[8];
 		this.show_info = true;
 		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
@@ -672,13 +668,13 @@ function oInfos() {
 		}
 		//if (properties.display_mood) btn_mood.Paint(gr);
 
-		var double_row = (properties.doubleRowText && this.txt_line3 !="");
+		var double_row = (properties.doubleRowText && this.txt_line3 !="" && this.txt_line2 !="");
 
 		if(this.line1_width<0) {
 			this.line1_width = gr.CalcTextWidth(this.txt_line1, g_font.italicplus5);
 			this.tooltip_line1 = (this.line1_width>this.txt_width);
 		}
-		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + rbutton[0].height + (properties.doubleRowText?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + rbutton[0].height + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		var line2 = ((this.txt_line2 !="" && this.show_info) || double_row) ? this.txt_line2 : this.txt_line3;
 		if(this.line2_width<0) {
