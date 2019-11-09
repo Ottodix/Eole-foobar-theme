@@ -940,7 +940,7 @@ oRow = function(metadb,itemIndex) {
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
 
-		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || this.artist!=brw.groups[g_showlist.idx].artist) this.title_text = this.title+" - "+this.artist;
+		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist")) this.title_text = this.title+" - "+this.artist;
 		else this.title_text = this.title;
 
         var duration = this.length;

@@ -75,7 +75,6 @@ function setButtons(){
 		},images.pause_img,images.pause_img),
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
 			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
-			console.log(g_cover.playlistIndex);
 			//plman.ActivePlaylist = this.SourcePlaylistIdx;
 			plman.PlayingPlaylist = g_cover.playlistIndex;			
 			if(fb.IsPaused) fb.Stop();
@@ -613,10 +612,8 @@ oCover = function() {
 		//if(state==this.is_playing) return;
 		if(state===false){
 			this.is_playing = false;
-			//console.log("notisplaying!")
 		} else {
 			this.is_playing = true;
-			//console.log("isplaying!")
 			this.playing_metadb = metadb;
 			this.playing_cachekey = this.cachekey;
 		}
@@ -664,7 +661,6 @@ oCover = function() {
 		var is_playing_old = this.is_playing;
 		this.playlistIndex = playlistIndex;	
 		this.itemIndex = itemIndex;		
-		console.log("getArtwork"+playlistIndex)
 		if(typeof is_playing == "undefined"){
 			var is_playing_new = false;
 			if(isValidHandle(this.playing_metadb) && isValidHandle(metadb) && metadb.Compare(this.playing_metadb) && fb.IsPlaying) {
@@ -677,12 +673,9 @@ oCover = function() {
 			}
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
-		
-		//console.log("getArtwork1 metadb "+metadb.RawPath+" this.is_playing "+this.is_playing+" is_playing_new"+is_playing_new);
-		
+				
 		if(this.is_playing!=is_playing_old) this.ResetMask();				
 		if(this.metadb && this.metadb.Compare(metadb)) {
-			//console.log("getArtwork2 metadb "+metadb.RawPath+" this.metadb "+this.metadb.RawPath+"");
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;
 		}
@@ -692,7 +685,6 @@ oCover = function() {
 			//if(this.playing_cachekey!="" && this.playing_cachekey == this.cachekey) {
 				//this.setPlaying(true, this.metadb);
 			//}
-			//console.log("getArtwork3 "+this.playing_cachekey+" - "+this.cachekey);
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;	
 		}

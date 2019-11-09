@@ -101,7 +101,8 @@ var time_e = fb.TitleFormat("%playback_time%");
 var time_t = fb.TitleFormat("$if(%length_seconds%,%length_seconds%,'ON AIR')");
 var time_r = fb.TitleFormat("$if(%length%,-%playback_time_remaining%,%playback_time%)");
 var tf_elapsed_seconds = fb.TitleFormat("$if2(%playback_time_seconds%,'ON AIR')");
-var tf_radio_artist = fb.TitleFormat("$if2(%artist%,%bitrate%'K')");
+//var tf_radio_artist = fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))");
+var tf_radio_artist = fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))");
 var tf_title = fb.TitleFormat("%title%");
 var tf_rating = fb.TitleFormat("$if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0)");
 var elapsed_seconds = -1;
@@ -682,8 +683,8 @@ function get_text(metadb) {
     g_text_tracknumber = "";
     if (metadb) {
 		current_played_track = metadb;
-        g_text_artist = tf_radio_artist.EvalWithMetadb(metadb);
-        g_text_title = tf_title.EvalWithMetadb(metadb);
+        g_text_artist = tf_radio_artist.Eval();
+        g_text_title = tf_title.Eval();
     } else {
 		current_played_track = null;
         g_text_artist="Nothing Played";
@@ -1236,6 +1237,12 @@ function on_playback_pause(){
     window.Repaint();
 }
 function on_playback_edited() {
+	old_artist=g_text_artist;
+	old_title=g_text_title;
+	get_text();
+	if(old_artist!=g_text_artist || old_title!=g_text_title) window.Repaint();
+}
+function on_playback_dynamic_info_track() {
 	old_artist=g_text_artist;
 	old_title=g_text_title;
 	get_text();
