@@ -2,7 +2,7 @@ var properties_big = {
     ParentName:  window.GetProperty("BIG:ParentName", "MainPanel"),
     lockOnNowPlaying: window.GetProperty("BIG:lockOnNowPlaying", true),
     lockOnPlaylistNamed: window.GetProperty("BIG:lockOnPlaylistNamed", ""),
-    FollowNowPlaying: window.GetProperty("MINI:FollowNowPlaying", true),
+    FollowNowPlaying: window.GetProperty("BIG:FollowNowPlaying", true),
     defaultRowHeight: window.GetProperty("BIG:defaultRowHeight", 30),
     drawAlternateBG: window.GetProperty("BIG:drawAlternateBG", false),
     extraRowsNumber: window.GetProperty("BIG:extraRowsNumber", 1),
@@ -6299,7 +6299,7 @@ var callback_items_removed=false;
 var callback_avoid_populate=false
 function on_playlist_items_added(playlist_idx) {
 	if(!callback_avoid_populate){
-		if(window.IsVisible) brw.setActivePlaylist(4);
+	//	if(window.IsVisible) brw.setActivePlaylist(4);
 		if(playlist_idx == g_active_playlist && !pman.drop_done) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
@@ -6315,7 +6315,7 @@ function on_playlist_items_added(playlist_idx) {
 
 function on_playlist_items_removed(playlist_idx, new_count) {
 	if(!callback_avoid_populate){
-		if(window.IsVisible) brw.setActivePlaylist(5);
+	//	if(window.IsVisible) brw.setActivePlaylist(5);
 		if(playlist_idx == g_active_playlist && new_count == 0) scroll = scroll_ = 0;
 		if(playlist_idx == g_active_playlist) {
 			g_focus_id = getFocusId(g_active_playlist);
@@ -6626,17 +6626,27 @@ function on_notify_data(name, info) {
 		break;
         case "FocusOnNowPlayingForce":
         case "FocusOnNowPlaying":
-			if(window.IsVisible && !avoidShowNowPlaying && !(window.Name=="BottomPlaylist" && nowplayingplaylist_state.isActive() && name!="FocusOnNowPlayingForce")) {
-				brw.setDisplayedPlaylistProperties(false);
-				brw.showNowPlaying();
-				avoidShowNowPlaying = true;
-				if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
-				timers.avoidShowNowPlaying = setTimeout(function() {
-					avoidShowNowPlaying = false;
-					clearTimeout(timers.avoidShowNowPlaying);
-					timers.avoidShowNowPlaying = false;
-				}, 500);
-			} else avoidShowNowPlaying = false;
+			if (!window.IsVisible && avoidShowNowPlaying) {
+                avoidShowNowPlaying = false;
+                break;
+            }
+            let current_playing_loc = plman.GetPlayingItemLocation();
+            if (name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid)
+                break;
+
+            if (current_playing_loc.PlaylistIndex > 0 && current_playing_loc.PlaylistIndex < plman.PlaylistCount)
+                plman.ActivePlaylist = current_playing_loc.PlaylistIndex;
+
+            brw.setDisplayedPlaylistProperties(false);
+            brw.showNowPlaying();
+            avoidShowNowPlaying = true;
+            if(timers.avoidShowNowPlaying) clearTimeout(timers.avoidShowNowPlaying);
+            timers.avoidShowNowPlaying = setTimeout(function() {
+                avoidShowNowPlaying = false;
+                clearTimeout(timers.avoidShowNowPlaying);
+                timers.avoidShowNowPlaying = false;
+            }, 500);
+
             break;
 		case"stopFlashNowPlaying":
 			stopFlashNowPlaying();
@@ -6902,11 +6912,14 @@ function on_drag_over(action, x, y, mask) {
 
     if(x == g_dragndrop_x && y == g_dragndrop_y) return true;
 
-    if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist)) {
+    if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist) && (pman.state == 0 || !pman._isHover(x, y))) {
         g_dragndrop_drop_forbidden = true;
+        pman.on_mouse("move", x, y);
         window.Repaint();
         return true;
-    };
+    } else
+        g_dragndrop_drop_forbidden = false;
+
 	if(properties.DropInplaylist && pman.state == 1) {
 		pman.on_mouse("move", x, y);
 		try{
@@ -7003,7 +7016,9 @@ function on_drag_drop(action, x, y, mask) {
 	}
 	if(pman.state == 1) {
 		action.Effect = 0;
-		pman.on_mouse("up", x, y);
+        pman.on_mouse("up", x, y);
+        g_dragndrop_drop_forbidden = false;
+        window.Repaint();
 		return;
 	}
     if(g_active_playlist >=0 && plman.IsAutoPlaylist(g_active_playlist)) {
