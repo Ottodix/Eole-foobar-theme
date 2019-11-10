@@ -338,7 +338,16 @@ function on_mouse_rbtn_up(x, y) {
 	rMenu = undefined;
 	return true;
 }
-
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_metadb_changed(metadbs, fromhook) {
 	g_infos.on_metadb_changed(metadbs, fromhook);
 }

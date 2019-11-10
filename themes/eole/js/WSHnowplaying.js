@@ -1228,6 +1228,16 @@ function showNowPlayingCover(){
 		HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
 	}
 }
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_mouse_rbtn_up(x, y){
 	var main_menu = window.CreatePopupMenu();
 	var idx;

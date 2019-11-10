@@ -279,7 +279,6 @@ oFilterBox = function() {
         this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt","Reset filter");
 	};
 	this.getImages();
-
 	this.on_init = function() {
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Playlists...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
@@ -292,12 +291,10 @@ oFilterBox = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
     };
-
     this.setSize = function(w, h, font_size) {
         this.inputbox.setSize(w, h, font_size);
         this.getImages();
     };
-
     this.clearInputbox = function() {
         if(this.inputbox.text.length > 0) {
             this.inputbox.text = "";
@@ -305,7 +302,13 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-
+	this.resetSearch = function() {
+		if(this.inputbox.text.length > 0) {
+			this.inputbox.text = "";
+			this.inputbox.offset = 0;
+			g_sendResponse();
+		}
+	}
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
@@ -2560,7 +2563,7 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;
     if(cSettings.visible) {
 
     } else {
@@ -2583,7 +2586,9 @@ function on_key_down(vkey) {
 
             // inputBox
             if(properties.showFilterBox && g_filterbox.inputbox.visible && g_filterbox.inputbox.edit) {
+				active_filterbox = g_filterbox.inputbox.isActive();
                 g_filterbox.on_key("down", vkey);
+				
             };
 
             var act_pls = g_active_playlist;
@@ -2631,7 +2636,8 @@ function on_key_down(vkey) {
                 case VK_BACK:
                     break;
                 case VK_ESCAPE:
-					if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+					if(active_filterbox) g_filterbox.resetSearch();
+					else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 					break;
                 case 222:
                     brw.inputboxID = -1;

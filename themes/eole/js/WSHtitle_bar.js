@@ -2421,7 +2421,12 @@ oSearch = function() {
 			gr.FillGradRect(this.x+this.w-1, this.y+1-grad_hadd, 1, grad_width, 90, colors.normal_bg, colors.search_line, 1.0); //right line
 		}
     };
-
+	this.resetSearch = function() {
+		if(fb.IsPlaying && this.inputbox.text.length > 0) showNowPlaying();
+		this.clearInputbox(true);
+		if(!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0)) g_searchbox.toggleVisibility(false);
+		g_searchbox.repaint();
+	}
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
@@ -2441,10 +2446,7 @@ oSearch = function() {
             case "lbtn_up":
                 if((this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) &&  !this.hide) {
                     if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
-						if(fb.IsPlaying && this.inputbox.text.length > 0) showNowPlaying();
-                        this.clearInputbox(true);
-						if(!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0)) g_searchbox.toggleVisibility(false);
-						g_searchbox.repaint();
+						this.resetSearch();
                     };
                 } else if((properties.alwaysShowSearch && !compact_titlebar.isActive())) {
 					if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
@@ -2496,7 +2498,7 @@ oSearch = function() {
 				if(!this.hide) {
 					switch (vkey) {
 							case VK_ESCAPE:
-								this.toggleVisibility(false);
+								this.resetSearch();
 								break;
 							default:
 								this.inputbox.on_key_down(vkey);
@@ -2550,7 +2552,7 @@ function g_launchSearch(play_results) {
 	var play_results = typeof play_results !== 'undefined' ? play_results : false;
 	if(g_searchbox.inputbox.text.length < 3)
 		return;
-	var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text);
+	var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text.toLowerCase());
 	//window.NotifyOthers("search_launched",0);
 	apply_playlist(search_results,play_results,true,false);
 	search_results = undefined;

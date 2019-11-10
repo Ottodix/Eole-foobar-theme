@@ -3163,6 +3163,9 @@ function searchLibrary() {
     this.on_key_down = function(vkey) {
         if (!p.s_search) return;
         switch (vkey) {
+			case VK_ESCAPE:
+				this.clear();console.log("test");
+			break;
             case v.left:
             case v.right:
                 if (vkey == v.left) {

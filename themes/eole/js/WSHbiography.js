@@ -3315,7 +3315,7 @@ timer.image();
 function on_focus(is_focused) {tb.focus = is_focused;}
 function on_get_album_art_done(handle, art_id, image, image_path) {img.get_album_art_done(handle, art_id, image, image_path);}
 function on_item_focus_change() {if (fb.IsPlaying && !ppt.focus) return; if (ppt.mul_item) p.get_multi(true); else if (!p.multi_new()) return; if (!ppt.mul_item) p.get_multi(true); p.get_multi(true); if (t.block() && !p.server) {img.get = true; t.get = ppt.focus ? 2 : 1; img.artist_reset(); t.album_reset(); t.artist_reset();} else {if (t.block() && p.server) {img.get = true; t.get = 1; img.artist_reset(); t.album_reset(); t.artist_reset();} else {img.get = false; t.get = 0;} p.focus_load(); p.focus_serv();}}
-function on_key_down(vkey) {switch(vkey) {case 0x10: case 0x11: case 0x12: t.paint(); break; case 0x21: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(1); break; case 0x22: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(-1); break; case 35: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().scroll_to_end(); break; case 36:if (!ppt.img_only && !p.zoom()) t.scrollbar_type().check_scroll(0, 'full'); break; case 37: img.wheel(1); break; case 39: img.wheel(-1); break;}}
+function on_key_down(vkey) {switch(vkey) {case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; case 0x10: case 0x11: case 0x12: t.paint(); break; case 0x21: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(1); break; case 0x22: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().page_throttle(-1); break; case 35: if (!ppt.img_only && !p.zoom()) t.scrollbar_type().scroll_to_end(); break; case 36:if (!ppt.img_only && !p.zoom()) t.scrollbar_type().check_scroll(0, 'full'); break; case 37: img.wheel(1); break; case 39: img.wheel(-1); break;}}
 function on_key_up(vkey) {if (vkey == 0x10 || vkey == 0x11 || vkey == 0x12) t.paint();}
 function on_library_items_added() {if (!lib) return; lib.update = true;}; function on_library_items_removed() {if (!lib) return; lib.update = true;}; function on_library_items_changed() {if (!lib) return; lib.update = true;}
 function on_load_image_done(id, image, image_path) {img.load_image_done(id, image, image_path);}
@@ -4006,6 +4006,9 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 		}
         //after check_scrollBtns code		
 */
+
+// Add to function on_key_down(vkey) {switch(vkey) {
+// case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 
 
 // Add to on_notify_data
 // case "lyrics_state": lyrics_state.value = info; positionButtons(); break;

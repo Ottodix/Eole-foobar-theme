@@ -5793,7 +5793,8 @@ function vk_pgdn() {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;
+	
     if(cSettings.visible) {
 
     } else {
@@ -5801,6 +5802,7 @@ function on_key_down(vkey) {
 
         // inputBox
         if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
+			active_filterbox = g_filterbox.inputbox.isActive();			
             g_filterbox.on_key("down", vkey);
         };
 
@@ -5842,7 +5844,8 @@ function on_key_down(vkey) {
                 };
                 break;
             case VK_ESCAPE:
-				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				if(active_filterbox) g_filterbox.clearInputbox();
+				else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 				break;
             case 222:
                 brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length*13)+(10*2)) / 2);

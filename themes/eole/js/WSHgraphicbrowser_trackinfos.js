@@ -7604,12 +7604,18 @@ function on_key_up(vkey) {
     // inputBox
     if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
         g_filterbox.on_key("up", vkey);
+			
     }
 };
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;	
+    // inputBox
+    if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
+		active_filterbox = g_filterbox.inputbox.isActive();			
+        g_filterbox.on_key("down", vkey);
+    }
 	if (mask == KMask.none) {
 		switch (vkey) {
 		case VK_F2:
@@ -7627,7 +7633,8 @@ function on_key_down(vkey) {
 		case VK_BACK:
 			break;
 		case VK_ESCAPE:
-			if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+			if(active_filterbox) g_filterbox.clearInputbox();
+			else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 			break;
 		case 222:
 			break;
@@ -7741,10 +7748,6 @@ function on_key_down(vkey) {
 				break;
 		};
 	};
-    // inputBox
-    if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
-        g_filterbox.on_key("down", vkey);
-    }
 };
 function on_focus(is_focused) {
 	g_filterbox.on_focus(is_focused)

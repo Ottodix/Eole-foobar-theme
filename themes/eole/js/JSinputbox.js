@@ -208,7 +208,12 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		this.anchor = this.Cpos;
 		this.SelBegin = this.Cpos;
 		this.SelEnd = this.Cpos;
-		this.resetCursorTimer();		
+		this.resetCursorTimer();
+		console.log(this.edit)
+	}
+	this.isActive = function (){
+		console.log(this.edit)
+		return this.edit;
 	}
     this.check = function (callback, x, y, force_activate) {
 		force_activate = typeof force_activate !== 'undefined' ? force_activate : false;		

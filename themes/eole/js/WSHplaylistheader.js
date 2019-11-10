@@ -882,7 +882,16 @@ function on_playlist_items_selection_change() {
 	} else g_pinfo.refresh_needed = 4;
 }
 
-
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_mouse_move(x, y, m) {
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);

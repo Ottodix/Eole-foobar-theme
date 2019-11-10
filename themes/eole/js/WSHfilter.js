@@ -816,7 +816,7 @@ oFilterBox = function() {
 	this.on_init();
     this.onFontChanged = function() {
 		this.inputbox.onFontChanged();
-	}
+	};
     this.reset_layout = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
@@ -826,12 +826,10 @@ oFilterBox = function() {
 		else var boxText = "Filter...";
 		this.inputbox.empty_text = boxText;
     };
-
     this.setSize = function(w, h, font_size) {
         this.inputbox.setSize(w, h, font_size);
         this.getImages();
     };
-
     this.clearInputbox = function() {
         if(this.inputbox.text.length > 0) {
             this.inputbox.text = "";
@@ -839,7 +837,13 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-
+	this.resetSearch = function() {
+		if(this.inputbox.text.length > 0) {
+			this.inputbox.text = "";
+			this.inputbox.offset = 0;
+			g_sendResponse();
+		}
+	};
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
@@ -852,7 +856,6 @@ oFilterBox = function() {
         };
 		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+5, by, 0, 0);
     };
-
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
@@ -862,13 +865,9 @@ oFilterBox = function() {
 				else this.search_bt.checkstate("down", x, y);
                 break;
             case "lbtn_up":
-                if(this.inputbox.text.length > 0) {
-                    if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
-                        this.inputbox.text = "";
-                        this.inputbox.offset = 0;
-                        g_sendResponse();
-                    };
-                } else if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
+				if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
+					this.resetSearch();
+                } else if(this.inputbox.text.length == 0 && this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 					this.inputbox.activate(x,y);
 					this.inputbox.repaint();
 				}
@@ -4895,15 +4894,14 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;
     if(cSettings.visible) {
 
     } else {
-        //if(dragndrop.drag_in) return true;
-
         // inputBox
         if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
-            g_filterbox.on_key("down", vkey);
+			active_filterbox = g_filterbox.inputbox.isActive();
+            g_filterbox.on_key("down", vkey);			
         };
 
         var act_pls = g_active_playlist;
@@ -4954,7 +4952,8 @@ function on_key_down(vkey) {
                 };
                 break;
             case VK_ESCAPE:
-				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				if(active_filterbox) g_filterbox.resetSearch();
+				else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 				break;
             case 222:
                 brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length*13)+(10*2)) / 2);
