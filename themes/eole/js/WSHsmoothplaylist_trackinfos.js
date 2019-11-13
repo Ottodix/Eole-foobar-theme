@@ -4339,8 +4339,8 @@ oBrowser = function(name) {
 			_menu1.CheckMenuRadioItem(914, 916, (!properties.drawProgressBar) ? 914 : (properties.AlbumArtProgressbar) ? 915 : 916);
             _menu1.AppendTo(_menu,MF_STRING, "Progress bar under playing title");
 
-            //_menu.AppendMenuItem(MF_STRING, 112, "Show Mood Icon");
-            //_menu.CheckMenuItem(112, properties.showMood);
+            //_menu.AppendMenuItem(MF_STRING, 118, "Show Mood Icon");
+            //_menu.CheckMenuItem(118, properties.showMood);
 
 			_menuRating.AppendMenuItem(MF_STRING, 113, "Show rating for each track");
 			_menuRating.AppendMenuItem(MF_STRING, 114, "Show rating for selected track");
@@ -4396,8 +4396,8 @@ oBrowser = function(name) {
                     brw.repaint();
                     break;
                 case (idx == 112):
-					setOneProperty("showMood",!properties.showMood);
-                    get_metrics();
+                    setOneProperty("circleMode",!properties.circleMode);
+                    brw.refreshThumbnails();
                     brw.repaint();
                     break;
                 case (idx == 113):
@@ -4435,11 +4435,11 @@ oBrowser = function(name) {
                     get_metrics();
                     brw.repaint();
                     break;
-				case (idx == 112):
-					setOneProperty("circleMode",!properties.circleMode);
-					brw.refreshThumbnails();
-					brw.repaint();
-					break;
+                case (idx == 118):
+                    setOneProperty("showMood",!properties.showMood);
+                    get_metrics();
+                    brw.repaint();
+                    break;
                 case (idx == 200):
                     toggleWallpaper();
                     break;
