@@ -808,7 +808,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
             }
             this.repaint();
     	}
-        
+
         // autosearch: has text changed after on_key or on_char ?
 		if(autovalidate) {
 			if(this.text != this.prev_text) {                      

@@ -3164,7 +3164,7 @@ function searchLibrary() {
         if (!p.s_search) return;
         switch (vkey) {
 			case VK_ESCAPE:
-				this.clear();console.log("test");
+				this.clear();
 			break;
             case v.left:
             case v.right:

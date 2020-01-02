@@ -64,7 +64,7 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		this.value = new_value;
 		window.NotifyOthers("g_avoid_on_metadb_changed",true);			
 		window.NotifyOthers(this.name,this.value);	
-		
+		//console.log("setValue"+this.name);
 		if(refresh_panel!==false) RefreshPSS();
 	}
 	this.setDefault = function () {
@@ -104,10 +104,13 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	this.getFileValue();
 }
 function RefreshPSS() {
-	//console.log("RefreshPSS")
 	if (fb.IsPlaying || fb.IsPaused) {
-		let handle = fb.GetNowPlaying();
-		handle.RefreshStats();
+		try{
+			let handle = fb.GetNowPlaying();
+			handle.RefreshStats();
+		} catch(e){
+			fb.Play();fb.Stop();
+		}
 	}	
 	else {
 		fb.Play();fb.Stop();

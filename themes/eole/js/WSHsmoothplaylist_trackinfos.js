@@ -1644,6 +1644,7 @@ oBrowser = function(name) {
 	};
 
     this.showNowPlaying = function(flash_nowplaying) {
+		
 		var flash_nowplaying = typeof flash_nowplaying !== 'undefined' ? flash_nowplaying : true;
         if(fb.IsPlaying) {
 			g_filterbox.clearInputbox();
@@ -3886,6 +3887,7 @@ oBrowser = function(name) {
 		}
 
 		if(brw.showNowPlaying_trigger && g_first_populate_done) {
+			//console.log("ehoeheoh")
 			brw.dontFlashNowPlaying = true;
 			brw.showNowPlaying();
 			brw.showNowPlaying_trigger = false;
@@ -4941,6 +4943,7 @@ function set_update_function(string){
 
 function on_paint(gr) {
 	if(Update_Required_function!="") {
+		//console.log(Update_Required_function);
 		eval(Update_Required_function);
 		Update_Required_function = "";
 	}
@@ -6570,6 +6573,7 @@ function stopFlashNowPlaying() {
 	cNowPlaying.flash = false;
 }
 function on_notify_data(name, info) {
+	//console.log(name+" - "+window.Name);
     switch(name) {
         case "use_ratings_file_tags":
             globalProperties.use_ratings_file_tags = info;
@@ -6584,7 +6588,7 @@ function on_notify_data(name, info) {
 			brw.repaint();
 		break;
 		case "resizingleft_rightsidebar":
-			if((window.Name!="BottomPlaylist")) g_resizing.show_resize_border = info;
+			if(window.Name!="BottomPlaylist") g_resizing.show_resize_border = info;
 			window.Repaint();
 			break;
 		case "enableResizableBorders":
@@ -6632,7 +6636,10 @@ function on_notify_data(name, info) {
 			if (!window.IsVisible && avoidShowNowPlaying) {
                 avoidShowNowPlaying = false;
                 break;
-            }
+            } else if (!window.IsVisible){
+				return;
+			}
+			//console.log(name+"- "+window.Name)
             let current_playing_loc = plman.GetPlayingItemLocation();
             if (name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid)
                 break;
@@ -6757,7 +6764,7 @@ function on_notify_data(name, info) {
 			}
 		break;
 		case "layout_state":
-			if(window.name!="BottomPlaylist"){
+			if(window.Name!="BottomPlaylist"){
 				layout_state.value=info;
 				brw.setDisplayedPlaylistProperties(true);
 				get_metrics(true);
@@ -6773,8 +6780,8 @@ function on_notify_data(name, info) {
 			}
 		break;
 		case "main_panel_state":
-			if(window.name!="BottomPlaylist"){
-				main_panel_state.value = info;
+			main_panel_state.value = info;
+			if(window.Name!="BottomPlaylist"){
 				setShowHeaderBar();
 				get_metrics();
 				if(properties.enableAutoSwitchPlaylistMode){

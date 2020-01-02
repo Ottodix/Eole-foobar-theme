@@ -8,6 +8,7 @@ var properties = {
 	fullMode_pmanagerheight: window.GetProperty("Full mode pmanager saved height", 820),
 	miniMode_savedwidth: window.GetProperty("Mini mode saved width", 290),
 	miniMode_playlistheight: window.GetProperty("Mini mode playlist saved height", 380),
+	autosearch: window.GetProperty("_DISPLAY: autosearch", true),
 	miniMode_defaultwidth:290,
 	miniMode_defaultheight:380,
 	fullMode_defaultwidth:1100,
@@ -2515,14 +2516,14 @@ oSearch = function() {
 		if(code==13) {
 			if(this.inputbox.text.length < 3)
 				return;
-			g_launchSearch(true);
+			g_launchSearch(properties.autosearch);
 			g_searchHistory.add(this.inputbox.text);
 			g_searchHistory.writeSearchHistoryIni();
 		} else if(code!="")	{
 			this.inputbox.on_char(code);
 			if(this.inputbox.text.length==0) window.NotifyOthers("reset_filters",0);
 		}
-		this.showSearchResults();
+		if(properties.autosearch || code==13) this.showSearchResults();
     };
     this.showSearchResults = function() {
 		if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1) && layout_state.isEqual(0)){
@@ -2542,7 +2543,7 @@ oSearch = function() {
 	};
 	this.on_init = function() {
 		this.inputbox = new oInputbox(this.w, this.h, "", "Search...", colors.search_txt , 0, 0, colors.selected_bg, g_launchSearch, "g_searchbox", undefined, "g_font.min1");
-        this.inputbox.autovalidation = true;
+        this.inputbox.autovalidation = properties.autosearch;
 		this.adapt_look_to_layout();
     };
 	this.on_init();
@@ -2645,21 +2646,28 @@ function draw_searchHistory_menu(x, y) {
 		basemenu.AppendMenuSeparator();
 		basemenu.AppendMenuItem(MF_STRING, properties.searchHistory_max_items+10, "Clear history");
 	}
-
+	basemenu.AppendMenuItem(MF_STRING, 1000, "Search as you type");
+	basemenu.CheckMenuItem(1000, properties.autosearch);
+	
     idx = 0;
     idx = basemenu.TrackPopupMenu(x, y, 0x0008);
 
     switch (true) {
-    case (idx > 0 && idx <= properties.searchHistory_max_items+1):
-		 g_searchbox.inputbox.text = g_searchHistory.historyList[idx-1][0];
-		 g_searchbox.inputbox.Cpos = g_searchbox.inputbox.text.length;
-		 g_launchSearch(false);
-		 g_searchbox.showSearchResults();
-		 window.Repaint();
-        break;
-    case (idx == properties.searchHistory_max_items+10):
-        g_searchHistory.reset();
-        break;
+		case (idx==1000):
+			properties.autosearch = !properties.autosearch;
+			window.SetProperty("_DISPLAY: autosearch", properties.autosearch);
+			g_searchbox.on_init();
+		break;
+		case (idx > 0 && idx <= properties.searchHistory_max_items+1):
+			g_searchbox.inputbox.text = g_searchHistory.historyList[idx-1][0];
+			g_searchbox.inputbox.Cpos = g_searchbox.inputbox.text.length;
+			g_launchSearch(false);
+			g_searchbox.showSearchResults();
+			window.Repaint();
+		break;
+		case (idx == properties.searchHistory_max_items+10):
+			g_searchHistory.reset();
+		break;
     }
     basemenu = undefined;
 }

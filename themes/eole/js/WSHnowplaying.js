@@ -1322,7 +1322,7 @@ function on_mouse_rbtn_up(x, y){
 			g_cover.refreshCurrent();
 			adaptButtons();
 			window.Repaint();
-			break;
+			break;		
 		case (idx == 100):
 			window.ShowProperties();
 			break;

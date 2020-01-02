@@ -612,7 +612,6 @@ function oInfos() {
 	this.getTrackInfos = function(){
 		var allinfos = g_tfo.allinfos.EvalWithMetadb(this.metadb);
 		allinfos = allinfos.split(" ^^ ");
-		console.log(allinfos);
 
 		this.rating = allinfos[0];
 
