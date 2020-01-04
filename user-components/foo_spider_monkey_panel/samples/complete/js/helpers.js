@@ -422,16 +422,7 @@ function _lastModified(file) {
 }
 
 function _lineWrap(value, font, width) {
-	let result = [];
-	_.forEach(value.split('\n'), (paragraph) => {
-		if (paragraph.length < 5) {
-			result.push(paragraph);
-		} else {
-			let lines = _.filter(_gr.EstimateLineWrap(paragraph, font, width), (item, i) => i % 2 == 0);
-			result = [...result, ...(_.map(lines, _.trim))];
-		}
-	});
-	return result;
+	return _.filter(_gr.EstimateLineWrap(value, font, width), (item, i) => i % 2 == 0);
 }
 
 function _lockSize(w, h) {

@@ -514,11 +514,11 @@ function _thumbs() {
 	}
 	
 	this.success = (base) => {
-		_(_getElementsByTagName(this.xmlhttp.responseText, 'img'))
-			.filter({className : 'image-list-image'})
+		_(_getElementsByTagName(this.xmlhttp.responseText, 'a'))
+			.filter({ className : 'image-list-item' })
 			.take(this.properties.limit.value)
 			.forEach((item) => {
-				const url = item.src.replace('avatar170s/', '');
+				const url = item.getElementsByTagName('img')[0].src.replace('avatar170s/', '');
 				const filename = base + url.substring(url.lastIndexOf('/') + 1) + '.jpg';
 				_runCmd('cscript //nologo ' + _q(this.vbs_file) + ' ' + _q(url) + ' ' + _q(filename), false);
 			})

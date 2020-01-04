@@ -104,55 +104,6 @@ var KMask = {
 	alt: 6
 };
 
-var vb = {};
-vb.Function = function (func) {
-	return function () {
-		return vb.Function.eval.call(this, func, arguments);
-	};
-};
-
-vb.Function.eval = function (func) {
-	var args = Array.prototype.slice.call(arguments[1]);
-	for (var i = 0;
-		i < args.length;
-		i++) {
-		if (typeof args[i] != 'string') {
-			continue;
-		};
-		args[i] = '"' + args[i].replace(/"/g, '" + Chr(34) + "') + '"';
-	};
-	var vbe;
-	vbe = new ActiveXObject('ScriptControl');
-	vbe.Language = 'VBScript';
-	return vbe.eval(func + '(' + args.join(', ') + ')');
-};
-
-var InputBox = vb.Function('InputBox');
-var MsgBox = vb.Function('MsgBox');
-vb.OKOnly = 0;
-vb.OKCancel = 1;
-vb.AbortRetryIgnore = 2;
-vb.YesNoCancel = 3;
-vb.YesNo = 4;
-vb.RetryCancel = 5;
-vb.Critical = 16;
-vb.Question = 32;
-vb.Exclamation = 48;
-vb.Information = 64;
-vb.DefaultButton1 = 0;
-vb.DefaultButton2 = 256;
-vb.DefaultButton3 = 512;
-vb.DefaultButton4 = 768;
-vb.ApplicationModal = 0;
-vb.SystemModal = 4096;
-vb.OK = 1;
-vb.Cancel = 2;
-vb.Abort = 3;
-vb.Retry = 4;
-vb.Ignore = 5;
-vb.Yes = 6;
-vb.No = 7;
-
 function GetKeyboardMask() {
 	var c = utils.IsKeyPressed(VK_CONTROL) ? true : false;
 	var a = utils.IsKeyPressed(VK_ALT) ? true : false;
@@ -722,51 +673,6 @@ function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, l
 
 function zoom(value, factor) {
 	return Math.ceil(value * factor / 100);
-};
-
-function Syscolor(color_n) {
-	var Shell = new ActiveXObject("WScript.Shell");
-	var tempc;
-	tempc = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Colors\\" + color_n).split(" ");
-	return (0xff000000 | (tempc[0] << 16) | (tempc[1] << 8) | (tempc[2]));
-};
-
-function get_system_dpi_percent() {
-	// get windows version
-	var wbemFlagReturnImmediately = 0x10;
-	var wbemFlagForwardOnly = 0x20;
-	var objWMIService = GetObject("winmgmts:\\\\.\\root\\CIMV2");
-	var colItems = objWMIService.ExecQuery("SELECT * FROM Win32_OperatingSystem", "WQL",
-			wbemFlagReturnImmediately | wbemFlagForwardOnly);
-	var enumItems = new Enumerator(colItems);
-	var objItem = enumItems.item();
-	var version_number = 0;
-	if (objItem.Caption.toUpperCase().indexOf("XP") != -1)
-		version_number = 5;
-	if (objItem.Caption.toUpperCase().indexOf("VISTA") != -1)
-		version_number = 6;
-	if (objItem.Caption.toUpperCase().indexOf("7") != -1)
-		version_number = 7;
-	if (objItem.Caption.toUpperCase().indexOf("8") != -1)
-		version_number = 8;
-
-	if (version_number == 8) {
-		var Shell = new ActiveXObject("WScript.Shell");
-		var tmp;
-		tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\Win8DpiScaling");
-		if (tmp == 1) {
-			tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");
-		} else {
-			//tmp = 100;
-			tmp = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI");
-			if (tmp < 100)
-				tmp = 100;
-		};
-	} else {
-		tmp = 100;
-	};
-	//tmp = Math.ceil(tmp/10)*10;
-	return tmp;
 };
 
 function get_system_scrollbar_width() {

@@ -1987,7 +1987,7 @@ function FbMetadbHandle() {
     this.Compare = function (handle) { }; // (boolean)
 
     /**
-     * @return {FbFileInfo}
+     * @return {?FbFileInfo} null if file info is not available.
      */
     this.GetFileInfo = function () { }; // (FbFileInfo)
 }
@@ -2004,7 +2004,9 @@ function FbFileInfo() {
      * @example
      * let handle = fb.GetFocusItem();
      * let file_info = handle.GetFileInfo();
-     * console.log(file_info.MetaCount); // 11
+     * if (file_info) {
+     *     console.log(file_info.MetaCount); // 11
+     * }
      */
     this.MetaCount = undefined; // (read)
 
@@ -3081,8 +3083,11 @@ function GdiGraphics() {
      * this will result in visual artifacts caused by ClearType hinting.<br>
      * Use {@link GdiGraphics#DrawString} instead in such cases.<br>
      * <br>
-     * To calculate text dimensions use {@link GdiGraphics#CalcTextHeight}, {@link GdiGraphics#CalcTextWidth} or DT_CALCRECT flag.
-     *
+     * To calculate text dimensions use {@link GdiGraphics#CalcTextHeight}, {@link GdiGraphics#CalcTextWidth} or DT_CALCRECT flag.<br>
+     * <br>
+     * Note: uses special rules for `&` character by default, which consumes the `&` and causes the next character to be underscored.
+     * This behaviour can be changed (or disabled) via `format` parameter.
+     * 
      * @param {string} str
      * @param {GdiFont} font
      * @param {number} colour

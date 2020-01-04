@@ -232,7 +232,7 @@ function _listenbrainz (x, y, size) {
 		const idx = m.TrackPopupMenu(this.x, this.y + this.size);
 		switch (idx) {
 		case 1:
-			const token = utils.InputBox(window.ID, 'Enter your token\n\nhttps://listenbrainz.org/user/import', window.Name, this.token);
+			const token = utils.InputBox(window.ID, 'Enter your token\n\nhttps://listenbrainz.org/profile', window.Name, this.token);
 			if (token != this.token) {
 				this.token = token;
 				utils.WriteINI(this.ini_file, 'Listenbrainz', 'token', this.token);
