@@ -1140,7 +1140,6 @@ function scrollbar() {
     }
 }
 
-
 function panel_operations() {
     var def_ppt = window.GetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
     var DT_LEFT = 0x00000000,
@@ -1244,7 +1243,7 @@ function panel_operations() {
         switch (this.view_by) {
             case this.folder_view:
                 li.OrderByPath();
-                li.OrderByRelativePath();
+                //li.OrderByRelativePath();
                 break;
             default:
                 var tfs = fb.TitleFormat(this.grp_sort);
