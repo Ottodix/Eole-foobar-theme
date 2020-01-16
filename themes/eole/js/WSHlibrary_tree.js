@@ -203,11 +203,11 @@ oTagSwitcherBar = function() {
 			this.items_x[i] = tx;
 
 			if(this.items_txt[i].length==1){
-				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
+				gr.DrawImage(this.images.library_tree, this.items_x[i]+Math.round(txt_padding_sides/2)-4, this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
 				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
-			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
+			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-9, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
 		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);
     };
@@ -1027,7 +1027,7 @@ function scrollbar() {
 		this.height_ratio = 1;
         // draw info
         this.scrollbar_height = this.h*this.height_ratio - this.but_h * 2;
-        this.bar_ht = Math.max(Math.round(this.scrollbar_height * this.rows_drawn / this.row_count), 12);
+        this.bar_ht = Math.max(Math.round(this.scrollbar_height * this.rows_drawn / this.row_count), 40);
         this.scrollbar_travel = this.scrollbar_height/this.height_ratio - this.bar_ht;
         // scrolling info
         this.scrollable_lines = this.row_count - this.rows_drawn;
