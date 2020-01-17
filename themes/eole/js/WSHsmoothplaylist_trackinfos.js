@@ -5517,7 +5517,8 @@ function on_font_changed() {
 };
 function setDarkLayout(){
 	var new_darklayout_state = false;
-	if(layout_state.isEqual(1)) new_darklayout_state = properties.minimode_dark_theme;
+	if(window.Name=="BottomPlaylist") new_darklayout_state = properties.playlists_dark_theme;
+	else if(layout_state.isEqual(1)) new_darklayout_state = properties.minimode_dark_theme;
 	else if(main_panel_state.isEqual(0)) new_darklayout_state = properties.library_dark_theme;
 	else if(main_panel_state.isEqual(1)) new_darklayout_state = properties.playlists_dark_theme;
 	else if(main_panel_state.isEqual(2)) {
@@ -6703,18 +6704,20 @@ function on_notify_data(name, info) {
 			window.Repaint();
 		break;
 		case "minimode_dark_theme":
-			if(info===true || info===false) {
-				setOneProperty("minimode_dark_theme",info, true);
-				on_colours_changed();
-			} else {
-				setOneProperty("minimode_dark_theme",(info==2 || info==3), true);
-				globalProperties.colorsMiniPlayer = info;
-				window.SetProperty("GLOBAL colorsMiniPlayer", globalProperties.colorsMiniPlayer);
-				setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),false,1);
-				toggleWallpaper((globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),1);
-				get_images();on_colours_changed();
+			if(window.Name!="BottomPlaylist"){
+				if(info===true || info===false) {
+					setOneProperty("minimode_dark_theme",info, true);
+					on_colours_changed();
+				} else {
+					setOneProperty("minimode_dark_theme",(info==2 || info==3), true);
+					globalProperties.colorsMiniPlayer = info;
+					window.SetProperty("GLOBAL colorsMiniPlayer", globalProperties.colorsMiniPlayer);
+					setOneProperty("AlbumArtProgressbar",(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),false,1);
+					toggleWallpaper((globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3),1);
+					get_images();on_colours_changed();
+				}
+				brw.repaint();
 			}
-			brw.repaint();
 		break;
 		case "bio_dark_theme":
 			setOneProperty("bio_dark_theme",info, true);

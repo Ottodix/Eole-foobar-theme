@@ -4582,10 +4582,7 @@ oBrowser = function(name) {
         this.list = plman.GetPlaylistItems(this.SourcePlaylistIdx);
 		this.playlistName = plman.GetPlaylistName(this.SourcePlaylistIdx);
 		this.playlistItemCount = this.list.Count;
-		//if(this.playlistName == globalProperties.whole_library)
-			this.showFilterBox = true;
-		//else
-			this.showFilterBox = properties.showFilterBox;
+		this.showFilterBox = properties.showFilterBox;
         // sort if custom sorting is present in window properties
 		if((force_sorting || properties.TFsorting_default.length > 0) && !this.dont_sort_on_next_populate)
 			 this.sortAccordingToProperties(force_sorting);
