@@ -2450,7 +2450,7 @@ oHeaderBar = function(name) {
 		this.hscr_btn_w = 18
 		var xpts_mtop = Math.ceil((this.h-9)/2);
 		var xpts_mright_next = Math.ceil((this.hscr_btn_w-5)/2);
-
+		this.h = Math.max(1,this.h);
 		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
 		gb = this.hide_bt_off.GetGraphics();
 			gb.FillSolidRect(this.hscr_btn_w-1, 0, 1, this.h, colors.sidesline);

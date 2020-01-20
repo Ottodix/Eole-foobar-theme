@@ -2796,14 +2796,24 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
-function FormatCover(image, w, h, rawBitmap, callID) {
+function FormatCover(image, w, h, rawBitmap, callID, keepratio) {
+	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;	
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
 		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
-	} else {
-		//try {
-			return image.Resize(w, h, globalProperties.ResizeQLY);
-		//} catch(e){fb.ShowPopupMessage(properties.panelName+" resize error w:"+w+" h:"+h+"error, typeof image:"+typeof(image)+image+", callID:"+callID+"\n"+e); return null;}
+	} else if(!keepratio){
+		return image.Resize(w, h, globalProperties.ResizeQLY);
+	} else {	
+		if(image.Height>=image.Width) {
+			var ratio = image.Width / image.Height;
+			var pw = w * ratio;
+			var ph = h;
+		} else {
+			var ratio = image.Height / image.Width;
+			var pw = w;
+			var ph = h * ratio;
+		};		
+		return image.Resize(pw, ph, globalProperties.ResizeQLY);
 	}
 };
 function isImage(variable){
