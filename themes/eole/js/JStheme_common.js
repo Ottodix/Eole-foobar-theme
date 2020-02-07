@@ -70,6 +70,7 @@ globalProperties.tf_album = fb.TitleFormat("%album%");
 globalProperties.tf_date = fb.TitleFormat("%date%");
 globalProperties.tf_time = fb.TitleFormat("%time%");
 globalProperties.tf_artist = fb.TitleFormat("%artist%");
+globalProperties.tf_albumartist = fb.TitleFormat("$if2($meta(album artist),$meta(artist))");
 globalProperties.tf_title = fb.TitleFormat("%title%");
 globalProperties.tf_order = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 globalProperties.coverCacheWidthMax = Math.max(50,Math.min(2000,Number(globalProperties.coverCacheWidthMax)));
@@ -2007,8 +2008,9 @@ function quickSearch(start,search_function){
 	}
 	switch(search_function) {
 		case 'artist':
-			var arr = globalProperties.tf_artist.EvalWithMetadb(start);
+			var arr = globalProperties.tf_albumartist.EvalWithMetadb(start);
 			try{
+				//console.log(arr);
 				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr));
 				if(artist_items.Count>0){
 					artist_items.OrderByFormat(globalProperties.tf_order, 1);
