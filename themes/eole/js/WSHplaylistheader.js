@@ -952,10 +952,10 @@ function on_mouse_lbtn_down(x, y) {
 function on_mouse_lbtn_up(x, y) {
     g_down = false;
     cur_btn = chooseButton(x, y);
-    if (cur_btn_down && typeof cur_btn_down === 'object') {
+    if (typeof cur_btn_down === 'object' && cur_btn_down != null) {
         cur_btn_down.onClick();
     }
-	if (cur_btn != null && typeof cur_btn === 'object' && plman.PlaylistItemCount(plman.ActivePlaylist)>0) {
+	if (typeof cur_btn === 'object' && cur_btn != null && plman.PlaylistItemCount(plman.ActivePlaylist)>0) {
         cur_btn.changeState(ButtonStates.hover);
          window.Repaint();
     }
