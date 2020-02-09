@@ -2,6 +2,7 @@
 
 #### Table of Contents
 - [Unreleased](#unreleased)
+- [1.2.3](#123---2020-01-04)
 - [1.2.2](#122---2019-09-14)
 - [1.2.1](#121---2019-04-24)
 - [1.2.0](#120---2019-04-22)
@@ -21,6 +22,35 @@
 ___
 
 ## [Unreleased][]
+
+## [1.2.3][] - 2020-01-04
+### Added
+- Moved documentation from Wiki to a new homepage: https://theqwertiest.github.io/foo_spider_monkey_panel/ :
+  - Contains JS documentation for the latest release.
+  - Contains script showcase with basic information about sample scripts and user-made scripts.
+- Updated `FindReplace` dialog in `Configure`:
+  - Added wrap-around support.
+  - Dialog is transparent when unfocused.
+- Made `Go to` dialog in `Configure` modeless.
+
+### Changed
+- Reimplemented `FbMetadbHandleList::OrderByRelativePath`:
+  - Uses MUCH less memory.
+  - Faster by 10% (on sorted list) to 500% (on unsorted list).
+- Adjusted codepage detection with various file handling methods.
+- Adjusted playlist lock check during drag-n-drop and `plman.AddLocations`: now only `playlist_lock::filter_add` flag is needed.
+- Removed unneeded `on_size` call.
+- Adjusted component initialization time reported in console to be more accurate.
+- Updated marc2003 scripts: 
+  - Note: `ListenBrainz` sample was removed - use https://github.com/marc2k3/foo_listenbrainz2 instead.
+
+### Fixed
+- Fixed rare crash when using `utils.RunMainMenuCommand` and `utils.IsMainMenuCommandChecked`.
+- Fixed crash when working with COM on systems with non English locale.
+- Fixed `window.GetProperty` not working when name contained whistespace at the beggining.
+- Fixed other various crashes.
+- Fixed occasional double error report in console.
+- Fixed crashes in `jsplaylist-mod` and other complete samples (by marc2003).
 
 ## [1.2.2][] - 2019-09-14
 ### Added
@@ -244,7 +274,8 @@ ___
   - More rigorous error checks.
 - Updated samples with compatibility fixes.
 
-[unreleased]: https://github.com/theqwertiest/foo_spider_monkey_panel/compare/v1.2.2-preview...HEAD
+[unreleased]: https://github.com/theqwertiest/foo_spider_monkey_panel/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.2-preview...v1.2.3
 [1.2.2]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.1...v1.2.2-preview
 [1.2.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.1.5...v1.2.0

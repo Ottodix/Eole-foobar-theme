@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Spider Monkey Panel</a></h1>
         
-            <span class="version">v1.2.2-preview-52-gfbfc0fd8</span>
+            <span class="version">v1.2.3</span>
         
     </div>
     <div class="search-container" id="search-container">
@@ -309,7 +309,7 @@
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line680">line 680</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line683">line 683</a></code>
             </div>
             
         </h4>
@@ -321,7 +321,10 @@
 
     
     <div class="description">
-        Performance note: avoid using inside `on_paint`.
+        Performance note: avoid using inside `on_paint`.<br>
+Performance note II: try caching and reusing `GdiFont` objects,
+since the maximum amount of such objects is hard-limited by Windows.
+`GdiFont` creation will fail after reaching this limit.
     </div>
     
 
@@ -559,7 +562,7 @@
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line694">line 694</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line697">line 697</a></code>
             </div>
             
         </h4>
@@ -727,7 +730,7 @@ or if the image is big.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line706">line 706</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line709">line 709</a></code>
             </div>
             
         </h4>
@@ -915,7 +918,7 @@ or if the image is big.
             
             <div class="container-source members">
                 <code><a href="js_foo_spider_monkey_panel.js.html">js/foo_spider_monkey_panel.js</a></code>,
-                <code><a href="js_foo_spider_monkey_panel.js.html#line719">line 719</a></code>
+                <code><a href="js_foo_spider_monkey_panel.js.html#line722">line 722</a></code>
             </div>
             
         </h4>

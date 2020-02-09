@@ -28,7 +28,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Spider Monkey Panel</a></h1>
         
-            <span class="version">v1.2.2-preview-52-gfbfc0fd8</span>
+            <span class="version">v1.2.3</span>
         
     </div>
     <div class="search-container" id="search-container">
@@ -720,7 +720,10 @@ let gdi = {
     CreateImage: function (w, h) { }, // (GdiBitmap)
 
     /**
-     * Performance note: avoid using inside `on_paint`.
+     * Performance note: avoid using inside `on_paint`.&lt;br>
+     * Performance note II: try caching and reusing `GdiFont` objects,
+     * since the maximum amount of such objects is hard-limited by Windows.
+     * `GdiFont` creation will fail after reaching this limit.
      *
      * @param {string} name
      * @param {number} size_px See Helper.js > Point2Pixel function for conversions
@@ -2873,7 +2876,11 @@ function GdiBitmap(arg) {
 }
 
 /**
- * Constructor may fail if font is not present.
+ * Constructor may fail if font is not present.&lt;br>
+ * 
+ * Performance note: try caching and reusing `GdiFont` objects, 
+ * since the maximum amount of such objects is hard-limited by Windows.
+ * `GdiFont` creation will fail after reaching this limit.
  * 
  * @constructor
  * @param {string} name

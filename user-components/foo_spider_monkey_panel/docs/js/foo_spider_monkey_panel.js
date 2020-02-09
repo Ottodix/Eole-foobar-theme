@@ -670,7 +670,10 @@ let gdi = {
     CreateImage: function (w, h) { }, // (GdiBitmap)
 
     /**
-     * Performance note: avoid using inside `on_paint`.
+     * Performance note: avoid using inside `on_paint`.<br>
+     * Performance note II: try caching and reusing `GdiFont` objects,
+     * since the maximum amount of such objects is hard-limited by Windows.
+     * `GdiFont` creation will fail after reaching this limit.
      *
      * @param {string} name
      * @param {number} size_px See Helper.js > Point2Pixel function for conversions
@@ -2823,7 +2826,11 @@ function GdiBitmap(arg) {
 }
 
 /**
- * Constructor may fail if font is not present.
+ * Constructor may fail if font is not present.<br>
+ * 
+ * Performance note: try caching and reusing `GdiFont` objects, 
+ * since the maximum amount of such objects is hard-limited by Windows.
+ * `GdiFont` creation will fail after reaching this limit.
  * 
  * @constructor
  * @param {string} name

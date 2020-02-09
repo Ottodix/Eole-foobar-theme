@@ -422,7 +422,14 @@ function _lastModified(file) {
 }
 
 function _lineWrap(value, font, width) {
-	return _.filter(_gr.EstimateLineWrap(value, font, width), (item, i) => i % 2 == 0);
+	return _(_gr.EstimateLineWrap(value, font, width))
+		.filter((item, i) => { return i % 2 == 0; })
+		.map((line) => {
+			// only trim if line begins with single space.
+			if (line.startsWith(' ') && !line.startsWith('  ')) return _.trim(line);
+			else return line;
+		})
+		.value()
 }
 
 function _lockSize(w, h) {
