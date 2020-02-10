@@ -1811,7 +1811,8 @@ oBrowser = function(name) {
         return row_idx;
     };
 	this.setActivePlaylist = function(call){
-		var g_active_playlist_new=-1
+		var g_active_playlist_new=-1;
+		if(g_active_playlist<0 || g_active_playlist==null) g_active_playlist = 0;
 		if(this.playlist_on_next_populate>-1){
 			g_active_playlist_new = this.playlist_on_next_populate;
 		} else if(properties.lockOnPlaylistNamed!="") {
@@ -3888,7 +3889,6 @@ oBrowser = function(name) {
 		}
 
 		if(brw.showNowPlaying_trigger && g_first_populate_done) {
-			//console.log("ehoeheoh")
 			brw.dontFlashNowPlaying = true;
 			brw.showNowPlaying();
 			brw.showNowPlaying_trigger = false;
@@ -4944,7 +4944,6 @@ function set_update_function(string){
 
 function on_paint(gr) {
 	if(Update_Required_function!="") {
-		//console.log(Update_Required_function);
 		eval(Update_Required_function);
 		Update_Required_function = "";
 	}
@@ -6575,7 +6574,6 @@ function stopFlashNowPlaying() {
 	cNowPlaying.flash = false;
 }
 function on_notify_data(name, info) {
-	//console.log(name+" - "+window.Name);
     switch(name) {
         case "use_ratings_file_tags":
             globalProperties.use_ratings_file_tags = info;
@@ -6641,7 +6639,6 @@ function on_notify_data(name, info) {
             } else if (!window.IsVisible){
 				return;
 			}
-			//console.log(name+"- "+window.Name)
             let current_playing_loc = plman.GetPlayingItemLocation();
             if (name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid)
                 break;
