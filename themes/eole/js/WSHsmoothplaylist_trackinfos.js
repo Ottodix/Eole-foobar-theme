@@ -3354,7 +3354,7 @@ oBrowser = function(name) {
         if(y > this.y && y < this.y + this.h) {
             this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);
             if(this.activeRow >= this.rows.length) {
-				this.activeRow = -1;
+				this.activeRow = this.rows.length-1;//-1;
 			}
 			try{
 				if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
@@ -3362,7 +3362,7 @@ oBrowser = function(name) {
 				}
 			} catch(e){}
             if(this.activeRow >= this.rows.length) {
-				this.activeRow = -1;
+				this.activeRow = this.rows.length-1;//this.activeRow = -1;
 			}
         } else {
             this.activeRow = -1;
@@ -3648,6 +3648,7 @@ oBrowser = function(name) {
 								g_tooltip.Deactivate();
 								on_drag_over(null, x, y, null);
 								var items = plman.GetPlaylistSelectedItems(g_active_playlist);
+								//console.log(this.activeRow+" / "+this.rows.length+" / "+(this.activeRow>-1));
 								if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
 									album_info=this.rows[this.activeRow].groupkeysplit;
 									if(items.Count>1) {
@@ -6307,7 +6308,7 @@ var callback_avoid_populate=false
 function on_playlist_items_added(playlist_idx) {
 	if(!callback_avoid_populate){
 	//	if(window.IsVisible) brw.setActivePlaylist(4);
-		if(playlist_idx == g_active_playlist && !pman.drop_done) {
+		if(playlist_idx == g_active_playlist) {// && !pman.drop_done) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
 			if(window.IsVisible) brw.populate(is_first_populate = false,9, false);
