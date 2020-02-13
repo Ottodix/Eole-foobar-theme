@@ -42,7 +42,9 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		} else {
 			this.value = this.default_value;
 			g_files.CreateTextFile(SettingsPath+this.file_prefix+this.value, true).Close();
-			if(this.update_settings_file_not_found) settings_file_not_found = true;	
+			if(this.update_settings_file_not_found) {
+				settings_file_not_found = true;	
+			}
 		}
 		return this.value;
     };
@@ -179,7 +181,7 @@ var playlistpanel_width = new oPanelSetting("playlistpanel_width", "PLAYLISTPANE
 var rightplaylist_width = new oPanelSetting("rightplaylist_width", "RIGHTPLAYLISTWIDTH_", 210, 100, 900);
 
 //Theme version
-var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", ".", 0, 0, false, false);
+var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", "0", 0, 0, false, false);
 
 //Get Now playing state according to main panel
 function getNowPlayingState(){

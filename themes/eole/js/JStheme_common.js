@@ -63,8 +63,6 @@ var globalProperties = {
 	ResizeQLY: 2,
 	use_ratings_file_tags: window.GetProperty("GLOBAL use ratings in file tags", false),
 }
-globalProperties.theme_version.replace('a|b','');
-globalProperties.lastest_breaking_version.replace('a|b','');
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 globalProperties.tf_genre = fb.TitleFormat("%genre%");
 globalProperties.tf_album = fb.TitleFormat("%album%");
@@ -3498,4 +3496,3 @@ function JSON_stringify(info) {
 		console.log(e)
 	}
 }
-
