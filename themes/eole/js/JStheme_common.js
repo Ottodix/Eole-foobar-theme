@@ -22,8 +22,8 @@ var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.3b10',
-	lastest_breaking_version: '1.2.3b5',
+	theme_version: '1.2.3.b11',
+	lastest_breaking_version: '1.2.3.b5',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -63,7 +63,8 @@ var globalProperties = {
 	ResizeQLY: 2,
 	use_ratings_file_tags: window.GetProperty("GLOBAL use ratings in file tags", false),
 }
-
+globalProperties.theme_version.replace('a|b','');
+globalProperties.lastest_breaking_version.replace('a|b','');
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 globalProperties.tf_genre = fb.TitleFormat("%genre%");
 globalProperties.tf_album = fb.TitleFormat("%album%");
@@ -76,7 +77,34 @@ globalProperties.tf_order = fb.TitleFormat("%album artist%|%date%|%album%|%discn
 globalProperties.coverCacheWidthMax = Math.max(50,Math.min(2000,Number(globalProperties.coverCacheWidthMax)));
 if(isNaN(globalProperties.coverCacheWidthMax)) globalProperties.coverCacheWidthMax = 200;
 globalProperties.thumbnailWidthMax = Math.max(50,globalProperties.coverCacheWidthMax);
-
+function versionCompare(v1, v2, options) {
+    var lexicographical = options && options.lexicographical,
+        zeroExtend = options && options.zeroExtend,
+        v1parts = v1.split('.'),
+        v2parts = v2.split('.');
+    function isValidPart(x) {
+        return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+    }
+    if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+        return NaN;
+    }
+    if (zeroExtend) {
+        while (v1parts.length < v2parts.length) v1parts.push("0");
+        while (v2parts.length < v1parts.length) v2parts.push("0");
+    }
+    if (!lexicographical) {
+        v1parts = v1parts.map(Number);
+        v2parts = v2parts.map(Number);
+    }
+    for (var i = 0; i < v1parts.length; ++i) {
+        if (v2parts.length == i) return 1;
+        if (v1parts[i] == v2parts[i]) continue;
+        else if (v1parts[i] > v2parts[i]) return 1;
+        else return -1;
+    }
+    if (v1parts.length != v2parts.length) return -1;
+    return 0;
+}
 function setMemoryParameters(){
 	switch(true) {
 		case (globalProperties.mem_solicitation==0):
@@ -3470,4 +3498,3 @@ function JSON_stringify(info) {
 		console.log(e)
 	}
 }
-

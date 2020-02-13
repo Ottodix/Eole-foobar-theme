@@ -2724,7 +2724,7 @@ function on_init(){
 			welcome_msg_timer=false;
 		}, 200);
 		RefreshPSS();
-	} else if(theme_version.getValue()<globalProperties.lastest_breaking_version) {
+	} else if(versionCompare(theme_version.getValue(),globalProperties.lastest_breaking_version)<0) {
 		var welcome_msg_timer = setTimeout(function(){
 			NoticeBox(" ","<div class='titleBig'>Import fcl file, Eole v"+(globalProperties.lastest_breaking_version)+" and after</div><div class='separator'></div><br/>Looks like your column UI configuration file is out of date, you need to import the new configuration file. You may loose some of the customizations you did to this theme, but you'll be able to set them back quickly.<br/><br/>On the preferences page (Foobar > File > Preferences), go to<br/>Display > column UI > Main tab > Import configuration...<br/><br/>And then import this file: [YOUR_FOOBAR_DIRECTORY]/themes/eole/columnsUI_eole.fcl", "Got it, open the preferences","Not now",'fb.RunMainMenuCommand("File/Preferences")');
 			clearTimeout(welcome_msg_timer);
