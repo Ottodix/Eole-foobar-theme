@@ -80,8 +80,8 @@ globalProperties.thumbnailWidthMax = Math.max(50,globalProperties.coverCacheWidt
 function versionCompare(v1, v2, options) {
     var lexicographical = options && options.lexicographical,
         zeroExtend = options && options.zeroExtend,
-        v1parts = v1.split('.'),
-        v2parts = v2.split('.');
+        v1parts = v1.replace('a','').replace('b','').split('.'),
+        v2parts = v2.replace('a','').replace('b','').split('.');
     function isValidPart(x) {
         return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
     }
@@ -3498,3 +3498,4 @@ function JSON_stringify(info) {
 		console.log(e)
 	}
 }
+
