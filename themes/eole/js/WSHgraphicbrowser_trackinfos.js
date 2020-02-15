@@ -3250,7 +3250,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			break;
 		case (idx == 11):
 			properties.expandInPlace = !properties.expandInPlace;
-			window.SetProperty("TRACKLIST expand in place", properties.expandInPlace);
+			window.SetProperty("TRACKLIST Expand in place", properties.expandInPlace);
 			if(!properties.expandInPlace){
 				g_showlist.close();
 			}
