@@ -2037,7 +2037,8 @@ function quickSearch(start,search_function){
 			var arr = globalProperties.tf_albumartist.EvalWithMetadb(start);
 			try{
 				//console.log(arr);
-				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr));
+				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr)+" OR %album artist% IS "+trim1(arr));
+				//artist_items = fb.GetQueryItems(fb.GetLibraryItems(), '"$meta(artist,0)" IS '+trim1(arr)+' OR "$meta(artist,1)" IS '+trim1(arr)+' OR "$meta(artist,2)" IS '+trim1(arr)+' OR "$meta(artist,3)" IS '+trim1(arr)+' OR "$meta(artist,4)" IS '+trim1(arr)+' OR "$meta(artist,5)" IS '+trim1(arr)+' OR "$meta(artist,6)" IS '+trim1(arr));				
 				if(artist_items.Count>0){
 					artist_items.OrderByFormat(globalProperties.tf_order, 1);
 					apply_playlist(artist_items,false,false);
