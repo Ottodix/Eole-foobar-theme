@@ -406,8 +406,8 @@ var darkcolors = {};
 function get_colors_global(){
 	darkcolors.normal_txt = GetGrey(240);
 	if(properties.darklayout || properties.stick2darklayout){
+		colors.normal_bg = GetGrey(30);
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
-			colors.normal_bg = GetGrey(30);
 			colors.lightgrey_bg = GetGrey(30);
 			colors.alternate_row = GetGrey(0,0);
 			colors.selected_item_bg = GetGrey(255,0);
@@ -416,7 +416,6 @@ function get_colors_global(){
 			colors.track_gradient_size = 20;
 			colors.padding_gradient = 10;
 		} else if(globalProperties.colorsMainPanel==2){
-			colors.normal_bg = GetGrey(30);
 			colors.lightgrey_bg = GetGrey(27);
 			colors.alternate_row = GetGrey(0,30);
 			colors.selected_item_bg = GetGrey(255,15);
