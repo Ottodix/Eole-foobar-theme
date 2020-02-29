@@ -1743,7 +1743,7 @@ oShowList = function(parentPanelName) {
 			this.album = brw.groups[this.idx].album;
 			//this.discnumber = (Tags[0]=='')?'':' - Disc '+Tags[0];
 			this.discnumber = '';
-			if(brw.groups[this.idx].date!="?") this.date = ' ('+brw.groups[this.idx].date+')';
+			if(brw.groups[this.idx].date!="?" && !brw.custom_groupby) this.date = ' ('+brw.groups[this.idx].date+')';
 			else this.date = '';
 			this.genre = brw.groups[this.idx].genre;
 			this.total_tracks = pl_count+(pl_count>1?" tracks":" track");
@@ -4040,8 +4040,7 @@ oBrowser = function(name) {
 	this.dontFlashNowPlaying = true;
 	this.dont_sort_on_next_populate = false;
 	this.click_down = false;
-	this.custom_firstRow = false;
-	this.custom_secondRow = false;
+	this.custom_groupby = false;
 	this.force_sorted = false;
 	this.currentSorting = "";
 	this.get_metrics_called = false;
@@ -4249,13 +4248,7 @@ oBrowser = function(name) {
 			this.found_albumIdx = -1;
 			this.isPlayingIdx = -1;
 			if(this.showFilterBox) g_filterbox.clearInputbox();
-			if(properties.TFgrouping!=""){
-					this.custom_firstRow = true;
-					this.custom_secondRow = true;
-			} else {
-				this.custom_firstRow = false;
-				this.custom_secondRow = false;
-			}
+			this.custom_groupby = (properties.TFgrouping!="");
 			this.get_metrics_called	= false;
 			this.totalTracks = this.list.Count;
 			this.ellipse_size = 0;
@@ -4302,7 +4295,7 @@ oBrowser = function(name) {
                 string_compare = temp;
 
 				if(i>0) {
-					if(this.custom_firstRow || this.custom_secondRow) {
+					if(this.custom_groupby) {
 						var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).split(" ^^ ");
 						this.groups[i-1].firstRow = groupinfos_rows[0];
 						this.groups[i-1].secondRow = (groupinfos_rows[1]!="")?groupinfos_rows[1]:this.groups[i-1].pl.Count+(this.groups[i-1].pl.Count>1?" tracks":" track");
@@ -4403,7 +4396,7 @@ oBrowser = function(name) {
 			//last group headers
 			if(this.groups.length>0){
 				
-				if(this.custom_firstRow || this.custom_secondRow) {
+				if(this.custom_groupby) {
 					var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).split(" ^^ ");
 					this.groups[this.groups.length-1].firstRow = groupinfos_rows[0];
 					this.groups[this.groups.length-1].secondRow = (groupinfos_rows[1]!="")?groupinfos_rows[1]:this.groups[this.groups.length-1].pl.Count+(this.groups[this.groups.length-1].pl.Count>1?" tracks":" track");
@@ -4878,7 +4871,7 @@ oBrowser = function(name) {
 						if(properties.showDiscNbOverCover && this.groups[this.groups_draw[i]].discnb!="?") {
 							if(this.groups[this.groups_draw[i]].discnb!="?") overlayTxt = this.groups[this.groups_draw[i]].discnb;
 						}
-						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?") {
+						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?" && !this.custom_groupby) {
 							if(properties.extractYearFromDate) overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].year;
 							else overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].date;
 						}
