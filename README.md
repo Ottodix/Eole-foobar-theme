@@ -26,7 +26,7 @@ If you've got some knowledge in javascript, feel free to suggest code performanc
 
 4. Configure the winamp directory in shpeck for the visualisations, it's at the bottom of the preferences window: Click the Foobar button on top > File > Preferences > Visualisations > Shpeck. Click on the browse buttom and select the directory [FOOBAR_PROFILE_DIRECTORY]\plugins\winamp. Now on the visualisation tab, you can do a right click and select Milkdrop in the "Autostart Plugin" submenu.
 
-5. Optionally, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
+5. Optionally, if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
 
 That's it! Enjoy your sound.
 
