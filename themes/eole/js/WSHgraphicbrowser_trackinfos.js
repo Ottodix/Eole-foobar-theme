@@ -1736,7 +1736,6 @@ oShowList = function(parentPanelName) {
 			this.genre = Tags[4];
 			this.total_tracks = pl_count+(pl_count>1?" tracks":" track");
 		} else {
-			console.log("eho2")
 			//TagsString = TF.showlistReduced.EvalWithMetadb(this.pl[0]);
 			//Tags = TagsString.split(" ^^ ");
 			this.artist = brw.groups[this.idx].artist;
