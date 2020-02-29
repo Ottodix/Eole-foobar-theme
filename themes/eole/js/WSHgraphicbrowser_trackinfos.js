@@ -1726,7 +1726,7 @@ oShowList = function(parentPanelName) {
 		EvalWithMetadb = typeof EvalWithMetadb !== 'undefined' ? EvalWithMetadb : false;
         // TF
 		var pl_count = this.pl.Count;
-		//if(EvalWithMetadb){
+		if(EvalWithMetadb){
 			TagsString = TF.showlist.EvalWithMetadb(this.pl[0]);
 			Tags = TagsString.split(" ^^ ");
 			this.artist = Tags[0];
@@ -1735,7 +1735,8 @@ oShowList = function(parentPanelName) {
 			this.date = Tags[3];
 			this.genre = Tags[4];
 			this.total_tracks = pl_count+(pl_count>1?" tracks":" track");
-		//} else {
+		} else {
+			console.log("eho2")
 			//TagsString = TF.showlistReduced.EvalWithMetadb(this.pl[0]);
 			//Tags = TagsString.split(" ^^ ");
 			this.artist = brw.groups[this.idx].artist;
@@ -1746,14 +1747,15 @@ oShowList = function(parentPanelName) {
 			else this.date = '';
 			this.genre = brw.groups[this.idx].genre;
 			this.total_tracks = pl_count+(pl_count>1?" tracks":" track");
-		//}
+		}
 
 		this.firstRow = this.album+this.discnumber+this.date;
 		this.secondRow = this.artist;
 
 		if(properties.TFgrouping!=""){
-			if(properties.TFgrouping.indexOf("%album%")==-1) this.firstRow = TF.grouping.EvalWithMetadb(this.pl[0]);
-			if(properties.TFgrouping.indexOf("artist%")==-1) this.secondRow = this.total_tracks;
+			var groupinfos_rows = TF.grouping.EvalWithMetadb(this.pl[0]).split(" ^^ ");
+			this.firstRow =  brw.groups[this.idx].secondRow+this.date;
+			this.secondRow = brw.groups[this.idx].firstRow;
 		}
 		if(!this.album_info_sent && !this.avoid_sending_album_infos && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
@@ -1949,7 +1951,7 @@ oShowList = function(parentPanelName) {
 			if(time>0) this.length = brw.FormatTime(time);
 			else this.length = 'ON AIR';
 
-			this.getHeaderInfos();
+			this.getHeaderInfos(false);
 		}
 		this.hscr_width = this.w - 65 - (this.hscr_btn_w*2);
 		this.hscr_step_width = this.hscr_width / this.totalCols;
@@ -2955,16 +2957,14 @@ oHeaderBar = function(name) {
 		}
 		actions[4001] = function(){
 			try {
-			   new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.\n\n", "Custom grouping", brw.current_grouping, true);
-				if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
-					properties.TFgrouping = new_TFgrouping;
-					TF.grouping = fb.TitleFormat(properties.TFgrouping);
-					window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);
-					g_showlist.close();
-					brw.populate(5,false);
-				}
+				var currrent_grouping_splitted = brw.current_grouping.split(" ^^ ");
+				customGraphicBrowserGrouping("Custom Grouping"
+									,"<div class='titleBig'>Custom Grouping</div><div class='separator'></div><br/>Enter a title formatting script for each line of text labelling a group. Note that it won't sort the tracks, it will group two consecutive tracks when their 2 lines defined there are equal.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
+									,''
+									,'First line of a group (default is %album artist%):##Second line (default is %album%, leave it empty to show the tracks count):'
+									,currrent_grouping_splitted[0]+'##'+currrent_grouping_splitted[1]);
 			} catch(e) {
-			}
+			}			
 		}
 		actions[4002] = function(){
 			properties.SingleMultiDisc = !properties.SingleMultiDisc;
@@ -4302,11 +4302,14 @@ oBrowser = function(name) {
                 string_compare = temp;
 
 				if(i>0) {
-					if(this.custom_firstRow) this.groups[i-1].firstRow = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]);
-					else this.groups[i-1].firstRow = this.groups[i-1].artist
-					if(this.custom_secondRow) this.groups[i-1].secondRow = this.groups[i-1].pl.Count+(this.groups[this.groups.length-1].pl.Count>1?" tracks":" track");
-					else this.groups[i-1].secondRow = this.groups[i-1].album;
-
+					if(this.custom_firstRow || this.custom_secondRow) {
+						var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).split(" ^^ ");
+						this.groups[i-1].firstRow = groupinfos_rows[0];
+						this.groups[i-1].secondRow = (groupinfos_rows[1]!="")?groupinfos_rows[1]:this.groups[i-1].pl.Count+(this.groups[i-1].pl.Count>1?" tracks":" track");
+					} else {
+						this.groups[i-1].firstRow = this.groups[i-1].artist
+						this.groups[i-1].secondRow = this.groups[i-1].album;
+					}
 					this.totalTime += this.groups[i-1].length;
 				}
 
@@ -4399,10 +4402,16 @@ oBrowser = function(name) {
 		if(k==this.totalTracks) {
 			//last group headers
 			if(this.groups.length>0){
-				if(this.custom_firstRow) this.groups[this.groups.length-1].firstRow = TF.grouping.EvalWithMetadb(this.groups[this.groups.length-1].pl[0]);
-				else this.groups[this.groups.length-1].firstRow = this.groups[this.groups.length-1].artist
-				if(this.custom_secondRow) this.groups[this.groups.length-1].secondRow = this.groups[this.groups.length-1].pl.Count+(this.groups[this.groups.length-1].pl.Count>1?" tracks":" track");
-				else this.groups[this.groups.length-1].secondRow = this.groups[this.groups.length-1].album;
+				
+				if(this.custom_firstRow || this.custom_secondRow) {
+					var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).split(" ^^ ");
+					this.groups[this.groups.length-1].firstRow = groupinfos_rows[0];
+					this.groups[this.groups.length-1].secondRow = (groupinfos_rows[1]!="")?groupinfos_rows[1]:this.groups[this.groups.length-1].pl.Count+(this.groups[this.groups.length-1].pl.Count>1?" tracks":" track");
+				} else {
+					this.groups[this.groups.length-1].firstRow = this.groups[this.groups.length-1].artist
+					this.groups[this.groups.length-1].secondRow = this.groups[this.groups.length-1].album;
+				}				
+			
 				this.totalTime += this.groups[this.groups.length-1].length;
 				if(this.searched_track!=null && this.found_albumIdx>-1) {
 					this.seek_track(this.searched_track, this.found_albumIdx);

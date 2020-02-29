@@ -108,8 +108,8 @@
                 close_window();
             };	
 			document.onkeydown = function () {
-				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
-					window.document.activeElement.onclick();
+				if (window.event.keyCode == 13 && window.btn_ok.onclick) {
+					window.btn_ok.onclick();
 				}
 			};
             window.btn_cancel.onclick = function () {

@@ -396,7 +396,27 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
-		data: ["", top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+	});
+}
+function customGraphicBrowserGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			//for(i=0;i<input_values.length;i++) input_values_string+=input_values[i];
+			//fb.ShowPopupMessage('ok_callback status:'+status+" - "+input_values, "ok_callback_title");
+			var input_values = input_values.split('##');
+			if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.TFgrouping==input_values[0]+" ^^ "+input_values[1])) {						
+				properties.TFgrouping = input_values[0]+" ^^ "+input_values[1];
+				TF.grouping = fb.TitleFormat(properties.TFgrouping);
+				window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);
+				g_showlist.close();
+				brw.populate(5,false);
+			}
+		}
+		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
 	});
 }
 //Colors ------------------------------------------------------------------------------
@@ -2036,7 +2056,8 @@ function quickSearch(start,search_function){
 			var arr = globalProperties.tf_albumartist.EvalWithMetadb(start);
 			try{
 				//console.log(arr);
-				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr)+" OR %album artist% IS "+trim1(arr));
+				//artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr)+" OR %album artist% IS "+trim1(arr));
+				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), '"*$meta_sep(artist,*)*" HAS *'+trim1(arr)+'*');
 				//artist_items = fb.GetQueryItems(fb.GetLibraryItems(), '"$meta(artist,0)" IS '+trim1(arr)+' OR "$meta(artist,1)" IS '+trim1(arr)+' OR "$meta(artist,2)" IS '+trim1(arr)+' OR "$meta(artist,3)" IS '+trim1(arr)+' OR "$meta(artist,4)" IS '+trim1(arr)+' OR "$meta(artist,5)" IS '+trim1(arr)+' OR "$meta(artist,6)" IS '+trim1(arr));				
 				if(artist_items.Count>0){
 					artist_items.OrderByFormat(globalProperties.tf_order, 1);
