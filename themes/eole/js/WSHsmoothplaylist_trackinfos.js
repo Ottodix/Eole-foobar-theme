@@ -4398,11 +4398,6 @@ oBrowser = function(name) {
                     get_metrics();
                     brw.repaint();
                     break;
-                case (idx == 112):
-					setOneProperty("showMood",!properties.showMood);
-                    get_metrics();
-                    brw.repaint();
-                    break;
                 case (idx == 113):
 					setOneProperty("showRating",true);
 					setOneProperty("showRatingSelected",false);
