@@ -1382,7 +1382,6 @@ oShowList = function(parentPanelName) {
 			this.total_tracks = this.pl.Count+(this.pl.Count>1?" tracks":" track");
 		}
 
-
 		this.firstRowInfo = this.album+this.discnumber+this.date;
 		this.secondRowInfo = this.artist;
 
@@ -1880,11 +1879,11 @@ oShowList = function(parentPanelName) {
                 }
 
 				//draw album cover
-				if(properties.showlistShowCover && this.idx > -1 && brw.groups_draw[this.idx].cover_img_thumb && (this.h-this.delta_)<40){
-					if(brw.groups_draw[this.idx].cover_img_thumb==null) brw.GetAlbumCover(this.idx);
+				if(properties.showlistShowCover && this.idx > -1 && brw.groups_draw[this.idx].cover_img && (this.h-this.delta_)<40){
+					if(brw.groups_draw[this.idx].cover_img==null) brw.GetAlbumCover(this.idx);
 
-					if(!isImage(this.cover_img_thumb)) this.cover_img_thumb = FormatCover(brw.groups_draw[this.idx].cover_img, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, false);
-					gr.DrawImage(this.cover_img_thumb, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, 0, 0, this.cover_img_thumb.Width, this.cover_img_thumb.Height);
+					if(!isImage(this.cover_img)) this.cover_img = FormatCover(brw.groups_draw[this.idx].cover_img, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, false);
+					gr.DrawImage(this.cover_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.CoverSize-2*this.marginCover, this.CoverSize-2*this.marginCover, 0, 0, this.cover_img.Width, this.cover_img.Height);
 				}
 
                 // draw columns & tracks

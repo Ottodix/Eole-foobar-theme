@@ -1887,7 +1887,6 @@ oBrowser = function(name) {
 			for(i=0;i<this.groups.length;i++){
 				start = this.groups[i].start;
 				groups_saved[start] = [];
-				groups_saved[start].count = this.groups[i].count;					
 				groups_saved[start].cover_img = this.groups[i].cover_img;
 				groups_saved[start].cover_formated = this.groups[i].cover_formated;				
 				groups_saved[start].mask_applied = this.groups[i].mask_applied;					
@@ -2849,12 +2848,10 @@ oBrowser = function(name) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
 												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
-												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
 												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
-												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -2921,12 +2918,10 @@ oBrowser = function(name) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
 												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
-												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
 												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
-												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -6210,7 +6205,7 @@ function on_playback_new_track(metadb) {
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			old_cachekey = nowplaying_cachekey;
 			nowplaying_cachekey = process_cachekey(metadb);
-			if(old_cachekey!=nowplaying_cachekey) {
+			if(old_cachekey!=nowplaying_cachekey || !fb.IsMetadbInMediaLibrary(metadb)) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}
 		};
@@ -6272,6 +6267,7 @@ function on_playback_seek(time) {
 //=================================================// Playlist Callbacks
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed){
+		console.log("on_playlists_changed"+g_active_playlist+" - "+plman.ActivePlaylist)
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
 			if(plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1) {
 				plman.ActivePlaylist = 0;
@@ -6292,13 +6288,17 @@ function on_playlists_changed() {
 };
 
 function on_playlist_switch() {
+	console.log("on_playlist_switch"+g_active_playlist+" - "+plman.ActivePlaylist)
 	if(!callback_avoid_populate){
+		console.log("on_playlist_switch2")
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
+			console.log("on_playlist_switch3")
 			if(pman.drop_done) return;
 			changed = brw.setActivePlaylist(3);
 			g_focus_id = getFocusId(g_active_playlist);
 			g_filterbox.clearInputbox();
 			if(changed) {
+				console.log("on_playlist_switch4")
 				callback_avoid_populate=true;
 				brw.populate(is_first_populate = true,8, false);
 			}
@@ -6898,9 +6898,6 @@ function on_notify_data(name, info) {
 			brw.collapseAll(info);
 			brw.showFocusedItem();
 			break;
-		case "cover_cache_finalized":
-			//g_image_cache.cachelist = cloneImgs(info);
-			//window.Repaint();
 		break;
 		case "WSH_panels_reload":
 			window.Reload();
