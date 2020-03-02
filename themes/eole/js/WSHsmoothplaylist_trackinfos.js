@@ -6272,7 +6272,6 @@ function on_playback_seek(time) {
 //=================================================// Playlist Callbacks
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed){
-		console.log("on_playlists_changed"+g_active_playlist+" - "+plman.ActivePlaylist)
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
 			if(plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1) {
 				plman.ActivePlaylist = 0;
@@ -6293,7 +6292,6 @@ function on_playlists_changed() {
 };
 
 function on_playlist_switch() {
-	console.log("on_playlist_switch "+g_active_playlist+" - "+plman.ActivePlaylist)
 	if(!callback_avoid_populate){
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
 			if(pman.drop_done) return;
