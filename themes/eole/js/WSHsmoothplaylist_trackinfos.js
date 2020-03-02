@@ -1816,8 +1816,10 @@ oBrowser = function(name) {
         };
         return row_idx;
     };
-	this.setActivePlaylist = function(call){
+	this.setActivePlaylist = function(call, switch_playlist){
+		var switch_playlist = typeof switch_playlist !== 'undefined' ? switch_playlist : false;		
 		var g_active_playlist_new=-1;
+		var force_changed = true;
 		if(g_active_playlist<0 || g_active_playlist==null) g_active_playlist = 0;
 		if(this.playlist_on_next_populate>-1){
 			g_active_playlist_new = this.playlist_on_next_populate;
@@ -1830,9 +1832,12 @@ oBrowser = function(name) {
 		}
 		else if(fb.IsPlaying && properties.lockOnNowPlaying) g_active_playlist_new = plman.PlayingPlaylist;
 		else if(properties.lockOnNowPlaying && !properties.displayActiveOnPlaybackStopped) g_active_playlist_new = g_active_playlist;
-		else g_active_playlist_new = plman.ActivePlaylist;
+		else {
+			g_active_playlist_new = plman.ActivePlaylist;
+			force_changed = switch_playlist;
+		}
 
-		if(g_active_playlist!=g_active_playlist_new) changed = true;
+		if(g_active_playlist!=g_active_playlist_new || force_changed) changed = true;
 		else changed = false;
 
 		g_active_playlist = g_active_playlist_new;
@@ -6288,17 +6293,14 @@ function on_playlists_changed() {
 };
 
 function on_playlist_switch() {
-	console.log("on_playlist_switch"+g_active_playlist+" - "+plman.ActivePlaylist)
+	console.log("on_playlist_switch "+g_active_playlist+" - "+plman.ActivePlaylist)
 	if(!callback_avoid_populate){
-		console.log("on_playlist_switch2")
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
-			console.log("on_playlist_switch3")
 			if(pman.drop_done) return;
-			changed = brw.setActivePlaylist(3);
+			changed = brw.setActivePlaylist(3, true);
 			g_focus_id = getFocusId(g_active_playlist);
 			g_filterbox.clearInputbox();
 			if(changed) {
-				console.log("on_playlist_switch4")
 				callback_avoid_populate=true;
 				brw.populate(is_first_populate = true,8, false);
 			}
@@ -6306,7 +6308,6 @@ function on_playlist_switch() {
 
 			// refresh playlists list
 			if(properties.DropInplaylist) pman.populate(exclude_active = false, reset_scroll = false);
-			if(properties.DropInplaylist) pman.populate(exclude_active = false);
 			timers.callback_avoid_populate = setTimeout(function() {
 				callback_avoid_populate=false;
 				clearTimeout(timers.callback_avoid_populate);
