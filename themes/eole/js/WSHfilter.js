@@ -1527,7 +1527,7 @@ oGroup = function(index, start, handle, groupkey) {
                 this.cachekey_album = process_cachekey(handle);
                 break;
         }
-        this.tracktype = TrackType(handle.RawPath.substring(0, 4));
+        this.tracktype = TrackType(handle);
     } else {
         this.cachekey = null;
         this.tracktype = 0;
@@ -2473,7 +2473,7 @@ oBrowser = function(name) {
 									}
 									if(g_files.FileExists(filepath)) {
 										this.groups[i].cover_img = gdi.Image(filepath);
-										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey);
+										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey, this.groups[i].metadb);
 									} else {
 										this.groups[i].save_requested = true;
 										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);

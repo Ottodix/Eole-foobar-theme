@@ -292,7 +292,7 @@ function on_paint(gr) {
 	}
 	if(!g_cover.isSetArtwork()) {
 		try{
-			tracktype = TrackType(fb.GetNowPlaying().RawPath.substring(0, 4));
+			tracktype = TrackType(fb.GetNowPlaying());
 			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
 			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
 		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
@@ -465,19 +465,17 @@ oImageCache = function () {
     this.hit = function (metadb) {
 		var img;
 		old_cachekey = nowPlaying_cachekey;
-		nowPlaying_cachekey = process_cachekey(metadb);
-		if(nowPlaying_cachekey==old_cachekey) return "unchanged";
+		nowPlaying_cachekey = process_cachekey(metadb);		
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {
 			cache_filename = check_cache(metadb, 0, nowPlaying_cachekey);
-
 			if(cache_filename) {
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
 			} else {
 				get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey, {isplaying:true});
 			}
-		}
+		} else if(nowPlaying_cachekey==old_cachekey) return "unchanged";
 		return img;
     };
     this.reset = function(key) {
@@ -609,7 +607,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
     cover_path = image_path;
 	if(image){
 		cachekey = process_cachekey(metadb);
-		save_image_to_cache(image, -1, cachekey);
+		save_image_to_cache(image, -1, cachekey, metadb);
 		g_cover.setArtwork(image,true,false);
 		g_image_cache.addToCache(image,cachekey,globalProperties.thumbnailWidthMax);
 	}

@@ -1473,7 +1473,7 @@ oGroup = function(index, start, handle, groupkey) {
     this.cover_img = null;
 	this.isPlaying = false;
     this.cover_type = null;
-    this.tracktype = TrackType(handle.RawPath.substring(0, 4));
+    this.tracktype = TrackType(handle);
     this.tracks = [];
     this.load_requested = 0;
 	this.cover_formated = false;
@@ -1942,7 +1942,7 @@ oBrowser = function(name) {
 							this.rows[r].playlistTrackId = this.groups[g].start;
 							this.rows[r].groupkey = this.groups[g].groupkey;
 							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
-							this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
+							this.rows[r].tracktype = TrackType(this.rows[r].metadb);
 							this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 							//if(this.rows[r].selected)
 								//this.groups[g-1].selected = true;
@@ -1967,7 +1967,7 @@ oBrowser = function(name) {
 						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;
-						this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
+						this.rows[r].tracktype = TrackType(this.rows[r].metadb);
 						this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 						//if(this.rows[r].selected)
 							//this.groups[g-1].selected = true;
@@ -2026,7 +2026,7 @@ oBrowser = function(name) {
                     this.rows_new[r].playlistTrackId = this.groups[i].start + j;
                     this.rows_new[r].groupkey = this.groups[i].groupkey;
 					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;
-                    this.rows_new[r].tracktype = TrackType(this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb.RawPath.substring(0, 4));
+                    this.rows_new[r].tracktype = TrackType(this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j]);
 					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].playlistTrackId);
 					if(this.rows_new[r].selected)
 						this.groups[i].selected = true;
@@ -2091,7 +2091,7 @@ oBrowser = function(name) {
                     this.rows[r].playlistTrackId = this.groups[i].start + j;
                     this.rows[r].groupkey = this.groups[i].groupkey;
 					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
-                    this.rows[r].tracktype = TrackType(this.rows[r].metadb.RawPath.substring(0, 4));
+                    this.rows[r].tracktype = TrackType(this.rows[r].metadb);
 					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 					if(this.rows[r].selected)
 						this.groups[i].selected = true;

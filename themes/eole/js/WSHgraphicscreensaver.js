@@ -3231,7 +3231,7 @@ oBrowser = function(name) {
 				}
                 this.groups[i].trackIndex = k;
                 this.groups[i].isPlaying = false;
-				this.groups[i].tracktype = TrackType(this.list[k].RawPath.substring(0, 4));
+				this.groups[i].tracktype = TrackType(this.list[k]);
 
 				if(properties.TFgrouping.length > 0) {
 					this.groups[i].artist = TF.albumartist.EvalWithMetadb(this.list[k]);
@@ -4683,7 +4683,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img_thumb != "string" && image) {
 					if(!timers.saveCover) {
 						brw.groups[i].save_requested = true;
-						save_image_to_cache(image, i);
+						save_image_to_cache(image, i, "undefined", brw.groups[i].metadb);
 						//timers.saveCover = setTimeout(function() {
 							//clearTimeout(timers.saveCover);
 							timers.saveCover = false;

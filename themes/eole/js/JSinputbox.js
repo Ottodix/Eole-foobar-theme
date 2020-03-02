@@ -209,7 +209,6 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		this.SelBegin = this.Cpos;
 		this.SelEnd = this.Cpos;
 		this.resetCursorTimer();
-		console.log(this.edit)
 	}
 	this.isActive = function (){
 		console.log(this.edit)

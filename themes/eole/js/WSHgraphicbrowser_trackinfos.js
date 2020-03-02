@@ -4308,7 +4308,7 @@ oBrowser = function(name) {
                 this.groups[i] = {};
 				this.groups_draw.push(i);
                 this.groups[i].trackIndex = k;
-				this.groups[i].tracktype = TrackType(this.list[k].RawPath.substring(0, 4));
+				this.groups[i].tracktype = TrackType(this.list[k]);
 
 				if(properties.TFgrouping.length > 0) {
 					groupinfoscustom = TF.groupinfoscustom.EvalWithMetadb(this.list[k]);
@@ -5783,7 +5783,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 				if(globalProperties.enableDiskCache && !brw.groups[i].save_requested && typeof brw.groups[i].cover_img_thumb != "string" && image) {
 					if(!timers.saveCover) {
 						brw.groups[i].save_requested = true;
-						save_image_to_cache(image, i);
+						save_image_to_cache(image, i, "undefined", brw.groups[i].metadb);
 						//timers.saveCover = setTimeout(function() {
 							//clearTimeout(timers.saveCover);
 							timers.saveCover = false;
@@ -5837,6 +5837,9 @@ function populate_with_library_covers(start_items, str_comp_items){
 		covers_FullLibraryList.OrderByFormat(fb.TitleFormat(sort_by_default), 1);
 		covers_loading_progress = 0;
 		gTime_covers = fb.CreateProfiler();
+		//gTime_covers_all = fb.CreateProfiler();		
+		//inlibrary_counter = 0;
+		//console.log("populate covers started time:"+gTime_covers_all.Time);
 	}
 	var covers_current_item = start_items;
 	var string_current_item = "";
@@ -5845,6 +5848,7 @@ function populate_with_library_covers(start_items, str_comp_items){
 	var total = covers_FullLibraryList.Count;
 	while(covers_current_item < total){
 		string_current_item = TF.grouping_populate.EvalWithMetadb(covers_FullLibraryList[covers_current_item]);
+		//inlibrary_counter += fb.IsMetadbInMediaLibrary(covers_FullLibraryList[covers_current_item])?1:0;
 		string_current_item = string_current_item.toUpperCase();
 		if(string_compare_items != string_current_item){
 			covers_loading_progress = Math.round((covers_current_item/total)*100);
@@ -5880,7 +5884,7 @@ function populate_with_library_covers(start_items, str_comp_items){
 		}
 	}
 	if(covers_current_item==covers_FullLibraryList.Count) {
-		//console.log("populate covers started time:"+gTime_covers_all.Time);
+		//console.log("populate covers finish time:"+gTime_covers_all.Time+" total:"+covers_current_item+" iteminlibrary:"+inlibrary_counter);
 		covers_FullLibraryList = undefined;
 		ClearCoversTimers();
 		gTime_covers = null;
@@ -7221,14 +7225,14 @@ function on_library_items_added() {
 	}
 };
 function on_metadb_changed(metadbs, fromhook) {
-	if(window.IsVisible) {			//console.log("fromhook"+fromhook+TrackType(metadbs[0].RawPath.substring(0, 4)))
+	if(window.IsVisible) {		
 		playing_track_new_count = parseInt(playing_track_playcount,10)+1;
 		try{
 			if(fb.IsPlaying && metadbs.Count==1 && metadbs[0].RawPath==fb.GetNowPlaying().RawPath && TF.play_count.Eval()==(playing_track_new_count)) {
 				playing_track_playcount = playing_track_new_count;
 				return;
 			}
-			if(metadbs.Count==1 && TrackType(metadbs[0].RawPath.substring(0, 4))>=3) return;
+			if(metadbs.Count==1 && TrackType(metadbs[0])>=3) return;
 
 		} catch(e){}
 

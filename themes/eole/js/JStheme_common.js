@@ -230,7 +230,6 @@ var oCursor = function () {
 		} else {
 			window.SetCursor(cursor_code);
 		}
-		//console.log(cursor_code+" - "+this.active_zone)
 	}
 	this.getCursor = function(){
 		return this.cursor;
@@ -2432,10 +2431,12 @@ function return_colors_from_string(string) {
     arr = string.split("-");
     return RGB(arr[0], arr[1], arr[2]);
 };
-function TrackType(trkpath) {
+function TrackType(metadb) {
     var taggable;
     var type;
-    switch (trkpath) {
+	var trackpath = metadb.RawPath.substring(0, 4);
+	//metadb.RawPath.startsWith("Hello");
+    switch (trackpath) {
         case "file":
         taggable = 1;
         type = 0;
@@ -2448,6 +2449,7 @@ function TrackType(trkpath) {
         taggable = 0;
         type = 2;
         break;
+        case "fy+h":		
         case "http":
         taggable = 0;
         type = 3;
@@ -2896,6 +2898,7 @@ function process_cachekey(metadb, titleformat, str){
 function check_cache(metadb, albumIndex, crc){
 	var crc = typeof crc !== 'undefined' ? crc : brw.groups[albumIndex].cachekey;
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
+	if(crc=="undefined") return false;
     if(g_files.FileExists(filename)) {
         return filename;
     };
@@ -2985,7 +2988,7 @@ function get_albumArt(metadb,cachekey){
 	return artwork_img;
 }
 function get_fallbackCover(metadb, tracktype){
-	var tracktype = typeof tracktype !== 'undefined' ? tracktype : TrackType(metadb.RawPath.substring(0, 4));
+	var tracktype = typeof tracktype !== 'undefined' ? tracktype : TrackType(metadb);
 	if(tracktype < 2) {
 		return globalProperties.nocover_img;
 	} else {
@@ -3003,13 +3006,14 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
-			save_image_to_cache(result.image, albumIndex, cachekey);
+			save_image_to_cache(result.image, albumIndex, cachekey, metadb);
 			if (typeof g_cover == "object") {
 				if(addArgs && addArgs.isplaying) g_cover.setArtwork(result.image,true,false,addArgs.isplaying,metadb);
 				else g_cover.setArtwork(result.image,true,false);
 				window.Repaint();
 			}
 		} else if (typeof brw == "object" && albumIndex>=0) {
+			
 			if(typeof brw.groups[albumIndex] == "undefined" || brw.groups[albumIndex].cachekey!= cachekey){
 				var img = get_fallbackCover(metadb,undefined);
 				g_image_cache.addToCache(img,cachekey);
@@ -3030,14 +3034,18 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	}
 };
 
-function save_image_to_cache(image, albumIndex, cachekey){
+function save_image_to_cache(image, albumIndex, cachekey, metadb){
 	cachekey = typeof cachekey !== 'undefined' ? cachekey : false;
 	if(!cachekey && typeof(brw) !== "undefined") var crc = brw.groups[albumIndex].cachekey;
 	else var crc = cachekey;
-	if(cachekey == "undefined") return false;
+	var save2cache = true;
+	if(cachekey == "undefined") {
+		var save2cache = false;
+		cachekey = metadb.RawPath;
+	}
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
 
-	if(!g_files.FileExists(filename)){
+	if(!g_files.FileExists(filename) && save2cache){
 		try {
 			if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
 				image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
@@ -3048,7 +3056,7 @@ function save_image_to_cache(image, albumIndex, cachekey){
 	if (typeof brw == "object" && albumIndex>=0) {
 		try{
 			brw.groups[albumIndex].cover_img = image;
-			g_image_cache.addToCache(image,cachekey); //g_image_cache.cachelist[cachekey] = image;
+			save2cache && g_image_cache.addToCache(image,cachekey); //g_image_cache.cachelist[cachekey] = image;
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
 			brw.repaint();
@@ -3083,14 +3091,13 @@ function createDragText(line1, line2, cover_size){
 function createDragImg(img, cover_size, count){
 	var drag_zone_size = 220;
 	var drag_img = gdi.CreateImage(drag_zone_size, drag_zone_size);
-
 	var left_padding = top_padding = Math.round((drag_zone_size - cover_size)/2);
 	var top_padding = drag_zone_size - cover_size-15;
 	var text_height = 25;
     var gb = drag_img.GetGraphics();
 	gb.SetTextRenderingHint(2);
 	gb.SetSmoothingMode(0);
-	gb.DrawImage(img, left_padding, top_padding, cover_size, cover_size, 0, 0, img.Width, img.Height);
+	if(isImage(img)) gb.DrawImage(img, left_padding, top_padding, cover_size, cover_size, 0, 0, img.Width, img.Height);
     gb.FillSolidRect(left_padding, top_padding, cover_size, cover_size, colors.dragcover_overlay);
 	gb.FillSolidRect(left_padding,top_padding+cover_size-text_height,cover_size,text_height,colors.dragimage_bg);
 	gb.DrawRect(left_padding, top_padding, cover_size-1, cover_size-1, 1.0,colors.dragimage_border);
@@ -3182,7 +3189,7 @@ oImageCache = function () {
 					}
 					if(g_files.FileExists(filepath)) {
 						img = gdi.Image(filepath);
-						save_image_to_cache(img, 0, cachekey);
+						save_image_to_cache(img, 0, cachekey, metadb);
 					} else if(properties.AlbumArtFallback){
 						//console.log("fallback "+i+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey_album)
 						brw.groups[albumIndex].cover_img = g_image_cache.hit(metadb, albumIndex, false, brw.groups[albumIndex].cachekey_album);
@@ -3212,9 +3219,10 @@ oImageCache = function () {
 					}
 				} else {
 					img = utils.GetAlbumArtV2(metadb, 0, false);
+					
 					if(img) {
 						if(!timers.saveCover && globalProperties.enableDiskCache) {
-							save_image_to_cache(img, 0,cachekey);
+							save_image_to_cache(img, 0,cachekey, metadb);
 							timers.saveCover = setTimeout(function() {
 								clearTimeout(timers.saveCover);
 								timers.saveCover = false;
