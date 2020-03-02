@@ -2748,30 +2748,33 @@ function draw_controls_menu(x,y){
 		_schedulerMenu.AppendMenuSeparator();
 		_schedulerMenu.AppendMenuItem(MF_STRING, 3022, "Hibernate after playlist");
 		_schedulerMenu.AppendMenuItem(MF_STRING, 3023, "Shutdown after playlist");
-			checked_item=0;
-			switch (true) {
-				case (scheduler.hibernate_after_current):
-					checked_item=3020
-					break;
-				case (scheduler.shutdown_after_current):
-					checked_item=3021
-					break;
-				case (scheduler.hibernate_after_playlist):
-					checked_item=3022
-					break;
-				case (scheduler.shutdown_after_playlist):
-					checked_item=3023
-					break;
-				case (fb.StopAfterCurrent):
-					checked_item=3019
-					break;
-				default:
-					checked_item=3018
-					break;
-			}
+		checked_item=0;
+		switch (true) {
+			case (scheduler.hibernate_after_current):
+				checked_item=3020
+				break;
+			case (scheduler.shutdown_after_current):
+				checked_item=3021
+				break;
+			case (scheduler.hibernate_after_playlist):
+				checked_item=3022
+				break;
+			case (scheduler.shutdown_after_playlist):
+				checked_item=3023
+				break;
+			case (fb.StopAfterCurrent):
+				checked_item=3019
+				break;
+			default:
+				checked_item=3018
+				break;
+		}
 		_schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 		_schedulerMenu.AppendTo(_menu, MF_STRING, "Scheduler");
-
+		
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 2, "Properties");
+		
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -2784,6 +2787,9 @@ function draw_controls_menu(x,y){
 			case (idx == 1):
 				draw_settings_menu(x,y);
                 break;
+			case (idx == 2):
+				fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
+			break;				
             case (idx == 3000):
                 fb.Stop();
                 break;

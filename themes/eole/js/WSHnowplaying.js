@@ -1246,7 +1246,6 @@ function on_mouse_rbtn_up(x, y){
 	if(g_cover.isValid()){
 		var now_playing_track = fb.GetNowPlaying();
 		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");
-		main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
 		var quickSearchMenu = window.CreatePopupMenu();
@@ -1258,8 +1257,10 @@ function on_mouse_rbtn_up(x, y){
 		quickSearchMenu.AppendTo(main_menu, MF_STRING, "Quick search for...");
 		main_menu.AppendMenuSeparator();
 	}
-
-	var checked_item_menu=3;
+		
+	main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");
+	main_menu.AppendMenuSeparator();	
+	/*var checked_item_menu=3;
 	main_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
 	main_menu.AppendMenuSeparator();
 	main_menu.AppendMenuItem(MF_STRING, 3, "Tracks");
@@ -1276,10 +1277,10 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
 
 	var genrePopupMenu = window.CreatePopupMenu();
-
 	createGenrePopupMenu(false, -1, genrePopupMenu);
-	genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");
+	genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");*/
 
+	main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -1289,6 +1290,9 @@ function on_mouse_rbtn_up(x, y){
 	}
 	idx = main_menu.TrackPopupMenu(x,y);
 	switch(true) {
+		case (idx == 2):
+			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
+		break;		
 		case (idx == 10):
 			properties.follow_cursor = !properties.follow_cursor;
 			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);

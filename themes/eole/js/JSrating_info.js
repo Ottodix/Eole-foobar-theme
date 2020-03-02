@@ -282,7 +282,8 @@ function on_mouse_rbtn_up(x, y) {
 	rMenu.AppendMenuItem(MF_STRING, 8, "Show infos on 2 rows");
 	rMenu.CheckMenuItem(8, properties.doubleRowText);
 	rMenu.AppendMenuSeparator();
-	rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
+	rMenu.AppendMenuItem(MF_STRING, 1, "Show now playing");
+	rMenu.AppendMenuSeparator();
 	rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)){
 		rMenu.AppendMenuSeparator();
