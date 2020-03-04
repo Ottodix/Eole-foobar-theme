@@ -3082,8 +3082,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		g_headerbar.append_group_menu(_menu, actions);
 		_menu.AppendMenuSeparator();
 	}
-	_menu.AppendMenuItem(MF_STRING, 60, "Grid mode, no padding, no labels");
-	_menu.CheckMenuItem(60, properties.CoverGridNoText);
 	_menu.AppendMenuItem(MF_STRING, 10, "Follow now playing (right playlist hidden)");
 	_menu.CheckMenuItem(10, properties.followNowPlaying);
 	_menu.AppendMenuItem(MF_STRING, 31, "Show tooltips");
@@ -3128,26 +3126,34 @@ function draw_settings_menu(x,y,right_align,sort_group){
 
 
 
+
+	
+	_menuGroupDisplay.AppendMenuItem(MF_STRING, 100, "Square Artwork");		
+	_menuGroupDisplay.AppendMenuItem(MF_STRING, 101, "Circle Artwork");
+	_menuGroupDisplay.AppendMenuItem(MF_STRING, 102, "Grid mode, no padding, no labels");	
+	_menuGroupDisplay.CheckMenuRadioItem(100, 102, (properties.CoverGridNoText) ? 102 : (properties.circleMode) ? 101 : 100);	
+	_menuGroupDisplay.AppendMenuSeparator();
+	
 	_dateMenu.AppendMenuItem(MF_STRING, 25, "Show");
 	_dateMenu.CheckMenuItem(25, properties.showdateOverCover);
 	_dateMenu.AppendMenuItem(MF_STRING, 49, "Try to extract and display only the year");
 	_dateMenu.CheckMenuItem(49, properties.extractYearFromDate);
 	_dateMenu.AppendTo(_menuGroupDisplay,MF_STRING, "Date over album art");
-
+	
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 26, "Show disc number over album art");
 	_menuGroupDisplay.CheckMenuItem(26, properties.showDiscNbOverCover);
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 46, "Animate while showing now playing");
 	_menuGroupDisplay.CheckMenuItem(46, properties.animateShowNowPlaying);
-	_menuGroupDisplay.AppendMenuItem(properties.CoverGridNoText?MF_GRAYED:MF_STRING, 37, "Circle Artwork");
-	_menuGroupDisplay.CheckMenuItem(37, properties.circleMode);
-	_menuGroupDisplay.AppendMenuItem(MF_STRING, 38, "Center text");
+	_menuGroupDisplay.AppendMenuSeparator();
+
+	_menuGroupDisplay.AppendMenuItem(properties.CoverGridNoText?MF_GRAYED:MF_STRING, 38, "Center text");
 	_menuGroupDisplay.CheckMenuItem(38, properties.centerText);
 	_menuCoverShadow.AppendMenuItem(MF_STRING, 47, "Show a shadow under artwork");
 	_menuCoverShadow.CheckMenuItem(47, properties.showCoverShadow);
 	_menuCoverShadow.AppendMenuItem(MF_STRING, 48, "Set shadow opacity (current:"+properties.default_CoverShadowOpacity+")");
 	_menuCoverShadow.AppendTo(_menuGroupDisplay,MF_STRING, "Covers shadow");
 
-	_menuGroupDisplay.AppendTo(_menu,MF_STRING, "Covers");
+	_menuGroupDisplay.AppendTo(_menu,MF_STRING, "Covers grid");
 
 	_menuTracklist.AppendMenuItem(MF_STRING, 11, "Activate tracklist");
 	_menuTracklist.CheckMenuItem(11, properties.expandInPlace);
@@ -3504,20 +3510,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_showlist.refresh();
 			brw.repaint();
 			break;
-		case (idx == 37):
-			properties.circleMode = !properties.circleMode;
-			window.SetProperty("COVER Circle artwork", properties.circleMode);
-			if(properties.circleMode){
-				properties.centerText = true;
-				window.SetProperty("COVER Center text", properties.centerText);
-			} else {
-				properties.centerText = false;
-				window.SetProperty("COVER Center text", properties.centerText);
-			}
-			brw.refresh_shadows();
-			brw.refresh_browser_thumbnails();
-			brw.repaint();
-			break;
 		case (idx == 38):
 			properties.centerText = !properties.centerText;
 			window.SetProperty("COVER Center text", properties.centerText);
@@ -3568,8 +3560,16 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			brw.refreshDates();
 			brw.repaint();
 			break;
-		case (idx == 60):
-			brw.toggle_grid_mode(null,!properties.CoverGridNoText);
+		case (idx == 100):
+			brw.toggle_grid_mode(false,false);
+			brw.repaint();
+			break;		
+		case (idx == 101):
+			brw.toggle_grid_mode(true,false);
+			brw.repaint();
+			break;			
+		case (idx == 102):
+			brw.toggle_grid_mode(false,true);
 			brw.repaint();
 			break;
 		case (idx == 200):

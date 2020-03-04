@@ -31,6 +31,7 @@ var properties = {
 	customColorHightlight: window.GetProperty("CUSTOM COLOR: highlight", "235-235-235"),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
+    sortAlphabetically: window.GetProperty("_PROPERTY: sort playlist alphabetically", false),	
 	panelFontAdjustement: -1,
 	emphasisOnActive: false,
 };
@@ -916,21 +917,48 @@ oBrowser = function(name) {
 			this.rows.push(new oPlaylist(-1, rowId, "Create Playlist"));
 			rowId++;
 		 }
-
-		for(var i = 0; i < total; i++) {
-			name = plman.GetPlaylistName(i);
-			if(ExcludePlaylist(name)){
-				var toAdd = false;
-			} else if(str_filter.length > 0) {
-				var toAdd = match(name, str_filter);
-			} else {
-				var toAdd = true;
+	
+		function sortPlaylistAlphaBetically(a,b) {
+			if(a.name < b.name) return -1;
+			if(a.name > b.name) return 1;
+			return 0;
+		}
+		
+		if(properties.sortAlphabetically){
+			var rows2add = [];
+			for(var i = 0; i < total; i++) {
+				name = plman.GetPlaylistName(i);
+				if(ExcludePlaylist(name)){
+					var toAdd = false;
+				} else if(str_filter.length > 0) {
+					var toAdd = match(name, str_filter);
+				} else {
+					var toAdd = true;
+				};
+				if(toAdd) {
+					rows2add.push(new oPlaylist(i, rowId, name));
+					rowId++;
+				};
 			};
-			if(toAdd) {
-				this.rows.push(new oPlaylist(i, rowId, name));
-				rowId++;
+			rows2add.sort(sortPlaylistAlphaBetically);
+			this.rows = this.rows.concat(rows2add);	
+		} else {
+			for(var i = 0; i < total; i++) {
+				name = plman.GetPlaylistName(i);
+				if(ExcludePlaylist(name)){
+					var toAdd = false;
+				} else if(str_filter.length > 0) {
+					var toAdd = match(name, str_filter);
+				} else {
+					var toAdd = true;
+				};
+				if(toAdd) {
+					this.rows.push(new oPlaylist(i, rowId, name));
+					rowId++;
+				};
 			};
 		};
+		
         this.rowsCount = rowId;
         this.getlimits();
     };
@@ -961,7 +989,7 @@ oBrowser = function(name) {
         g_first_populate_done = true;
 		Update_Required_function = "";
     };
-
+	
     this.getRowIdFromIdx = function(idx) {
         var total = this.rows.length;
         var rowId = -1;
@@ -1291,7 +1319,6 @@ oBrowser = function(name) {
 							this.inputbox.check("down", x, y);
 						} else {
 							if(this.inputboxID > -1) this.inputboxID = -1;
-							//if(this.selectedRow == this.rows[this.activeRow].idx) {
 							if(!this.up) {
 								// set dragged item to reorder list
 								cPlaylistManager.drag_clicked = true;
@@ -1390,7 +1417,7 @@ oBrowser = function(name) {
                 if(this.inputboxID >= 0) {
                     this.inputbox.check("move", x, y);
                 } else {
-                    if(cPlaylistManager.drag_clicked && (Math.abs(cPlaylistManager.drag_x-x)>10 || Math.abs(cPlaylistManager.drag_y-y)>10)) {
+                    if(cPlaylistManager.drag_clicked && (Math.abs(cPlaylistManager.drag_x-x)>10 || Math.abs(cPlaylistManager.drag_y-y)>10) && !properties.sortAlphabetically) {
                         cPlaylistManager.drag_moved = true;
 						g_cursor.setCursor(IDC_HELP,'drag');
                     };
@@ -1877,7 +1904,10 @@ oBrowser = function(name) {
 
 		_menu.AppendMenuItem(MF_STRING, 913, "Playlists Icons");
 		_menu.CheckMenuItem(913, properties.showPlaylistIcons);
-
+		
+		//_menu.AppendMenuItem(MF_STRING, 914, "Sort playlists alphabetically");
+		//_menu.CheckMenuItem(914, properties.sortAlphabetically);	
+		
 		_menu.AppendMenuSeparator();
 
 		_rowHeight.AppendMenuItem(MF_STRING, 1000, "Increase");
@@ -1984,6 +2014,13 @@ oBrowser = function(name) {
                 get_metrics();
                 brw.repaint();
                 break;
+            case (idx == 914):
+                properties.sortAlphabetically = !properties.sortAlphabetically;
+                window.SetProperty("_PROPERTY: sort playlist alphabetically", properties.sortAlphabetically);
+				brw.populate(true, 3);
+                get_metrics();
+                brw.repaint();
+                break;				
             case (idx == 991):
                 window.ShowProperties();
                 break;
@@ -2598,29 +2635,16 @@ function on_key_down(vkey) {
                 case VK_F2:
                     // set rename it
                     var rowId = brw.selectedRow;
-                    if(rowId > -1) {
-                        var rh = properties.rowHeight - 10;
-                        var tw = brw.w - rh - 10;
-                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw", undefined, "g_font.plus1");
-                        brw.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
-                        brw.inputboxID = rowId;
-                        // activate inputbox for edit
-                        brw.inputbox.on_focus(true);
-                        brw.inputbox.edit = true;
-                        brw.inputbox.Cpos = brw.inputbox.text.length;
-                        brw.inputbox.anchor = brw.inputbox.Cpos;
-                        brw.inputbox.SelBegin = brw.inputbox.Cpos;
-                        brw.inputbox.SelEnd = brw.inputbox.Cpos;
-                        if(!cInputbox.timer_cursor) {
-                            brw.inputbox.resetCursorTimer();
-                        };
-                        brw.inputbox.dblclk = true;
-                        brw.inputbox.SelBegin = 0;
-                        brw.inputbox.SelEnd = brw.inputbox.text.length;
-                        brw.inputbox.text_selected = brw.inputbox.text;
-                        brw.inputbox.select = true;
-                        brw.repaint();
-                    };
+					
+					try {
+						playlistname = utils.InputBox(window.ID, "Rename the playlist: "+plman.GetPlaylistName(brw.rows[rowId].idx), "Rename a playlist", plman.GetPlaylistName(brw.rows[rowId].idx), true);
+						if(!playlistname || playlistname == "") playlistname = plman.GetPlaylistName(brw.rows[rowId].idx);
+						if (playlistname.length > 1 || (playlistname.length == 1 && (playlistname >= "a" && playlistname <= "z") || (playlistname >= "A" && playlistname <= "Z") || (playlistname >= "0" && playlistname <= "9"))) {
+							plman.RenamePlaylist(brw.rows[rowId].idx, playlistname);
+							window.Repaint();
+						}
+					} catch(e) {
+					}					
                     break;
                 case VK_F3:
                     brw.showActivePlaylist();

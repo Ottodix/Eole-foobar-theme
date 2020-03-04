@@ -1509,7 +1509,7 @@ oGroup = function(index, start, handle, groupkey) {
 		} else time_txt="";
 		return time_txt;
 	}
-    this.finalize = function(count, tracks, groups_saved) {
+    this.finalize = function(count, tracks) {
         this.tracks = tracks.slice(0);
         this.tooltip = Array();
         this.count = count;
@@ -1525,12 +1525,6 @@ oGroup = function(index, start, handle, groupkey) {
                 this.collapsed = false;
             }
         };
-		if(groups_saved[start]){
-			this.cover_img = groups_saved[start].cover_img;
-			this.load_requested = groups_saved[start].load_requested;
-			this.cover_formated = groups_saved[start].cover_formated;		
-			this.mask_applied = groups_saved[start].mask_applied;					
-		}
     };
 };
 
@@ -1816,10 +1810,8 @@ oBrowser = function(name) {
         };
         return row_idx;
     };
-	this.setActivePlaylist = function(call, switch_playlist){
-		var switch_playlist = typeof switch_playlist !== 'undefined' ? switch_playlist : false;		
+	this.setActivePlaylist = function(call){
 		var g_active_playlist_new=-1;
-		var force_changed = true;
 		if(g_active_playlist<0 || g_active_playlist==null) g_active_playlist = 0;
 		if(this.playlist_on_next_populate>-1){
 			g_active_playlist_new = this.playlist_on_next_populate;
@@ -1832,12 +1824,9 @@ oBrowser = function(name) {
 		}
 		else if(fb.IsPlaying && properties.lockOnNowPlaying) g_active_playlist_new = plman.PlayingPlaylist;
 		else if(properties.lockOnNowPlaying && !properties.displayActiveOnPlaybackStopped) g_active_playlist_new = g_active_playlist;
-		else {
-			g_active_playlist_new = plman.ActivePlaylist;
-			force_changed = switch_playlist;
-		}
+		else g_active_playlist_new = plman.ActivePlaylist;
 
-		if(g_active_playlist!=g_active_playlist_new || force_changed) changed = true;
+		if(g_active_playlist!=g_active_playlist_new) changed = true;
 		else changed = false;
 
 		g_active_playlist = g_active_playlist_new;
@@ -1870,15 +1859,14 @@ oBrowser = function(name) {
 			if(changed) brw.populate(true,71, false);
 		}
 	};
-    this.init_groups = function(refresh) {
-		var refresh = typeof refresh !== 'undefined' ? refresh : false;		
+    this.init_groups = function() {
 		var handle = null;
 		var current = "";
 		var previous = "";
         var g = 0, t = 0, r = 0, j = 0;
         var arr = [];
         var tr = [];
-		var groups_saved = [];
+
         var total = this.list.Count;
         this.totaltracks = 0;
 		if(plman.PlaylistItemCount(g_active_playlist) > 0) {
@@ -1886,18 +1874,7 @@ oBrowser = function(name) {
 		} else {
 			this.focusedTrackId = -1;
 		};
-		
-		if(refresh){
-			var start = 0;
-			for(i=0;i<this.groups.length;i++){
-				start = this.groups[i].start;
-				groups_saved[start] = [];
-				groups_saved[start].cover_img = this.groups[i].cover_img;
-				groups_saved[start].cover_formated = this.groups[i].cover_formated;				
-				groups_saved[start].mask_applied = this.groups[i].mask_applied;					
-				groups_saved[start].load_requested = this.groups[i].load_requested;								
-			}
-		}
+
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
@@ -1916,7 +1893,7 @@ oBrowser = function(name) {
                 if(current != previous) {
                     if(g > 0) {
                         // finalize current group
-                        this.groups[g-1].finalize(t, tr, groups_saved);
+                        this.groups[g-1].finalize(t, tr);
 						p = this.groups[g-1].rowsToAdd;
 
 						if(!properties.autocollapse){
@@ -2005,7 +1982,7 @@ oBrowser = function(name) {
         this.rowsCount = r;
 
         // update last group properties
-        if(g > 0) this.groups[g-1].finalize(t, tr, groups_saved);
+        if(g > 0) this.groups[g-1].finalize(t, tr);
 		//Open group if there is only one group
 		if(brw.groups.length==1) this.groups[0].collapsed = false;
     };
@@ -2018,7 +1995,7 @@ oBrowser = function(name) {
         var end = this.groups.length;
         for(i = 0; i < end; i++) {
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks, []);
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
 
 			r_beggining = r;
 			if(properties.showGroupHeaders) {
@@ -2083,7 +2060,7 @@ oBrowser = function(name) {
 
         for(i = 0; i < end; i++) {
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks, []);
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
 
 			this.groups[i].rowId = r;
 			if(properties.showGroupHeaders) {
@@ -2156,7 +2133,7 @@ oBrowser = function(name) {
 		if(properties.showHeaderBar) g_filterbox.set_default_text();
         this.list = plman.GetPlaylistItems(g_active_playlist);
 		this.source_idx = g_active_playlist;
-        this.init_groups(!is_first_populate);
+        this.init_groups();
         if(properties.autocollapse) this.setList();
 
         if(!this.dont_scroll_to_focus) g_focus_row = brw.getOffsetFocusItem(g_focus_id);
@@ -2675,6 +2652,9 @@ oBrowser = function(name) {
                                     var track_artist_part = " "+add_infos;
                                 };
 
+                                // rating tag fixing & formatting
+                                // console.log(globalProperties.use_ratings_file_tags);
+
                                 if(this.rows[i].rating == -1) {
                                     if(isNaN(arr_t[2])) {
                                         var track_rating_part = 0;
@@ -2850,10 +2830,12 @@ oBrowser = function(name) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
 												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
 												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -2920,10 +2902,12 @@ oBrowser = function(name) {
 												this.groups[g].cover_img = globalProperties.nocover_img;
 												var image = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.nocover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											} else if(this.groups[g].cover_type == 3) {
 												this.groups[g].cover_img = globalProperties.stream_img;
 												var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 												g_image_cache.addToCache(image,this.groups[g].cachekey);
+												//g_image_cache.cachelist[this.groups[g].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 											};
 											if(this.groups[g].cover_img != null && typeof this.groups[g].cover_img != "string") {
 												if(!this.groups[g].cover_formated && !properties.showGroupHeaders){
@@ -3664,6 +3648,7 @@ oBrowser = function(name) {
 								g_tooltip.Deactivate();
 								on_drag_over(null, x, y, null);
 								var items = plman.GetPlaylistSelectedItems(g_active_playlist);
+								//console.log(this.activeRow+" / "+this.rows.length+" / "+(this.activeRow>-1));
 								if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
 									album_info=this.rows[this.activeRow].groupkeysplit;
 									if(items.Count>1) {
@@ -6206,7 +6191,7 @@ function on_playback_new_track(metadb) {
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			old_cachekey = nowplaying_cachekey;
 			nowplaying_cachekey = process_cachekey(metadb);
-			if(old_cachekey!=nowplaying_cachekey || !fb.IsMetadbInMediaLibrary(metadb)) {
+			if(old_cachekey!=nowplaying_cachekey) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}
 		};
@@ -6291,7 +6276,7 @@ function on_playlist_switch() {
 	if(!callback_avoid_populate){
 		if(!(properties.lockOnNowPlaying || properties.lockOnPlaylistNamed!="") && window.IsVisible) {
 			if(pman.drop_done) return;
-			changed = brw.setActivePlaylist(3, true);
+			changed = brw.setActivePlaylist(3);
 			g_focus_id = getFocusId(g_active_playlist);
 			g_filterbox.clearInputbox();
 			if(changed) {
@@ -6302,6 +6287,7 @@ function on_playlist_switch() {
 
 			// refresh playlists list
 			if(properties.DropInplaylist) pman.populate(exclude_active = false, reset_scroll = false);
+			if(properties.DropInplaylist) pman.populate(exclude_active = false);
 			timers.callback_avoid_populate = setTimeout(function() {
 				callback_avoid_populate=false;
 				clearTimeout(timers.callback_avoid_populate);
@@ -6893,6 +6879,9 @@ function on_notify_data(name, info) {
 			brw.collapseAll(info);
 			brw.showFocusedItem();
 			break;
+		case "cover_cache_finalized":
+			//g_image_cache.cachelist = cloneImgs(info);
+			//window.Repaint();
 		break;
 		case "WSH_panels_reload":
 			window.Reload();
