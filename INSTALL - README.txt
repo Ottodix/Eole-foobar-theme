@@ -22,7 +22,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 That's it! Enjoy your sound.
 
-WARNING : The visualization tab is powered by shpeck, which can be unstable. So if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: right click the visualisation tab at the top and select Settings. Check "hide visualization tab". And remove the speck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout).
+WARNING : The visualization tab is powered by shpeck, which can be unstable. So if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: right click the visualisation tab at the top and select Settings. Check "hide visualization tab". And remove the Shpeck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout).
 
 ## USEFUL TO KNOW
 
