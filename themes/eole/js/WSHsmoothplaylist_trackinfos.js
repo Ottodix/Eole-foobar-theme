@@ -3353,19 +3353,24 @@ oBrowser = function(name) {
         // get hover row index (mouse cursor hover)
         if(y > this.y && y < this.y + this.h) {
             this.activeRow = Math.ceil((y + scroll_ - this.y) / properties.rowHeight - 1);
+			this.activeRowTooltip = this.activeRow;
             if(this.activeRow >= this.rows.length) {
-				this.activeRow = this.rows.length-1;//-1;
+				this.activeRow = this.rows.length-1;
+				this.activeRowTooltip = -1;
 			}
 			try{
 				if (this.activeRow > -1 && this.rows[this.activeRow].type == 99 && this.activeRow < this.rows.length) {
 					this.activeRow = Math.ceil((y - this.groups[this.rows[this.activeRow+1].albumId].group_height_fix + scroll_ - this.y) / properties.rowHeight - 1);
+					this.activeRowTooltip = this.activeRow;
 				}
 			} catch(e){}
             if(this.activeRow >= this.rows.length) {
-				this.activeRow = this.rows.length-1;//this.activeRow = -1;
+				this.activeRow = this.rows.length-1;
+				this.activeRowTooltip = -1;
 			}
         } else {
             this.activeRow = -1;
+			this.activeRowTooltip = -1;
         };
 		//this.groups[this.rows[this.activeRow].albumId].group_height_fix
 
@@ -3721,27 +3726,27 @@ oBrowser = function(name) {
 				ToolTip_mouse_x = x;
 				ToolTip_mouse_y = y;
 
-				if(this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2 && (this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1 || this.rows[this.activeRow].type==0) && properties.showToolTip && !this.drag_moving) {
-					if (!timers.showToolTip && !this.ishover_rating && g_tooltip.activeZone!=this.activeRow) {
+				if(this.ishover && this.activeRowTooltip > -1 && Math.abs(scroll - scroll_) < 2 && (this.rows[this.activeRowTooltip].type==2 || this.rows[this.activeRowTooltip].type==1 || this.rows[this.activeRowTooltip].type==0) && properties.showToolTip && !this.drag_moving) {
+					if (!timers.showToolTip && !this.ishover_rating && g_tooltip.activeZone!=this.activeRowTooltip) {
 						if(g_tooltip.activeZone!='') g_tooltip.Deactivate();
-						if(this.rows[this.activeRow].tooltip && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)){
-							if(this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
-								album_info=this.rows[this.activeRow].groupkeysplit;
+						if(this.rows[this.activeRowTooltip].tooltip && !(this.scrollbar.cursorDrag || this.scrollbar.cursorHover)){
+							if(this.rows[this.activeRowTooltip].type==2 || this.rows[this.activeRowTooltip].type==1){
+								album_info=this.rows[this.activeRowTooltip].groupkeysplit;
 								new_tooltip_text=album_info[0]+"\n"+album_info[1];
-							} else if(this.rows[this.activeRow].type==0){
-								track_info=this.groups[this.rows[this.activeRow].albumId].tracks[this.rows[this.activeRow].albumTrackId];
-								var add_fields = this.getAdditionalFields(this.rows[this.activeRow].infos);
+							} else if(this.rows[this.activeRowTooltip].type==0){
+								track_info=this.groups[this.rows[this.activeRowTooltip].albumId].tracks[this.rows[this.activeRowTooltip].albumTrackId];
+								var add_fields = this.getAdditionalFields(this.rows[this.activeRowTooltip].infos);
 								if(properties.doubleRowText) new_tooltip_text=track_info[1]+"\n"+track_info[0]+add_fields;
 								else  new_tooltip_text=track_info[1]+" - "+track_info[0]+add_fields;
 							}
-							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeRow);
-						} else if((g_tooltip.activeZone!=this.activeRow) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
+							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.activeRowTooltip);
+						} else if((g_tooltip.activeZone!=this.activeRowTooltip) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 							g_tooltip.Deactivate();
 						}
-					} else if((g_tooltip.activeZone!=this.activeRow) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
+					} else if((g_tooltip.activeZone!=this.activeRowTooltip) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 						g_tooltip.Deactivate();
 					}
-				} else if((g_tooltip.activeZone!=this.activeRow && g_tooltip.activeZone!='' && !isNaN(g_tooltip.activeZone)) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
+				} else if((g_tooltip.activeZone!=this.activeRowTooltip && g_tooltip.activeZone!='' && !isNaN(g_tooltip.activeZone)) || this.ishover_rating || this.scrollbar.cursorDrag || this.scrollbar.cursorHover){
 						g_tooltip.Deactivate();
 				}
                 break;
