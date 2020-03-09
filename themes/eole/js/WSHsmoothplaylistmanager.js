@@ -903,7 +903,29 @@ oBrowser = function(name) {
         // scrollbar update
         this.scrollbar.updateScrollbar();
     };
-
+	this.sort = function(){
+        var total = this.rows.length;
+		function sortPlaylistAlphabetically(a,b) {
+			if(a.name < b.name) return -1;
+			if(a.name > b.name) return 1;
+			return 0;
+		}		
+		g_avoid_on_playlists_changed = true;
+		if(properties.showNewPlaylistButton) this.rows.shift();
+		this.rows.sort(sortPlaylistAlphabetically);
+		var order = [];
+		for(var i = this.rows.length-1; i > 0; i--) {
+			order[this.rows[i].idx] = i;
+			g_avoid_on_playlists_changed = true;
+			//console.log(this.rows[i].name+" - from:"+this.rows[i].idx+" to:"+i);
+			//plman.MovePlaylist(this.rows[i].idx, i);
+		}
+		order.forEach((v, i) => {
+			plman.MovePlaylist(v, i);
+			console.log(this.rows[i].name+" - from:"+v+" to:"+i);
+		});
+		this.populate(true,14);
+	}
     this.init_groups = function() {
         var rowId = 0;
         var name = "";
