@@ -882,6 +882,7 @@ oRow = function(metadb,itemIndex) {
 	this.hover_rating = -1;
 	this.tracknumber_w = 0;
 	this.title_length = 0;
+	this.artist_length = 0;
 	this.playcount_length = 0;
 	this.cursorHand = false;
 	this.isFirstRow = false;
@@ -940,8 +941,8 @@ oRow = function(metadb,itemIndex) {
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
 
-		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist")) this.title_text = this.title+" - "+this.artist;
-		else this.title_text = this.title;
+		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist")) this.artist_text = " - "+this.artist;
+		else this.artist_text = "";
 
         var duration = this.length;
         var isPlaying = false;
@@ -1029,24 +1030,31 @@ oRow = function(metadb,itemIndex) {
 
 		if(this.tracknumber=="NaN") this.tracknumber="?";
 
+
+		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
-		if(!isPlaying)  gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-
-        gr.GdiDrawText(this.title_text, g_font.normal, g_showlist.colorSchemeText, (this.x + this.tracknumber_w + 10), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10), this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title_text, g_font.normal);
-
+		
+		var tx = this.x + this.tracknumber_w + 10;
+		var tw = this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10)
+        gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, this.y, tw, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title, g_font.normal);
+		
+		if(this.artist_text!=""){
+			gr.GdiDrawText(this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, this.y, tw - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(this.artist_text, g_font.italic);
+		}
 		if(properties.showPlaycount || properties.showCodec || properties.showBitrate){
 			this.playcount_text = "  ("+this.playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
-			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10) - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, tx + this.title_length + this.artist_length, this.y, tw - this.title_length - this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		} else {
 			this.playcount_length = 0;
 			this.playcount_text = '';
 		}
 
-		if(properties.showToolTip && (this.title_length + this.playcount_length) > (this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10))) {
+		if(properties.showToolTip && (this.title_length + this.playcount_length) > tw) {
 			this.showToolTip = true;
-			this.ToolTipText = this.title_text + this.playcount_text;
+			this.ToolTipText = this.title + this.artist_text + this.playcount_text;
 		} else this.showToolTip = false;
 
         gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -1073,9 +1081,12 @@ oRow = function(metadb,itemIndex) {
 
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
-				gr.GdiDrawText(this.title_text, g_font.normal, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10), this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((this.x + this.tracknumber_w + 10 + this.title_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+this.playcount_length<this.w - length_w))){
-					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10 + this.title_length), this.y, current_size-this.tracknumber_w+2 - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				if(this.artist_text!=""){
+					gr.GdiDrawText(this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, this.y, title_w - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				}
+				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((tx + this.title_length+ this.artist_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+ this.artist_length+this.playcount_length<this.w - length_w))){
+					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, this.y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
         }
 		// rating Stars

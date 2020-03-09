@@ -3080,7 +3080,7 @@ oBrowser = function(name) {
                                         if(track_time_part == "ON AIR") {
                                             gr.GdiDrawText(g_radio_artist_final, g_font.normal, colors.fadedsmall_txt, tx+this.rows[i].artist_part_w+10, ay, tw-this.rows[i].artist_part_w-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         } else if(show_track_part2) {
-                                            gr.GdiDrawText(track_part2, g_font_light, colors.fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                            gr.GdiDrawText(track_part2, g_font_lightmin1, colors.fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
                                         gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
@@ -3121,7 +3121,7 @@ oBrowser = function(name) {
 														var margin_left = tx+13 - progress_x;
 
 														gr.GdiDrawText(track_part1, g_font.normal, colors.albumartprogressbar_txt, tx+13, ay, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-														gr.GdiDrawText(track_part2, g_font_light, colors.albumartprogressbar_txt, tx+this.rows[i].track_part1+8, ay, Math.min(progress_w-margin_left-this.rows[i].track_part1+5,tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+														gr.GdiDrawText(track_part2, g_font_lightmin1, colors.albumartprogressbar_txt, tx+this.rows[i].track_part1+8, ay, Math.min(progress_w-margin_left-this.rows[i].track_part1+5,tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 
 												};
 											} else {
@@ -3702,7 +3702,6 @@ oBrowser = function(name) {
 					if(this.rows[this.activeRow].hover_rating > 5) this.rows[this.activeRow].hover_rating = 5;
 					else if(this.rows[this.activeRow].hover_rating < 0) this.rows[this.activeRow].hover_rating = 0;
 					if(hover_rating_old != this.rows[this.activeRow].hover_rating) this.repaint();
-
                 } else if(!this.drag_tracks){
                     if(this.cursorHand) {
 						g_cursor.setCursor(IDC_ARROW,1);
@@ -6634,10 +6633,10 @@ function on_notify_data(name, info) {
 				return;
 			}
             let current_playing_loc = plman.GetPlayingItemLocation();
-            if (name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid)
+            if ((name!="FocusOnNowPlayingForce" && !current_playing_loc.IsValid) || (name!="FocusOnNowPlayingForce" && window.Name=="BottomPlaylist" && nowplayingplaylist_state.isActive()))
                 break;
 
-            if (current_playing_loc.PlaylistIndex > 0 && current_playing_loc.PlaylistIndex < plman.PlaylistCount)
+            if (current_playing_loc.PlaylistIndex > 0 && current_playing_loc.PlaylistIndex < plman.PlaylistCount && name=="FocusOnNowPlayingForce")
                 plman.ActivePlaylist = current_playing_loc.PlaylistIndex;
 
             brw.setDisplayedPlaylistProperties(false);

@@ -918,47 +918,27 @@ oBrowser = function(name) {
 			rowId++;
 		 }
 	
-		function sortPlaylistAlphaBetically(a,b) {
+		function sortPlaylistAlphabetically(a,b) {
 			if(a.name < b.name) return -1;
 			if(a.name > b.name) return 1;
 			return 0;
 		}
 		
-		if(properties.sortAlphabetically){
-			var rows2add = [];
-			for(var i = 0; i < total; i++) {
-				name = plman.GetPlaylistName(i);
-				if(ExcludePlaylist(name)){
-					var toAdd = false;
-				} else if(str_filter.length > 0) {
-					var toAdd = match(name, str_filter);
-				} else {
-					var toAdd = true;
-				};
-				if(toAdd) {
-					rows2add.push(new oPlaylist(i, rowId, name));
-					rowId++;
-				};
+		for(var i = 0; i < total; i++) {
+			name = plman.GetPlaylistName(i);
+			if(ExcludePlaylist(name)){
+				var toAdd = false;
+			} else if(str_filter.length > 0) {
+				var toAdd = match(name, str_filter);
+			} else {
+				var toAdd = true;
 			};
-			rows2add.sort(sortPlaylistAlphaBetically);
-			this.rows = this.rows.concat(rows2add);	
-		} else {
-			for(var i = 0; i < total; i++) {
-				name = plman.GetPlaylistName(i);
-				if(ExcludePlaylist(name)){
-					var toAdd = false;
-				} else if(str_filter.length > 0) {
-					var toAdd = match(name, str_filter);
-				} else {
-					var toAdd = true;
-				};
-				if(toAdd) {
-					this.rows.push(new oPlaylist(i, rowId, name));
-					rowId++;
-				};
+			if(toAdd) {
+				this.rows.push(new oPlaylist(i, rowId, name));
+				rowId++;
 			};
 		};
-		
+
         this.rowsCount = rowId;
         this.getlimits();
     };
@@ -1417,7 +1397,7 @@ oBrowser = function(name) {
                 if(this.inputboxID >= 0) {
                     this.inputbox.check("move", x, y);
                 } else {
-                    if(cPlaylistManager.drag_clicked && (Math.abs(cPlaylistManager.drag_x-x)>10 || Math.abs(cPlaylistManager.drag_y-y)>10) && !properties.sortAlphabetically) {
+                    if(cPlaylistManager.drag_clicked && (Math.abs(cPlaylistManager.drag_x-x)>10 || Math.abs(cPlaylistManager.drag_y-y)>10)) {
                         cPlaylistManager.drag_moved = true;
 						g_cursor.setCursor(IDC_HELP,'drag');
                     };
@@ -2015,10 +1995,11 @@ oBrowser = function(name) {
                 brw.repaint();
                 break;
             case (idx == 914):
-                properties.sortAlphabetically = !properties.sortAlphabetically;
+				brw.sort();
+                /*properties.sortAlphabetically = !properties.sortAlphabetically;
                 window.SetProperty("_PROPERTY: sort playlist alphabetically", properties.sortAlphabetically);
 				brw.populate(true, 3);
-                get_metrics();
+                get_metrics();*/
                 brw.repaint();
                 break;				
             case (idx == 991):
@@ -2910,7 +2891,7 @@ function on_playlists_changed() {
 
 		brw.repaint();
 		brw.delete_pending = false;
-	} else set_update_function('on_playlists_changed()');
+	} else if(!g_avoid_on_playlists_changed) set_update_function('on_playlists_changed()');
 };
 
 function on_playlist_switch() {

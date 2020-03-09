@@ -2840,9 +2840,8 @@ function get_font() {
 		g_font_lightmin1 = gdi.Font(g_fname_light, g_fsize-1, g_fstyle_light);
 	} else {
 		g_font_light = g_font.normal;
-		g_font_lightmin1 = g_font.min1;
-		g_fname_light = g_fname_light;
-        g_fstyle_light = 0;
+		//g_font_lightmin1 = g_font.min1;
+		g_font_lightmin1 = gdi.Font(g_fname, g_fsize-1, g_fstyle_light);		
     }
 };
 
