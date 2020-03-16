@@ -151,6 +151,7 @@ var properties = {
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
+    wallpapermode: 0,	
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
 	show_covers_progress: window.GetProperty("COVER Show loading progress", true),
 	showToolTip: window.GetProperty("MAINPANEL Show tooltips", true),
