@@ -151,7 +151,6 @@ var properties = {
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
-    wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
 	show_covers_progress: window.GetProperty("COVER Show loading progress", true),
 	showToolTip: window.GetProperty("MAINPANEL Show tooltips", true),
@@ -3586,20 +3585,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 200):
 			toggleWallpaper();
 			break;
-		case (idx == 210):
-			properties.wallpapermode = 99;
-			on_colours_changed();
-			window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-			if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-			brw.repaint();
-			break;
-		case (idx == 211):
-			properties.wallpapermode = 0;
-			on_colours_changed();
-			window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-			if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-			brw.repaint();
-			break;
 		case (idx == 220):
 			properties.wallpaperblurred = !properties.wallpaperblurred;
 			on_colours_changed();
@@ -5999,7 +5984,6 @@ function on_size(w, h) {
 		g_scrollbar.setSize(ww - cScrollBar.activeWidth, brw.y-brw.headerBarHeight, cScrollBar.activeWidth, wh - brw.y+brw.headerBarHeight, cScrollBar.normalWidth);
 		g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount, scroll);
 		scroll = g_scrollbar.check_scroll(scroll);
-		update_wallpaper = true;
 		set_update_function("on_size(window.Width, window.Height)");*/
 	}
 }
@@ -7043,7 +7027,7 @@ function on_playback_stop(reason) {
 		case 0: // user stop
 		case 1: // eof (e.g. end of playlist)
 			// update wallpaper
-			if(properties.showwallpaper && properties.wallpapermode == 0) {
+			if(properties.showwallpaper) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
 			};
 			brw.repaint();
@@ -7083,7 +7067,7 @@ function on_playback_new_track(metadb) {
 				}
 			}
 		}
-		if(properties.showwallpaper && properties.wallpapermode == 0) {
+		if(properties.showwallpaper) {
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 		}
 		timers.updateHeaderText = setTimeout(function(){
@@ -7095,7 +7079,7 @@ function on_playback_new_track(metadb) {
 		brw.repaint();
 	} else {
 		update_headerbar = true;
-		if(properties.wallpapermode == 0) update_wallpaper = true;
+		update_wallpaper = true;
 	}
 }
 

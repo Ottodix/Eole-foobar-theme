@@ -2770,7 +2770,7 @@ function get_font() {
         g_fname_italic = "Segoe UI Italic";
         g_fname_semibold = "Segoe UI Semibold";
         g_fsize = default_font.Size;
-        g_fstyle = default_font.Style;
+        g_fstyle = 0;
         g_fstyle_light = 2;
     } catch(e) {
         console.log("WSH Panel Error: Unable to use the default font. Using Arial font instead.");
