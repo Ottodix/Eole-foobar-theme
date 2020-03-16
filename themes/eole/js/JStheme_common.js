@@ -2773,7 +2773,7 @@ function get_font() {
         g_fstyle = 0;
         g_fstyle_light = 2;
     } catch(e) {
-        console.log("WSH Panel Error: Unable to use the default font. Using Arial font instead.");
+        console.log("SMP Panel Error: Unable to use the default font. Using Arial font instead. "+e);
         g_fname = "arial";
         g_fname_light = "arial";
         g_fsize = 12;
