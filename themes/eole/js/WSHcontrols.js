@@ -2772,8 +2772,10 @@ function draw_controls_menu(x,y){
 		_schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 		_schedulerMenu.AppendTo(_menu, MF_STRING, "Scheduler");
 		
-		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 2, "Properties");
+		if(fb.IsPlaying){
+			_menu.AppendMenuSeparator();
+			_menu.AppendMenuItem(MF_STRING, 2, "Properties");
+		}
 		
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();
