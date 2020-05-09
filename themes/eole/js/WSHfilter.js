@@ -84,7 +84,6 @@ var properties = {
     artist_customGroup_label: window.GetProperty("_DISPLAY: artist customGroup name", ""),
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
-    tf_path_artist: fb.TitleFormat(window.GetProperty("_PROPERTY: Artist Images Folder (for disk cache)", "X:\\XPS2720\\MP3\\artists\\$meta(artist,0).jpg")),
     tf_path_genre: fb.TitleFormat(images.path+"genres\\$meta(genre,0).jpg"),
     tf_crc_artist: fb.TitleFormat(globalProperties.crc_artist),
     tf_crc_genre: fb.TitleFormat("$crc32('genres'$meta(genre,0))"),

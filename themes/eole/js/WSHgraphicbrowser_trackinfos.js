@@ -131,7 +131,7 @@ var properties = {
     TFgrouping_populate: "%album artist% ^^ %album%",
     TFsorting: "",
     TFsorting_default: window.GetProperty("MAINPANEL Library Default Sort TitleFormat", ""),
-    TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'0') ^^ %title% ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ $if(%length%,%length_seconds%,'ON AIR')",
+    TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'?') ^^ %title% ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ $if(%length%,%length_seconds%,'ON AIR')",
     TFbitrate: "$if2(%bitrate% kbit,'')",
     TFcodec: "$if2(%codec%,'')",
     TFplaycount: "$if2(%play_counter%,$if2(%play_count%,0))",

@@ -2640,8 +2640,9 @@ oBrowser = function(name) {
                                 if(nbc == 1) nbc++;
 
                                 // fields
-                                var track_num = arr_t[0] == "?" ? this.rows[i].albumTrackId+1 : arr_t[0];
-                                var track_num_part = parseInt(track_num,10)+"    ";
+                                //var track_num = arr_t[0] == "?" ? this.rows[i].albumTrackId+1 : arr_t[0];
+								var track_num = arr_t[0] == "?" ? "" : arr_t[0];
+                                var track_num_part = arr_t[0] == "?" ? "?    " : parseInt(track_num,10)+"    ";
 								var add_infos = this.getAdditionalFields(arr_t);
 
                                 var track_title_part = arr_e[1];
