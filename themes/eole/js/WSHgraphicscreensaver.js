@@ -111,7 +111,7 @@ var properties = {
     TFgrouping_default: "%title% ^^ %album artist% ^^ %album%[' - Disc '%discnumber%]",
     TFsorting: window.GetProperty("MAINPANEL Library Sort TitleFormat", ""),
     TFsorting_default: window.GetProperty("MAINPANEL Library Default Sort TitleFormat", ""),
-    TFtitle: "%artist% ^^ [%discnumber%.] ^^ $if(%tracknumber%,%tracknumber%,'?') ^^ %title% ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ $if(%length%,%length_seconds%,'ON AIR') ^^ $if2(%play_counter%,$if2(%play_count%,0))",
+    TFtitle: "%artist% ^^ [%discnumber%.] ^^ %tracknumber% ^^ %title% ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ $if(%length%,%length_seconds%,'ON AIR') ^^ $if2(%play_counter%,$if2(%play_count%,0))",
     TFshowlist: "%album artist% ^^ %album% ^^ [' - Disc '%discnumber%] ^^ %date% ^^ %genre%",
 	TFshowlistReduced: "[%discnumber%]",
     TFgroupinfos: "%genre% ^^ %date%",
@@ -757,8 +757,11 @@ oRow = function(metadb,itemIndex) {
 			var total_size=this.w-3+select_start-track_gradient_size;
 			var elapsed_seconds = g_seconds;
 			var ratio = elapsed_seconds/this.length_seconds;
-			if(duration=="ON AIR") var current_size = track_gradient_size+total_size;
-			else var current_size = track_gradient_size+Math.round(total_size*ratio);
+			if(this.length=="ON AIR") {
+				var current_size = track_gradient_size+total_size;
+				duration = 'ON AIR';
+			} else var current_size = track_gradient_size+Math.round(total_size*ratio);
+			if(isNaN(current_size) || current_size<0) current_size = track_gradient_size+total_size;
 		}
 		if(!g_showlist.light_bg){
 			image0 = now_playing_progress0;
