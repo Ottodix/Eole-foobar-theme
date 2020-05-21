@@ -1497,13 +1497,15 @@ function library_manager() {
             ix = pop.get_ix(0, p.s_h + ui.row_h / 2, true, false);
             tr = 0;
             for (var i = ix; i < ix + l; i++) {
-                tr = pop.tree[i].tr;
-                scr.push({
-                    tr: tr,
-                    a: pop.tree[i].name,
-                    b: tr != 0 ? pop.tree[pop.tree[i].par].name : "",
-                    c: tr > 1 ? pop.tree[pop.tree[pop.tree[i].par].par].name : ""
-                })
+				try{
+					tr = pop.tree[i].tr;
+					scr.push({
+						tr: tr,
+						a: pop.tree[i].name,
+						b: tr != 0 ? pop.tree[pop.tree[i].par].name : "",
+						c: tr > 1 ? pop.tree[pop.tree[pop.tree[i].par].par].name : ""
+					})
+				} catch(e){}
             }
             //exp = JSON_parse(JSON_stringify(tr_sort(expanded_items)));
         }
