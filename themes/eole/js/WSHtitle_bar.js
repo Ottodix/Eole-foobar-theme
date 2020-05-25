@@ -199,8 +199,9 @@ function build_images(){
 
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
 
-	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_icon.png");
-
+	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_on.png");
+	images.visualization_img_off = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_off.png");
+	
 	images.fullscreen_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\fullscreen_icon.png");
 
 	images.search_toggle_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\search_icon.png");
@@ -481,8 +482,8 @@ function build_buttons(){
 			buttons.RightSidebar.H_img = images.visualization_img;
 			buttons.RightSidebar.N_img = images.visualization_img;
 		} else {
-			buttons.RightSidebar.H_img = images.visualization_img;
-			buttons.RightSidebar.N_img = images.visualization_img;
+			buttons.RightSidebar.H_img = images.visualization_img_off;
+			buttons.RightSidebar.N_img = images.visualization_img_off;
 		}
 		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 
