@@ -243,7 +243,6 @@ function reset_cover_timers() {
 
 function on_load_image_done(tid, image){
     var tot = brw.groups.length;
-
     for(var k = 0; k < tot; k++) {
         if(brw.groups[k].metadb) {
             if(brw.groups[k].tid == tid && brw.groups[k].load_requested == 1) {
@@ -1973,7 +1972,7 @@ oBrowser = function(name) {
             this.groups[g-1].finalize(t, tr, pl);
 			this.groups[g-1].date = arr[2];
 
-			if(properties.tagMode==1){
+			/*if(properties.tagMode==1){
 				if(default_grouping){
 					var artist_album = arr[0].split(" ^^ ");
 				} else {
@@ -1981,7 +1980,7 @@ oBrowser = function(name) {
 				}
 				this.groups[g-1].artist_name = artist_album[0];
 				this.groups[g-1].album = artist_album[1];
-			}
+			}*/
 
 			//this.groups[g-1].artist_name = arr[4];
             // add 1st group ("ALL" item)
