@@ -199,8 +199,10 @@ function build_images(){
 
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
 
-	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_on.png");
-	images.visualization_img_off = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_off.png");
+	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_icon.png");
+	
+	images.trackinfos_on = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_on.png");
+	images.trackinfos_off = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_off.png");	
 	
 	images.fullscreen_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\fullscreen_icon.png");
 
@@ -479,11 +481,11 @@ function build_buttons(){
 		buttons.Idle.D_img = buttons.Idle.H_img;
 
 		if(getTrackInfosState()==1) {
-			buttons.RightSidebar.H_img = images.visualization_img;
-			buttons.RightSidebar.N_img = images.visualization_img;
+			buttons.RightSidebar.H_img = images.trackinfos_on;
+			buttons.RightSidebar.N_img = images.trackinfos_on;
 		} else {
-			buttons.RightSidebar.H_img = images.visualization_img_off;
-			buttons.RightSidebar.N_img = images.visualization_img_off;
+			buttons.RightSidebar.H_img = images.trackinfos_off;
+			buttons.RightSidebar.N_img = images.trackinfos_off;
 		}
 		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 

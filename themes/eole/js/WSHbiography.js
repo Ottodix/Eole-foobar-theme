@@ -3482,7 +3482,7 @@ function on_key_down(vkey) {switch(vkey) {case VK_ESCAPE: if(g_uihacks.getFullsc
 function on_key_up(vkey) {if (vkey == 0x10 || vkey == 0x11 || vkey == 0x12) t.paint();}
 function on_library_items_added() {if (!ppt.panelActive) return; if (!lib) return; lib.update = true;}; function on_library_items_removed() {if (!ppt.panelActive) return; if (!lib) return; lib.update = true;}; function on_library_items_changed() {if (!ppt.panelActive) return; if (!lib) return; lib.update = true;}
 function on_load_image_done(id, image, image_path) {img.load_image_done(id, image, image_path);}
-function on_metadb_changed() {if (!ppt.panelActive) return; if (p.ir(ppt.focus) || t.block() && !p.server || !p.multi_new()) return; p.get_multi(true); if (!ppt.img_only) t.on_playback_new_track(); if (!ppt.text_only || ui.blur) img.on_playback_new_track(); p.metadb_serv();}
+//function on_metadb_changed() {if (!ppt.panelActive) return; if (p.ir(ppt.focus) || t.block() && !p.server || !p.multi_new()) return; p.get_multi(true); if (!ppt.img_only) t.on_playback_new_track(); if (!ppt.text_only || ui.blur) img.on_playback_new_track(); p.metadb_serv();}
 function on_mouse_lbtn_dblclk(x, y) {if (!ppt.panelActive) return; but.lbtn_dn(x, y); t.scrollbar_type().lbtn_dblclk(x, y); if (!p.dblClick) return; if (ppt.touchControl) p.last_pressed_coord = {x: x, y: y}; p.click(x, y);}
 function on_mouse_lbtn_down(x, y) {
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);		
