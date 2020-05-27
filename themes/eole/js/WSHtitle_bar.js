@@ -481,11 +481,11 @@ function build_buttons(){
 		buttons.Idle.D_img = buttons.Idle.H_img;
 
 		if(getTrackInfosState()==1) {
-			buttons.RightSidebar.H_img = images.trackinfos_on;
-			buttons.RightSidebar.N_img = images.trackinfos_on;
-		} else {
 			buttons.RightSidebar.H_img = images.trackinfos_off;
 			buttons.RightSidebar.N_img = images.trackinfos_off;
+		} else {
+			buttons.RightSidebar.H_img = images.trackinfos_on;
+			buttons.RightSidebar.N_img = images.trackinfos_on;
 		}
 		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 
