@@ -2542,6 +2542,10 @@ function populate() {
 				this.lclick_action(x, y);
 				this.lclick_action_done = true;
 			}
+		} else {
+			this.clear();
+			this.sel_items = [];
+			p.tree_paint();
 		}
 		g_tooltip.Deactivate();
     }
