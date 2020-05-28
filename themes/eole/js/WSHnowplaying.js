@@ -978,10 +978,13 @@ function on_notify_data(name, info) {
 			focus_on_now_playing = true;
 			if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 			focus_on_now_playing = false;
-			break;
+			break;		
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
-			g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
+			cover_img = new GdiBitmap(info.cover_img);
+			g_cover.setArtwork(cover_img, true, false, false, metadb[0]);
+			window.Repaint();
+			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex);
 			g_avoid_on_focus_change = true;
 			timers.on_focus_change = setTimeout(function() {

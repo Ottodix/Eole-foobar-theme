@@ -1771,6 +1771,7 @@ oShowList = function(parentPanelName) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
 				trackIndex:brw.groups[this.idx].trackIndex,
+				cover_img:brw.groups[this.idx].cover_img,
 				metadb:this.pl[0],
 				totalTracks:this.total_tracks,
 				genre:this.genre,
