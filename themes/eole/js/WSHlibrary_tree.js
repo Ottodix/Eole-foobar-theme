@@ -2621,7 +2621,7 @@ function populate() {
     this.move = function(x, y) {
 
 		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !(sbar.hover || sbar.b_is_dragging) && !p.s_search && m_i>=0) {
-			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6) {
+			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6 && pop.sel_items.length>0) {
 				ui.drag_moving = true;
 				g_cursor.setCursor(IDC_HELP,"pman");
 				pop.deactivate_tooltip();
@@ -2639,11 +2639,7 @@ function populate() {
 
 				if(pop.sel_group_count>1) var drag_text = pop.sel_group_count+" selected nodes";
 				else {
-					try{
-						var drag_text = pop.tree[last_sel].name;
-					} catch(e){
-						var drag_text = pop.sel_group_count+" selected nodes";
-					}
+					var drag_text = pop.tree[last_sel].name;
 				}
 
 				var options = {
