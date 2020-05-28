@@ -2638,7 +2638,13 @@ function populate() {
 				for (var i = 0; i < list.length; i++) items.Add(p.list[list[i]]);
 
 				if(pop.sel_group_count>1) var drag_text = pop.sel_group_count+" selected nodes";
-				else var drag_text = pop.tree[last_sel].name
+				else {
+					try{
+						var drag_text = pop.tree[last_sel].name;
+					} catch(e){
+						var drag_text = pop.sel_group_count+" selected nodes";
+					}
+				}
 
 				var options = {
 					show_text : false,
