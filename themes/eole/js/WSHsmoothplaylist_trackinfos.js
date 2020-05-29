@@ -3654,7 +3654,6 @@ oBrowser = function(name) {
 								g_tooltip.Deactivate();
 								on_drag_over(null, x, y, null);
 								var items = plman.GetPlaylistSelectedItems(g_active_playlist);
-								//console.log(this.activeRow+" / "+this.rows.length+" / "+(this.activeRow>-1));
 								if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
 									album_info=this.rows[this.activeRow].groupkeysplit;
 									if(items.Count>1) {
