@@ -3775,7 +3775,7 @@ oBrowser = function(name) {
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, cover_border_color);
 
 						//date drawing black
-						if(properties.showdateOverCover && this.groups_draw[i].position_from_playing<=0){
+						if(properties.showdateOverCover && this.groups_draw[i].position_from_playing>=0){
 							if(properties.circleMode) {
 								if(!this.dateCircleBG) this.DefineCircleMask(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
