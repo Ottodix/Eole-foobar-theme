@@ -1208,15 +1208,16 @@ oRow = function(metadb,itemIndex) {
 						fb.Play();
 					} else {
 						var PlaybackPlaylist = brw.getPlaybackPlaylist();
-
 						plman.ClearPlaylist(PlaybackPlaylist);
-						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.groups[g_showlist.idx].pl);
-						plman.PlayingPlaylist = plman.ActivePlaylist = PlaybackPlaylist;
+						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.GetFilteredTracks(g_showlist.idx));// brw.groups[g_showlist.idx].pl);
+						plman.PlayingPlaylist = PlaybackPlaylist;//plman.ActivePlaylist = PlaybackPlaylist;
 						plman.SetPlaylistFocusItemByHandle(PlaybackPlaylist, this.metadb);
 						if(fb.IsPaused) fb.Stop();
 						plman.FlushPlaybackQueue();
-						fb.RunContextCommandWithMetadb("Add to playback queue", this.metadb);
+						plman.AddPlaylistItemToPlaybackQueue(PlaybackPlaylist, this.itemIndex)
 						fb.Play();
+						//fb.RunContextCommandWithMetadb("Add to playback queue", this.metadb);
+						//fb.Play();
 
 						/*plman.ClearPlaylist(PlaybackPlaylist);
 						plman.InsertPlaylistItems(PlaybackPlaylist, 0, brw.groups[g_showlist.idx].pl);
