@@ -6,7 +6,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
 
 ## Participate to the theme
 
-If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request, I'll review it and merge it to the master code. I can also add your github account to the collaborators of this repository, just ask!
+If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request, I'll review it and merge it to the master code. I can also add your github account to the collaborators of this repository, just ask.
 
 ## Preview
 
