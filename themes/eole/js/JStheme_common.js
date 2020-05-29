@@ -2220,8 +2220,7 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 			break;
 		case '1_genre':
 		case 'same_genre':
-			//try{console.log("-"+random_function)
-				if(random_function=="same_genre"){console.log("-"+random_function)
+				if(random_function=="same_genre"){
 					console.log(current_genre)
 					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+current_genre);
 				} else
@@ -2231,7 +2230,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 				plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
 				plman.ExecutePlaylistDefaultAction(playlist_index,start_index);
 				genre_item_list = undefined;
-			//} catch(e) {}
 			break;
 		case '1_artist':
 			var library_items = fb.GetLibraryItems();
@@ -2908,7 +2906,6 @@ function delete_file_cache(metadb, albumIndex, crc, delete_at_startup){
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
     if(g_files.FileExists(filename)) {
 		try {
-			console.log("delete "+filename)
 			g_files.DeleteFile(filename);
 		} catch(e) {
 			already_asked_to_delete = false;
@@ -3124,12 +3121,10 @@ oImageCache = function () {
 			try {
 				if(properties.load_image_from_cache_direct) {
 					img = load_image_from_cache_direct(filename);
-					this.addToCache(img,cachekey); //g_image_cache.cachelist[cachekey] = img;
-					//console.log("ehh2 "+albumIndex+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey+" - "+filename+" img "+isImage(img))
+					this.addToCache(img,cachekey);
 					brw.groups[albumIndex].load_requested = 2;
 					brw.groups[albumIndex].cover_type = 1;
 					brw.groups[albumIndex].cover_img = img;
-					//console.log("load_cache_async "+albumIndex+" "+brw.groups[albumIndex].cover_img)
 					brw.groups[albumIndex].cover_img_mask = false;
 					brw.groups[albumIndex].cover_formated = false;
 					brw.repaint();
@@ -3155,12 +3150,11 @@ oImageCache = function () {
 					// load img from cache
 					if(!isScrolling){
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename);
-						this.addToCache(img,cachekey); //this.cachelist[cachekey] = img;
+						this.addToCache(img,cachekey);
 						brw.groups[albumIndex].cover_type = 1;
 						brw.groups[albumIndex].cover_img = img;
 						brw.groups[albumIndex].cover_img_mask = false;
 						brw.groups[albumIndex].cover_formated = false;
-						//console.log("ehh0 "+albumIndex+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey+" - "+brw.groups[albumIndex].cover_filename)
 						brw.groups[albumIndex].load_requested = 2;
 						brw.repaint();
 						this.cover_load_timer = Array();
@@ -3170,8 +3164,8 @@ oImageCache = function () {
 					} else {
 						img = load_image_from_cache_direct(brw.groups[albumIndex].cover_filename)
 						if(img) {
-							this.addToCache(img,cachekey); //this.cachelist[cachekey] = img
-						} else this.addToCache(globalProperties.nocover_img,cachekey); //this.cachelist[cachekey] = globalProperties.nocover_img;
+							this.addToCache(img,cachekey);
+						} else this.addToCache(globalProperties.nocover_img,cachekey);
 						brw.groups[albumIndex].load_requested = 2;
 					}
 			} else {
@@ -3190,7 +3184,6 @@ oImageCache = function () {
 						img = gdi.Image(filepath);
 						save_image_to_cache(img, 0, cachekey, metadb);
 					} else if(properties.AlbumArtFallback){
-						//console.log("fallback "+i+" "+brw.groups[albumIndex].groupkey+" - "+brw.groups[albumIndex].cachekey_album)
 						brw.groups[albumIndex].cover_img = g_image_cache.hit(metadb, albumIndex, false, brw.groups[albumIndex].cachekey_album);
 						if(brw.groups[albumIndex].cover_img=='loading') {
 							brw.groups[albumIndex].load_requested = 2;
@@ -3207,14 +3200,10 @@ oImageCache = function () {
 						try{
 							get_albumArt_async(metadb,-1, cachekey);
 						} catch(e){console.log("timers.coverLoad line 5151 failed")}
-					} else { //if(this.cover_load_timer.length<20){
-						//this.cover_load_timer[this.cover_load_timer.length] = setTimeout(function(){
-							try{
-								get_albumArt_async(metadb,albumIndex, cachekey);
-							} catch(e){console.log("timers.coverLoad line 5157 failed")}
-							//clearTimeout(g_image_cache.cover_load_timer[g_image_cache.cover_load_timer.length-1]);
-							//g_image_cache.cover_load_timer.pop();
-						//}, 5);
+					} else {
+						try{
+							get_albumArt_async(metadb,albumIndex, cachekey);
+						} catch(e){console.log("timers.coverLoad line 5157 failed")}
 					}
 				} else {
 					img = utils.GetAlbumArtV2(metadb, 0, false);
