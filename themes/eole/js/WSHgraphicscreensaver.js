@@ -1862,8 +1862,8 @@ oShowList = function(parentPanelName) {
 
 						}
 					}
-
-					var genreText = this.genre.replace(/\s+/g, " ");
+					if(typeof this.genre == 'undefined') var genreText = "";
+					else var genreText = this.genre.replace(/\s+/g, " ");
 					if(this.genreTextLenght==0) this.genreTextLenght = gr.CalcTextWidth(genreText,g_font.normal);
 					if(this.timeTextLenght==0) this.timeTextLenght = gr.CalcTextWidth(this.length+',  '+this.total_tracks,g_font.normal);
 

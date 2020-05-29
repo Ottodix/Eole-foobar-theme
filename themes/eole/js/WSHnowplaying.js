@@ -981,8 +981,9 @@ function on_notify_data(name, info) {
 			break;		
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
-			cover_img = new GdiBitmap(info.cover_img);
-			g_cover.setArtwork(cover_img, true, false, false, metadb[0]);
+			if(info.cover_img==null) {
+				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
+			} else g_cover.setArtwork(cover_img, true, false, false, metadb[0]);
 			window.Repaint();
 			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex);

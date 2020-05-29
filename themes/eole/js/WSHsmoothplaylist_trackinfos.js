@@ -3430,6 +3430,7 @@ oBrowser = function(name) {
 								window.NotifyOthers("trigger_on_focus_change_album",{
 									playlist:g_active_playlist,
 									trackIndex:playlistTrackId,
+									cover_img:null;
 									totalTracks:this.groups[groupId].count+(this.groups[groupId].count > 1 ? " tracks" : " track"),
 									genre:this.groups[groupId].genre,
 									metadb:this.groups[groupId].metadb,
