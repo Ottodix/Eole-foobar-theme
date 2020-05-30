@@ -211,7 +211,6 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		this.resetCursorTimer();
 	}
 	this.isActive = function (){
-		console.log(this.edit)
 		return this.edit;
 	}
     this.check = function (callback, x, y, force_activate) {

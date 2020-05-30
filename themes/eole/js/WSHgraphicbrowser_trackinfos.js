@@ -5190,6 +5190,7 @@ oBrowser = function(name) {
 						this.TooltipAlbum = -1;
 						g_tooltip.Deactivate();
 					}
+					console.log(this.activeTextIndex);
 					if(this.activeTextIndex>-1 && this.TooltipAlbum!=this.activeTextIndex && this.groups[this.groups_draw[this.activeTextIndex]].showToolTip && this.groups[this.groups_draw[this.activeTextIndex]].text_y < y){
 							this.TooltipAlbum=this.activeTextIndex;
 							new_tooltip_text=this.groups[this.groups_draw[this.activeTextIndex]].firstRow+'\n'+this.groups[this.groups_draw[this.activeTextIndex]].secondRow;
