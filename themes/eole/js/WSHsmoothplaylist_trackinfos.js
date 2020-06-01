@@ -194,7 +194,7 @@ var TF = {
 	radio_artist:fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))"),
 	artist:fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
 }
-
+var recalculate_time = false;
 var gradient_w = 31;
 var gradient_m = 15;
 var draw_right_line = false;
@@ -3905,6 +3905,17 @@ oBrowser = function(name) {
             brw.activeRow = -1;
         };
 
+		if(window.IsVisible && recalculate_time){
+			if(g_total_seconds>0){
+				g_time_remaining = g_total_seconds - g_elapsed_seconds;
+				g_time_remaining = "-"+g_time_remaining.toHHMMSS();
+			} else {
+				g_time_remaining = properties.tf_time_remaining.Eval(true);
+			}
+			recalculate_time = false;
+			repaint_1 = true;
+		}  
+	
         if(repaint_main1 == repaint_main2){
             repaint_main2 = !repaint_main1;
             repaint_1 = true;
@@ -6222,8 +6233,8 @@ function on_playback_new_track(metadb) {
 };
 
 function on_playback_time(time) {
-	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){
-		g_elapsed_seconds = time;
+	g_elapsed_seconds = time;
+	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){	
 		if(g_total_seconds>0 && g_total_seconds!="ON AIR"){
 			g_time_remaining = g_total_seconds - time;
 			g_time_remaining = "-"+g_time_remaining.toHHMMSS();
@@ -6241,11 +6252,12 @@ function on_playback_time(time) {
 				brw.repaint();
 			};
 		};
-	}
+	} else if(plman.PlayingPlaylist==g_active_playlist) recalculate_time = true;
 };
+
 function on_playback_seek(time) {
+	g_elapsed_seconds = time;
 	if(window.IsVisible){
-		g_elapsed_seconds = time;
 		if(g_total_seconds>0){
 			g_time_remaining = g_total_seconds - time;
 			g_time_remaining = "-"+g_time_remaining.toHHMMSS();
@@ -6253,8 +6265,8 @@ function on_playback_seek(time) {
 			g_time_remaining = properties.tf_time_remaining.Eval(true);
 		}
 		brw.repaint();
-	}
-}
+	} else recalculate_time = true;
+};
 //=================================================// Playlist Callbacks
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed){
