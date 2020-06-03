@@ -2703,6 +2703,15 @@ oBrowser = function(name) {
                                         if(!g_total_seconds) {
                                             g_total_seconds = properties.tf_total_seconds.Eval(true);
                                         };
+										if(recalculate_time){
+											if(g_total_seconds>0){
+												g_time_remaining = g_total_seconds - g_elapsed_seconds;
+												g_time_remaining = "-"+g_time_remaining.toHHMMSS();
+											} else {
+												g_time_remaining = properties.tf_time_remaining.Eval(true);
+											}
+											recalculate_time = false;
+										}  										
                                         track_time_part = g_time_remaining;
 
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
@@ -3011,6 +3020,15 @@ oBrowser = function(name) {
                                         if(!g_total_seconds) {
                                             g_total_seconds = properties.tf_total_seconds.Eval(true);
                                         };
+										if(recalculate_time){
+											if(g_total_seconds>0){
+												g_time_remaining = g_total_seconds - g_elapsed_seconds;
+												g_time_remaining = "-"+g_time_remaining.toHHMMSS();
+											} else {
+												g_time_remaining = properties.tf_time_remaining.Eval(true);
+											}
+											recalculate_time = false;
+										}  										
                                         track_time_part = g_time_remaining;
 
 
@@ -3904,17 +3922,6 @@ oBrowser = function(name) {
         } else {
             brw.activeRow = -1;
         };
-
-		if(window.IsVisible && recalculate_time){
-			if(g_total_seconds>0){
-				g_time_remaining = g_total_seconds - g_elapsed_seconds;
-				g_time_remaining = "-"+g_time_remaining.toHHMMSS();
-			} else {
-				g_time_remaining = properties.tf_time_remaining.Eval(true);
-			}
-			recalculate_time = false;
-			repaint_1 = true;
-		}  
 	
         if(repaint_main1 == repaint_main2){
             repaint_main2 = !repaint_main1;
@@ -6234,6 +6241,7 @@ function on_playback_new_track(metadb) {
 
 function on_playback_time(time) {
 	g_elapsed_seconds = time;
+	console.log("g_total_seconds:"+g_total_seconds+" g_elapsed_seconds:"+g_elapsed_seconds)
 	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){	
 		if(g_total_seconds>0 && g_total_seconds!="ON AIR"){
 			g_time_remaining = g_total_seconds - time;
