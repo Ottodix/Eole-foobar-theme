@@ -6232,7 +6232,7 @@ function on_playback_new_track(metadb) {
 		brw.repaint();
 	} else {
 		set_update_function("on_playback_new_track(fb.GetNowPlaying())");
-		//g_total_seconds = null;
+		g_total_seconds = null;
 		g_time_remaining = null;
 		g_elapsed_seconds = 0;
 		if(properties.wallpapermode == 0) update_wallpaper = true;
@@ -6241,6 +6241,7 @@ function on_playback_new_track(metadb) {
 
 function on_playback_time(time) {
 	g_elapsed_seconds = time;
+	console.log("g_total_seconds:"+g_total_seconds+" g_elapsed_seconds:"+g_elapsed_seconds)	
 	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){	
 		if(g_total_seconds>0 && g_total_seconds!="ON AIR"){
 			g_time_remaining = g_total_seconds - time;
