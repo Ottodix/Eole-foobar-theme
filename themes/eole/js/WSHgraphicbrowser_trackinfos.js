@@ -186,7 +186,6 @@ function setShowInLibrary(){
 }
 setShowInLibrary();
 
-
 if(libraryfilter_state.isActive()){
 	properties.showFilterBox = properties.showFilterBox_filter_active;
 } else {
@@ -1063,11 +1062,11 @@ oRow = function(metadb,itemIndex) {
 				var playingText = gdi.CreateImage(this.w+10, this.h);
 				pt = playingText.GetGraphics();
 					pt.SetTextRenderingHint(5);
-					if(typeof(g_showlist.g_wallpaperImg) == "undefined" || !g_showlist.g_wallpaperImg) {
-						g_showlist.g_wallpaperImg = setWallpaperImgV2(g_showlist.showlist_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
-						//g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+					if(typeof(g_showlist.backgroungImg) == "undefined" || !g_showlist.backgroungImg) {
+						g_showlist.backgroungImg = setWallpaperImgV2(g_showlist.showlist_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+						//g_showlist.backgroungImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 					};
-					pt.DrawImage(g_showlist.g_wallpaperImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.g_wallpaperImg.Width, this.h);
+					pt.DrawImage(g_showlist.backgroungImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.backgroungImg.Width, this.h);
 					pt.FillSolidRect(10, 0, this.w, this.h, (g_showlist.colorSchemeAlbumArtProgressbar)?g_showlist.colorSchemeAlbumArtProgressbar:g_showlist.progressbar_color_bg_on); //solid bg
 					if(elapsed_seconds%2==0)
 						pt.DrawImage(now_playing_progress0, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
@@ -1848,7 +1847,7 @@ oShowList = function(parentPanelName) {
 		}
 		if(!((properties.showListColoredOneColor || properties.showListColoredMixedColor || properties.showListColoredBlurred) && properties.showListColored)){
 			this.colorSchemeBack = colors.showlist_bg;
-			this.color_showlist_arrow = colors.showlist_arrow;
+			this.color_showlist_arrow = colors.showlist_bg;
 		}
         this.setShowListArrow();
         this.setColumnsButtons();
@@ -2247,7 +2246,7 @@ oShowList = function(parentPanelName) {
 						gr.FillSolidRect(this.x, this.y + this.marginTop, this.w + g_scrollbar.w, slh+1, this.colorSchemeBack);
 					}
 				}
-				else if(properties.showListColoredMixedColor) {
+				else if(properties.showListColoredMixedColor && properties.showListColored) {
 					try {
 						if((this.h-this.delta_)<40) {
 							gr.DrawImage(this.g_wallpaperImg, this.x, this.y + this.marginTop, this.w + g_scrollbar.w, slh+1, 0, 0, this.g_wallpaperImg.Width, this.g_wallpaperImg.Height);
@@ -3310,7 +3309,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);
 			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
 			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
-			g_showlist.g_wallpaperImg = null;
+			g_showlist.backgroungImg = null;
 			g_showlist.reset();
 			brw.repaint();
 			break;
@@ -3324,7 +3323,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);
 			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
 			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
-			g_showlist.g_wallpaperImg = null;
+			g_showlist.backgroungImg = null;
 			g_showlist.reset();
 			brw.repaint();
 			break;
@@ -3414,7 +3413,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("TRACKLIST Draw a progress bar under song title", properties.drawProgressBar);
 			window.SetProperty("TRACKLIST Blurred album art progress bar", properties.AlbumArtProgressbar);
 			get_colors();
-			g_showlist.g_wallpaperImg = null;
+			g_showlist.backgroungImg = null;
 			g_showlist.reset();
 			brw.repaint();
 			break;
@@ -3424,7 +3423,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("TRACKLIST Draw a progress bar under song title", properties.drawProgressBar);
 			window.SetProperty("TRACKLIST Blurred album art progress bar", properties.AlbumArtProgressbar);
 			get_colors();
-			g_showlist.g_wallpaperImg = null;
+			g_showlist.backgroungImg = null;
 			g_showlist.reset();
 			brw.repaint();
 			break;
@@ -5931,6 +5930,7 @@ function toggleWallpaper(wallpaper_state){
 	if(properties.showwallpaper || properties.darklayout) {
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.IsPlaying ? fb.GetNowPlaying() : null);
 	}
+	
 	brw.repaint();
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
@@ -5940,7 +5940,6 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 	if(fb.IsPlaying) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	brw.repaint();
 }
-
 
 // ============================================= JScript Callbacks ===========================================================
 function on_size(w, h) {
@@ -5995,6 +5994,7 @@ function on_paint(gr) {
 	}
     if(properties.showwallpaper && (typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper)) {
         g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;
     };
 	if(update_headerbar) g_headerbar.setDisplayedInfo();
 	// draw background under playlist

@@ -4839,6 +4839,7 @@ function on_paint(gr) {
 	}
     if(properties.showwallpaper && (typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper)) {
         g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
     };
 	// draw background under playlist
 	if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {

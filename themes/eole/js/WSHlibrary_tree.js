@@ -3355,6 +3355,7 @@ function on_paint(gr) {
 
 	if((update_wallpaper || !g_wallpaperImg) && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
 	if(g_wallpaperImg && properties.showwallpaper) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ui.w, ui.h, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);

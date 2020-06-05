@@ -3399,7 +3399,6 @@ function setWallpaperImg(defaultpath, metadb, progressbar_art, width, height, bl
 		var display = 2;
 	}
     var img = FormatWallpaper(tmp_img, width, height, 2, display, 0, "", rawBitmap, progressbar_art, blur_value, quality);
-	update_wallpaper = false;
     return img;
 };
 function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle, txt, rawBitmap, force_blur, blur_value,quality) {

@@ -2169,6 +2169,7 @@ function on_paint(gr) {
 
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
 
     if(!g_1x1) {
