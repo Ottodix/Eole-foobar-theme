@@ -4049,6 +4049,7 @@ oBrowser = function(name) {
 	this.dontRetractOnMouseUp = false;
 	this.avoidDlbePlay = false;
 	this.searched_track_rawpath = "";
+	this.repaint_rect = false;
 	if(properties.showheaderbar)
 		this.headerBarHeight = (properties.CoverGridNoText?39:43);
 	else
@@ -4062,6 +4063,14 @@ oBrowser = function(name) {
     this.repaint = function() {
         repaint_main1 = repaint_main2;
     }
+    this.RepaintRect = function(x,y,w,h) {
+		if(this.repaint_rect) this.repaint();
+		this.repaint_x = x;
+		this.repaint_y = y;		
+		this.repaint_w = w;
+		this.repaint_h = h;
+		this.repaint_rect = true;
+    }	
 	this.FormatTime = function(time){
 		time_txt="";
 		timetodraw=time;
@@ -5420,7 +5429,6 @@ oBrowser = function(name) {
         }
 
 		if(brw.activeIndex != brw.activeIndexSaved) {
-			repaint_rect = true;
 			repaintIndexSaved = (brw.activeIndexSaved>=0)?brw.activeIndexSaved:brw.activeIndex;
 			repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
 			
@@ -5444,10 +5452,9 @@ oBrowser = function(name) {
 					repaint_y_end = active_y_saved + brw.coverRealWith;				
 				}
 			}
-			//if(brw.activeIndexSaved>0) window.RepaintRect(brw.groups[brw.groups_draw[brw.activeIndexSaved]].x, brw.groups[brw.groups_draw[brw.activeIndexSaved]].y, brw.coverRealWith, brw.coverRealWith);			
-			//if(brw.activeIndex>0) window.RepaintRect(brw.groups[brw.groups_draw[brw.activeIndex]].x, brw.groups[brw.groups_draw[brw.activeIndex]].y, brw.coverRealWith, brw.coverRealWith);			
+			brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);			
 			brw.activeIndexSaved = brw.activeIndex;
-		} else repaint_rect = false;
+		}
 
 		if(properties.showheaderbar && brw.finishLoading && properties.show_covers_progress && covers_loading_progress!=prev_covers_loading_progress) {
 			repaint_1 = true;
@@ -5457,9 +5464,11 @@ oBrowser = function(name) {
         if(repaint_1 && brw.finishLoading){
             repaintforced = true;
             repaint_main = true;
+			brw.repaint_rect = false;
             window.Repaint();
-        } else if(repaint_rect && brw.finishLoading){
-			window.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+        } else if(brw.repaint_rect && brw.finishLoading){
+			window.RepaintRect(brw.repaint_x, brw.repaint_y, brw.repaint_w, brw.repaint_h);
+			brw.repaint_rect = false;
 		}
     }
 
@@ -7110,7 +7119,7 @@ function on_playback_time(time) {
 	if(window.IsVisible) {
 		if(g_showlist.idx > -1 && g_showlist.playing_row_w>0) {
 			if(g_showlist.y > 0 - g_showlist.h && g_showlist.y < wh && g_showlist.playing_row_y>0) {
-				window.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
+				brw.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
 			}
 		}
 	}
@@ -7120,7 +7129,7 @@ function on_playback_seek(time) {
 	if(window.IsVisible) {
 		if(g_showlist.idx > -1 && g_showlist.playing_row_w>0) {
 			if(g_showlist.y > 0 - g_showlist.h && g_showlist.y < wh) {
-				window.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
+				brw.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
 			}
 		}
 	}
