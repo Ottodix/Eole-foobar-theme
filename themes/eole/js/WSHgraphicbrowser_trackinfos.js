@@ -7110,7 +7110,7 @@ function on_playback_time(time) {
 	if(window.IsVisible) {
 		if(g_showlist.idx > -1 && g_showlist.playing_row_w>0) {
 			if(g_showlist.y > 0 - g_showlist.h && g_showlist.y < wh && g_showlist.playing_row_y>0) {
-				//window.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
+				window.RepaintRect(g_showlist.playing_row_x, g_showlist.playing_row_y, g_showlist.playing_row_w+4, g_showlist.playing_row_h+4);
 			}
 		}
 	}
