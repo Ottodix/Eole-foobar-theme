@@ -5333,7 +5333,8 @@ oBrowser = function(name) {
 
         var repaint_1 = false;
         var repaint_2 = false;
-
+		var repaint_x = repaint_y = repaint_x_end = repaint_y_end = 0;
+		
         if(cNowPlaying.flashEnable) {
             cNowPlaying.flashescounter++;
             if(cNowPlaying.flashescounter%5 == 0 && cNowPlaying.flashescounter <= cNowPlaying.flashescountermax && cNowPlaying.flashescounter>0) {
