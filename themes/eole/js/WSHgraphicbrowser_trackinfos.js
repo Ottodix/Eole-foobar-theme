@@ -3910,13 +3910,13 @@ oScrollbar = function(parentObjectName) {
 						scroll = scroll - scroll%brw.rowHeight;
 					else scroll = scroll + (brw.rowHeight-scroll%brw.rowHeight);
 				}
+				this.repaint();
             }
             this.cursorClickX = 0;
             this.cursorClickY = 0;
 			this.cursorPrevY = 0;
 			this.cursorDragDelta = 0;
             this.cursorDrag = false;
-			this.repaint();
             break;
         case "move":
 
@@ -6246,7 +6246,6 @@ function on_mouse_lbtn_up_delayed(x, y){
 	brw.stopDragging(x, y);
 	// scrollbar scrolls up and down RESET
 	brw.buttonclicked = false;
-	brw.repaint();
 }
 
 function on_mouse_lbtn_up(x, y, m) {
@@ -6337,11 +6336,14 @@ function on_mouse_lbtn_up(x, y, m) {
 		if(properties.showscrollbar && g_scrollbar && g_scrollbar.isVisible) {
 			g_scrollbar.check("up", x, y);
 		}
-		// inputBox
-		if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
-			g_filterbox.on_mouse("lbtn_up", x, y);
+
+		if(properties.showheaderbar && y>0 && y<brw.headerBarHeight) {
+			g_headerbar.on_mouse("lbtn_up", x, y);
+			// inputBox
+			if(brw.showFilterBox && g_filterbox.inputbox.visible) {
+				g_filterbox.on_mouse("lbtn_up", x, y);
+			}			
 		}
-		if(properties.showheaderbar && y>0 && y<brw.headerBarHeight) g_headerbar.on_mouse("lbtn_up", x, y);
 	};
 }
 
@@ -6522,13 +6524,13 @@ function on_mouse_rbtn_down(x, y){
 			drawSeparator = true;
 		}
 
-		if(y>0 && y<brw.headerBarHeight) {
+		if(y>0 && y<brw.headerBarHeight && properties.showheaderbar) {
 			 g_headerbar.on_mouse("rbtn_up",x,y); return true;
+			// inputBox
+			if(brw.showFilterBox && g_filterbox.inputbox.visible) {
+				g_filterbox.on_mouse("rbtn_down", x, y);
+			}			 
 		}
-        // inputBox
-        if(brw.showFilterBox && properties.showheaderbar  && g_filterbox.inputbox.visible) {
-            g_filterbox.on_mouse("rbtn_down", x, y);
-        }
 
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();
