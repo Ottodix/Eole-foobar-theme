@@ -1051,7 +1051,7 @@ oRow = function(metadb,itemIndex) {
 			this.playcount_text = '';
 		}
 
-		if(properties.showToolTip && (this.title_length + this.playcount_length) > tw) {
+		if(properties.showToolTip && (this.title_length + this.artist_length + this.playcount_length) > tw) {
 			this.showToolTip = true;
 			this.ToolTipText = this.title + this.artist_text + this.playcount_text;
 		} else this.showToolTip = false;

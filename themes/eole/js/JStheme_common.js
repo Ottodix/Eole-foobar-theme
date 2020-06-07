@@ -3255,7 +3255,7 @@ oImageCache = function () {
         var img = null;
         var cover_type = null;
 
-        if(!image) {
+        if(!isImage(image)) {
             if(brw.groups[albumId].tracktype != 3) {
                 cover_type = 0;
             } else {
