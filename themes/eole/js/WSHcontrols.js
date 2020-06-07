@@ -2121,7 +2121,7 @@ function randomPlayMenu(x, y){
 		_menu.AppendMenuSeparator();
         _menu.AppendMenuItem(MF_STRING, 3, "Tracks");
 			if(properties.random_function=='200_tracks') checked_item_menu=3;
-        _menu.AppendMenuItem(MF_STRING, 2, "Albums");
+        _menu.AppendMenuItem(MF_STRING, 2, "Album");
 			if(properties.random_function=='20_albums') checked_item_menu=2;
         _menu.AppendMenuItem(MF_STRING, 5, "Artist");
 			if(properties.random_function=='1_artist') checked_item_menu=5;

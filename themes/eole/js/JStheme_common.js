@@ -2195,7 +2195,7 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 	if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
 
 	switch(random_function) {
-		case '20_albums':
+		case '20_albums_old':
 			var library_items = fb.GetLibraryItems();
 			var library_items_number=library_items.Count;
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
@@ -2218,6 +2218,24 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 			albums_list = undefined;
 			library_items = undefined;
 			break;
+		case '20_albums':
+			var library_items = fb.GetLibraryItems();
+			var library_items_number=library_items.Count;
+			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
+			var albums_list=new FbMetadbHandleList();
+
+			try {
+				var random_item = library_items[Math.floor(Math.random()*library_items_number)];
+				var arr = fb.TitleFormat("%album artist% ## %album%").EvalWithMetadb(random_item).split(" ## ");
+				album_items = fb.GetQueryItems(library_items, "%album artist% IS "+arr[0]+" AND %album% IS "+arr[1]);
+				album_items.OrderByFormat(tfo, 1);
+			} catch(e) {}
+			
+			plman.InsertPlaylistItems(playlist_index, start_index, album_items);
+			plman.ExecutePlaylistDefaultAction(playlist_index,start_index);
+			album_items = undefined;
+			library_items = undefined;
+			break;		
 		case '1_genre':
 		case 'same_genre':
 				if(random_function=="same_genre"){
