@@ -5451,8 +5451,8 @@ oBrowser = function(name) {
 					repaint_y = active_y;
 					repaint_y_end = active_y_saved + brw.coverRealWith;				
 				}
-			}
-			brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);			
+				brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+			} else repaint_1 = true;						
 			brw.activeIndexSaved = brw.activeIndex;
 		}
 
