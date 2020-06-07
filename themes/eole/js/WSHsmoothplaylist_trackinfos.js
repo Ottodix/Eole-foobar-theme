@@ -3543,15 +3543,15 @@ oBrowser = function(name) {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+										this.repaint();
                                     };
                                 };
                             };
                             break;
                         case (rowType == 99):                   // ----------------> extra empty row
-
                             break;
                     };
-                    this.repaint();
+                    
                 };
 				if(this.track_rating && this.ishover_rating){
 					var l_rating = Math.ceil((x - rating_x) / (this.rows[this.activeRow].rating_length / 5) + 0.1);
