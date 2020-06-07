@@ -1230,7 +1230,8 @@ function on_playback_time(time) {
 	evalTimeDisplayed(time,false);
     if (!progress_vars.drag) {
         if (g_length_progress > 0) g_pos_progress = Math.round(ww_progress * time / g_length_progress);
-        window.Repaint();
+        if(layout_state.isEqual(0)) window.RepaintRect(progress_margin_left, 0 , ww_progress, wh);
+		else window.Repaint();
     }
 }
 function on_playback_pause(){
