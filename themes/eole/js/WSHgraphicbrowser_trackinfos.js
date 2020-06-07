@@ -4064,7 +4064,11 @@ oBrowser = function(name) {
         repaint_main1 = repaint_main2;
     }
     this.RepaintRect = function(x,y,w,h) {
-		if(this.repaint_rect) this.repaint();
+		if(this.repaint_rect) {
+			this.repaint();
+			this.repaint_rect = false;
+			return;
+		}
 		this.repaint_x = x;
 		this.repaint_y = y;		
 		this.repaint_w = w;
@@ -4815,28 +4819,13 @@ oBrowser = function(name) {
 					// cover
 					if(this.groups[this.groups_draw[i]].cover_img_thumb!=null && typeof this.groups[this.groups_draw[i]].cover_img_thumb != "string") {
 
-						//Show now playing animation
-						/*if(this.groups[this.groups_draw[i]].isPlaying){
-							var animation_x = ax+1-(this.ellipse_size-this.coverRealWith)/2;
-							var animation_y = coverTop+1-(this.ellipse_size-this.coverRealWith)/2;
-						}
-						if(cNowPlaying.flashEnable && this.groups[this.groups_draw[i]].isPlaying) {
-							if(this.ellipse_size==0){
-								this.ellipse_size = this.coverRealWith;
-							} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
-							gr.FillEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
-							//gr.DrawEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, 1.0, colors.nowplaying_animation_line);
-						}	*/
-
 						//Shadow
 						if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
-
 							if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow,10, (properties.circleMode && !properties.CoverGridNoText));
 							if(!this.cover_shadow_hover || this.cover_shadow_hover==null) this.cover_shadow_hover = createCoverShadowStack(this.coverRealWith, this.coverRealWith, colors.cover_shadow_hover,10, (properties.circleMode && !properties.CoverGridNoText));
 							if(i == this.activeIndex && this.activeRow>-1) var drawn_cover_shadow = this.cover_shadow_hover;
 							else var drawn_cover_shadow = this.cover_shadow;
 							gr.DrawImage(drawn_cover_shadow, ax-8, coverTop-8, this.coverRealWith+20, this.coverRealWith+20, 0, 0, drawn_cover_shadow.Width, drawn_cover_shadow.Height);
-
 						}
 
 						if(!this.groups[this.groups_draw[i]].mask_applied && (properties.circleMode && !properties.CoverGridNoText)){
@@ -4855,16 +4844,17 @@ oBrowser = function(name) {
 							gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 1, 1, image_to_draw.Width-2, image_to_draw.Height-2);
 						else
 							gr.DrawImage(image_to_draw, ax, coverTop, this.coverRealWith, this.coverRealWith, 0, 0, image_to_draw.Width, image_to_draw.Height);
+						
 						if(properties.CoverGridNoText){
 							this.groups[this.groups_draw[i]].text_y = coverTop;
 							this.groups[this.groups_draw[i]].showToolTip = true;
-						}
-						if(!properties.CoverGridNoText){
+						} else {
 							if(!(properties.circleMode && !properties.CoverGridNoText))
 								gr.DrawRect(ax, coverTop, this.coverRealWith-1, this.coverRealWith-1, 1.0, colors.cover_rectline);
 							else
 								gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, colors.cover_rectline);
 						}
+						
 						//date drawing black
 						var overlayTxt = "";
 						if(properties.showDiscNbOverCover && this.groups[this.groups_draw[i]].discnb!="?") {
@@ -4950,18 +4940,6 @@ oBrowser = function(name) {
 							var space_between_lines = 2;
 							this.groups[this.groups_draw[i]].showToolTip = ( (this.groups[this.groups_draw[i]].firstRowLength > this.coverRealWith) || (this.groups[this.groups_draw[i]].secondRowLength > this.coverRealWith) )
 
-							/*if(this.groups[this.groups_draw[i]].text_y+this.firstRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								firstRow_color = colors.normal_txt;
-							else
-								firstRow_color = colors.superfaded_txt;
-							gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, firstRow_color, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-
-							if(this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								secondRow_color = colors.faded_txt;
-							else
-								secondRow_color = colors.superfaded_txt;
-							gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, secondRow_color, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 25, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);*/
-
 							if(this.groups[this.groups_draw[i]].text_y+this.firstRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
 								gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
@@ -4981,16 +4959,6 @@ oBrowser = function(name) {
 
             }
 
-			//Show now playing animation
-			/*if(cNowPlaying.flashEnable && this.isPlayingIdx>-1) {
-				if(this.ellipse_size==0){
-					this.ellipse_size = this.coverRealWith;
-				} else this.ellipse_size+=5*(cNowPlaying.flashCover?-1:1);
-
-				gr.FillEllipse(animation_x, animation_y, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
-				//gr.DrawEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, 1.0, colors.nowplaying_animation_line);
-			}	*/
-
             // draw tracks of expanded album
             g_showlist.draw(gr);
 
@@ -5003,15 +4971,10 @@ oBrowser = function(name) {
 				}
 			}
 
-
-
             // panel playlist
             if(properties.DragToPlaylist) {
                 if(g_plmanager.isOpened) g_plmanager.draw(gr);
             }
-
-			//this.drawRightLine = getRightPlaylistState();
-			//if(this.drawRightLine) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
 
 			if(g_resizing.isResizing()) {
 				if(g_resizing.resizing_right_active) gr.FillSolidRect(ww-1, 0, 1, wh, colors.dragdrop_marker_line);
@@ -6040,17 +6003,12 @@ function on_paint(gr) {
 		update_wallpaper = false;
     };
 	if(update_headerbar) g_headerbar.setDisplayedInfo();
-	// draw background under playlist
-	if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
+
+	if(g_wallpaperImg && properties.showwallpaper) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
 		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
 	} else {
-		if(g_wallpaperImg && properties.showwallpaper) {
-			gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-			gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-		} else {
-			gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-		}
+		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	}
 
     brw && brw.draw(gr);
@@ -6066,28 +6024,6 @@ function on_paint(gr) {
     if(paint_scrollbar && g_scrollbar.isVisible) {
         g_scrollbar.draw(gr);
     }
-
-	var show_shadow = false;
-	if(show_shadow){
-		var line_w = Math.round(ww / 2);
-		var line_padding = 10;
-		var color = RGBA(0, 0, 0, 15);
-		gr.FillGradRect(line_padding, 0, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 0, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 0, 1, 1, color);
-		var color = RGBA(0, 0, 0, 10);
-		gr.FillGradRect(line_padding, 1, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 1, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 1, 1, 1, color);
-		var color = RGBA(0, 0, 0, 5);
-		gr.FillGradRect(0, 2, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 2, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 2, 1, 1, color);
-		var color = RGBA(0, 0, 0, 0);
-		gr.FillGradRect(line_padding, 3, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 3, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 3, 1, 1, color);
-	}
 }
 //=================================================// Mouse Callbacks =================================================
 function on_mouse_mbtn_down(x, y, mask) {

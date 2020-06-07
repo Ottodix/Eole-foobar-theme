@@ -5005,29 +5005,6 @@ function on_paint(gr) {
     };
 
 	if(main_panel_state.isEqual(2) && layout_state.isEqual(0) && !properties.darklayout) gr.FillSolidRect(0, wh-1, ww, 1, colors.line_top_dark);
-
-	var show_shadow = false;
-	if(show_shadow){
-		var line_w = Math.round(ww / 2);
-		var line_padding = 10;
-		var color = RGBA(0, 0, 0, 15);
-		gr.FillGradRect(line_padding, 0, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 0, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 0, 1, 1, color);
-		var color = RGBA(0, 0, 0, 10);
-		gr.FillGradRect(line_padding, 1, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 1, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 1, 1, 1, color);
-		var color = RGBA(0, 0, 0, 5);
-		gr.FillGradRect(0, 2, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 2, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 2, 1, 1, color);
-		var color = RGBA(0, 0, 0, 0);
-		gr.FillGradRect(line_padding, 3, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 3, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 3, 1, 1, color);
-	}
-
 };
 
 function on_mouse_lbtn_down(x, y, m) {

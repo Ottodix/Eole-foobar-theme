@@ -79,7 +79,7 @@ var playAndRandom_triggered = false;
 var drag_timer = false;
 var update_wallpaper = false;
 var nowplaying_cachekey = '';
-var ww = 0, wh = 0;
+var ww = 0, wh = 0, ellipse_radius = 0;
 var m_pos_progress = 0;
 var global_top_m=15;
 var button_top_m=global_top_m;
@@ -796,8 +796,8 @@ function on_paint(gr) {
 
 	//Progress
 	if(ww_progress > 0 && !(hideProgressWhenVolumeChange && VolumeSliderActive)) {
-		if(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag)) var ellipse_radius = 0;
-		else var ellipse_radius = Math.ceil(progress_vars.ellipse_diameter/2);
+		if(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag)) ellipse_radius = 0;
+		else ellipse_radius = Math.ceil(progress_vars.ellipse_diameter/2);
 
 		if(properties.cursor_style==2) {
 			gr.FillSolidRect(progress_margin_left, progress_margin_top-Math.round(progress_vars.height/2)+1, ww_progress, progress_vars.height,progressOffcolor);
@@ -1230,7 +1230,7 @@ function on_playback_time(time) {
 	evalTimeDisplayed(time,false);
     if (!progress_vars.drag) {
         if (g_length_progress > 0) g_pos_progress = Math.round(ww_progress * time / g_length_progress);
-        if(layout_state.isEqual(0)) window.RepaintRect(progress_margin_left, 0 , ww_progress, wh);
+        if(layout_state.isEqual(0)) window.RepaintRect(progress_margin_left-progress_vars.ellipse_diameter, 0 , ww_progress, wh);
 		else window.Repaint();
     }
 }
