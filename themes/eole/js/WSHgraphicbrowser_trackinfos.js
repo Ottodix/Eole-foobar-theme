@@ -175,7 +175,7 @@ var properties = {
 	showlistCoverMinSize:132,
 	showlistCoverMargin:28,
 	load_image_from_cache_direct:true,
-	veryTighCoverActiveZone : true,
+	veryTighCoverActiveZone : false,
 }
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
 properties.smooth_expand_value = properties.smooth_expand_value < 0 ? 0 : properties.smooth_expand_value > 0.9 ? 0.9 : properties.smooth_expand_value;
@@ -5281,17 +5281,13 @@ oBrowser = function(name) {
 						}
 					}
 				} else {
-					if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
-						this.activeColumn = 0;
-						this.activeIndex = -1;
-						this.activeTextIndex = -1;
-					} else {
-						if(x < this.x + this.marginLR) this.activeColumn=0;
-						else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
-						this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
-						this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
-						this.activeTextIndex = -1;
-					}
+					if(x < this.x + this.marginLR) this.activeColumn=0;
+					else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
+					this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
+					this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
+					if((y + scroll_ - this.y - this.CoverMarginTop-1 - ((y > g_showlist.y)?g_showlist.h:0))%this.rowHeight>this.coverRealWith){
+						this.activeTextIndex = this.activeIndex;
+					} else this.activeTextIndex = -1;
 				}
             } else {
                 this.activeIndex = -1;
