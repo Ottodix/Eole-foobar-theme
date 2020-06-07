@@ -5331,9 +5331,12 @@ oBrowser = function(name) {
 
         if(!window.IsVisible) return;
 
-        var repaint_1 = false;
-        var repaint_2 = false;
-		var repaint_x = repaint_y = repaint_x_end = repaint_y_end = 0;
+        var repaint_1 = false,
+			repaint_2 = false;
+		var repaint_x = 0,
+			repaint_y = 0,
+			repaint_x_end = 0,
+			repaint_y_end = 0;
 		
         if(cNowPlaying.flashEnable) {
             cNowPlaying.flashescounter++;
