@@ -6155,6 +6155,7 @@ function on_playback_stop(reason) {
 		case 0: // user stop
 		case 1: // eof (e.g. end of playlist)
 			// update wallpaper
+			nowplaying_cachekey = '';
 			if(properties.showwallpaper && properties.wallpapermode == 0) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
 			};
