@@ -4264,7 +4264,8 @@ oBrowser = function(name) {
 
         this.gTime.Reset();
         var trackinfos = "", arr = [], group = "";
-
+		
+		if(this.list==undefined) return;
         while(k < this.totalTracks){
             if(properties.TFgrouping.length > 0) {
                 group_string = TF.grouping.EvalWithMetadb(this.list[k]);
@@ -5393,30 +5394,34 @@ oBrowser = function(name) {
         }
 
 		if(brw.activeIndex != brw.activeIndexSaved) {
-			repaintIndexSaved = (brw.activeIndexSaved>=0)?brw.activeIndexSaved:brw.activeIndex;
-			repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
-			
-			if(repaintIndex>=0 && repaintIndexSaved>=0){
-				active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x;
-				active_x = brw.groups[brw.groups_draw[repaintIndex]].x;
-				if(active_x > active_x_saved) {
-					repaint_x = active_x_saved;
-					repaint_x_end = active_x + brw.coverRealWith;
-				} else {
-					repaint_x = active_x;
-					repaint_x_end = active_x_saved + brw.coverRealWith;				
-				}
-				active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y;
-				active_y = brw.groups[brw.groups_draw[repaintIndex]].y;
-				if(active_y > active_y_saved) {
-					repaint_y = active_y_saved;
-					repaint_y_end = active_y + brw.coverRealWith;
-				} else {
-					repaint_y = active_y;
-					repaint_y_end = active_y_saved + brw.coverRealWith;				
-				}
-				brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
-			} else repaint_1 = true;						
+			try{
+				repaintIndexSaved = (brw.activeIndexSaved>=0)?brw.activeIndexSaved:brw.activeIndex;
+				repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
+				
+				if(repaintIndex>=0 && repaintIndexSaved>=0){
+					active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x;
+					active_x = brw.groups[brw.groups_draw[repaintIndex]].x;
+					if(active_x > active_x_saved) {
+						repaint_x = active_x_saved;
+						repaint_x_end = active_x + brw.coverRealWith;
+					} else {
+						repaint_x = active_x;
+						repaint_x_end = active_x_saved + brw.coverRealWith;				
+					}
+					active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y;
+					active_y = brw.groups[brw.groups_draw[repaintIndex]].y;
+					if(active_y > active_y_saved) {
+						repaint_y = active_y_saved;
+						repaint_y_end = active_y + brw.coverRealWith;
+					} else {
+						repaint_y = active_y;
+						repaint_y_end = active_y_saved + brw.coverRealWith;				
+					}
+					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+				} else repaint_1 = true;
+			} catch(e){
+				repaint_1 = true;
+			}				
 			brw.activeIndexSaved = brw.activeIndex;
 		}
 
