@@ -1763,6 +1763,7 @@ oShowList = function(parentPanelName) {
 				playlist:brw.getSourcePlaylist(),
 				trackIndex:brw.groups[this.idx].trackIndex,
 				cover_img:brw.groups[this.idx].cover_img,
+				cachekey:brw.groups[this.idx].cachekey,				
 				metadb:this.pl[0],
 				totalTracks:this.total_tracks,
 				genre:this.genre,
@@ -5395,7 +5396,7 @@ oBrowser = function(name) {
 			repaintIndexSaved = (brw.activeIndexSaved>=0)?brw.activeIndexSaved:brw.activeIndex;
 			repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
 			
-			if(repaintIndex>=0){
+			if(repaintIndex>=0 && repaintIndexSaved>=0){
 				active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x;
 				active_x = brw.groups[brw.groups_draw[repaintIndex]].x;
 				if(active_x > active_x_saved) {

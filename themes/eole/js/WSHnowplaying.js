@@ -740,10 +740,11 @@ oCover = function() {
 			window.Repaint();
 		}
 	}
-	this.setArtwork = function(image, resize, filler, is_playing, metadb) {
+	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;
+		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;		
 		this.resized = false;
-		this.artwork = image;
+		this.artwork = image;	
 		this.setPlaying(is_playing===true, metadb);
 		this.metadb = metadb;
 		if(!isImage(image)) return;
@@ -1090,7 +1091,7 @@ function on_notify_data(name, info) {
 				g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
 			} else {
 				cover_img = new GdiBitmap(info.cover_img);
-				g_cover.setArtwork(cover_img, true, false, false, metadb[0]);
+				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey);
 				g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
 			}
 			window.Repaint();
@@ -1528,7 +1529,7 @@ function oInfos() {
 		this.show_info = true;
 		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
-	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating){
+	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, cachekey){
 		this.txt_line1 = row1;
 		this.txt_line2 = row2;
 		this.txt_line3 = row3;
