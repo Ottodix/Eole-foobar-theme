@@ -2436,7 +2436,8 @@ oBrowser = function(name) {
 						} else {
 							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
-									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');
+									debugger_hint("hit1 "+i)
+									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');									
 									if(img!="loading") this.groups[i].cover_img = img;
 									if (isImage(this.groups[i].cover_img)) {
 										this.groups[i].cover_type = 1;
@@ -2444,6 +2445,7 @@ oBrowser = function(name) {
 										debugger_hint("getit "+i)
 									} else if(properties.AlbumArtFallback && this.groups[i].cover_img!='loading'){
 										this.groups[i].save_requested = true;
+										debugger_hint("hit2 "+i)
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;

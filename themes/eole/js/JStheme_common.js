@@ -3022,8 +3022,6 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 				image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 			}
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
-			g_image_cache.addToCache(image,cachekey);
-			debugger_hint("addToCache "+albumIndex+" with"+image.Width)
 		} catch(e){}
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
@@ -3032,6 +3030,8 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
 			brw.groups[albumIndex].cover_formated = false;
+			g_image_cache.addToCache(image,cachekey);
+			debugger_hint("addToCache "+albumIndex+" with"+image.Width)			
 			brw.repaint();
 		} catch(e){}
 	}
@@ -3174,20 +3174,22 @@ oImageCache = function () {
 						if(brw.groups[albumIndex].cover_img=='loading') {
 							brw.groups[albumIndex].load_requested = 2;
 							brw.groups[albumIndex].cover_type = 1;
-							brw.groups[albumIndex].cover_img = null;
 							brw.groups[albumIndex].cover_img_mask = false;
 							brw.groups[albumIndex].cover_formated = false;
 							return 'loading';
 						}
 					}
 				} else if(!direct_return){
+					debugger_hint("get_albumArt_async"+albumIndex);						
 					if(albumIndex<0) {
 						try{
 							get_albumArt_async(metadb,-1, cachekey);
+							return 'loading';
 						} catch(e){console.log("timers.coverLoad line 5151 failed")}
 					} else {
 						try{
 							get_albumArt_async(metadb,albumIndex, cachekey);
+							return 'loading';
 						} catch(e){console.log("timers.coverLoad line 5157 failed")}
 					}
 				} else {
