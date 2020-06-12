@@ -5472,7 +5472,6 @@ oBrowser = function(name) {
 			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.faded_txt);
 	}
 	this.moveResizeBtn = function (x,y){
-		//var new_value = logposition(logslider(Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w)));
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
 		properties.thumbnailWidth = Math.round((globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
 		if(properties.thumbnailWidth>globalProperties.thumbnailWidthMax) properties.thumbnailWidth=globalProperties.thumbnailWidthMax;

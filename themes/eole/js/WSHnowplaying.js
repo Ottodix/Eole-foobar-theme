@@ -1200,6 +1200,7 @@ function on_notify_data(name, info) {
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
 			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
+			if(process_cachekey(metadb)==g_cover.cachekey)
 				g_cover.refresh(metadb[0], false, undefined, true, g_cover.isPlaying());
 		break;
 		case "cover_cache_finalized":

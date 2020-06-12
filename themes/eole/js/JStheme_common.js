@@ -978,7 +978,6 @@ oUIHacks = function () {
         try {
            this.activeXObject.Aero.Effect = effect;
         } catch (e) {
-			fb.ShowPopupMessage('Oupppppsssss, it look like an error\n\n'+"UIHacks setAeroEffect "+effect, "Error");
 			console.log(e);
 		}
 	}
@@ -1643,9 +1642,6 @@ oGenreCache = function () {
 		if(genre_added) this.onFinish();
     };
 	this.build_from_library = function () {
-		//var gTime = fb.CreateProfiler();
-		//gTime.Reset();
-		//console.log("Genre list started time:"+gTime.Time);
 		var libraryList = fb.GetLibraryItems();
 		libraryList.OrderByFormat(globalProperties.tf_genre, 1);
 		var i = 0;
@@ -1662,7 +1658,6 @@ oGenreCache = function () {
 		}
 		libraryList = undefined;
 		this.onFinish();
-		//console.log("Genre list built in: " + gTime.Time / 1000 + " seconds");
 	}
 }
 var_cache = function(){
@@ -1738,42 +1733,6 @@ function sortNumber(a,b) {
     if(a[0] < b[0]) return -1;
     if(a[0] > b[0]) return 1;
     return 0;
-}
-function logslider(position) {
-	// position will be between 0 and 100
-	var minp = 0;
-	var maxp = 100;
-
-	// The result should be between 100 an 10000000
-	var minv = Math.log(100);
-	var maxv = Math.log(10000000);
-
-	// calculate adjustment factor
-	var scale = (maxv-minv) / (maxp-minp);
-
-	return Math.exp(minv + scale*(position-minp));
-}
-function logposition(value) {
-	// position will be between 0 and 100
-	var minp = 0;
-	var maxp = 100;
-
-	// The result should be between 100 an 10000000
-	var minv = Math.log(100);
-	var maxv = Math.log(10000000);
-
-	// calculate adjustment factor
-	var scale = (maxv-minv) / (maxp-minp);
-	return (Math.log(value)-minv) / scale + minp;
-}
-function logspace(lower, upper, amount) {
-    var start = Math.log(Math.min(lower, upper));
-    var end = Math.log(Math.max(lower, upper));
-    var step = (end - start) / amount;
-
-    for(level = start; level <= end; level += step) {
-        console.log(Math.exp(level));
-    }
 }
 function createGenrePopupMenu(firstFile, checked_item, genrePopupMenu){
 	var checked_item = typeof checked_item !== 'undefined' ? checked_item : -1;
@@ -2054,7 +2013,6 @@ function quickSearch(start,search_function){
 		case 'artist':
 			var arr = globalProperties.tf_albumartist.EvalWithMetadb(start);
 			try{
-				//console.log(arr);
 				//artist_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS "+trim1(arr)+" OR %album artist% IS "+trim1(arr));
 				artist_items = fb.GetQueryItems(fb.GetLibraryItems(), '"*$meta_sep(artist,*)*" HAS *'+trim1(arr)+'*');
 				//artist_items = fb.GetQueryItems(fb.GetLibraryItems(), '"$meta(artist,0)" IS '+trim1(arr)+' OR "$meta(artist,1)" IS '+trim1(arr)+' OR "$meta(artist,2)" IS '+trim1(arr)+' OR "$meta(artist,3)" IS '+trim1(arr)+' OR "$meta(artist,4)" IS '+trim1(arr)+' OR "$meta(artist,5)" IS '+trim1(arr)+' OR "$meta(artist,6)" IS '+trim1(arr));				
@@ -2239,7 +2197,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 		case '1_genre':
 		case 'same_genre':
 				if(random_function=="same_genre"){
-					console.log(current_genre)
 					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+current_genre);
 				} else
 					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
@@ -3065,14 +3022,17 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 				image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 			}
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
+			debugger_hint("resize")
 		} catch(e){}
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
 		try{
+			debugger_hint("addToCache "+albumIndex+" with"+image.Width)
 			brw.groups[albumIndex].cover_img = image;
 			save2cache && g_image_cache.addToCache(image,cachekey); //g_image_cache.cachelist[cachekey] = image;
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
+			brw.groups[albumIndex].cover_formated = false;
 			brw.repaint();
 		} catch(e){}
 	}
@@ -3132,6 +3092,7 @@ oImageCache = function () {
 			this.cachelist[cachekey] = image;
 			if(resize_width) this.cachelist[cachekey].Resize(resize_width, resize_height, globalProperties.ResizeQLY);
 		}
+		debugger_hint("addToCache "+image.Width)
 	}
 	this.load_image_from_cache_async = async(albumIndex, cachekey, filename) =>
 	{
@@ -3199,19 +3160,26 @@ oImageCache = function () {
 						}
 					}
 					if(g_files.FileExists(filepath)) {
+						debugger_hint("load_artist");
 						img = gdi.Image(filepath);
-						save_image_to_cache(img, 0, cachekey, metadb);
+						if(!timers.saveCover && globalProperties.enableDiskCache) {
+							save_image_to_cache(img, albumIndex, cachekey, metadb);
+							timers.saveCover = setTimeout(function() {
+								clearTimeout(timers.saveCover);
+								timers.saveCover = false;
+							}, 100);
+						};
 					} else if(properties.AlbumArtFallback){
+						debugger_hint("load_fallback");						
 						brw.groups[albumIndex].cover_img = g_image_cache.hit(metadb, albumIndex, false, brw.groups[albumIndex].cachekey_album);
 						if(brw.groups[albumIndex].cover_img=='loading') {
 							brw.groups[albumIndex].load_requested = 2;
 							brw.groups[albumIndex].cover_type = 1;
-							brw.groups[albumIndex].cover_img = img;
+							brw.groups[albumIndex].cover_img = null;
 							brw.groups[albumIndex].cover_img_mask = false;
 							brw.groups[albumIndex].cover_formated = false;
 							return 'loading';
 						}
-
 					}
 				} else if(!direct_return){
 					if(albumIndex<0) {
@@ -3512,6 +3480,10 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
         return tmp_img;
     };
 };
+// Debugger functions
+function debugger_hint(string){
+	//console.log(string)	;
+}
 //JSON wrappers
 function JSON_parse(info) {
 	try {

@@ -2441,6 +2441,7 @@ oBrowser = function(name) {
 									if (isImage(this.groups[i].cover_img)) {
 										this.groups[i].cover_type = 1;
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w);
+										debugger_hint("getit "+i)
 									} else if(properties.AlbumArtFallback && this.groups[i].cover_img!='loading'){
 										this.groups[i].save_requested = true;
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
@@ -2481,25 +2482,27 @@ oBrowser = function(name) {
 										} else this.groups[i].cover_img = images.noartist;
 									}
 									var image = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									debugger_hint("FormatCover "+i)
 									g_image_cache.addToCache(image,this.groups[i].cachekey);
 									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 									this.groups[i].cover_img = image;
 								} else {
-									this.groups[i].cover_img = globalProperties.noart;
 									var image = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-									g_image_cache.addToCache(image,this.groups[i].cachekey);
+									this.groups[i].cover_img = image;
+									//g_image_cache.addToCache(image,this.groups[i].cachekey);
 									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 								}
 
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
-								this.groups[i].cover_img = globalProperties.stream_img;
 								var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-								g_image_cache.addToCache(image,this.groups[i].cachekey);
+								this.groups[i].cover_img = image;								
+								//g_image_cache.addToCache(image,this.groups[i].cachekey);
 								//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 							}
-							if(!this.groups[i].cover_formated){
+							if(!this.groups[i].cover_formated && isImage(this.groups[i].cover_img)){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
 								this.groups[i].cover_formated = true;
+								debugger_hint("this.groups["+i+"].cover_img.Width"+this.groups[i].cover_img.Width)
 							}
 						};
 					};
