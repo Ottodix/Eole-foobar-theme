@@ -3486,7 +3486,7 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
 };
 // Debugger functions
 function debugger_hint(string){
-	console.log(string)	;
+	//console.log(string)	;
 }
 //JSON wrappers
 function JSON_parse(info) {
