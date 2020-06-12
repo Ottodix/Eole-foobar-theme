@@ -3177,6 +3177,7 @@ oImageCache = function () {
 						if(brw.groups[albumIndex].cover_img=='loading') {
 							brw.groups[albumIndex].load_requested = 2;
 							brw.groups[albumIndex].cover_type = 1;
+							brw.groups[albumIndex].cover_img = null;							
 							brw.groups[albumIndex].cover_img_mask = false;
 							brw.groups[albumIndex].cover_formated = false;
 							return 'loading';
