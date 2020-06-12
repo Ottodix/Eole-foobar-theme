@@ -2971,10 +2971,11 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb) {
+    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.9) {
         return;
     }
-    let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
+	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
+    var result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
 			save_image_to_cache(result.image, albumIndex, cachekey, metadb);
@@ -3015,15 +3016,17 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 		cachekey = metadb.RawPath;
 	}
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
-
-	if(!g_files.FileExists(filename) && save2cache){
-		try {
-			if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
-				image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
-			}
+    if (window.TotalMemoryUsage>window.MemoryLimit*0.9) {
+        return;
+    }
+	try {
+		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
+			image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
+		}		
+		if(!g_files.FileExists(filename) && save2cache){
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
-		} catch(e){}
-	}
+		}
+	} catch(e){}
 	if (typeof brw == "object" && albumIndex>=0) {
 		try{
 			brw.groups[albumIndex].cover_img = image;			
@@ -3483,7 +3486,7 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
 };
 // Debugger functions
 function debugger_hint(string){
-	//console.log(string)	;
+	console.log(string)	;
 }
 //JSON wrappers
 function JSON_parse(info) {
