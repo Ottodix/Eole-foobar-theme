@@ -3022,14 +3022,13 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 				image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 			}
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
-			debugger_hint("resize")
+			g_image_cache.addToCache(image,cachekey);
+			debugger_hint("addToCache "+albumIndex+" with"+image.Width)
 		} catch(e){}
 	}
 	if (typeof brw == "object" && albumIndex>=0) {
 		try{
-			debugger_hint("addToCache "+albumIndex+" with"+image.Width)
-			brw.groups[albumIndex].cover_img = image;
-			save2cache && g_image_cache.addToCache(image,cachekey); //g_image_cache.cachelist[cachekey] = image;
+			brw.groups[albumIndex].cover_img = image;			
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
 			brw.groups[albumIndex].cover_formated = false;
@@ -3482,7 +3481,7 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
 };
 // Debugger functions
 function debugger_hint(string){
-	//console.log(string)	;
+	console.log(string)	;
 }
 //JSON wrappers
 function JSON_parse(info) {
