@@ -13,7 +13,7 @@ var sort_by_path = "%path%|%album%|%date%|%discnumber%|%tracknumber%";
 var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
-var sort_by_date_added = "%added%|%album artist%|%date%|%album%";
+var sort_by_date_added = "$sub(9999,$year(%added%))-$sub(9999,$month(%added%))-$sub(9999,$day_of_month(%added%))|%album artist%|%date%|%album%|%tracknumber%";//"%added% ASC|%album artist%|%date%|%album%|%tracknumber%";
 var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
@@ -2971,11 +2971,11 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.9) {
+    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8) {
         return;
     }
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
-    var result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
+    let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
 			save_image_to_cache(result.image, albumIndex, cachekey, metadb);
@@ -3016,7 +3016,7 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 		cachekey = metadb.RawPath;
 	}
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
-    if (window.TotalMemoryUsage>window.MemoryLimit*0.9) {
+    if (window.TotalMemoryUsage>window.MemoryLimit*0.8) {
         return;
     }
 	try {

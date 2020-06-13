@@ -2890,7 +2890,7 @@ oHeaderBar = function(name) {
 				brw.populate(8,true);
 			}
 			actions[3005] = function(){
-				properties.TFsorting = sort_by_date_added+"#-1";
+				properties.TFsorting = sort_by_date_added+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(9,true);
