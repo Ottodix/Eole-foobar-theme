@@ -2971,9 +2971,10 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8) {
+    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>10) {
         return;
     }
+	g_image_cache.loadCounter++;			
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
@@ -3004,6 +3005,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 		}
 	} catch(e){
 	}
+	g_image_cache.loadCounter--;
 };
 
 function save_image_to_cache(image, albumIndex, cachekey, metadb){
@@ -3086,7 +3088,7 @@ function createDragImg(img, cover_size, count){
 
 oImageCache = function () {
     this.cachelist = Array();
-	this.cover_load_timer = [];
+	this.loadCounter = 0;
     this.addToCache = function (image, cachekey, resize_width, resize_height) {
 		if(!globalProperties.loaded_covers2memory) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
@@ -3094,7 +3096,6 @@ oImageCache = function () {
 			this.cachelist[cachekey] = image;
 			if(resize_width) this.cachelist[cachekey].Resize(resize_width, resize_height, globalProperties.ResizeQLY);
 		}
-		debugger_hint("addToCache "+image.Width)
 	}
 	this.load_image_from_cache_async = async(albumIndex, cachekey, filename) =>
 	{
