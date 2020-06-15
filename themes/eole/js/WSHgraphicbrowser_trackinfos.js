@@ -5289,7 +5289,7 @@ oBrowser = function(name) {
 			window.NotifyOthers("Randomsetfocus", false);
 			randomStartTime=0;
 		}
-
+console.log(g_image_cache.loadCounter);
         if(!window.IsVisible) return;
 
         var repaint_1 = false,
