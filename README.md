@@ -1,8 +1,7 @@
 # Eole Foobar theme
 
 This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
-
-THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
+This theme require Foobar2000 1.4 (or superior).
 
 ## Participate to the theme
 
