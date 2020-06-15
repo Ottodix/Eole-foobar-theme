@@ -2972,6 +2972,14 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	only_embed = false;
 	no_load = false;
     if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>5) {
+		if(g_image_cache.loadCounter>5 && !timers.loadCounterReset){
+			timers.loadCounterReset = setTimeout(function() {
+				g_image_cache.loadCounter = 0;
+				window.Repaint();
+				clearTimeout(timers.loadCounterReset);
+				timers.loadCounterReset = false;
+			}, 3000);
+		}
         return;
     }
 	g_image_cache.loadCounter++;			
@@ -3004,6 +3012,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			window.Repaint();
 		}
 	} catch(e){
+		fb.ShowPopupMessage("error");
 	}
 	g_image_cache.loadCounter--;
 };
@@ -3139,7 +3148,6 @@ oImageCache = function () {
 						brw.groups[albumIndex].cover_formated = false;
 						brw.groups[albumIndex].load_requested = 2;
 						brw.repaint();
-						this.cover_load_timer = Array();
 					} else if(!direct_return){
 						this.load_image_from_cache_async(albumIndex, cachekey, brw.groups[albumIndex].cover_filename);
 						return "loading";
@@ -3151,7 +3159,6 @@ oImageCache = function () {
 						brw.groups[albumIndex].load_requested = 2;
 					}
 			} else {
-				if(!isScrolling) this.cover_load_timer = Array();
 				if(artist_name!=''){
 					var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 					var filepath = '';

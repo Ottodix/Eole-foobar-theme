@@ -61,7 +61,6 @@ var LibraryItems_counter = 0;
 var WshShell = new ActiveXObject("WScript.Shell")
 var paint_scrollbar = true;
 var get_albums_timer = [];
-var cover_load_timer = [];
 var populate_covers_timer = [];
 var playing_track_playcount = 0;
 
@@ -5894,10 +5893,6 @@ function populate_with_library_covers(start_items, str_comp_items){
 }
 
 function ClearCoversTimers(){
-	for(var i=0; i < cover_load_timer.length; i++) {
-		window.ClearInterval(cover_load_timer[i]);
-	}
-	cover_load_timer = [];
 	for(var i=0; i < populate_covers_timer.length; i++) {
 		window.ClearInterval(populate_covers_timer[i]);
 	}
