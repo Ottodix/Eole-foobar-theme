@@ -3012,7 +3012,6 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 			window.Repaint();
 		}
 	} catch(e){
-		fb.ShowPopupMessage("error");
 	}
 	g_image_cache.loadCounter--;
 };
