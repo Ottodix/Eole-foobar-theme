@@ -2974,8 +2974,10 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>5) {
 		if(g_image_cache.loadCounter>5 && !timers.loadCounterReset){
 			timers.loadCounterReset = setTimeout(function() {
-				g_image_cache.loadCounter = 0;
-				window.Repaint();
+				if(g_image_cache.loadCounter!=0){
+					g_image_cache.loadCounter = 0;
+					window.Repaint();
+				}
 				clearTimeout(timers.loadCounterReset);
 				timers.loadCounterReset = false;
 			}, 3000);
