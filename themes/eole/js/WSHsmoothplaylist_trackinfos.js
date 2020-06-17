@@ -6145,29 +6145,28 @@ function on_char(code) {
 
 //=================================================// Playback Callbacks
 function on_playback_stop(reason) {
-	if(window.IsVisible) {
-		g_elapsed_seconds = null;
-		g_time_remaining = null;
-		g_total_seconds = null;
-		g_metadb = null;
+	g_elapsed_seconds = null;
+	g_time_remaining = null;
+	g_total_seconds = null;
+	g_metadb = null;
 
-		switch(reason) {
-		case 0: // user stop
-		case 1: // eof (e.g. end of playlist)
-			// update wallpaper
-			nowplaying_cachekey = '';
-			if(properties.showwallpaper && properties.wallpapermode == 0) {
-				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
-			};
-			brw.repaint();
-			break;
-		case 2: // starting_another (only called on user action, i.e. click on next button)
-			break;
+	switch(reason) {
+	case 0: // user stop
+	case 1: // eof (e.g. end of playlist)
+		// update wallpaper
+		nowplaying_cachekey = '';
+		if(properties.showwallpaper && properties.wallpapermode == 0) {
+			if(window.IsVisible) g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
+			else update_wallpaper = true;
 		};
+		brw.repaint();
+		break;
+	case 2: // starting_another (only called on user action, i.e. click on next button)
+		break;
+	};
 
-		g_radio_title = "loading live tag ...";
-		g_radio_artist = "";
-	}
+	g_radio_title = "loading live tag ...";
+	g_radio_artist = "";
 };
 function on_playback_dynamic_info_track() {
 	g_radio_title = TF.title.Eval(true);
