@@ -1359,7 +1359,7 @@ function draw_main_menu(x,y){
     child4.AppendTo(basemenu, MF_STRING, "Playback");
     child5.AppendTo(basemenu, MF_STRING, "Library");
     child6.AppendTo(basemenu, MF_STRING, "Help");
-    child7.AppendTo(basemenu, MF_STRING, "Now Playing");
+	if(fb.IsPlaying) child7.AppendTo(basemenu, MF_STRING, "Now Playing");
 
 	skin_settings_menu = window.CreatePopupMenu();
 	library_menu = window.CreatePopupMenu();
