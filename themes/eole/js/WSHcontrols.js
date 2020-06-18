@@ -14,6 +14,7 @@ var properties = {
     screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
+    displayDevice: window.GetProperty("_DISPLAY device", false),	
     displayEqualizer: window.GetProperty("_DISPLAY equalizer", false),
     displayScheduler: window.GetProperty("_DISPLAY scheduler", false),
     displayRating: window.GetProperty("_DISPLAY rating", true),
@@ -221,6 +222,8 @@ function build_images(){
 	menu_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\settings.png");
 	equalizer_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\equalizer_hover.png");
 	equalizer_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\equalizer.png");
+	device_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\output_hover.png");
+	device_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\output.png");	
 	shuffle_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_hover.png");
 	shuffle_img_active = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_active.png");
 	shuffle_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle.png");
@@ -493,10 +496,11 @@ function build_buttons(){
 		button_sep_value=53;
 	}
 	nb_of_buttons_right = 1;
-	properties.displayMore = (!properties.displayScheduler || !properties.displayEqualizer || !properties.displayRating || !properties.displayPlayRandom || !properties.displayShuffle || !properties.displayRepeat || !properties.displayOpen);
+	properties.displayMore = (!properties.displayScheduler || !properties.displayDevice || !properties.displayEqualizer || !properties.displayRating || !properties.displayPlayRandom || !properties.displayShuffle || !properties.displayRepeat || !properties.displayOpen);
 
 	nb_of_buttons_right+= (properties.displayMore)?1:0;
 	nb_of_buttons_right+= (properties.displayScheduler)?1:0;
+	nb_of_buttons_right+= (properties.displayDevice)?1:0;	
 	nb_of_buttons_right+= (properties.displayEqualizer)?1:0;
 	nb_of_buttons_right+= (properties.displayRating)?1:0;
 	nb_of_buttons_right+= (properties.displayPlayRandom)?1:0;
@@ -594,6 +598,10 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Device", function () {
+			g_tooltip.Deactivate();
+			menudevice(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
+		},false,false,device_img,device_img_hover),		
 		Open: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Open", "Open files...",false, function () {
 			g_tooltip.Deactivate();
 			fb.AddFiles()
@@ -650,6 +658,9 @@ function build_buttons(){
 	if(!properties.displayEqualizer){
 		buttons_right.Equalizer.changeState(ButtonStates.hide);
 	}
+	if(!properties.displayDevice){
+		buttons_right.Device.changeState(ButtonStates.hide);
+	}	
 	if(!properties.displayScheduler){
 		buttons_right.Scheduler.changeState(ButtonStates.hide);
 	}
@@ -2136,7 +2147,7 @@ function randomPlayMenu(x, y){
 
 		genrePopupMenu.AppendTo(_menu, MF_STRING, "A specific genre");
 
-        idx = _menu.TrackPopupMenu(x,y,0x0020);
+        idx = _menu.TrackPopupMenu(x-(properties.displayDevice?100:0),y,0x0020);
         switch(true) {
             case (idx == 2):
                 properties.random_function = '20_albums';
@@ -2177,7 +2188,24 @@ function randomPlayMenu(x, y){
         _menu = undefined;
         return true;
 }
-
+function menudevice(x, y){
+   var menu = window.CreatePopupMenu();
+   var str = fb.GetOutputDevices();
+   var arr = JSON.parse(str);
+   var active = -1;
+   menu.AppendMenuItem(MF_GRAYED, 0, "Output selection");
+   menu.AppendMenuSeparator();
+   for (var i = 0; i < arr.length; i++) {
+      menu.AppendMenuItem(MF_STRING, i + 1, arr[i].name);
+      if (arr[i].active) active = i;
+   }
+   
+   if (active > -1) menu.CheckMenuRadioItem(1, arr.length + 1, active + 1);
+   
+   var idx = menu.TrackPopupMenu(x, y, 0x0020);
+   
+   if (idx > 0) fb.RunMainMenuCommand("Playback/Device/" + arr[idx - 1].name);
+}
 function moreMenu(x, y){
 
         var idx;
@@ -2332,6 +2360,8 @@ function moreMenu(x, y){
 		_menu_button.CheckMenuItem(4020, properties.displayPlayRandom);
 		_menu_button.AppendMenuItem(MF_STRING, 4017, "Equalizer");
 		_menu_button.CheckMenuItem(4017, properties.displayEqualizer);
+		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device");
+		_menu_button.CheckMenuItem(4024, properties.displayDevice);		
 		_menu_button.AppendMenuItem(MF_STRING, 4018, "Rating");
 		_menu_button.CheckMenuItem(4018, properties.displayRating);
 		_menu_button.AppendMenuItem(MF_STRING, 4019, "Scheduler");
@@ -2552,6 +2582,14 @@ function moreMenu(x, y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
+            case (idx == 4024):
+				properties.displayDevice = !properties.displayDevice;
+				window.SetProperty("_DISPLAY device", properties.displayDevice);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;		
             case (idx == 4016):
 				properties.displayStop = !properties.displayStop;
 				window.SetProperty("_DISPLAY stop btn", properties.displayStop);
