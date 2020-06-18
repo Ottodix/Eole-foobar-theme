@@ -598,7 +598,7 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
-		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Device", function () {
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device", function () {
 			g_tooltip.Deactivate();
 			menudevice(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,device_img,device_img_hover),		
@@ -2127,7 +2127,7 @@ function randomPlayMenu(x, y){
         var idx;
 
 		var checked_item_menu=3;
-		_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
+		_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly:");
 		_menu.AppendMenuSeparator();
         _menu.AppendMenuItem(MF_STRING, 3, "Tracks");
 			if(properties.random_function=='200_tracks') checked_item_menu=3;
@@ -2193,7 +2193,7 @@ function menudevice(x, y){
    var str = fb.GetOutputDevices();
    var arr = JSON.parse(str);
    var active = -1;
-   menu.AppendMenuItem(MF_GRAYED, 0, "Output selection");
+   menu.AppendMenuItem(MF_GRAYED, 0, "Output device:");
    menu.AppendMenuSeparator();
    for (var i = 0; i < arr.length; i++) {
       menu.AppendMenuItem(MF_STRING, i + 1, arr[i].name);
