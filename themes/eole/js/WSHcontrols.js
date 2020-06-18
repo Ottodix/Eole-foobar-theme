@@ -2933,12 +2933,14 @@ function draw_settings_menu(x,y){
 		_menu_button.CheckMenuItem(3022, properties.displayRepeat);
 		_menu_button.AppendMenuItem(MF_STRING, 3021, "Shuffle");
 		_menu_button.CheckMenuItem(3021, properties.displayShuffle);
+		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
+		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);		
 		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
 		_menu_button.CheckMenuItem(3023, properties.displayOpen);
-		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
-		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);
+		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device");
+		_menu_button.CheckMenuItem(3029, properties.displayDevice);				
 		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
-		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);
+		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	
 		_menu_button.AppendMenuItem(MF_STRING, 3018, "Rating");
 		_menu_button.CheckMenuItem(3018, properties.displayRating);
 		_menu_button.AppendMenuItem(MF_STRING, 3019, "Scheduler");
@@ -3018,6 +3020,14 @@ function draw_settings_menu(x,y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
+            case (idx == 3029):
+				properties.displayDevice = !properties.displayDevice;
+				window.SetProperty("_DISPLAY device", properties.displayDevice);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;					
             case (idx == 3018):
 				properties.displayRating = !properties.displayRating;
 				window.SetProperty("_DISPLAY rating", properties.displayRating);
