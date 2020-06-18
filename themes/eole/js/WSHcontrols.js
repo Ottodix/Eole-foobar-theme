@@ -2204,7 +2204,7 @@ function menudevice(x, y){
    
    var idx = menu.TrackPopupMenu(x, y, 0x0020);
    
-   if (idx > 0) fb.RunMainMenuCommand("Playback/Device/" + arr[idx - 1].name);
+   if (idx > 0) fb.SetOutputDevice(arr[idx - 1].output_id, arr[idx - 1].device_id); 
 }
 function moreMenu(x, y){
 
