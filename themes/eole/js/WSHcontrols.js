@@ -2376,7 +2376,7 @@ function moreMenu(x, y){
 		_menu_button.CheckMenuItem(4020, properties.displayPlayRandom);
 		_menu_button.AppendMenuItem(MF_STRING, 4017, "Equalizer");
 		_menu_button.CheckMenuItem(4017, properties.displayEqualizer);
-		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device");
+		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device / DSP presets");
 		_menu_button.CheckMenuItem(4024, properties.displayDevice);		
 		_menu_button.AppendMenuItem(MF_STRING, 4018, "Rating");
 		_menu_button.CheckMenuItem(4018, properties.displayRating);
