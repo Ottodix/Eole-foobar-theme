@@ -598,9 +598,9 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
-		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device", function () {
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device & DSP presets", function () {
 			g_tooltip.Deactivate();
-			menudevice(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
+			menuOutputAndDSP(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,device_img,device_img_hover),		
 		Open: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Open", "Open files...",false, function () {
 			g_tooltip.Deactivate();
@@ -2188,23 +2188,39 @@ function randomPlayMenu(x, y){
         _menu = undefined;
         return true;
 }
-function menudevice(x, y){
-   var menu = window.CreatePopupMenu();
-   var str = fb.GetOutputDevices();
-   var arr = JSON.parse(str);
-   var active = -1;
-   menu.AppendMenuItem(MF_GRAYED, 0, "Output device:");
-   menu.AppendMenuSeparator();
-   for (var i = 0; i < arr.length; i++) {
-      menu.AppendMenuItem(MF_STRING, i + 1, arr[i].name);
-      if (arr[i].active) active = i;
-   }
-   
-   if (active > -1) menu.CheckMenuRadioItem(1, arr.length + 1, active + 1);
-   
-   var idx = menu.TrackPopupMenu(x, y, 0x0020);
-   
-   if (idx > 0) fb.SetOutputDevice(arr[idx - 1].output_id, arr[idx - 1].device_id); 
+function menuOutputAndDSP(x, y){
+	var menu = window.CreatePopupMenu();
+
+	var str = fb.GetOutputDevices();
+	var arr = JSON.parse(str);
+	menu.AppendMenuItem(MF_GRAYED, 0, "Output device:");
+	menu.AppendMenuSeparator();	
+	var active = -1;
+	for (var i = 0; i < arr.length; i++) {
+		menu.AppendMenuItem(MF_STRING, i + 1, arr[i].name);
+		if (arr[i].active) active = i;
+	}
+	if (active > -1) menu.CheckMenuRadioItem(1, arr.length + 1, active + 1);
+
+	var str = fb.GetDSPPresets();
+	var arr = JSON.parse(str);	
+	menu.AppendMenuSeparator();			
+	menu.AppendMenuItem(MF_GRAYED, 0, "DSP preset:");
+	menu.AppendMenuSeparator();	
+	if(arr.length>0){
+		var active = -1;   	
+		for (var i = 0; i < arr.length; i++) {
+			menu.AppendMenuItem(MF_STRING, i + 1000, arr[i].name);		
+			if (arr[i].active) active = i;
+		}   
+		if (active > -1) menu.CheckMenuRadioItem(1000, arr.length + 1000, active + 1000);	
+	} else {
+		menu.AppendMenuItem(MF_GRAYED, 0, "You didn't define any DSP presets.");
+		menu.AppendMenuItem(MF_GRAYED, 0, "Foobar > File > Preference > Playback > DSP manager");		
+	}
+	var idx = menu.TrackPopupMenu(x, y, 0x0020);
+	if (idx > 0 && idx < 999) fb.SetOutputDevice(arr[idx - 1].output_id, arr[idx - 1].device_id); 
+	else if (idx > 999) fb.SetDSPPreset(idx-1000); 
 }
 function moreMenu(x, y){
 
