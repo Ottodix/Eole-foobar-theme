@@ -17,21 +17,21 @@ function include(path, options) { }
 
 /**
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearTimeout}.
- * 
+ *
  * @param {number} timerID
  */
 function clearTimeout(timerID) { } // (void)
 
 /**
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/clearInterval}.
- * 
+ *
  * @param {number} timerID
  */
 function clearInterval(timerID) { } // (void)
 
 /**
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval}.
- * 
+ *
  * @param {function()} func
  * @param {number} delay
  * @param {...*} func_args
@@ -41,7 +41,7 @@ function setInterval(func, delay, func_args) { } // (uint)
 
 /**
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout}.
- * 
+ *
  * @param {function()} func
  * @param {number} delay
  * @param {...*} func_args
@@ -535,8 +535,8 @@ let fb = {
 
     /**
      * Loads playlist from file. Equivalent to `File`>`Load Playlist...`.
-     * 
-     * @method 
+     *
+     * @method
      */
     LoadPlaylist: function () { }, // (void)
 
@@ -575,8 +575,8 @@ let fb = {
     RunContextCommand: function (command, flags) { }, // (boolean) [, flags]
 
     /**
-     * Shows context menu for supplied tracks. 
-     * 
+     * Shows context menu for supplied tracks.
+     *
      * @param {string} command
      * @param {FbMetadbHandle|FbMetadbHandleList} handle_or_handle_list Handles on which to apply context menu
      * @param {number=} flags Same flags as {@link fb.RunContextCommand}
@@ -636,7 +636,7 @@ let fb = {
     Stop: function () { }, // (void)
 
     /**
-     * Performance note: if you use the same query frequently, 
+     * Performance note: if you use the same query frequently,
      * try caching FbTitleFormat object (by storing it somewhere),
      * instead of creating it every time.
      *
@@ -702,7 +702,7 @@ let gdi = {
      * @param {number} window_id see {@link window.ID}
      * @param {string} path
      * @return {number} a unique id, which is used in {@link module:callbacks~on_load_image_done on_load_image_done}.
-     * 
+     *
      * @example
      * // See samples\basic\LoadImageAsync.txt
      */
@@ -711,7 +711,7 @@ let gdi = {
     /**
      * Load image from file asynchronously.
      * Returns a `Promise` object, which will be resolved when image loading is done.
-     * 
+     *
      * @param {number} window_id see {@link window.ID}
      * @param {string} path
      * @return {Promise.<?GdiBitmap>}
@@ -731,7 +731,7 @@ let plman = {
 
     /**
      * -1 if there is no active playlist.
-     * 
+     *
      * @type {number}
      *
      * @example
@@ -758,7 +758,7 @@ let plman = {
 
     /**
      * -1 if there is no playing playlist.
-     * 
+     *
      * @type {number}
      *
      * @example
@@ -774,7 +774,7 @@ let plman = {
 
     /**
      * A Recycle Bin for playlists.
-     * 
+     *
      * @type {FbPlaylistRecycler}
      * @readonly
      */
@@ -849,7 +849,7 @@ let plman = {
 
     /**
      * Signals playlist viewers to display the track (e.g. by scrolling to it's position).
-     * 
+     *
      * @param {number} playlistIndex
      * @param {number} playlistItemIndex
      */
@@ -1241,7 +1241,7 @@ let utils = {
 
     /**
      * Checks the availability of foobar2000 component.
-     * 
+     *
      * @param {string} name
      * @param {boolean=} [is_dll=true] If true, method checks filename as well as the internal name.
      * @return {boolean}
@@ -1275,7 +1275,7 @@ let utils = {
 
     /**
      * Various utility functions for working with file.
-     * 
+     *
      * @param {string} path
      * @param {string} mode
      *     "chardet" - Detects the codepage of the given file. Returns a corresponding codepage number on success, 0 if codepage detection failed.<br>
@@ -1316,7 +1316,7 @@ let utils = {
      * <br>
      * Performance note: consider using {@link gdi.LoadImageAsync} or {@link gdi.LoadImageAsyncV2} if there are a lot of images to load
      * or if the image is big.
-     * 
+     *
      * @param {number} window_id {@link window.ID}
      * @param {FbMetadbHandle} handle
      * @param {number=} [art_id=0] See Flags.js > AlbumArtId
@@ -1338,7 +1338,7 @@ let utils = {
     /**
      * Load art image for the track asynchronously.<br>
      * Returns a `Promise` object, which will be resolved when art loading is done.
-     * 
+     *
      * @param {number} window_id {@link window.ID}
      * @param {FbMetadbHandle} handle
      * @param {number=} [art_id=0] See Flags.js > AlbumArtId
@@ -1375,7 +1375,7 @@ let utils = {
      * @param {number=} [art_id=0] See Flags.js > AlbumArtId
      * @param {boolean=} [need_stub=true]
      * @return {GdiBitmap}
-     * 
+     *
      * @example
      * // See samples\basic\GetAlbumArtV2.txt
      */
@@ -1398,7 +1398,7 @@ let utils = {
 
     /**
      * Retrieves filepaths that match the supplied pattern.
-     * 
+     *
      * @param {string} pattern
      * @param {number=} [exc_mask=0x10] Default is FILE_ATTRIBUTE_DIRECTORY. See Flags.js > Used in utils.Glob()
      * @param {number=} [inc_mask=0xffffffff]
@@ -1443,7 +1443,7 @@ let utils = {
 
     /**
      * See {@link https://docs.microsoft.com/en-us/windows/desktop/api/winnls/nf-winnls-lcmapstringa}.
-     * 
+     *
      * @param {string} text
      * @param {string} lcid
      * @param {number} flags
@@ -1463,7 +1463,7 @@ let utils = {
 
     /**
      * Performance note: supply codepage argument if it is known, since codepage detection might take some time.
-     * 
+     *
      * @param {string} filename
      * @param {number=} [codepage=0] See Codepages.js. If codepage is 0, then automatic detection is performed.
      * @return {string}
@@ -1638,7 +1638,7 @@ let window = {
     /**
      * Maximum allowed memory usage for the component (in bytes).<br>
      * If the total memory usage exceeds this value, all panels will fail with OOM error.
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -1669,7 +1669,7 @@ let window = {
 
     /**
      * Memory usage of the current panel (in bytes).
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -1677,7 +1677,7 @@ let window = {
 
     /**
      * Total memory usage of all panels (in bytes).
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -1691,14 +1691,14 @@ let window = {
 
     /**
      * See {@link clearTimeout}.
-     * 
+     *
      * @param {number} timerID
      */
     ClearTimeout: function (timerID) { }, // (void)
 
     /**
      * See {@link clearInterval}.
-     * 
+     *
      * @param {number} timerID
      */
     ClearInterval: function (timerID) { }, // (void)
@@ -1757,7 +1757,7 @@ let window = {
 
     /**
      * Note: see the example in {@link window.GetFontDUI}.
-     * 
+     *
      * @param {number} type See Flags.js > Used in window.GetFontXXX()
      * @param {string=} client_guid See Flags.js > Used in GetFontCUI() as client_guid.
      * @return {?GdiFont} returns null if the requested font was not found.
@@ -1810,7 +1810,7 @@ let window = {
      * Performance note: don't force the repaint unless it's really necessary -
      * repaint calls might be grouped up when *not forced* which will turn them into a single repaint call,
      * thus reducing the amount of {@link module:callbacks~on_paint on_paint} calls.
-     * 
+     *
      * @param {boolean=} [force=false] If true, will repaint immediately, otherwise a repaint task will be *scheduled*.
      */
     Repaint: function (force) { }, // (void) [force]
@@ -1821,7 +1821,7 @@ let window = {
      * such as time, bitrate, seekbar, etc.<br>
      * <br>
      * Performance note: see Performance note in {@link window.Repaint}.
-     * 
+     *
      * @param {number} x
      * @param {number} y
      * @param {number} w
@@ -1917,7 +1917,7 @@ function FbMetadbHandle() {
     /**
      * -1 if size is unavailable.
      *
-     * @type {number} 
+     * @type {number}
      * @readonly
      */
     this.FileSize = undefined; // (LONGLONG) (read)
@@ -2069,7 +2069,7 @@ function FbFileInfo() {
 
     /**
      * The number of values contained in a meta tag.
-     * 
+     *
      * @param {number} idx
      * @return {number}
      */
@@ -2215,7 +2215,7 @@ function FbMetadbHandleList(arg) {
 
     /**
      * Note: sort with {@link FbMetadbHandleList#Sort} before using.
-     * 
+     *
      * @param {FbMetadbHandleList} handle_list Sorted handle list.
      *
      * @example
@@ -2233,7 +2233,7 @@ function FbMetadbHandleList(arg) {
 
     /**
      * Note: sort with {@link FbMetadbHandleList#Sort} before using.
-     * 
+     *
      * @param {FbMetadbHandleList} handle_list Sorted handle list.
      *
      * @example
@@ -2250,7 +2250,7 @@ function FbMetadbHandleList(arg) {
 
     /**
      * Note: sort with {@link FbMetadbHandleList#Sort} before using.
-     * 
+     *
      * @param {FbMetadbHandleList} handle_list Sorted handle list.
      *
      * @example
@@ -2310,7 +2310,7 @@ function FbMetadbHandleList(arg) {
 
     /**
      * Removes all attached images.
-     * 
+     *
      * Note: a progress dialog will be shown for larger file selections.
      */
     this.RemoveAttachedImages = function () { }; // (void)
@@ -2368,7 +2368,7 @@ function FbMetadbHandleList(arg) {
 
 /**
  * A Recycle Bin for playlists.
- * 
+ *
  * @constructor
  * @hideconstructor
  */
@@ -2419,7 +2419,7 @@ function FbPlayingItemLocation() {
     /**
      * False if foobar2000 isn't playing or if the playing track
 	 * has since been removed from the playlist it was on when playback was started.
-     * 
+     *
      * @type {boolean}
      * @readonly
      */
@@ -2427,7 +2427,7 @@ function FbPlayingItemLocation() {
 
     /**
      * -1 if item is not in a playlist
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -2435,7 +2435,7 @@ function FbPlayingItemLocation() {
 
     /**
      * -1 if item is not in a playlist
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -2456,7 +2456,7 @@ function FbPlaybackQueueItem() {
 
     /**
      * -1 if item is not in a playlist
-     * 
+     *
      * @type {number}
      * @readonly
      */
@@ -2492,10 +2492,10 @@ function FbProfiler(name) {
     /** @method */
     this.Reset = function () { }; // (void)
 
-    /** 
+    /**
      * @param {string=} [additionalMsg=''] string that will be prepended to the measured time
      * @param {boolean=} [printComponentInfo=true]
-     * 
+     *
      * @example
      * let test = new FbProfiler('Group #1');
      * // Do smth #1
@@ -2505,7 +2505,7 @@ function FbProfiler(name) {
      * // Do smth
      * test.Print();
      * // Output:
-     * // profiler (Group #1): 
+     * // profiler (Group #1):
      * // Task #1: 789 ms"
      * // profiler (Group #1):
      * // Task #2: 1530 ms"
@@ -2515,10 +2515,10 @@ function FbProfiler(name) {
 }
 
 /**
- * Performance note: if you use the same query frequently, 
+ * Performance note: if you use the same query frequently,
  * try caching FbTitleFormat object (by storing it somewhere),
  * instead of creating it every time.
- * 
+ *
  * @constructor
  * @param {string} expression
  */
@@ -2718,7 +2718,7 @@ function GdiBitmap(arg) {
      * Changes will be saved in the current bitmap.
      *
      * @param {GdiBitmap} img
-     * 
+     *
      * @example <caption>Blur image<caption>
      * // samples\basic\Apply Mask.txt
      */
@@ -2774,6 +2774,13 @@ function GdiBitmap(arg) {
     this.GetGraphics = function () { };
 
     /**
+     * Inverts the colours in a bitmap, to create a negative image.
+     * i.e. White becomes black, black becomes white, etc.
+     * @return {GdiBitmap}
+     */
+    this.InvertColours = function () { }; // (GdiBitmap)
+
+    /**
      * @param {GdiGraphics} gr
      */
     this.ReleaseGraphics = function (gr) { }; // (GdiGraphics)
@@ -2788,7 +2795,7 @@ function GdiBitmap(arg) {
 
     /**
      * Changes will be saved in the current bitmap.
-     * 
+     *
      * @param {number} mode See Flags.js > RotateFlipType
      */
     this.RotateFlip = function (mode) { }; // (void)
@@ -2813,7 +2820,7 @@ function GdiBitmap(arg) {
 
     /**
      * Changes will be saved in the current bitmap.
-     * 
+     *
      * @param {number} radius Valid values 2-254.
      *
      * @example <caption>Blur image<caption>
@@ -2827,11 +2834,11 @@ function GdiBitmap(arg) {
 
 /**
  * Constructor may fail if font is not present.<br>
- * 
- * Performance note: try caching and reusing `GdiFont` objects, 
+ *
+ * Performance note: try caching and reusing `GdiFont` objects,
  * since the maximum amount of such objects is hard-limited by Windows.
  * `GdiFont` creation will fail after reaching this limit.
- * 
+ *
  * @constructor
  * @param {string} name
  * @param {number} size_px See Helper.js > Point2Pixel function for conversions
@@ -3094,7 +3101,7 @@ function GdiGraphics() {
      * <br>
      * Note: uses special rules for `&` character by default, which consumes the `&` and causes the next character to be underscored.
      * This behaviour can be changed (or disabled) via `format` parameter.
-     * 
+     *
      * @param {string} str
      * @param {GdiFont} font
      * @param {number} colour
@@ -3249,20 +3256,20 @@ function DropTargetAction() {
      */
     this.Playlist = undefined; // (write)
 
-    /** 
+    /**
      * The tooltip text that is displayed during dragging.<br>
      * If the property is not modified, then default tooltip text will be used.
      * <br>
      * Note: property is write-only.
-     * 
-     * @type {string} 
+     *
+     * @type {string}
      */
     this.Text = undefined; // (write)
 
-    /**      
+    /**
      * Note: property is write-only.
-     * 
-     * @type {boolean} 
+     *
+     * @type {boolean}
      */
     this.ToSelect = undefined; // (boolean) (write)
 }
@@ -3287,7 +3294,7 @@ function ContextMenuManager() {
 
     /**
      * Initializes context menu by supplied tracks.
-     * 
+     *
      * @param {FbMetadbHandleList} handle_list
      */
     this.InitContext = function (handle_list) { }; // (void)
@@ -3300,8 +3307,8 @@ function ContextMenuManager() {
 
     /**
      * Initializes context menu by currently played track.
-     * 
-     * @method 
+     *
+     * @method
      */
     this.InitNowPlaying = function () { }; // (void)
 }
@@ -3324,7 +3331,7 @@ function MainMenuManager() {
      */
     this.ExecuteByID = function (id) { }; // (boolean)
 
-    /** 
+    /**
      * @param {string} root_name Must be one of the following: 'file', 'view', 'edit', 'playback', 'library', 'help'
      */
     this.Init = function (root_name) { }; // (void)

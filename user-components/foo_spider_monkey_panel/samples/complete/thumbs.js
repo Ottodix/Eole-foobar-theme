@@ -63,13 +63,17 @@ function on_playback_dynamic_info_track() {
 }
 
 function on_playback_new_track() {
-	panel.item_focus_change();
+	thumbs.playback_new_track();
 }
 
 function on_playback_stop(reason) {
 	if (reason != 2) {
 		panel.item_focus_change();
 	}
+}
+
+function on_playback_time(time) {
+	thumbs.playback_time();
 }
 
 function on_playlist_switch() {
