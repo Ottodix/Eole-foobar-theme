@@ -3031,6 +3031,7 @@ oBrowser = function(name) {
 	this.dateCircleBG = false;
 	this.cursor = 'default';
 	this.playedCoversGradient = 4;
+	this.repaint_rect = false;	
 	if(properties.showheaderbar)
 		this.headerBarHeight = 44;
 	else
@@ -3046,6 +3047,18 @@ oBrowser = function(name) {
     this.repaint = function() {
         repaint_main1 = repaint_main2;
     }
+    this.RepaintRect = function(x,y,w,h) {
+		if(this.repaint_rect) {
+			this.repaint();
+			this.repaint_rect = false;
+			return;
+		}
+		this.repaint_x = x;
+		this.repaint_y = y;		
+		this.repaint_w = w;
+		this.repaint_h = h;
+		this.repaint_rect = true;
+    }		
 	this.FormatTime = function(time){
 		time_txt="";
 		timetodraw=time;
@@ -3712,7 +3725,9 @@ oBrowser = function(name) {
 				if(ay >= (0 - this.rowHeight) && ay < this.y + this.h) {
 					// Calcs
 					coverTop = ay + this.CoverMarginTop;
-
+					this.groups_draw[i].x = ax;
+					this.groups_draw[i].y = coverTop;
+					
 					// cover
 					if(this.groups_draw[i].cover_img_thumb!=null && typeof this.groups_draw[i].cover_img_thumb != "string") {
 						//Shadow
@@ -4206,15 +4221,15 @@ oBrowser = function(name) {
             }
 
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
-				if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
-					this.activeColumn = 0;
-					this.activeIndex = -1;
-				} else {
+				//if((x - this.x - this.marginLR)%this.thumbnailWidth < this.marginSide - properties.CoverHoverExtendRect || (x - this.x - this.marginLR)%this.thumbnailWidth > this.thumbnailWidth - this.marginSide +properties.CoverHoverExtendRect )  {
+				//	this.activeColumn = 0;
+				//	this.activeIndex = -1;
+				//} else {
 					if(x < this.x + this.marginLR) this.activeColumn=0;
 					else this.activeColumn = Math.ceil((x - this.x - this.marginLR) / this.thumbnailWidth) - 1;
 					this.activeIndex = (this.activeRow * this.totalColumns) + this.activeColumn;
 					this.activeIndex = this.activeIndex > this.groups_draw.length - 1 ? -1 : this.activeIndex;
-				}
+				//}
             } else {
                 this.activeIndex = -1;
             }
@@ -4342,7 +4357,39 @@ oBrowser = function(name) {
                 isScrolling = false;
             }
         }
-
+		
+		if(brw.activeIndex != brw.activeIndexSaved) {
+			try{
+				repaintIndexSaved = (brw.activeIndexSaved>=0)?brw.activeIndexSaved:brw.activeIndex;
+				repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
+				
+				if(repaintIndex>=0){
+					active_x_saved = brw.groups_draw[repaintIndexSaved].x;
+					active_x = brw.groups_draw[repaintIndex].x;
+					if(active_x > active_x_saved) {
+						repaint_x = active_x_saved;
+						repaint_x_end = active_x + brw.coverRealWith;
+					} else {
+						repaint_x = active_x;
+						repaint_x_end = active_x_saved + brw.coverRealWith;				
+					}
+					active_y_saved = brw.groups_draw[repaintIndexSaved].y;
+					active_y = brw.groups_draw[repaintIndex].y;
+					if(active_y > active_y_saved) {
+						repaint_y = active_y_saved;
+						repaint_y_end = active_y + brw.coverRealWith;
+					} else {
+						repaint_y = active_y;
+						repaint_y_end = active_y_saved + brw.coverRealWith;				
+					}
+					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+				} else repaint_1 = true;
+			} catch(e){
+				repaint_1 = true;
+			}				
+			brw.activeIndexSaved = brw.activeIndex;
+		}
+		
 		if(brw.activeIndex != brw.activeIndexSaved) {
 			brw.activeIndexSaved = brw.activeIndex;
 			repaint_1 = true;
@@ -4357,7 +4404,10 @@ oBrowser = function(name) {
             repaintforced = true;
             repaint_main = true;
             window.Repaint();
-        }
+        } else if(brw.repaint_rect && brw.finishLoading){
+			window.RepaintRect(brw.repaint_x, brw.repaint_y, brw.repaint_w, brw.repaint_h);
+			brw.repaint_rect = false;
+		}
     }
 
     this.setResizeButton = function (w,h) {
