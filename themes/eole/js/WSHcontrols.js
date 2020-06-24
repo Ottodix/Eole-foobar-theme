@@ -2191,35 +2191,33 @@ function randomPlayMenu(x, y){
 function menuOutputAndDSP(x, y){
 	var menu = window.CreatePopupMenu();
 
-	var str = fb.GetOutputDevices();
-	var arr = JSON.parse(str);
+	var outputs = JSON.parse(fb.GetOutputDevices());
 	menu.AppendMenuItem(MF_GRAYED, 0, "Output device:");
 	menu.AppendMenuSeparator();	
 	var active = -1;
-	for (var i = 0; i < arr.length; i++) {
-		menu.AppendMenuItem(MF_STRING, i + 1, arr[i].name);
-		if (arr[i].active) active = i;
+	for (var i = 0; i < outputs.length; i++) {
+		menu.AppendMenuItem(MF_STRING, i + 1, outputs[i].name);
+		if (outputs[i].active) active = i;
 	}
-	if (active > -1) menu.CheckMenuRadioItem(1, arr.length + 1, active + 1);
+	if (active > -1) menu.CheckMenuRadioItem(1, outputs.length + 1, active + 1);
 
-	var str = fb.GetDSPPresets();
-	var arr = JSON.parse(str);	
-	menu.AppendMenuSeparator();			
+	var dsps = JSON.parse(fb.GetDSPPresets());
+	menu.AppendMenuSeparator();
 	menu.AppendMenuItem(MF_GRAYED, 0, "DSP preset:");
 	menu.AppendMenuSeparator();	
-	if(arr.length>0){
-		var active = -1;   	
-		for (var i = 0; i < arr.length; i++) {
-			menu.AppendMenuItem(MF_STRING, i + 1000, arr[i].name);		
-			if (arr[i].active) active = i;
-		}   
-		if (active > -1) menu.CheckMenuRadioItem(1000, arr.length + 1000, active + 1000);	
+	if(dsps.length>0){
+		var active = -1;
+		for (var i = 0; i < dsps.length; i++) {
+			menu.AppendMenuItem(MF_STRING, i + 1000, dsps[i].name);
+			if (dsps[i].active) active = i;
+		}
+		if (active > -1) menu.CheckMenuRadioItem(1000, dsps.length + 1000, active + 1000);
 	} else {
 		menu.AppendMenuItem(MF_GRAYED, 0, "You didn't define any DSP presets.");
-		menu.AppendMenuItem(MF_GRAYED, 0, "Foobar > File > Preference > Playback > DSP manager");		
+		menu.AppendMenuItem(MF_GRAYED, 0, "Foobar > File > Preference > Playback > DSP manager");
 	}
 	var idx = menu.TrackPopupMenu(x, y, 0x0020);
-	if (idx > 0 && idx < 999) fb.SetOutputDevice(arr[idx - 1].output_id, arr[idx - 1].device_id); 
+	if (idx > 0 && idx < 999) fb.RunMainMenuCommand(outputs[idx - 1].name); 
 	else if (idx > 999) fb.SetDSPPreset(idx-1000); 
 }
 function moreMenu(x, y){
