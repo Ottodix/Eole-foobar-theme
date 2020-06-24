@@ -11,7 +11,7 @@ var properties = {
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),
     showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),
-	headerbar_height:35,
+	headerbar_height:39,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
 	showLibraryTreeSwitch:true,
@@ -1368,7 +1368,7 @@ function panel_operations() {
 
     this.on_size = function() {
         this.f_x1 = ui.w - ui.margin - this.f_w[this.filter_by] - this.f_sw;
-        this.s_x = Math.round(ui.margin + properties.headerbar_height*4/5)-5;
+        this.s_x = Math.round(ui.margin + properties.headerbar_height*4/5)-4;
         this.s_w1 = ui.w - ui.margin;
         this.s_w2 = this.s_show > 1 ? this.f_x1 - this.s_x - 11 : this.s_w1 - Math.round(ui.row_h * 0.75) - this.s_x + 1;
         this.ln_sp = this.s_show ? ui.row_h * 0.1 : 0;
@@ -3237,7 +3237,7 @@ function searchLibrary() {
             this.drawsel(gr);
             get_offset(gr);
             gr.GdiDrawText(p.s_txt.substr(offset), ui.font, colors.normal_txt, p.s_x, this.y, p.s_w2, p.s_sp, p.l);
-        } else if(!(p.s_search)) gr.GdiDrawText("Search tree...", ui.s_font, colors.normal_txt, p.s_x, this.y+1, p.s_w2-5, p.s_sp-1, p.l | DT_END_ELLIPSIS);
+        } else if(!(p.s_search)) gr.GdiDrawText("Filter...", g_font.plus1, colors.normal_txt, p.s_x, this.y, p.s_w2-5, p.s_sp-1, p.l | DT_END_ELLIPSIS);
         sL.drawcursor(gr);
 
         if (p.s_show > 1) {
@@ -3561,19 +3561,19 @@ function button_manager() {
         }
 		this.btns = [];
         if (p.s_show) {
-            this.btns.s_img = new btn(qx-4, qy, images.search_icon.Width, qh, 3, "", "", "", {
+            this.btns.s_img = new btn(qx, qy-1, images.search_icon.Width, qh, 3, "", "", "", {
                 normal: images.search_icon,
                 hover: images.search_icon
             }, function() {
 				sL.activate(0,0);
             }, "", "Filter tree");
-            this.btns.cross1 = new btn(qx-4, qy, qh, qh, 3, "", "", "", {
+            this.btns.cross1 = new btn(qx, qy-2, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
                 if(!sL.lbtn_down) sL.clear();
             }, "Reset filter");
-            this.btns.cross2 = new btn(qx-1, qy-1, qh, qh, 3, "", "", "", {
+            this.btns.cross2 = new btn(qx+2, qy-2, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
