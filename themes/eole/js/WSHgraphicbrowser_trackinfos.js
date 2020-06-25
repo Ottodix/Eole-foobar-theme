@@ -1061,12 +1061,13 @@ oRow = function(metadb,itemIndex) {
 				var playingText = gdi.CreateImage(this.w+10, this.h);
 				pt = playingText.GetGraphics();
 					pt.SetTextRenderingHint(5);
-					if(typeof(g_showlist.backgroungImg) == "undefined" || !g_showlist.backgroungImg) {
-						g_showlist.backgroungImg = setWallpaperImgV2(g_showlist.showlist_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
-						//g_showlist.backgroungImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+					if(typeof(g_showlist.g_wallpaperImg) == "undefined" || !g_showlist.g_wallpaperImg) {
+						g_showlist.g_wallpaperImg = setWallpaperImgV2(g_showlist.showlist_img, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
+						//g_showlist.g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_showlist.pl[0], true, this.w, this.h*16,properties.wallpaperblurvalue,false);
 					};
-					pt.DrawImage(g_showlist.backgroungImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.backgroungImg.Width, this.h);
-					pt.FillSolidRect(10, 0, this.w, this.h, (g_showlist.colorSchemeAlbumArtProgressbar)?g_showlist.colorSchemeAlbumArtProgressbar:g_showlist.progressbar_color_bg_on); //solid bg
+					pt.DrawImage(g_showlist.g_wallpaperImg, 10, 0, this.w,  this.h, 0, 0, g_showlist.g_wallpaperImg.Width, this.h);
+					if(!g_showlist.light_bg) pt.FillSolidRect (10, 0, this.w, this.h, dark.albumartprogressbar_overlay);  //solid bg
+					else pt.FillSolidRect (10, 0, this.w, this.h, colors.albumartprogressbar_overlay);  //solid bg
 					if(elapsed_seconds%2==0)
 						pt.DrawImage(now_playing_progress0, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
 					else
@@ -6776,6 +6777,7 @@ function get_colors() {
 		showlist_close_icon : GetGrey(255),
 		showlist_close_iconhv : GetGrey(0),
 		border_color : GetGrey(255,30),
+		albumartprogressbar_overlay : GetGrey(255,30),		
 	}
 	light = {
 		normal_txt : GetGrey(0),
@@ -6800,7 +6802,8 @@ function get_colors() {
 		showlist_close_iconhv : GetGrey(255),
 		border_color : GetGrey(0,60),
 		border_color_colored : GetGrey(0,20),
-		border_color_colored_darklayout : GetGrey(255,30)
+		border_color_colored_darklayout : GetGrey(255,30),
+		albumartprogressbar_overlay : GetGrey(0,80),
 	}
 	colors.showlist_arrow = colors.showlist_bg;
 	if(properties.darklayout){

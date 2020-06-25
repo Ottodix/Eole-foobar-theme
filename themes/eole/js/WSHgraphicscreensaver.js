@@ -788,14 +788,11 @@ oRow = function(metadb,itemIndex) {
 			gr.DrawRect(this.x+9, y-3, this.w+1, this.h-1, 1.0, g_showlist.g_color_flash_rectline);
 		}
         if(isPlaying && properties.drawProgressBar && !(properties.AlbumArtProgressbar && !(properties.showListColoredOneColor || properties.showListColoredBlurred || properties.showListColoredMixedColor)) && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
-
 				gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, this.h, 0, g_showlist.progressbar_color_bg_off, g_showlist.progressbar_color_bg_on, 1.0); //grad bg
 				gr.FillSolidRect(this.x+20, y-3, current_size-7, this.h, g_showlist.progressbar_color_bg_on); //solid bg
 
 				gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad top
 				gr.FillSolidRect(this.x+20, y-3, current_size-7, 1, g_showlist.progressbar_linecolor1); //line top
-
-
 
 				gr.FillGradRect(this.x+20-track_gradient_size, y-4+this.h, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad bottom
 				gr.FillSolidRect(this.x+20, y-4+this.h, current_size-7, 1, g_showlist.progressbar_linecolor1); //line bottom
@@ -843,17 +840,6 @@ oRow = function(metadb,itemIndex) {
 			this.ToolTipText = this.title_text + this.playcount_text;
 		}
 
-		// rating Stars
-		if(properties.showRating && g_showlist.ratingImages && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0))) {
-			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
-			if(this.ishover_rating && this.hover_rating>-1) {
-				var rating = this.hover_rating;
-			} else
-				var rating = this.rating;
-
-			gr.DrawImage(g_showlist.ratingImages[rating], this.rating_x, this.y+rating_vpadding, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 0, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 255);
-		};
-
         gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
         if(isPlaying && properties.AlbumArtProgressbar && !(properties.showListColoredOneColor || properties.showListColoredBlurred || properties.showListColoredMixedColor) && properties.drawProgressBar) {
@@ -879,7 +865,16 @@ oRow = function(metadb,itemIndex) {
 				gr.DrawRect(this.x+10, y-3, current_size+1, this.h-1,1,colors.albumartprogressbar_rectline)
 				gr.GdiDrawText(this.title_text, g_font.normal, colors.albumartprogressbar_txt, (this.x + this.tracknumber_w + 10), y+this.textTop, current_size-26, this.textHeight, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX);
         }
+		// rating Stars
+		if(properties.showRating && g_showlist.ratingImages && (!properties.showRatingSelected || this.isSelected || (properties.showRatingRated && this.rating>0))) {
+			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
+			if(this.ishover_rating && this.hover_rating>-1) {
+				var rating = this.hover_rating;
+			} else
+				var rating = this.rating;
 
+			gr.DrawImage(g_showlist.ratingImages[rating], this.rating_x, this.y+rating_vpadding, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 0, g_showlist.ratingImages[rating].Width, g_showlist.ratingImages[rating].Height, 0, 255);
+		};
     }
     this.check = function(event, x, y) {
         this.ishover = (x > this.x+10 && x < this.x + 10 + this.w - 5 && y >= this.y && y < this.y + this.h - 1);
