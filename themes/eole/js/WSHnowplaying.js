@@ -245,13 +245,13 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;
         } else if(this.text=='NowPlaying'){
-            if((g_cover.isPlaying()) || (!g_cover.isPlaying() && properties.single_click_action!=1) || !g_cover.isHover  || Randomsetfocus || g_cover.playlistIndex<0 || !g_cover.metadb || !fb.IsPlaying){
+            if((properties.single_click_action!=1) || !g_cover.isHover  || Randomsetfocus || g_cover.playlistIndex<0 || !g_cover.metadb || !fb.IsPlaying){
                 this.state = ButtonStates.hide;return;
             } else this.state = ButtonStates.normal;
         } else if(this.text=='Pause'){
 			this.tooltip_text = fb.IsPaused?"Resume Playback":"Pause playback";
 			var play_pause = (fb.IsPaused || (g_cover.isPlaying() && g_cover.isHover));
-            if(!play_pause || Randomsetfocus || !g_cover.isPlaying()){
+            if(!play_pause || Randomsetfocus || !g_cover.isPlaying() || properties.single_click_action!=0){
                 this.state = ButtonStates.hide;return;
             } else {
 				if(this.state!=ButtonStates.hover)
@@ -428,7 +428,7 @@ function on_size(w, h) {
 		index=i-1;
 		rbutton[i].setx(rating_x + imgw * index + rating_spacing * index);
 	}
-	TextBtn_info.setSize(0, rbutton[0].height + 10, ww, track_infos_height);	
+	TextBtn_info.setSize(0, wh-track_infos_height, ww, track_infos_height);	
 }
 
 function on_mouse_lbtn_up(x, y, m) {
@@ -474,28 +474,30 @@ function on_mouse_lbtn_down(x, y, m) {
 
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
-	if(fb.IsPlaying) {
-		switch(true){
-
-			case (properties.dble_click_action==0):
-				fb.Pause();
-				window.NotifyOthers("stopFlashNowPlaying",true);
-			break;
-			case (properties.dble_click_action==1):
-				showNowPlaying(true);
-			break;
-			case (properties.dble_click_action==2):
-				if(!g_cover.isFiller()) showNowPlayingCover();
-			break;
-			case (properties.dble_click_action==3):
-				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
-			break;
-			case (properties.dble_click_action==4):
-				window.NotifyOthers('toggleLayoutMode',true);
-			break;
-		}
+	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
+		fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);	
+	} else {
+		if(fb.IsPlaying) {
+			switch(true){
+				case (properties.dble_click_action==0):
+					fb.Pause();
+					window.NotifyOthers("stopFlashNowPlaying",true);
+				break;
+				case (properties.dble_click_action==1):
+					showNowPlaying(true);
+				break;
+				case (properties.dble_click_action==2):
+					if(!g_cover.isFiller()) showNowPlayingCover();
+				break;
+				case (properties.dble_click_action==3):
+					fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
+				break;
+				case (properties.dble_click_action==4):
+					window.NotifyOthers('toggleLayoutMode',true);
+				break;
+			}
+		}		
 	}
-	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);	
 }
 
 function on_mouse_move(x, y, m) {
@@ -1855,7 +1857,7 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuSeparator();
 
 		var _single_click_menu = window.CreatePopupMenu();
-		_single_click_menu.AppendMenuItem(MF_STRING, 14, "Play");
+		_single_click_menu.AppendMenuItem(MF_STRING, 14, "Play / pause");
 		_single_click_menu.AppendMenuItem(MF_STRING, 15, "Show now playing");
 		_single_click_menu.CheckMenuRadioItem(14, 15, 14+properties.single_click_action);
 		_single_click_menu.AppendTo(_menu, MF_STRING, "Single click action");
