@@ -30,6 +30,7 @@ var properties = {
 	playandrandom: window.GetProperty("GLOBAL play and random",false),
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
 	panelFontAdjustement: -1,
+	volumeA1waysVisible: window.GetProperty("_DISPLAY always show volume bar", false),
 	repeatRandom: true,
 }
 
@@ -159,7 +160,7 @@ volume_vars = {
 volume_vars.ellipse_diameter_start = volume_vars.ellipse_diameter = progress_vars.ellipse_diameter;
 volume_vars.ellipse_margin_top=-Math.ceil(volume_vars.ellipse_diameter/2);
 
-var VolumeSliderActive=false;
+var VolumeSliderActive=properties.volumeA1waysVisible && layout_state.isEqual(0);
 
 var hoovervolume=false;
 var g_pos_progress = 0;
@@ -350,7 +351,7 @@ function get_colors(){
 	build_images();
 	adapt_display_to_layout();
 }
-function adapt_display_to_layout(){
+function adapt_display_to_layout(new_track){
 	if(layout_state.isEqual(1)){
 		hideProgressWhenVolumeChange = true;
 		for (var i in buttons_right) {
@@ -439,13 +440,18 @@ function adapt_display_to_layout(){
 			for (var i in buttons_right) {
 				buttons_right[i].y = buttons_right_top_m;
 			}
-			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
-			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5;
-
 			volume_vars.margin_top = global_top_m+20;
-			volume_vars.margin_right = 40;
-			volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
-			volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			if(!properties.volumeA1waysVisible){
+				volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
+				volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+				volume_vars.margin_right = 40;
+			} else {
+				volume_vars.width = 80;
+				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 10;
+				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;				
+			}
+			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
+			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5+(properties.volumeA1waysVisible?volume_vars.width+button_padding:0);			
 		} else {
 			if(mini_controlbar.isActive()) {
 				title_margin_top = -19;
@@ -473,8 +479,17 @@ function adapt_display_to_layout(){
 
 			volume_vars.margin_top = global_top_m+20;
 			volume_vars.margin_right = 40;
-			volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
-			volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			if(!properties.volumeA1waysVisible){
+				volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
+				volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			} else {
+				volume_vars.width = 80;
+				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 10;
+				console.log(buttons_right.Volume.x)				
+				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;	
+				progress_margin_right = progress_margin_right + volume_vars.width + button_padding+5;
+			}			
+
 		}
 	}
 }
@@ -719,6 +734,10 @@ function setRatingBtn(metadb,new_rating){
 }
 function showVolumeSlider(new_state){
 	var toggle = typeof new_state !== 'undefined' ? false : true;
+	if(properties.volumeA1waysVisible && layout_state.isEqual(0)) {
+		VolumeSliderActive=true;	console.log("--------------------")
+		return;
+	}
 	if(toggle){
 		for (var i in buttons_right) {
 			if(buttons_right[i].text!="Volume") buttons_right[i].Togglehide();
@@ -759,8 +778,12 @@ function on_size(w, h) {
 
 }
 function calculate_onsize_vars(w, h){
-	if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
-	else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left
+	if(!properties.volumeA1waysVisible || layout_state.isEqual(1)){
+		if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
+		else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left;
+	} else {
+		volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;		
+	}
 	calculateVolumeSize();
 
 	//Progress
@@ -1261,7 +1284,7 @@ function on_playback_dynamic_info_track() {
 }
 function on_playback_new_track(metadb) {
 	if(properties.displayStop) {
-		adapt_display_to_layout();
+		adapt_display_to_layout(true);
 		calculate_onsize_vars(ww, wh);
 	}
 	setSchedulerText();
@@ -1331,7 +1354,7 @@ function on_playback_stop(reason) {
 			get_text();
 		}
 		if(properties.displayStop){
-			adapt_display_to_layout();
+			adapt_display_to_layout(true);
 			calculate_onsize_vars(ww, wh);
 		}
 		break;
@@ -1663,12 +1686,14 @@ function on_notify_data(name, info) {
 					properties.showwallpaper=(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3);
 					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
 				}
+				VolumeSliderActive = false;
 			} else {
 				properties.showTrackInfo = showtrackinfo_big.isActive();
 				if(globalProperties.colorsControls==4) {
 					properties.showwallpaper=(globalProperties.colorsMainPanel==1 || globalProperties.colorsMainPanel==3);
 					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
 				}
+				VolumeSliderActive = properties.volumeA1waysVisible;
 			}
 			get_colors();
 			on_size(window.Width, window.Height);
@@ -2913,6 +2938,8 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(3027, mini_controlbar.isActive());
 		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
 		_menu.CheckMenuItem(3015, properties.showTrackInfo);
+		_menu.AppendMenuItem(MF_STRING, 3030, "Always show volume bar");
+		_menu.CheckMenuItem(3030, properties.volumeA1waysVisible);		
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
 		_menu.CheckMenuItem(3016, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
 
@@ -3123,7 +3150,16 @@ function draw_settings_menu(x,y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
-            default:
+            case (idx == 3030):
+				properties.volumeA1waysVisible = !properties.volumeA1waysVisible;
+				VolumeSliderActive = properties.volumeA1waysVisible;
+				window.SetProperty("_DISPLAY always show volume bar", properties.volumeA1waysVisible);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;				
+            default:		
 				return true;
         }
 
