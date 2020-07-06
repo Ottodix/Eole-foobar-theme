@@ -380,12 +380,9 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				this.cur_btn = this.chooseButton(x, y);
 				if (this.cur_btn == old && this.cur_btn != null && typeof this.cur_btn === 'object') {
 					this.cur_btn.onMouse('lbtn_up',x,y);
-					//console.log("lbtn_up1"+this.cur_btn.name)
 				}
 				else {
 					old && old.changeState(ButtonStates.normal);
-					/*console.log("lbtn_up2"+old.name)
-					window.Repaint();*/
 				}
 				return (this.cur_btn != null && typeof this.cur_btn === 'object');				
 			break;

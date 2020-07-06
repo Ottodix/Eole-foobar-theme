@@ -2850,10 +2850,6 @@ var gtt = fb.CreateProfiler();
 var g_dnd_handles = null;
 var g_dnd_status = false;
 
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var WshShell = new ActiveXObject("WScript.Shell");
-var htmlfile = new ActiveXObject('htmlfile');
-
 var cover_path = new RegExp("(artwork)|(cover)|(scan)|(image)");
 var cover_img = cover.masks.split(";");
 var stub_image, cell_null;

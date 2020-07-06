@@ -882,7 +882,16 @@ function on_playlist_items_selection_change() {
 	} else g_pinfo.refresh_needed = 4;
 }
 
-
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_mouse_move(x, y, m) {
 	if(g_cursor.x==x && g_cursor.y==y) return;
 	g_cursor.onMouse("move", x, y, m);
@@ -943,9 +952,10 @@ function on_mouse_lbtn_down(x, y) {
 function on_mouse_lbtn_up(x, y) {
     g_down = false;
     cur_btn = chooseButton(x, y);
-    if (cur_btn_down != null && typeof cur_btn_down === 'object') {
+    if (typeof cur_btn_down === 'object' && cur_btn_down != null) {
         cur_btn_down.onClick();
-    } if (cur_btn != null && typeof cur_btn === 'object' && plman.PlaylistItemCount(plman.ActivePlaylist)>0) {
+    }
+	if (typeof cur_btn === 'object' && cur_btn != null && plman.PlaylistItemCount(plman.ActivePlaylist)>0) {
         cur_btn.changeState(ButtonStates.hover);
          window.Repaint();
     }

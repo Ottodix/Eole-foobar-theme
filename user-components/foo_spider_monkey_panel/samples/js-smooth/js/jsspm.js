@@ -1650,9 +1650,6 @@ oBrowser = function (name) {
 Main
 ===================================================================================================
  */
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var WshShell = new ActiveXObject("WScript.Shell");
-var htmlfile = new ActiveXObject('htmlfile');
 
 var brw = null;
 var isScrolling = false;

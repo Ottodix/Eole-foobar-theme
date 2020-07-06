@@ -14,6 +14,7 @@ var properties = {
     screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
+    displayDevice: window.GetProperty("_DISPLAY device", false),	
     displayEqualizer: window.GetProperty("_DISPLAY equalizer", false),
     displayScheduler: window.GetProperty("_DISPLAY scheduler", false),
     displayRating: window.GetProperty("_DISPLAY rating", true),
@@ -29,6 +30,7 @@ var properties = {
 	playandrandom: window.GetProperty("GLOBAL play and random",false),
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
 	panelFontAdjustement: -1,
+	volumeA1waysVisible: window.GetProperty("_DISPLAY always show volume bar", false),
 	repeatRandom: true,
 }
 
@@ -79,7 +81,7 @@ var playAndRandom_triggered = false;
 var drag_timer = false;
 var update_wallpaper = false;
 var nowplaying_cachekey = '';
-var ww = 0, wh = 0;
+var ww = 0, wh = 0, ellipse_radius = 0;
 var m_pos_progress = 0;
 var global_top_m=15;
 var button_top_m=global_top_m;
@@ -158,7 +160,7 @@ volume_vars = {
 volume_vars.ellipse_diameter_start = volume_vars.ellipse_diameter = progress_vars.ellipse_diameter;
 volume_vars.ellipse_margin_top=-Math.ceil(volume_vars.ellipse_diameter/2);
 
-var VolumeSliderActive=false;
+var VolumeSliderActive=properties.volumeA1waysVisible && layout_state.isEqual(0);
 
 var hoovervolume=false;
 var g_pos_progress = 0;
@@ -221,6 +223,8 @@ function build_images(){
 	menu_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\settings.png");
 	equalizer_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\equalizer_hover.png");
 	equalizer_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\equalizer.png");
+	device_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\output_hover.png");
+	device_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\output.png");	
 	shuffle_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_hover.png");
 	shuffle_img_active = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_active.png");
 	shuffle_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle.png");
@@ -347,7 +351,7 @@ function get_colors(){
 	build_images();
 	adapt_display_to_layout();
 }
-function adapt_display_to_layout(){
+function adapt_display_to_layout(new_track){
 	if(layout_state.isEqual(1)){
 		hideProgressWhenVolumeChange = true;
 		for (var i in buttons_right) {
@@ -436,13 +440,18 @@ function adapt_display_to_layout(){
 			for (var i in buttons_right) {
 				buttons_right[i].y = buttons_right_top_m;
 			}
-			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
-			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5;
-
 			volume_vars.margin_top = global_top_m+20;
-			volume_vars.margin_right = 40;
-			volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
-			volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			if(!properties.volumeA1waysVisible){
+				volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
+				volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+				volume_vars.margin_right = 40;
+			} else {
+				volume_vars.width = 80;
+				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 10;
+				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;				
+			}
+			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
+			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5+(properties.volumeA1waysVisible?volume_vars.width+button_padding:0);			
 		} else {
 			if(mini_controlbar.isActive()) {
 				title_margin_top = -19;
@@ -470,8 +479,17 @@ function adapt_display_to_layout(){
 
 			volume_vars.margin_top = global_top_m+20;
 			volume_vars.margin_right = 40;
-			volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
-			volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			if(!properties.volumeA1waysVisible){
+				volume_vars.width = -1*buttons_right.Volume.x-button_width*3+5;
+				volume_vars.margin_left = window.Width-volume_vars.width-volume_vars.margin_right;
+			} else {
+				volume_vars.width = 80;
+				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 10;
+				console.log(buttons_right.Volume.x)				
+				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;	
+				progress_margin_right = progress_margin_right + volume_vars.width + button_padding+5;
+			}			
+
 		}
 	}
 }
@@ -493,10 +511,11 @@ function build_buttons(){
 		button_sep_value=53;
 	}
 	nb_of_buttons_right = 1;
-	properties.displayMore = (!properties.displayScheduler || !properties.displayEqualizer || !properties.displayRating || !properties.displayPlayRandom || !properties.displayShuffle || !properties.displayRepeat || !properties.displayOpen);
+	properties.displayMore = (!properties.displayScheduler || !properties.displayDevice || !properties.displayEqualizer || !properties.displayRating || !properties.displayPlayRandom || !properties.displayShuffle || !properties.displayRepeat || !properties.displayOpen);
 
 	nb_of_buttons_right+= (properties.displayMore)?1:0;
 	nb_of_buttons_right+= (properties.displayScheduler)?1:0;
+	nb_of_buttons_right+= (properties.displayDevice)?1:0;	
 	nb_of_buttons_right+= (properties.displayEqualizer)?1:0;
 	nb_of_buttons_right+= (properties.displayRating)?1:0;
 	nb_of_buttons_right+= (properties.displayPlayRandom)?1:0;
@@ -594,6 +613,10 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device & DSP presets", function () {
+			g_tooltip.Deactivate();
+			menuOutputAndDSP(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
+		},false,false,device_img,device_img_hover),		
 		Open: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Open", "Open files...",false, function () {
 			g_tooltip.Deactivate();
 			fb.AddFiles()
@@ -650,6 +673,9 @@ function build_buttons(){
 	if(!properties.displayEqualizer){
 		buttons_right.Equalizer.changeState(ButtonStates.hide);
 	}
+	if(!properties.displayDevice){
+		buttons_right.Device.changeState(ButtonStates.hide);
+	}	
 	if(!properties.displayScheduler){
 		buttons_right.Scheduler.changeState(ButtonStates.hide);
 	}
@@ -708,6 +734,10 @@ function setRatingBtn(metadb,new_rating){
 }
 function showVolumeSlider(new_state){
 	var toggle = typeof new_state !== 'undefined' ? false : true;
+	if(properties.volumeA1waysVisible && layout_state.isEqual(0)) {
+		VolumeSliderActive=true;	console.log("--------------------")
+		return;
+	}
 	if(toggle){
 		for (var i in buttons_right) {
 			if(buttons_right[i].text!="Volume") buttons_right[i].Togglehide();
@@ -748,8 +778,12 @@ function on_size(w, h) {
 
 }
 function calculate_onsize_vars(w, h){
-	if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
-	else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left
+	if(!properties.volumeA1waysVisible || layout_state.isEqual(1)){
+		if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
+		else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left;
+	} else {
+		volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;		
+	}
 	calculateVolumeSize();
 
 	//Progress
@@ -796,8 +830,8 @@ function on_paint(gr) {
 
 	//Progress
 	if(ww_progress > 0 && !(hideProgressWhenVolumeChange && VolumeSliderActive)) {
-		if(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag)) var ellipse_radius = 0;
-		else var ellipse_radius = Math.ceil(progress_vars.ellipse_diameter/2);
+		if(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag)) ellipse_radius = 0;
+		else ellipse_radius = Math.ceil(progress_vars.ellipse_diameter/2);
 
 		if(properties.cursor_style==2) {
 			gr.FillSolidRect(progress_margin_left, progress_margin_top-Math.round(progress_vars.height/2)+1, ww_progress, progress_vars.height,progressOffcolor);
@@ -1250,7 +1284,7 @@ function on_playback_dynamic_info_track() {
 }
 function on_playback_new_track(metadb) {
 	if(properties.displayStop) {
-		adapt_display_to_layout();
+		adapt_display_to_layout(true);
 		calculate_onsize_vars(ww, wh);
 	}
 	setSchedulerText();
@@ -1263,7 +1297,7 @@ function on_playback_new_track(metadb) {
 	if(properties.showwallpaper && properties.wallpapermode == 0) {
 		old_cachekey = nowplaying_cachekey;
 		nowplaying_cachekey = process_cachekey(metadb);
-		if(old_cachekey!=nowplaying_cachekey) {
+		if(old_cachekey!=nowplaying_cachekey || !fb.IsMetadbInMediaLibrary(metadb)) {
 			if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 		}
@@ -1320,7 +1354,7 @@ function on_playback_stop(reason) {
 			get_text();
 		}
 		if(properties.displayStop){
-			adapt_display_to_layout();
+			adapt_display_to_layout(true);
 			calculate_onsize_vars(ww, wh);
 		}
 		break;
@@ -1652,12 +1686,14 @@ function on_notify_data(name, info) {
 					properties.showwallpaper=(globalProperties.colorsMiniPlayer==1 || globalProperties.colorsMiniPlayer==3);
 					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
 				}
+				VolumeSliderActive = false;
 			} else {
 				properties.showTrackInfo = showtrackinfo_big.isActive();
 				if(globalProperties.colorsControls==4) {
 					properties.showwallpaper=(globalProperties.colorsMainPanel==1 || globalProperties.colorsMainPanel==3);
 					window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
 				}
+				VolumeSliderActive = properties.volumeA1waysVisible;
 			}
 			get_colors();
 			on_size(window.Width, window.Height);
@@ -2116,11 +2152,11 @@ function randomPlayMenu(x, y){
         var idx;
 
 		var checked_item_menu=3;
-		_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
+		_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly:");
 		_menu.AppendMenuSeparator();
         _menu.AppendMenuItem(MF_STRING, 3, "Tracks");
 			if(properties.random_function=='200_tracks') checked_item_menu=3;
-        _menu.AppendMenuItem(MF_STRING, 2, "Albums");
+        _menu.AppendMenuItem(MF_STRING, 2, "Album");
 			if(properties.random_function=='20_albums') checked_item_menu=2;
         _menu.AppendMenuItem(MF_STRING, 5, "Artist");
 			if(properties.random_function=='1_artist') checked_item_menu=5;
@@ -2136,7 +2172,7 @@ function randomPlayMenu(x, y){
 
 		genrePopupMenu.AppendTo(_menu, MF_STRING, "A specific genre");
 
-        idx = _menu.TrackPopupMenu(x,y,0x0020);
+        idx = _menu.TrackPopupMenu(x-(properties.displayDevice?100:0),y,0x0020);
         switch(true) {
             case (idx == 2):
                 properties.random_function = '20_albums';
@@ -2177,7 +2213,38 @@ function randomPlayMenu(x, y){
         _menu = undefined;
         return true;
 }
+function menuOutputAndDSP(x, y){
+	var menu = window.CreatePopupMenu();
 
+	var outputs = JSON.parse(fb.GetOutputDevices());
+	menu.AppendMenuItem(MF_GRAYED, 0, "Output device:");
+	menu.AppendMenuSeparator();	
+	var active = -1;
+	for (var i = 0; i < outputs.length; i++) {
+		menu.AppendMenuItem(MF_STRING, i + 1, outputs[i].name);
+		if (outputs[i].active) active = i;
+	}
+	if (active > -1) menu.CheckMenuRadioItem(1, outputs.length + 1, active + 1);
+
+	var dsps = JSON.parse(fb.GetDSPPresets());
+	menu.AppendMenuSeparator();
+	menu.AppendMenuItem(MF_GRAYED, 0, "DSP preset:");
+	menu.AppendMenuSeparator();	
+	if(dsps.length>0){
+		var active = -1;
+		for (var i = 0; i < dsps.length; i++) {
+			menu.AppendMenuItem(MF_STRING, i + 1000, dsps[i].name);
+			if (dsps[i].active) active = i;
+		}
+		if (active > -1) menu.CheckMenuRadioItem(1000, dsps.length + 1000, active + 1000);
+	} else {
+		menu.AppendMenuItem(MF_GRAYED, 0, "You didn't define any DSP presets.");
+		menu.AppendMenuItem(MF_GRAYED, 0, "Foobar > File > Preference > Playback > DSP manager");
+	}
+	var idx = menu.TrackPopupMenu(x, y, 0x0020);
+	if (idx > 0 && idx < 999) fb.RunMainMenuCommand(outputs[idx - 1].name); 
+	else if (idx > 999) fb.SetDSPPreset(idx-1000); 
+}
 function moreMenu(x, y){
 
         var idx;
@@ -2332,6 +2399,8 @@ function moreMenu(x, y){
 		_menu_button.CheckMenuItem(4020, properties.displayPlayRandom);
 		_menu_button.AppendMenuItem(MF_STRING, 4017, "Equalizer");
 		_menu_button.CheckMenuItem(4017, properties.displayEqualizer);
+		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device / DSP presets");
+		_menu_button.CheckMenuItem(4024, properties.displayDevice);		
 		_menu_button.AppendMenuItem(MF_STRING, 4018, "Rating");
 		_menu_button.CheckMenuItem(4018, properties.displayRating);
 		_menu_button.AppendMenuItem(MF_STRING, 4019, "Scheduler");
@@ -2552,6 +2621,14 @@ function moreMenu(x, y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
+            case (idx == 4024):
+				properties.displayDevice = !properties.displayDevice;
+				window.SetProperty("_DISPLAY device", properties.displayDevice);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;		
             case (idx == 4016):
 				properties.displayStop = !properties.displayStop;
 				window.SetProperty("_DISPLAY stop btn", properties.displayStop);
@@ -2748,30 +2825,35 @@ function draw_controls_menu(x,y){
 		_schedulerMenu.AppendMenuSeparator();
 		_schedulerMenu.AppendMenuItem(MF_STRING, 3022, "Hibernate after playlist");
 		_schedulerMenu.AppendMenuItem(MF_STRING, 3023, "Shutdown after playlist");
-			checked_item=0;
-			switch (true) {
-				case (scheduler.hibernate_after_current):
-					checked_item=3020
-					break;
-				case (scheduler.shutdown_after_current):
-					checked_item=3021
-					break;
-				case (scheduler.hibernate_after_playlist):
-					checked_item=3022
-					break;
-				case (scheduler.shutdown_after_playlist):
-					checked_item=3023
-					break;
-				case (fb.StopAfterCurrent):
-					checked_item=3019
-					break;
-				default:
-					checked_item=3018
-					break;
-			}
+		checked_item=0;
+		switch (true) {
+			case (scheduler.hibernate_after_current):
+				checked_item=3020
+				break;
+			case (scheduler.shutdown_after_current):
+				checked_item=3021
+				break;
+			case (scheduler.hibernate_after_playlist):
+				checked_item=3022
+				break;
+			case (scheduler.shutdown_after_playlist):
+				checked_item=3023
+				break;
+			case (fb.StopAfterCurrent):
+				checked_item=3019
+				break;
+			default:
+				checked_item=3018
+				break;
+		}
 		_schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 		_schedulerMenu.AppendTo(_menu, MF_STRING, "Scheduler");
-
+		
+		if(fb.IsPlaying){
+			_menu.AppendMenuSeparator();
+			_menu.AppendMenuItem(MF_STRING, 2, "Properties");
+		}
+		
 		if(utils.IsKeyPressed(VK_SHIFT)) {
 			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -2784,6 +2866,9 @@ function draw_controls_menu(x,y){
 			case (idx == 1):
 				draw_settings_menu(x,y);
                 break;
+			case (idx == 2):
+				fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
+			break;				
             case (idx == 3000):
                 fb.Stop();
                 break;
@@ -2853,6 +2938,8 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(3027, mini_controlbar.isActive());
 		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
 		_menu.CheckMenuItem(3015, properties.showTrackInfo);
+		_menu.AppendMenuItem(MF_STRING, 3030, "Always show volume bar");
+		_menu.CheckMenuItem(3030, properties.volumeA1waysVisible);		
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
 		_menu.CheckMenuItem(3016, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
 
@@ -2887,12 +2974,14 @@ function draw_settings_menu(x,y){
 		_menu_button.CheckMenuItem(3022, properties.displayRepeat);
 		_menu_button.AppendMenuItem(MF_STRING, 3021, "Shuffle");
 		_menu_button.CheckMenuItem(3021, properties.displayShuffle);
+		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
+		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);		
 		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
 		_menu_button.CheckMenuItem(3023, properties.displayOpen);
-		_menu_button.AppendMenuItem(MF_STRING, 3020, "Play randomly");
-		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);
+		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device");
+		_menu_button.CheckMenuItem(3029, properties.displayDevice);				
 		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
-		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);
+		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	
 		_menu_button.AppendMenuItem(MF_STRING, 3018, "Rating");
 		_menu_button.CheckMenuItem(3018, properties.displayRating);
 		_menu_button.AppendMenuItem(MF_STRING, 3019, "Scheduler");
@@ -2972,6 +3061,14 @@ function draw_settings_menu(x,y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
+            case (idx == 3029):
+				properties.displayDevice = !properties.displayDevice;
+				window.SetProperty("_DISPLAY device", properties.displayDevice);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;					
             case (idx == 3018):
 				properties.displayRating = !properties.displayRating;
 				window.SetProperty("_DISPLAY rating", properties.displayRating);
@@ -3053,7 +3150,16 @@ function draw_settings_menu(x,y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
-            default:
+            case (idx == 3030):
+				properties.volumeA1waysVisible = !properties.volumeA1waysVisible;
+				VolumeSliderActive = properties.volumeA1waysVisible;
+				window.SetProperty("_DISPLAY always show volume bar", properties.volumeA1waysVisible);
+				build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;				
+            default:		
 				return true;
         }
 

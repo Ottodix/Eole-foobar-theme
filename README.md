@@ -1,12 +1,11 @@
 # Eole Foobar theme
 
 This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
-
-THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
+This theme require Foobar2000 1.4 (or superior).
 
 ## Participate to the theme
 
-If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes, or even new features for this theme. Open an issue ticket, and share the code on [pastebin.com](https://www.pastebin.com), I'll review it and merge it to the master code. I can also add your github account to the collaborators of this repository, just ask!
+If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request, I'll review it and merge it to the master code. I can also add your github account to the collaborators of this repository, just ask.
 
 ## Preview
 
@@ -24,19 +23,19 @@ If you've got some knowledge in javascript, feel free to suggest code performanc
 
 3. From Columns UI in File > Preferences > Display > Columns UI, click on import, and select the following file: [FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl.
 
-4. Configure the winamp directory in shpeck for the visualisations, it's at the bottom of the preferences window: Click the Foobar button on top > File > Preferences > Visualisations > Shpeck. Click on the browse buttom and select the directory [FOOBAR_PROFILE_DIRECTORY]\plugins\winamp. Now on the visualisation tab, you can do a right click and select Milkdrop in the "Autostart Plugin" submenu.
+4. Configure the winamp directory in Shpeck for the visualisations, it's at the bottom of the preferences window: Click the Foobar button on top > File > Preferences > Visualisations > Shpeck. Click on the browse buttom and select the directory [FOOBAR_PROFILE_DIRECTORY]\plugins\winamp. Now on the visualisation tab, you can do a right click and select Milkdrop in the "Autostart Plugin" submenu.
 
-5. Optionally, only if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
+5. Optionally, if you want an extra polish, change the systray icon: Click the Foobar button on top > File > Preferences > Display > Columns UI > On the right, notification area tab > Tick Use custom icon > Click Select icon... and select the file [FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico (or any of the alternative icons in this folder)
 
 That's it! Enjoy your sound.
 
-WARNING : The visualization tab is powered by shpeck, which can be unstable. So if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: hold SHIFT and right click the visualisation tab at the top and select Properties. In the properties window, turn the value of "_PROPERTY show visualisation tab" to false. And remove the speck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout).
+WARNING : The visualization tab is powered by Shpeck, which can be unstable. So if it doesn't work or make foobar crash on your computer, you'll have to figure what's wrong yourself, you can try to find the lastest informations at the end of the discussion topic of Shpeck here http://tinyurl.com/hr2ybp2, or remove completely the visualisations (you will need to edit the theme a little bit for that: right click the visualisation tab at the top and select Settings. Check "hide visualization tab". And remove the Shpeck component at the bottom of the panel list in File > Preferences > Display > Columns UI > Layout).
 
-## USEFUL TO KNOW
+## Useful to know
 
 - Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display. This cache is based on the %album artist% & %album% tags. After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.
 
-- The library browser panel have an option to load every covers from the image cache at startup which is enabled by default and allow to browse your library without waiting for the covers to load. Foobar memory usage is higher when this option is enabled, because all the covers are loaded into the memory. This option work only once the image cache is already built: the image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.
+- The library browser panel have an option to load every covers from the image cache at startup which is enabled by default and allow to browse your library without waiting for the covers to load. Foobar memory usage is higher when this option is enabled, because all the covers are loaded into the memory. This option works only once the image cache is already built: the image cache is built little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.
 
 - Most panels have a settings menu, do a right click over them for that, or look for the hamburger icons. And if you want to get your hands dirty and edit a panel, press SHIFT and do a right click, you will then have a configure option, and you will see from the code which file contains the related script.
 

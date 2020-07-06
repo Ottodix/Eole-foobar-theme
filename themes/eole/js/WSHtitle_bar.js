@@ -8,6 +8,7 @@ var properties = {
 	fullMode_pmanagerheight: window.GetProperty("Full mode pmanager saved height", 820),
 	miniMode_savedwidth: window.GetProperty("Mini mode saved width", 290),
 	miniMode_playlistheight: window.GetProperty("Mini mode playlist saved height", 380),
+	autosearch: window.GetProperty("_DISPLAY: autosearch", true),
 	miniMode_defaultwidth:290,
 	miniMode_defaultheight:380,
 	fullMode_defaultwidth:1100,
@@ -199,7 +200,10 @@ function build_images(){
 	images.playlist_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\playlist_icon.png");
 
 	images.visualization_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_icon.png");
-
+	
+	images.trackinfos_on = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_on.png");
+	images.trackinfos_off = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\trackinfos_off.png");	
+	
 	images.fullscreen_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\fullscreen_icon.png");
 
 	images.search_toggle_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\search_icon.png");
@@ -477,11 +481,11 @@ function build_buttons(){
 		buttons.Idle.D_img = buttons.Idle.H_img;
 
 		if(getTrackInfosState()==1) {
-			buttons.RightSidebar.H_img = images.visualization_img;
-			buttons.RightSidebar.N_img = images.visualization_img;
+			buttons.RightSidebar.H_img = images.trackinfos_off;
+			buttons.RightSidebar.N_img = images.trackinfos_off;
 		} else {
-			buttons.RightSidebar.H_img = images.visualization_img;
-			buttons.RightSidebar.N_img = images.visualization_img;
+			buttons.RightSidebar.H_img = images.trackinfos_on;
+			buttons.RightSidebar.N_img = images.trackinfos_on;
 		}
 		buttons.RightSidebar.D_img = buttons.RightSidebar.H_img;
 
@@ -1355,7 +1359,7 @@ function draw_main_menu(x,y){
     child4.AppendTo(basemenu, MF_STRING, "Playback");
     child5.AppendTo(basemenu, MF_STRING, "Library");
     child6.AppendTo(basemenu, MF_STRING, "Help");
-    child7.AppendTo(basemenu, MF_STRING, "Now Playing");
+	if(fb.IsPlaying) child7.AppendTo(basemenu, MF_STRING, "Now Playing");
 
 	skin_settings_menu = window.CreatePopupMenu();
 	library_menu = window.CreatePopupMenu();
@@ -2421,7 +2425,12 @@ oSearch = function() {
 			gr.FillGradRect(this.x+this.w-1, this.y+1-grad_hadd, 1, grad_width, 90, colors.normal_bg, colors.search_line, 1.0); //right line
 		}
     };
-
+	this.resetSearch = function() {
+		if(fb.IsPlaying && this.inputbox.text.length > 0) showNowPlaying();
+		this.clearInputbox(true);
+		if(!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0)) g_searchbox.toggleVisibility(false);
+		g_searchbox.repaint();
+	}
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
@@ -2441,10 +2450,7 @@ oSearch = function() {
             case "lbtn_up":
                 if((this.inputbox.text.length > 0 || (!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0))) &&  !this.hide) {
                     if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
-						if(fb.IsPlaying && this.inputbox.text.length > 0) showNowPlaying();
-                        this.clearInputbox(true);
-						if(!(properties.alwaysShowSearch && !compact_titlebar.isActive()) && layout_state.isEqual(0)) g_searchbox.toggleVisibility(false);
-						g_searchbox.repaint();
+						this.resetSearch();
                     };
                 } else if((properties.alwaysShowSearch && !compact_titlebar.isActive())) {
 					if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
@@ -2496,7 +2502,7 @@ oSearch = function() {
 				if(!this.hide) {
 					switch (vkey) {
 							case VK_ESCAPE:
-								this.toggleVisibility(false);
+								this.resetSearch();
 								break;
 							default:
 								this.inputbox.on_key_down(vkey);
@@ -2513,14 +2519,14 @@ oSearch = function() {
 		if(code==13) {
 			if(this.inputbox.text.length < 3)
 				return;
-			g_launchSearch(true);
+			g_launchSearch(properties.autosearch);
 			g_searchHistory.add(this.inputbox.text);
 			g_searchHistory.writeSearchHistoryIni();
 		} else if(code!="")	{
 			this.inputbox.on_char(code);
 			if(this.inputbox.text.length==0) window.NotifyOthers("reset_filters",0);
 		}
-		this.showSearchResults();
+		if(properties.autosearch || code==13) this.showSearchResults();
     };
     this.showSearchResults = function() {
 		if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1) && layout_state.isEqual(0)){
@@ -2540,7 +2546,7 @@ oSearch = function() {
 	};
 	this.on_init = function() {
 		this.inputbox = new oInputbox(this.w, this.h, "", "Search...", colors.search_txt , 0, 0, colors.selected_bg, g_launchSearch, "g_searchbox", undefined, "g_font.min1");
-        this.inputbox.autovalidation = true;
+        this.inputbox.autovalidation = properties.autosearch;
 		this.adapt_look_to_layout();
     };
 	this.on_init();
@@ -2550,7 +2556,7 @@ function g_launchSearch(play_results) {
 	var play_results = typeof play_results !== 'undefined' ? play_results : false;
 	if(g_searchbox.inputbox.text.length < 3)
 		return;
-	var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text);
+	var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text.toLowerCase());
 	//window.NotifyOthers("search_launched",0);
 	apply_playlist(search_results,play_results,true,false);
 	search_results = undefined;
@@ -2643,21 +2649,28 @@ function draw_searchHistory_menu(x, y) {
 		basemenu.AppendMenuSeparator();
 		basemenu.AppendMenuItem(MF_STRING, properties.searchHistory_max_items+10, "Clear history");
 	}
-
+	basemenu.AppendMenuItem(MF_STRING, 1000, "Search as you type");
+	basemenu.CheckMenuItem(1000, properties.autosearch);
+	
     idx = 0;
     idx = basemenu.TrackPopupMenu(x, y, 0x0008);
 
     switch (true) {
-    case (idx > 0 && idx <= properties.searchHistory_max_items+1):
-		 g_searchbox.inputbox.text = g_searchHistory.historyList[idx-1][0];
-		 g_searchbox.inputbox.Cpos = g_searchbox.inputbox.text.length;
-		 g_launchSearch(false);
-		 g_searchbox.showSearchResults();
-		 window.Repaint();
-        break;
-    case (idx == properties.searchHistory_max_items+10):
-        g_searchHistory.reset();
-        break;
+		case (idx==1000):
+			properties.autosearch = !properties.autosearch;
+			window.SetProperty("_DISPLAY: autosearch", properties.autosearch);
+			g_searchbox.on_init();
+		break;
+		case (idx > 0 && idx <= properties.searchHistory_max_items+1):
+			g_searchbox.inputbox.text = g_searchHistory.historyList[idx-1][0];
+			g_searchbox.inputbox.Cpos = g_searchbox.inputbox.text.length;
+			g_launchSearch(false);
+			g_searchbox.showSearchResults();
+			window.Repaint();
+		break;
+		case (idx == properties.searchHistory_max_items+10):
+			g_searchHistory.reset();
+		break;
     }
     basemenu = undefined;
 }
@@ -2708,13 +2721,13 @@ function on_init(){
 	if(fb.IsPlaying) caption_title = fb.TitleFormat("[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]").Eval();
 	if(settings_file_not_found){
 		var welcome_msg_timer = setTimeout(function(){
-			chooseMemorySettings(" ", "<div class='titleBig'>Thanks for using EOLE!</div><div class='separator'></div><br/>Looks like you just installed this theme. In order to adapt the memory usage to the speed of your computer and size of your music library, please choose one of the covers & memory settings below.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it. If you don't understand all this, I advice to keep the default settings.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>After updating a existing cover, you must manually refresh it in foobar, do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','MemoryDialog','You can also reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers may look blurred if you decrease it too much.');
+			chooseMemorySettings(" ", "<div class='titleBig'>Looks like you just installed this theme?</div><div class='separator'></div><br/>Please read this popup fully, especially the text at the bottom, in order to understand how Eole image cache works.\n\nThe settings below influence the performances, the resolution of covers, and the memory footprint of this skin.\n\nYou can decrease it later by going to Foobar > Skin settings > Cover & memory usage\nif you experience performances issues or out of memory errors. On the contrary, if everything is working fine, then you can increase it. If you don't understand all this, keep the default settings.",'<br/>Useful tip: most panels have a settings menu available with a right-click.<br/><br/>Note: Eole uses a cover cache. The cover cache is built little by little: when a cover is displayed, if it isn\'t stored yet in the cache, it will be added to it, so on first display of any cover, it will be a little bit slow, but it will get a lot faster on the second display.<br/><br/>This cache is based on the %album artist% & %album% tags.<br/><br/>If you update a existing cover, you need to trigger a cache refresh. Do a right click over the cover which need to be refreshed, and you will have a menu item for that.<br/><br/>','MemoryDialog','You can reduce the width of the covers stocked in memory, below. Lower is this number, lower is the memory footprint of this skin. Note: the covers will looks blurred if you decrease it too much.');
 			theme_version.setValue(globalProperties.theme_version);
 			clearTimeout(welcome_msg_timer);
 			welcome_msg_timer=false;
 		}, 200);
 		RefreshPSS();
-	} else if(theme_version.getValue()<globalProperties.lastest_breaking_version) {
+	} else if(versionCompare(theme_version.getValue(),globalProperties.lastest_breaking_version)<0) {
 		var welcome_msg_timer = setTimeout(function(){
 			NoticeBox(" ","<div class='titleBig'>Import fcl file, Eole v"+(globalProperties.lastest_breaking_version)+" and after</div><div class='separator'></div><br/>Looks like your column UI configuration file is out of date, you need to import the new configuration file. You may loose some of the customizations you did to this theme, but you'll be able to set them back quickly.<br/><br/>On the preferences page (Foobar > File > Preferences), go to<br/>Display > column UI > Main tab > Import configuration...<br/><br/>And then import this file: [YOUR_FOOBAR_DIRECTORY]/themes/eole/columnsUI_eole.fcl", "Got it, open the preferences","Not now",'fb.RunMainMenuCommand("File/Preferences")');
 			clearTimeout(welcome_msg_timer);

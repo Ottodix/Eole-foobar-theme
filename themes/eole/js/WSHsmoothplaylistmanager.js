@@ -31,6 +31,7 @@ var properties = {
 	customColorHightlight: window.GetProperty("CUSTOM COLOR: highlight", "235-235-235"),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
+    sortAlphabetically: window.GetProperty("_PROPERTY: sort playlist alphabetically", false),	
 	panelFontAdjustement: -1,
 	emphasisOnActive: false,
 };
@@ -279,7 +280,6 @@ oFilterBox = function() {
         this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt","Reset filter");
 	};
 	this.getImages();
-
 	this.on_init = function() {
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Playlists...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.plus1");
         this.inputbox.autovalidation = true;
@@ -292,12 +292,10 @@ oFilterBox = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
     };
-
     this.setSize = function(w, h, font_size) {
         this.inputbox.setSize(w, h, font_size);
         this.getImages();
     };
-
     this.clearInputbox = function() {
         if(this.inputbox.text.length > 0) {
             this.inputbox.text = "";
@@ -305,7 +303,13 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-
+	this.resetSearch = function() {
+		if(this.inputbox.text.length > 0) {
+			this.inputbox.text = "";
+			this.inputbox.offset = 0;
+			g_sendResponse();
+		}
+	}
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
@@ -899,7 +903,29 @@ oBrowser = function(name) {
         // scrollbar update
         this.scrollbar.updateScrollbar();
     };
-
+	this.sort = function(){
+        var total = this.rows.length;
+		function sortPlaylistAlphabetically(a,b) {
+			if(a.name < b.name) return -1;
+			if(a.name > b.name) return 1;
+			return 0;
+		}		
+		g_avoid_on_playlists_changed = true;
+		if(properties.showNewPlaylistButton) this.rows.shift();
+		this.rows.sort(sortPlaylistAlphabetically);
+		var order = [];
+		for(var i = this.rows.length-1; i > 0; i--) {
+			order[this.rows[i].idx] = i;
+			g_avoid_on_playlists_changed = true;
+			//console.log(this.rows[i].name+" - from:"+this.rows[i].idx+" to:"+i);
+			//plman.MovePlaylist(this.rows[i].idx, i);
+		}
+		order.forEach((v, i) => {
+			plman.MovePlaylist(v, i);
+			console.log(this.rows[i].name+" - from:"+v+" to:"+i);
+		});
+		this.populate(true,14);
+	}
     this.init_groups = function() {
         var rowId = 0;
         var name = "";
@@ -913,7 +939,13 @@ oBrowser = function(name) {
 			this.rows.push(new oPlaylist(-1, rowId, "Create Playlist"));
 			rowId++;
 		 }
-
+	
+		function sortPlaylistAlphabetically(a,b) {
+			if(a.name < b.name) return -1;
+			if(a.name > b.name) return 1;
+			return 0;
+		}
+		
 		for(var i = 0; i < total; i++) {
 			name = plman.GetPlaylistName(i);
 			if(ExcludePlaylist(name)){
@@ -928,6 +960,7 @@ oBrowser = function(name) {
 				rowId++;
 			};
 		};
+
         this.rowsCount = rowId;
         this.getlimits();
     };
@@ -958,7 +991,7 @@ oBrowser = function(name) {
         g_first_populate_done = true;
 		Update_Required_function = "";
     };
-
+	
     this.getRowIdFromIdx = function(idx) {
         var total = this.rows.length;
         var rowId = -1;
@@ -1288,7 +1321,6 @@ oBrowser = function(name) {
 							this.inputbox.check("down", x, y);
 						} else {
 							if(this.inputboxID > -1) this.inputboxID = -1;
-							//if(this.selectedRow == this.rows[this.activeRow].idx) {
 							if(!this.up) {
 								// set dragged item to reorder list
 								cPlaylistManager.drag_clicked = true;
@@ -1874,7 +1906,10 @@ oBrowser = function(name) {
 
 		_menu.AppendMenuItem(MF_STRING, 913, "Playlists Icons");
 		_menu.CheckMenuItem(913, properties.showPlaylistIcons);
-
+		
+		//_menu.AppendMenuItem(MF_STRING, 914, "Sort playlists alphabetically");
+		//_menu.CheckMenuItem(914, properties.sortAlphabetically);	
+		
 		_menu.AppendMenuSeparator();
 
 		_rowHeight.AppendMenuItem(MF_STRING, 1000, "Increase");
@@ -1981,6 +2016,14 @@ oBrowser = function(name) {
                 get_metrics();
                 brw.repaint();
                 break;
+            case (idx == 914):
+				brw.sort();
+                /*properties.sortAlphabetically = !properties.sortAlphabetically;
+                window.SetProperty("_PROPERTY: sort playlist alphabetically", properties.sortAlphabetically);
+				brw.populate(true, 3);
+                get_metrics();*/
+                brw.repaint();
+                break;				
             case (idx == 991):
                 window.ShowProperties();
                 break;
@@ -2126,6 +2169,7 @@ function on_paint(gr) {
 
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
 
     if(!g_1x1) {
@@ -2560,7 +2604,7 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;
     if(cSettings.visible) {
 
     } else {
@@ -2583,7 +2627,9 @@ function on_key_down(vkey) {
 
             // inputBox
             if(properties.showFilterBox && g_filterbox.inputbox.visible && g_filterbox.inputbox.edit) {
+				active_filterbox = g_filterbox.inputbox.isActive();
                 g_filterbox.on_key("down", vkey);
+				
             };
 
             var act_pls = g_active_playlist;
@@ -2593,29 +2639,16 @@ function on_key_down(vkey) {
                 case VK_F2:
                     // set rename it
                     var rowId = brw.selectedRow;
-                    if(rowId > -1) {
-                        var rh = properties.rowHeight - 10;
-                        var tw = brw.w - rh - 10;
-                        brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", colors.normal_txt, colors.lightgrey_bg, colors.normal_txt, colors.selected_bg, "renamePlaylist()", "brw", undefined, "g_font.plus1");
-                        brw.inputbox.setSize(tw, rh, g_fsize+1); // set font_size
-                        brw.inputboxID = rowId;
-                        // activate inputbox for edit
-                        brw.inputbox.on_focus(true);
-                        brw.inputbox.edit = true;
-                        brw.inputbox.Cpos = brw.inputbox.text.length;
-                        brw.inputbox.anchor = brw.inputbox.Cpos;
-                        brw.inputbox.SelBegin = brw.inputbox.Cpos;
-                        brw.inputbox.SelEnd = brw.inputbox.Cpos;
-                        if(!cInputbox.timer_cursor) {
-                            brw.inputbox.resetCursorTimer();
-                        };
-                        brw.inputbox.dblclk = true;
-                        brw.inputbox.SelBegin = 0;
-                        brw.inputbox.SelEnd = brw.inputbox.text.length;
-                        brw.inputbox.text_selected = brw.inputbox.text;
-                        brw.inputbox.select = true;
-                        brw.repaint();
-                    };
+					
+					try {
+						playlistname = utils.InputBox(window.ID, "Rename the playlist: "+plman.GetPlaylistName(brw.rows[rowId].idx), "Rename a playlist", plman.GetPlaylistName(brw.rows[rowId].idx), true);
+						if(!playlistname || playlistname == "") playlistname = plman.GetPlaylistName(brw.rows[rowId].idx);
+						if (playlistname.length > 1 || (playlistname.length == 1 && (playlistname >= "a" && playlistname <= "z") || (playlistname >= "A" && playlistname <= "Z") || (playlistname >= "0" && playlistname <= "9"))) {
+							plman.RenamePlaylist(brw.rows[rowId].idx, playlistname);
+							window.Repaint();
+						}
+					} catch(e) {
+					}					
                     break;
                 case VK_F3:
                     brw.showActivePlaylist();
@@ -2631,7 +2664,8 @@ function on_key_down(vkey) {
                 case VK_BACK:
                     break;
                 case VK_ESCAPE:
-					if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+					if(active_filterbox) g_filterbox.resetSearch();
+					else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 					break;
                 case 222:
                     brw.inputboxID = -1;
@@ -2880,7 +2914,7 @@ function on_playlists_changed() {
 
 		brw.repaint();
 		brw.delete_pending = false;
-	} else set_update_function('on_playlists_changed()');
+	} else if(!g_avoid_on_playlists_changed) set_update_function('on_playlists_changed()');
 };
 
 function on_playlist_switch() {

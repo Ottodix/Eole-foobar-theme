@@ -1,24 +1,4 @@
 var settings_file_not_found = false;
-
-/*var SettingsPath = data_global_path+"\\"+theme_name+"-settings\\";
-gTime_covers = fb.CreateProfiler();			
-gTime_covers.Reset();
-console.log("pss_switch 0 time:"+gTime_covers.Time);	
-
-var settings_files = utils.Glob(SettingsPath+"*.*");
-var PSS_settings = Array();
-for(i=0; i < settings_files.length; i++) {
-	filename = settings_files[i];
-	
-	let arr = utils.FileTest(settings_files[i], "split");
-	filename = arr[1];
-
-	last_underscore = filename.lastIndexOf('_');
-	setting_value = filename.substring(0,last_underscore + 1);		
-	setting_name = filename.substring(last_underscore + 1);
-	PSS_settings[setting_name] = setting_value; 
-}
-console.log("pss_switch 1 time:"+gTime_covers.Time);*/
 	
 oPanelSetting = function (name, file_prefix, default_value, min_value, max_value, int_value, update_settings_file_not_found) {
 	this.name = name;	
@@ -42,7 +22,9 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		} else {
 			this.value = this.default_value;
 			g_files.CreateTextFile(SettingsPath+this.file_prefix+this.value, true).Close();
-			if(this.update_settings_file_not_found) settings_file_not_found = true;	
+			if(this.update_settings_file_not_found) {
+				settings_file_not_found = true;	
+			}
 		}
 		return this.value;
     };
@@ -64,7 +46,6 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 		this.value = new_value;
 		window.NotifyOthers("g_avoid_on_metadb_changed",true);			
 		window.NotifyOthers(this.name,this.value);	
-		
 		if(refresh_panel!==false) RefreshPSS();
 	}
 	this.setDefault = function () {
@@ -104,10 +85,13 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	this.getFileValue();
 }
 function RefreshPSS() {
-	//console.log("RefreshPSS")
 	if (fb.IsPlaying || fb.IsPaused) {
-		let handle = fb.GetNowPlaying();
-		handle.RefreshStats();
+		try{
+			let handle = fb.GetNowPlaying();
+			handle.RefreshStats();
+		} catch(e){
+			fb.Play();fb.Stop();
+		}
 	}	
 	else {
 		fb.Play();fb.Stop();
@@ -176,7 +160,7 @@ var playlistpanel_width = new oPanelSetting("playlistpanel_width", "PLAYLISTPANE
 var rightplaylist_width = new oPanelSetting("rightplaylist_width", "RIGHTPLAYLISTWIDTH_", 210, 100, 900);
 
 //Theme version
-var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", ".", 0, 0, false, false);
+var theme_version = new oPanelSetting("theme_version", "THEMEVERSION_", "0", 0, 0, false, false);
 
 //Get Now playing state according to main panel
 function getNowPlayingState(){
@@ -232,7 +216,7 @@ function getRightPlaylistState(){
 	return (nowplayinglib_state.isActive());
 	//return (!trackinfoslib_state.isActive() && nowplayinglib_state.isActive());
 }
-// console.log("pss_switch 2 time:"+gTime_covers.Time);	
+
 // Example of use in a PSS :
 // The first line set a panel stack global variable according to the panel current state, the second line switch the visibility of a panel named library, it show the panel when the current state is 3
 // $set_ps_global(MAIN_PANEL_SWITCH,$right($findfile(themes/eole/Settings/MAINPANEL_*),1))

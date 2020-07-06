@@ -292,7 +292,7 @@ function on_paint(gr) {
 	}
 	if(!g_cover.isSetArtwork()) {
 		try{
-			tracktype = TrackType(fb.GetNowPlaying().RawPath.substring(0, 4));
+			tracktype = TrackType(fb.GetNowPlaying());
 			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
 			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
 		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
@@ -465,19 +465,17 @@ oImageCache = function () {
     this.hit = function (metadb) {
 		var img;
 		old_cachekey = nowPlaying_cachekey;
-		nowPlaying_cachekey = process_cachekey(metadb);
-		if(nowPlaying_cachekey==old_cachekey) return "unchanged";
+		nowPlaying_cachekey = process_cachekey(metadb);		
 		try{img = this.cachelist[nowPlaying_cachekey];}catch(e){}
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {
 			cache_filename = check_cache(metadb, 0, nowPlaying_cachekey);
-
 			if(cache_filename) {
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
 			} else {
 				get_albumArt_async(metadb,AlbumArtId.front, nowPlaying_cachekey, {isplaying:true});
 			}
-		}
+		} else if(nowPlaying_cachekey==old_cachekey) return "unchanged";
 		return img;
     };
     this.reset = function(key) {
@@ -609,7 +607,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
     cover_path = image_path;
 	if(image){
 		cachekey = process_cachekey(metadb);
-		save_image_to_cache(image, -1, cachekey);
+		save_image_to_cache(image, -1, cachekey, metadb);
 		g_cover.setArtwork(image,true,false);
 		g_image_cache.addToCache(image,cachekey,globalProperties.thumbnailWidthMax);
 	}
@@ -910,8 +908,20 @@ function showNowPlayingCover(){
 		HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
 	}
 }
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_mouse_rbtn_up(x, y){
 	var main_menu = window.CreatePopupMenu();
+	var Context = fb.CreateContextMenuManager();
+	var context_menu = window.CreatePopupMenu();	
 	var idx;
 
 	main_menu.AppendMenuItem(MF_STRING, 35, "Settings...");
@@ -930,29 +940,34 @@ function on_mouse_rbtn_up(x, y){
 		quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
 		quickSearchMenu.AppendTo(main_menu, MF_STRING, "Quick search for...");
 		main_menu.AppendMenuSeparator();
+	} else {
+		var checked_item_menu=3;
+		main_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
+		main_menu.AppendMenuSeparator();
+		main_menu.AppendMenuItem(MF_STRING, 3, "Tracks");
+			if(properties.random_function=='200_tracks') checked_item_menu=3;
+		main_menu.AppendMenuItem(MF_STRING, 2, "Albums");
+			if(properties.random_function=='20_albums') checked_item_menu=2;
+		main_menu.AppendMenuItem(MF_STRING, 5, "Artist");
+			if(properties.random_function=='1_artist') checked_item_menu=5;
+
+		var genreValue=parseInt(properties.random_function);
+			main_menu.AppendMenuItem(MF_STRING, 4, "Genre");
+		if((genreValue >= 1000 && genreValue < 2001) || properties.random_function=='1_genre')	checked_item_menu=4;
+
+		main_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
+
+		var genrePopupMenu = window.CreatePopupMenu();
+		createGenrePopupMenu(false, -1, genrePopupMenu);
+		genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");
 	}
-
-	var checked_item_menu=3;
-	main_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
-	main_menu.AppendMenuSeparator();
-	main_menu.AppendMenuItem(MF_STRING, 3, "Tracks");
-		if(properties.random_function=='200_tracks') checked_item_menu=3;
-	main_menu.AppendMenuItem(MF_STRING, 2, "Albums");
-		if(properties.random_function=='20_albums') checked_item_menu=2;
-	main_menu.AppendMenuItem(MF_STRING, 5, "Artist");
-		if(properties.random_function=='1_artist') checked_item_menu=5;
-
-	var genreValue=parseInt(properties.random_function);
-		main_menu.AppendMenuItem(MF_STRING, 4, "Genre");
-	if((genreValue >= 1000 && genreValue < 2001) || properties.random_function=='1_genre')	checked_item_menu=4;
-
-	main_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
-
-	var genrePopupMenu = window.CreatePopupMenu();
-
-	createGenrePopupMenu(false, -1, genrePopupMenu);
-	genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");
-
+	
+	if(fb.IsPlaying){
+		//Context.InitContext(new FbMetadbHandleList(fb.GetNowPlaying()));
+		//Context.BuildMenu(context_menu, 100, -1);
+		//context_menu.AppendTo(main_menu, MF_STRING, "Track properties");
+	}
+	main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -962,6 +977,9 @@ function on_mouse_rbtn_up(x, y){
 	}
 	idx = main_menu.TrackPopupMenu(x,y,0x0020);
 	switch(true) {
+		case (idx == 2):
+			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
+		break;
 		case (idx == 100):
 			window.ShowProperties();
 			break;
@@ -1053,6 +1071,9 @@ function on_mouse_rbtn_up(x, y){
 		case (idx == 35):
 			draw_settings_menu(x,y);
 			break;
+		case (idx >= 100 && idx < 800):
+			Context.ExecuteByID(idx - 100);
+			break;			
 		case (idx == 10000):
 			g_genre_cache.build_from_library();
 			break;

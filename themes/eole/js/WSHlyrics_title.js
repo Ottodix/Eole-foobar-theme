@@ -67,6 +67,16 @@ function on_mouse_lbtn_up(x,y){
 function on_mouse_lbtn_dblclk(x, y) {
 	all_btns.on_mouse("dble_click",x, y);
 }
+function on_key_down(vkey) {
+    var mask = GetKeyboardMask();
+	if (mask == KMask.none) {
+		switch (vkey) {
+			case VK_ESCAPE:
+				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				break;
+		};
+	}
+};
 function on_size(w, h) {
     ww = w;
     wh = h;

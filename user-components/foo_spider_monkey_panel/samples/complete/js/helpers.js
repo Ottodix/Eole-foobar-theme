@@ -194,7 +194,7 @@ function _artistFolder(artist) {
 	if (_isFolder(folder)) {
 		return fso.GetFolder(folder) + '\\';
 	} else {
-		folder = folders.artists + _.truncate(a, 64);
+		folder = folders.artists + _.truncate(a, { length : 64 });
 		_createFolder(folder);
 		return fso.GetFolder(folder) + '\\';
 	}
@@ -422,16 +422,14 @@ function _lastModified(file) {
 }
 
 function _lineWrap(value, font, width) {
-	let result = [];
-	_.forEach(value.split('\n'), (paragraph) => {
-		if (paragraph.length < 5) {
-			result.push(paragraph);
-		} else {
-			let lines = _.filter(_gr.EstimateLineWrap(paragraph, font, width), (item, i) => i % 2 == 0);
-			result = [...result, ...(_.map(lines, _.trim))];
-		}
-	});
-	return result;
+	return _(_gr.EstimateLineWrap(value, font, width))
+		.filter((item, i) => { return i % 2 == 0; })
+		.map((line) => {
+			// only trim if line begins with single space.
+			if (line.startsWith(' ') && !line.startsWith('  ')) return _.trim(line);
+			else return line;
+		})
+		.value()
 }
 
 function _lockSize(w, h) {
@@ -510,7 +508,7 @@ function _q(value) {
 
 function _recycleFile(file) {
 	if (_isFile(file)) {
-		app.Namespace(10).MoveHere(file);
+		app.NameSpace(10).MoveHere(file);
 	}
 }
 

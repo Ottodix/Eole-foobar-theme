@@ -3053,9 +3053,6 @@ var g_time_remaining = null;
 var g_radio_title = "loading live tag ...";
 var g_radio_artist = "";
 
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var WshShell = new ActiveXObject("WScript.Shell");
-var htmlfile = new ActiveXObject('htmlfile');
 var list_img = [];
 var g_valid_tid = 0;
 

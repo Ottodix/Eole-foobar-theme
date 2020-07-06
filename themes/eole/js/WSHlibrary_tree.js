@@ -11,7 +11,7 @@ var properties = {
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),
     showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),
-	headerbar_height:35,
+	headerbar_height:39,
 	TagSwitcherBarHeight: 30,
 	panelFontAdjustement: -1,
 	showLibraryTreeSwitch:true,
@@ -203,11 +203,11 @@ oTagSwitcherBar = function() {
 			this.items_x[i] = tx;
 
 			if(this.items_txt[i].length==1){
-				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
+				gr.DrawImage(this.images.library_tree, this.items_x[i]+Math.round(txt_padding_sides/2)-4, this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
 				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
-			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
+			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-9, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
 		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);
     };
@@ -690,14 +690,14 @@ function userinterface() {
         custom_col = window.GetProperty("_CUSTOM COLOURS: USE", false),
         mix = 0,
         orig_font_sz = 16,
-        s_col = window.GetProperty(" Search Style: Fade-0 Blend-1 Norm-2 Highlight-3", 0),
-        s_linecol = window.GetProperty(" Search: Line Colour: Grey-0 Blend-1 Text-2", 0),
+        s_col = window.GetProperty("Search Style: Fade-0 Blend-1 Norm-2 Highlight-3", 0),
+        s_linecol = window.GetProperty("Search: Line Colour: Grey-0 Blend-1 Text-2", 0),
         sp = 6,
         sp1 = 6,
         sp2 = 6,
         sum = 0,
-        sy = window.GetProperty(" Node: Custom Symbols: Collapse|Expand", "- |> ").split("|");
-	this.linestyle = window.GetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", 1);
+        sy = window.GetProperty("Node: Custom Symbols: Collapse|Expand", "- |> ").split("|");
+	this.linestyle = window.GetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", 1);
     this.b1 = 0x04ffffff;
     this.b2 = 0x04000000;
     this.backcol = "";
@@ -727,16 +727,16 @@ function userinterface() {
     this.textsymbcol = "";
     this.txt_box = "";
     this.w = 0;
-    this.alternate = window.GetProperty(" Row Stripes", true);
-    this.margin = window.GetProperty(" Margin", 8);
-    this.node_style = window.GetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", 1);
-    this.node_themed = window.GetProperty(" Node: Themed nodes", true);
-    this.node_sz = window.GetProperty(" Node: Size", 9);
+    this.alternate = window.GetProperty("Row Stripes", true);
+    this.margin = window.GetProperty("Margin", 8);
+    this.node_style = window.GetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", 1);
+    this.node_themed = window.GetProperty("Node: Themed nodes", true);
+    this.node_sz = window.GetProperty("Node: Size", 9);
     this.node_sz = Math.max(this.node_sz, 6);
     this.node_sz_begin = this.node_sz;
-    this.pad = window.GetProperty(" Tree Indent", 19);
-    this.scrollbar_show = window.GetProperty(" Scrollbar Show", true);
-    this.scr_w = this.scrollbar_show ? window.GetProperty(" Scrollbar Width", 12) : 0;
+    this.pad = window.GetProperty("Tree Indent", 19);
+    this.scrollbar_show = window.GetProperty("Scrollbar Show", true);
+    this.scr_w = this.scrollbar_show ? window.GetProperty("Scrollbar Width", 12) : 0;
 	this.force_SelectedDraw = false;
     window.SetProperty("_CUSTOM COLOURS: EMPTY = DEFAULT", "R-G-B (any) or R-G-B-A (not Text...), e.g. 255-0-0");
     var R = function(c) {
@@ -786,11 +786,11 @@ function userinterface() {
 		if(typeof new_padding !== 'undefined'){
 			if(new_padding<ui.row_p_min) new_padding=ui.row_p_min;
 			this.row_p = new_padding;
-			window.SetProperty(" Row Vertical Item Padding", this.row_p);
+			window.SetProperty("Row Vertical Item Padding", this.row_p);
 			on_size(window.Width, window.Height);
 			window.Repaint();
 		} else {
-			this.row_p = window.GetProperty(" Row Vertical Item Padding", 18) + g_fsize - 11;
+			this.row_p = window.GetProperty("Row Vertical Item Padding", 18) + g_fsize - 11;
 		}
 	}
 	this.setRowPadding();
@@ -934,15 +934,15 @@ function on_font_changed() {
 }
 
 function scrollbar() {
-    var smoothness = 1 - window.GetProperty(" Scroll: Smooth Scroll Level 0-1", 0.6561);
+    var smoothness = 1 - window.GetProperty("Scroll: Smooth Scroll Level 0-1", 0.6561);
     smoothness = Math.max(Math.min(smoothness, 0.99), 0.01);
     this.count = -1;
     this.draw_timer = false;
     this.hover = false;
     this.s1 = 0;
     this.s2 = 0;
-    this.scroll_step = window.GetProperty(" Scroll - Mouse Wheel: Page Scroll", false);
-    this.smooth = window.GetProperty(" Scroll: Smooth Scroll", true);
+    this.scroll_step = window.GetProperty("Scroll - Mouse Wheel: Page Scroll", false);
+    this.smooth = window.GetProperty("Scroll: Smooth Scroll", true);
     this.timer_but = false;
     this.x = 0;
     this.y = 0;
@@ -1027,7 +1027,7 @@ function scrollbar() {
 		this.height_ratio = 1;
         // draw info
         this.scrollbar_height = this.h*this.height_ratio - this.but_h * 2;
-        this.bar_ht = Math.max(Math.round(this.scrollbar_height * this.rows_drawn / this.row_count), 12);
+        this.bar_ht = Math.max(Math.round(this.scrollbar_height * this.rows_drawn / this.row_count), 40);
         this.scrollbar_travel = this.scrollbar_height/this.height_ratio - this.bar_ht;
         // scrolling info
         this.scrollable_lines = this.row_count - this.rows_drawn;
@@ -1140,9 +1140,8 @@ function scrollbar() {
     }
 }
 
-
 function panel_operations() {
-    var def_ppt = window.GetProperty(" View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
+    var def_ppt = window.GetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
     var DT_LEFT = 0x00000000,
         DT_CENTER = 0x00000001,
         DT_RIGHT = 0x00000002,
@@ -1155,35 +1154,35 @@ function panel_operations() {
         i = 0,
         sort = "";
     var view_ppt = [
-        window.GetProperty(" View 01: Name // Pattern", "View by Artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
-        window.GetProperty(" View 02: Name // Pattern", "View by Album Artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
-        window.GetProperty(" View 03: Name // Pattern", "View by Album Artist - Album // [%album artist% - ]['['%date%']' ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
-        window.GetProperty(" View 04: Name // Pattern", "View by Album // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
-        window.GetProperty(" View 05: Name // Pattern", "View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
-        window.GetProperty(" View 06: Name // Pattern", "View by Year // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")
+        window.GetProperty("View 01: Name // Pattern", "View by Artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
+        window.GetProperty("View 02: Name // Pattern", "View by Album Artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
+        window.GetProperty("View 03: Name // Pattern", "View by Album Artist - Album // [%album artist% - ]['['%date%']' ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
+        window.GetProperty("View 04: Name // Pattern", "View by Album // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
+        window.GetProperty("View 05: Name // Pattern", "View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"),
+        window.GetProperty("View 06: Name // Pattern", "View by Year // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")
     ];
     var nm = "",
         ppt_l = view_ppt.length + 1;
     for (i = ppt_l; i < ppt_l + 93; i++) {
-        nm = window.GetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern");
-        if (nm && nm != " // ") view_ppt.push(window.GetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern"));
+        nm = window.GetProperty("View " + (i < 10 ? "0" + i : i) + ": Name // Pattern");
+        if (nm && nm != " // ") view_ppt.push(window.GetProperty("View " + (i < 10 ? "0" + i : i) + ": Name // Pattern"));
     }
 
     var filter_ppt = [
-        window.GetProperty(" View Filter 01: Name // Query", "No // Query Not Configurable"),
-        window.GetProperty(" View Filter 02: Name // Query", "Lossless // \"$info(encoding)\" IS lossless"),
-        window.GetProperty(" View Filter 03: Name // Query", "Lossy // \"$info(encoding)\" IS lossy"),
-        window.GetProperty(" View Filter 04: Name // Query", "Missing Replaygain // %replaygain_track_gain% MISSING"),
-        window.GetProperty(" View Filter 05: Name // Query", "Never Played // %play_count% MISSING"),
-        window.GetProperty(" View Filter 06: Name // Query", "Played Often // %play_count% GREATER 9"),
-        window.GetProperty(" View Filter 07: Name // Query", "Recently Added // %added% DURING LAST 2 WEEKS"),
-        window.GetProperty(" View Filter 08: Name // Query", "Recently Played // %last_played% DURING LAST 2 WEEKS"),
-        window.GetProperty(" View Filter 09: Name // Query", "Top Rated // " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 3")
+        window.GetProperty("View Filter 01: Name // Query", "No // Query Not Configurable"),
+        window.GetProperty("View Filter 02: Name // Query", "Lossless // \"$info(encoding)\" IS lossless"),
+        window.GetProperty("View Filter 03: Name // Query", "Lossy // \"$info(encoding)\" IS lossy"),
+        window.GetProperty("View Filter 04: Name // Query", "Missing Replaygain // %replaygain_track_gain% MISSING"),
+        window.GetProperty("View Filter 05: Name // Query", "Never Played // %play_count% MISSING"),
+        window.GetProperty("View Filter 06: Name // Query", "Played Often // %play_count% GREATER 9"),
+        window.GetProperty("View Filter 07: Name // Query", "Recently Added // %added% DURING LAST 2 WEEKS"),
+        window.GetProperty("View Filter 08: Name // Query", "Recently Played // %last_played% DURING LAST 2 WEEKS"),
+        window.GetProperty("View Filter 09: Name // Query", "Top Rated // " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 3")
     ];
     var filt_l = filter_ppt.length + 1;
     for (i = filt_l; i < filt_l + 90; i++) {
-        nm = window.GetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query");
-        if (nm && nm != " // ") filter_ppt.push(window.GetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query"));
+        nm = window.GetProperty("View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query");
+        if (nm && nm != " // ") filter_ppt.push(window.GetProperty("View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query"));
     }
 
     this.cc = DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX;
@@ -1217,11 +1216,11 @@ function panel_operations() {
     this.statistics = false;
     this.tf = "";
     this.view = "";
-    this.autofit = window.GetProperty(" Auto Fit", true);
-    this.syncType = window.GetProperty(" Library Sync: Auto-0, Initialisation Only-1", 0);
-    this.base = window.GetProperty(" Node: Show All Music", false);
-    this.s_show = window.GetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", 2);
-	this.tag_switcherbar = window.GetProperty(" Tag switcher bar", false);
+    this.autofit = window.GetProperty("Auto Fit", true);
+    this.syncType = window.GetProperty("Library Sync: Auto-0, Initialisation Only-1", 0);
+    this.base = window.GetProperty("Node: Show All Music", false);
+    this.s_show = window.GetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", 2);
+	this.tag_switcherbar = window.GetProperty("Tag switcher bar", false);
 	this.showFiltersTogglerBtn = window.GetProperty("_PROPERTY: show filters toggler btn", false);
     if (!this.s_show) this.autofit = true;
     this.filter_by = window.GetProperty("SYSTEM.Filter By", 0);
@@ -1239,12 +1238,12 @@ function panel_operations() {
         chk = chk.toUpperCase();
         if (chk.indexOf("ADD") != -1 || chk.indexOf("PLAY") != -1 || chk.indexOf("RATING") != -1) this.statistics = true;
     }
-    this.show_tracks = window.GetProperty(" Node: Show Tracks", true);
+    this.show_tracks = window.GetProperty("Node: Show Tracks", true);
     this.sort = function(li) {
         switch (this.view_by) {
             case this.folder_view:
                 li.OrderByPath();
-                li.OrderByRelativePath();
+                //li.OrderByRelativePath();
                 break;
             default:
                 var tfs = fb.TitleFormat(this.grp_sort);
@@ -1252,7 +1251,7 @@ function panel_operations() {
                 break;
         }
     }
-    this.tooltip = window.GetProperty(" Tooltips", true);
+    this.tooltip = window.GetProperty("Tooltips", true);
     this.tree_paint = function() {
         window.Repaint();
     }
@@ -1350,26 +1349,26 @@ function panel_operations() {
 
     var k = 1;
     for (i = 0; i < 100; i++) {
-        nm = window.GetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern");
+        nm = window.GetProperty("View " + (i < 10 ? "0" + i : i) + ": Name // Pattern");
         if (nm && nm != " // ") {
-            window.SetProperty(" View " + (k < 10 ? "0" + k : k) + ": Name // Pattern", nm);
+            window.SetProperty("View " + (k < 10 ? "0" + k : k) + ": Name // Pattern", nm);
             k += 1
-        } else window.SetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", null);
+        } else window.SetProperty("View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", null);
     }
-    for (i = k; i < k + 5; i++) window.SetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", " // ");
+    for (i = k; i < k + 5; i++) window.SetProperty("View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", " // ");
     k = 1;
     for (i = 0; i < 100; i++) {
-        nm = window.GetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query");
+        nm = window.GetProperty("View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query");
         if (nm && nm != " // ") {
-            window.SetProperty(" View Filter " + (k < 10 ? "0" + k : k) + ": Name // Query", nm);
+            window.SetProperty("View Filter " + (k < 10 ? "0" + k : k) + ": Name // Query", nm);
             k += 1
-        } else window.SetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query", null);
+        } else window.SetProperty("View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query", null);
     }
-    for (i = k; i < k + 5; i++) window.SetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query", " // ");
+    for (i = k; i < k + 5; i++) window.SetProperty("View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query", " // ");
 
     this.on_size = function() {
         this.f_x1 = ui.w - ui.margin - this.f_w[this.filter_by] - this.f_sw;
-        this.s_x = Math.round(ui.margin + properties.headerbar_height*4/5)-5;
+        this.s_x = Math.round(ui.margin + properties.headerbar_height*4/5)-4;
         this.s_w1 = ui.w - ui.margin;
         this.s_w2 = this.s_show > 1 ? this.f_x1 - this.s_x - 11 : this.s_w1 - Math.round(ui.row_h * 0.75) - this.s_x + 1;
         this.ln_sp = this.s_show ? ui.row_h * 0.1 : 0;
@@ -1498,13 +1497,15 @@ function library_manager() {
             ix = pop.get_ix(0, p.s_h + ui.row_h / 2, true, false);
             tr = 0;
             for (var i = ix; i < ix + l; i++) {
-                tr = pop.tree[i].tr;
-                scr.push({
-                    tr: tr,
-                    a: pop.tree[i].name,
-                    b: tr != 0 ? pop.tree[pop.tree[i].par].name : "",
-                    c: tr > 1 ? pop.tree[pop.tree[pop.tree[i].par].par].name : ""
-                })
+				try{
+					tr = pop.tree[i].tr;
+					scr.push({
+						tr: tr,
+						a: pop.tree[i].name,
+						b: tr != 0 ? pop.tree[pop.tree[i].par].name : "",
+						c: tr > 1 ? pop.tree[pop.tree[pop.tree[i].par].par].name : ""
+					})
+				} catch(e){}
             }
             //exp = JSON_parse(JSON_stringify(tr_sort(expanded_items)));
         }
@@ -1807,20 +1808,20 @@ function populate() {
         tt = "",
         tooltip = false,
         tt_id = -1;
-    this.auto = window.GetProperty(" Node: Auto Collapse", false);
+    this.auto = window.GetProperty("Node: Auto Collapse", false);
 	this.populated = false;
 	this.lclick_action_done = false;
-    var autoplay = window.GetProperty(" Playlist: Play On Send From Menu", false);
-    var btn_pl = window.GetProperty(" Playlist Use: 0 or 1", "General,1,Alt+LeftBtn,1,MiddleBtn,1").replace(/\s+/g, "").split(",");
-    if (btn_pl[0] == "LeftBtn") window.SetProperty(" Playlist Use: 0 or 1", "General," + btn_pl[1] + ",Alt+LeftBtn," + btn_pl[3] + ",MiddleBtn," + btn_pl[5]);
-    var custom_sort = window.GetProperty(" Playlist: Custom Sort", "");
-    var dbl_action = window.GetProperty(" Double-Click Action: ExplorerStyle-0 Play-1", 1);
+    var autoplay = window.GetProperty("Playlist: Play On Send From Menu", false);
+    var btn_pl = window.GetProperty("Playlist Use: 0 or 1", "General,1,Alt+LeftBtn,1,MiddleBtn,1").replace(/\s+/g, "").split(",");
+    if (btn_pl[0] == "LeftBtn") window.SetProperty("Playlist Use: 0 or 1", "General," + btn_pl[1] + ",Alt+LeftBtn," + btn_pl[3] + ",MiddleBtn," + btn_pl[5]);
+    var custom_sort = window.GetProperty("Playlist: Custom Sort", "");
+    var dbl_action = window.GetProperty("Double-Click Action: ExplorerStyle-0 Play-1", 1);
     var alt_lbtn_pl = btn_pl[3] == 1 ? true : false,
         mbtn_pl = btn_pl[5] == 1 ? true : false;
-    var lib_playlist = window.GetProperty(" Playlist", "Library Selection");
-    this.show_counts = window.GetProperty(" Node: Show Item Counts", false);
-	this.autoExpandSingleChild = window.GetProperty(" Node: Auto Expand Single Childs", false);
-    this.show_aggregate_item = window.GetProperty(" Node: Show Aggregate Item", false);
+    var lib_playlist = window.GetProperty("Playlist", "Library Selection");
+    this.show_counts = window.GetProperty("Node: Show Item Counts", false);
+	this.autoExpandSingleChild = window.GetProperty("Node: Auto Expand Single Childs", false);
+    this.show_aggregate_item = window.GetProperty("Node: Show Aggregate Item", false);
     var symb = window.CreateThemeManager("TREEVIEW");
     var im = gdi.CreateImage(ui.node_sz, ui.node_sz),
         g = im.GetGraphics(),
@@ -2541,6 +2542,10 @@ function populate() {
 				this.lclick_action(x, y);
 				this.lclick_action_done = true;
 			}
+		} else {
+			this.clear();
+			this.sel_items = [];
+			p.tree_paint();
 		}
 		g_tooltip.Deactivate();
     }
@@ -2620,7 +2625,7 @@ function populate() {
     this.move = function(x, y) {
 
 		if(ui.drag_clicked && !ui.drag_moving && properties.DropInplaylist && !(sbar.hover || sbar.b_is_dragging) && !p.s_search && m_i>=0) {
-			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6) {
+			if((Math.abs(x - ui.drag_clicked_x) > 10 || Math.abs(y - ui.drag_clicked_y) > 10) && ui.h > cPlaylistManager.rowHeight * 6 && pop.sel_items.length>0) {
 				ui.drag_moving = true;
 				g_cursor.setCursor(IDC_HELP,"pman");
 				pop.deactivate_tooltip();
@@ -2637,7 +2642,9 @@ function populate() {
 				for (var i = 0; i < list.length; i++) items.Add(p.list[list[i]]);
 
 				if(pop.sel_group_count>1) var drag_text = pop.sel_group_count+" selected nodes";
-				else var drag_text = pop.tree[last_sel].name
+				else {
+					var drag_text = pop.tree[last_sel].name;
+				}
 
 				var options = {
 					show_text : false,
@@ -3163,6 +3170,9 @@ function searchLibrary() {
     this.on_key_down = function(vkey) {
         if (!p.s_search) return;
         switch (vkey) {
+			case VK_ESCAPE:
+				this.clear();
+			break;
             case v.left:
             case v.right:
                 if (vkey == v.left) {
@@ -3227,7 +3237,7 @@ function searchLibrary() {
             this.drawsel(gr);
             get_offset(gr);
             gr.GdiDrawText(p.s_txt.substr(offset), ui.font, colors.normal_txt, p.s_x, this.y, p.s_w2, p.s_sp, p.l);
-        } else if(!(p.s_search)) gr.GdiDrawText("Search tree...", ui.s_font, colors.normal_txt, p.s_x, this.y+1, p.s_w2-5, p.s_sp-1, p.l | DT_END_ELLIPSIS);
+        } else if(!(p.s_search)) gr.GdiDrawText("Filter...", g_font.plus1, colors.normal_txt, p.s_x, this.y, p.s_w2-5, p.s_sp-1, p.l | DT_END_ELLIPSIS);
         sL.drawcursor(gr);
 
         if (p.s_show > 1) {
@@ -3345,6 +3355,7 @@ function on_paint(gr) {
 
 	if((update_wallpaper || !g_wallpaperImg) && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
 	if(g_wallpaperImg && properties.showwallpaper) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ui.w, ui.h, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
@@ -3550,19 +3561,19 @@ function button_manager() {
         }
 		this.btns = [];
         if (p.s_show) {
-            this.btns.s_img = new btn(qx-4, qy, images.search_icon.Width, qh, 3, "", "", "", {
+            this.btns.s_img = new btn(qx, qy-1, images.search_icon.Width, qh, 3, "", "", "", {
                 normal: images.search_icon,
                 hover: images.search_icon
             }, function() {
 				sL.activate(0,0);
             }, "", "Filter tree");
-            this.btns.cross1 = new btn(qx-4, qy, qh, qh, 3, "", "", "", {
+            this.btns.cross1 = new btn(qx, qy-2, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
                 if(!sL.lbtn_down) sL.clear();
             }, "Reset filter");
-            this.btns.cross2 = new btn(qx-1, qy-1, qh, qh, 3, "", "", "", {
+            this.btns.cross2 = new btn(qx+2, qy-2, qh, qh, 3, "", "", "", {
                 normal: images.resetIcon_off,
                 hover: images.resetIcon_ov
             }, "", function() {
@@ -4034,62 +4045,62 @@ function showSettingsMenu(x,y){
 		librarytree.toggleValue();
 	} else if(idx==7005){
 		p.s_show = 0;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7006){
 		p.s_show = 1;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7007){
 		p.s_show = 2;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7008){
 		pop.show_counts = !pop.show_counts;
-		window.SetProperty(" Node: Show Item Counts", pop.show_counts);
+		window.SetProperty("Node: Show Item Counts", pop.show_counts);
 		window.Repaint();
 	} else if(idx==7009){
 		pop.show_aggregate_item = !pop.show_aggregate_item;
-		window.SetProperty(" Node: Show Aggregate Item", pop.show_aggregate_item);
+		window.SetProperty("Node: Show Aggregate Item", pop.show_aggregate_item);
 		lib.time.Reset();
 		lib.get_library();
 		lib.rootNodes();
 	} else if(idx==7010){
 		ui.node_style = 0;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7011){
 		ui.node_style = 1;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7012){
 		ui.node_style = 2;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7030){
 		ui.linestyle = 0;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7031){
 		ui.linestyle = 2;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7032){
 		ui.linestyle = 1;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7015){
 		pop.auto = !pop.auto;
-		window.SetProperty(" Node: Auto Collapse", pop.auto);
+		window.SetProperty("Node: Auto Collapse", pop.auto);
 		if(pop.auto) {
 			pop.branch_chg(pop.tree[0]);
 			pop.buildTree(lib.root, 0, true, true);
@@ -4097,15 +4108,15 @@ function showSettingsMenu(x,y){
 		window.Repaint();
 	} else if(idx==7023){
 		pop.autoExpandSingleChild = !pop.autoExpandSingleChild;
-		window.SetProperty(" Node: Auto Expand Single Childs", pop.autoExpandSingleChild);
+		window.SetProperty("Node: Auto Expand Single Childs", pop.autoExpandSingleChild);
 		window.Repaint();
 	} else if(idx==7016){
 		p.tooltip = !p.tooltip;
-		window.SetProperty(" Tooltips", p.tooltip);
+		window.SetProperty("Tooltips", p.tooltip);
 		window.Repaint();
 	} else if(idx==7017){
 		p.tag_switcherbar = !p.tag_switcherbar;
-		window.SetProperty(" Tag switcher bar", p.tag_switcherbar);
+		window.SetProperty("Tag switcher bar", p.tag_switcherbar);
 		p.on_size();but.refresh(true);
 		window.Repaint();
 	} else if(idx==7018){
@@ -4210,62 +4221,62 @@ function showOptionsMenu(x,y,reduced){
 		window.Reload();
 	} else if(idx==7005){
 		p.s_show = 0;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7006){
 		p.s_show = 1;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7007){
 		p.s_show = 2;
-		window.SetProperty(" Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
+		window.SetProperty("Search: Hide-0, SearchOnly-1, Search+Filter-2", p.s_show);
 		p.on_size();
 		but.refresh(true);
 	} else if(idx==7008){
 		pop.show_counts = !pop.show_counts;
-		window.SetProperty(" Node: Show Item Counts", pop.show_counts);
+		window.SetProperty("Node: Show Item Counts", pop.show_counts);
 		window.Repaint();
 	} else if(idx==7009){
 		pop.show_aggregate_item = !pop.show_aggregate_item;
-		window.SetProperty(" Node: Show Aggregate Item", pop.show_aggregate_item);
+		window.SetProperty("Node: Show Aggregate Item", pop.show_aggregate_item);
 		lib.time.Reset();
 		lib.get_library();
 		lib.rootNodes();
 	} else if(idx==7010){
 		ui.node_style = 0;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7011){
 		ui.node_style = 1;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7012){
 		ui.node_style = 2;
-		window.SetProperty(" Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
+		window.SetProperty("Node: Custom Symbols-0 Soft-1 Bold-2", ui.node_style);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7030){
 		ui.linestyle = 0;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7031){
 		ui.linestyle = 2;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7032){
 		ui.linestyle = 1;
-		window.SetProperty(" Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
+		window.SetProperty("Node: Lines: Hide-0 Grey-1 Blend-2 Text-3", ui.linestyle);
 		ui.get_colors();
 		window.Repaint();
 	} else if(idx==7015){
 		pop.auto = !pop.auto;
-		window.SetProperty(" Node: Auto Collapse", pop.auto);
+		window.SetProperty("Node: Auto Collapse", pop.auto);
 		if(pop.auto) {
 			pop.branch_chg(pop.tree[0]);
 			pop.buildTree(lib.root, 0, true, true);
@@ -4273,17 +4284,17 @@ function showOptionsMenu(x,y,reduced){
 		window.Repaint();
 	} else if(idx==7023){
 		pop.autoExpandSingleChild = !pop.autoExpandSingleChild;
-		window.SetProperty(" Node: Auto Expand Single Childs", pop.autoExpandSingleChild);
+		window.SetProperty("Node: Auto Expand Single Childs", pop.autoExpandSingleChild);
 		window.Repaint();
 	} else if(idx==7024){
 		showSettingsMenu(x,y);
 	} else if(idx==7016){
 		p.tooltip = !p.tooltip;
-		window.SetProperty(" Tooltips", p.tooltip);
+		window.SetProperty("Tooltips", p.tooltip);
 		window.Repaint();
 	} else if(idx==7017){
 		p.tag_switcherbar = !p.tag_switcherbar;
-		window.SetProperty(" Tag switcher bar", p.tag_switcherbar);
+		window.SetProperty("Tag switcher bar", p.tag_switcherbar);
 		p.on_size();but.refresh(true);
 		window.Repaint();
 	} else if(idx==7018){

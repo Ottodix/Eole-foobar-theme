@@ -84,7 +84,6 @@ var properties = {
     artist_customGroup_label: window.GetProperty("_DISPLAY: artist customGroup name", ""),
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
-    tf_path_artist: fb.TitleFormat(window.GetProperty("_PROPERTY: Artist Images Folder (for disk cache)", "X:\\XPS2720\\MP3\\artists\\$meta(artist,0).jpg")),
     tf_path_genre: fb.TitleFormat(images.path+"genres\\$meta(genre,0).jpg"),
     tf_crc_artist: fb.TitleFormat(globalProperties.crc_artist),
     tf_crc_genre: fb.TitleFormat("$crc32('genres'$meta(genre,0))"),
@@ -244,7 +243,6 @@ function reset_cover_timers() {
 
 function on_load_image_done(tid, image){
     var tot = brw.groups.length;
-
     for(var k = 0; k < tot; k++) {
         if(brw.groups[k].metadb) {
             if(brw.groups[k].tid == tid && brw.groups[k].load_requested == 1) {
@@ -816,7 +814,7 @@ oFilterBox = function() {
 	this.on_init();
     this.onFontChanged = function() {
 		this.inputbox.onFontChanged();
-	}
+	};
     this.reset_layout = function() {
         this.inputbox.textcolor = colors.normal_txt;
         this.inputbox.backselectioncolor = colors.selected_bg;
@@ -826,12 +824,10 @@ oFilterBox = function() {
 		else var boxText = "Filter...";
 		this.inputbox.empty_text = boxText;
     };
-
     this.setSize = function(w, h, font_size) {
         this.inputbox.setSize(w, h, font_size);
         this.getImages();
     };
-
     this.clearInputbox = function() {
         if(this.inputbox.text.length > 0) {
             this.inputbox.text = "";
@@ -839,7 +835,13 @@ oFilterBox = function() {
             filter_text = "";
         };
     };
-
+	this.resetSearch = function() {
+		if(this.inputbox.text.length > 0) {
+			this.inputbox.text = "";
+			this.inputbox.offset = 0;
+			g_sendResponse();
+		}
+	};
 	this.draw = function(gr, x, y) {
         var bx = x;
 		var by = y + properties.headerBarPaddingTop;
@@ -852,7 +854,6 @@ oFilterBox = function() {
         };
 		this.inputbox.draw(gr, bx+Math.round(22 * g_zoom_percent / 100)+5, by, 0, 0);
     };
-
     this.on_mouse = function(event, x, y, delta) {
         switch(event) {
             case "lbtn_down":
@@ -862,13 +863,9 @@ oFilterBox = function() {
 				else this.search_bt.checkstate("down", x, y);
                 break;
             case "lbtn_up":
-                if(this.inputbox.text.length > 0) {
-                    if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
-                        this.inputbox.text = "";
-                        this.inputbox.offset = 0;
-                        g_sendResponse();
-                    };
-                } else if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
+				if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
+					this.resetSearch();
+                } else if(this.inputbox.text.length == 0 && this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
 					this.inputbox.activate(x,y);
 					this.inputbox.repaint();
 				}
@@ -1074,11 +1071,11 @@ oTagSwitcherBar = function() {
 
 			brw.margin_left = 5;
 			if(this.items_txt[i].length==1){
-				gr.DrawImage(this.images.library_tree, this.items_x[i], this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
+				gr.DrawImage(this.images.library_tree, this.items_x[i]+Math.round(txt_padding_sides/2)-4, this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
 				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.btn_inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
-			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-8, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
+			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-9, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
 		if(properties.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);
     };
@@ -1528,7 +1525,7 @@ oGroup = function(index, start, handle, groupkey) {
                 this.cachekey_album = process_cachekey(handle);
                 break;
         }
-        this.tracktype = TrackType(handle.RawPath.substring(0, 4));
+        this.tracktype = TrackType(handle);
     } else {
         this.cachekey = null;
         this.tracktype = 0;
@@ -1975,7 +1972,7 @@ oBrowser = function(name) {
             this.groups[g-1].finalize(t, tr, pl);
 			this.groups[g-1].date = arr[2];
 
-			if(properties.tagMode==1){
+			/*if(properties.tagMode==1){
 				if(default_grouping){
 					var artist_album = arr[0].split(" ^^ ");
 				} else {
@@ -1983,7 +1980,7 @@ oBrowser = function(name) {
 				}
 				this.groups[g-1].artist_name = artist_album[0];
 				this.groups[g-1].album = artist_album[1];
-			}
+			}*/
 
 			//this.groups[g-1].artist_name = arr[4];
             // add 1st group ("ALL" item)
@@ -2439,13 +2436,16 @@ oBrowser = function(name) {
 						} else {
 							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
-									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');
+									debugger_hint("hit1 "+i)
+									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');									
 									if(img!="loading") this.groups[i].cover_img = img;
 									if (isImage(this.groups[i].cover_img)) {
 										this.groups[i].cover_type = 1;
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w);
+										debugger_hint("getit "+i)
 									} else if(properties.AlbumArtFallback && this.groups[i].cover_img!='loading'){
 										this.groups[i].save_requested = true;
+										debugger_hint("hit2 "+i)
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
 										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
 											this.groups[i].cover_type = 1;
@@ -2474,7 +2474,7 @@ oBrowser = function(name) {
 									}
 									if(g_files.FileExists(filepath)) {
 										this.groups[i].cover_img = gdi.Image(filepath);
-										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey);
+										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey, this.groups[i].metadb);
 									} else {
 										this.groups[i].save_requested = true;
 										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
@@ -2484,25 +2484,27 @@ oBrowser = function(name) {
 										} else this.groups[i].cover_img = images.noartist;
 									}
 									var image = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+									debugger_hint("FormatCover "+i)
 									g_image_cache.addToCache(image,this.groups[i].cachekey);
 									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 									this.groups[i].cover_img = image;
 								} else {
-									this.groups[i].cover_img = globalProperties.noart;
 									var image = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-									g_image_cache.addToCache(image,this.groups[i].cachekey);
+									this.groups[i].cover_img = image;
+									//g_image_cache.addToCache(image,this.groups[i].cachekey);
 									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 								}
 
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
-								this.groups[i].cover_img = globalProperties.stream_img;
 								var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-								g_image_cache.addToCache(image,this.groups[i].cachekey);
+								this.groups[i].cover_img = image;								
+								//g_image_cache.addToCache(image,this.groups[i].cachekey);
 								//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 							}
-							if(!this.groups[i].cover_formated){
+							if(!this.groups[i].cover_formated && isImage(this.groups[i].cover_img)){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
 								this.groups[i].cover_formated = true;
+								debugger_hint("this.groups["+i+"].cover_img.Width"+this.groups[i].cover_img.Width)
 							}
 						};
 					};
@@ -4297,6 +4299,7 @@ function on_paint(gr) {
 	if(update_size) on_size(window.Width, window.Height);
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
 
     if(!g_1x1) {
@@ -4329,27 +4332,6 @@ function on_paint(gr) {
             };
         };
     };
-	var show_shadow = false;
-	if(show_shadow){
-		var line_w = Math.round(ww / 2);
-		var line_padding = 10;
-		var color = RGBA(0, 0, 0, 15);
-		gr.FillGradRect(line_padding, 0, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 0, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 0, 1, 1, color);
-		var color = RGBA(0, 0, 0, 10);
-		gr.FillGradRect(line_padding, 1, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 1, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 1, 1, 1, color);
-		var color = RGBA(0, 0, 0, 5);
-		gr.FillGradRect(0, 2, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 2, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 2, 1, 1, color);
-		var color = RGBA(0, 0, 0, 0);
-		gr.FillGradRect(line_padding, 3, line_w-line_padding, 1, 0, RGBA(0, 0, 0, 0), color, 1.0);
-		gr.FillGradRect(line_w, 3, line_w-line_padding, 1, 0, color, RGBA(0, 0, 0, 0), 1.0);
-		gr.FillSolidRect(line_w, 3, 1, 1, color);
-	}
 };
 
 function on_mouse_lbtn_down(x, y, m) {
@@ -4895,15 +4877,14 @@ function on_key_up(vkey) {
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
-
+	var active_filterbox = false;
     if(cSettings.visible) {
 
     } else {
-        //if(dragndrop.drag_in) return true;
-
         // inputBox
         if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
-            g_filterbox.on_key("down", vkey);
+			active_filterbox = g_filterbox.inputbox.isActive();
+            g_filterbox.on_key("down", vkey);			
         };
 
         var act_pls = g_active_playlist;
@@ -4954,7 +4935,8 @@ function on_key_down(vkey) {
                 };
                 break;
             case VK_ESCAPE:
-				if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
+				if(active_filterbox) g_filterbox.resetSearch();
+				else if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen();
 				break;
             case 222:
                 brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length*13)+(10*2)) / 2);
