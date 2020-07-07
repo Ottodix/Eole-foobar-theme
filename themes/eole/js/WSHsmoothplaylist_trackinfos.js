@@ -115,7 +115,7 @@ var properties_common = {
 	panelName: 'WSHsmoothplaylist',
     tf_artist: fb.TitleFormat("%artist%"),
     tf_albumartist: fb.TitleFormat("%album artist%"),
-    tf_groupkey: fb.TitleFormat("$if2(%album%[' - Disc '%discnumber%],$if(%length%,'?',%path%)) ^^ $if2(%album artist%,$if(%length%,'Unknown artist(s)',%title%)) ^^ %discnumber% ## $if2(%artist%,$if(%length%,'Unknown artist',%path%)) ^^ %title% ^^ [%genre%] ^^ [%date%]"),
+    tf_groupkey: fb.TitleFormat("$if2(%album%$ifgreater(%totaldiscs%,1,[' - Disc '%discnumber%],),$if(%length%,'?',%path%)) ^^ $if2(%album artist%,$if(%length%,'Unknown artist(s)',%title%)) ^^ %discnumber% ## $if2(%artist%,$if(%length%,'Unknown artist',%path%)) ^^ %title% ^^ [%genre%] ^^ [%date%]"),
     tf_track: fb.TitleFormat("%tracknumber% ^^ $if(%length%,%length%,ON AIR) ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ %mood% ^^ %play_count% ^^ %bitrate% ^^ %codec%"),
     tf_path: fb.TitleFormat("$directory_path(%path%)\\"),
     tf_time_remaining: fb.TitleFormat("$if(%length%,-%playback_time_remaining%,'ON AIR')"),
@@ -1644,7 +1644,7 @@ oBrowser = function(name) {
 	};
 
     this.showNowPlaying = function(flash_nowplaying) {
-		
+
 		var flash_nowplaying = typeof flash_nowplaying !== 'undefined' ? flash_nowplaying : true;
         if(fb.IsPlaying) {
 			g_filterbox.clearInputbox();
@@ -2711,7 +2711,7 @@ oBrowser = function(name) {
 												g_time_remaining = properties.tf_time_remaining.Eval(true);
 											}
 											recalculate_time = false;
-										}  										
+										}
                                         track_time_part = g_time_remaining;
 
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
@@ -3028,7 +3028,7 @@ oBrowser = function(name) {
 												g_time_remaining = properties.tf_time_remaining.Eval(true);
 											}
 											recalculate_time = false;
-										}  										
+										}
                                         track_time_part = g_time_remaining;
 
 
@@ -3551,7 +3551,7 @@ oBrowser = function(name) {
                         case (rowType == 99):                   // ----------------> extra empty row
                             break;
                     };
-                    
+
                 };
 				if(this.track_rating && this.ishover_rating){
 					var l_rating = Math.ceil((x - rating_x) / (this.rows[this.activeRow].rating_length / 5) + 0.1);
@@ -3922,7 +3922,7 @@ oBrowser = function(name) {
         } else {
             brw.activeRow = -1;
         };
-	
+
         if(repaint_main1 == repaint_main2){
             repaint_main2 = !repaint_main1;
             repaint_1 = true;
@@ -4364,8 +4364,8 @@ oBrowser = function(name) {
 			_menu1.CheckMenuRadioItem(914, 916, (!properties.drawProgressBar) ? 914 : (properties.AlbumArtProgressbar) ? 915 : 916);
             _menu1.AppendTo(_menu,MF_STRING, "Progress bar under playing title");
 
-            //_menu.AppendMenuItem(MF_STRING, 112, "Show Mood Icon");
-            //_menu.CheckMenuItem(112, properties.showMood);
+            //_menu.AppendMenuItem(MF_STRING, 118, "Show Mood Icon");
+            //_menu.CheckMenuItem(118, properties.showMood);
 
 			_menuRating.AppendMenuItem(MF_STRING, 113, "Show rating for each track");
 			_menuRating.AppendMenuItem(MF_STRING, 114, "Show rating for selected track");
@@ -4420,6 +4420,11 @@ oBrowser = function(name) {
                     get_metrics();
                     brw.repaint();
                     break;
+                case (idx == 112):
+                    setOneProperty("circleMode",!properties.circleMode);
+                    brw.refreshThumbnails();
+                    brw.repaint();
+                    break;
                 case (idx == 113):
 					setOneProperty("showRating",true);
 					setOneProperty("showRatingSelected",false);
@@ -4455,11 +4460,11 @@ oBrowser = function(name) {
                     get_metrics();
                     brw.repaint();
                     break;
-				case (idx == 112):
-					setOneProperty("circleMode",!properties.circleMode);
-					brw.refreshThumbnails();
-					brw.repaint();
-					break;
+                case (idx == 118):
+                    setOneProperty("showMood",!properties.showMood);
+                    get_metrics();
+                    brw.repaint();
+                    break;
                 case (idx == 200):
                     toggleWallpaper();
                     break;
@@ -5793,7 +5798,7 @@ function vk_pgdn() {
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
 	var active_filterbox = false;
-	
+
     if(cSettings.visible) {
 
     } else {
@@ -5801,7 +5806,7 @@ function on_key_down(vkey) {
 
         // inputBox
         if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
-			active_filterbox = g_filterbox.inputbox.isActive();			
+			active_filterbox = g_filterbox.inputbox.isActive();
             g_filterbox.on_key("down", vkey);
         };
 
@@ -6219,7 +6224,7 @@ function on_playback_new_track(metadb) {
 
 function on_playback_time(time) {
 	g_elapsed_seconds = time;
-	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){	
+	if(window.IsVisible && plman.PlayingPlaylist==g_active_playlist){
 		if(g_total_seconds>0 && g_total_seconds!="ON AIR"){
 			g_time_remaining = g_total_seconds - time;
 			g_time_remaining = "-"+g_time_remaining.toHHMMSS();
@@ -7195,7 +7200,7 @@ function on_init() {
 	brw.setActivePlaylist();
 	brw.startTimer();
     pman = new oPlaylistManager("pman");
-	
+
     if(fb.IsPlaying) playing_track_playcount = TF.play_count.Eval();
 	g_total_seconds =  properties.tf_total_seconds.Eval(true);
 	on_playback_dynamic_info_track();
