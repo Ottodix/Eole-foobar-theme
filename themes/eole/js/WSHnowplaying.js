@@ -442,12 +442,12 @@ function on_mouse_lbtn_up(x, y, m) {
 	for (var i = 1; i < rbutton.length + 1; i++) {
 		rbutton[i - 1].MouseUp(x, y, i);
 	}
-	if (TextBtn_info.isXYInButton(x, y)) {
+	/*if (TextBtn_info.isXYInButton(x, y)) {
 		if (fb.IsPlaying) {
 			window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
 			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying())
 		}
-	}
+	}*/
     g_dble_click=false;
 }
 function on_mouse_lbtn_down(x, y, m) {
@@ -463,40 +463,41 @@ function on_mouse_lbtn_down(x, y, m) {
 		}
 		/*if(!fb.IsPlaying) {
 			play_random(properties.random_function);
-		} else */
+		} else 
 		if(!click_on_btn) {
 			if(fb.IsPlaying) {
 				window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 				on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
 			} else if(g_cover.metadb) window.NotifyOthers("FocusOnTrack",g_cover.metadb);
-		}
+		}*/
 	}
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
-	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
-		fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
-	} else {
-		if(fb.IsPlaying) {
-			switch(true){
-				case (properties.dble_click_action==0):
-					fb.Pause();
-					window.NotifyOthers("stopFlashNowPlaying",true);
-				break;
-				case (properties.dble_click_action==1):
-					showNowPlaying(true);
-				break;
-				case (properties.dble_click_action==2):
-					if(!g_cover.isFiller()) showNowPlayingCover();
-				break;
-				case (properties.dble_click_action==3):
-					fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
-				break;
-				case (properties.dble_click_action==4):
-					window.NotifyOthers('toggleLayoutMode',true);
-				break;
-			}
+	if(fb.IsPlaying) {
+		switch(true){
+			case (properties.dble_click_action==0):
+				fb.Pause();
+				window.NotifyOthers("stopFlashNowPlaying",true);
+			break;
+			case (properties.dble_click_action==1):
+				showNowPlaying(true);
+			break;
+			case (properties.dble_click_action==2):
+				if(!g_cover.isFiller()) showNowPlayingCover();
+			break;
+			case (properties.dble_click_action==3):
+				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
+			break;
+			case (properties.dble_click_action==4):
+				window.NotifyOthers('toggleLayoutMode',true);
+			break;
+			case (properties.dble_click_action==5):
+				if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
+					fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
+				}
+			break;
 		}
 	}
 }
@@ -1892,14 +1893,6 @@ function draw_settings_menu(x,y){
 
         idx = _menu.TrackPopupMenu(x,y);
         switch(true) {
-			case (idx == 8):
-                properties.follow_cursor = !properties.follow_cursor;
-                window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-				if(properties.follow_cursor) on_item_focus_change();
-				else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-				window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
-				window.Repaint();
-				break;
 			case (idx == 1):
                 properties.showVisualization = !properties.showVisualization;
                 window.SetProperty("Show Visualization", properties.showVisualization);
