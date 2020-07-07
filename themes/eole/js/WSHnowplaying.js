@@ -1091,11 +1091,19 @@ function on_notify_data(name, info) {
 			metadb = new FbMetadbHandleList(info.metadb);
 			if(info.cover_img==null) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
-				g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+				if (properties.follow_cursor) {
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+				} else {
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+				}
 			} else {
 				cover_img = new GdiBitmap(info.cover_img);
 				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey);
-				g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+				if (properties.follow_cursor) {
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+				} else {
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+				}
 			}
 			window.Repaint();
 			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
