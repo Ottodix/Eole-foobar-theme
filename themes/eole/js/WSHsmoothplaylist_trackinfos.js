@@ -6393,7 +6393,7 @@ function on_item_focus_change(playlist, from, to) {
                 };
             };
 
-            if(!g_rbtn_click) { // if new focused track not totally visible, we scroll to show it centered in the panel
+            /*if(!g_rbtn_click) { // if new focused track not totally visible, we scroll to show it centered in the panel
                 g_focus_row = brw.getOffsetFocusItem(g_focus_id);
                 if(g_focus_row < scroll/properties.rowHeight || g_focus_row > scroll/properties.rowHeight + brw.totalRowsVis - 0.1) {
                     var old = scroll;
@@ -6408,15 +6408,9 @@ function on_item_focus_change(playlist, from, to) {
                             };
                         };
                     };
-                    /*
-                    if(!properties.enableFullScrollEffectOnFocusChange && !properties.autocollapse) {
-                        scroll_ = scroll + properties.rowHeight * 5 * (from <= to ? -1 : 1);
-                        scroll_ = check_scroll(scroll_);
-                    };
-                    */
                     brw.scrollbar.updateScrollbar();
                 };
-            };
+            };*/
 
             brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
             if(!isScrolling) brw.repaint();

@@ -26,7 +26,7 @@ var properties = {
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
-	showRating: window.GetProperty("_DISPLAY: showRating", false),
+	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
 	rawBitmap: false,
 	refreshRate: 50,
@@ -442,12 +442,12 @@ function on_mouse_lbtn_up(x, y, m) {
 	for (var i = 1; i < rbutton.length + 1; i++) {
 		rbutton[i - 1].MouseUp(x, y, i);
 	}
-	if (TextBtn_info.isXYInButton(x, y)) {
+	/*if (TextBtn_info.isXYInButton(x, y)) {
 		if (fb.IsPlaying) {
 			window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
 			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying())
 		}
-	}
+	}*/
     g_dble_click=false;
 }
 function on_mouse_lbtn_down(x, y, m) {
@@ -463,40 +463,41 @@ function on_mouse_lbtn_down(x, y, m) {
 		}
 		/*if(!fb.IsPlaying) {
 			play_random(properties.random_function);
-		} else */
+		} else 
 		if(!click_on_btn) {
 			if(fb.IsPlaying) {
 				window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
 				on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
 			} else if(g_cover.metadb) window.NotifyOthers("FocusOnTrack",g_cover.metadb);
-		}
+		}*/
 	}
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
-	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
-		fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
-	} else {
-		if(fb.IsPlaying) {
-			switch(true){
-				case (properties.dble_click_action==0):
-					fb.Pause();
-					window.NotifyOthers("stopFlashNowPlaying",true);
-				break;
-				case (properties.dble_click_action==1):
-					showNowPlaying(true);
-				break;
-				case (properties.dble_click_action==2):
-					if(!g_cover.isFiller()) showNowPlayingCover();
-				break;
-				case (properties.dble_click_action==3):
-					fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
-				break;
-				case (properties.dble_click_action==4):
-					window.NotifyOthers('toggleLayoutMode',true);
-				break;
-			}
+	if(fb.IsPlaying) {
+		switch(true){
+			case (properties.dble_click_action==0):
+				fb.Pause();
+				window.NotifyOthers("stopFlashNowPlaying",true);
+			break;
+			case (properties.dble_click_action==1):
+				showNowPlaying(true);
+			break;
+			case (properties.dble_click_action==2):
+				if(!g_cover.isFiller()) showNowPlayingCover();
+			break;
+			case (properties.dble_click_action==3):
+				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
+			break;
+			case (properties.dble_click_action==4):
+				window.NotifyOthers('toggleLayoutMode',true);
+			break;
+			case (properties.dble_click_action==5):
+				if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
+					fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
+				}
+			break;
 		}
 	}
 }
@@ -681,6 +682,7 @@ oCover = function() {
 	this.filler = false;
 	this.buttons_positioned = false;
 	this.padding = Array(20,20,0,20);
+	this.padding_norating = Array(7,7,0,7);	
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -854,8 +856,13 @@ oCover = function() {
 		this.buttons_positioned = false;
 	}
     this.setSize = function(w, h) {
-		this.w = w - this.padding[1] - this.padding[3];
-		this.h = h - this.padding[0] - this.padding[2];
+		if(properties.showRating){
+			this.w = w - this.padding[1] - this.padding[3];
+			this.h = h - this.padding[0] - this.padding[2];
+		} else {
+			this.w = w - this.padding_norating[1] - this.padding_norating[3];
+			this.h = h - this.padding_norating[0] - this.padding_norating[2];
+		}
 		if(this.isSetArtwork()) {
 			this.resize();
 		}
@@ -945,7 +952,7 @@ oCover = function() {
 				gr.FillEllipse(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
 				gr.SetSmoothingMode(0);
 			} else {
-				if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50)
+				if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50);
 				gr.DrawImage(this.btn_shadow, this.x, this.y, this.drawn_w, this.drawn_w, 0, 0, this.btn_shadow.Width, this.btn_shadow.Height);
 			}
 		}
@@ -1595,7 +1602,8 @@ function oInfos() {
 			for (var i = 1; i < rbutton.length + 1; i++) {
 				rbutton[i - 1].Paint(gr, i, y+10);
 			}
-		}
+			var text_y_adj = 10;
+		} else var text_y_adj = 6;
 
 		var double_row = (properties.doubleRowText && this.txt_line3 !="" && this.txt_line2 !="");
 
@@ -1603,21 +1611,21 @@ function oInfos() {
 			this.line1_width = gr.CalcTextWidth(this.txt_line1, g_font.italicplus5);
 			this.tooltip_line1 = (this.line1_width>this.txt_width);
 		}
-		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + (properties.showRating ? rbutton[0].height : rbutton[0].height / 3) + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + (properties.showRating ? rbutton[0].height-10 : 5) + text_y_adj + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		var line2 = ((this.txt_line2 !="" && this.show_info) || double_row) ? this.txt_line2 : this.txt_line3;
 		if(this.line2_width<0) {
 			this.line2_width = gr.CalcTextWidth(line2, g_font.min1);
 			this.tooltip_line2 = (this.line2_width>this.txt_width);
 		}
-		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, this.y+(double_row?39:47), this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, this.y+(double_row?29:37)+text_y_adj, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		if(double_row) {
 			if(this.line3_width<0) {
 				this.line3_width = gr.CalcTextWidth(this.txt_line3, g_font.min2);
 				this.tooltip_line3 = (this.line3_width>this.txt_width);
 			}
-			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, this.y+53, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, this.y+43+text_y_adj, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		}
     };
     this.onMouse = function (state, x, y, m) {
@@ -1701,15 +1709,8 @@ function on_mouse_rbtn_up(x, y){
 		quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
 		quickSearchMenu.AppendTo(main_menu, MF_STRING, "Quick search for...");
-		main_menu.AppendMenuSeparator();
 	}
-
-	main_menu.AppendMenuItem(MF_STRING, 7, "Cover always follow cursor");
-	main_menu.CheckMenuItem(7,properties.follow_cursor);
-	main_menu.AppendMenuItem(MF_STRING, 10, "Show infos on 2 rows");
-	main_menu.CheckMenuItem(10, properties.doubleRowText);
-	main_menu.AppendMenuItem(MF_STRING, 14, "Show rating");
-	main_menu.CheckMenuItem(14, properties.showRating);
+	
 	main_menu.AppendMenuSeparator();
 	main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");
 	main_menu.AppendMenuSeparator();
@@ -1726,19 +1727,6 @@ function on_mouse_rbtn_up(x, y){
 		case (idx == 2):
 			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
 		break;
-		case (idx == 10):
-			properties.doubleRowText = !properties.doubleRowText;
-			window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
-			window.Repaint();
-			break;
-		case (idx == 7):
-			properties.follow_cursor = !properties.follow_cursor;
-			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-			if(properties.follow_cursor) g_cover.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
-			else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-			window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
-			window.Repaint();
-			break;
 		case (idx == 11):
 			properties.circleMode = !properties.circleMode;
 			window.SetProperty("_DISPLAY: circle mode", properties.circleMode);
@@ -1759,14 +1747,6 @@ function on_mouse_rbtn_up(x, y){
 		case (idx == 13):
 			properties.innerCircle = !properties.innerCircle;
 			window.SetProperty("Show Inner Cirle", properties.innerCircle);
-			get_images();
-			g_cover.refreshCurrent();
-			adaptButtons();
-			window.Repaint();
-			break;
-		case (idx == 14):
-			properties.showRating = !properties.showRating;
-			window.SetProperty("_DISPLAY: showRating", properties.showRating);
 			get_images();
 			g_cover.refreshCurrent();
 			adaptButtons();
@@ -1873,6 +1853,11 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(13,properties.innerCircle);
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion");
 		_menu.CheckMenuItem(12,properties.keepProportion);
+		_menu.AppendMenuItem(MF_STRING, 16, "Show rating");
+		_menu.CheckMenuItem(16,properties.showRating);
+		_menu.AppendMenuItem(MF_STRING, 17, "Show infos on 2 rows");
+		_menu.CheckMenuItem(17, properties.doubleRowText);
+		
 		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");
 		_menu.CheckMenuItem(1,properties.showVisualization);
 		_menu.AppendMenuSeparator();
@@ -1881,7 +1866,7 @@ function draw_settings_menu(x,y){
 		_single_click_menu.AppendMenuItem(MF_STRING, 14, "Play / pause");
 		_single_click_menu.AppendMenuItem(MF_STRING, 15, "Show now playing");
 		_single_click_menu.CheckMenuRadioItem(14, 15, 14+properties.single_click_action);
-		_single_click_menu.AppendTo(_menu, MF_STRING, "Single click action");
+		_single_click_menu.AppendTo(_menu, MF_STRING, "Cover button");
 
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
@@ -1889,7 +1874,8 @@ function draw_settings_menu(x,y){
 		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
-		_dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);
+		_dble_click_menu.AppendMenuItem(MF_STRING, 8, "Edit track properties");		
+		_dble_click_menu.CheckMenuRadioItem(3, 8, 3+properties.dble_click_action);
 		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");
 
 		wallpapper_menu.AppendMenuItem(MF_STRING, 200, "Enable");
@@ -1907,14 +1893,6 @@ function draw_settings_menu(x,y){
 
         idx = _menu.TrackPopupMenu(x,y);
         switch(true) {
-			case (idx == 8):
-                properties.follow_cursor = !properties.follow_cursor;
-                window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-				if(properties.follow_cursor) on_item_focus_change();
-				else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-				window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
-				window.Repaint();
-				break;
 			case (idx == 1):
                 properties.showVisualization = !properties.showVisualization;
                 window.SetProperty("Show Visualization", properties.showVisualization);
@@ -1946,6 +1924,10 @@ function draw_settings_menu(x,y){
 				properties.dble_click_action = 4;
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
                 break;
+            case (idx == 8):
+				properties.dble_click_action = 5;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+                break;				
 			case (idx == 10):
 				properties.follow_cursor = !properties.follow_cursor;
 				window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
@@ -1982,6 +1964,20 @@ function draw_settings_menu(x,y){
 				properties.single_click_action = idx-14;
 				window.SetProperty("PROPERTY single_click_action", properties.single_click_action);
                 break;
+			case (idx == 16):
+				properties.showRating = !properties.showRating;
+				window.SetProperty("_DISPLAY: showRating", properties.showRating);
+				get_images();
+				g_cover.refreshCurrent();
+				on_size(window.Width,window.Height);			
+				adaptButtons();
+				window.Repaint();
+				break;	
+			case (idx == 17):
+				properties.doubleRowText = !properties.doubleRowText;
+				window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
+				window.Repaint();
+				break;				
 			case (idx == 200):
 				toggleWallpaper();
 				break;
