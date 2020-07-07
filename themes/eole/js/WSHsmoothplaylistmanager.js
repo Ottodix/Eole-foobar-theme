@@ -3137,7 +3137,7 @@ function on_drag_drop(action, x, y, mask) {
             } else if(g_dragndrop_targetPlaylistId > -1 && brw.rows[g_dragndrop_targetPlaylistId].idx>-1) {
                 action.Effect = 1;
                 action.Playlist = brw.rows[g_dragndrop_targetPlaylistId].idx;
-				action.Base = plman.PlaylistItemCount(g_dragndrop_targetPlaylistId);
+				action.Base = plman.PlaylistItemCount(brw.rows[g_dragndrop_targetPlaylistId].idx);
                 action.ToSelect = false;
             } else {
 				drop_done = true;

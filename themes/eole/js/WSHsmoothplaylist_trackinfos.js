@@ -6393,7 +6393,7 @@ function on_item_focus_change(playlist, from, to) {
                 };
             };
 
-            if(!g_rbtn_click) { // if new focused track not totally visible, we scroll to show it centered in the panel
+            if(!g_rbtn_click && 1==2) { // if new focused track not totally visible, we scroll to show it centered in the panel
                 g_focus_row = brw.getOffsetFocusItem(g_focus_id);
                 if(g_focus_row < scroll/properties.rowHeight || g_focus_row > scroll/properties.rowHeight + brw.totalRowsVis - 0.1) {
                     var old = scroll;

@@ -681,6 +681,7 @@ oCover = function() {
 	this.filler = false;
 	this.buttons_positioned = false;
 	this.padding = Array(20,20,0,20);
+	this.padding_norating = Array(7,7,0,7);	
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -854,8 +855,13 @@ oCover = function() {
 		this.buttons_positioned = false;
 	}
     this.setSize = function(w, h) {
-		this.w = w - this.padding[1] - this.padding[3];
-		this.h = h - this.padding[0] - this.padding[2];
+		if(properties.showRating){
+			this.w = w - this.padding[1] - this.padding[3];
+			this.h = h - this.padding[0] - this.padding[2];
+		} else {
+			this.w = w - this.padding_norating[1] - this.padding_norating[3];
+			this.h = h - this.padding_norating[0] - this.padding_norating[2];
+		}
 		if(this.isSetArtwork()) {
 			this.resize();
 		}
@@ -945,7 +951,7 @@ oCover = function() {
 				gr.FillEllipse(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
 				gr.SetSmoothingMode(0);
 			} else {
-				if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50)
+				if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50);
 				gr.DrawImage(this.btn_shadow, this.x, this.y, this.drawn_w, this.drawn_w, 0, 0, this.btn_shadow.Width, this.btn_shadow.Height);
 			}
 		}
@@ -1595,7 +1601,8 @@ function oInfos() {
 			for (var i = 1; i < rbutton.length + 1; i++) {
 				rbutton[i - 1].Paint(gr, i, y+10);
 			}
-		}
+			var text_y_adj = 10;
+		} else var text_y_adj = 6;
 
 		var double_row = (properties.doubleRowText && this.txt_line3 !="" && this.txt_line2 !="");
 
@@ -1603,21 +1610,21 @@ function oInfos() {
 			this.line1_width = gr.CalcTextWidth(this.txt_line1, g_font.italicplus5);
 			this.tooltip_line1 = (this.line1_width>this.txt_width);
 		}
-		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + (properties.showRating ? rbutton[0].height : rbutton[0].height / 3) + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + (properties.showRating ? rbutton[0].height-10 : 5) + text_y_adj + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		var line2 = ((this.txt_line2 !="" && this.show_info) || double_row) ? this.txt_line2 : this.txt_line3;
 		if(this.line2_width<0) {
 			this.line2_width = gr.CalcTextWidth(line2, g_font.min1);
 			this.tooltip_line2 = (this.line2_width>this.txt_width);
 		}
-		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, this.y+(double_row?39:47), this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(line2, g_font.min1, colors.faded_txt, this.x, this.y+(double_row?29:37)+text_y_adj, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		if(double_row) {
 			if(this.line3_width<0) {
 				this.line3_width = gr.CalcTextWidth(this.txt_line3, g_font.min2);
 				this.tooltip_line3 = (this.line3_width>this.txt_width);
 			}
-			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, this.y+53, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+			gr.GdiDrawText(this.txt_line3, g_font.min2, colors.faded_txt, this.x, this.y+43+text_y_adj, this.txt_width, 30, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		}
     };
     this.onMouse = function (state, x, y, m) {
@@ -1769,6 +1776,7 @@ function on_mouse_rbtn_up(x, y){
 			window.SetProperty("_DISPLAY: showRating", properties.showRating);
 			get_images();
 			g_cover.refreshCurrent();
+			on_size(window.Width,window.Height);			
 			adaptButtons();
 			window.Repaint();
 			break;
@@ -1873,6 +1881,10 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(13,properties.innerCircle);
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion");
 		_menu.CheckMenuItem(12,properties.keepProportion);
+		_menu.AppendMenuItem(MF_STRING, 16, "Show rating");
+		_menu.CheckMenuItem(16,properties.showRating);
+		
+		
 		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");
 		_menu.CheckMenuItem(1,properties.showVisualization);
 		_menu.AppendMenuSeparator();
@@ -1982,6 +1994,15 @@ function draw_settings_menu(x,y){
 				properties.single_click_action = idx-14;
 				window.SetProperty("PROPERTY single_click_action", properties.single_click_action);
                 break;
+			case (idx == 16):
+				properties.showRating = !properties.showRating;
+				window.SetProperty("_DISPLAY: showRating", properties.showRating);
+				get_images();
+				g_cover.refreshCurrent();
+				on_size(window.Width,window.Height);			
+				adaptButtons();
+				window.Repaint();
+				break;			
 			case (idx == 200):
 				toggleWallpaper();
 				break;
