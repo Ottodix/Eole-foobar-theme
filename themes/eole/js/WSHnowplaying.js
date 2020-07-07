@@ -1866,7 +1866,7 @@ function draw_settings_menu(x,y){
 		_single_click_menu.AppendMenuItem(MF_STRING, 14, "Play / pause");
 		_single_click_menu.AppendMenuItem(MF_STRING, 15, "Show now playing");
 		_single_click_menu.CheckMenuRadioItem(14, 15, 14+properties.single_click_action);
-		_single_click_menu.AppendTo(_menu, MF_STRING, "Single click action");
+		_single_click_menu.AppendTo(_menu, MF_STRING, "Cover button");
 
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
