@@ -20,16 +20,17 @@ var properties = {
 	follow_cursor: window.GetProperty("_DISPLAY: cover follow cursor", false),
 	circleMode: window.GetProperty("_DISPLAY: circle mode", true),
 	keepProportion: window.GetProperty("_DISPLAY: keepProportion", true),
-	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),	
+	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
-    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),	
+    wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
+	showRating: window.GetProperty("_DISPLAY: showRating", false),
 	tintOnHover : true,
 	rawBitmap: false,
 	refreshRate: 50,
-	panelFontAdjustement: 0,	
+	panelFontAdjustement: 0,
 }
 if(properties.single_click_action>1) properties.single_click_action=1;
 
@@ -109,7 +110,7 @@ function setButtons(){
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
 			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
 			//plman.ActivePlaylist = this.SourcePlaylistIdx;
-			plman.PlayingPlaylist = g_cover.playlistIndex;			
+			plman.PlayingPlaylist = g_cover.playlistIndex;
 			if(fb.IsPaused) fb.Stop();
 			plman.FlushPlaybackQueue();
 			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
@@ -349,14 +350,14 @@ function calculate_visu_margin_left(){
 }
 
 function on_paint(gr) {
-	
+
 	if(Update_Required_function!="") {
 		eval(Update_Required_function);
 		Update_Required_function = "";
 	}
 	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-		update_wallpaper = false;		
+		update_wallpaper = false;
 	}
 
 	// draw background under playlist
@@ -371,7 +372,7 @@ function on_paint(gr) {
 			gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 		}
 	}
-	
+
 	if(!g_cover.isSetArtwork()) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying());
@@ -398,11 +399,11 @@ function on_paint(gr) {
 	}
 
 	drawAllButtons(gr);
-	
+
 	g_infos.draw(gr, 0, wh-track_infos_height);
 	var side_padding = 10;
 	gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
-	
+
 	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
 	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
 }
@@ -412,23 +413,23 @@ function on_size(w, h) {
 	calculate_visu_margin_left();
 	if((properties.showVisualization && g_cover.isPlaying()) || globalProperties.enable_screensaver) startAnimation();
 	g_cover.setSize(ww,wh-track_infos_height);
-	
+
 	g_infos.setSize(w,track_infos_height);
 
 	rating_spacing = Math.min(10, (ww-imgw*5) / 5);
-	
+
 	// set wallpaper
 	if(properties.showwallpaper){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	} else update_wallpaper = true;
-		
+
 	var img_rating_w = imgw * 5 + rating_spacing * 4;
 	rating_x = (ww - img_rating_w) / 2;
 	for(var i = 0; i < rbutton.length; i++){
 		index=i-1;
 		rbutton[i].setx(rating_x + imgw * index + rating_spacing * index);
 	}
-	TextBtn_info.setSize(0, wh-track_infos_height, ww, track_infos_height);	
+	TextBtn_info.setSize(0, wh-track_infos_height, ww, track_infos_height);
 }
 
 function on_mouse_lbtn_up(x, y, m) {
@@ -446,7 +447,7 @@ function on_mouse_lbtn_up(x, y, m) {
 			window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
 			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying())
 		}
-	}	
+	}
     g_dble_click=false;
 }
 function on_mouse_lbtn_down(x, y, m) {
@@ -475,7 +476,7 @@ function on_mouse_lbtn_down(x, y, m) {
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
 	if (g_infos.metadb && TextBtn_info.isXYInButton(x, y)) {
-		fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);	
+		fb.RunContextCommandWithMetadb("Properties", g_infos.metadb);
 	} else {
 		if(fb.IsPlaying) {
 			switch(true){
@@ -496,7 +497,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 					window.NotifyOthers('toggleLayoutMode',true);
 				break;
 			}
-		}		
+		}
 	}
 }
 
@@ -523,7 +524,7 @@ function on_mouse_move(x, y, m) {
 			if(rbutton[i - 1].MouseMove(x, y, i)) is_hover_rating = true;
 		}
 		if(!is_hover_rating) rating_hover_id = false;
-		if(is_hover_rating_old!=is_hover_rating || old_rating_hover_id!=rating_hover_id) window.Repaint();		
+		if(is_hover_rating_old!=is_hover_rating || old_rating_hover_id!=rating_hover_id) window.Repaint();
 	}
 }
 
@@ -541,7 +542,7 @@ function on_mouse_leave() {
 	if(rating_hover_id){
 		rating_hover_id = false;
 		window.Repaint();
-	}	
+	}
 }
 function on_playback_new_track(metadb) {
 	if (metadb)	{
@@ -555,8 +556,8 @@ function on_playback_new_track(metadb) {
 			if(old_cachekey!=nowplaying_cachekey || nowplaying_cachekey=="undefined") {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}
-		};		
-		g_infos.on_item_focus_change(plman.PlayingPlaylist,-1,-1,metadb);		
+		};
+		g_infos.on_item_focus_change(plman.PlayingPlaylist,-1,-1,metadb);
 	}
 	window.Repaint();
 }
@@ -578,7 +579,7 @@ function on_playback_stop(reason) {
 		nowplaying_cachekey = '';
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, null);
-		};		
+		};
 		window.Repaint();
 		break;
 	case 2: // starting_another (only called on user action, i.e. click on next button)
@@ -744,9 +745,9 @@ oCover = function() {
 	}
 	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;
-		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;		
+		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;
 		this.resized = false;
-		this.artwork = image;	
+		this.artwork = image;
 		this.setPlaying(is_playing===true, metadb);
 		this.metadb = metadb;
 		if(!isImage(image)) return;
@@ -760,8 +761,8 @@ oCover = function() {
 	}
 	this.getArtwork = function(metadb, is_playing, playlistIndex, itemIndex) {
 		var is_playing_old = this.is_playing;
-		this.playlistIndex = playlistIndex;	
-		this.itemIndex = itemIndex;		
+		this.playlistIndex = playlistIndex;
+		this.itemIndex = itemIndex;
 		if(typeof is_playing == "undefined"){
 			var is_playing_new = false;
 			if(isValidHandle(this.playing_metadb) && isValidHandle(metadb) && metadb.Compare(this.playing_metadb) && fb.IsPlaying) {
@@ -774,8 +775,8 @@ oCover = function() {
 			}
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
-				
-		if(this.is_playing!=is_playing_old) this.ResetMask();				
+
+		if(this.is_playing!=is_playing_old) this.ResetMask();
 		if(this.metadb && this.metadb.Compare(metadb)) {
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;
@@ -1068,7 +1069,7 @@ function on_notify_data(name, info) {
 			globalProperties.use_ratings_file_tags = info;
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
 			window.Reload();
-		break;		
+		break;
 		case "g_avoid_on_focus_change":
 			g_avoid_on_focus_change = info;
 			timers.on_focus_change = setTimeout(function() {
@@ -1085,7 +1086,7 @@ function on_notify_data(name, info) {
 			focus_on_now_playing = true;
 			if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 			focus_on_now_playing = false;
-			break;		
+			break;
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
 			if(info.cover_img==null) {
@@ -1110,11 +1111,11 @@ function on_notify_data(name, info) {
 			try{
 				metadb = new FbMetadbHandleList(info[2]);
 				g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
-				g_cover.on_item_focus_change(info[0], -1, info[1], metadb[0]);					
+				g_cover.on_item_focus_change(info[0], -1, info[1], metadb[0]);
 			} catch(e){
 				g_infos.on_item_focus_change(info[0], -1, info[1]);
-				g_cover.on_item_focus_change(info[0], -1, info[1]);				
-			}		
+				g_cover.on_item_focus_change(info[0], -1, info[1]);
+			}
 			g_avoid_on_focus_change = true;
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;
@@ -1125,15 +1126,15 @@ function on_notify_data(name, info) {
 		case "Right_panel_follow_cursor":
 			properties.follow_cursor = info;
 			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-			if(properties.follow_cursor) g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());			
+			if(properties.follow_cursor) g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
 			if(properties.follow_cursor) g_cover.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
 			else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 			break;
 	    case "FocusOnNowPlayingForce":
         case "FocusOnNowPlaying":
 			focus_on_now_playing = true;
-			var track = new FbMetadbHandleList(info);			
-			if(fb.IsPlaying && track.Count>0) on_playback_new_track(track[0]);					
+			var track = new FbMetadbHandleList(info);
+			if(fb.IsPlaying && track.Count>0) on_playback_new_track(track[0]);
 			else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
 			focus_on_now_playing = false;
         break;
@@ -1166,7 +1167,7 @@ function on_notify_data(name, info) {
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
 			on_font_changed();
-			window.Repaint();		
+			window.Repaint();
 		break;
 		case "mouse_move":
 			last_mouse_move_notified = info;
@@ -1341,7 +1342,7 @@ function on_notify_data(name, info) {
 		case "wallpaperBlurGlobal":
 		case "wallpaperBlur":
 			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
-		break;		
+		break;
 	}
 }
 function showNowPlayingCover(){
@@ -1581,9 +1582,11 @@ function oInfos() {
 	this.draw = function(gr, x, y) {
 		if(!this.metadb) return
 		this.y = y+track_infos_margin_top;
-		
-		for (var i = 1; i < rbutton.length + 1; i++) {
-			rbutton[i - 1].Paint(gr, i, y+10);
+
+		if (properties.showRating) {
+			for (var i = 1; i < rbutton.length + 1; i++) {
+				rbutton[i - 1].Paint(gr, i, y+10);
+			}
 		}
 
 		var double_row = (properties.doubleRowText && this.txt_line3 !="" && this.txt_line2 !="");
@@ -1592,7 +1595,7 @@ function oInfos() {
 			this.line1_width = gr.CalcTextWidth(this.txt_line1, g_font.italicplus5);
 			this.tooltip_line1 = (this.line1_width>this.txt_width);
 		}
-		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + rbutton[0].height + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(this.txt_line1, g_font.italicplus5, colors.normal_txt, this.x, this.y + (properties.showRating ? rbutton[0].height : rbutton[0].height / 3) + (double_row?0:2), this.txt_width, 34, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 		var line2 = ((this.txt_line2 !="" && this.show_info) || double_row) ? this.txt_line2 : this.txt_line3;
 		if(this.line2_width<0) {
@@ -1697,9 +1700,11 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.CheckMenuItem(7,properties.follow_cursor);
 	main_menu.AppendMenuItem(MF_STRING, 10, "Show infos on 2 rows");
 	main_menu.CheckMenuItem(10, properties.doubleRowText);
+	main_menu.AppendMenuItem(MF_STRING, 14, "Show rating");
+	main_menu.CheckMenuItem(14, properties.showRating);
 	main_menu.AppendMenuSeparator();
 	main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");
-	main_menu.AppendMenuSeparator();	
+	main_menu.AppendMenuSeparator();
 	main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
@@ -1712,12 +1717,12 @@ function on_mouse_rbtn_up(x, y){
 	switch(true) {
 		case (idx == 2):
 			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
-		break;		
+		break;
 		case (idx == 10):
 			properties.doubleRowText = !properties.doubleRowText;
 			window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
 			window.Repaint();
-			break;		
+			break;
 		case (idx == 7):
 			properties.follow_cursor = !properties.follow_cursor;
 			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
@@ -1750,7 +1755,15 @@ function on_mouse_rbtn_up(x, y){
 			g_cover.refreshCurrent();
 			adaptButtons();
 			window.Repaint();
-			break;		
+			break;
+		case (idx == 14):
+			properties.showRating = !properties.showRating;
+			window.SetProperty("_DISPLAY: showRating", properties.showRating);
+			get_images();
+			g_cover.refreshCurrent();
+			adaptButtons();
+			window.Repaint();
+			break;
 		case (idx == 100):
 			window.ShowProperties();
 			break;
@@ -1759,7 +1772,7 @@ function on_mouse_rbtn_up(x, y){
 			break;
 		case (idx == 102):
 			window.Reload();
-			break;	
+			break;
 		case (idx == 1):
 			showNowPlayingCover();
 			break;
@@ -1841,7 +1854,7 @@ function on_mouse_rbtn_up(x, y){
 function draw_settings_menu(x,y){
         var _menu = window.CreatePopupMenu();
 		var wallpapper_menu = window.CreatePopupMenu();
-		var wallpapper_menub = window.CreatePopupMenu();		
+		var wallpapper_menub = window.CreatePopupMenu();
         var idx;
 
 		_menu.AppendMenuItem(MF_STRING, 10, "Cover always follow cursor");
@@ -1874,14 +1887,14 @@ function draw_settings_menu(x,y){
 		wallpapper_menu.AppendMenuItem(MF_STRING, 200, "Enable");
 		wallpapper_menu.CheckMenuItem(200, properties.showwallpaper);
 		wallpapper_menu.AppendMenuItem(MF_STRING, 220, "Blur");
-		wallpapper_menu.CheckMenuItem(220, properties.wallpaperblurred);	
+		wallpapper_menu.CheckMenuItem(220, properties.wallpaperblurred);
 		wallpapper_menub.AppendMenuItem(MF_STRING, 221, "Filling");
 		wallpapper_menub.CheckMenuItem(221, properties.wallpaperdisplay==0);
 		wallpapper_menub.AppendMenuItem(MF_STRING, 222, "Adjust");
 		wallpapper_menub.CheckMenuItem(222, properties.wallpaperdisplay==1);
 		wallpapper_menub.AppendMenuItem(MF_STRING, 223, "Stretch");
 		wallpapper_menub.CheckMenuItem(223, properties.wallpaperdisplay==2);
-		wallpapper_menub.AppendTo(wallpapper_menu,MF_STRING, "Wallpaper size");	
+		wallpapper_menub.AppendTo(wallpapper_menu,MF_STRING, "Wallpaper size");
 		wallpapper_menu.AppendTo(_menu,MF_STRING, "Background Wallpaper");
 
         idx = _menu.TrackPopupMenu(x,y);
@@ -1988,17 +2001,17 @@ function draw_settings_menu(x,y){
 				properties.wallpaperdisplay = 2;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
 				on_colours_changed();
-				break;			
+				break;
 			case (idx == 220):
 				properties.wallpaperblurred = !properties.wallpaperblurred;
 				window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
 				on_colours_changed();
-				break;						
+				break;
             default:
 				return true;
         }
 		wallpapper_menu = undefined;
-		wallpapper_menub = undefined;	
+		wallpapper_menub = undefined;
         _menu = undefined;
         return true;
 }
@@ -2028,7 +2041,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 	} else {
 		fb.Volume=fb.Volume + Math.pow((120+fb.Volume)/100,1/1000)*intern_step*2;
 		window.NotifyOthers("AdjustVolume", true);
-		g_infos.cycle_infos();		
+		g_infos.cycle_infos();
 	}
 }
 var colors = {};
@@ -2124,7 +2137,7 @@ function get_images(){
 		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors_anim);
 	nowplaying_img.ReleaseGraphics(gb);
 	images.nowplaying_img = nowplaying_img;
-	
+
 	var gb;
 	pointArr = {
 		p1: Array(9, 1, 6.4, 6, 1, 6.6, 4.6, 10.6, 4, 16.2, 9, 13.4, 14, 16.2, 13.6, 10.6, 17, 6.6, 11.6, 6),
@@ -2143,7 +2156,7 @@ function get_images(){
 		gb.SetSmoothingMode(2);
 		gb.FillPolygon(colors.rating_icon_off, 0, pointArr.p1);
 		gb.SetSmoothingMode(0);
-	img_rating_off.ReleaseGraphics(gb);	
+	img_rating_off.ReleaseGraphics(gb);
 }
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
@@ -2173,11 +2186,11 @@ function on_init(){
 	get_images();
 	setButtons();
 	get_font();
-	g_infos = new oInfos();	
+	g_infos = new oInfos();
 	on_layout_change();
 	initbutton();
 	if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-	else g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem()); //g_cover.getArtwork(fb.GetFocusItem(), false);	
+	else g_infos.on_item_focus_change(-1,-1,-1,fb.GetFocusItem()); //g_cover.getArtwork(fb.GetFocusItem(), false);
 	if(fb.IsPlaying) g_cover.getArtwork(fb.GetNowPlaying(), true, plman.PlayingPlaylist);
 	else g_cover.getArtwork(fb.GetFocusItem(), false, plman.ActivePlaylist);
 }
