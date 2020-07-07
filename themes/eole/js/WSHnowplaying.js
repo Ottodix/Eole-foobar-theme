@@ -1708,15 +1708,8 @@ function on_mouse_rbtn_up(x, y){
 		quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
 		quickSearchMenu.AppendTo(main_menu, MF_STRING, "Quick search for...");
-		main_menu.AppendMenuSeparator();
 	}
-
-	main_menu.AppendMenuItem(MF_STRING, 7, "Cover always follow cursor");
-	main_menu.CheckMenuItem(7,properties.follow_cursor);
-	main_menu.AppendMenuItem(MF_STRING, 10, "Show infos on 2 rows");
-	main_menu.CheckMenuItem(10, properties.doubleRowText);
-	main_menu.AppendMenuItem(MF_STRING, 14, "Show rating");
-	main_menu.CheckMenuItem(14, properties.showRating);
+	
 	main_menu.AppendMenuSeparator();
 	main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing");
 	main_menu.AppendMenuSeparator();
@@ -1733,19 +1726,6 @@ function on_mouse_rbtn_up(x, y){
 		case (idx == 2):
 			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
 		break;
-		case (idx == 10):
-			properties.doubleRowText = !properties.doubleRowText;
-			window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
-			window.Repaint();
-			break;
-		case (idx == 7):
-			properties.follow_cursor = !properties.follow_cursor;
-			window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
-			if(properties.follow_cursor) g_cover.on_item_focus_change(-1,-1,-1,fb.GetFocusItem());
-			else if(fb.IsPlaying) on_playback_new_track(fb.GetNowPlaying());
-			window.NotifyOthers("Right_panel_follow_cursor",properties.follow_cursor);
-			window.Repaint();
-			break;
 		case (idx == 11):
 			properties.circleMode = !properties.circleMode;
 			window.SetProperty("_DISPLAY: circle mode", properties.circleMode);
@@ -1768,15 +1748,6 @@ function on_mouse_rbtn_up(x, y){
 			window.SetProperty("Show Inner Cirle", properties.innerCircle);
 			get_images();
 			g_cover.refreshCurrent();
-			adaptButtons();
-			window.Repaint();
-			break;
-		case (idx == 14):
-			properties.showRating = !properties.showRating;
-			window.SetProperty("_DISPLAY: showRating", properties.showRating);
-			get_images();
-			g_cover.refreshCurrent();
-			on_size(window.Width,window.Height);			
 			adaptButtons();
 			window.Repaint();
 			break;
@@ -1883,7 +1854,8 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(12,properties.keepProportion);
 		_menu.AppendMenuItem(MF_STRING, 16, "Show rating");
 		_menu.CheckMenuItem(16,properties.showRating);
-		
+		_menu.AppendMenuItem(MF_STRING, 17, "Show infos on 2 rows");
+		_menu.CheckMenuItem(17, properties.doubleRowText);
 		
 		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");
 		_menu.CheckMenuItem(1,properties.showVisualization);
@@ -1901,7 +1873,8 @@ function draw_settings_menu(x,y){
 		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
-		_dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);
+		_dble_click_menu.AppendMenuItem(MF_STRING, 8, "Edit track properties");		
+		_dble_click_menu.CheckMenuRadioItem(3, 8, 3+properties.dble_click_action);
 		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");
 
 		wallpapper_menu.AppendMenuItem(MF_STRING, 200, "Enable");
@@ -1958,6 +1931,10 @@ function draw_settings_menu(x,y){
 				properties.dble_click_action = 4;
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
                 break;
+            case (idx == 8):
+				properties.dble_click_action = 5;
+				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+                break;				
 			case (idx == 10):
 				properties.follow_cursor = !properties.follow_cursor;
 				window.SetProperty("_DISPLAY: cover follow cursor", properties.follow_cursor);
@@ -2002,7 +1979,12 @@ function draw_settings_menu(x,y){
 				on_size(window.Width,window.Height);			
 				adaptButtons();
 				window.Repaint();
-				break;			
+				break;	
+			case (idx == 17):
+				properties.doubleRowText = !properties.doubleRowText;
+				window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
+				window.Repaint();
+				break;				
 			case (idx == 200):
 				toggleWallpaper();
 				break;
