@@ -26,7 +26,7 @@ var properties = {
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpapermode: window.GetProperty("_SYSTEM: Wallpaper Mode", 0),
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
-	showRating: window.GetProperty("_DISPLAY: showRating", false),
+	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
 	rawBitmap: false,
 	refreshRate: 50,
