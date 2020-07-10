@@ -1685,8 +1685,8 @@ oBrowser = function(name) {
 							//plman.SetPlaylistSelectionSingle(g_active_playlist, g_focus_id, true);
 						};
 
-						plman.SetPlaylistFocusItem(g_active_playlist, g_focus_id);
-						this.showFocusedItem();
+						//plman.SetPlaylistFocusItem(g_active_playlist, g_focus_id);
+						//this.showFocusedItem();
 						if(this.rowsCount > 0) this.gettags(true);
 						if(!cNowPlaying.flashEnable && !this.dontFlashNowPlaying && flash_nowplaying) {
 							cNowPlaying.flashEnable = true;
@@ -6218,7 +6218,7 @@ function on_playback_new_track(metadb) {
 		g_radio_artist = "";
 		
 		//Move expanded group
-		if(properties.autocollapse && brw.isPlayingIdx>=0 && !brw.groups[brw.isPlayingIdx].collapsed){
+		if(properties.autocollapse && brw.isPlayingIdx>=0 && brw.isPlayingIdx<brw.groups.length && !brw.groups[brw.isPlayingIdx].collapsed){
 			activate_focus_changes = true;
 		}
 			
@@ -6418,7 +6418,7 @@ function on_item_focus_change(playlist, from, to) {
                     if(old_focused_group_id > -1) {
                         brw.groups[old_focused_group_id].collapsed = true;
                     };
-                    if(new_focused_group_id > -1) {
+                    if(new_focused_group_id > -1 && !properties.autocollapse) {
 						brw.expand_group(new_focused_group_id);
                     };
                     brw.setList();
