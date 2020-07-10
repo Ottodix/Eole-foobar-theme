@@ -194,6 +194,7 @@ var TF = {
 	radio_artist:fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))"),
 	artist:fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
 }
+var activate_autocollapse_changes = false;
 var recalculate_time = false;
 var gradient_w = 31;
 var gradient_m = 15;
@@ -5015,7 +5016,7 @@ function on_paint(gr) {
 function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
-
+	activate_autocollapse_changes = true;
     // stop inertia
     if(cTouch.timer) {
         window.ClearInterval(cTouch.timer);
@@ -6190,6 +6191,7 @@ function on_playback_new_track(metadb) {
 		g_metadb = metadb;
 		g_radio_title = "loading live tag ...";
 		g_radio_artist = "";
+		activate_autocollapse_changes = true;
 		if((properties.lockOnNowPlaying && plman.PlayingPlaylist!=g_active_playlist) || repopulate) {
 			brw.populate(is_first_populate = true,6);
 			repopulate = false;
@@ -6369,7 +6371,7 @@ function on_item_focus_change(playlist, from, to) {
             plman.SetActivePlaylistContext();
 
             // Autocollapse handle
-            if(properties.autocollapse) { // && !center_focus_item
+            if(properties.autocollapse && activate_autocollapse_changes) { // && !center_focus_item
                 if(from > -1 && from < brw.list.Count) {
                     var old_focused_group_id = brw.getAlbumIdfromTrackId(from);
                 } else {
@@ -6390,10 +6392,10 @@ function on_item_focus_change(playlist, from, to) {
                     brw.setList();
                     brw.scrollbar.updateScrollbar();
                     if(brw.rowsCount > 0) brw.gettags(true);
-                };
+                };				
             };
-
-            /*if(!g_rbtn_click) { // if new focused track not totally visible, we scroll to show it centered in the panel
+			
+            if(!g_rbtn_click && activate_autocollapse_changes && properties.autocollapse) { // if new focused track not totally visible, we scroll to show it centered in the panel
                 g_focus_row = brw.getOffsetFocusItem(g_focus_id);
                 if(g_focus_row < scroll/properties.rowHeight || g_focus_row > scroll/properties.rowHeight + brw.totalRowsVis - 0.1) {
                     var old = scroll;
@@ -6410,12 +6412,13 @@ function on_item_focus_change(playlist, from, to) {
                     };
                     brw.scrollbar.updateScrollbar();
                 };
-            };*/
+            };
 
             brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
             if(!isScrolling) brw.repaint();
         };
     };
+	activate_autocollapse_changes = false;
 	}
 };
 
