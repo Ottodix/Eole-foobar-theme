@@ -3467,6 +3467,7 @@ oBrowser = function(name) {
 							}
 							if(this.groups[groupId].collapsed && properties.expandBySingleClick) {
 								this.expand_group(groupId);
+								activate_autocollapse_changes = false;
 								this.setList();
 								this.scrollbar.updateScrollbar();
 								if(this.rowsCount > 0) this.gettags(true);
@@ -6197,7 +6198,12 @@ function on_playback_new_track(metadb) {
 		g_metadb = metadb;
 		g_radio_title = "loading live tag ...";
 		g_radio_artist = "";
-
+		
+		//Move expanded group
+		if(properties.autocollapse && brw.isPlayingIdx>=0 && !brw.groups[brw.isPlayingIdx].collapsed){
+			activate_autocollapse_changes = true;
+		}
+			
 		if((properties.lockOnNowPlaying && plman.PlayingPlaylist!=g_active_playlist) || repopulate) {
 			brw.populate(is_first_populate = true,6);
 			repopulate = false;
@@ -6220,6 +6226,8 @@ function on_playback_new_track(metadb) {
 			on_playback_dynamic_info_track();
 		}
 		g_elapsed_seconds = 0;
+		
+
 		brw.repaint();
 	} else {
 		set_update_function("on_playback_new_track(fb.GetNowPlaying())");
@@ -6392,7 +6400,7 @@ function on_item_focus_change(playlist, from, to) {
                     if(old_focused_group_id > -1) {
                         brw.groups[old_focused_group_id].collapsed = true;
                     };
-                    if(new_focused_group_id > -1 && (!properties.expandBySingleClick)) {
+                    if(new_focused_group_id > -1) {
 						brw.expand_group(new_focused_group_id);
                     };
                     brw.setList();
