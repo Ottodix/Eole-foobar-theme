@@ -1746,7 +1746,7 @@ oBrowser = function(name) {
         plman.SetPlaylistSelection(g_active_playlist, affectedItems, true);
 
         plman.SetPlaylistFocusItem(g_active_playlist, end_id);
-
+		activate_focus_changes = true;
         if(affectedItems.length > 1) {
             if(end_id > previous_focus_id) {
                 var delta = end_id - previous_focus_id;
@@ -3461,6 +3461,7 @@ oBrowser = function(name) {
 									firstRow: this.groups[groupId].group_header_row_1,
 									secondRow: this.groups[groupId].group_header_row_2});
 								plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+								activate_focus_changes = true;
 							}
 							if(this.groups[groupId].collapsed && properties.expandBySingleClick) {
 								this.expand_group(groupId);
@@ -3486,6 +3487,7 @@ oBrowser = function(name) {
                                 } else {
                                     plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                     plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+									activate_focus_changes = true;
                                 };
                                 this.SHIFT_start_id = null;
                             } else {
@@ -3498,6 +3500,7 @@ oBrowser = function(name) {
                                             //plman.ClearPlaylistSelection(g_active_playlist);
                                             //plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                             //plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+											//activate_focus_changes = true;
                                         } else {
                                             // nothing, single track already selected
                                         };
@@ -3506,11 +3509,13 @@ oBrowser = function(name) {
 											this.sentAlbumId = -1;
 											window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));
 											plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+											activate_focus_changes = true;
 										}
                                     } else {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+										activate_focus_changes = true;
 										this.sentTrackId = playlistTrackId;
 										this.sentAlbumId = -1;
 										window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));
@@ -3548,6 +3553,7 @@ oBrowser = function(name) {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+										activate_focus_changes = true;
 										this.repaint();
                                     };
                                 };
@@ -3605,6 +3611,7 @@ oBrowser = function(name) {
 
 							plman.PlayingPlaylist = g_active_playlist;
 							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId);
+							activate_focus_changes = true;
 							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId);
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();
 							else fb.Play();
@@ -3785,6 +3792,7 @@ oBrowser = function(name) {
                                 plman.ClearPlaylistSelection(g_active_playlist);
                                 this.selectGroupTracks(this.rows[this.activeRow].albumId);
                                 plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+								activate_focus_changes = true;
                                 this.SHIFT_start_id = null;
                             //};
                             if(!utils.IsKeyPressed(VK_SHIFT)) {
@@ -3797,6 +3805,7 @@ oBrowser = function(name) {
                                 plman.ClearPlaylistSelection(g_active_playlist);
                                 plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                 plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+								activate_focus_changes = true;
                             };
                             if(!utils.IsKeyPressed(VK_SHIFT)) {
                                 this.context_menu(x, y, playlistTrackId, this.activeRow);
