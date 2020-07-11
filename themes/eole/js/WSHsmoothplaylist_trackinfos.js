@@ -4081,6 +4081,7 @@ oBrowser = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 1040, "Date");
 			SortMenu.AppendMenuItem(MF_STRING, 1041, "Shortest to longest");
 			SortMenu.AppendMenuItem(MF_STRING, 1042, "Longest to shortest");
+			SortMenu.AppendMenuItem(MF_STRING, 1046, "Rating");			
 			SortMenu.AppendMenuSeparator();
 			SortMenu.AppendMenuItem(MF_STRING, 1039, "Randomize");
 		}
@@ -4257,6 +4258,11 @@ oBrowser = function(name) {
 				plman.SortByFormatV2(g_active_playlist,sort_by_title,1);
 				this.scroll = this.offset = 0;
 				break;
+			case 1046:
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_rating,1);
+				this.scroll = this.offset = 0;
+				break;				
 			case 2000:
 				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);

@@ -1110,7 +1110,7 @@ function on_notify_data(name, info) {
 				if (properties.follow_cursor) {
 					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info.trackIndex, metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
 				}
 			}
 			window.Repaint();
