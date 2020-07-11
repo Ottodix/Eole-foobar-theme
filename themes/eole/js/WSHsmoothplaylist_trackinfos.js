@@ -1684,9 +1684,8 @@ oBrowser = function(name) {
 						} else {
 							//plman.SetPlaylistSelectionSingle(g_active_playlist, g_focus_id, true);
 						};
-
-						//plman.SetPlaylistFocusItem(g_active_playlist, g_focus_id);
-						//this.showFocusedItem();
+						plman.SetPlaylistFocusItem(g_active_playlist, g_focus_id);
+						this.showFocusedItem();
 						if(this.rowsCount > 0) this.gettags(true);
 						if(!cNowPlaying.flashEnable && !this.dontFlashNowPlaying && flash_nowplaying) {
 							cNowPlaying.flashEnable = true;
@@ -1699,13 +1698,13 @@ oBrowser = function(name) {
         };
     };
 
-    this.showFocusedItem = function() {
-        g_focus_row = this.getOffsetFocusItem(g_focus_id);
+    this.showFocusedItem = function(g_focus_row) {
+		g_focus_row = typeof g_focus_row !== 'undefined' ? g_focus_row : this.getOffsetFocusItem(g_focus_id);
 
        // if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + this.totalRowsVis) {
 		   if(properties.showGroupHeaders) {
 				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis/4)) * properties.rowHeight;
-				scroll_to_header = this.groups[this.rows[g_focus_row].albumId].rowId * properties.rowHeight - properties.rowHeight*(properties.extraRowsNumber+1)
+				scroll_to_header = this.groups[this.rows[g_focus_row].albumId].rowId * properties.rowHeight //- properties.rowHeight*(properties.extraRowsNumber+1)
 				if(g_focus_row*properties.rowHeight-scroll_to_header+properties.rowHeight>wh-properties.rowHeight*5) scroll=scroll_to_track
 				else scroll=scroll_to_header
 		   } else
@@ -3465,10 +3464,12 @@ oBrowser = function(name) {
 							}
 							if(this.groups[groupId].collapsed && properties.expandBySingleClick) {
 								this.expand_group(groupId);
-								activate_focus_changes = false;
-								this.setList();
-								this.scrollbar.updateScrollbar();
-								if(this.rowsCount > 0) this.gettags(true);
+								// activate_focus_changes = false;
+								// this.setList();
+								// this.scrollbar.updateScrollbar();
+								// if(this.rowsCount > 0) this.gettags(true);
+								// plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
+								// this.showFocusedItem();
 							}
                             break;
                         case (rowType == 0):                    // ----------------> track row
@@ -6217,10 +6218,7 @@ function on_playback_new_track(metadb) {
 		g_radio_title = "loading live tag ...";
 		g_radio_artist = "";
 		
-		//Move expanded group
-		if(properties.autocollapse && brw.isPlayingIdx>=0 && brw.isPlayingIdx<brw.groups.length && !brw.groups[brw.isPlayingIdx].collapsed){
-			activate_focus_changes = true;
-		}
+
 			
 		if((properties.lockOnNowPlaying && plman.PlayingPlaylist!=g_active_playlist) || repopulate) {
 			brw.populate(is_first_populate = true,6);
@@ -6389,6 +6387,9 @@ function on_playlist_items_reordered(playlist_idx) {
 
 function on_item_focus_change(playlist, from, to) {
     var save_focus_id = g_focus_id;
+	var update_list = false;
+	var update_scrollbar = false;	
+	var get_tags = false;		
     g_focus_id = to;
 
 	if(window.IsVisible){
@@ -6421,9 +6422,9 @@ function on_item_focus_change(playlist, from, to) {
                     if(new_focused_group_id > -1 && !properties.autocollapse) {
 						brw.expand_group(new_focused_group_id);
                     };
-                    brw.setList();
-                    brw.scrollbar.updateScrollbar();
-                    if(brw.rowsCount > 0) brw.gettags(true);
+					brw.setList();
+					update_scrollbar = true;   
+					if(brw.rowsCount > 0) brw.gettags(true);
                 };				
             };
 			
@@ -6433,19 +6434,18 @@ function on_item_focus_change(playlist, from, to) {
                     var old = scroll;
                     scroll = (g_focus_row - Math.floor(brw.totalRowsVis / 2)) * properties.rowHeight;
                     scroll = check_scroll(scroll);
-                    if(!properties.enableFullScrollEffectOnFocusChange) {
-                        if(Math.abs(scroll - scroll_) > properties.rowHeight * 5) {
-                            if(scroll_ > scroll) {
-                                scroll_ = scroll + properties.rowHeight * 5;
-                            } else {
-                                scroll_ = scroll - properties.rowHeight * 5;
-                            };
-                        };
-                    };
-                    brw.scrollbar.updateScrollbar();
+					if(Math.abs(scroll - scroll_) > properties.rowHeight * 5) {
+						if(scroll_ > scroll) {
+							scroll_ = scroll + properties.rowHeight * 5;
+						} else {
+							scroll_ = scroll - properties.rowHeight * 5;
+						};
+					};
+                    brw.showFocusedItem(g_focus_row);
+					update_scrollbar = false;
                 };
             };
-
+			update_scrollbar && brw.scrollbar.updateScrollbar();
             brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
             if(!isScrolling) brw.repaint();
         };
