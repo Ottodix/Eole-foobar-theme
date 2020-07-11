@@ -108,9 +108,9 @@ function setButtons(){
 			fb.Pause();
 		},images.pause_img,images.pause_img),
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
-			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
-			//plman.ActivePlaylist = this.SourcePlaylistIdx;
 			plman.PlayingPlaylist = g_cover.playlistIndex;
+			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
+			plman.ActivePlaylist = g_cover.playlistIndex;		
 			if(fb.IsPaused) fb.Stop();
 			plman.FlushPlaybackQueue();
 			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
@@ -733,7 +733,7 @@ oCover = function() {
 			} else {
 				metadb = fb.GetFocusItem();
 				itemIndex = plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist);
-				playlistIndex = plman.ActivePlaylist;
+				if(!playlistIndex) playlistIndex = plman.ActivePlaylist;
 				if(!metadb){
 					metadb = null;
 					window.Repaint();
@@ -745,9 +745,10 @@ oCover = function() {
 			window.Repaint();
 		}
 	}
-	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey) {
+	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey, playlistIndex) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;
 		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;
+		if(typeof playlistIndex !== 'undefined') this.playlistIndex = playlistIndex;
 		this.resized = false;
 		this.artwork = image;
 		this.setPlaying(is_playing===true, metadb);
@@ -1105,11 +1106,11 @@ function on_notify_data(name, info) {
 				}
 			} else {
 				cover_img = new GdiBitmap(info.cover_img);
-				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey);
+				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey, info.playlist);
 				if (properties.follow_cursor) {
 					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info.trackIndex, metadb[0]);
 				}
 			}
 			window.Repaint();
