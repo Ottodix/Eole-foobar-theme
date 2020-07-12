@@ -1353,11 +1353,11 @@ function on_notify_data(name, info) {
 		break;
 		case "wallpaperVisibilityGlobal":
 		case "wallpaperVisibility":
-			if(window.IsVisible || name=="wallpaperVisibilityGlobal") toggleWallpaper(info);
+			if(window.IsVisible || name=="wallpaperVisibilityGlobal" || getNowPlayingState()==1) toggleWallpaper(info);
 		break;
 		case "wallpaperBlurGlobal":
 		case "wallpaperBlur":
-			if(window.IsVisible || name=="wallpaperBlurGlobal") toggleBlurWallpaper(info);
+			if(window.IsVisible || name=="wallpaperBlurGlobal" || getNowPlayingState()==1) toggleBlurWallpaper(info);
 		break;
 	}
 }
