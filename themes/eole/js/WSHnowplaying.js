@@ -1985,32 +1985,30 @@ function draw_settings_menu(x,y){
 			case (idx == 210):
 				properties.wallpapermode = 99;
 				window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-				on_colours_changed();
+				toggleWallpaper(properties.showwallpaper);
 				break;
 			case (idx == 211):
 				properties.wallpapermode = 0;
 				window.SetProperty("_SYSTEM: Wallpaper Mode", properties.wallpapermode);
-				on_colours_changed();
+				toggleWallpaper(properties.showwallpaper);
 				break;
 			case (idx == 221):
 				properties.wallpaperdisplay = 0;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-				on_colours_changed();
+				toggleWallpaper(properties.showwallpaper);
 				break;
 			case (idx == 222):
 				properties.wallpaperdisplay = 1;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-				on_colours_changed();
+				toggleWallpaper(properties.showwallpaper);
 				break;
 			case (idx == 223):
 				properties.wallpaperdisplay = 2;
 				window.SetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", properties.wallpaperdisplay);
-				on_colours_changed();
+				toggleWallpaper(properties.showwallpaper);
 				break;
 			case (idx == 220):
-				properties.wallpaperblurred = !properties.wallpaperblurred;
-				window.SetProperty("_DISPLAY: Wallpaper Blurred", properties.wallpaperblurred);
-				on_colours_changed();
+				toggleBlurWallpaper();
 				break;
             default:
 				return true;
@@ -2167,6 +2165,7 @@ function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
 	properties.showwallpaper = wallpaper_state;
 	window.SetProperty("_DISPLAY: Show Wallpaper", properties.showwallpaper);
+	g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 	on_colours_changed();
 }
 function toggleBlurWallpaper(wallpaper_blur_state){
