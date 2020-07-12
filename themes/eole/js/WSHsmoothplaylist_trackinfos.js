@@ -194,7 +194,10 @@ var TF = {
 	radio_artist:fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))"),
 	artist:fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
 }
-var activate_focus_changes = false;
+var focus_changes = {
+	scroll: false,
+	collapse: false
+}
 var recalculate_time = false;
 var gradient_w = 31;
 var gradient_m = 15;
@@ -1620,6 +1623,7 @@ oBrowser = function(name) {
         for(i = 0; i < end; i++) {
 			if(this.groups[i].isPlaying) {
 				this.groups[i].collapsed = false;
+				this.expanded_group = i;
 			} else this.groups[i].collapsed = bool;
         };
         this.setList();
@@ -1650,7 +1654,6 @@ oBrowser = function(name) {
 	};
 
     this.showNowPlaying = function(flash_nowplaying) {
-
 		var flash_nowplaying = typeof flash_nowplaying !== 'undefined' ? flash_nowplaying : true;
         if(fb.IsPlaying) {
 			g_filterbox.clearInputbox();
@@ -1684,7 +1687,6 @@ oBrowser = function(name) {
 						} else {
 							//plman.SetPlaylistSelectionSingle(g_active_playlist, g_focus_id, true);
 						};
-
 						plman.SetPlaylistFocusItem(g_active_playlist, g_focus_id);
 						this.showFocusedItem();
 						if(this.rowsCount > 0) this.gettags(true);
@@ -1699,13 +1701,13 @@ oBrowser = function(name) {
         };
     };
 
-    this.showFocusedItem = function() {
-        g_focus_row = this.getOffsetFocusItem(g_focus_id);
+    this.showFocusedItem = function(g_focus_row) {
+		g_focus_row = typeof g_focus_row !== 'undefined' ? g_focus_row : this.getOffsetFocusItem(g_focus_id);
 
        // if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + this.totalRowsVis) {
 		   if(properties.showGroupHeaders) {
 				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis/4)) * properties.rowHeight;
-				scroll_to_header = this.groups[this.rows[g_focus_row].albumId].rowId * properties.rowHeight - properties.rowHeight*(properties.extraRowsNumber+1)
+				scroll_to_header = this.groups[this.rows[g_focus_row].albumId].rowId * properties.rowHeight //- properties.rowHeight*(properties.extraRowsNumber+1)
 				if(g_focus_row*properties.rowHeight-scroll_to_header+properties.rowHeight>wh-properties.rowHeight*5) scroll=scroll_to_track
 				else scroll=scroll_to_header
 		   } else
@@ -1746,7 +1748,7 @@ oBrowser = function(name) {
         plman.SetPlaylistSelection(g_active_playlist, affectedItems, true);
 
         plman.SetPlaylistFocusItem(g_active_playlist, end_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
         if(affectedItems.length > 1) {
             if(end_id > previous_focus_id) {
                 var delta = end_id - previous_focus_id;
@@ -1880,7 +1882,7 @@ oBrowser = function(name) {
 		} else {
 			this.focusedTrackId = -1;
 		};
-
+		this.expanded_group = -1; 
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
@@ -2065,7 +2067,7 @@ oBrowser = function(name) {
         var headerTotalRows = properties.groupHeaderRowsNumber;
 
         var end = this.groups.length;
-
+		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
 
 			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
@@ -2599,7 +2601,7 @@ oBrowser = function(name) {
 							var t_selected_old = t_selected;
 							var t_selected = this.rows[i].selected;
 
-							if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
+							/*if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
 								var color_selected = colors.grad_line_selected;
 								var color_selected_off = colors.grad_line_bg_selected;
 								this.groups[this.rows[i].albumId].isPlaying = true;
@@ -2607,7 +2609,9 @@ oBrowser = function(name) {
 							} else {
 								var color_selected = colors.grad_line;
 								var color_selected_off = colors.grad_line_bg;
-							}
+							}*/
+							var color_selected = colors.grad_line;
+							var color_selected_off = colors.grad_line_bg;
                             if(t_selected) {
 								//top
 								if(!t_selected_old){
@@ -2659,9 +2663,6 @@ oBrowser = function(name) {
                                 } else {
                                     var track_artist_part = " "+add_infos;
                                 };
-
-                                // rating tag fixing & formatting
-                                // console.log(globalProperties.use_ratings_file_tags);
 
                                 if(this.rows[i].rating == -1) {
                                     if(isNaN(arr_t[2])) {
@@ -3461,13 +3462,14 @@ oBrowser = function(name) {
 									firstRow: this.groups[groupId].group_header_row_1,
 									secondRow: this.groups[groupId].group_header_row_2});
 								plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-								activate_focus_changes = true;
+								focus_changes.collapse = true;
 							}
 							if(this.groups[groupId].collapsed && properties.expandBySingleClick) {
 								this.expand_group(groupId);
-								activate_focus_changes = false;
+								focus_changes.collapse = false;
+								focus_changes.scroll = true;
 								this.setList();
-								this.scrollbar.updateScrollbar();
+								// this.scrollbar.updateScrollbar();
 								if(this.rowsCount > 0) this.gettags(true);
 							}
                             break;
@@ -3487,7 +3489,7 @@ oBrowser = function(name) {
                                 } else {
                                     plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                     plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-									activate_focus_changes = true;
+									focus_changes.collapse = true;
                                 };
                                 this.SHIFT_start_id = null;
                             } else {
@@ -3500,7 +3502,7 @@ oBrowser = function(name) {
                                             //plman.ClearPlaylistSelection(g_active_playlist);
                                             //plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                             //plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-											//activate_focus_changes = true;
+											//focus_changes.collapse = true;
                                         } else {
                                             // nothing, single track already selected
                                         };
@@ -3509,13 +3511,13 @@ oBrowser = function(name) {
 											this.sentAlbumId = -1;
 											window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));
 											plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-											activate_focus_changes = true;
+											focus_changes.collapse = true;
 										}
                                     } else {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-										activate_focus_changes = true;
+										focus_changes.collapse = true;
 										this.sentTrackId = playlistTrackId;
 										this.sentAlbumId = -1;
 										window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId, this.rows[this.activeRow].metadb));
@@ -3553,7 +3555,7 @@ oBrowser = function(name) {
                                         plman.ClearPlaylistSelection(g_active_playlist);
                                         plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                         plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-										activate_focus_changes = true;
+										focus_changes.collapse = true;
 										this.repaint();
                                     };
                                 };
@@ -3601,6 +3603,8 @@ oBrowser = function(name) {
 									scroll_ = scroll;
 								};
 								//*/
+								focus_changes.collapse = false;
+								focus_changes.scroll = false;
 								if(this.rowsCount > 0) brw.gettags(true);
 								this.scrollbar.updateScrollbar();
 								brw.repaint();
@@ -3611,12 +3615,11 @@ oBrowser = function(name) {
 
 							plman.PlayingPlaylist = g_active_playlist;
 							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId);
-							activate_focus_changes = true;
+							focus_changes.collapse = true;
 							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId);
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();
 							else fb.Play();
 							//previous_active_playlist = plman.ActivePlaylist;
-							//plman.ActivePlaylist = g_active_playlist;
 							//if(fb.IsPaused || fb.IsPlaying) fb.Stop();
 							//plman.SetPlaylistFocusItemByHandle(g_active_playlist, this.rows[this.activeRow].metadb);
 							//plman.ExecutePlaylistDefaultAction(g_active_playlist, this.rows[this.activeRow].playlistTrackId);
@@ -3792,7 +3795,7 @@ oBrowser = function(name) {
                                 plman.ClearPlaylistSelection(g_active_playlist);
                                 this.selectGroupTracks(this.rows[this.activeRow].albumId);
                                 plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-								activate_focus_changes = true;
+								focus_changes.collapse = true;
                                 this.SHIFT_start_id = null;
                             //};
                             if(!utils.IsKeyPressed(VK_SHIFT)) {
@@ -3805,7 +3808,7 @@ oBrowser = function(name) {
                                 plman.ClearPlaylistSelection(g_active_playlist);
                                 plman.SetPlaylistSelectionSingle(g_active_playlist, playlistTrackId, true);
                                 plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
-								activate_focus_changes = true;
+								focus_changes.collapse = true;
                             };
                             if(!utils.IsKeyPressed(VK_SHIFT)) {
                                 this.context_menu(x, y, playlistTrackId, this.activeRow);
@@ -3864,7 +3867,6 @@ oBrowser = function(name) {
                     g_dragndrop_trackId = 0;
                     g_dragndrop_rowId = 0;
                 };
-				console.log(g_dragndrop_rowId);
                 break;
         };
     };
@@ -4081,6 +4083,7 @@ oBrowser = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 1040, "Date");
 			SortMenu.AppendMenuItem(MF_STRING, 1041, "Shortest to longest");
 			SortMenu.AppendMenuItem(MF_STRING, 1042, "Longest to shortest");
+			SortMenu.AppendMenuItem(MF_STRING, 1046, "Rating");			
 			SortMenu.AppendMenuSeparator();
 			SortMenu.AppendMenuItem(MF_STRING, 1039, "Randomize");
 		}
@@ -4257,6 +4260,11 @@ oBrowser = function(name) {
 				plman.SortByFormatV2(g_active_playlist,sort_by_title,1);
 				this.scroll = this.offset = 0;
 				break;
+			case 1046:
+				this.dont_scroll_to_focus = true;
+				plman.SortByFormatV2(g_active_playlist,sort_by_rating,1);
+				this.scroll = this.offset = 0;
+				break;				
 			case 2000:
 				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);
@@ -5030,7 +5038,7 @@ function on_paint(gr) {
 function on_mouse_lbtn_down(x, y, m) {
     g_lbtn_click = true;
     g_rbtn_click = false;
-	activate_focus_changes = true;
+	focus_changes.collapse = true;
     // stop inertia
     if(cTouch.timer) {
         window.ClearInterval(cTouch.timer);
@@ -5632,7 +5640,7 @@ function vk_up() {
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
     } else {
         // kill timer
         cScrollBar.timerCounter = -1;
@@ -5698,7 +5706,7 @@ function vk_down() {
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
     } else {
         // kill timer
         cScrollBar.timerCounter = -1;
@@ -5752,7 +5760,7 @@ function vk_pgup() {
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
     } else {
         // kill timer
         cScrollBar.timerCounter = -1;
@@ -5804,7 +5812,7 @@ function vk_pgdn() {
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
     } else {
         // kill timer
         cScrollBar.timerCounter = -1;
@@ -5951,7 +5959,7 @@ function on_key_down(vkey) {
 					while(i>0 && brw.rows[i].type==99) i--;
                     var new_focus_id = brw.rows[i].playlistTrackId;
                     plman.SetPlaylistFocusItem(act_pls, new_focus_id);
-					activate_focus_changes = true;
+					focus_changes.collapse = true;
                     plman.ClearPlaylistSelection(act_pls);
                     plman.SetPlaylistSelectionSingle(act_pls, new_focus_id, true);
                 };
@@ -5962,7 +5970,7 @@ function on_key_down(vkey) {
                     plman.ClearPlaylistSelection(act_pls);
                     plman.SetPlaylistSelectionSingle(act_pls, new_focus_id, true);
                     plman.SetPlaylistFocusItem(act_pls, new_focus_id);
-					activate_focus_changes = true;
+					focus_changes.collapse = true;
                 };
                 break;
             case VK_DELETE:
@@ -5991,7 +5999,7 @@ function on_key_down(vkey) {
                                     g_focus_id--;
                                     plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, true);
                                     plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-									activate_focus_changes = true;
+									focus_changes.collapse = true;
                                 };
                             } else if(brw.SHIFT_count < 0) {
                                 if(g_focus_id > 0) {
@@ -5999,14 +6007,14 @@ function on_key_down(vkey) {
                                     g_focus_id--;
                                     plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, true);
                                     plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-									activate_focus_changes = true;
+									focus_changes.collapse = true;
                                 };
                             } else {
                                 plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, false);
                                 brw.SHIFT_count--;
                                 g_focus_id--;
                                 plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-								activate_focus_changes = true;
+								focus_changes.collapse = true;
                             };
                             break;
                         case VK_DOWN: // SHIFT + KEY DOWN
@@ -6021,7 +6029,7 @@ function on_key_down(vkey) {
                                     g_focus_id++;
                                     plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, true);
                                     plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-									activate_focus_changes = true;
+									focus_changes.collapse = true;
                                 };
                             } else if(brw.SHIFT_count>0) {
                                 if(g_focus_id < brw.list.Count - 1) {
@@ -6029,14 +6037,14 @@ function on_key_down(vkey) {
                                     g_focus_id++;
                                     plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, true);
                                     plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-									activate_focus_changes = true;
+									focus_changes.collapse = true;
                                 };
                             } else {
                                 plman.SetPlaylistSelectionSingle(act_pls, g_focus_id, false);
                                 brw.SHIFT_count++;
                                 g_focus_id++;
                                 plman.SetPlaylistFocusItem(act_pls, g_focus_id);
-								activate_focus_changes = true;
+								focus_changes.collapse = true;
                             };
                             break;
                     };
@@ -6218,9 +6226,9 @@ function on_playback_new_track(metadb) {
 		g_radio_artist = "";
 		
 		//Move expanded group
-		if(properties.autocollapse && brw.isPlayingIdx>=0 && !brw.groups[brw.isPlayingIdx].collapsed){
-			activate_focus_changes = true;
-		}
+		/*if(properties.autocollapse && brw.isPlayingIdx>=0 && brw.isPlayingIdx<brw.groups.length && !brw.groups[brw.isPlayingIdx].collapsed){
+			focus_changes.collapse = true;
+		}*/
 			
 		if((properties.lockOnNowPlaying && plman.PlayingPlaylist!=g_active_playlist) || repopulate) {
 			brw.populate(is_first_populate = true,6);
@@ -6233,7 +6241,8 @@ function on_playback_new_track(metadb) {
 				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
 			}
 		};
-		if(((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) {
+		
+		if((((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) || (brw.expanded_group<0 && properties.autocollapse && plman.PlayingPlaylist == g_active_playlist)) {		
 			brw.dontFlashNowPlaying=true;
 			brw.showNowPlaying();
 		}
@@ -6389,68 +6398,61 @@ function on_playlist_items_reordered(playlist_idx) {
 
 function on_item_focus_change(playlist, from, to) {
     var save_focus_id = g_focus_id;
+	var update_list = false;
+	var update_scrollbar = false;	
+	var get_tags = false;		
     g_focus_id = to;
 
 	if(window.IsVisible){
-    if(!brw.list || !brw || !brw.list) return;
+		if(!brw.list || !brw || !brw.list) return;
 
-    if(!g_avoid_on_item_focus_change) {
+		if(!g_avoid_on_item_focus_change) {
 
-        plman.SetActivePlaylistContext();
+			plman.SetActivePlaylistContext();
 
-        if(playlist == g_active_playlist) {
-            //
-            plman.SetActivePlaylistContext();
+			if(playlist == g_active_playlist) {
 
-            // Autocollapse handle
-            if(properties.autocollapse && activate_focus_changes) { // && !center_focus_item
-                if(from > -1 && from < brw.list.Count) {
-                    var old_focused_group_id = brw.getAlbumIdfromTrackId(from);
-                } else {
-                    var old_focused_group_id = -1;
-                };
-                if(to > -1 && to < brw.list.Count) {
-                    var new_focused_group_id = brw.getAlbumIdfromTrackId(to);
-                } else {
-                    var old_focused_group_id = -1;
-                };
-                if(new_focused_group_id != old_focused_group_id) {
-                    if(old_focused_group_id > -1) {
-                        brw.groups[old_focused_group_id].collapsed = true;
-                    };
-                    if(new_focused_group_id > -1) {
-						brw.expand_group(new_focused_group_id);
-                    };
-                    brw.setList();
-                    brw.scrollbar.updateScrollbar();
-                    if(brw.rowsCount > 0) brw.gettags(true);
-                };				
-            };
-			
-            if(!g_rbtn_click && activate_focus_changes) { // if new focused track not totally visible, we scroll to show it centered in the panel
-                g_focus_row = brw.getOffsetFocusItem(g_focus_id);
-                if(g_focus_row < scroll/properties.rowHeight || g_focus_row > scroll/properties.rowHeight + brw.totalRowsVis - 0.1) {
-                    var old = scroll;
-                    scroll = (g_focus_row - Math.floor(brw.totalRowsVis / 2)) * properties.rowHeight;
-                    scroll = check_scroll(scroll);
-                    if(!properties.enableFullScrollEffectOnFocusChange) {
-                        if(Math.abs(scroll - scroll_) > properties.rowHeight * 5) {
-                            if(scroll_ > scroll) {
-                                scroll_ = scroll + properties.rowHeight * 5;
-                            } else {
-                                scroll_ = scroll - properties.rowHeight * 5;
-                            };
-                        };
-                    };
-                    brw.scrollbar.updateScrollbar();
-                };
-            };
+				plman.SetActivePlaylistContext();
 
-            brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
-            if(!isScrolling) brw.repaint();
-        };
-    };
-	activate_focus_changes = false;
+				// Autocollapse handle
+				if(properties.autocollapse && focus_changes.collapse) {
+					if(from > -1 && from < brw.list.Count) {
+						var old_focused_group_id = brw.getAlbumIdfromTrackId(from);
+					} else {
+						var old_focused_group_id = -1;
+					};
+					if(to > -1 && to < brw.list.Count) {
+						var new_focused_group_id = brw.getAlbumIdfromTrackId(to);
+					} else {
+						var old_focused_group_id = -1;
+					};
+					if(new_focused_group_id != old_focused_group_id) {
+						if(old_focused_group_id > -1) {
+							brw.groups[old_focused_group_id].collapsed = true;
+						};
+						if(new_focused_group_id > -1) {
+							brw.expand_group(new_focused_group_id);
+						};
+						brw.setList();
+						update_scrollbar = true;   
+						if(brw.rowsCount > 0) brw.gettags(true);
+					};				
+				};
+				
+				if(focus_changes.collapse || focus_changes.scroll) { // if new focused track not totally visible, we scroll to show it centered in the panel
+					g_focus_row = brw.getOffsetFocusItem(g_focus_id);
+					if(g_focus_row < scroll/properties.rowHeight || g_focus_row > scroll/properties.rowHeight + brw.totalRowsVis - 0.1) {
+						brw.showFocusedItem(g_focus_row);
+						update_scrollbar = false;
+					};
+				};
+				update_scrollbar && brw.scrollbar.updateScrollbar();
+				brw.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
+				if(!isScrolling) brw.repaint();
+			};
+		};
+		focus_changes.collapse = false;
+		focus_changes.scroll = false;
 	}
 };
 
@@ -6492,7 +6494,7 @@ function on_metadb_changed(metadbs, fromhook) {
 						plman.ClearPlaylistSelection(g_active_playlist);
 						plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
 						plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-						activate_focus_changes = true;
+						focus_changes.collapse = true;
 					};
 				} else {
 					brw.populate(is_first_populate = false,14, false);
@@ -6597,7 +6599,7 @@ function g_sendResponse() {
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
-		activate_focus_changes = true;
+		focus_changes.collapse = true;
     };
 };
 function stopFlashNowPlaying() {
@@ -7102,8 +7104,6 @@ function on_drag_drop(action, x, y, mask) {
 		if(properties.lockOnNowPlaying) {
 			window.NotifyOthers("nowPlayingTrack",true);
 			plman.PlayingPlaylist = toPlaylistIdx;
-			//fb.Stop();fb.Play();
-			//plman.ActivePlaylist = toPlaylistIdx;
 		} else plman.ActivePlaylist = toPlaylistIdx;
         action.Effect = 1;
 		plman.UndoBackup(toPlaylistIdx);
@@ -7144,7 +7144,7 @@ function on_drag_drop(action, x, y, mask) {
             g_dragndrop_timer && clearTimeout(g_dragndrop_timer);
             g_dragndrop_timer = setTimeout(function(){
                 plman.SetPlaylistFocusItem(g_active_playlist, g_dragndrop_total_before);
-				activate_focus_changes = true;
+				focus_changes.collapse = true;
                 //brw.showFocusedItem();
                 //full_repaint();
                 clearTimeout(g_dragndrop_timer);

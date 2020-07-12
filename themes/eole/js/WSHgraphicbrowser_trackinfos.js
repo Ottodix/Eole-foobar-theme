@@ -2814,40 +2814,44 @@ oHeaderBar = function(name) {
 			var SortMenu = window.CreatePopupMenu(); //Custom Entries
 			SortMenu.AppendTo(basemenu, MF_STRING, "Sort By");
 
-			SortMenu.AppendMenuItem(MF_STRING, 3000, "Don't sort (Playing order)");
+			SortMenu.AppendMenuItem(MF_STRING, 2999, "Don't sort (Playing order)");
 			SortMenu.AppendMenuSeparator();
-			SortMenu.AppendMenuItem(MF_STRING, 3001, "Artist / Album / Tracknumber");
-			SortMenu.AppendMenuItem(MF_STRING, 3002, "Title");
-			SortMenu.AppendMenuItem(MF_STRING, 3003, "Tracknumber");
-			SortMenu.AppendMenuItem(MF_STRING, 3004, "Date");
-			SortMenu.AppendMenuItem(MF_STRING, 3005, "Date added to library (Newest first)");
+			SortMenu.AppendMenuItem(MF_STRING, 3000, "Artist / Album / Tracknumber");
+			SortMenu.AppendMenuItem(MF_STRING, 3001, "Title");
+			SortMenu.AppendMenuItem(MF_STRING, 3002, "Tracknumber");
+			SortMenu.AppendMenuItem(MF_STRING, 3003, "Date");
+			SortMenu.AppendMenuItem(MF_STRING, 3004, "Date added to library (Newest first)");
+			SortMenu.AppendMenuItem(MF_STRING, 3005, "Track rating");			
 			SortMenu.AppendMenuItem(MF_STRING, 3006, "Custom titleformat...");
 
 			checked_item=0;
 			switch (true) {
 				case (brw.currentSorting.indexOf(sort_by_album_artist) > -1):
-					checked_item=3001
+					checked_item=3000
 					break;
 				case (brw.currentSorting.indexOf(sort_by_title) > -1):
-					checked_item=3002
+					checked_item=3001
 					break;
 				case (brw.currentSorting.indexOf(sort_by_tracknumber) > -1):
-					checked_item=3003
+					checked_item=3002
 					break;
 				case (brw.currentSorting.indexOf(sort_by_date) > -1):
-					checked_item=3004
+					checked_item=3003
 					break;
 				case (brw.currentSorting.indexOf(sort_by_date_added) > -1):
-					checked_item=3005
+					checked_item=3004
 					break;
+				case (brw.currentSorting.indexOf(sort_by_rating) > -1):
+					checked_item=3005
+					break;					
 				case (brw.currentSorting=="" || !brw.currently_sorted):
-					checked_item=3000
+					checked_item=2999
 					break;
 				default:
 					checked_item=3006
 					break;
 			}
-			SortMenu.CheckMenuRadioItem(3000, 3006, checked_item);
+			SortMenu.CheckMenuRadioItem(2999, 3006, checked_item);
 			SortMenu.AppendMenuSeparator();
 
 			SortMenu.AppendMenuItem(MF_STRING, 3007, "Randomize");
@@ -2858,42 +2862,48 @@ oHeaderBar = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 3009, "Set current sorting as default");
 			SortMenu.CheckMenuItem(3009, (brw.currentSorting==properties.TFsorting_default));
 
-			actions[3000] = function(){
+			actions[2999] = function(){
 				properties.TFsorting = "";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(4,true);
 			}
-			actions[3001] = function(){
+			actions[3000] = function(){
 				properties.TFsorting = sort_by_album_artist+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(5,true);
 			}
-			actions[3002] = function(){
+			actions[3001] = function(){
 				properties.TFsorting = sort_by_title+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(6,true);
 			}
-			actions[3003] = function(){
+			actions[3002] = function(){
 				properties.TFsorting = sort_by_tracknumber+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(7,true);
 			}
-			actions[3004] = function(){
+			actions[3003] = function(){
 				properties.TFsorting = sort_by_date+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(8,true);
 			}
-			actions[3005] = function(){
+			actions[3004] = function(){
 				properties.TFsorting = sort_by_date_added+"#1";
 				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
 				g_showlist.close();
 				brw.populate(9,true);
 			}
+			actions[3005] = function(){
+				properties.TFsorting = sort_by_rating+"#1";
+				window.SetProperty("MAINPANEL Library Sort TitleFormat", properties.TFsorting);
+				g_showlist.close();
+				brw.populate(9,true);
+			}			
 			actions[3006] = function(){
 				try {
 					new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", brw.currentSorting, true);

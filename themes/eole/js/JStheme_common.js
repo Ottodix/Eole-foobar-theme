@@ -14,6 +14,7 @@ var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
 var sort_by_date_added = "$sub(9999,$year(%added%))-$sub(9999,$month(%added%))-$sub(9999,$day_of_month(%added%))|%album artist%|%date%|%album%|%tracknumber%";//"%added% ASC|%album artist%|%date%|%album%|%tracknumber%";
+var sort_by_rating = "$sub(10,%rating%)|%album artist%|%album%";
 var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
