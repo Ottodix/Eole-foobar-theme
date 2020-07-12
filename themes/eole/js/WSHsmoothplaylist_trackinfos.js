@@ -2601,7 +2601,7 @@ oBrowser = function(name) {
 							var t_selected_old = t_selected;
 							var t_selected = this.rows[i].selected;
 
-							if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
+							/*if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) {
 								var color_selected = colors.grad_line_selected;
 								var color_selected_off = colors.grad_line_bg_selected;
 								this.groups[this.rows[i].albumId].isPlaying = true;
@@ -2609,7 +2609,9 @@ oBrowser = function(name) {
 							} else {
 								var color_selected = colors.grad_line;
 								var color_selected_off = colors.grad_line_bg;
-							}
+							}*/
+							var color_selected = colors.grad_line;
+							var color_selected_off = colors.grad_line_bg;
                             if(t_selected) {
 								//top
 								if(!t_selected_old){
