@@ -1525,7 +1525,7 @@ oGroup = function(index, start, handle, groupkey) {
         this.rowsToAdd += properties.extraRowsNumber;
 		this.TimeString = this.FormatTime(this.TotalTime);
         if(this.collapsed) {
-            if(brw.focusedTrackId >= this.start && brw.focusedTrackId < this.start + count) { // focused track is in this group!
+            if(brw.expanded_group<0 && brw.focusedTrackId >= this.start && brw.focusedTrackId < this.start + count) { // focused track is in this group!
 				brw.expand_group(index);
             }
         };
@@ -1882,7 +1882,7 @@ oBrowser = function(name) {
 		} else {
 			this.focusedTrackId = -1;
 		};
-		this.expanded_group = -1; 
+
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
@@ -2129,6 +2129,7 @@ oBrowser = function(name) {
 		} else if(set_active_playlist && !g_avoid_playlist_displayed_switch) brw.setActivePlaylist(1);
 		else g_avoid_playlist_displayed_switch = false;
 
+		if(is_first_populate) this.expanded_group = -1;
 		//gTime_covers = fb.CreateProfiler();
 		//gTime_covers.Reset();
 		//console.log("populate Smoothplaylist started time:"+gTime_covers.Time);
@@ -2144,8 +2145,10 @@ oBrowser = function(name) {
         this.list = plman.GetPlaylistItems(g_active_playlist);
 		this.source_idx = g_active_playlist;
         this.init_groups();
-        if(properties.autocollapse) this.setList();
-
+        if(properties.autocollapse) {
+			if(this.expanded_group>-1) this.expand_group(this.expanded_group);
+			this.setList();
+		}	
         if(!this.dont_scroll_to_focus) g_focus_row = brw.getOffsetFocusItem(g_focus_id);
 		else {
 			g_focus_row = 0;
@@ -2174,6 +2177,7 @@ oBrowser = function(name) {
 				brw.showNowPlaying();
 				this.showNowPlaying_trigger = false;
 			}
+			console.log("showNowPlaying_trigger")
 		}
 		if(first_on_size) on_size();
         if(brw.rowsCount > 0) brw.gettags(true);
@@ -3469,7 +3473,7 @@ oBrowser = function(name) {
 								focus_changes.collapse = false;
 								focus_changes.scroll = true;
 								this.setList();
-								// this.scrollbar.updateScrollbar();
+								this.scrollbar.updateScrollbar();
 								if(this.rowsCount > 0) this.gettags(true);
 							}
                             break;
@@ -6488,7 +6492,7 @@ function on_metadb_changed(metadbs, fromhook) {
 			if(!(metadbs.Count == 1 && metadbs[0].Length < 0)) {
 				if(filter_text.length > 0) {
 					g_focus_id = 0;
-					brw.populate(is_first_populate = true,13, false);
+					brw.populate(true,13, false);
 					if(brw.rowsCount > 0) {
 						var new_focus_id = brw.rows[0].playlistTrackId;
 						plman.ClearPlaylistSelection(g_active_playlist);
@@ -6497,7 +6501,7 @@ function on_metadb_changed(metadbs, fromhook) {
 						focus_changes.collapse = true;
 					};
 				} else {
-					brw.populate(is_first_populate = false,14, false);
+					brw.populate(false,14, false);
 				};
 			};
 		};
