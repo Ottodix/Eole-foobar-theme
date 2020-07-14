@@ -2177,7 +2177,6 @@ oBrowser = function(name) {
 				brw.showNowPlaying();
 				this.showNowPlaying_trigger = false;
 			}
-			console.log("showNowPlaying_trigger")
 		}
 		if(first_on_size) on_size();
         if(brw.rowsCount > 0) brw.gettags(true);
