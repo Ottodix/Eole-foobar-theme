@@ -27,7 +27,7 @@ var properties = {
 	custom_firstRow: window.GetProperty("_DISPLAY: custom first row", ""),
 	custom_secondRow: window.GetProperty("_DISPLAY: custom second row", ""),
 	default_firstRow: fb.TitleFormat("$if2(%discnumber%.,)$num(%tracknumber%,1) ^^ %title% ^^ $if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
-	default_secondRow: fb.TitleFormat("%album% ['('%date%')']"),
+	default_secondRow: fb.TitleFormat("%album%[' ('%date%')']"),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", false),
     bio_stick_to_dark_theme: window.GetProperty("BIO stick to dark theme", false),
@@ -735,7 +735,6 @@ function get_text(metadb) {
 			g_text_title = first_row;		
 			g_text_artist =  "";
 			if(!mini_controlbar.isActive()) g_text_second_line = properties.tf_custom_secondRow.Eval();
-			if(g_text_second_line=="?") g_text_second_line = "";
 		}
     } else {
 		current_played_track = null;
@@ -744,6 +743,7 @@ function get_text(metadb) {
         g_text_second_line="";
         g_text_title_prefix="";
     }
+	if(g_text_second_line=="?") g_text_second_line = "";
 	setRatingBtn(metadb);
 	g_panel.set_title_text(g_text_title);
 	g_panel.set_artist_text(g_text_artist);
@@ -1735,7 +1735,7 @@ function on_notify_data(name, info) {
 		case "set_font":
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
-			get_font();on_font_changed();adapt_display_to_layout();
+			get_font();on_font_changed();adapt_display_to_layout(true);
 			window.Repaint();
 		break;
 		case "cover_cache_finalized":
@@ -3249,10 +3249,10 @@ function draw_settings_menu(x,y){
                 break;			
 			case (idx == 3031):
 				try {
-					customControlDetails("Customize fields displayed"
+					customControlDetails("Customize displayed fields"
 										,"<div class='titleBig'>Customize displayed fields</div><div class='separator'></div><br/>Enter a title formatting script for each line displayed.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 										,''
-										,'First line (default is %title% - %artist%):##Second line (default is %album% (%date%)):'
+										,'First line (default is %title% - %artist%):##Second line, displayed when the option is enabled (default is %album% (%date%)):'
 										,properties.custom_firstRow+'##'+properties.custom_secondRow);
 					properties.tf_custom_firstRow = fb.TitleFormat(properties.custom_firstRow);
 					properties.tf_custom_secondRow = fb.TitleFormat(properties.custom_secondRow);

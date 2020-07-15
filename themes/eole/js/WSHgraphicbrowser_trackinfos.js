@@ -118,6 +118,7 @@ var properties = {
     showRating: window.GetProperty("TRACKLIST Show rating in Track Row", false),
     showRatingSelected: window.GetProperty("TRACKLIST Show rating in Selected Track Row", false),
     showRatingRated: window.GetProperty("TRACKLIST Show rating in Rated Track Row", false),
+    show2rows: window.GetProperty("TRACKLIST Show track details on 2 rows", false),	
 	showlistShowCover: window.GetProperty("TRACKLIST Show cover", true),
     SortBy: window.GetProperty("MAINPANEL Sort albums by", "standard"),
     SortDescending: window.GetProperty("MAINPANEL sort descending", false),
@@ -885,7 +886,6 @@ oRow = function(metadb,itemIndex) {
 	this.cursorHand = false;
 	this.isFirstRow = false;
 	this.getTags = function(){
-
 		if(properties.showPlaycount) {
 			if(properties.showCodec) {
 				if(properties.showBitrate)
@@ -935,11 +935,17 @@ oRow = function(metadb,itemIndex) {
         this.w = w;
         var tracknumber_w = 28;
         var length_w = 55;
-
+		
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
 
-		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist")) this.artist_text = " - "+this.artist;
+		if(properties.show2rows) var text_height = Math.ceil(this.h/2);
+		else var text_height = this.h;
+		
+		if(properties.show2rows) var text_y = this.y+3;
+		else var text_y = this.y;
+			
+		if((properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist"))) this.artist_text = this.artist;
 		else this.artist_text = "";
 
         var duration = this.length;
@@ -1009,16 +1015,16 @@ oRow = function(metadb,itemIndex) {
         }
 		if(isPlaying) {
             if(elapsed_seconds%2==0)
-				gr.DrawImage(image0, this.x+12,  this.y+Math.ceil((this.h-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
+				gr.DrawImage(image0, this.x+12,  text_y+Math.ceil((text_height-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
 			else
-				gr.DrawImage(image1, this.x+12,  this.y+Math.ceil((this.h-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
+				gr.DrawImage(image1, this.x+12,  text_y+Math.ceil((text_height-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
 		}
 
 		if(properties.showRating && ((properties.showRatingSelected && this.isSelected) || (properties.showRatingRated && this.rating>0) || (!properties.showRatingSelected && !properties.showRatingRated))) {
 			rating_vpadding = 4;
 			if(typeof this.rating_length == 'undefined' || this.rating_length==0) this.rating_length = gr.CalcTextWidth("HHHHH", g_font.plus6);
 			if(!g_showlist.ratingImages) {
-				g_showlist.SetRatingImages(this.rating_length, this.h-rating_vpadding*2, g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
+				g_showlist.SetRatingImages(this.rating_length, text_height-rating_vpadding*(properties.show2rows?1:2), g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
 			}
 			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
 		} else {
@@ -1029,32 +1035,35 @@ oRow = function(metadb,itemIndex) {
 		if(this.tracknumber=="NaN") this.tracknumber="?";
 
 		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
-		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, text_y, this.tracknumber_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 		var tx = this.x + this.tracknumber_w + 10;
 		var tw = this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10)
-        gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, this.y, tw, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		var tw2 = this.w - this.tracknumber_w - length_w;
+        gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, text_y, tw, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title, g_font.normal);
 
-		if(this.artist_text!=""){
-			gr.GdiDrawText(this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, this.y, tw - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(this.artist_text, g_font.italic);
+		if(this.artist_text!="" && !properties.show2rows){
+			gr.GdiDrawText(" - "+this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, text_y, tw - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(" - "+this.artist_text, g_font.italic);
 		}
-		if(properties.showPlaycount || properties.showCodec || properties.showBitrate){
+		if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && !properties.show2rows){
 			this.playcount_text = "  ("+this.playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
-			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, tx + this.title_length + this.artist_length, this.y, tw - this.title_length - this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, tx + this.title_length + this.artist_length, text_y, tw - this.title_length - this.artist_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		} else {
 			this.playcount_length = 0;
 			this.playcount_text = '';
 		}
-
+		if(properties.show2rows) {
+			gr.GdiDrawText(this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount, g_font.normal, g_showlist.colorSchemeTextFaded, tx, text_y+text_height-6, tw2, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		}
 		if(properties.showToolTip && (this.title_length + this.artist_length + this.playcount_length) > tw) {
 			this.showToolTip = true;
-			this.ToolTipText = this.title + this.artist_text + this.playcount_text;
+			this.ToolTipText = this.title + " - "+this.artist_text + this.playcount_text;
 		} else this.showToolTip = false;
 
-        gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+        gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, text_y, length_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
         if(isPlaying && properties.AlbumArtProgressbar && properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
 				var playingText = gdi.CreateImage(this.w+10, this.h);
@@ -1068,23 +1077,25 @@ oRow = function(metadb,itemIndex) {
 					if(!g_showlist.light_bg) pt.FillSolidRect (10, 0, this.w, this.h, dark.albumartprogressbar_overlay);  //solid bg
 					else pt.FillSolidRect (10, 0, this.w, this.h, colors.albumartprogressbar_overlay);  //solid bg
 					if(elapsed_seconds%2==0)
-						pt.DrawImage(now_playing_progress0, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
+						pt.DrawImage(now_playing_progress0, 12, text_y-this.y+Math.round(text_height/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
 					else
-						pt.DrawImage(now_playing_progress1, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress1.Width, now_playing_progress1.Height, 0, 0, now_playing_progress1.Width, now_playing_progress1.Height,0,255);
-					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, 1, length_w, g_showlist.textHeight-g_showlist.textBot, 554696704);
+						pt.DrawImage(now_playing_progress1, 12, text_y-this.y+Math.round(text_height/2-now_playing_progress0.Height/2), now_playing_progress1.Width, now_playing_progress1.Height, 0, 0, now_playing_progress1.Width, now_playing_progress1.Height,0,255);
+					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, text_y-this.y+1, length_w, text_height-g_showlist.textBot, 554696704);
 				playingText.ReleaseGraphics(pt);
 				gr.DrawImage(playingText, this.x, this.y, current_size+12, this.h, 0, 0, current_size+12, this.h, 0, 255);
 				gr.DrawRect(this.x+10, this.y, Math.min(current_size+1,this.w), this.h-1,1,g_showlist.albumartprogressbar_color_rectline);
-				//gr.FillSolidRect(this.x+10, this.y, Math.min(current_size+1,this.w)+1, this.h,g_showlist.albumartprogressbar_color_overlay);
 
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
-				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, text_y, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				if(this.artist_text!=""){
-					gr.GdiDrawText(this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, this.y, title_w - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+					gr.GdiDrawText(" - "+this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, text_y, title_w - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
+				if(properties.show2rows) {
+					gr.GdiDrawText(this.artist_text+" - "+this.playcount, g_font.normal, colors.albumartprogressbar_txt, tx, text_y+text_height-6, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				}				
 				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((tx + this.title_length+ this.artist_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+ this.artist_length+this.playcount_length<this.w - length_w))){
-					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, this.y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, text_y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
         }
 		// rating Stars
@@ -1386,7 +1397,7 @@ oShowList = function(parentPanelName) {
 		this.margins_plus_paddings = this.paddingTop + this.paddingBot + (this.marginTop+this.marginBot);
 	}
 	this.onFontChanged = function(){
-		this.textHeight = Math.ceil(g_fsize * 1.8)+this.textBot;
+		this.textHeight = Math.ceil(g_fsize * 1.8)*(properties.show2rows?2:1)+this.textBot;
 		this.on_init();
 	}
 	this.onFontChanged();
@@ -2081,12 +2092,8 @@ oShowList = function(parentPanelName) {
 			if(properties.filterBox_filter_tracks && g_filterbox.isActive) this.setFilteredPlaylist();
 
 			this.album_info_sent = !send_albums_info;
-			//plman.SetPlaylistFocusItem(brw.getSourcePlaylist(), brw.groups[brw.groups_draw[drawn_idx]].trackIndex);
 		}
 
-		/*if(brw.followActivePlaylist && window.IsVisible && !getRightPlaylistState()) {
-			plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist,this.pl[0]);
-		}		*/
 		if(properties.showlistShowCover && properties.CoverGridNoText && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.heightMin = properties.showlistheightMinCoverGrid;
 		} else if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
@@ -3187,6 +3194,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_additionalInfos.CheckMenuItem(44, properties.showCodec);
 	_additionalInfos.AppendMenuItem(MF_STRING, 43, "Show bitrate");
 	_additionalInfos.CheckMenuItem(43, properties.showBitrate);
+	_additionalInfos.AppendMenuItem(MF_STRING, 60, "Show infos on 2 rows");
+	_additionalInfos.CheckMenuItem(60, properties.show2rows);	
 	_additionalInfos.AppendMenuSeparator();
 	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "Displayed in this order:");
 	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "[Artist name] ([Playcount] - [Codec] - [Bitrate])");
@@ -3468,6 +3477,13 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_showlist.refresh();
 			brw.repaint();
 			break;
+		case (idx == 60):
+			properties.show2rows = !properties.show2rows;
+			window.SetProperty("TRACKLIST Show track details on 2 rows", properties.show2rows);
+			g_showlist.onFontChanged();
+			g_showlist.refresh();
+			brw.repaint();
+			break;			
 		case (idx == 31):
 			properties.showToolTip = !properties.showToolTip;
 			window.SetProperty("MAINPANEL Show tooltips", properties.showToolTip);

@@ -3129,7 +3129,6 @@ oBrowser = function(name) {
 					gr.GdiDrawText("Filter", g_font.italicplus1, colors.faded_txt, this.x, py + 6, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			};
 
-			//draw_right_line = (properties.DrawRightLine && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && properties.filterOrder==2) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && properties.filterOrder==1) && !(!nowplayingplaylist_state.isActive() && !filters_panel_state.isMaximumValue() && !filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0));
 			this.draw_right_line = (properties.DrawRightLine && (!(properties.filterOrder==2) && !(!filter3_state.isActive() && properties.filterOrder==1) && !(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0) || main_panel_state.isEqual(0)));
             // draw top header bar
             if(properties.showHeaderBar) {

@@ -6472,6 +6472,7 @@ function on_metadb_changed(metadbs, fromhook) {
 		}
 	} catch(e){
 		console.log("ERROR:on_metadb_changed, WSHsmoothplaylist try/catch");
+		if(metadbs.Count==1) return;		
 	}
 
     if(window.IsVisible){
