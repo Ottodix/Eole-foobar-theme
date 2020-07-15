@@ -4717,7 +4717,7 @@ function get_colors() {
 		colors.node_icon_bold = GetGrey(0);
 
 
-        colors.grad_bottom_1 = GetGrey(0, 150);
+        colors.grad_bottom_1 = GetGrey(0, 70);
         colors.grad_bottom_2 = GetGrey(0, 0);
         colors.fading_bottom_height = 50;
 
