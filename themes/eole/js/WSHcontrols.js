@@ -889,7 +889,7 @@ function on_paint(gr) {
                 gr.GdiDrawText(g_text_title_prefix, font_adjusted , colors.normal_txt, progress_margin_left, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left+title_prefix_length, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
             if (properties.showTrackSecondaryInfo)
-                gr.GdiDrawText(g_text_title_secondary, g_font.italic, colors.normal_txt_secondary, progress_margin_left, margin_top_adapted + title_margin_top + (mini_controlbar.isActive()?14:16), ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                gr.GdiDrawText(g_text_title_secondary, g_font.italic, colors.normal_txt_secondary, progress_margin_left, margin_top_adapted + title_margin_top + (mini_controlbar.isActive()||layout_state.isEqual(1)?14:16), ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
             var title_length = g_panel.get_title_length(gr)+title_prefix_length;
 			gr.GdiDrawText(" -  "+g_text_artist, font_adjusted_italic , colors.normal_txt, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), margin_top_adapted + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
