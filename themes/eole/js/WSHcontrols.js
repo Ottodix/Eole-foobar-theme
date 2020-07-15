@@ -730,17 +730,14 @@ function get_text(metadb) {
 			g_text_title = infos[1];		
 			g_text_artist = " -  "+infos[2];
 			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
+			if(!mini_controlbar.isActive()) g_text_second_line = properties.default_secondRow.Eval();
 		} else {
 			var first_row = properties.tf_custom_firstRow.Eval();
 			g_text_title_prefix = "";	
 			g_text_title = first_row;		
 			g_text_artist =  "";
-		}
-		if(properties.custom_secondRow=="" && !mini_controlbar.isActive()) {
-			g_text_second_line = properties.default_secondRow.Eval();
-		} else if(!mini_controlbar.isActive()){
-			var second_row = properties.tf_custom_secondRow.Eval();
-			g_text_second_line = second_row;
+			if(!mini_controlbar.isActive()) g_text_second_line = properties.tf_custom_secondRow.Eval();
+			if(g_text_second_line=="?") g_text_second_line = "";
 		}
     } else {
 		current_played_track = null;
