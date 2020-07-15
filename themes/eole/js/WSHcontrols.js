@@ -115,8 +115,6 @@ var tf_elapsed_seconds = fb.TitleFormat("$if2(%playback_time_seconds%,'ON AIR')"
 //var tf_radio_artist = fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))");
 var tf_radio_artist = fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))");
 var tf_title = fb.TitleFormat("%title%");
-var tf_title_secondary = fb.TitleFormat("$if2(%originaltitle%,)");
-var tf_title_prefix = fb.TitleFormat("$if2(%discnumber%.,)$num(%tracknumber%,1) - ");
 var tf_rating = fb.TitleFormat("$if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0)");
 var elapsed_seconds = -1;
 var TimeElapsed=".";var TimeRemaining=".";var TimeTotal=".";var text_length="";
