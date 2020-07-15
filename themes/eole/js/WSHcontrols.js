@@ -23,8 +23,11 @@ var properties = {
     displayRepeat: window.GetProperty("_DISPLAY repeat btn", true),
     displayOpen: window.GetProperty("_DISPLAY open btn", true),
     displayStop: window.GetProperty("_DISPLAY stop btn", false),
-    showTrackSecondaryInfo: window.GetProperty("_DISPLAY show track info secondary", false),
     showTrackPrefix: window.GetProperty("_DISPLAY show track title prefix", false),
+	custom_firstRow: window.GetProperty("_DISPLAY: custom first row", ""),
+	custom_secondRow: window.GetProperty("_DISPLAY: custom second row", ""),
+	default_firstRow: fb.TitleFormat("$if2(%discnumber%.,)$num(%tracknumber%,1) ^^ %title% ^^ $if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))"),
+	default_secondRow: fb.TitleFormat("%album% ['('%date%')']"),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", false),
     bio_stick_to_dark_theme: window.GetProperty("BIO stick to dark theme", false),
@@ -35,6 +38,8 @@ var properties = {
 	volumeA1waysVisible: window.GetProperty("_DISPLAY always show volume bar", false),
 	repeatRandom: true,
 }
+properties.tf_custom_firstRow = fb.TitleFormat(properties.custom_firstRow);
+properties.tf_custom_secondRow = fb.TitleFormat(properties.custom_secondRow);
 
 scheduler = {
     shutdown_after_current: false,
@@ -101,7 +106,7 @@ var g_genre_cache = null;
 var scheduler_timer = false;
 var g_text_artist="";
 var g_text_title="";
-var g_text_title_secondary="";
+var g_text_second_line="";
 var g_text_title_prefix="";
 var time_e = fb.TitleFormat("%playback_time%");
 var time_t = fb.TitleFormat("$if(%length_seconds%,%length_seconds%,'ON AIR')");
@@ -712,29 +717,43 @@ function build_buttons(){
 
 function get_text(metadb) {
 	metadb = typeof metadb !== 'undefined' ? metadb : fb.GetNowPlaying();
-    g_text_artist = "";
+    g_text_title_prefix = "";	
     g_text_title = "";
-    g_text_title_secondary = "";
-    g_text_title_prefix = "";
-    g_text_tracknumber = "";
+    g_text_artist = "";	
+    g_text_second_line = "";
+
     if (metadb) {
 		current_played_track = metadb;
-        g_text_artist = tf_radio_artist.Eval();
-        g_text_title = tf_title.Eval();
-        if (properties.showTrackSecondaryInfo) g_text_title_secondary = tf_title_secondary.Eval();
-        if (properties.showTrackPrefix) g_text_title_prefix = tf_title_prefix.Eval(); 
+		if(properties.custom_firstRow=="") {
+			var infos = properties.default_firstRow.Eval();
+			infos = infos.split(" ^^ ");
+			g_text_title = infos[1];		
+			g_text_artist = " -  "+infos[2];
+			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
+		} else {
+			var first_row = properties.tf_custom_firstRow.Eval();
+			g_text_title_prefix = "";	
+			g_text_title = first_row;		
+			g_text_artist =  "";
+		}
+		if(properties.custom_secondRow=="" && !mini_controlbar.isActive()) {
+			g_text_second_line = properties.default_secondRow.Eval();
+		} else if(!mini_controlbar.isActive()){
+			var second_row = properties.tf_custom_secondRow.Eval();
+			g_text_second_line = second_row;
+		}
     } else {
 		current_played_track = null;
-        g_text_artist="Nothing Played";
+        g_text_artist=" -  Nothing Played";
         g_text_title="No Sound";
-        g_text_title_secondary="";
+        g_text_second_line="";
         g_text_title_prefix="";
     }
 	setRatingBtn(metadb);
 	g_panel.set_title_text(g_text_title);
 	g_panel.set_artist_text(g_text_artist);
     g_panel.set_title_prefix_text(g_text_title_prefix);
-    g_panel.set_title_secondary_text(g_text_title_secondary);
+    g_panel.set_title_secondary_text(g_text_second_line);
 }
 function setRatingBtn(metadb,new_rating){
 	metadb = typeof metadb !== 'undefined' ? metadb : fb.GetNowPlaying();
@@ -847,7 +866,7 @@ function on_paint(gr) {
 	//Progress
     //Dynamic place the progress bar
     var offset_progress_top = 0;
-    if (properties.showTrackSecondaryInfo && g_panel.get_title_secondary_length(gr) > 0){
+    if (!mini_controlbar.isActive() && g_panel.get_title_secondary_length(gr) > 0 && properties.showTrackInfo){
         offset_progress_top = 10;
 		var margin_top_adapted = progress_margin_top-4;
 	} else {
@@ -888,11 +907,11 @@ function on_paint(gr) {
             if (properties.showTrackPrefix)
                 gr.GdiDrawText(g_text_title_prefix, font_adjusted , colors.normal_txt, progress_margin_left, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left+title_prefix_length, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-            if (properties.showTrackSecondaryInfo)
-                gr.GdiDrawText(g_text_title_secondary, g_font.italic, colors.normal_txt_secondary, progress_margin_left, margin_top_adapted + title_margin_top + (mini_controlbar.isActive()||layout_state.isEqual(1)?14:16), ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+            if (!mini_controlbar.isActive())
+                gr.GdiDrawText(g_text_second_line, g_font.italic, colors.normal_txt_secondary, progress_margin_left, margin_top_adapted + title_margin_top + (mini_controlbar.isActive()||layout_state.isEqual(1)?14:16), ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
             var title_length = g_panel.get_title_length(gr)+title_prefix_length;
-			gr.GdiDrawText(" -  "+g_text_artist, font_adjusted_italic , colors.normal_txt, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), margin_top_adapted + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(g_text_artist, font_adjusted_italic , colors.normal_txt, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), margin_top_adapted + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			var artist_length = g_panel.get_artist_length(gr);
 			showTitleTooltip = (title_length+artist_length > ww_progress - timeInfo_length);
 
@@ -1109,7 +1128,7 @@ function on_mouse_move(x,y,m){
 			g_cursor.setCursor(IDC_HAND,"title");
 		}
 		if(showTitleTooltip && g_tooltip.activeZone != 'track_title' && !progress_vars.drag){
-			new_tooltip_text=scheduler_string+g_text_title+" - "+g_text_artist;
+			new_tooltip_text=scheduler_string+g_text_title+g_text_artist;
 			g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 0, false, 'track_title');
 		}
 	} else if(g_cursor.getActiveZone()=='title'){
@@ -2994,21 +3013,29 @@ function draw_settings_menu(x,y){
 		var _menu3A = window.CreatePopupMenu();
 		var _menu_button = window.CreatePopupMenu();
 		var _menu_slider = window.CreatePopupMenu();
+		var _menu_track_infos = window.CreatePopupMenu();		
         var idx;
 
-		_menu.AppendMenuItem(MF_STRING, 3027, "Compact controls");
-		_menu.CheckMenuItem(3027, mini_controlbar.isActive());
-		_menu.AppendMenuItem(MF_STRING, 3015, "Show track name");
-		_menu.CheckMenuItem(3015, properties.showTrackInfo);
+		//_menu.AppendMenuItem(MF_STRING, 3027, "Compact controls");
+		//_menu.CheckMenuItem(3027, mini_controlbar.isActive());
+
+		var custom_rows = properties.custom_firstRow!=""||properties.custom_secondRow!="";
+		_menu_track_infos.AppendMenuItem(MF_STRING, 3015, properties.showTrackInfo?"Hide":"Show");
+		_menu_track_infos.AppendMenuItem(MF_STRING, 3027, "Large controls / track details on 2 lines");
+		_menu_track_infos.CheckMenuItem(3027,!mini_controlbar.isActive());		
+		_menu_track_infos.AppendMenuSeparator();		
+        _menu_track_infos.AppendMenuItem(properties.showTrackInfo&&!custom_rows?MF_STRING:MF_GRAYED, 9001, "Show track title prefix (Discnumber.tracknumber)");
+		_menu_track_infos.CheckMenuItem(9001, properties.showTrackPrefix);
+        _menu_track_infos.AppendMenuItem(properties.showTrackInfo?MF_STRING:MF_GRAYED, 3031, "Customize...");
+		_menu_track_infos.CheckMenuItem(3031, custom_rows);
+        if(custom_rows) _menu_track_infos.AppendMenuItem(properties.showTrackInfo?MF_STRING:MF_GRAYED, 3032, "Reset");		
+		_menu_track_infos.AppendTo(_menu,MF_STRING, "Track details");
+		
 		_menu.AppendMenuItem(MF_STRING, 3030, "Always show volume bar");
 		_menu.CheckMenuItem(3030, properties.volumeA1waysVisible);		
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
 		_menu.CheckMenuItem(3016, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
-        _menu.AppendMenuItem(MF_STRING, 9000, "Show secondary info");
-		_menu.CheckMenuItem(9000, properties.showTrackSecondaryInfo);
-        _menu.AppendMenuItem(MF_STRING, 9001, "Show track title prefix (DiscNum.TrackNum)");
-		_menu.CheckMenuItem(9001, properties.showTrackPrefix);
-        
+
 		_menu.AppendMenuSeparator();
 		_menu3.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu3.CheckMenuItem(200, properties.showwallpaper);
@@ -3225,21 +3252,36 @@ function draw_settings_menu(x,y){
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;			
-            case (idx == 9000):
-                properties.showTrackSecondaryInfo = !properties.showTrackSecondaryInfo;
-                window.SetProperty("_DISPLAY show track info secondary", properties.showTrackSecondaryInfo);
-                build_buttons();
-				adapt_display_to_layout();
-				get_text(fb.GetNowPlaying())
-				on_size(window.Width, window.Height);
+			case (idx == 3031):
+				try {
+					customControlDetails("Customize fields displayed"
+										,"<div class='titleBig'>Customize displayed fields</div><div class='separator'></div><br/>Enter a title formatting script for each line displayed.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
+										,''
+										,'First line (default is %title% - %artist%):##Second line (default is %album% (%date%)):'
+										,properties.custom_firstRow+'##'+properties.custom_secondRow);
+					properties.tf_custom_firstRow = fb.TitleFormat(properties.custom_firstRow);
+					properties.tf_custom_secondRow = fb.TitleFormat(properties.custom_secondRow);
+					get_text();
+					window.Repaint();
+				} catch(e) {
+				}
+				break;				
+            case (idx == 3032):
+				properties.custom_firstRow = "";
+				properties.custom_secondRow = "";				
+				window.SetProperty("_DISPLAY: custom first row", "");
+				window.SetProperty("_DISPLAY: custom second row", "");			
+				properties.tf_custom_firstRow = fb.TitleFormat(properties.custom_firstRow);
+				properties.tf_custom_secondRow = fb.TitleFormat(properties.custom_secondRow);
+				get_text();
 				window.Repaint();
-                break;
+                break;						
             case (idx == 9001):
                 properties.showTrackPrefix = !properties.showTrackPrefix;
                 window.SetProperty("_DISPLAY show track title prefix", properties.showTrackPrefix);
                 build_buttons();
 				adapt_display_to_layout();
-				get_text(fb.GetNowPlaying())
+				get_text();
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;                
@@ -3250,6 +3292,7 @@ function draw_settings_menu(x,y){
         _menu = undefined;
 		_menu3 = undefined;
 		_menu3A = undefined;
+		_menu_track_infos = undefined;
 		_menu_button = undefined;
         return true;
 }

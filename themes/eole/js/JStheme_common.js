@@ -332,7 +332,6 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 				window.NotifyOthers("WSH_panels_reload",true);
 			}
 		}
-		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html",dialog_name+".html"), {
 		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax,inter_text],
@@ -341,8 +340,6 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
 	function ok_callback(status, input_values) {
 		if(status!="cancel"){
-			//for(i=0;i<input_values.length;i++) input_values_string+=input_values[i];
-			//fb.ShowPopupMessage('ok_callback status:'+status+" - "+input_values, "ok_callback_title");
 			var input_values = input_values.split('##');
 			var refresh_filters = false;
 			switch(properties.tagMode) {
@@ -393,7 +390,6 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 				brw.populate(true,1);
 			}
 		}
-		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
 		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
@@ -402,8 +398,6 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 function customGraphicBrowserGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
 	function ok_callback(status, input_values) {
 		if(status!="cancel"){
-			//for(i=0;i<input_values.length;i++) input_values_string+=input_values[i];
-			//fb.ShowPopupMessage('ok_callback status:'+status+" - "+input_values, "ok_callback_title");
 			var input_values = input_values.split('##');
 			if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || properties.TFgrouping==input_values[0]+" ^^ "+input_values[1])) {						
 				properties.TFgrouping = input_values[0]+" ^^ "+input_values[1];
@@ -413,7 +407,26 @@ function customGraphicBrowserGrouping(title, top_msg, bottom_msg, input_default_
 				brw.populate(5,false);
 			}
 		}
-		//fb.ShowPopupMessage('ok_callback status:'+status+' and mem_solicitation clicked:'+mem_solicitation+'', "ok_callback_title");
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+	});
+}
+function customControlDetails(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			var input_values = input_values.split('##');
+			if (!(typeof input_values[0] == 'undefined' || properties.custom_firstRow==input_values[0])) {
+				properties.custom_firstRow = input_values[0];
+				window.SetProperty("_DISPLAY: custom first row", properties.custom_firstRow);
+				get_text(fb.GetNowPlaying());
+			}
+			if (!(typeof input_values[1] == 'undefined' || properties.custom_secondRow==input_values[1])) {
+				properties.custom_secondRow = input_values[1];
+				window.SetProperty("_DISPLAY: custom second row", properties.custom_secondRow);
+				get_text(fb.GetNowPlaying());
+			}
+		}
 	}
 	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
 		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
