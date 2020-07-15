@@ -1092,7 +1092,7 @@ oRow = function(metadb,itemIndex) {
 					gr.GdiDrawText(" - "+this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, text_y, title_w - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
 				if(properties.show2rows) {
-					gr.GdiDrawText(this.artist_text+" - "+this.playcount, g_font.normal, colors.albumartprogressbar_txt, tx, text_y+text_height-6, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+					gr.GdiDrawText(this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount, g_font.normal, colors.albumartprogressbar_txt, tx, text_y+text_height-6, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}				
 				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((tx + this.title_length+ this.artist_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+ this.artist_length+this.playcount_length<this.w - length_w))){
 					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, text_y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
