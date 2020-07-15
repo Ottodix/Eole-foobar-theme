@@ -23,6 +23,8 @@ var properties = {
     displayRepeat: window.GetProperty("_DISPLAY repeat btn", true),
     displayOpen: window.GetProperty("_DISPLAY open btn", true),
     displayStop: window.GetProperty("_DISPLAY stop btn", false),
+    displayShowTrackInfoSecondary: window.GetProperty("_DISPLAY show track info secondary", false),
+    displayShowTrackPrefix: window.GetProperty("_DISPLAY show track title prefix", false),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", false),
     bio_stick_to_dark_theme: window.GetProperty("BIO stick to dark theme", false),
@@ -99,6 +101,8 @@ var g_genre_cache = null;
 var scheduler_timer = false;
 var g_text_artist="";
 var g_text_title="";
+var g_text_title_secondary="";
+var g_text_title_prefix="";
 var time_e = fb.TitleFormat("%playback_time%");
 var time_t = fb.TitleFormat("$if(%length_seconds%,%length_seconds%,'ON AIR')");
 var time_r = fb.TitleFormat("$if(%length%,-%playback_time_remaining%,%playback_time%)");
@@ -106,6 +110,8 @@ var tf_elapsed_seconds = fb.TitleFormat("$if2(%playback_time_seconds%,'ON AIR')"
 //var tf_radio_artist = fb.TitleFormat("$if2(%artist%,$if(%bitrate%,%bitrate%K',''))");
 var tf_radio_artist = fb.TitleFormat("$if3($meta(artist,0),$meta(album artist,0),$meta(composer,0),$meta(performer,0))");
 var tf_title = fb.TitleFormat("%title%");
+var tf_title_secondary = fb.TitleFormat("$if2(%originaltitle%,)");
+var tf_title_prefix = fb.TitleFormat("%discnumber%.%tracknumber% - ");
 var tf_rating = fb.TitleFormat("$if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0)");
 var elapsed_seconds = -1;
 var TimeElapsed=".";var TimeRemaining=".";var TimeTotal=".";var text_length="";
@@ -331,6 +337,7 @@ function get_colors(){
 		colors.line_bottom = GetGrey(40,200);
 		colors.dotted_progress = GetGrey(255,220);
 		colors.normal_txt = GetGrey(255);
+        colors.normal_txt_secondary = GetGrey(192);
 	} else {
 		colors.wallpaper_overlay = GetGrey(255,235);
 		colors.wallpaper_overlay_blurred = GetGrey(255,225);
@@ -706,19 +713,27 @@ function get_text(metadb) {
 	metadb = typeof metadb !== 'undefined' ? metadb : fb.GetNowPlaying();
     g_text_artist = "";
     g_text_title = "";
+    g_text_title_secondary = "";
+    g_text_title_prefix = "";
     g_text_tracknumber = "";
     if (metadb) {
 		current_played_track = metadb;
         g_text_artist = tf_radio_artist.Eval();
         g_text_title = tf_title.Eval();
+        g_text_title_secondary = tf_title_secondary.Eval();
+        g_text_title_prefix = tf_title_prefix.Eval();
     } else {
 		current_played_track = null;
         g_text_artist="Nothing Played";
         g_text_title="No Sound";
+        g_text_title_secondary="";
+        g_text_title_prefix="";
     }
 	setRatingBtn(metadb);
 	g_panel.set_title_text(g_text_title);
 	g_panel.set_artist_text(g_text_artist);
+    g_panel.set_title_prefix_text(g_text_title_prefix);
+    g_panel.set_title_secondary_text(g_text_title_secondary);
 }
 function setRatingBtn(metadb,new_rating){
 	metadb = typeof metadb !== 'undefined' ? metadb : fb.GetNowPlaying();
@@ -829,25 +844,30 @@ function on_paint(gr) {
 	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);
 
 	//Progress
+    //Dynamic place the progress bar
+    var offset_progress_top = 0;
+    if (properties.showTrackSecondaryInfo && g_panel.get_title_secondary_length(gr) > 0)
+        offset_progress_top = 15;
+    
 	if(ww_progress > 0 && !(hideProgressWhenVolumeChange && VolumeSliderActive)) {
 		if(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag)) ellipse_radius = 0;
 		else ellipse_radius = Math.ceil(progress_vars.ellipse_diameter/2);
 
 		if(properties.cursor_style==2) {
-			gr.FillSolidRect(progress_margin_left, progress_margin_top-Math.round(progress_vars.height/2)+1, ww_progress, progress_vars.height,progressOffcolor);
+			gr.FillSolidRect(progress_margin_left, offset_progress_top+progress_margin_top-Math.round(progress_vars.height/2)+1, ww_progress, progress_vars.height,progressOffcolor);
 		} else {
 			var dot_x = progress_margin_left + ww_progress;
 			while (dot_x >= progress_margin_left + g_pos_progress + (fb.IsPlaying && g_length_progress > 0?ellipse_radius:0)) {
-				gr.FillSolidRect(dot_x, progress_margin_top+1, 1, 1, colors.dotted_progress);
+				gr.FillSolidRect(dot_x, offset_progress_top+progress_margin_top+1, 1, 1, colors.dotted_progress);
 				dot_x = dot_x-3;
 			}
 		}
 
 		if (fb.IsPlaying && g_length_progress > 0) {
-			gr.FillSolidRect(progress_margin_left, progress_margin_top-Math.round(progress_vars.height/2)+1, g_pos_progress-ellipse_radius, progress_vars.height,progressOncolor);
+			gr.FillSolidRect(progress_margin_left, offset_progress_top+progress_margin_top-Math.round(progress_vars.height/2)+1, g_pos_progress-ellipse_radius, progress_vars.height,progressOncolor);
 			if(!(properties.cursor_style==2 && !(progress_vars.hover_slider || progress_vars.drag))){
 				var slider2draw = (progress_vars.hover_slider || progress_vars.drag)?slider_cursor_hover:slider_cursor;
-				gr.DrawImage(slider2draw,progress_margin_left+g_pos_progress-Math.round(slider2draw.Width/2)-1,progress_margin_top-Math.round(slider2draw.Height/2)+1,slider2draw.Width,slider2draw.Height,0,0,slider2draw.Width,slider2draw.Height,0,255);
+				gr.DrawImage(slider2draw,progress_margin_left+g_pos_progress-Math.round(slider2draw.Width/2)-1,offset_progress_top+progress_margin_top-Math.round(slider2draw.Height/2)+1,slider2draw.Width,slider2draw.Height,0,0,slider2draw.Width,slider2draw.Height,0,255);
 			}
 		}
     }
@@ -856,8 +876,17 @@ function on_paint(gr) {
 	if(!(hideProgressWhenVolumeChange && VolumeSliderActive)) {
 		if(properties.showTrackInfo){
 			timeInfo_length = g_panel.get_time_length(gr);
-			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left, progress_margin_top + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-			var title_length = g_panel.get_title_length(gr);
+            var title_prefix_length = 0;
+            if (properties.showTrackPrefix)
+                title_prefix_length = g_panel.get_title_prefix_length(gr);
+            //prefix text (discnum.tracknum)
+            if (properties.showTrackPrefix)
+                gr.GdiDrawText(g_text_title_prefix, font_adjusted , colors.normal_txt, progress_margin_left, progress_margin_top + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left+title_prefix_length, progress_margin_top + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+            if (properties.showTrackSecondaryInfo)
+                gr.GdiDrawText(scheduler_string+g_text_title_secondary, g_font.min1, colors.normal_txt_secondary, progress_margin_left+title_prefix_length, (progress_margin_top + title_margin_top)*1.9, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+
+            var title_length = g_panel.get_title_length(gr)+title_prefix_length;
 			gr.GdiDrawText(" -  "+g_text_artist, font_adjusted_italic , colors.normal_txt, progress_margin_left+title_length +((layout_state.isEqual(0))?4:2), progress_margin_top + artist_margin_top, ww_progress - title_length - timeInfo_length, 10, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			var artist_length = g_panel.get_artist_length(gr);
 			showTitleTooltip = (title_length+artist_length > ww_progress - timeInfo_length);
@@ -1396,10 +1425,14 @@ function Scheduler(callBackName){
 }
 function oPanel(){
 	this.title_length = -1;
+	this.title_prefix_length = -1;
+    this.title_secondary_length = -1;
 	this.artist_length = -1;
 	this.time_length = -1;
 	this.fullTitle_length = -1;
 	this.title_txt = '';
+    this.title_prefix_txt = '';
+    this.title_secondary_txt = '';
 	this.artist_txt = '';
 	this.time_txt = '';
 	this.on_font_changed = function(){
@@ -1412,12 +1445,36 @@ function oPanel(){
 		this.title_txt = title_txt;
 		this.title_length = -1;
 	}
+  
 	this.get_title_length = function(gr){
 		if(this.title_length<0){
 			this.title_length = gr.CalcTextWidth(this.scheduler_txt+this.title_txt, font_adjusted);
 		}
 		return this.title_length;
 	}
+    
+	this.set_title_prefix_text = function(title_prefix_txt){
+		this.title_prefix_txt = title_prefix_txt;
+		this.title_prefix_length = -1;
+	}    
+	this.get_title_prefix_length = function(gr){
+		if(this.title_prefix_length<0){
+			this.title_prefix_length = gr.CalcTextWidth(this.scheduler_txt+this.title_prefix_txt, font_adjusted);
+		}
+		return this.title_prefix_length;
+	}  
+
+	this.set_title_secondary_text = function(title_secondary_txt){
+		this.title_secondary_txt = title_secondary_txt;
+		this.title_secondary_length = -1;
+	}    
+	this.get_title_secondary_length = function(gr){
+		if(this.title_secondary_length<0){
+			this.title_secondary_length = gr.CalcTextWidth(this.scheduler_txt+this.title_secondary_txt, font_adjusted);
+		}
+		return this.title_secondary_length;
+	}    
+    
 	this.set_fullTitle_length = function(gr){
 		this.fullTitle_length =  this.get_title_length(gr)+this.get_artist_length(gr);
 	}
@@ -2942,7 +2999,11 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(3030, properties.volumeA1waysVisible);		
 		_menu.AppendMenuItem(MF_STRING, 3016, "Show now playing artwork");
 		_menu.CheckMenuItem(3016, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
-
+        _menu.AppendMenuItem(MF_STRING, 9000, "Show secondary info");
+		_menu.CheckMenuItem(9000, properties.showTrackSecondaryInfo);
+        _menu.AppendMenuItem(MF_STRING, 9001, "Show track title prefix (DiscNum.TrackNum)");
+		_menu.CheckMenuItem(9001, properties.showTrackPrefix);
+        
 		_menu.AppendMenuSeparator();
 		_menu3.AppendMenuItem(MF_STRING, 200, "Enable");
 		_menu3.CheckMenuItem(200, properties.showwallpaper);
@@ -3158,7 +3219,23 @@ function draw_settings_menu(x,y){
 				adapt_display_to_layout();
 				on_size(window.Width, window.Height);
 				window.Repaint();
-                break;				
+                break;			
+            case (idx == 9000):
+                properties.showTrackSecondaryInfo = !properties.showTrackSecondaryInfo;
+                window.SetProperty("_DISPLAY show track info secondary", properties.showTrackSecondaryInfo);
+                build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;
+            case (idx == 9001):
+                properties.showTrackPrefix = !properties.showTrackPrefix;
+                window.SetProperty("_DISPLAY show track title prefix", properties.showTrackPrefix);
+                build_buttons();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;                
             default:		
 				return true;
         }
