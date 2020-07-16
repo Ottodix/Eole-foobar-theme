@@ -885,6 +885,7 @@ oRow = function(metadb,itemIndex) {
 	this.title_length = 0;
 	this.artist_length = 0;
 	this.playcount_length = 0;
+	this.secondLine_length = 0;
 	this.cursorHand = false;
 	this.isFirstRow = false;
 	this.getTags = function(){
@@ -1064,16 +1065,20 @@ oRow = function(metadb,itemIndex) {
 			this.playcount_text = '';
 		}
 		if(properties.show2lines) {
-			if(this.secondLine=="")
-				gr.GdiDrawText(this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount, g_font.normal, g_showlist.colorSchemeTextFaded, tx, text_y+text_height-6, tw2, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-			else
-				gr.GdiDrawText(this.secondLine, g_font.normal, g_showlist.colorSchemeTextFaded, tx, text_y+text_height-6, tw2, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);			
+			if(this.secondLine=="") this.secondLine = this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount;
+			if(this.secondLine_length==0) this.secondLine_length = gr.CalcTextWidth(this.secondLine, g_font.normal);
+			gr.GdiDrawText(this.secondLine, g_font.normal, g_showlist.colorSchemeTextFaded, tx, text_y+text_height-6, tw2, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);			
 		}
-		if(properties.showToolTip && (this.title_length + this.artist_length + this.playcount_length) > tw) {
+		if(properties.showToolTip && ((this.title_length + this.artist_length + this.playcount_length) > tw || this.secondLine_length>tw2)) {
 			this.showToolTip = true;
 			this.ToolTipText = this.title;
-			if(this.artist_text!="") this.ToolTipText += " - "+this.artist_text;
-			this.ToolTipText += this.playcount_text;
+			if(this.secondLine_length==0){
+				if(this.artist_text!="") this.ToolTipText += " - "+this.artist_text;
+				this.ToolTipText += this.playcount_text;
+			} else {
+				this.ToolTipText += "\n"+this.secondLine;
+			}
+			
 		} else this.showToolTip = false;
 
         gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, text_y, length_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -1281,7 +1286,7 @@ oRow = function(metadb,itemIndex) {
 						if(this.ishover && brw.TooltipRow!=this.itemIndex && !this.ishover_rating) {
 							brw.TooltipRow=this.itemIndex;
 							new_tooltip_text=this.ToolTipText;//+"\n"+this.artist;
-							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay);
+							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200);
 						}
 						if(brw.TooltipRow==this.itemIndex && !this.ishover) {
 							brw.TooltipRow = -1;
