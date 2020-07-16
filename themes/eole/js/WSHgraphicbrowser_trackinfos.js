@@ -929,7 +929,7 @@ oRow = function(metadb,itemIndex) {
 		this.length = Tags[5].toHHMMSS();
 
 		this.playcount = Tags[6];
-		if(!properties.show2lines) this.playcount = this.playcount.replace(" plays","");
+		if(!properties.show2lines && properties.showPlaycount) this.playcount = this.playcount.replace(" plays","");
 	}
 	this.getTags();
 	this.repaint = function() {
