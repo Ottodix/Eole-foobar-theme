@@ -928,7 +928,8 @@ oRow = function(metadb,itemIndex) {
 		this.length_seconds = Tags[5];
 		this.length = Tags[5].toHHMMSS();
 
-		this.playcount = Tags[6];
+		if(Tags[6]) this.playcount = Tags[6];
+		else this.playcount = ""
 		if(!properties.show2lines && properties.showPlaycount) this.playcount = this.playcount.replace(" plays","");
 	}
 	this.getTags();

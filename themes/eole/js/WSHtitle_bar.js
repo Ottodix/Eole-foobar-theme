@@ -251,7 +251,7 @@ function get_colors(){
 	setDarkLayout();
 	get_colors_global();
 	if (properties.darklayout) {
-		colors.wallpaper_overlay = GetGrey(0,233);
+		colors.wallpaper_overlay = GetGrey(0,203);
 		colors.wallpaper_overlay_blurred = GetGrey(0,140);
 		colors.albumartbg_overlay = GetGrey(0,80);
 
@@ -279,8 +279,8 @@ function get_colors(){
 		cSearchBox.marginBottom = 3;
 	}
 	else {
-		colors.wallpaper_overlay = GetGrey(255,252);
-		colors.wallpaper_overlay_blurred = GetGrey(255,252);
+		colors.wallpaper_overlay = GetGrey(255,232);
+		colors.wallpaper_overlay_blurred = GetGrey(255,232);
 		colors.albumartbg_overlay = GetGrey(0,80);
 
 		colors.btn_inactive_opacity = 255;
@@ -883,10 +883,7 @@ function SetPseudoCaption(){
 function on_paint(gr) {
 	gr.SetTextRenderingHint(globalProperties.TextRendering);
 
-    //BG
-	if(!properties.showwallpaper){
-		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	}
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
     // BG wallpaper
     if(properties.showwallpaper && (typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper)) {
         g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());

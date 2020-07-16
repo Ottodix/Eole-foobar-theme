@@ -772,7 +772,7 @@ function setRatingBtn(metadb,new_rating){
 function showVolumeSlider(new_state){
 	var toggle = typeof new_state !== 'undefined' ? false : true;
 	if(properties.volumeA1waysVisible && layout_state.isEqual(0)) {
-		VolumeSliderActive=true;	console.log("--------------------")
+		VolumeSliderActive=true;	
 		return;
 	}
 	if(toggle){
@@ -831,9 +831,7 @@ function on_paint(gr) {
 	gr.SetTextRenderingHint(globalProperties.TextRendering);
 
     //BG
-	if(!properties.showwallpaper){
-		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	}
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
     // BG wallpaper
     if(properties.showwallpaper && (typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper)) {
         g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
