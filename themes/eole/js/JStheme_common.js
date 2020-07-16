@@ -432,6 +432,20 @@ function customControlDetails(title, top_msg, bottom_msg, input_default_values, 
 		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
 	});
 }
+function customTracklistDetails(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			var input_values = input_values.split('##');
+			if (!(typeof input_values[0] == 'undefined' || properties.show2linesCustomTag==input_values[0])) {
+				properties.show2linesCustomTag = input_values[0];
+				window.SetProperty("TRACKLIST track details on 2 rows - custom tag", properties.show2linesCustomTag);
+			}
+		}
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+	});
+}
 //Colors ------------------------------------------------------------------------------
 var colors = {};
 var darkcolors = {};

@@ -3209,18 +3209,21 @@ function draw_settings_menu(x,y){
 				properties.cursor_style = 0;
 				window.SetProperty("_DISPLAY slider cursor style", properties.cursor_style);
 				build_images();
+				adapt_display_to_layout();
 				window.Repaint();
                 break;
             case (idx == 3025):
 				properties.cursor_style = 1;
 				window.SetProperty("_DISPLAY slider cursor style", properties.cursor_style);
 				build_images();
+				adapt_display_to_layout();
 				window.Repaint();
                 break;
             case (idx == 3026):
 				properties.cursor_style = 2;
 				window.SetProperty("_DISPLAY slider cursor style", properties.cursor_style);
 				build_images();
+				adapt_display_to_layout();
 				window.Repaint();
                 break;
             case (idx == 3027):

@@ -5003,16 +5003,13 @@ function on_paint(gr) {
 
     if(!g_1x1) {
         // draw background under playlist
+		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
             gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
             gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-        } else {
-            if(g_wallpaperImg && properties.showwallpaper) {
-                gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-                gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-            } else {
-                gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-            }
+        } else if(g_wallpaperImg && properties.showwallpaper) {
+			gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
+			gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
         }
 
         brw && brw.draw(gr);
