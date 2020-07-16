@@ -239,6 +239,7 @@ function build_images(){
 	shuffle_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle.png");
 	shuffle_off = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_off.png");
 	shuffle_off_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\shuffle_off_hover.png");
+	
 	volume1_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume1.png");
 	volume1_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume1_hover.png");
 	volume2_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume2.png");
@@ -249,6 +250,12 @@ function build_images(){
 	volume4_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume4_hover.png");
 	mute_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\mute_hover.png");
 	mute_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\mute.png");
+
+	volume_img_mini = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume_mini.png");
+	volume_img_hover_mini = gdi.Image(theme_img_path + "\\" + theme_path + "\\volume_mini_hover.png");
+	mute_img_hover_mini = gdi.Image(theme_img_path + "\\" + theme_path + "\\mute_mini_hover.png");
+	mute_img_mini = gdi.Image(theme_img_path + "\\" + theme_path + "\\mute_mini.png");
+
 	random_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\random_hover.png");
 	random_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\random.png");
 	shutdown_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\shutdown_hover.png");
@@ -458,8 +465,8 @@ function adapt_display_to_layout(new_track){
 				volume_vars.margin_right = 40;
 			} else {
 				volume_vars.width = 80;
-				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 10;
-				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;				
+				if(!new_track) buttons_right.Volume.x = buttons_right.Volume.x - volume_vars.width	- button_padding - 5;
+				volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding-5;				
 			}
 			progress_margin_left = button_left_m + 180 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
 			progress_margin_right = button_right_m + nb_of_buttons_right*(button_width+button_padding)-5+(properties.volumeA1waysVisible?volume_vars.width+button_padding:0);			
@@ -812,7 +819,7 @@ function calculate_onsize_vars(w, h){
 		if(layout_state.isEqual(0)) volume_vars.margin_left = w-volume_vars.width-volume_vars.margin_right;
 		else volume_vars.width = w-volume_vars.margin_right-volume_vars.margin_left;
 	} else {
-		volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding;		
+		volume_vars.margin_left = window.Width+buttons_right.Volume.x+button_width+button_padding-5;		
 	}
 	calculateVolumeSize();
 
@@ -3398,8 +3405,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonDown, fonUp, fonDbleCli
                 this.H_img=mini_play_img_hover;
                 this.D_img=mini_play_img_hover;
             }
-        }
-        else if(this.text=="Volume"){
+        } else if(this.text=="Volume" && !properties.volumeA1waysVisible){
 			if (volume_vars.gradvolume<=0.1) {
 				this.N_img=mute_img;
 				this.H_img=mute_img_hover;
@@ -3421,9 +3427,18 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonDown, fonUp, fonDbleCli
 				this.H_img=volume4_img_hover;
 				this.D_img=volume4_img_hover;
 			}
-
+        } else if(this.text=="Volume"){
+			if (volume_vars.gradvolume<=0.1) {
+				this.N_img=mute_img_mini;
+				this.H_img=mute_img_hover_mini;
+				this.D_img=mute_img_hover_mini;
+			} else {
+				this.N_img=volume_img_mini;
+				this.H_img=volume_img_hover_mini;
+				this.D_img=volume_img_hover_mini;
+			}
         }
-
+		
         switch (this.state) {
 			case ButtonStates.normal:
 				b_img=this.N_img;
