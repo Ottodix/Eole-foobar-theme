@@ -1101,12 +1101,11 @@ function draw_settings_menu(x,y){
 		var _visu_menu = window.CreatePopupMenu();
 		_visu_menu.AppendMenuItem(MF_STRING, 8, "Always show");
 		_visu_menu.CheckMenuItem(8,properties.showVisualization==2);
-		_visu_menu.AppendMenuItem(MF_STRING, 9, "Only when main panel animation isn't visible");
-		_visu_menu.CheckMenuItem(9,properties.showVisualization==1);
 		_visu_menu.AppendMenuItem(MF_STRING, 10, "Never");
 		_visu_menu.CheckMenuItem(10,properties.showVisualization==0);
-		_visu_menu.AppendTo(_menu, MF_STRING, "Animation on playback");
-
+		
+		_menu.AppendMenuItem(MF_STRING, 8, "Animation on playback");
+		_menu.CheckMenuItem(8,properties.showVisualization==2);
 
 		_menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
 		_menu.CheckMenuItem(2, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
@@ -1139,26 +1138,13 @@ function draw_settings_menu(x,y){
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
                 break;
 			case (idx == 8):
-				properties.showVisualization = 2;
+				if(properties.showVisualization==0) properties.showVisualization = 2;
+				else properties.showVisualization = 0;
 				window.SetProperty("Show Visualization", properties.showVisualization);
 				if(!globalProperties.enable_screensaver) resetAnimation();
 				calculate_visu_margin_left();
 				window.Repaint();
 				break;
-			case (idx == 9):
-				properties.showVisualization = 1;
-				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				calculate_visu_margin_left();
-				window.Repaint();
-				break;
-			case (idx == 10):
-				properties.showVisualization = 0;
-				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				calculate_visu_margin_left();
-				window.Repaint();
-			break;
             default:
 				return true;
         }

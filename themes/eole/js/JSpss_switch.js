@@ -153,6 +153,7 @@ var trackinfoslib_state = new oPanelSetting("trackinfoslib_state", "TRACKINFOSLI
 var trackinfosplaylist_state = new oPanelSetting("trackinfosplaylist_state", "TRACKINFOSPLAYLIST_", 0, 0, 1);
 var trackinfosbio_state = new oPanelSetting("trackinfosbio_state", "TRACKINFOSBIO_", 1, 0, 1);
 var trackinfosvisu_state = new oPanelSetting("trackinfosvisu_state", "TRACKINFOSVISU_", 1, 0, 1);
+var trackinfostext_state = new oPanelSetting("trackinfostext_state", "TRACKINFOSTEXT_", 1, 0, 1);
 
 //Panels width
 var libraryfilter_width = new oPanelSetting("libraryfilter_width", "LIBRARYFILTERWIDTH_", 210, 100, 900);

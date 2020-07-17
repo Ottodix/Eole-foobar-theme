@@ -1416,6 +1416,9 @@ oShowList = function(parentPanelName) {
 		this.margins_plus_paddings = this.paddingTop + this.paddingBot + (this.marginTop+this.marginBot);
 	}
 	this.onFontChanged = function(){
+		this.ratingImages = false;
+		this.ratingImgsLight = false;
+		this.ratingImgsDark = false;		
 		this.textHeight = Math.ceil(g_fsize * 1.8)*(properties.show2lines?2:1)+this.textBot;
 		this.on_init();
 	}
@@ -5468,8 +5471,8 @@ oBrowser = function(name) {
 				repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
 
 				if(repaintIndex>=0){
-					active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x;
-					active_x = brw.groups[brw.groups_draw[repaintIndex]].x;
+					active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x-8;
+					active_x = brw.groups[brw.groups_draw[repaintIndex]].x-8;
 					if(active_x > active_x_saved) {
 						repaint_x = active_x_saved;
 						repaint_x_end = active_x + brw.coverRealWith;
@@ -5477,8 +5480,8 @@ oBrowser = function(name) {
 						repaint_x = active_x;
 						repaint_x_end = active_x_saved + brw.coverRealWith;
 					}
-					active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y;
-					active_y = brw.groups[brw.groups_draw[repaintIndex]].y;
+					active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y-8;
+					active_y = brw.groups[brw.groups_draw[repaintIndex]].y-8;
 					if(active_y > active_y_saved) {
 						repaint_y = active_y_saved;
 						repaint_y_end = active_y + brw.coverRealWith;
@@ -5486,7 +5489,7 @@ oBrowser = function(name) {
 						repaint_y = active_y;
 						repaint_y_end = active_y_saved + brw.coverRealWith;
 					}
-					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x+20, repaint_y_end-repaint_y+20);
 				} else repaint_1 = true;
 			} catch(e){
 				repaint_1 = true;
@@ -7023,8 +7026,6 @@ function get_colors() {
 function on_font_changed() {
     get_font();
 	brw.on_font_changed(true);
-	g_showlist.ratingImgsLight = false;
-	g_showlist.ratingImgsDark = false;
 	g_showlist.onFontChanged();
 	brw.get_metrics_called = false;
 	g_filterbox.onFontChanged();
