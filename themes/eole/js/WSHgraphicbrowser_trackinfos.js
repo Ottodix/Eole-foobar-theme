@@ -2392,9 +2392,14 @@ oShowList = function(parentPanelName) {
 
                     gr.GdiDrawText(this.firstRow, first_row_font, first_row_color, tx+4, ty, this.w - this.MarginRight - 40 - this.timeTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                     gr.GdiDrawText(this.secondRow, second_row_font, second_row_color, tx+4, ty + 8+g_fsize, this.w - this.MarginRight - 25 - this.genreTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                    gr.GdiDrawText(this.length+',  '+this.total_tracks, g_font.normal, this.colorSchemeTextFaded, (brw.groups_draw.length>1) ? tx-32 : tx-13, ty-2, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                    gr.GdiDrawText(genreText, genre_font, genre_color, tx-13, ty + item_height +1, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-
+					//if(!trackinfostext_state.isActive() || !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+						gr.GdiDrawText(this.length+',  '+this.total_tracks, g_font.normal, this.colorSchemeTextFaded, (brw.groups_draw.length>1) ? tx-32 : tx-13, ty-2, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(genreText, genre_font, genre_color, tx-13, ty + item_height +1, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						// close button
+						if(slh > this.paddingBot*2 && brw.groups_draw.length>1) {
+							this.close_bt.draw(gr, this.x+this.w-this.MarginRight-4-rightfix, ty +17-this.close_bt.img[0].Height, 255);
+						}						
+					//}
 					if(typeof this.firstRowLength == 'undefined') this.firstRowLength = gr.CalcTextWidth(this.firstRow,g_font.italicplus5);
 					if(typeof this.secondRowLength == 'undefined') this.secondRowLength = gr.CalcTextWidth(this.secondRow,g_font.plus2);
 
@@ -2441,11 +2446,6 @@ oShowList = function(parentPanelName) {
                             cy = this.y + this.paddingTop + 11+5;
                         }
                     }
-                }
-
-                // close button
-                if(slh > this.paddingBot*2 && brw.groups_draw.length>1) {
-                    this.close_bt.draw(gr, this.x+this.w-this.MarginRight-4-rightfix, ty +17-this.close_bt.img[0].Height, 255);
                 }
             }
         } else {
@@ -7499,6 +7499,10 @@ function on_notify_data(name, info) {
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
 		break;
+		case "trackinfostext_state":
+			trackinfostext_state.value=info;
+			g_showlist.refresh();
+		break;		
 		case "trackinfoslib_state":
 			trackinfoslib_state.value=info;
 			if(getRightPlaylistState()) {
