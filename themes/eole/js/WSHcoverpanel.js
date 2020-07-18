@@ -966,8 +966,8 @@ function on_mouse_rbtn_up(x, y){
 		//Context.InitContext(new FbMetadbHandleList(fb.GetNowPlaying()));
 		//Context.BuildMenu(context_menu, 100, -1);
 		//context_menu.AppendTo(main_menu, MF_STRING, "Track properties");
+		main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	}
-	main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
