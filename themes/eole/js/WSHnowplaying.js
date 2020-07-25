@@ -1758,10 +1758,10 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 18, "Show track details");
 		_menu.CheckMenuItem(18, trackinfostext_state.isActive());		
-		_menu.AppendMenuItem(MF_STRING, 16, "Show rating");
-		_menu.CheckMenuItem(16,properties.showRating);
-		_menu.AppendMenuItem(MF_STRING, 17, "Show details on 2 rows");
+		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 17, "Show details on 2 rows");
 		_menu.CheckMenuItem(17, properties.doubleRowText);
+		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 16, "Show rating");
+		_menu.CheckMenuItem(16,properties.showRating);		
 		_menu.AppendMenuSeparator();
 
 		var _single_click_menu = window.CreatePopupMenu();

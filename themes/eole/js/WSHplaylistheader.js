@@ -3,6 +3,7 @@ var properties = {
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
 	savedFilterState: window.GetProperty("_PROPERTY: Saved filter state", -1),
+    filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),		
 	panelFontAdjustement: -1
 }
 
@@ -645,7 +646,7 @@ playlistInfo = function(){
 		this.plist_items = plman.GetPlaylistItems(plman.ActivePlaylist);
 		this.items_count=this.plist_items.Count;
 		if(this.items_count==0) {this.time_txt=""; this.setTexts(); return;}
-		if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist) {
+		if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist) {
 			i=0;this.totalTime=0;
 			while(i < this.items_count) {this.totalTime+=this.plist_items[i].Length; i++;}
 			this.setTexts(); return;
@@ -739,7 +740,13 @@ playlistInfo = function(){
 			this.items_txt=displayed_count+' items';
 
 			// Main Text, Left justified
-			if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist){
+			var filtered_playlist = "";
+			if(this.playlist_name==globalProperties.filter_playlist && properties.filtred_playlist_idx>-1){
+				var filtered_playlist = plman.GetPlaylistName(properties.filtred_playlist_idx);
+			}
+			if(filtered_playlist!="" && filtered_playlist!=globalProperties.selection_playlist){				
+				this.main_txt='Playlist : '+plman.GetPlaylistName(properties.filtred_playlist_idx)+' (Filtered)';	
+			} else if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist){
 				this.main_txt='Playlist : '+this.playlist_name;
 			} else if(this.albums!=""){
 				if(this.artists!="") this.main_txt=this.albums+' - '+this.artists
@@ -1028,6 +1035,15 @@ function on_notify_data(name, info) {
 			positionButtons();
 			window.Repaint();
 		break;
+		case "refresh_filters":
+			if(info[1]) {
+				properties.filtred_playlist_idx = info[1];
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
+			} else if(properties.filtred_playlist_idx>-1 && plman.GetPlaylistName(plman.ActivePlaylist)!=globalProperties.filter_playlist) {
+				properties.filtred_playlist_idx = -1;
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx)
+			}
+		break;			
     };
 };
 function on_init(){

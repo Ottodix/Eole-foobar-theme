@@ -129,7 +129,7 @@ var showtrackinfo_small = new oPanelSetting("showtrackinfo_small", "SHOWTRACKINF
 
 var coverpanel_state_mini = new oPanelSetting("coverpanel_state_mini", "COVERPANELMINI_", 1, 0, 1);
 var coverpanel_state_big = new oPanelSetting("coverpanel_state_big", "COVERPANELBIG_", 1, 0, 1);
-var filters_panel_state = new oPanelSetting("filters_panel_state", "FILTERSPANEL_", 1, 0, 3);
+var filters_panel_state = new oPanelSetting("filters_panel_state", "FILTERSPANEL_", 1, 0, 5);
 var libraryfilter_state = new oPanelSetting("libraryfilter_state", "LIBRARYFILTER_", 1, 0, 1);
 var screensaver_state = new oPanelSetting("screensaver_state", "SCREENSAVER_", 0, 0, 1);
 var lyrics_state = new oPanelSetting("lyrics_state", "LYRICS_", 1, 0, 5);

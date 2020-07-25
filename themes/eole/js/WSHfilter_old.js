@@ -25,7 +25,6 @@ var properties = {
     sourcePlaylist: globalProperties.selection_playlist,//window.GetProperty("_PROPERTY: Source Playlist", globalProperties.selection_playlist),
     selectionPlaylist: globalProperties.selection_playlist,//window.GetProperty("_PROPERTY: Selection Playlist", globalProperties.selection_playlist),
     playingPlaylist: globalProperties.playing_playlist,
-    filterPlaylist: globalProperties.filter_playlist,	
     filterOrder: window.GetProperty("_PROPERTY: filter Order", 0),
     tagMode: window.GetProperty("_PROPERTY: Tag Mode", 3), // 1 = album, 2 = artist, 3 = genre
     albumArtId: 0, // 0 = front
@@ -42,7 +41,6 @@ var properties = {
     drawItemsCounter2: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 2", true),
     drawItemsCounter3: window.GetProperty("_PROPERTY: Show numbers of items for tag mode 3", true),
     drawAlternateBG: window.GetProperty("_PROPERTY: Alternate row background", true),
-    filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),	
     albumsTFsortingdefault: window.GetProperty("Sort Order - ALBUM", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
     artistsTFsortingdefault: "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%",//window.GetProperty("Sort Order - ARTIST", "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
     genresTFsortingdefault: window.GetProperty("Sort Order - GENRE", "$meta(genre,0) | %album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
@@ -128,8 +126,7 @@ var properties = {
     DrawRightLine: window.GetProperty("_PROPERTY: Draw a line on the right side", true),
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
 	panelFontAdjustement: -1,
-	load_image_from_cache_direct: true,
-	adapt_to_playlist: false	
+	load_image_from_cache_direct: true
 };
 
 var TF = {
@@ -437,12 +434,12 @@ oPlaylistManager = function(name) {
             isReserved = (plname == "Queue Content" || plname == "Historic");
 
             if(!isAutoPl && !isReserved) {
-                if(idx == plman.ActivePlaylist && properties.selectionPlaylist!=plname && properties.filterPlaylist!=plname) {
+                if(idx == plman.ActivePlaylist && properties.selectionPlaylist!=plname) {
                     if(!exclude_active) {
                         this.playlists.push(new oPlaylist(idx, rowId));
                         rowId++;
                     };
-                } else if(properties.selectionPlaylist!=plname && properties.filterPlaylist!=plname){
+                } else if(properties.selectionPlaylist!=plname){
                     this.playlists.push(new oPlaylist(idx, rowId));
                     rowId++;
                 };
@@ -1797,11 +1794,7 @@ oBrowser = function(name) {
                     if(plman.PlayingPlaylist != plman.ActivePlaylist) {
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;
                     };
-					console.log("showNowPlaying "+properties.filtred_playlist_idx)
-					if(plman.PlayingPlaylist==this.pidx_filter && properties.filtred_playlist_idx>-1) {
-						brw.populate(true, "showNowPlaying", false, properties.filtred_playlist_idx);
-						
-					} else if(brw.sourcePlaylistIdx != plman.PlayingPlaylist) brw.populate(true, "showNowPlaying", false, plman.PlayingPlaylist);
+					if(brw.sourcePlaylistIdx != plman.PlayingPlaylist) brw.populate(true, "showNowPlaying", false, plman.PlayingPlaylist);
 					var handle = fb.GetNowPlaying();
 					this.showItemFromItemHandle(handle, true);
                     /*this.nowplaying = plman.GetPlayingItemLocation();
@@ -2010,9 +2003,8 @@ oBrowser = function(name) {
 		this.current_sourceMode = properties.sourceMode;
 		if((!filter1_state.isActive() && properties.filterOrder==1) || (!filter1_state.isActive() && !filter2_state.isActive() && properties.filterOrder==2))
 			this.current_sourceMode = 0;
-		if(properties.adapt_to_playlist) this.current_sourceMode = 1;
-		
-		if(force_sourceMode) this.populate_sourceMode = force_sourceMode;
+
+		if(typeof force_sourceMode !== 'undefined') this.populate_sourceMode = force_sourceMode;
 		else this.populate_sourceMode = this.current_sourceMode;
 
         console.log("--> populate Filter order:"+properties.filterOrder+" parent panel:"+properties.ParentName+" call_id:"+call_id);
@@ -2170,50 +2162,20 @@ oBrowser = function(name) {
 	this.searchPlaylists = function(){
         this.pfound_selectionPlaylist = false;
         this.pfound_playingPlaylist = false;
-        this.pfound_filterPlaylist = false;		
         this.pidx_selection = -1;
         this.pidx_playing = -1;
-        this.pidx_filter = -1;
         var total = plman.PlaylistCount;
         for(var i = 0; i < total; i++) {
             if(!this.pfound_selectionPlaylist && plman.GetPlaylistName(i) == properties.selectionPlaylist) {
                 this.pidx_selection = i;
                 this.pfound_selectionPlaylist = true;
             };
-            if(!this.pfound_filterPlaylist && plman.GetPlaylistName(i) == properties.filterPlaylist) {
-                this.pidx_filter = i;
-                this.pfound_filterPlaylist = true;
-            };			
             if(!this.pfound_playingPlaylist && plman.GetPlaylistName(i) == properties.playingPlaylist) {
                 this.pidx_playing = i;
                 this.pfound_playingPlaylist = true;
             };
-            if(this.pfound_selectionPlaylist && this.pfound_playingPlaylist && this.pfound_filterPlaylist) break;
+            if(this.pfound_selectionPlaylist && this.pfound_playingPlaylist) break;
         };
-		if(!this.pfound_selectionPlaylist) {
-			this.pidx_selection = plman.PlaylistCount;
-			plman.CreatePlaylist(this.pidx_selection, properties.selectionPlaylist);
-		};
-		if(!this.pfound_playingPlaylist) {
-			this.pidx_playing = plman.PlaylistCount;
-			plman.CreatePlaylist(this.pidx_playing, properties.playingPlaylist);
-		};		
-		if(!this.pfound_filterPlaylist) {
-			this.pidx_filter = plman.PlaylistCount;
-			plman.CreatePlaylist(this.pidx_filter, properties.filterPlaylist);
-		};
-		this.setReceiverPlaylist();		
-	}
-	this.setReceiverPlaylist = function() {
-		if(properties.adapt_to_playlist){
-			if(!this.pfound_filterPlaylist) this.searchPlaylists();
-			this.pidx_to_send = this.pidx_filter;
-			this.name_to_send = properties.filterPlaylist;
-		} else {
-			if(!this.pfound_selectionPlaylist) this.searchPlaylists();
-			this.pidx_to_send = this.pidx_selection;
-			this.name_to_send = properties.selectionPlaylist;			
-		}
 	}
 	this.getSelectedItems = function() {
 		var selectedItems = new FbMetadbHandleList();
@@ -2227,12 +2189,6 @@ oBrowser = function(name) {
 		}
 		return selectedItems;
 	}
-	this.setFiltredPlaylist = function(filtred_playlist_idx) {
-		if(properties.filtred_playlist_idx>-1 || filtred_playlist_idx>-1){
-			properties.filtred_playlist_idx = filtred_playlist_idx;
-			window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
-		}		
-	}
     this.sendItemToPlaylist = function(index,index_to) {
 		index_to = typeof index_to !== 'undefined' ? index_to : -1;
 
@@ -2241,7 +2197,16 @@ oBrowser = function(name) {
 
         if(this.groups.length == 0) return;
 
-        // check if playlists are present
+        // parse stored tags
+        /*if(properties.showAllItem && index == 0 && this.groups.length > 1) {
+            var arr = null;
+        } else {
+            var arr = this.groups[index].groupkey.split(" ^^ ");
+        };*/
+        // ======================================
+        // Send item tracks to JSBrowser playlist
+        // ======================================
+        // check if JSBrowser playlists are present
         var items2remove = [];
 		var inserted = false;
 		var clearPlaylist = false;
@@ -2250,85 +2215,134 @@ oBrowser = function(name) {
 		var toInsert = new FbMetadbHandleList();
 		var playlistToInsert = -1;
 		var positionToInsert = -1;
-			
-		this.setReceiverPlaylist();
-		
+
+		/*if(fb.IsPlaying) {
+			var playing_item = plman.GetPlayingItemLocation();
+			if(playing_item.IsValid){
+				window.NotifyOthers("trigger_on_focus_change",Array(playing_item.PlaylistIndex,playing_item.PlaylistItemIndex));
+			}
+		} */
+		//window.NotifyOthers("g_avoid_on_focus_change",true);
         if(index_to>-1 && index_to>index){
-            // *** insert tracks into this.pidx_to_send playlist
+            // initialize properties.selectionPlaylist playlist
+            if(this.pfound_selectionPlaylist) {
+                var from = plman.PlaylistItemCount(this.pidx_selection);
+            } else {
+                this.pidx_selection = plman.PlaylistCount;
+                plman.CreatePlaylist(this.pidx_selection, properties.selectionPlaylist);
+                var from = 0;
+            };
+            // *** insert tracks into this.pidx_selection playlist
 			for(var i = index; i <= index_to; i++) {
 				if(!arrayContains(this.MultipleSelectedIndex,i) && i!=this.selectedIndex) {
 					this.MultipleSelectedIndex.push(i);
 					toInsert.InsertRange(toInsert.Count,this.groups[i].pl);
 					inserted = true;
 				}
+				//from += this.groups[index].pl.Count;
 			}
-			playlistToInsert = this.pidx_to_send;
-			positionToInsert = plman.PlaylistItemCount(this.pidx_to_send);
-			//plman.InsertPlaylistItems(this.pidx_to_send, from, toInsert, false);
+			playlistToInsert = this.pidx_selection;
+			positionToInsert = from;
+			//plman.InsertPlaylistItems(this.pidx_selection, from, toInsert, false);
 		}
         else if(utils.IsKeyPressed(VK_CONTROL) && this.MultipleSelectedIndex.length>0) {
-			 var from = plman.PlaylistItemCount(this.pidx_to_send);
-            // *** insert tracks into this.pidx_to_send playlist
+            // initialize properties.selectionPlaylist playlist
+            if(this.pfound_selectionPlaylist) {
+                var from = plman.PlaylistItemCount(this.pidx_selection);
+            } else {
+                this.pidx_selection = plman.PlaylistCount;
+                plman.CreatePlaylist(this.pidx_selection, properties.selectionPlaylist);
+                var from = 0;
+            };
+            // *** insert tracks into this.pidx_selection playlist
             if(!arrayContains(this.MultipleSelectedIndex,index)) {
 				toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
-				playlistToInsert = this.pidx_to_send;
+				playlistToInsert = this.pidx_selection;
 				positionToInsert = from;
+				//plman.InsertPlaylistItems(this.pidx_selection, from, this.groups[index].pl, false);
 				inserted = true;
 			}
         } else {
             if(fb.IsPlaying) {
-                if(plman.PlayingPlaylist == this.pidx_to_send) { // playing playlist is this.name_to_send
-                    plman.RenamePlaylist(this.pidx_to_send, properties.playingPlaylist);
+                if(plman.PlayingPlaylist == this.pidx_selection) { // playing playlist is properties.selectionPlaylist
+                    plman.RenamePlaylist(this.pidx_selection, properties.playingPlaylist);
                     if(this.pfound_playingPlaylist) {
-                        plman.RenamePlaylist(this.pidx_playing, this.name_to_send);
+                        plman.RenamePlaylist(this.pidx_playing, properties.selectionPlaylist);
+                        // 1. initialize old properties.playingPlaylist playlist
                         clearPlaylist = true;
+                        //plman.SetPlaylistSelection(this.pidx_playing, items2remove, true);
+                        //plman.RemovePlaylistSelection(this.pidx_playing, false);
                     } else {
                         this.pidx_playing = plman.PlaylistCount;
-                        plman.CreatePlaylist(this.pidx_playing, this.name_to_send);
+                        plman.CreatePlaylist(this.pidx_playing, properties.selectionPlaylist);
                     };
                     // *** insert tracks into this.pidx_playing playlist
 					playlistToInsert = this.pidx_playing;
 					positionToInsert = 0;
 					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
+                    //plman.InsertPlaylistItems(this.pidx_playing, 0, this.groups[index].pl, false);
 					inserted = true;
-					var previous_pidx=this.pidx_to_send;
-					if(properties.adapt_to_playlist) this.pidx_selection = this.pidx_playing;
-					else this.pidx_filter = this.pidx_playing;
-					this.pidx_to_send = this.pidx_playing;
-					this.pidx_playing = previous_pidx;					
+					var previous_pidx=this.pidx_selection;
+					this.pidx_selection = this.pidx_playing;
+					this.pidx_playing = previous_pidx;
                 } else {
-                    // *** insert tracks into this.pidx_to_send playlist
-					clearPlaylist = true;
-					playlistToInsert = this.pidx_to_send;
+                    // initialize true properties.selectionPlaylist playlist
+                    if(this.pfound_selectionPlaylist) {
+                        // clear properties.selectionPlaylist playlist content
+                        clearPlaylist = true;
+                        //plman.SetPlaylistSelection(this.pidx_selection, items2remove, true);
+                        //plman.RemovePlaylistSelection(this.pidx_selection, false);
+                    } else {
+                        // create properties.selectionPlaylist playlist
+                        this.pidx_selection = plman.PlaylistCount;
+                        plman.CreatePlaylist(this.pidx_selection, properties.selectionPlaylist);
+                    };
+                    // *** insert tracks into this.pidx_selection playlist
+					playlistToInsert = this.pidx_selection;
 					positionToInsert = 0;
 					toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
+                    //plman.InsertPlaylistItems(this.pidx_selection, 0, this.groups[index].pl, false);
 					inserted = true;
                 };
             } else {
-                // *** insert tracks into this.pidx_to_send playlist
-				clearPlaylist = true;
-				playlistToInsert = this.pidx_to_send;
+                // initialize properties.selectionPlaylist playlist
+                if(this.pfound_selectionPlaylist) {
+                    // clear properties.selectionPlaylist playlist content
+                    clearPlaylist = true;
+                    //plman.SetPlaylistSelection(this.pidx_selection, items2remove, true);
+                    //plman.RemovePlaylistSelection(this.pidx_selection, false);
+                } else {
+                    // create properties.selectionPlaylist playlist
+                    this.pidx_selection = plman.PlaylistCount;
+                    plman.CreatePlaylist(this.pidx_selection, properties.selectionPlaylist);
+                };
+                // *** insert tracks into this.pidx_selection playlist
+				playlistToInsert = this.pidx_selection;
 				positionToInsert = 0;
 				toInsert.InsertRange(toInsert.Count,this.groups[index].pl);
+                //plman.InsertPlaylistItems(this.pidx_selection, 0, this.groups[index].pl, false);
 				inserted = true;
             };
-            plman.ActivePlaylist = this.pidx_to_send;
+
+
+            plman.ActivePlaylist = this.pidx_selection;
         };
 		if(inserted) {
 			plman.UndoBackup(playlistToInsert);
 			if(clearPlaylist){
 				plman.ClearPlaylist(playlistToInsert);
-				
 			} else if(items2remove.length>0){
 				plman.SetPlaylistSelection(playlistToInsert, items2remove, true);
 				plman.RemovePlaylistSelection(playlistToInsert, false);
 			}
 			plman.InsertPlaylistItems(playlistToInsert, positionToInsert, toInsert, false);
 			toInsert = undefined;
-			if(brw.sourcePlaylistIdx != brw.pidx_filter && properties.adapt_to_playlist && brw.sourcePlaylistIdx>-1) {
-				window.NotifyOthers("refresh_filters",[properties.filterOrder,brw.sourcePlaylistIdx]);
-				this.setFiltredPlaylist(brw.sourcePlaylistIdx);
-			} else window.NotifyOthers("refresh_filters",[properties.filterOrder]);
+
+			/*if(clearPlaylist && !fb.IsPlaying){
+				window.NotifyOthers("trigger_on_focus_change",Array(playlistToInsert,0));
+			}*/
+
+			window.NotifyOthers("refresh_filters",properties.filterOrder);
 			this.repaint();
 		}
     };
@@ -2515,7 +2529,7 @@ oBrowser = function(name) {
 								};
 							}
 							// background selection
-							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==this.name_to_send)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
+							if(((i == this.selectedIndex || arrayContains(this.MultipleSelectedIndex,i)) && (plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist)) || i == g_rightClickedIndex || i == this.tempSelectedItem) {
 
 								this.groups[i].selected = true;
 
@@ -2898,7 +2912,7 @@ oBrowser = function(name) {
 											break;
 										case 3: // genre
 											try{
-												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "")?' groups)':" genres)"), g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==this.name_to_send) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText("All ("+(total-1)+(!(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "")?' groups)':" genres)"), g_font.normal, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - items_counter_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min2, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
@@ -2973,7 +2987,7 @@ oBrowser = function(name) {
 												if(typeof this.groups[i].textLength == 'undefined') this.groups[i].textLength = gr.CalcTextWidth(this.groups[i].tooltipText, font);
 												this.groups[i].showToolTip = (this.groups[i].textLength > available_width);
 
-												gr.GdiDrawText(this.groups[i].groupkey, font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==this.name_to_send) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+												gr.GdiDrawText(this.groups[i].groupkey, font, ((i == this.selectedIndex && plman.GetPlaylistName(plman.ActivePlaylist)==properties.selectionPlaylist) ? colors.selected_txt : txt_color1), this.margin_left + ax + coverWidth + this.marginCover*2, ay, available_width, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 												if(properties.drawItemsCounter) gr.GdiDrawText(items_counter_txt, g_font.min1, txt_color2, this.margin_left + ax + coverWidth + this.marginCover*2, ay, aw - coverWidth - this.marginCover*3-this.textMarginRight - this.margin_right, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 											} catch(e) {}
 											break;
@@ -3092,14 +3106,14 @@ oBrowser = function(name) {
 					var px = 0;
 					var line_width = Math.min(130,Math.round(this.w-40));
 					var py = this.y + Math.round(this.h  / 2)-1;
-					if(g_filterbox.inputbox.text!='') {
+					if(g_filterbox.inputbox.text!='' || properties.sourceMode==0) {
 						var text1 = "No items";
 						var text2 = "matching";
 					} else {
 						var text1 = "";
-						var text2 = "No items";
+						var text2 = "Nothing seleted";
 					}
-					if(text1!='') {
+					if(text1!='' || properties.sourceMode==0) {
 						gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
 						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 5, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -3562,7 +3576,7 @@ oBrowser = function(name) {
 		for(var i=0; i < pl_count; i++) {
 			if(i != this.playlist && !plman.IsAutoPlaylist(i)) {
 				playlist_name = plman.GetPlaylistName(i);
-				if(playlist_name!=properties.selectionPlaylist && playlist_name!=properties.filterPlaylist) _child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
+				if(playlist_name!=properties.selectionPlaylist) _child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
 			};
 		};
 
@@ -5210,24 +5224,20 @@ function on_playlist_switch() {
 		};
 
 		g_active_playlist = plman.ActivePlaylist;
-		if(brw.pidx_to_send != g_active_playlist){
+		if(brw.pidx_selection != g_active_playlist){
 			brw.clearSelectedItem();
 		}
 
-		if(brw.current_sourceMode == 1 && brw.pidx_to_send != plman.ActivePlaylist) {
+		if(brw.current_sourceMode == 1) {
 			scroll = scroll_ = 0;
 			brw.populate(false,7);
-			console.log("on_playlist_switch "+plman.GetPlaylistName(brw.pidx_to_send)+" - "+plman.GetPlaylistName(g_active_playlist));
 		};
 
 		// refresh playlists list
 		pman.populate(exclude_active = false, reset_scroll = false);
 		brw.repaint();
 		//Update_Required_function="";
-	} else {
-		if(brw.current_sourceMode == 1 && brw.pidx_to_send != g_active_playlist) set_update_function('g_active_playlist = plman.ActivePlaylist; brw.populate(false,7)');
-		else set_update_function('on_playlist_switch()');
-	}
+	} else set_update_function('on_playlist_switch()');
 };
 
 function on_playlist_items_added(playlist_idx) {
@@ -5240,7 +5250,7 @@ function on_playlist_items_added(playlist_idx) {
 		g_avoid_on_playlist_items_removed=true;
 		//if(playlist_idx==brw.selectionIdx) brw.tempSelectedItem = -1;
 		if(brw.current_sourceMode == 1 || brw.current_sourceMode == 2) {
-			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist && playlist_idx!=brw.pidx_to_send) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
+			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
 				brw.populate(is_first_populate = false,8);
 			};
 		};
@@ -5260,9 +5270,8 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 		if(playlist_idx == g_active_playlist && new_count == 0) scroll = scroll_ = 0;
 
 		if(brw.current_sourceMode == 1 || brw.current_sourceMode == 2) {
-			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist && playlist_idx!=brw.pidx_to_send) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
+			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
 				brw.populate(is_first_populate = false,9);
-				console.log("on_playlist_items_removed "+plman.GetPlaylistName(brw.pidx_to_send)+" - "+plman.GetPlaylistName(playlist_idx));
 			};
 		};
 		//Update_Required_function="";
@@ -5476,16 +5485,15 @@ function on_notify_data(name, info) {
 			}
 			break;
         case "refresh_filters":
-			if(info[0]<=properties.filterOrder && window.IsVisible){
+			if(info<=properties.filterOrder && window.IsVisible){
 				if(brw.current_sourceMode != 0){
 					browser_refresh_required=true;
 					brw.populate(is_first_populate = false,15);
 				} else {
 					browser_refresh_required=true;
 					brw.populate(is_first_populate = false,16,1);
-				}				
+				}
 			} else if(!window.IsVisible) brw.clearSelectedItem();
-			if(info[1]) brw.setFiltredPlaylist(info[1]);
             break;
         case "reset_filters":
 			if(info<=properties.filterOrder){

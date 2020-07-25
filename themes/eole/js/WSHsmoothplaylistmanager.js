@@ -32,6 +32,7 @@ var properties = {
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
     sortAlphabetically: window.GetProperty("_PROPERTY: sort playlist alphabetically", false),	
+    filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),	
 	panelFontAdjustement: -1,
 	emphasisOnActive: false,
 };
@@ -860,6 +861,7 @@ oBrowser = function(name) {
 	this.playing_icon_y = 0;
 	this.playing_icon_w = 0;
 	this.playing_icon_h = 0;
+	this.filter_results = -1;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             brw.populate(is_first_populate = true, 2, reset_scroll = true);
@@ -948,6 +950,7 @@ oBrowser = function(name) {
 		
 		for(var i = 0; i < total; i++) {
 			name = plman.GetPlaylistName(i);
+			if(name==globalProperties.filter_playlist) this.filter_results = i;
 			if(ExcludePlaylist(name)){
 				var toAdd = false;
 			} else if(str_filter.length > 0) {
@@ -1078,7 +1081,7 @@ oBrowser = function(name) {
 						};
 
                         // active playlist row bg
-                        if(this.rows[i].idx == plman.ActivePlaylist || (i==g_rightClickedIndex && g_rightClickedIndex > -1)) {
+                        if(this.rows[i].idx == plman.ActivePlaylist || (i==g_rightClickedIndex && g_rightClickedIndex > -1) || (this.rows[i].idx == properties.filtred_playlist_idx && properties.filtred_playlist_idx>-1 && plman.ActivePlaylist==this.filter_results)) {
                             gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);
 							//top
 							if(i>0 ){
@@ -2917,7 +2920,7 @@ function on_playlists_changed() {
 	} else if(!g_avoid_on_playlists_changed) set_update_function('on_playlists_changed()');
 };
 
-function on_playlist_switch() {
+function on_playlist_switch() {	
 	if(window.IsVisible) {
 		g_active_playlist = plman.ActivePlaylist;
 		brw.showActivePlaylist();
@@ -3077,6 +3080,15 @@ function on_notify_data(name, info) {
 		case "WSH_panels_reload":
 			window.Reload();
 		break;
+		case "refresh_filters":
+			if(info[1]) {
+				properties.filtred_playlist_idx = info[1];
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
+			} else if(properties.filtred_playlist_idx>-1 && plman.GetPlaylistName(plman.ActivePlaylist)!=globalProperties.filter_playlist) {
+				properties.filtred_playlist_idx = -1;
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx)
+			}
+		break;		
     };
 };
 
@@ -3212,6 +3224,9 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 }
 
 function on_init() {
+	if(plman.GetPlaylistName(plman.ActivePlaylist)==globalProperties.filter_playlist && properties.filtred_playlist_idx>-1)
+		plman.ActivePlaylist = properties.filtred_playlist_idx;
+	
     window.DlgCode = 0x0004;
 
     get_font();

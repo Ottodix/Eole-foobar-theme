@@ -13,12 +13,12 @@ var sort_by_path = "%path%|%album%|%date%|%discnumber%|%tracknumber%";
 var sort_by_title = "%title%|%tracknumber%";
 var sort_by_tracknumber = "%tracknumber%|%album artist%";
 var sort_by_date = "%date%|%album artist%|%album%";
-var sort_by_date_added = "$sub(9999,$year(%added%))-$sub(9999,$month(%added%))-$sub(9999,$day_of_month(%added%))|%album artist%|%date%|%album%|%tracknumber%";//"%added% ASC|%album artist%|%date%|%album%|%tracknumber%";
+var sort_by_date_added = "$sub(9999,$year(%added%))-$sub(9999,$month(%added%))-$sub(9999,$day_of_month(%added%))|%album artist%|%date%|%album%|%tracknumber%";
 var sort_by_rating = "$sub(10,%rating%)|%album artist%|%album%";
 var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
-var PlaylistExclude = Array("Whole Library");
+var PlaylistExclude = Array("Whole Library","Filter Results");
 var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
@@ -57,6 +57,7 @@ var globalProperties = {
 	crc_artist: "$crc32('artists'$meta(artist))",
 	selection_playlist : "Library Selection",
 	playing_playlist : "Library Playback",
+	filter_playlist : "Filter Results",	
 	whole_library : "Whole Library",
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
@@ -1202,14 +1203,11 @@ function setPlaybackPlaylist(){
 			var items = plman.GetPlaylistItems(pidx_selection);
 			plman.ClearPlaylist(pidx_playing);
 			plman.InsertPlaylistItems(pidx_playing, 0, items);
-			//plman.MovePlaylist(pidx_playing, pidx_selection);
-			//plman.MovePlaylist(pidx_selection-1, pidx_playing);
 		};
 		if(!setPlaybackPlaylist_timer) {
 			setPlaybackPlaylist_timer = setTimeout(function() {
 				window.NotifyOthers("avoid_on_playlists_changed",false);
 				window.NotifyOthers("UpdatePlaylists",true);
-				//window.NotifyOthers("rePopulate",false);
 				setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
 				setPlaybackPlaylist_timer = false;
 			}, 125);
