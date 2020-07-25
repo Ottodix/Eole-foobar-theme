@@ -129,9 +129,10 @@ var properties = {
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
 	panelFontAdjustement: -1,
 	load_image_from_cache_direct: true,
-	adapt_to_playlist: false	
+	adapt_to_playlist: true	
 };
-
+if(properties.adapt_to_playlist && properties.ParentName=="Library") properties.adapt_to_playlist = false;
+	
 var TF = {
 	genre: fb.TitleFormat('%genre%'),
 	albumartist: fb.TitleFormat("%album artist%"),
