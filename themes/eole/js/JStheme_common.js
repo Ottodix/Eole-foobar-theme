@@ -3006,7 +3006,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				}
 				clearTimeout(timers.loadCounterReset);
 				timers.loadCounterReset = false;
-			}, 3000);
+			}, 1000);
 		}
         return;
     }
