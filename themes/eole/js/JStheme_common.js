@@ -2997,8 +2997,8 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>5) {
-		if(g_image_cache.loadCounter>5 && !timers.loadCounterReset){
+    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>10) {
+		if(g_image_cache.loadCounter>10 && !timers.loadCounterReset){
 			timers.loadCounterReset = setTimeout(function() {
 				if(g_image_cache.loadCounter!=0){
 					g_image_cache.loadCounter = 0;
