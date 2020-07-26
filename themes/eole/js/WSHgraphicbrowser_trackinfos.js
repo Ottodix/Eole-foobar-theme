@@ -4757,7 +4757,7 @@ oBrowser = function(name) {
 		} else {
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
 			if (isImage(img_full)) {
-				this.groups[idx].cover_img = FormatCover(img_full, g_showlist.coverRealSize, g_showlist.coverRealSize, false, "GetAlbumCover2");;
+				this.groups[idx].cover_img = img_full;
 				img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover2");
 			}
 		}
