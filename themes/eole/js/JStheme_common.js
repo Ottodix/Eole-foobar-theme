@@ -2997,7 +2997,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || g_image_cache.loadCounter>2) {
+    if (!metadb || g_image_cache.loadCounter>2 || window.TotalMemoryUsage>window.MemoryLimit*0.8) {
 		if(g_image_cache.loadCounter>2 && !timers.loadCounterReset){
 			timers.loadCounterReset = setTimeout(function() {
 				if(g_image_cache.loadCounter!=0){
@@ -3008,9 +3008,9 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				timers.loadCounterReset = false;
 			}, 3000);
 		}
+		freeCacheMemory();
         return;
     }
-	if(freeCacheMemory()) return;
 	g_image_cache.loadCounter++;			
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
@@ -3139,10 +3139,10 @@ oImageCache = function () {
 		}
 	}
     this.resetCache = function () {
-		console.log("-------------- image cache reset --------------");
-		console.log(window.TotalMemoryUsage+" > TotalMemoryUsage");
-		console.log(window.MemoryLimit+" > MemoryLimit");
-		console.log(window.MemoryLimit-window.TotalMemoryUsage+" > MemoryLimit-TotalMemoryUsage");
+		debugger_hint("-------------- image cache reset --------------");
+		debugger_hint(window.TotalMemoryUsage+" > TotalMemoryUsage");
+		debugger_hint(window.MemoryLimit+" > MemoryLimit");
+		debugger_hint(window.MemoryLimit-window.TotalMemoryUsage+" > MemoryLimit-TotalMemoryUsage");
 		this.cachelist = Array();
 	}
 	this.load_image_from_cache_async = async(albumIndex, cachekey, filename) =>

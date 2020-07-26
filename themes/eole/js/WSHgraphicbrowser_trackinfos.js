@@ -1427,7 +1427,7 @@ oShowList = function(parentPanelName) {
 		if(!isImage(brw.groups[this.idx].cover_img)) {
 			brw.GetAlbumCover(this.idx);
 		}
-		this.showlist_img = FormatCover(brw.groups[this.idx].cover_img, this.coverRealSize, this.coverRealSize, false, "setCover");
+		this.showlist_img = brw.groups[this.idx].cover_img;
 
 		this.setShowListArrow();
 		this.setColumnsButtons(false);
@@ -4757,7 +4757,7 @@ oBrowser = function(name) {
 		} else {
 			img_full = g_image_cache.hit(this.groups[idx].metadb, idx, false, this.groups[idx].cachekey, false);
 			if (isImage(img_full)) {
-				this.groups[idx].cover_img = img_full;
+				this.groups[idx].cover_img = FormatCover(img_full, g_showlist.coverRealSize, g_showlist.coverRealSize, false, "GetAlbumCover2");;
 				img_thumb = FormatCover(this.groups[idx].cover_img, this.coverRealWith+(properties.CoverGridNoText?2:0), this.coverRealWith+(properties.CoverGridNoText?2:0), false, "GetAlbumCover2");
 			}
 		}
