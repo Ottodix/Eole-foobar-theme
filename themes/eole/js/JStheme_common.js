@@ -3154,7 +3154,8 @@ oImageCache = function () {
 		if(brw.groups[albumIndex].load_requested == 0){
 			try {
 				if(properties.load_image_from_cache_direct) {
-					img = load_image_from_cache_direct(filename);
+					img = await gdi.LoadImageAsyncV2(window.ID, filename);
+					//img = load_image_from_cache_direct(filename);
 					this.addToCache(img,cachekey);
 					brw.groups[albumIndex].load_requested = 2;
 					brw.groups[albumIndex].cover_type = 1;

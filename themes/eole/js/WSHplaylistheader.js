@@ -720,12 +720,13 @@ playlistInfo = function(){
 			var displayed_count = this.items_count;
 		}
 		if(displayed_count>0) {
-			totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-			totalW=Math.floor(r_timetodraw/604800);
-			totalD=Math.floor((r_timetodraw%604800)/86400);
-			totalH=Math.floor((r_timetodraw%86400)/3600);
-			totalM=Math.floor((r_timetodraw%3600)/60);
-			totalS=Math.round((r_timetodraw%60));
+			
+			totalMth=Math.floor(timetodraw/2592000); r_timetodraw=timetodraw-totalMth*2592000;
+			totalW=Math.floor(r_timetodraw/604800); r_timetodraw=r_timetodraw-totalW*604800;
+			totalD=Math.floor(r_timetodraw/86400); r_timetodraw=r_timetodraw-totalD*86400;
+			totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
+			totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
+			totalS=Math.round(r_timetodraw);
 			totalS=(totalS>9) ? totalS:'0'+totalS;
 
 			txt_month=(totalMth>1)?totalMth+'months, ':totalMth+'month, ';

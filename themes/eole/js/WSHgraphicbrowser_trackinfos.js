@@ -4152,12 +4152,12 @@ oBrowser = function(name) {
 		time_txt="";
 		timetodraw=time;
 
-		totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800);
-		totalD=Math.floor((r_timetodraw%604800)/86400);
-		totalH=Math.floor((r_timetodraw%86400)/3600);
-		totalM=Math.floor((r_timetodraw%3600)/60);
-		totalS=Math.round((r_timetodraw%60));
+		totalMth=Math.floor(timetodraw/2592000); r_timetodraw=timetodraw-totalMth*2592000;
+		totalW=Math.floor(r_timetodraw/604800); r_timetodraw=r_timetodraw-totalW*604800;
+		totalD=Math.floor(r_timetodraw/86400); r_timetodraw=r_timetodraw-totalD*86400;
+		totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
+		totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
+		totalS=Math.round(r_timetodraw);
 		totalS=(totalS>9) ? totalS:'0'+totalS;
 
 		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
@@ -4308,6 +4308,7 @@ oBrowser = function(name) {
 		this.get_metrics_called = true;
 	   	this.firstRowHeight = gr.CalcTextHeight("Wcgregor", g_font.plus2);
 	   	this.secondRowHeight = gr.CalcTextHeight("Wcgregor", g_font.italic);
+		this.setResizeButton(65,14);
 	}
 
     this.get_albums = function(start, str_comp){
@@ -4333,7 +4334,7 @@ oBrowser = function(name) {
         }
 
         var i = this.groups.length, k = start, temp = "", string_compare = str_comp;
-
+		var currentCallIndex = 0;
         this.gTime.Reset();
         var trackinfos = "", arr = [], group = "";
 
@@ -4365,7 +4366,7 @@ oBrowser = function(name) {
 				}
             }
 
-            temp = group_string.toUpperCase();
+            temp = group_string;
 
             if(string_compare != temp){
                 string_compare = temp;
@@ -4453,9 +4454,9 @@ oBrowser = function(name) {
 					this.found_albumIdx=this.groups_draw.length-1;
 				}
 			}
-            k++;
+            k++;currentCallIndex++;
 			//Set a timer to avoid freezing on really big libraries
-            if(k%500 == 0 && this.gTime.Time > 150){
+            if(currentCallIndex > 500 && this.gTime.Time > 150){
 				string_compare_timeout=string_compare;
 				if(this.firstInitialisation) this.get_albums(k, string_compare_timeout);
 				else {
@@ -4801,6 +4802,8 @@ oBrowser = function(name) {
 		this.coverMask = Mimg;
 	}
     this.draw = function(gr) {
+		//gTime_draw = fb.CreateProfiler();
+		//gTime_draw.Reset();	
         if(repaint_main || repaint_f || !repaintforced){
             repaint_main = false;
             repaint_f = false;
@@ -5086,7 +5089,7 @@ oBrowser = function(name) {
             }
 
         }
-
+		//console.log("draw albums finished time:"+gTime_draw.Time);	
     }
 	this.stopResizing = function() {
 		if(this.resize_click || this.resize_drag) {
@@ -5518,6 +5521,7 @@ oBrowser = function(name) {
 
     this.setResizeButton = function (w,h) {
         var gb;
+		this.thumbnailWidthMax = Math.max(((this.w-this.x - this.marginSide - this.marginLR)/2),properties.thumbnailWidth);
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
 			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
@@ -5540,7 +5544,7 @@ oBrowser = function(name) {
     }
 	this.drawResizeButton = function (gr,x,y){
 		 this.resize_bt.draw(gr,x,y,255);
-		 resizeCursorPos=Math.round(this.resize_bt.w*(properties.thumbnailWidth-properties.thumbnailWidthMin)/(globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin));
+		 resizeCursorPos=Math.round(this.resize_bt.w*(properties.thumbnailWidth-properties.thumbnailWidthMin)/(this.thumbnailWidthMax-properties.thumbnailWidthMin));
 		 if(this.resize_bt.state==ButtonStates.hover || this.resize_bt.state==ButtonStates.down)
 			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.normal_txt);
 		 else
@@ -5548,15 +5552,16 @@ oBrowser = function(name) {
 	}
 	this.moveResizeBtn = function (x,y){
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
-		properties.thumbnailWidth = Math.round((globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
-		if(properties.thumbnailWidth>globalProperties.thumbnailWidthMax) properties.thumbnailWidth=globalProperties.thumbnailWidthMax;
+		this.thumbnailWidthMax = Math.max(((ww-this.x - this.marginSide - this.marginLR)/2),properties.thumbnailWidth);
+		properties.thumbnailWidth = Math.round((this.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
+		if(properties.thumbnailWidth>this.thumbnailWidthMax) properties.thumbnailWidth=this.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
 		this.refresh_shadows();
 		on_size(window.Width, window.Height);
-	}
-    this.setResizeButton(65,14);
+	}    
+    this.setResizeButton(65,14);	
 	this.stopFlashNowPlaying = function (){
 		cNowPlaying.flashEnable = false;
 		cNowPlaying.flashescounter = 0;

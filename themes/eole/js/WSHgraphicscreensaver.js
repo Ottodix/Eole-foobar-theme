@@ -3058,21 +3058,21 @@ oBrowser = function(name) {
 		time_txt="";
 		timetodraw=time;
 
-		totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800);
-		totalD=Math.floor((r_timetodraw%604800)/86400);
-		totalH=Math.floor((r_timetodraw%86400)/3600);
-		totalM=Math.floor((r_timetodraw%3600)/60);
-		totalS=Math.round((r_timetodraw%60));
+		totalMth=Math.floor(timetodraw/2592000); r_timetodraw=timetodraw-totalMth*2592000;
+		totalW=Math.floor(r_timetodraw/604800); r_timetodraw=r_timetodraw-totalW*604800;
+		totalD=Math.floor(r_timetodraw/86400); r_timetodraw=r_timetodraw-totalD*86400;
+		totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
+		totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
+		totalS=Math.round(r_timetodraw);
 		totalS=(totalS>9) ? totalS:'0'+totalS;
 
 		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
 		txt_week=(totalW>1)?totalW+' weeks, ':totalW+' week, ';if(totalW==0) txt_week='';
 		txt_day=(totalD>1)?totalD+' days, ':totalD+' day, '; if(totalD==0) txt_day='';
 		txt_hour=(totalH>1)?totalH+' h':totalH+' h'; if(totalH==0) txt_hour='';
-		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalD>0) time_txt=txt_day+txt_hour+", "+totalM+' min ';
+		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min';
+		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min';
+		else if (totalD>0) time_txt=txt_day+((totalH>0)?""+totalH+' h, ':'')+totalM+' min';
 		else if (totalH>0) time_txt=txt_hour+((totalM>0)?", "+totalM+' min':'');
 		else time_txt=totalM+' min';
 

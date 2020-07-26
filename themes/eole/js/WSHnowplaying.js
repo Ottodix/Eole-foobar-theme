@@ -1008,7 +1008,7 @@ function on_notify_data(name, info) {
 			break;
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
-			if(info.cover_img==null || 1==1) {
+			if(info.cover_img==null) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 				if (properties.follow_cursor) {
 					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
