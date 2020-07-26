@@ -4735,6 +4735,9 @@ oBrowser = function(name) {
 		}
 		brw.repaint();
 	}
+	this.freeMemory = function () {
+		this.refresh_all_images();
+	}
 	this.GetFilteredTracks = function(idx){
 		if(properties.filterBox_filter_tracks && g_filterbox.isActive){
 			var playlist = new FbMetadbHandleList();

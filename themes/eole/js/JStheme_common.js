@@ -2997,7 +2997,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>2) {
+    if (!metadb || g_image_cache.loadCounter>2) {
 		if(g_image_cache.loadCounter>2 && !timers.loadCounterReset){
 			timers.loadCounterReset = setTimeout(function() {
 				if(g_image_cache.loadCounter!=0){
@@ -3010,6 +3010,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 		}
         return;
     }
+	if(freeCacheMemory()) return;
 	g_image_cache.loadCounter++;			
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
@@ -3051,12 +3052,11 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 	var save2cache = true;
 	if(cachekey == "undefined") {
 		var save2cache = false;
+		console.log("ehoeho")
 		cachekey = metadb.RawPath;
 	}
 	var filename = cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt;
-    if (window.TotalMemoryUsage>window.MemoryLimit*0.8) {
-        return;
-    }
+    if(freeCacheMemory()) return;
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
 			image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
@@ -3064,9 +3064,7 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 		if(!g_files.FileExists(filename) && save2cache){
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
 		}
-	} catch(e){}
-	if (typeof brw == "object" && albumIndex>=0) {
-		try{
+		if (typeof brw == "object" && albumIndex>=0) {
 			brw.groups[albumIndex].cover_img = image;			
 			brw.groups[albumIndex].load_requested = 2;
 			brw.groups[albumIndex].mask_applied = false;
@@ -3074,8 +3072,8 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 			g_image_cache.addToCache(image,cachekey);
 			debugger_hint("addToCache "+albumIndex+" with"+image.Width)			
 			brw.repaint();
-		} catch(e){}
-	}
+		}
+	} catch(e){}
 	if (typeof brw == "object") brw.repaint();
 	//return image;
 }
@@ -3121,17 +3119,31 @@ function createDragImg(img, cover_size, count){
 	//drag_img = drag_img.Resize(cover_size, cover_size, 2);
 	return drag_img;
 };
-
+function freeCacheMemory(){
+	if(window.TotalMemoryUsage>window.MemoryLimit*0.8) {
+		g_image_cache.resetCache();
+		brw.freeMemory();
+		return true;
+	}
+	return false;
+}
 oImageCache = function () {
     this.cachelist = Array();
 	this.loadCounter = 0;
     this.addToCache = function (image, cachekey, resize_width, resize_height) {
-		if(!globalProperties.loaded_covers2memory || window.TotalMemoryUsage>window.MemoryLimit*0.8) return;
+		if(!globalProperties.loaded_covers2memory || freeCacheMemory()) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
 		if(cachekey!="undefined") {
 			this.cachelist[cachekey] = image;
 			if(resize_width) this.cachelist[cachekey].Resize(resize_width, resize_height, globalProperties.ResizeQLY);
 		}
+	}
+    this.resetCache = function () {
+		console.log("-------------- image cache reset --------------");
+		console.log(window.TotalMemoryUsage+" > TotalMemoryUsage");
+		console.log(window.MemoryLimit+" > MemoryLimit");
+		console.log(window.MemoryLimit-window.TotalMemoryUsage+" > MemoryLimit-TotalMemoryUsage");
+		this.cachelist = Array();
 	}
 	this.load_image_from_cache_async = async(albumIndex, cachekey, filename) =>
 	{

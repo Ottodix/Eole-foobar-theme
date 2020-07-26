@@ -4061,6 +4061,9 @@ oBrowser = function(name) {
 			this.groups[i].cover_type = null;
 		};
 	}
+	this.freeMemory = function () {
+		this.refreshThumbnails();
+	}		
 	this.context_menu = function(x, y, id, row_id, context_items) {
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(g_active_playlist);
 		var context_items = typeof context_items !== 'undefined' ? context_items : this.metadblist_selection;
