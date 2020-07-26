@@ -3130,13 +3130,17 @@ function freeCacheMemory(){
 oImageCache = function () {
     this.cachelist = Array();
 	this.loadCounter = 0;
+	this.coverCacheWidthMax = -1;
     this.addToCache = function (image, cachekey, resize_width, resize_height) {
 		if(!globalProperties.loaded_covers2memory || freeCacheMemory()) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
 		if(cachekey!="undefined") {
-			this.cachelist[cachekey] = image;
-			if(resize_width) this.cachelist[cachekey].Resize(resize_width, resize_height, globalProperties.ResizeQLY);
+			if(this.coverCacheWidthMax>0) this.cachelist[cachekey] = FormatCover(image, this.coverCacheWidthMax, this.coverCacheWidthMax, false, "addToCache", true);
+			else this.cachelist[cachekey] = image;
 		}
+	}
+	this.setMaxWidth = function(maxWidth){		
+		this.coverCacheWidthMax = maxWidth;
 	}
     this.resetCache = function () {
 		debugger_hint("-------------- image cache reset --------------");

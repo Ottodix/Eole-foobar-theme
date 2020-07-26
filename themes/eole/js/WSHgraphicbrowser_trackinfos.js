@@ -172,7 +172,7 @@ var properties = {
 	showlistheightMin:107,
 	showlistheightMinCover:147,
 	showlistheightMinCoverGrid:107,
-	showlistCoverMaxSize:232,
+	showlistCoverMaxSize:300,
 	showlistCoverMinSize:132,
 	showlistCoverMargin:28,
 	load_image_from_cache_direct:true,
