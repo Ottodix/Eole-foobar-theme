@@ -2997,8 +2997,8 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 	need_stub = true;
 	only_embed = false;
 	no_load = false;
-    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>5) {
-		if(g_image_cache.loadCounter>5 && !timers.loadCounterReset){
+    if (!metadb || window.TotalMemoryUsage>window.MemoryLimit*0.8 || g_image_cache.loadCounter>2) {
+		if(g_image_cache.loadCounter>2 && !timers.loadCounterReset){
 			timers.loadCounterReset = setTimeout(function() {
 				if(g_image_cache.loadCounter!=0){
 					g_image_cache.loadCounter = 0;
@@ -3126,7 +3126,7 @@ oImageCache = function () {
     this.cachelist = Array();
 	this.loadCounter = 0;
     this.addToCache = function (image, cachekey, resize_width, resize_height) {
-		if(!globalProperties.loaded_covers2memory) return;
+		if(!globalProperties.loaded_covers2memory || window.TotalMemoryUsage>window.MemoryLimit*0.8) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
 		if(cachekey!="undefined") {
 			this.cachelist[cachekey] = image;
@@ -3233,7 +3233,6 @@ oImageCache = function () {
 					}
 				} else {
 					img = utils.GetAlbumArtV2(metadb, 0, false);
-					
 					if(img) {
 						if(!timers.saveCover && globalProperties.enableDiskCache) {
 							save_image_to_cache(img, 0,cachekey, metadb);

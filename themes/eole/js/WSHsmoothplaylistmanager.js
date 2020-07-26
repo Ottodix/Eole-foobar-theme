@@ -3081,7 +3081,6 @@ function on_notify_data(name, info) {
 			window.Reload();
 		break;
 		case "refresh_filters":
-			console.log(info[1])
 			if(info[1]!="undefined") {
 				properties.filtred_playlist_idx = info[1];
 				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);

@@ -1798,10 +1798,8 @@ oBrowser = function(name) {
                     if(plman.PlayingPlaylist != plman.ActivePlaylist) {
                         g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;
                     };
-					console.log("showNowPlaying "+properties.filtred_playlist_idx)
 					if(plman.PlayingPlaylist==this.pidx_filter && properties.filtred_playlist_idx>-1) {
 						brw.populate(true, "showNowPlaying", false, properties.filtred_playlist_idx);
-						
 					} else if(brw.sourcePlaylistIdx != plman.PlayingPlaylist) brw.populate(true, "showNowPlaying", false, plman.PlayingPlaylist);
 					var handle = fb.GetNowPlaying();
 					this.showItemFromItemHandle(handle, true);
@@ -5218,7 +5216,6 @@ function on_playlist_switch() {
 		if(brw.current_sourceMode == 1 && brw.pidx_to_send != plman.ActivePlaylist) {
 			scroll = scroll_ = 0;
 			brw.populate(false,7);
-			console.log("on_playlist_switch "+plman.GetPlaylistName(brw.pidx_to_send)+" - "+plman.GetPlaylistName(g_active_playlist));
 		};
 
 		// refresh playlists list
@@ -5263,7 +5260,6 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 		if(brw.current_sourceMode == 1 || brw.current_sourceMode == 2) {
 			if((brw.current_sourceMode == 1 && playlist_idx == g_active_playlist && playlist_idx!=brw.pidx_to_send) || (brw.current_sourceMode == 2 && playlist_idx==brw.sourceIdx)) {
 				brw.populate(is_first_populate = false,9);
-				console.log("on_playlist_items_removed "+plman.GetPlaylistName(brw.pidx_to_send)+" - "+plman.GetPlaylistName(playlist_idx));
 			};
 		};
 		//Update_Required_function="";
