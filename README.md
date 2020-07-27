@@ -5,7 +5,7 @@ This theme require Foobar2000 1.4 (or superior).
 
 ## Participate to the theme
 
-If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request, I'll review it and merge it to the master code.
+If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request.
 
 ## Preview
 
