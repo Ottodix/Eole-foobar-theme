@@ -3081,7 +3081,7 @@ function on_notify_data(name, info) {
 			window.Reload();
 		break;
 		case "refresh_filters":
-			if(info[1]!="undefined") {
+			if(typeof info[1] !== 'undefined') {
 				properties.filtred_playlist_idx = info[1];
 				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
 			} else if(properties.filtred_playlist_idx>-1 && plman.GetPlaylistName(plman.ActivePlaylist)!=globalProperties.filter_playlist) {

@@ -2055,7 +2055,7 @@ oBrowser = function(name) {
 				break;
         };
 
-		if(force_playlist){
+		if(typeof force_playlist !== 'undefined'){
 			this.list = plman.GetPlaylistItems(force_playlist);
 			this.sourcePlaylistIdx = force_playlist;
 		} else if(this.populate_sourceMode == 0) {
@@ -5484,7 +5484,7 @@ function on_notify_data(name, info) {
 					brw.populate(is_first_populate = false,16,1);
 				}				
 			} else if(!window.IsVisible) brw.clearSelectedItem();
-			if(info[1]) brw.setFiltredPlaylist(info[1]);
+			if(typeof info[1] !== 'undefined') brw.setFiltredPlaylist(info[1]);
             break;
         case "reset_filters":
 			if(info<=properties.filterOrder){
