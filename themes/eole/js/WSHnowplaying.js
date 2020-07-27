@@ -1425,7 +1425,7 @@ function oInfos() {
 	}
 	this.on_metadb_changed = function(metadbs, fromhook) {
 		if(window.IsVisible || !this.first_populate_done) {
-
+			if(!properties.showInfos) return;
 			if(!this.metadb || g_avoid_metadb_updated) {
 				g_avoid_metadb_updated = false;
 				return;

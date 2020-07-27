@@ -5617,20 +5617,23 @@ function on_notify_data(name, info) {
 		break;
 		case "filter1_state":
 			filter1_state.value=info;
+			updateIndividualFilterState();
 		break;
 		case "filter2_state":
 			filter2_state.value=info;
+			updateIndividualFilterState();
 		break;
 		case "filter3_state":
 			filter3_state.value=info;
+			updateIndividualFilterState();
 		break;
     };
 };
 
 function updateIndividualFilterState(){
-	if(!filter3_state.isActive() && properties.filterOrder==1) properties.showPanelToggleButtons=true
-	else if(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0 && main_panel_state.isEqual(1)) properties.showPanelToggleButtons=true
-	else if (properties.filterOrder!=2) properties.showPanelToggleButtons=false
+	if(!filter3_state.isActive() && properties.filterOrder==1) properties.showPanelToggleButtons=true;
+	else if(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0 && main_panel_state.isEqual(1)) properties.showPanelToggleButtons=true;
+	else if (properties.filterOrder!=2) properties.showPanelToggleButtons=false;
 	else properties.showPanelToggleButtons=true;
 	if((!filter1_state.isActive() && properties.filterOrder==1) || (!filter1_state.isActive() && !filter2_state.isActive() && properties.filterOrder==2)) {
 		browser_refresh_required=true;
