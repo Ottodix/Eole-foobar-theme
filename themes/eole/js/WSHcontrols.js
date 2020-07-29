@@ -36,6 +36,7 @@ var properties = {
     cursor_style: window.GetProperty("_DISPLAY slider cursor style", 0),	//0 circle, 1 full disk, 2 full disk on hover
 	panelFontAdjustement: -1,
 	volumeA1waysVisible: window.GetProperty("_DISPLAY always show volume bar", false),
+	twoLinesDetails: window.GetProperty("_DISPLAY details on two lines", false),	
 	repeatRandom: true,
 }
 properties.tf_custom_firstRow = fb.TitleFormat(properties.custom_firstRow);
@@ -735,13 +736,13 @@ function get_text(metadb) {
 			g_text_title = infos[1];		
 			g_text_artist = " -  "+infos[2];
 			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
-			if(!mini_controlbar.isActive()) g_text_second_line = properties.default_secondRow.Eval();
+			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = properties.default_secondRow.Eval();
 		} else {
 			var first_row = properties.tf_custom_firstRow.Eval();
 			g_text_title_prefix = "";	
 			g_text_title = first_row;		
 			g_text_artist =  "";
-			if(!mini_controlbar.isActive()) g_text_second_line = properties.tf_custom_secondRow.Eval();
+			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = properties.tf_custom_secondRow.Eval();
 		}
     } else {
 		current_played_track = null;
@@ -907,7 +908,7 @@ function on_paint(gr) {
             if (properties.showTrackPrefix)
                 gr.GdiDrawText(g_text_title_prefix, font_adjusted , colors.normal_txt, progress_margin_left, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 			gr.GdiDrawText(scheduler_string+g_text_title, font_adjusted , colors.normal_txt, progress_margin_left+title_prefix_length, margin_top_adapted + title_margin_top, ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-            if (!mini_controlbar.isActive())
+            if (!mini_controlbar.isActive() && properties.twoLinesDetails)
                 gr.GdiDrawText(g_text_second_line, g_font.italic, colors.normal_txt_secondary, progress_margin_left, margin_top_adapted + title_margin_top + (mini_controlbar.isActive()||layout_state.isEqual(1)?14:16), ww_progress - timeInfo_length, 10,  DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
             var title_length = g_panel.get_title_length(gr)+title_prefix_length;
@@ -3018,11 +3019,12 @@ function draw_settings_menu(x,y){
 
 		//_menu.AppendMenuItem(MF_STRING, 3027, "Compact controls");
 		//_menu.CheckMenuItem(3027, mini_controlbar.isActive());
-
+		_menu.AppendMenuItem(MF_STRING, 3027, "Large controls");
+		_menu.CheckMenuItem(3027,!mini_controlbar.isActive());		
 		var custom_rows = properties.custom_firstRow!=""||properties.custom_secondRow!="";
 		_menu_track_infos.AppendMenuItem(MF_STRING, 3015, properties.showTrackInfo?"Hide":"Show");
-		_menu_track_infos.AppendMenuItem(MF_STRING, 3027, "Large controls / track details on 2 lines");
-		_menu_track_infos.CheckMenuItem(3027,!mini_controlbar.isActive());		
+		_menu_track_infos.AppendMenuItem(MF_STRING, 3040, "Track details on 2 lines");
+		_menu_track_infos.CheckMenuItem(3040,!mini_controlbar.isActive() && properties.twoLinesDetails);		
 		_menu_track_infos.AppendMenuSeparator();		
         _menu_track_infos.AppendMenuItem(properties.showTrackInfo&&!custom_rows?MF_STRING:MF_GRAYED, 9001, "Show track title prefix (Discnumber.tracknumber)");
 		_menu_track_infos.CheckMenuItem(9001, properties.showTrackPrefix);
@@ -3234,10 +3236,25 @@ function draw_settings_menu(x,y){
             case (idx == 3027):
 				mini_controlbar.toggleValue(1);
 				build_buttons();
+				get_text();
 				adapt_display_to_layout();
 				on_size(window.Width, window.Height);
 				window.Repaint();
                 break;
+            case (idx == 3040):
+				if(mini_controlbar.isActive()) {
+					mini_controlbar.toggleValue(1);
+					properties.twoLinesDetails = true;
+				} else {
+					properties.twoLinesDetails = !properties.twoLinesDetails;
+				}
+				window.SetProperty("_DISPLAY details on two lines", properties.twoLinesDetails);
+				build_buttons();
+				get_text();
+				adapt_display_to_layout();
+				on_size(window.Width, window.Height);
+				window.Repaint();
+                break;				
             case (idx == 3028):
 				properties.displayStop = !properties.displayStop;
 				window.SetProperty("_DISPLAY stop btn", properties.displayStop);
