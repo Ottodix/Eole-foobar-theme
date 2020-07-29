@@ -3023,7 +3023,7 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(3027,!mini_controlbar.isActive());		
 		var custom_rows = properties.custom_firstRow!=""||properties.custom_secondRow!="";
 		_menu_track_infos.AppendMenuItem(MF_STRING, 3015, properties.showTrackInfo?"Hide":"Show");
-		_menu_track_infos.AppendMenuItem(MF_STRING, 3040, "Track details on 2 lines");
+		_menu_track_infos.AppendMenuItem(properties.showTrackInfo?MF_STRING:MF_GRAYED, 3040, "Track details on 2 lines");
 		_menu_track_infos.CheckMenuItem(3040,!mini_controlbar.isActive() && properties.twoLinesDetails);		
 		_menu_track_infos.AppendMenuSeparator();		
         _menu_track_infos.AppendMenuItem(properties.showTrackInfo&&!custom_rows?MF_STRING:MF_GRAYED, 9001, "Show track title prefix (Discnumber.tracknumber)");
