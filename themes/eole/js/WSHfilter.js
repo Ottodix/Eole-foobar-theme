@@ -3788,7 +3788,7 @@ oBrowser = function(name) {
 			_menu.AppendMenuItem(MF_STRING, 2997, "Show playlist panel on drag and drop");
 			_menu.CheckMenuItem(2997, properties.DropInplaylist);
 			
-			_menu.AppendMenuItem(MF_STRING, 2998, "Sort artist ignoring the/les/los");
+			_menu.AppendMenuItem(MF_STRING, 2998, "Sort artists ignoring the/les/los");
 			_menu.CheckMenuItem(2998, properties.removePrefix);			
 
 			if(main_panel_state.isEqual(1)) {
