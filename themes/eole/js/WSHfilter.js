@@ -129,7 +129,8 @@ var properties = {
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
 	panelFontAdjustement: -1,
 	load_image_from_cache_direct: true,
-	adapt_to_playlist: true	
+	adapt_to_playlist: true,
+	removePrefix: window.GetProperty("_PROPERTY: ignore artist prefix", false),
 };
 if(properties.adapt_to_playlist && properties.ParentName=="Library") properties.adapt_to_playlist = false;
 	
@@ -1508,13 +1509,15 @@ oScrollbar = function(themed) {
     };
 };
 
-oGroup = function(index, start, handle, groupkey) {
+oGroup = function(index, start, handle, groupkey, sortkey) {
 	this.index = index;
 	this.start = start;
 	this.count = 1;
     this.metadb = handle;
     this.groupkey = groupkey;
     this.cover_img_mask = null;
+	this.sortkey = sortkey.toLowerCase();
+	this.sortkeyNoPrefix = "";
     if(handle) {
         switch(properties.tagMode) {
             case 1:
@@ -1544,9 +1547,12 @@ oGroup = function(index, start, handle, groupkey) {
         this.tra = tracks.slice(0);
         this.pl = handles.Clone();
         this.count = count;
+		if(properties.removePrefix) this.removePrefix();
     };
-
-    //this.totalPreviousRows = 0
+	this.removePrefix = function() {
+		var substr = /^(the|les|los) /;
+		this.sortkeyNoPrefix = this.sortkey.replace(substr, '');
+	};
 };
 
 oBrowser = function(name) {
@@ -1878,7 +1884,6 @@ oBrowser = function(name) {
         };
         plman.SetPlaylistSelection(g_active_playlist, affectedItems, true);
     };
-
     this.init_groups = function() {
 		var handle = null;
 		var current = "";
@@ -1946,7 +1951,7 @@ oBrowser = function(name) {
                         };
                         t_all++;
                         t++;
-                        this.groups.push(new oGroup(g+1, i, handle, arr[0]));
+                        this.groups.push(new oGroup(g+1, i, handle, arr[0], arr[0]));
                         g++;
 						this.groups[g-1].date = arr[2];
 						if(properties.tagMode==1){
@@ -1991,11 +1996,11 @@ oBrowser = function(name) {
 			//this.groups[g-1].artist_name = arr[4];
             // add 1st group ("ALL" item)
             if(properties.showAllItem && g > 1) {
-                this.groups.unshift(new oGroup(0, 0, null, null));
+                this.groups.unshift(new oGroup(0, 0, null, null,""));
                 this.groups[0].finalize(t_all, tr_all, pl_all);
             };
         };
-
+		if(properties.removePrefix && properties.tagMode==2) this.sort();
         // free memory
         tr.splice(0, tr.length);
         tr_all.splice(0, tr_all.length);
@@ -2003,7 +2008,22 @@ oBrowser = function(name) {
         pl.RemoveAll();
         pl_all.RemoveAll();
     };
-
+	this.sort = function() {
+		function noPrefixSorting(a,b) {
+			return a.sortkeyNoPrefix.localeCompare(b.sortkeyNoPrefix, 'gb', { sensitivity: 'base' });
+			if(a.sortkeyNoPrefix < b.sortkeyNoPrefix) return -1;
+			if(a.sortkeyNoPrefix > b.sortkeyNoPrefix) return 1;
+			return 0;
+		}
+		function standardSorting(a,b) {
+			return a.sortkey.localeCompare(b.sortkey, 'gb', { sensitivity: 'base' });
+			if(a.sortkey < b.sortkey) return -1;
+			if(a.sortkey > b.sortkey) return 1;
+			return 0;
+		}		
+		if(properties.removePrefix) this.groups.sort(noPrefixSorting);
+		else this.groups.sort(standardSorting);
+	}
     this.populate = function(is_first_populate, call_id, force_sourceMode, force_playlist) {
 
 		this.current_sourceMode = properties.sourceMode;
@@ -3767,6 +3787,9 @@ oBrowser = function(name) {
 
 			_menu.AppendMenuItem(MF_STRING, 2997, "Show playlist panel on drag and drop");
 			_menu.CheckMenuItem(2997, properties.DropInplaylist);
+			
+			_menu.AppendMenuItem(MF_STRING, 2998, "Sort artist ignoring the/les/los");
+			_menu.CheckMenuItem(2998, properties.removePrefix);			
 
 			if(main_panel_state.isEqual(1)) {
 				_menu.AppendMenuSeparator();
@@ -4092,6 +4115,11 @@ oBrowser = function(name) {
 					properties.DropInplaylist = !properties.DropInplaylist;
 					window.SetProperty("_SYSTEM: Allow to drag items into a playlist", properties.DropInplaylist);
 					break;
+				case (idx == 2998):
+					properties.removePrefix = !properties.removePrefix;
+					window.SetProperty("_PROPERTY: ignore artist prefix", properties.removePrefix);
+					brw.populate(true,"NoPrefix");				
+					break;					
             };
             _menu3 = undefined;
             _menu2 = undefined;
