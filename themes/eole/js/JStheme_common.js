@@ -3246,10 +3246,7 @@ oImageCache = function () {
 							break;
 						}
 					}
-					console.log(artist_name)
-					console.log(path)
 					if(g_files.FileExists(filepath)) {
-						console.log(artist_name+" file exist!")
 						debugger_hint("load_artist");
 						//img = gdi.Image(filepath);
 						this.load_image_from_cache_async(albumIndex, cachekey, filepath, true, metadb);
