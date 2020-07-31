@@ -1215,6 +1215,27 @@ function setPlaybackPlaylist(){
 
 	}
 }
+function renamePlaybackPlaylist(){
+	if(fb.IsPlaying && plman.GetPlaylistName(plman.PlayingPlaylist) == globalProperties.selection_playlist) {
+		var found_playingPlaylist = false;
+		var total = plman.PlaylistCount;
+		var pidx_selection = plman.PlayingPlaylist;
+		var pidx_playing = -1;
+		for(var i = 0; i < total; i++) {
+			if(!found_playingPlaylist && plman.GetPlaylistName(i) == globalProperties.playing_playlist) {
+				pidx_playing = i;
+				found_playingPlaylist = true;
+			};
+			if(found_playingPlaylist) break;
+		};
+		plman.RenamePlaylist(pidx_selection, globalProperties.playing_playlist);
+		if(found_playingPlaylist) {
+			plman.RenamePlaylist(pidx_playing, globalProperties.selection_playlist);
+		};
+		return pidx_playing;
+	}
+	return false;
+}
 function sendandplayPlaybackPlaylist(items, play_metadb){
 	play_metadb = typeof play_metadb !== 'undefined' ? play_metadb : null;
 	window.NotifyOthers("avoid_on_playlists_changed",true);

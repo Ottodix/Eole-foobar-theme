@@ -2331,6 +2331,13 @@ function populate() {
                 plman.InsertPlaylistItems(this.pln, 0, items);
             }
         } else */
+		if(plman.PlayingPlaylist == this.pln) { // playing playlist is this.name_to_send
+			var new_playlist = renamePlaybackPlaylist();
+			if(new_playlist!==false) {
+				this.pln = new_playlist;
+				plman.ActivePlaylist = this.pln;
+			}
+		}		
 		if (!add) {
             plman.UndoBackup(this.pln);
             plman.ClearPlaylist(this.pln);
