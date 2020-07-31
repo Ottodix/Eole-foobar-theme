@@ -3236,6 +3236,7 @@ oImageCache = function () {
 					}
 			} else {
 				if(artist_name!=''){
+					var artist_name = artist_name.sanitise();
 					var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 					var filepath = '';
 					var all_files = utils.Glob(path + "\\*");
@@ -3245,7 +3246,10 @@ oImageCache = function () {
 							break;
 						}
 					}
+					console.log(artist_name)
+					console.log(path)
 					if(g_files.FileExists(filepath)) {
+						console.log(artist_name+" file exist!")
 						debugger_hint("load_artist");
 						//img = gdi.Image(filepath);
 						this.load_image_from_cache_async(albumIndex, cachekey, filepath, true, metadb);
