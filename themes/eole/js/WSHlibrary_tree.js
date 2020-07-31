@@ -3011,6 +3011,7 @@ function searchLibrary() {
     }
 
     this.lbtn_dn = function(x, y) {
+		
         p.search_paint();
         this.lbtn_down = (y < p.s_h && y > this.y && x > ui.margin + ui.row_h * 0.6 && x < p.s_x + p.s_w2);
         if (!this.lbtn_down) {
@@ -3020,7 +3021,7 @@ function searchLibrary() {
 			p.search_paint();
             return;
         } else {
-            this.activate();
+            this.activate(x,y);
         }
     }
 	this.activate = function(x, y) {
