@@ -166,17 +166,14 @@ function DeletePlaylist(delete_pid){
 
 	function delete_confirmation(status, confirmed) {
 		if(confirmed){
-			if(plman.ActivePlaylist == parent.delete_pid){
-				if(parent.delete_pid==plman.PlaylistCount-1) plman.ActivePlaylist = parent.delete_pid-1;
-				else plman.ActivePlaylist = parent.delete_pid+1;
-			}
+
 			brw.delete_pending = true;
 			timers.deletePlaylist = setTimeout(function(){
 				timers.deletePlaylist && clearTimeout(timers.deletePlaylist);
 				timers.deletePlaylist = false;
 			}, 150);
 			//
-			var updateActivePlaylist = (brw.selectedRow == plman.ActivePlaylist);
+			var updateActivePlaylist = (brw.selectedRow == plman.ActivePlaylist || plman.ActivePlaylist == parent.delete_pid);
 			var row = brw.getRowIdFromIdx(parent.delete_pid);
 			plman.RemovePlaylistSwitch(parent.delete_pid);
 			if(row < brw.rowsCount - 1) {
@@ -186,10 +183,16 @@ function DeletePlaylist(delete_pid){
 			};
 			if(updateActivePlaylist) {
 				if(row < brw.rowsCount - 1) {
-					plman.ActivePlaylist = parent.delete_pid;
+					var new_active_playlist = parent.delete_pid;					 
 				} else if(row > 0) {
-					plman.ActivePlaylist = parent.delete_pid - 1;
+					var new_active_playlist = parent.delete_pid - 1;
 				};
+				var direction = -1;
+				while(ExcludePlaylist(plman.GetPlaylistName(new_active_playlist))){
+					if(new_active_playlist==0) direction=1;
+					new_active_playlist = new_active_playlist + direction;
+				}			
+				if(new_active_playlist>=0 && new_active_playlist<=brw.rowsCount - 1) plman.ActivePlaylist = new_active_playlist;
 			};
 		}
 	}
