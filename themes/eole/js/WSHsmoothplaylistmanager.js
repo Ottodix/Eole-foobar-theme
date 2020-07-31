@@ -3045,6 +3045,7 @@ function on_notify_data(name, info) {
 			g_avoid_on_playlists_changed=info;
 			//if(!g_avoid_on_playlists_changed) on_playlists_changed();
 			break;
+		case "UpdatePlaylistsManager":			
 		case "UpdatePlaylists":
 			on_playlists_changed();
 		break;

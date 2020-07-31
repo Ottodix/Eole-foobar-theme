@@ -1236,7 +1236,7 @@ function renamePlaybackPlaylist(){
 		if(!setPlaybackPlaylist_timer) {
 			setPlaybackPlaylist_timer = setTimeout(function() {
 				window.NotifyOthers("avoid_on_playlists_changed",false);
-				//window.NotifyOthers("rePopulate",false);
+				window.NotifyOthers("UpdatePlaylistsManager",false);
 				setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
 				setPlaybackPlaylist_timer = false;
 			}, 125);
