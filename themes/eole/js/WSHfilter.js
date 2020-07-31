@@ -2442,13 +2442,13 @@ oBrowser = function(name) {
 							if(this.groups[i].cover_type == null) {
 								if(this.groups[i].load_requested == 0) {
 									debugger_hint("hit1 "+i)
-									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');									
+									img = g_image_cache.hit(this.groups[i].metadb, i, false, undefined, properties.albumArtId==4?this.groups[i].groupkey:'');				
 									if(img!="loading") this.groups[i].cover_img = img;
 									if (isImage(this.groups[i].cover_img)) {
 										this.groups[i].cover_type = 1;
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, im_w);
 										debugger_hint("getit "+i)
-									} else if(properties.AlbumArtFallback && this.groups[i].cover_img!='loading'){
+									} else if(properties.AlbumArtFallback && img!='loading'){
 										this.groups[i].save_requested = true;
 										debugger_hint("hit2 "+i)
 										this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
@@ -2456,55 +2456,24 @@ oBrowser = function(name) {
 											this.groups[i].cover_type = 1;
 											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, cover.max_w);
 										}
-									} else if(properties.albumArtId == 4 && this.groups[i].cover_img!='loading'){
+									} else if(properties.albumArtId == 4 && img!='loading'){
 										this.groups[i].cover_type = (this.groups[i].cover_img=='loading'?null:1);
 										this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);
-									} else if(this.groups[i].cover_img=='loading') {
+									} else if(img=='loading') {
 										this.groups[i].cover_img = null;
 									}
 								}
 							} else if(this.groups[i].cover_type == 0 && !this.groups[i].cover_img) {
-								if(properties.albumArtId == 4){
-									//var arr = this.groups[i].groupkey.split(" ^^ ");
-									var artist_name = this.groups[i].groupkey.sanitise();
-									var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
-									var filepath = '';
-									var all_files = utils.Glob(path + "\\*");
-									for (var j = 0; j < all_files.length; j++) {
-										if ((/(?:jpe?g|gif|png|bmp)$/i).test(g_files.GetExtensionName(all_files[j]))) {
-											filepath = all_files[j];
-											break;
-										}
-
-									}
-									if(g_files.FileExists(filepath)) {
-										this.groups[i].cover_img = gdi.Image(filepath);
-										save_image_to_cache(this.groups[i].cover_img, 0, this.groups[i].cachekey, this.groups[i].metadb);
-									} else {
-										this.groups[i].save_requested = true;
-										if(properties.AlbumArtFallback) this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i, false, this.groups[i].cachekey_album);
-										if (typeof this.groups[i].cover_img !== "undefined" && this.groups[i].cover_img!==null) {
-											this.groups[i].cover_type = 1;
-											this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, this.groups[i].cover_img, aw);
-										} else this.groups[i].cover_img = images.noartist;
-									}
-									var image = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-									debugger_hint("FormatCover "+i)
-									g_image_cache.addToCache(image,this.groups[i].cachekey);
-									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(this.groups[i].cover_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-									this.groups[i].cover_img = image;
-								} else {
-									var image = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-									this.groups[i].cover_img = image;
-									//g_image_cache.addToCache(image,this.groups[i].cachekey);
-									//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
-								}
-
+								var image = FormatCover(globalProperties.noart, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+								this.groups[i].cover_img = image;
 							} else if(this.groups[i].cover_type == 3 && !this.groups[i].cover_img) {
 								var image = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
 								this.groups[i].cover_img = image;								
-								//g_image_cache.addToCache(image,this.groups[i].cachekey);
-								//g_image_cache.cachelist[this.groups[i].cachekey] = FormatCover(globalProperties.stream_img, globalProperties.thumbnailWidthMax, globalProperties.thumbnailWidthMax, false);
+							}
+							if(properties.AlbumArtFallback && properties.albumArtId == 4 && this.groups[i].is_fallback){
+								this.groups[i].is_fallback = false;
+								this.groups[i].cover_type = (this.groups[i].cover_img=='loading'?null:1);
+								this.groups[i].cover_img = g_image_cache.getit(this.groups[i].metadb, i, images.noartist, cover.max_w);								
 							}
 							if(!this.groups[i].cover_formated && isImage(this.groups[i].cover_img)){
 								this.groups[i].cover_img = FormatCover(this.groups[i].cover_img, im_w, im_h, false);
