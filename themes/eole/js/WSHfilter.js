@@ -4380,6 +4380,14 @@ function on_mouse_lbtn_down(x, y, m) {
 function on_mouse_lbtn_up(x, y, m) {
 	var isResizing = g_resizing.on_mouse("lbtn_up", x, y, m);
 	if(!isResizing){
+		g_lbtn_click = false;
+		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
+			g_down = false;
+			if (cur_btn_down != null && typeof cur_btn_down === 'object') {
+				cur_btn_down.onClick();
+				return;
+			}
+		}		
 		// inputBox
 		if(properties.showHeaderBar && cFilterBox.enabled && g_filterbox.inputbox.visible) {
 			g_filterbox.on_mouse("lbtn_up", x, y);
@@ -4427,14 +4435,6 @@ function on_mouse_lbtn_up(x, y, m) {
 				}, 75);
 			};
 		};
-
-		g_lbtn_click = false;
-		if(properties.showPanelToggleButtons && filters_panel_state.isActive()){
-			g_down = false;
-			if (cur_btn_down != null && typeof cur_btn_down === 'object') {
-				cur_btn_down.onClick();
-			}
-		}
 	};
 };
 
