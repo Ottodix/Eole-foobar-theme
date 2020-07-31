@@ -1636,7 +1636,7 @@ function library_manager() {
             if (!this.list.Count) return;
             this.none = "";
             try {
-                p.list = fb.GetQueryItems(this.list, p.s_txt)
+                p.list = fb.GetQueryItems(this.list, p.s_txt.toLowerCase())
             } catch (e) {};
             if (!p.list.Count) {
                 pop.tree = [];
@@ -3049,7 +3049,7 @@ function searchLibrary() {
         switch (code) {
             case v.enter:
                 if (p.s_txt.length < 3) break;
-                var items = fb.GetQueryItems(lib.list, p.s_txt);
+                var items = fb.GetQueryItems(lib.list, p.s_txt.toLowerCase());
                 pop.load(items, false, false, false, pop.gen_pl, false);
                 items = undefined;
                 break;
