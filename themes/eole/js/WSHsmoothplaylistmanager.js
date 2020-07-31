@@ -205,6 +205,7 @@ oPlaylist = function(idx, rowId, name) {
     this.idx = idx;
     this.rowId = rowId;
     this.name = name;
+	this.update_count_flag = false;
 	try {
 		if(idx>=0)
 			this.isAutoPlaylist = plman.IsAutoPlaylist(idx);
@@ -226,8 +227,16 @@ oPlaylist = function(idx, rowId, name) {
 	} catch(e){
 		this.item_count = 0;
 	}
+	this.getCount = function() {
+		if(this.update_count_flag) {
+			this.update_count_flag = false;			
+			this.update_count();
+		} 
+		return this.item_count;
+	}
 	this.update_count = function() {
-		this.item_count = plman.PlaylistItemCount(idx);
+		if(!window.IsVisible) this.update_count_flag = true;
+		else this.item_count = plman.PlaylistItemCount(idx);
 	}
 	this.setIcon = function() {
 		this.icon = playlistName2icon(this.name, this.isAutoPlaylist, images);
@@ -988,6 +997,7 @@ oBrowser = function(name) {
     this.populate = function(is_first_populate, call_id, reset_scroll) {
 		console.log("--> populate smoothPlaylistManager call_id:"+call_id)
         this.init_groups();
+		if(this.selectedRow > this.rowsCount) this.selectedRow = plman.ActivePlaylist;		
         if(reset_scroll) scroll = scroll_ = 0;
         this.scrollbar.updateScrollbar();
         this.repaint();
@@ -1174,7 +1184,7 @@ oBrowser = function(name) {
 
                             // fields
                             var track_name_part = this.rows[i].name;
-                            var track_total_part = this.rows[i].item_count;
+                            var track_total_part = this.rows[i].getCount();
 
                             cColumns.track_name_part = gr.CalcTextWidth(track_name_part, font) + 15;
 							if(properties.drawItemsCounter && this.rows[i].idx !=-1)
@@ -2913,11 +2923,9 @@ function on_playlists_changed() {
 		};
 		brw.populate(is_first_populate = false, 4, reset_scroll = false);
 
-		if(brw.selectedRow > brw.rowsCount) brw.selectedRow = plman.ActivePlaylist;
-
 		brw.repaint();
 		brw.delete_pending = false;
-	} else if(!g_avoid_on_playlists_changed) set_update_function('on_playlists_changed()');
+	} else if(!g_avoid_on_playlists_changed) set_update_function('brw.populate(false, 4, false)');
 };
 
 function on_playlist_switch() {	
@@ -2930,25 +2938,21 @@ function on_playlist_switch() {
 };
 
 function on_playlist_items_added(playlist_idx) {
-	if(window.IsVisible) {
-		try{
-			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
-		} catch(e){
-			console.log('on_playlist_items_added failed');
-		}
-		brw.repaint();
-	} else set_update_function('on_playlist_items_added('+playlist_idx+')');
+	try{
+		brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
+		if(window.IsVisible) brw.repaint();
+	} catch(e){
+		console.log('on_playlist_items_added failed');
+	}
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if(window.IsVisible) {
-		try{
-			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
-		} catch(e){
-			console.log('on_playlist_items_removed failed');
-		}
-		brw.repaint();
-	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');
+	try{
+		brw.rows[brw.getRowIdFromIdx(playlist_idx)].item_count = new_count;
+		if(window.IsVisible) brw.repaint();
+	} catch(e){
+		console.log('on_playlist_items_removed failed');
+	}
 };
 
 
