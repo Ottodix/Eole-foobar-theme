@@ -7213,7 +7213,7 @@ function on_playlist_items_selection_change() {
 function on_playlist_items_added(playlist) {
 	source_playlist_idx = brw.calculateSourcePlaylist();
 	if(brw.followActivePlaylist || source_playlist_idx==playlist){
-		if(!g_avoid_on_items_added && !g_avoid_on_playlists_changed){
+		if(!g_avoid_on_items_added){
 			g_avoid_on_items_removed=true;
 			g_avoid_on_playlist_switch=true;
 			//brw.calculateSourcePlaylist();

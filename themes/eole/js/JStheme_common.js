@@ -1217,6 +1217,7 @@ function setPlaybackPlaylist(){
 }
 function renamePlaybackPlaylist(){
 	if(fb.IsPlaying && plman.GetPlaylistName(plman.PlayingPlaylist) == globalProperties.selection_playlist) {
+		window.NotifyOthers("avoid_on_playlists_changed",true);
 		var found_playingPlaylist = false;
 		var total = plman.PlaylistCount;
 		var pidx_selection = plman.PlayingPlaylist;
@@ -1232,6 +1233,14 @@ function renamePlaybackPlaylist(){
 		if(found_playingPlaylist) {
 			plman.RenamePlaylist(pidx_playing, globalProperties.selection_playlist);
 		};
+		if(!setPlaybackPlaylist_timer) {
+			setPlaybackPlaylist_timer = setTimeout(function() {
+				window.NotifyOthers("avoid_on_playlists_changed",false);
+				//window.NotifyOthers("rePopulate",false);
+				setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
+				setPlaybackPlaylist_timer = false;
+			}, 125);
+		};			
 		return pidx_playing;
 	}
 	return false;

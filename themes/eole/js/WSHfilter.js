@@ -2297,6 +2297,7 @@ oBrowser = function(name) {
         } else {
             if(fb.IsPlaying) {
                 if(plman.PlayingPlaylist == this.pidx_to_send) { // playing playlist is this.name_to_send
+					window.NotifyOthers("avoid_on_playlists_changed",true);
                     plman.RenamePlaylist(this.pidx_to_send, properties.playingPlaylist);
                     if(this.pfound_playingPlaylist) {
                         plman.RenamePlaylist(this.pidx_playing, this.name_to_send);
@@ -2314,7 +2315,12 @@ oBrowser = function(name) {
 					if(properties.adapt_to_playlist) this.pidx_selection = this.pidx_playing;
 					else this.pidx_filter = this.pidx_playing;
 					this.pidx_to_send = this.pidx_playing;
-					this.pidx_playing = previous_pidx;					
+					this.pidx_playing = previous_pidx;				
+					setPlaybackPlaylist_timer = setTimeout(function() {
+						window.NotifyOthers("avoid_on_playlists_changed",false);
+						setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
+						setPlaybackPlaylist_timer = false;
+					}, 125);					
                 } else {
                     // *** insert tracks into this.pidx_to_send playlist
 					clearPlaylist = true;
