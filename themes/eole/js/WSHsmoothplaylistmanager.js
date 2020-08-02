@@ -1150,7 +1150,7 @@ oBrowser = function(name) {
                         // =====
                         if(ay >= (0 - ah) && ay < this.y + this.h) {
 
-							if(fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist && this.rows[i].idx>=0) {
+							if(fb.IsPlaying && (this.rows[i].idx == plman.PlayingPlaylist || (this.rows[i].idx == properties.filtred_playlist_idx && properties.filtred_playlist_idx>-1 && plman.PlayingPlaylist==this.filter_results)) && this.rows[i].idx>=0) {
                                 var font = g_font.boldplus1;
 								if(is_active && properties.emphasisOnActive)
 									var playlist_icon = (g_seconds%2==0)?images_inverse.now_playing_0:images_inverse.now_playing_1;
