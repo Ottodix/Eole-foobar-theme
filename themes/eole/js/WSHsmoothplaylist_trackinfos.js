@@ -5034,8 +5034,6 @@ function on_paint(gr) {
             };
         };
     };
-
-	if(main_panel_state.isEqual(2) && layout_state.isEqual(0) && !properties.darklayout) gr.FillSolidRect(0, wh-1, ww, 1, colors.line_top_dark);
 };
 
 function on_mouse_lbtn_down(x, y, m) {
