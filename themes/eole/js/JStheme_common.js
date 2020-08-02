@@ -3564,7 +3564,7 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
 };
 function openCoverFullscreen(metadb){
 	var img = utils.GetAlbumArtV2(metadb, 0, false);
-	var filepath = cover_img_cache+"\\img_fullscreen."+globalProperties.ImageCacheExt;
+	var filepath = cover_img_cache+"\\original_size."+globalProperties.ImageCacheExt;
 	img.SaveAs(filepath, globalProperties.ImageCacheFileType);
 	var WshShell = new ActiveXObject("WScript.Shell");
 	var open_cover_flag = false;

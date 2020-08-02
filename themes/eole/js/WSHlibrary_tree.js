@@ -2440,7 +2440,7 @@ function populate() {
             if (this.line_l && ui.linestyle<2) gr.FillSolidRect(ln_x, ln_y, 1, ln_h, ui.linecol);
         }
         for (i = s; i < e; i++) {
-            if ((this.tree[i].sel && ui.backcolsel != 0 && (plman.GetPlaylistName(plman.ActivePlaylist)==lib_playlist || ui.force_SelectedDraw)) || g_rightClickedIndex == i) {
+            if ((this.tree[i].sel && ui.backcolsel != 0) || g_rightClickedIndex == i) {
                 item_y = ui.row_h * i + p.s_h - sbar.delta;
                 item_x = Math.round(ui.pad * this.tree[i].tr + ui.margin);
                 if (ui.node_style>=0 || !this.tree[i].track) item_x = item_x + ui.symbol_w;
@@ -4451,14 +4451,14 @@ function on_playlists_changed() {
 	}
 };
 function on_playlist_switch() {
-	ui.force_SelectedDraw = false;
     if(window.IsVisible) {
 		pman.populate(exclude_active = false, reset_scroll = false);
-		if(pop.pln != plman.ActivePlaylist){
+		if(pop.pln != plman.ActivePlaylist && !ui.force_SelectedDraw){
 			pop.clearSelectedItem();
 		}
 		window.Repaint();
 	} else set_update_function('on_playlist_switch()');
+	ui.force_SelectedDraw = false;	
 };
 //=================================================// Playback Callbacks
 function on_playback_new_track(metadb){
