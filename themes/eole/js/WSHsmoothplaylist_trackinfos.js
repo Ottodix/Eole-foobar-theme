@@ -4999,8 +4999,8 @@ function on_paint(gr) {
 		Update_Required_function = "";
 	}
 	if((typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper) && properties.showwallpaper){
-		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-		update_wallpaper = false;
+		updateWallpaper(fb.GetNowPlaying());
+		update_wallpaper = false;		
 	}
     if(!ww) return;
 
@@ -6216,6 +6216,13 @@ function on_playback_dynamic_info_track() {
 		g_radio_artist = "";
 	}
 }
+function updateWallpaper(metadb){
+	old_cachekey = nowplaying_cachekey;
+	nowplaying_cachekey = process_cachekey(metadb);
+	if(old_cachekey!=nowplaying_cachekey || nowplaying_cachekey=="undefined") {
+		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
+	}	
+}
 function on_playback_new_track(metadb) {
 	if(brw.isPlayingIdx>=0) try{brw.groups[brw.isPlayingIdx].isPlaying = false;} catch(e){}
 	try{
@@ -6236,12 +6243,8 @@ function on_playback_new_track(metadb) {
 			repopulate = false;
 		}
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
-			old_cachekey = nowplaying_cachekey;
-			nowplaying_cachekey = process_cachekey(metadb);
-			if(old_cachekey!=nowplaying_cachekey || nowplaying_cachekey=="undefined") {
-				g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, metadb);
-			}
-		};
+			updateWallpaper(metadb);
+		} else update_wallpaper = true;
 		
 		if((((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) || (brw.expanded_group<0 && properties.autocollapse && plman.PlayingPlaylist == g_active_playlist)) {		
 			brw.dontFlashNowPlaying=true;
@@ -6255,14 +6258,13 @@ function on_playback_new_track(metadb) {
 		}
 		g_elapsed_seconds = 0;
 		
-
 		brw.repaint();
 	} else {
 		set_update_function("on_playback_new_track(fb.GetNowPlaying())");
 		g_total_seconds = null;
 		g_time_remaining = null;
 		g_elapsed_seconds = 0;
-		if(properties.wallpapermode == 0) update_wallpaper = true;
+		if(properties.wallpapermode == 0) update_wallpaper = true;		 
 	}
 };
 
