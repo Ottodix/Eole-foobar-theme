@@ -2930,17 +2930,16 @@ function draw_controls_menu(x,y){
 		}
 		_schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 		_schedulerMenu.AppendTo(_menu, MF_STRING, "Scheduler");
-		_menu.AppendMenuSeparator();
-		
-		var _quickSearchMenu = window.CreatePopupMenu();
-		_quickSearchMenu.AppendMenuItem(MF_STRING, 34,"Same title");
-		_quickSearchMenu.AppendMenuItem(MF_STRING, 30,"Same artist");
-		_quickSearchMenu.AppendMenuItem(MF_STRING, 31,"Same album");
-		_quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");
-		_quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
-		_quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search for...");
-		
+
 		if(fb.IsPlaying){
+			_menu.AppendMenuSeparator();
+			var _quickSearchMenu = window.CreatePopupMenu();
+			_quickSearchMenu.AppendMenuItem(MF_STRING, 34,"Same title");
+			_quickSearchMenu.AppendMenuItem(MF_STRING, 30,"Same artist");
+			_quickSearchMenu.AppendMenuItem(MF_STRING, 31,"Same album");
+			_quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");
+			_quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
+			_quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search for...");			
 			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 		}
