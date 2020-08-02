@@ -129,7 +129,7 @@ var properties = {
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
 	panelFontAdjustement: -1,
 	load_image_from_cache_direct: true,
-	adapt_to_playlist: true,
+	adapt_to_playlist: window.GetProperty("_PROPERTY: populate from active playlist", false),
 	removePrefix: window.GetProperty("_PROPERTY: ignore artist prefix", false),
 };
 if(properties.adapt_to_playlist && properties.ParentName=="Library") properties.adapt_to_playlist = false;
@@ -2269,7 +2269,6 @@ oBrowser = function(name) {
 		var toInsert = new FbMetadbHandleList();
 		var playlistToInsert = -1;
 		var positionToInsert = -1;
-			
 		this.setReceiverPlaylist();
 		
         if(index_to>-1 && index_to>index){
@@ -2315,7 +2314,8 @@ oBrowser = function(name) {
 					if(properties.adapt_to_playlist) this.pidx_selection = this.pidx_playing;
 					else this.pidx_filter = this.pidx_playing;
 					this.pidx_to_send = this.pidx_playing;
-					this.pidx_playing = previous_pidx;				
+					this.pidx_playing = previous_pidx;
+					window.NotifyOthers("UpdatePlaylists",true);
 					setPlaybackPlaylist_timer = setTimeout(function() {
 						window.NotifyOthers("avoid_on_playlists_changed",false);
 						setPlaybackPlaylist_timer && clearTimeout(setPlaybackPlaylist_timer);
@@ -3638,13 +3638,14 @@ oBrowser = function(name) {
 			var _menu3A = window.CreatePopupMenu();
 			var _rowHeight = window.CreatePopupMenu();
             var idx;
-
-            /*_menu0.AppendMenuItem(MF_STRING, 50, "Library");
-            _menu0.AppendMenuItem(MF_STRING, 51, "Playlist");
-            _menu0.CheckMenuRadioItem(50, 51, 50 + this.current_sourceMode);
-            _menu0.AppendTo(_menu,MF_STRING, "Source");
-            _menu.AppendMenuSeparator();*/
-
+			
+			if(properties.ParentName!="Library"){
+				_menu0.AppendMenuItem(MF_STRING, 50, "Library");
+				_menu0.AppendMenuItem(MF_STRING, 51, "Playlist");
+				_menu0.CheckMenuRadioItem(50, 51, 50 + (properties.adapt_to_playlist?1:0));
+				_menu0.AppendTo(_menu,MF_STRING, "Source");
+				_menu.AppendMenuSeparator();
+			}
             //_menu.AppendMenuItem((this.current_sourceMode == 1 ? MF_STRING : MF_GRAYED | MF_DISABLED), 60, "Cursor follows Focus");
             //_menu.CheckMenuItem(60, properties.followFocusChange);
             //_menu.AppendMenuSeparator();
@@ -3794,11 +3795,18 @@ oBrowser = function(name) {
             idx = _menu.TrackPopupMenu(x,y);
 
             switch(true) {
-                /*case (idx >= 50 && idx <= 51):
-                    properties.sourceMode = idx - 50;
-                    window.SetProperty("_PROPERTY: Source Mode", properties.sourceMode);
+                case (idx == 50):
+                    properties.adapt_to_playlist = false;
+                    window.SetProperty("_PROPERTY: populate from active playlist", properties.adapt_to_playlist);
+					window.NotifyOthers("adapt_to_playlist",properties.adapt_to_playlist);
                     window.Reload();
-                    break;*/
+                    break;
+                case (idx == 51):
+                    properties.adapt_to_playlist = true;
+                    window.SetProperty("_PROPERTY: populate from active playlist", properties.adapt_to_playlist);
+					window.NotifyOthers("adapt_to_playlist",properties.adapt_to_playlist);
+                    window.Reload();
+                    break;					
                 case (idx == 60):
                     properties.followFocusChange = !properties.followFocusChange;
                     window.SetProperty("_PROPERTY: Follow focus change", properties.followFocusChange);
@@ -5391,6 +5399,13 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
 			window.Reload();
 		break;
+		case "adapt_to_playlist":
+			if(properties.ParentName!="Library"){
+				properties.adapt_to_playlist = info;
+				window.SetProperty("_PROPERTY: populate from active playlist", properties.adapt_to_playlist);
+				window.Reload();
+			}
+		break;		
 		case "colors":
 			globalProperties.colorsMainPanel = info;
 			window.SetProperty("GLOBAL colorsMainPanel", globalProperties.colorsMainPanel);

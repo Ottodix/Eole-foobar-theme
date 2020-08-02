@@ -3047,6 +3047,7 @@ function on_notify_data(name, info) {
 			break;
 		case "UpdatePlaylistsManager":			
 		case "UpdatePlaylists":
+			g_avoid_on_playlists_changed=false;
 			on_playlists_changed();
 		break;
 		case "enable_screensaver":
