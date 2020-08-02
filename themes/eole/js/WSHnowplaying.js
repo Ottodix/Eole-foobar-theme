@@ -339,7 +339,7 @@ function on_paint(gr) {
 	} else {
 		//gr.FillSolidRect(0, 1, ww, 1, colors.sidesline);
 		var side_padding = 5;
-		gr.FillGradRect(side_padding, 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);		
+		gr.FillGradRect(side_padding, 0, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);		
 	}
 
 	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
