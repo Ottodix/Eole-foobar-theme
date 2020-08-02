@@ -2930,6 +2930,15 @@ function draw_controls_menu(x,y){
 		}
 		_schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 		_schedulerMenu.AppendTo(_menu, MF_STRING, "Scheduler");
+		_menu.AppendMenuSeparator();
+		
+		var _quickSearchMenu = window.CreatePopupMenu();
+		_quickSearchMenu.AppendMenuItem(MF_STRING, 34,"Same title");
+		_quickSearchMenu.AppendMenuItem(MF_STRING, 30,"Same artist");
+		_quickSearchMenu.AppendMenuItem(MF_STRING, 31,"Same album");
+		_quickSearchMenu.AppendMenuItem(MF_STRING, 32,"Same genre");
+		_quickSearchMenu.AppendMenuItem(MF_STRING, 33,"Same date");
+		_quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search for...");
 		
 		if(fb.IsPlaying){
 			_menu.AppendMenuSeparator();
@@ -2950,7 +2959,37 @@ function draw_controls_menu(x,y){
                 break;
 			case (idx == 2):
 				fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
-			break;				
+			break;		
+		case (idx == 30):
+			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+				main_panel_state.setValue(0)
+			}
+			quickSearch(fb.GetNowPlaying(),"artist");
+			break;
+		case (idx == 31):
+			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+				main_panel_state.setValue(0)
+			}
+			quickSearch(fb.GetNowPlaying(),"album");
+			break;
+		case (idx == 32):
+			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+				main_panel_state.setValue(0)
+			}
+			quickSearch(fb.GetNowPlaying(),"genre");
+			break;
+		case (idx == 33):
+			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+				main_panel_state.setValue(0)
+			}
+			quickSearch(fb.GetNowPlaying(),"date");
+			break;
+		case (idx == 34):
+			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+				main_panel_state.setValue(0)
+			}
+			quickSearch(fb.GetNowPlaying(),"title");
+			break;		
             case (idx == 3000):
                 fb.Stop();
                 break;
@@ -3004,6 +3043,7 @@ function draw_controls_menu(x,y){
                 break;
         }
         _menu = undefined;
+		_quickSearchMenu = undefined;
 		_playbackOrder = undefined;
         _schedulerMenu = undefined;
         return true;

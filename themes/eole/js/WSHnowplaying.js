@@ -1634,7 +1634,7 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.AppendMenuSeparator();
 	if(g_cover.isValid()){
 		var now_playing_track = fb.GetNowPlaying();
-		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");
+		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover in its full/original size");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
 		var quickSearchMenu = window.CreatePopupMenu();
@@ -1689,7 +1689,7 @@ function on_mouse_rbtn_up(x, y){
 			window.Reload();
 			break;
 		case (idx == 1):
-			showNowPlayingCover();
+			openCoverFullscreen(g_cover.metadb);
 			break;
 		case (idx == 2):
 			properties.random_function = '20_albums';
@@ -1798,7 +1798,7 @@ function draw_settings_menu(x,y){
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");
+		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover in its full/original size");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 8, "Edit track properties");		

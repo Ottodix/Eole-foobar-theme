@@ -3562,6 +3562,24 @@ function FormatWallpaper(image, iw, ih, interpolation_mode, display_mode, angle,
         return tmp_img;
     };
 };
+function openCoverFullscreen(metadb){
+	var img = utils.GetAlbumArtV2(metadb, 0, false);
+	var filepath = cover_img_cache+"\\img_fullscreen."+globalProperties.ImageCacheExt;
+	img.SaveAs(filepath, globalProperties.ImageCacheFileType);
+	var WshShell = new ActiveXObject("WScript.Shell");
+	var open_cover_flag = false;
+	var open_cover = setInterval(function(filepath) {
+		if(g_files.FileExists(filepath) && !open_cover_flag) {
+			open_cover_flag = true;
+			window.ClearInterval(open_cover);			
+			try {
+				WshShell.Run("\"" + filepath + "\"", 0);
+			} catch(e) {
+				HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
+			}			
+		}
+	},60,filepath);	
+}
 // Debugger functions
 function debugger_hint(string){
 	//console.log(string)	;
