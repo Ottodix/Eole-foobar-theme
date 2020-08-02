@@ -28,6 +28,7 @@ var properties = {
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
 	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
+	coverNoPadding : window.GetProperty("_DISPLAY: cover no padding", true),
 	rawBitmap: false,
 	refreshRate: 50,
 	panelFontAdjustement: 0,
@@ -332,8 +333,14 @@ function on_paint(gr) {
 	drawAllButtons(gr);
 
 	if(trackinfostext_state.isActive()) g_infos.draw(gr, 0, wh-track_infos_height-(properties.showRating?rating_height:0));
-	var side_padding = 10;
-	gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
+	if(getTrackInfosState()==1){
+		var side_padding = 10;
+		gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
+	} else {
+		//gr.FillSolidRect(0, 1, ww, 1, colors.sidesline);
+		var side_padding = 5;
+		gr.FillGradRect(side_padding, 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);		
+	}
 
 	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
 	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
@@ -343,7 +350,7 @@ function on_size(w, h) {
     wh = h;
 	calculate_visu_margin_left();
 	if((properties.showVisualization && g_cover.isPlaying()) || globalProperties.enable_screensaver) startAnimation();
-	g_cover.setSize(ww,wh-(trackinfostext_state.isActive()?track_infos_height:0)-(properties.showRating?rating_height:0));
+	g_cover.setSize(ww,wh-(trackinfostext_state.isActive()?track_infos_height+(properties.showRating?rating_height:0):0));
 
 	g_infos.setSize(w,track_infos_height+(properties.showRating?rating_height:0));
 
@@ -599,7 +606,8 @@ oCover = function() {
 	this.buttons_positioned = false;
 	this.padding_default = Array(20,20,0,20);
 	this.padding_norating = Array(20,7,0,7);	
-	this.padding_noinfos = Array(20,20,20,20);
+	this.padding_noinfos = Array(24,24,24,24);
+	this.nopadding = Array(0,0,0,0);	
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -779,7 +787,8 @@ oCover = function() {
 		} else if(trackinfostext_state.isActive()){
 			this.padding = this.padding_norating;
 		} else {
-			this.padding = this.padding_noinfos;
+			if(!properties.coverNoPadding) this.padding = this.padding_noinfos;
+			else this.padding = this.nopadding;
 		}
 		this.w = w - this.padding[1] - this.padding[3];
 		this.h = h - this.padding[0] - this.padding[2];		
@@ -852,7 +861,7 @@ oCover = function() {
 			this.drawn_w = this.w;
 			gr.DrawImage(cover_to_draw, this.x, this.y, this.w, this.h, 0, 0, cover_to_draw.Width, cover_to_draw.Height);
 		}
-		if(this.borders){
+		if(this.borders && !properties.coverNoPadding){
 			if(properties.circleMode) gr.DrawEllipse(this.x, this.y, this.drawn_w, this.drawn_h, 1.0, colors.border_covers);
 			else gr.DrawRect(this.x, this.y, this.drawn_w-1, this.drawn_h-1, 1, colors.border_covers);
 		}
@@ -1130,7 +1139,9 @@ function on_notify_data(name, info) {
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
 			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
-			if(process_cachekey(metadb)==g_cover.cachekey)
+			var cachekey = process_cachekey(metadb);
+			g_image_cache.reset(cachekey);
+			if(cachekey==g_cover.cachekey)
 				g_cover.refresh(metadb[0], false, undefined, true, g_cover.isPlaying());
 		break;
 		case "cover_cache_finalized":
@@ -1166,6 +1177,18 @@ function on_notify_data(name, info) {
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
 		break;
+		case "trackinfoslib_state":
+			trackinfoslib_state.value=info;
+		break;
+		case "trackinfosplaylist_state":
+			trackinfosplaylist_state.value=info;
+		break;
+		case "trackinfosbio_state":
+			trackinfosbio_state.value=info;
+		break;
+		case "trackinfosvisu_state":
+			trackinfosvisu_state.value=info;
+		break;		
 		case "minimode_dark_theme":
 			properties.minimode_dark_theme=info;
 			window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
@@ -1753,8 +1776,10 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(10,properties.follow_cursor);
 		_menu.AppendMenuItem(MF_STRING, 11, "Circle artwork");
 		_menu.CheckMenuItem(11,properties.circleMode);
-		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion");
+		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion")
 		_menu.CheckMenuItem(12,properties.keepProportion);
+		_menu.AppendMenuItem(MF_STRING, 13, "Fill the whole space");
+		_menu.CheckMenuItem(13,!trackinfostext_state.isActive() && properties.coverNoPadding);				
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 18, "Show track details");
 		_menu.CheckMenuItem(18, trackinfostext_state.isActive());		
@@ -1846,6 +1871,20 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
 				window.Repaint();
 				break;
+			case (idx == 13):
+				if(!trackinfostext_state.isActive() && properties.coverNoPadding) {
+					properties.coverNoPadding = false;					
+				} else {
+					properties.coverNoPadding = true;
+					trackinfostext_state.setValue(0);
+				}
+				get_images();
+				adaptButtons();
+				g_cover.refreshCurrent();
+				on_size(window.Width,window.Height);
+				window.SetProperty("_DISPLAY: cover no padding", properties.coverNoPadding)
+				window.Repaint();
+				break;				
             case (idx >= 14 && idx<=15):
 				properties.single_click_action = idx-14;
 				window.SetProperty("PROPERTY single_click_action", properties.single_click_action);

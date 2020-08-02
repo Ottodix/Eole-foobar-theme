@@ -411,10 +411,10 @@ function toggleTrackInfosState(switch_all,new_state, refresh_panel){
 
 	if(switch_all){
 		if(new_state===false) {
-			trackinfoslib_state.toggleValue(refresh_panel);
-			trackinfosplaylist_state.toggleValue(refresh_panel);
-			trackinfosbio_state.toggleValue(refresh_panel);
-			trackinfosvisu_state.toggleValue(refresh_panel);
+			trackinfoslib_state.cycleIncrement(1,refresh_panel);
+			trackinfosplaylist_state.cycleIncrement(1,refresh_panel);
+			trackinfosbio_state.cycleIncrement(1,refresh_panel);
+			trackinfosvisu_state.cycleIncrement(1,refresh_panel);
 		} else {
 			trackinfoslib_state.setValue(new_state,refresh_panel);
 			trackinfosplaylist_state.setValue(new_state,refresh_panel);
@@ -425,19 +425,19 @@ function toggleTrackInfosState(switch_all,new_state, refresh_panel){
 		switch(main_panel_state.value){
 			case 0:
 				if(new_state!==false) trackinfoslib_state.setValue(new_state,refresh_panel);
-				else trackinfoslib_state.toggleValue(refresh_panel);
+				else trackinfoslib_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 1:
 				if(new_state!==false) trackinfosplaylist_state.setValue(new_state,refresh_panel);
-				else trackinfosplaylist_state.toggleValue(refresh_panel);
+				else trackinfosplaylist_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 2:
 				if(new_state!==false) trackinfosbio_state.setValue(new_state,refresh_panel);
-				else trackinfosbio_state.toggleValue(refresh_panel);
+				else trackinfosbio_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 3:
 				if(new_state!==false) trackinfosvisu_state.setValue(new_state,refresh_panel);
-				else trackinfosvisu_state.toggleValue(refresh_panel);
+				else trackinfosvisu_state.cycleIncrement(1,refresh_panel);
 			break;
 		}
 	}
@@ -480,7 +480,7 @@ function build_buttons(){
 		buttons.Idle.N_img = images.idle_img;
 		buttons.Idle.D_img = buttons.Idle.H_img;
 
-		if(getTrackInfosState()==1) {
+		if(getTrackInfosState()>=1) {
 			buttons.RightSidebar.H_img = images.trackinfos_off;
 			buttons.RightSidebar.N_img = images.trackinfos_off;
 		} else {
@@ -545,7 +545,7 @@ function build_buttons(){
 				if(getNowPlayingState()==1) {
 					toggleTrackInfosState();
 				} else {
-					if(getTrackInfosState()==0) toggleTrackInfosState(false,undefined,false);
+					if(getTrackInfosState()==0) toggleTrackInfosState(false,1,false);
 					toggleNowPlayingState();
 					/*trigger_refresh_PSS = setTimeout(function(){
 						RefreshPSS();

@@ -3264,8 +3264,8 @@ oBrowser = function(name) {
                     };
 
                 };
-				//if(properties.darklayout) Draw bottom gradient
-				gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);
+				if(!(getTrackInfosState()==2 && window.Name!='BottomPlaylist'))
+					gr.FillGradRect(0, wh-colors.fading_bottom_height, ww, colors.fading_bottom_height, 90, colors.grad_bottom_2,  colors.grad_bottom_1,1);
 
                 // Incremental Search Display
                 if(cList.search_string.length > 0) {

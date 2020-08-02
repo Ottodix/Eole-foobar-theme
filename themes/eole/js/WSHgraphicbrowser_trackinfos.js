@@ -309,7 +309,6 @@ var cover = {
 	btn_play: play_img,
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
-	marginSide:5,
 	marginBottom:30,
     masks: window.GetProperty("COVER album art masks (for disk cache)","*front*.*;*cover*.*;*folder*.*;*.*"),
 };
@@ -2057,7 +2056,7 @@ oShowList = function(parentPanelName) {
 		}
 	}
 	this.setMarginRight = function(){
-		if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.MarginRight = this.MarginRightFromCover + this.CoverSize;
 		} else {
 			this.MarginRight = this.MarginRightStandard;
@@ -2116,9 +2115,9 @@ oShowList = function(parentPanelName) {
 			this.album_info_sent = !send_albums_info;
 		}
 
-		if(properties.showlistShowCover && properties.CoverGridNoText && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		if(properties.showlistShowCover>0 && properties.CoverGridNoText && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.heightMin = properties.showlistheightMinCoverGrid;
-		} else if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		} else if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.heightMin = properties.showlistheightMinCover;
 		} else {
 			this.heightMin = properties.showlistheightMin;
@@ -2420,7 +2419,7 @@ oShowList = function(parentPanelName) {
                 }
 
 				//draw album cover
-				if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.showlist_img) && (this.h-this.delta_)<40){
+				if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.showlist_img) && (this.h-this.delta_)<40){
 					if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 						if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealSize, this.coverRealSize, colors.cover_shadow,10);
 						gr.DrawImage(this.cover_shadow, this.x+this.w-this.CoverSize+this.marginCover-8, this.y+this.marginTop+this.marginCover-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
@@ -3109,6 +3108,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	var _menuCoverShadow = window.CreatePopupMenu();
 	var _menuFilters = window.CreatePopupMenu();
 	var _menuTracklist = window.CreatePopupMenu();
+	var _menuCover = window.CreatePopupMenu();	
 	var _menuProgressBar = window.CreatePopupMenu();
 	var _menuBackground = window.CreatePopupMenu();
 	var _menuRating = window.CreatePopupMenu();
@@ -3166,10 +3166,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuFilters.CheckMenuItem(39, properties.displayToggleBtns);
 	_menuFilters.AppendTo(_menu,MF_STRING, "Left menu");
 
-
-
-
-
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 100, "Square Artwork");
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 101, "Circle Artwork");
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 102, "Grid mode, no padding, no labels");
@@ -3203,9 +3199,16 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuTracklist.CheckMenuItem(45, properties.expandOnHover);	*/
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
-	_menuTracklist.AppendMenuItem(MF_STRING, 29, "Show the cover on the right (when right sidebar doesn't already display it)");
-	_menuTracklist.CheckMenuItem(29, properties.showlistShowCover);
-
+	
+	
+	_menuCover.AppendMenuItem(MF_STRING, 80, "Always");
+	_menuCover.CheckMenuItem(80, properties.showlistShowCover==2);
+	_menuCover.AppendMenuItem(MF_STRING, 81, "When right sidebar doesn't already display it");
+	_menuCover.CheckMenuItem(81, properties.showlistShowCover==1);
+	_menuCover.AppendMenuItem(MF_STRING, 82, "Never");
+	_menuCover.CheckMenuItem(82, properties.showlistShowCover==0);	
+	_menuCover.AppendTo(_menuTracklist,MF_STRING, "Show the cover on the right");
+	
 	_menuTracklist.AppendMenuSeparator();
 
 	var custom_tag = properties.show2linesCustomTag!="";
@@ -3384,13 +3387,27 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_showlist.reset();
 			brw.repaint();
 			break;
-		case (idx == 29):
-			properties.showlistShowCover = !properties.showlistShowCover;
+		case (idx == 80):
+			properties.showlistShowCover = 2;
 			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
 			g_showlist.refresh();
 			brw.refresh_browser_thumbnails();
 			brw.repaint();
 			break;
+		case (idx == 81):
+			properties.showlistShowCover = 1;
+			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
+			g_showlist.refresh();
+			brw.refresh_browser_thumbnails();
+			brw.repaint();
+			break;
+		case (idx == 82):
+			properties.showlistShowCover = 0;
+			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
+			g_showlist.refresh();
+			brw.refresh_browser_thumbnails();
+			brw.repaint();
+			break;			
 		case (idx == 26):
 			properties.showDiscNbOverCover = !properties.showDiscNbOverCover;
 			window.SetProperty("COVER Show Disc number over album art", properties.showDiscNbOverCover);
@@ -3716,6 +3733,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menu2A = undefined;
 	//_menuDisplayedPlaylist = undefined;
 	_menuTracklist = undefined;
+	_menuCover = undefined;	
 	_menuProgressBar = undefined;
 	_menuRating = undefined;
 	_menuHeaderBar = undefined;
@@ -4263,28 +4281,16 @@ oBrowser = function(name) {
 		var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
 		var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
 		this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
-		while(this.thumbnailWidth>globalProperties.coverCacheWidthMax){
-			this.totalColumns = this.totalColumns+1;
-			var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-			var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-			this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
-		}
-
-		if(properties.CoverGridNoText)
-			this.marginSide = 0;
-		else
-			this.marginSide = Math.round(this.thumbnailWidth/10 + deltaToAdd/10);
 
 		if(properties.showheaderbar) {
 			g_headerbar.setSize(0,0,this.w,this.headerBarHeight);
 			if(this.showFilterBox) g_filterbox.setSize(ww-g_headerbar.resize_bt_w-g_headerbar.rightpadding-g_headerbar.RightTextLength-g_headerbar.MarginRight-g_headerbar.mainTxtX +20, cFilterBox.h, g_fsize+2);
 		}
-        // calc size of the cover art
-        //this.coverRealWith = (this.thumbnailWidth - (this.marginSide * 2));
+
 		if(properties.CoverGridNoText)
 			this.coverRealWith = this.thumbnailWidth;
 		else
-			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.16);
+			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.15);
 
 		this.coverHalfWidth = Math.round(this.coverRealWith/2);
         // Adjust Row & showList bloc Height
@@ -4814,7 +4820,7 @@ oBrowser = function(name) {
             var ax, ay, by, rowStart, row, coverTop;
             var aw = this.coverRealWith;
 			var awhalf = this.coverHalfWidth;
-            var firstalbum_x = this.x + this.marginSide + this.marginLR;
+            var firstalbum_x = this.x + this.marginLR;
             var firstalbum_y = Math.floor(this.y + this.marginTop - scroll_);
 
 			//Force showlist if there is only one group
@@ -4877,7 +4883,7 @@ oBrowser = function(name) {
             for(var i = start_;i < end_;i++){
 				row = Math.floor(i/this.totalColumns);
 
-				ax = firstalbum_x + (rowPosition * this.thumbnailWidth);
+				ax = firstalbum_x + (rowPosition * this.thumbnailWidth)+ (this.thumbnailWidth-this.coverRealWith)/2;
 				ay = firstalbum_y + (row * this.rowHeight);
 
 				if(g_showlist.delta_ > 0) {
@@ -5308,7 +5314,7 @@ oBrowser = function(name) {
 
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
 						this.activeColumn = 0;
 						this.activeIndex = -1;
 						this.activeTextIndex = -1;
@@ -5521,7 +5527,7 @@ oBrowser = function(name) {
 
     this.setResizeButton = function (w,h) {
         var gb;
-		this.thumbnailWidthMax = Math.max(((this.w-this.x - this.marginSide - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.max(((this.w - this.x - this.marginLR)/2),properties.thumbnailWidth);
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
 			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
@@ -5552,7 +5558,7 @@ oBrowser = function(name) {
 	}
 	this.moveResizeBtn = function (x,y){
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
-		this.thumbnailWidthMax = Math.max(((ww-this.x - this.marginSide - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.max(((ww - this.x - this.marginLR)/2),properties.thumbnailWidth);
 		properties.thumbnailWidth = Math.round((this.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
 		if(properties.thumbnailWidth>this.thumbnailWidthMax) properties.thumbnailWidth=this.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
@@ -6757,14 +6763,11 @@ function on_mouse_wheel(step, stepstrait, delta){
 	} else {
 		if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
 			properties.thumbnailWidth += (intern_step)*4;
-			if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
-			if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
+			if(properties.thumbnailWidth>brw.thumbnailWidthMax) properties.thumbnailWidth=brw.thumbnailWidthMax;
+			else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 			window.SetProperty("COVER Width", properties.thumbnailWidth);
 			brw.refresh_browser_thumbnails();
-			if(properties.CoverShadowOpacity>0 && this.cover_shadow != null){
-				this.cover_shadow = undefined;
-				this.cover_shadow = null;
-			}
+			brw.refresh_shadows();
 			on_size(window.Width, window.Height);
 			return;
 		}
@@ -7396,6 +7399,7 @@ function on_notify_data(name, info) {
 			window.SetProperty("_MAINPANEL: right_panel_follow_cursor", properties.right_panel_follow_cursor);
 			g_showlist.refresh();
 			brw.refresh_browser_thumbnails();
+			brw.repaint();
 			break;
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;

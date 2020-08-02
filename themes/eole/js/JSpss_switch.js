@@ -73,6 +73,16 @@ oPanelSetting = function (name, file_prefix, default_value, min_value, max_value
 	this.increment = function (increment_value) {
 		this.setValue(parseInt(this.value)+increment_value);		
 	}	
+	this.cycleIncrement = function (increment_value, refresh_panel) {
+		var new_value = parseInt(this.value)+increment_value;
+		if(new_value>this.max_value) new_value = this.min_value;
+		this.setValue(new_value, refresh_panel);		
+	}	
+	this.cycleDecrement = function (decrement_value, refresh_panel) {
+		var new_value = parseInt(this.value)-decrement_value;
+		if(new_value<this.min_value) new_value = this.max_value;
+		this.setValue(new_value, refresh_panel);		
+	}	
 	this.userInputValue = function (msg,title) {
 		try {
 			new_value = utils.InputBox(window.ID, msg, title, this.value, true);
@@ -149,10 +159,10 @@ var nowplayingbio_state = new oPanelSetting("nowplayingbio_state", "NOWPLAYINGBI
 var nowplayingvisu_state = new oPanelSetting("nowplayingvisu_state", "NOWPLAYINGVISU_", 1, 0, 1);
 
 //Track infos switch for each main panels
-var trackinfoslib_state = new oPanelSetting("trackinfoslib_state", "TRACKINFOSLIB_", 0, 0, 1);
-var trackinfosplaylist_state = new oPanelSetting("trackinfosplaylist_state", "TRACKINFOSPLAYLIST_", 0, 0, 1);
-var trackinfosbio_state = new oPanelSetting("trackinfosbio_state", "TRACKINFOSBIO_", 1, 0, 1);
-var trackinfosvisu_state = new oPanelSetting("trackinfosvisu_state", "TRACKINFOSVISU_", 1, 0, 1);
+var trackinfoslib_state = new oPanelSetting("trackinfoslib_state", "TRACKINFOSLIB_", 0, 0, 2);
+var trackinfosplaylist_state = new oPanelSetting("trackinfosplaylist_state", "TRACKINFOSPLAYLIST_", 0, 0, 2);
+var trackinfosbio_state = new oPanelSetting("trackinfosbio_state", "TRACKINFOSBIO_", 1, 0, 2);
+var trackinfosvisu_state = new oPanelSetting("trackinfosvisu_state", "TRACKINFOSVISU_", 1, 0, 2);
 var trackinfostext_state = new oPanelSetting("trackinfostext_state", "TRACKINFOSTEXT_", 1, 0, 1);
 
 //Panels width
@@ -200,16 +210,16 @@ function getTrackInfosState(){
 function getTrackInfosVisibility(){
 	switch(main_panel_state.value){
 		case 0:
-			return (trackinfoslib_state.value==1 && nowplayinglib_state.value==1);
+			return (trackinfoslib_state.value>=1 && nowplayinglib_state.value==1);
 		break;
 		case 1:
-			return (trackinfosplaylist_state.value==1 && nowplayingbio_state.value==1);
+			return (trackinfosplaylist_state.value>=1 && nowplayingbio_state.value==1);
 		break;
 		case 2:
-			return (trackinfosbio_state.value==1 && nowplayinglib_state.value==1);
+			return (trackinfosbio_state.value>=1 && nowplayinglib_state.value==1);
 		break;
 		case 3:
-			return (trackinfosvisu_state.value==1 && nowplayingvisu_state.value==1);
+			return (trackinfosvisu_state.value>=1 && nowplayingvisu_state.value==1);
 		break;		
 	}	
 }
