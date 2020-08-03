@@ -2639,7 +2639,7 @@ oBrowser = function(name) {
 							if(g_dragndrop_rowId==i){
 								if(!g_dragndrop_bottom) gr.FillSolidRect(ax, ay-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 								else gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
-							}
+							} 
 							//if(g_dragndrop_bottom && i==this.rows.length-1-((properties.showGroupHeaders) ? properties.extraRowsNumber: 0))  gr.FillSolidRect(ax, ay+ah-1, aw+this.paddingRight, 2, colors.dragdrop_marker_line);
 
 
@@ -3369,8 +3369,11 @@ oBrowser = function(name) {
         if(this.activeRow > -1 && rowId == this.activeRow) {
 			while(typeof(this.rows[rowId]) !== "undefined" && this.rows[rowId].type == 99) {
 				rowId=rowId+1;
-				if(typeof(this.rows[rowId]) == "undefined") {rowId=this.rows.length-1;g_dragndrop_bottom=true;break}
+				if(typeof(this.rows[rowId]) == "undefined") {rowId=this.rows.length-1;console.log("drag_bottom"+this.rows[rowId].type+" rowId "+rowId);g_dragndrop_bottom=true;break}
 			};
+			while(typeof(this.rows[rowId]) === "undefined" || this.rows[rowId].type == 99) {
+				rowId=rowId-1;
+			};		
             g_dragndrop_trackId = this.rows[rowId].playlistTrackId;
             g_dragndrop_rowId = rowId;
         };
@@ -3863,7 +3866,7 @@ oBrowser = function(name) {
                     else if(y > limit || g_dragndrop_trackId==-1) {
                         g_dragndrop_bottom = true;
                         g_dragndrop_trackId = this.rows[rowId].playlistTrackId;
-                        g_dragndrop_rowId = rowId;
+                        //g_dragndrop_rowId = rowId;
                     }
                 } else {
                     g_dragndrop_bottom = true;
