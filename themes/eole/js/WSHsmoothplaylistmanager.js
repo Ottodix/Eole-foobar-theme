@@ -6,7 +6,6 @@ var properties = {
     rowScrollStep: 3,
     drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", true),
     scrollSmoothness: 3.0,
-    refreshRate: 40,
     showHeaderBar: window.GetProperty("DISPLAY: Show Top Bar", false),
     showNewPlaylistButton: window.GetProperty("DISPLAY: Show new playlist button", true),
     defaultHeaderBarHeight: 40,
@@ -1617,12 +1616,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 

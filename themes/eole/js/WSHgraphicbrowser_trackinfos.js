@@ -102,7 +102,6 @@ var properties = {
     filterBox_filter_tracks: window.GetProperty("MAINPANEL filter tracks", false),
     followNowPlaying: window.GetProperty("TRACKLIST Always Follow Now Playing", true),
 	right_panel_follow_cursor: window.GetProperty("_MAINPANEL: right_panel_follow_cursor", true),
-    refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true),
     expandOnHover: window.GetProperty("TRACKLIST Expand on hover", true),
     showListColored: window.GetProperty("TRACKLIST Color according to albumart", true),
@@ -5361,12 +5360,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 

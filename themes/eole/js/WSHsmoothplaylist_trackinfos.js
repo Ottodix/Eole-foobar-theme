@@ -126,8 +126,6 @@ var properties_common = {
     scrollSmoothness: 2.5,
 	track_gradient_margin: 13,
 	track_gradient_size: 13,
-    refreshRate: 35,
-    refreshRateCover: 5,
 	drag_scroll_speed_ms: 100,
     albumArtId: 0,
     defaultHeaderBarHeight: 40,
@@ -3894,12 +3892,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
         if(!g_first_populate_done) {

@@ -89,7 +89,6 @@ var properties = {
     showheaderbar: window.GetProperty("MAINPANEL Show Header Bar", false),
     showFilterBox: window.GetProperty("MAINPANEL Show filter box", false),
     followNowPlaying: window.GetProperty("TRACKLIST Always Follow Now Playing", true),
-    refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true),
     followActivePlaylist: window.GetProperty("MAINPANEL Follow active playlist", true),
     followPlayingPlaylist: window.GetProperty("MAINPANEL Follow playing playlist", false),
@@ -4247,12 +4246,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 

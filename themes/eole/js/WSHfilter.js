@@ -102,8 +102,6 @@ var properties = {
     rowHeight: 22,
     rowScrollStep: 1,
     scrollSmoothness: 2.5,
-    refreshRate: 40,
-    refreshRateCover: 2,
     TagSwitcherBarHeight: 30,
     headerBarHeight: 40,
     defaultHeaderBarHeight: 40,
@@ -3460,12 +3458,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
         if(!g_first_populate_launched) {

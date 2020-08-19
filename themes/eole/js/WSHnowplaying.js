@@ -30,7 +30,6 @@ var properties = {
 	tintOnHover : true,
 	coverNoPadding : window.GetProperty("_DISPLAY: cover no padding", true),
 	rawBitmap: false,
-	refreshRate: 50,
 	panelFontAdjustement: 0,
 	showInfos:true,
 }
