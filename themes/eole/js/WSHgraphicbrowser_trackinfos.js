@@ -942,8 +942,7 @@ oRow = function(metadb,itemIndex) {
         this.y = y-3;
         this.w = w;
         var tracknumber_w = 28;
-        var length_w = 55;
-		
+
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
 
@@ -981,6 +980,10 @@ oRow = function(metadb,itemIndex) {
 			} else var current_size = track_gradient_size+Math.round(total_size*ratio);
 			if(isNaN(current_size) || current_size<0) current_size = track_gradient_size+total_size;
 		}
+		if(typeof brw.max_duration_length == 'undefined' || brw.max_duration_length==0) brw.max_duration_length = gr.CalcTextWidth("00:00:00", g_font.normal);
+		
+		var length_w = duration.length*brw.max_duration_length/8+30;
+		
 		if(!g_showlist.light_bg){
 			image0 = now_playing_progress0;
 			image1 = now_playing_progress1;
@@ -4246,6 +4249,7 @@ oBrowser = function(name) {
 	this.on_font_changed = function(refreshDates) {
 		this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
 		if(refreshDates) this.refreshDates();
+		this.max_duration_length = 0;
 	}
 	this.on_font_changed();
 	this.on_init = function(){

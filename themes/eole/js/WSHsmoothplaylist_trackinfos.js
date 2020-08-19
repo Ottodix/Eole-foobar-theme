@@ -2737,7 +2737,8 @@ oBrowser = function(name) {
                                         if(!isDefined(this.rows[i].artist_part_w)) this.rows[i].artist_part_w = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part, g_font.italicmin1) + 0 : 0;
                                         if(!isDefined(this.rows[i].title_part_w)) this.rows[i].title_part_w = gr.CalcTextWidth(track_title_part, g_font.normal) + 10;
 										if(!g_var_cache.isdefined("track_time_part")) g_var_cache.set("track_time_part",gr.CalcTextWidth("00:00:00", g_font.normal));
-                                        cColumns.track_time_part = g_var_cache.get("track_time_part");
+                                        cColumns.track_time_part = track_time_part.length*g_var_cache.get("track_time_part")/8+20;
+										
 
 										if(properties.doubleRowShowCover)
 											var left_margin = TrackText_x;
@@ -2970,7 +2971,7 @@ oBrowser = function(name) {
                                         if(!isDefined(this.rows[i].artist_part_w)) this.rows[i].artist_part_w = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part, g_font.normal) : 0;
                                         if(!isDefined(this.rows[i].title_part_w)) this.rows[i].title_part_w = gr.CalcTextWidth(track_title_part, g_font.normal) + 10;
 										if(!g_var_cache.isdefined("track_time_part")) g_var_cache.set("track_time_part",gr.CalcTextWidth("00:00:00", g_font.normal));
-                                        cColumns.track_time_part = g_var_cache.get("track_time_part");
+                                        cColumns.track_time_part = track_time_part.length*g_var_cache.get("track_time_part")/8+20;
 
 										if(properties.doubleRowShowCover)
 											var left_margin = TrackText_x;
@@ -3055,7 +3056,7 @@ oBrowser = function(name) {
                                         cColumns.track_num_part = g_var_cache.get("track_num_part") + 11;
                                         if(!isDefined(this.rows[i].title_part_w)) this.rows[i].title_part_w = gr.CalcTextWidth(track_title_part, g_font.normal) + 10;
 										if(!g_var_cache.isdefined("track_time_part")) g_var_cache.set("track_time_part",gr.CalcTextWidth("00:00:00", g_font.normal));
-                                        cColumns.track_time_part = g_var_cache.get("track_time_part") + 7;
+                                        cColumns.track_time_part = track_time_part.length*g_var_cache.get("track_time_part")/8+27;
 
                                         var tx = ax + cColumns.track_num_part;
                                         var tw = aw - cColumns.track_num_part;
@@ -3196,7 +3197,7 @@ oBrowser = function(name) {
                                         if(!isDefined(this.rows[i].artist_part_w)) this.rows[i].artist_part_w = track_artist_part.length > 0 ? gr.CalcTextWidth(track_artist_part + " - ", g_font.normal) + 5 : 5;
                                         if(!isDefined(this.rows[i].title_part_w)) this.rows[i].title_part_w = gr.CalcTextWidth(track_title_part, g_font.normal) + 10;
 										if(!g_var_cache.isdefined("track_time_part")) g_var_cache.set("track_time_part",gr.CalcTextWidth("00:00:00", g_font.normal));
-                                        cColumns.track_time_part = g_var_cache.get("track_time_part") + 7;
+                                        cColumns.track_time_part = track_time_part.length*g_var_cache.get("track_time_part")/8+27;
 
                                         var tx = ax + cColumns.track_num_part;
                                         var tw = aw - cColumns.track_num_part;

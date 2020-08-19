@@ -1487,7 +1487,6 @@ function oInfos() {
 		this.tooltip_line1 = this.tooltip_line2 = this.tooltip_line3 = false;
 		this.album_infos = album_infos;
 		this.tracklist = tracklist;
-		if(tracklist) console.log(tracklist.Count);		
 		if(this.album_infos) {
 			this.metadb = metadb[0];
 			if(typeof rating == "undefined") this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
