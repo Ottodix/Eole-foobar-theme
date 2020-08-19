@@ -2,6 +2,8 @@
 
 #### Table of Contents
 - [Unreleased](#unreleased)
+- [1.3.1](#131---2020-07-18)
+- [1.3.0](#130---2020-07-10)
 - [1.2.3](#123---2020-01-04)
 - [1.2.2](#122---2019-09-14)
 - [1.2.1](#121---2019-04-24)
@@ -22,13 +24,30 @@
 ___
 
 ## [Unreleased][]
+
+## [1.3.1][] - 2020-07-18
+### Fixed
+- Fixed `FbTooltip.SetFont()` not working.
+- Fixed a memory leak when using `window.Tooltip`.
+- Fixed task id collision in `gdi.LoadImageAsync()`.
+
+## [1.3.0][] - 2020-07-10
 ### Added
 - Re-added ability to automatically download thumbnail images to `thumbs.js` sample (by marc2003).
+- Added missing documentation for `fb.GetDSPPresets()` and `fb.SetDSPPreset()`.
+- API changes:
+  - Added `GdiBitmap.InvertColours()` method.
+  - Added `ActiveXObject.ActiveX_CreateArray()` method.
+  - Added `window.Tooltip` property.
+  - Added `FbTooltip.SetFont()` method.
+  - Deprecated `window.CreateTooltip()` method.
 
 ### Changed
 - Updated SpiderMonkey JavaScript engine to 68.8.0 ESR:
   - ECMAScript 2019 conformant JavaScript.
-  - Various performance improvements and bug fixes  
+  - Various performance improvements and bug fixes.
+- Adjusted a "Function failed successfully" error message (e.g. when running out of GDI handles).
+- Updated `Tooltip` sample.
 
 ### Fixed
 - Fixed incorrect sorting in `FbMetadbHandleList.OrderByRelativePath()`.
@@ -289,7 +308,9 @@ ___
   - More rigorous error checks.
 - Updated samples with compatibility fixes.
 
-[unreleased]: https://github.com/theqwertiest/foo_spider_monkey_panel/compare/v1.2.3...HEAD
+[unreleased]: https://github.com/theqwertiest/foo_spider_monkey_panel/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.2-preview...v1.2.3
 [1.2.2]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.1...v1.2.2-preview
 [1.2.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.0...v1.2.1

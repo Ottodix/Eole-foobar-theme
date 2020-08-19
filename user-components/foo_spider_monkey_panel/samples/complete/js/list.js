@@ -980,7 +980,7 @@ function _list(mode, x, y, w, h) {
 			
 			this.add_location = () => {
 				let names = ['FILE NAME', 'FOLDER NAME', 'FILE PATH', 'SUBSONG INDEX', 'FILE SIZE', 'LAST MODIFIED'];
-				let values = [panel.tf('%filename_ext%'), panel.tf('$directory_path(%path%)'), this.filename, panel.metadb.Subsong, panel.tf('[%filesize_natural%]'), panel.tf('[%last_modified%]')];
+				let values = [panel.tf('%filename_ext%'), panel.tf('$directory_path(%path%)'), this.filename, panel.metadb.SubSong, panel.tf('[%filesize_natural%]'), panel.tf('[%last_modified%]')];
 				let urls = ['%filename_ext% IS ', '"$directory_path(%path%)" IS ', '%path% IS ', '%subsong% IS ', '%filesize_natural% IS ', '%last_modified% IS '];
 				for (let i = 0; i < 6; i++) {
 					this.data.push({

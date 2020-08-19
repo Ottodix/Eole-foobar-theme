@@ -548,9 +548,9 @@ function get_colors_global(){
 		} else if(globalProperties.colorsMainPanel==2){
 			colors.normal_bg = GetGrey(255);
 			colors.lightgrey_bg = GetGrey(245);
-			colors.alternate_row = GetGrey(0,5);
-			colors.selected_item_bg = GetGrey(0,17);
-			colors.selected_item_line = GetGrey(0,16);
+			colors.alternate_row = GetGrey(0,3);
+			colors.selected_item_bg = GetGrey(0,15);
+			colors.selected_item_line = GetGrey(0,10);
 			colors.track_gradient_size = 0;
 			colors.padding_gradient = 0;
 		}
