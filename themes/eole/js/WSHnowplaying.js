@@ -352,7 +352,6 @@ function on_size(w, h) {
     ww = w;
     wh = h;
 	calculate_visu_margin_left();
-	if((properties.showVisualization && g_cover.isPlaying()) || globalProperties.enable_screensaver) startAnimation();
 	g_cover.setSize(ww,wh-(trackinfostext_state.isActive()?track_infos_height+(properties.showRating?rating_height:0):0));
 
 	g_infos.setSize(w,track_infos_height+(properties.showRating?rating_height:0));
@@ -475,9 +474,6 @@ function on_mouse_leave() {
 function on_playback_new_track(metadb) {
 	if (metadb)	{
 		g_cover.getArtwork(metadb, true, plman.PlayingPlaylist);
-		if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver) && g_cover.isPlaying()) {
-			startAnimation();
-		}
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			old_cachekey = nowplaying_cachekey;
 			nowplaying_cachekey = process_cachekey(metadb);
@@ -492,10 +488,6 @@ function on_playback_new_track(metadb) {
 /*function on_playlist_switch() {
 	on_item_focus_change(plman.ActivePlaylist);
 }*/
-
-function on_playback_time() {
-	if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver) && g_cover.isPlaying()) {startAnimation();}
-}
 
 function on_playback_stop(reason) {
 	switch(reason) {
