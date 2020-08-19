@@ -1979,7 +1979,7 @@ oBrowser = function(name) {
         if(g > 0) {
             // update last group properties
             this.groups[g-1].finalize(t, tr, pl);
-			this.groups[g-1].date = arr[2];
+			//this.groups[g-1].date = arr[2];
 
 			/*if(properties.tagMode==1){
 				if(default_grouping){
