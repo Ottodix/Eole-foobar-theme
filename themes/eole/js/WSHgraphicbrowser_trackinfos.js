@@ -1792,10 +1792,11 @@ oShowList = function(parentPanelName) {
 		if(!this.album_info_sent && !this.avoid_sending_album_infos && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
-				trackIndex:brw.groups[this.idx].trackIndex,
+				trackIndex:0,
 				cover_img:brw.groups[this.idx].cover_img,
 				cachekey:brw.groups[this.idx].cachekey,
 				metadb:this.pl[0],
+				tracklist:this.pl,
 				totalTracks:this.total_tracks,
 				genre:this.genre,
 				length:this.length,

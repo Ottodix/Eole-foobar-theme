@@ -376,7 +376,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 				showNowPlaying(true);
 			break;
 			case (properties.dble_click_action==2):
-				if(!g_cover.isFiller()) showNowPlayingCover();
+				if(!g_cover.isFiller()) openCoverFullscreen(fb.GetNowPlaying());
 			break;
 			case (properties.dble_click_action==3):
 				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);

@@ -2025,12 +2025,12 @@ oBrowser = function(name) {
 		else this.groups.sort(standardSorting);
 	}
     this.populate = function(is_first_populate, call_id, force_sourceMode, force_playlist) {
-
+		
 		this.current_sourceMode = properties.sourceMode;
 		if((!filter1_state.isActive() && properties.filterOrder==1) || (!filter1_state.isActive() && !filter2_state.isActive() && properties.filterOrder==2))
 			this.current_sourceMode = 0;
+
 		if(properties.adapt_to_playlist) this.current_sourceMode = 1;
-		
 		if(force_sourceMode) this.populate_sourceMode = force_sourceMode;
 		else this.populate_sourceMode = this.current_sourceMode;
 

@@ -3568,6 +3568,9 @@ function openCoverFullscreen(metadb){
 	img.SaveAs(filepath, globalProperties.ImageCacheFileType);
 	var WshShell = new ActiveXObject("WScript.Shell");
 	var open_cover_flag = false;
+	var tryCount = 0;
+	var stopAfter = 3000;
+	var intervalDelay = 60;
 	var open_cover = setInterval(function(filepath) {
 		if(g_files.FileExists(filepath) && !open_cover_flag) {
 			open_cover_flag = true;
@@ -3575,10 +3578,15 @@ function openCoverFullscreen(metadb){
 			try {
 				WshShell.Run("\"" + filepath + "\"", 0);
 			} catch(e) {
-				HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
+				HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file."+filepath,"Ok");
 			}			
 		}
-	},60,filepath);	
+		if(tryCount*intervalDelay>stopAfter) {
+			window.ClearInterval(open_cover);
+			return;
+		}
+		tryCount++;
+	},intervalDelay,filepath);	
 }
 // Debugger functions
 function debugger_hint(string){

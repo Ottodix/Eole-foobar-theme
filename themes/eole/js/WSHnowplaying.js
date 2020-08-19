@@ -111,13 +111,17 @@ function setButtons(){
 			fb.Pause();
 		},images.pause_img,images.pause_img),
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
-			plman.PlayingPlaylist = g_cover.playlistIndex;
-			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
-			plman.ActivePlaylist = g_cover.playlistIndex;		
-			if(fb.IsPaused) fb.Stop();
-			plman.FlushPlaybackQueue();
-			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
-			fb.Play();
+			if(g_infos.tracklist){ 
+				sendandplayPlaybackPlaylist(g_infos.tracklist);
+			} else {
+				plman.PlayingPlaylist = g_cover.playlistIndex;
+				plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
+				plman.ActivePlaylist = g_cover.playlistIndex;		
+				if(fb.IsPaused) fb.Stop();
+				plman.FlushPlaybackQueue();
+				fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
+				fb.Play();
+			}
 		},function () {},images.play_img,images.play_img),
 		NowPlaying: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "NowPlaying", "Show now playing", function () {
 			window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
@@ -408,7 +412,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 				showNowPlaying(true);
 			break;
 			case (properties.dble_click_action==2):
-				if(!g_cover.isFiller()) showNowPlayingCover();
+				if(!g_cover.isFiller()) openCoverFullscreen(g_cover.metadb);
 			break;
 			case (properties.dble_click_action==3):
 				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
@@ -1017,25 +1021,25 @@ function on_notify_data(name, info) {
 			break;
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
+			if(info.tracklist) var tracklist = new FbMetadbHandleList(info.tracklist);
+			else var tracklist = null;
 			if(info.cover_img==null) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 				if (properties.follow_cursor) {
-					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0], tracklist);
 				}
 			} else {
 				cover_img = new GdiBitmap(info.cover_img);
 				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey, info.playlist);
 				if (properties.follow_cursor) {
-					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0], tracklist);
 				}
 			}
 			window.Repaint();
-			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
-			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex);
 			g_avoid_on_focus_change = true;
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;
@@ -1423,7 +1427,7 @@ function oInfos() {
 			this.playing_metadb = metadb;
 		}
 	}
-	this.on_item_focus_change = function(playlistIndex, from, to, metadb) {
+	this.on_item_focus_change = function(playlistIndex, from, to, metadb, tracklist) {
 		if (g_avoid_on_focus_change || (to<0 && !metadb)) {
 			g_avoid_on_focus_change = false;
 			return;
@@ -1441,6 +1445,7 @@ function oInfos() {
 				window.Repaint();
 			}
 		}
+		this.tracklist = tracklist;
 		if (this.metadb) {
 			this.setTimerCycle();
 			this.on_metadb_changed(new FbMetadbHandleList(this.metadb));
@@ -1483,14 +1488,15 @@ function oInfos() {
 		this.show_info = true;
 		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
-	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, cachekey){
+	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, tracklist){
 		this.txt_line1 = row1;
 		this.txt_line2 = row2;
 		this.txt_line3 = row3;
 		this.line1_width = this.line2_width = this.line3_width = -1;
 		this.tooltip_line1 = this.tooltip_line2 = this.tooltip_line3 = false;
 		this.album_infos = album_infos;
-
+		this.tracklist = tracklist;
+		if(tracklist) console.log(tracklist.Count);		
 		if(this.album_infos) {
 			this.metadb = metadb[0];
 			if(typeof rating == "undefined") this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
@@ -1689,7 +1695,7 @@ function on_mouse_rbtn_up(x, y){
 			window.Reload();
 			break;
 		case (idx == 1):
-			openCoverFullscreen(g_cover.metadb);
+			if(!g_cover.isFiller()) openCoverFullscreen(g_cover.metadb);
 			break;
 		case (idx == 2):
 			properties.random_function = '20_albums';
