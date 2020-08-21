@@ -3455,7 +3455,7 @@ oBrowser = function(name) {
 								this.sentAlbumId = groupId;
 								this.sentTrackId = -1;
 								//window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId));
-								window.NotifyOthers("trigger_on_focus_change_album",{
+								var notify_array = {
 									playlist:g_active_playlist,
 									trackIndex:playlistTrackId,
 									cover_img:null,
@@ -3465,7 +3465,13 @@ oBrowser = function(name) {
 									date:this.groups[groupId].date,
 									length:this.groups[groupId].TimeString,
 									firstRow: this.groups[groupId].group_header_row_1,
-									secondRow: this.groups[groupId].group_header_row_2});
+									secondRow: this.groups[groupId].group_header_row_2};
+								var playlistname = plman.GetPlaylistName(g_active_playlist);
+								if(playlistname==globalProperties.selection_playlist || playlistname==globalProperties.playing_playlist ||  playlistname==globalProperties.filter_playlist) {
+									notify_array.tracklist = this.getGroupTracks(groupId);
+									notify_array.trackIndex = 0;
+								}
+								window.NotifyOthers("trigger_on_focus_change_album",notify_array);
 								plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
 								focus_changes.collapse = true;
 							}
