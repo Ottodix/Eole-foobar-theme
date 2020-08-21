@@ -493,7 +493,7 @@ function adapt_display_to_layout(new_track){
 				buttons_right[i].y = buttons_right_top_m;
 			}
 
-			progress_margin_left = button_left_m + 201 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0);
+			progress_margin_left = button_left_m + 201 + ((properties.displayStop && fb.IsPlaying)?buttons.Stop.w+4:0)+(!mini_controlbar.isActive()?12:0);
 			progress_margin_right =  button_right_m + nb_of_buttons_right*(button_width+button_padding)+20;
 
 			volume_vars.margin_top = global_top_m+20;
