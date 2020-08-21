@@ -730,7 +730,7 @@ function get_text(metadb) {
 
     if (metadb) {
 		current_played_track = metadb;
-		if(properties.custom_firstRow=="") {console.log("eee")
+		if(properties.custom_firstRow=="") {
 			var infos = properties.default_firstRow.Eval();
 			infos = infos.split(" ^^ ");
 			g_text_title = infos[1];		
