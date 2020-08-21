@@ -730,11 +730,11 @@ function get_text(metadb) {
 
     if (metadb) {
 		current_played_track = metadb;
-		if(properties.custom_firstRow=="") {
+		if(properties.custom_firstRow=="") {console.log("eee")
 			var infos = properties.default_firstRow.Eval();
 			infos = infos.split(" ^^ ");
 			g_text_title = infos[1];		
-			g_text_artist = " -  "+infos[2];
+			if(infos[2]) g_text_artist = " -  "+infos[2];
 			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
 			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = properties.default_secondRow.Eval();
 		} else {
@@ -744,6 +744,11 @@ function get_text(metadb) {
 			g_text_artist =  "";
 			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = properties.tf_custom_secondRow.Eval();
 		}
+		if(TimeTotal=="ON AIR") {
+			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = metadb.RawPath;
+			else if(g_text_artist == "") g_text_artist = " -  "+metadb.RawPath;
+			g_text_title_prefix = "";
+		}		
     } else {
 		current_played_track = null;
         g_text_artist=" -  Nothing Played";
@@ -3815,13 +3820,13 @@ function on_init(){
 	g_cursor = new oCursor();
 	g_panel = new oPanel();
 	get_font();
-	get_colors();
-	get_text();
+	get_colors();	
 	g_tooltip = new oTooltip('g_tooltip');
 	g_genre_cache = new oGenreCache();
 	g_image_cache = new oImageCache();
 	g_resizing = new Resizing();
 	evalTimeDisplayed();
+	get_text();
 	fb.StopAfterCurrent = false;
 	setSchedulerText();
 }
