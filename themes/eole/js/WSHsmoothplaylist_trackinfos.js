@@ -3451,11 +3451,12 @@ oBrowser = function(name) {
                                 };
                                 this.SHIFT_start_id = null;
                             };
+							var notify_array = false;
 							if(g_focus_id!=playlistTrackId || this.sentAlbumId!=groupId) {
 								this.sentAlbumId = groupId;
 								this.sentTrackId = -1;
 								//window.NotifyOthers("trigger_on_focus_change",Array(g_active_playlist,playlistTrackId));
-								var notify_array = {
+								notify_array = {
 									playlist:g_active_playlist,
 									trackIndex:playlistTrackId,
 									cover_img:null,
@@ -3466,12 +3467,6 @@ oBrowser = function(name) {
 									length:this.groups[groupId].TimeString,
 									firstRow: this.groups[groupId].group_header_row_1,
 									secondRow: this.groups[groupId].group_header_row_2};
-								var playlistname = plman.GetPlaylistName(g_active_playlist);
-								if(playlistname==globalProperties.selection_playlist || playlistname==globalProperties.playing_playlist ||  playlistname==globalProperties.filter_playlist) {
-									notify_array.tracklist = this.getGroupTracks(groupId);
-									notify_array.trackIndex = 0;
-								}
-								window.NotifyOthers("trigger_on_focus_change_album",notify_array);
 								plman.SetPlaylistFocusItem(g_active_playlist, playlistTrackId);
 								focus_changes.collapse = true;
 							}
@@ -3483,6 +3478,14 @@ oBrowser = function(name) {
 								this.scrollbar.updateScrollbar();
 								if(this.rowsCount > 0) this.gettags(true);
 							}
+							if(notify_array){
+								var playlistname = plman.GetPlaylistName(g_active_playlist);
+								if(playlistname==globalProperties.selection_playlist || playlistname==globalProperties.playing_playlist ||  playlistname==globalProperties.filter_playlist) {
+									notify_array.tracklist = this.getGroupTracks(groupId);
+									notify_array.trackIndex = 0;
+								}
+								window.NotifyOthers("trigger_on_focus_change_album",notify_array);	
+							}							
                             break;
                         case (rowType == 0):                    // ----------------> track row
                             var playlistTrackId = this.rows[this.activeRow].playlistTrackId;
