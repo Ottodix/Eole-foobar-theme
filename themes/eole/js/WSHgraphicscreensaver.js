@@ -729,7 +729,6 @@ oRow = function(metadb,itemIndex) {
         this.w = w;
         this.h = this.h;
         var tracknumber_w = 28;
-        var length_w = 55;
 
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
@@ -762,6 +761,10 @@ oRow = function(metadb,itemIndex) {
 			} else var current_size = track_gradient_size+Math.round(total_size*ratio);
 			if(isNaN(current_size) || current_size<0) current_size = track_gradient_size+total_size;
 		}
+		
+		if(typeof brw.max_duration_length == 'undefined' || brw.max_duration_length==0) brw.max_duration_length = gr.CalcTextWidth("00:00:00", g_font.normal);
+		var length_w = duration.length*brw.max_duration_length/8+30;	
+		
 		if(!g_showlist.light_bg){
 			image0 = now_playing_progress0;
 			image1 = now_playing_progress1;
@@ -3784,7 +3787,7 @@ oBrowser = function(name) {
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, cover_border_color);
 
 						//date drawing black
-						if(properties.showdateOverCover && this.groups_draw[i].position_from_playing>=0){
+						if(properties.showdateOverCover && this.groups_draw[i].date!="?" && this.groups_draw[i].position_from_playing>=0){
 							if(properties.circleMode) {
 								if(!this.dateCircleBG) this.DefineCircleMask(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
@@ -5837,6 +5840,7 @@ function on_font_changed() {
 	g_filterbox.onFontChanged();
 	brw.get_metrics_called = false;
 	on_size(window.Width, window.Height);
+	brw.max_duration_length = 0;
 }
 
 function on_colours_changed() {

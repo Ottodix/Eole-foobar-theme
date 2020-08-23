@@ -6400,7 +6400,7 @@ function on_playlist_items_reordered(playlist_idx) {
 		if(playlist_idx == g_active_playlist) {
 			g_focus_id = getFocusId(g_active_playlist);
 			callback_avoid_populate=true;
-			if(window.IsVisible) brw.populate(true,11, false);
+			if(window.IsVisible) brw.populate(false,11, false);
 			else set_update_function("brw.populate(true,11, false)");
 			timers.callback_avoid_populate = setTimeout(function() {
 				callback_avoid_populate=false;
