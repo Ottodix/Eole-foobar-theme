@@ -3574,9 +3574,9 @@ function openCoverFullscreen(metadb){
 	var intervalDelay = 60;
 	var intervalAfterFileExist = 0;	
 	var open_cover = setInterval(function(filepath) {
-		if(g_files.FileExists(filepath) && !open_cover_flag) {			
+		if((intervalAfterFileExist>0 || g_files.FileExists(filepath)) && !open_cover_flag) {			
 			intervalAfterFileExist++;
-			if(intervalAfterFileExist==3){
+			if(intervalAfterFileExist==5){
 				open_cover_flag = true;
 				window.ClearInterval(open_cover);			
 				try {
