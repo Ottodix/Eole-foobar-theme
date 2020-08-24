@@ -3572,19 +3572,15 @@ function openCoverFullscreen(metadb){
 	var tryCount = 0;
 	var stopAfter = 3000;
 	var intervalDelay = 60;
-	var intervalAfterFileExist = 0;	
 	var open_cover = setInterval(function(filepath) {
-		if((intervalAfterFileExist>0 || g_files.FileExists(filepath)) && !open_cover_flag) {			
-			intervalAfterFileExist++;
-			if(intervalAfterFileExist==5){
-				open_cover_flag = true;
-				window.ClearInterval(open_cover);			
-				try {
-					WshShell.Run("\"" + filepath + "\"", 0);
-				} catch(e) {
-					HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file."+filepath,"Ok");
-				}			
-			}
+		if(g_files.FileExists(filepath) && !open_cover_flag) {
+			open_cover_flag = true;
+			window.ClearInterval(open_cover);			
+			try {
+				WshShell.Run("\"" + filepath + "\"", 0);
+			} catch(e) {
+				HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file."+filepath,"Ok");
+			}			
 		}
 		if(tryCount*intervalDelay>stopAfter) {
 			window.ClearInterval(open_cover);
