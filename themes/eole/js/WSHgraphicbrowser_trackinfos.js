@@ -5569,6 +5569,7 @@ oBrowser = function(name) {
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
 		this.refresh_shadows();
+		this.refreshDates();
 		on_size(window.Width, window.Height);
 	}    
     this.setResizeButton(65,14);	
@@ -6772,6 +6773,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			window.SetProperty("COVER Width", properties.thumbnailWidth);
 			brw.refresh_browser_thumbnails();
 			brw.refresh_shadows();
+			brw.refreshDates();
 			on_size(window.Width, window.Height);
 			return;
 		}
