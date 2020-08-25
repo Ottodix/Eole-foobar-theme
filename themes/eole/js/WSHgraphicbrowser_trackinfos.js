@@ -5531,7 +5531,7 @@ oBrowser = function(name) {
 
     this.setResizeButton = function (w,h) {
         var gb;
-		this.thumbnailWidthMax = Math.max(((this.w - this.x - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.min(((this.w - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
 			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
@@ -5562,7 +5562,7 @@ oBrowser = function(name) {
 	}
 	this.moveResizeBtn = function (x,y){
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
-		this.thumbnailWidthMax = Math.max(((ww - this.x - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.min(((ww - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
 		properties.thumbnailWidth = Math.round((this.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
 		if(properties.thumbnailWidth>this.thumbnailWidthMax) properties.thumbnailWidth=this.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
@@ -5901,7 +5901,7 @@ function on_load_image_done(tid, image){
 				brw.groups[k].load_requested = 2;
 
 				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax);
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,globalProperties.thumbnailWidthMax);
 				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
 
 				if(k <= g_end) {
