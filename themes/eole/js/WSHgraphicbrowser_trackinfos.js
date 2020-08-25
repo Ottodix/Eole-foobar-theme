@@ -161,7 +161,7 @@ var properties = {
 	enableAutoSwitchPlaylistMode: window.GetProperty("MAINPANEL Automatically change displayed playlist", false),
 	showTotalTime: window.GetProperty("_DISPLAY: Total time", true),
 	fullPlaylistHistory:false,
-	marginLR: 12,
+	marginLR: window.GetProperty("COVER Side margin min", 12),
 	showlistWidthMax:1300,
 	CoverHoverExtendRect:2,
 	showlistRowWidthMin:100,
@@ -175,7 +175,7 @@ var properties = {
 	showlistCoverMinSize:132,
 	showlistCoverMargin:28,
 	load_image_from_cache_direct:true,
-	veryTighCoverActiveZone : false,
+	veryTighCoverActiveZone: window.GetProperty("COVER Small active zone", false),
 }
 properties.show2linesCustomTag_tf = fb.TitleFormat(properties.show2linesCustomTag);
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
@@ -4247,13 +4247,11 @@ oBrowser = function(name) {
 	this.on_font_changed();
 	this.on_init = function(){
 		if(properties.CoverGridNoText){
-			this.marginLR = 0;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 0;
 			this.CoverMarginTop = 0;
 		} else {
-			this.marginLR = properties.marginLR;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 2;
@@ -4273,28 +4271,28 @@ oBrowser = function(name) {
 		this.setSizeFirstCall = true;
 
         // Adjust Column
-		this.totalColumns = Math.floor((this.w - this.marginLR * 2) / properties.thumbnailWidth);
+		this.coverRealWith = properties.thumbnailWidth;
 
-		var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-		var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-		this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
+		if (properties.CoverGridNoText) {
+			this.totalColumns = Math.ceil(this.w / this.coverRealWith);
+			this.marginLR = 0;
+			this.rowHeight = this.thumbnailWidth = this.coverRealWith -= Math.round(((this.totalColumns * this.coverRealWith) - this.w) / this.totalColumns);
+		} else {
+			this.marginLR = properties.marginLR;
+			this.totalColumns = Math.floor((this.w - 2 * this.marginLR) / this.coverRealWith);
+			while (this.w - this.totalColumns * this.coverRealWith < this.marginLR * (this.totalColumns + 1)) this.totalColumns--
+			this.marginLR = Math.round((this.w - this.coverRealWith * this.totalColumns) / (this.totalColumns + 1));
+			this.thumbnailWidth = this.coverRealWith + this.marginLR;
+			this.marginLR = Math.round(this.marginLR / 2);
+			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
+		}
+		
+		this.coverHalfWidth = Math.round(this.coverRealWith / 2);
 
 		if(properties.showheaderbar) {
 			g_headerbar.setSize(0,0,this.w,this.headerBarHeight);
 			if(this.showFilterBox) g_filterbox.setSize(ww-g_headerbar.resize_bt_w-g_headerbar.rightpadding-g_headerbar.RightTextLength-g_headerbar.MarginRight-g_headerbar.mainTxtX +20, cFilterBox.h, g_fsize+2);
 		}
-
-		if(properties.CoverGridNoText)
-			this.coverRealWith = this.thumbnailWidth;
-		else
-			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.15);
-
-		this.coverHalfWidth = Math.round(this.coverRealWith/2);
-        // Adjust Row & showList bloc Height
-		if(!properties.CoverGridNoText)
-			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
-		else
-			this.rowHeight = this.coverRealWith;
 
         this.totalRows = Math.ceil(this.h / this.rowHeight);
         this.totalRowsVis = Math.floor(this.h / this.rowHeight);
@@ -5311,7 +5309,7 @@ oBrowser = function(name) {
 
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > ((this.thumbnailWidth + this.coverRealWith)/2)) {
 						this.activeColumn = 0;
 						this.activeIndex = -1;
 						this.activeTextIndex = -1;
