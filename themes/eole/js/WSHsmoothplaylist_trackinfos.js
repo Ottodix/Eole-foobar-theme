@@ -1486,29 +1486,22 @@ oGroup = function(index, start, handle, groupkey) {
     this.TotalTime = 0;
 	this.track_rating = false;
 
-	this.FormatTime = function(time){
-		if(time>0){
-		time_txt="";
-		timetodraw=time;
+	this.FormatTime = function(time) {
+		time_txt = "";
+		if (time > 0) {
+			totalS = Math.round(time);
 
-		totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800);
-		totalD=Math.floor((r_timetodraw%604800)/86400);
-		totalH=Math.floor((r_timetodraw%86400)/3600);
-		totalM=Math.floor((r_timetodraw%3600)/60);
-		totalS=Math.round((r_timetodraw%60));
-		totalS=(totalS>9) ? totalS:'0'+totalS;
+			totalS -= (totalW = Math.floor(totalS / 604800)) * 604800;
+			totalS -= (totalD = Math.floor(totalS / 86400)) * 86400;
+			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
+			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
-		txt_week=(totalW>1)?totalW+' weeks, ':totalW+' week, ';if(totalW==0) txt_week='';
-		txt_day=(totalD>1)?totalD+' days, ':totalD+' day, '; if(totalD==0) txt_day='';
-		txt_hour=(totalH>1)?totalH+' h':totalH+' h'; if(totalH==0) txt_hour='';
-		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalD>0) time_txt=txt_day+txt_hour+", "+totalM+' min ';
-		else if (totalH>0) time_txt=txt_hour+((totalM>0)?", "+totalM+' min':'');
-		else time_txt=totalM+' min';
-		} else time_txt="";
+			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
+			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
+			if (totalH != 0) time_txt += ' ' + totalH + ' h';
+			if (totalM != 0) time_txt += ' ' + totalM + ' min';
+			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+		}
 		return time_txt;
 	}
     this.finalize = function(count, tracks) {

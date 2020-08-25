@@ -161,7 +161,7 @@ var properties = {
 	enableAutoSwitchPlaylistMode: window.GetProperty("MAINPANEL Automatically change displayed playlist", false),
 	showTotalTime: window.GetProperty("_DISPLAY: Total time", true),
 	fullPlaylistHistory:false,
-	marginLR: 12,
+	marginLR: window.GetProperty("COVER Side margin min", 12),
 	showlistWidthMax:1300,
 	CoverHoverExtendRect:2,
 	showlistRowWidthMin:100,
@@ -175,7 +175,7 @@ var properties = {
 	showlistCoverMinSize:132,
 	showlistCoverMargin:28,
 	load_image_from_cache_direct:true,
-	veryTighCoverActiveZone : false,
+	veryTighCoverActiveZone: window.GetProperty("COVER Small active zone", false),
 }
 properties.show2linesCustomTag_tf = fb.TitleFormat(properties.show2linesCustomTag);
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
@@ -3187,7 +3187,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuGroupDisplay.CheckMenuItem(46, properties.animateShowNowPlaying);
 	_menuGroupDisplay.AppendMenuSeparator();
 
-	_menuGroupDisplay.AppendMenuItem(properties.CoverGridNoText?MF_GRAYED:MF_STRING, 38, "Center text");
+	_menuGroupDisplay.AppendMenuItem((properties.CoverGridNoText | properties.circleMode)?MF_GRAYED:MF_STRING, 38, "Center text");
 	_menuGroupDisplay.CheckMenuItem(38, properties.centerText);
 	_menuCoverShadow.AppendMenuItem(MF_STRING, 47, "Show a shadow under artwork");
 	_menuCoverShadow.CheckMenuItem(47, properties.showCoverShadow);
@@ -4169,28 +4169,22 @@ oBrowser = function(name) {
 		this.repaint_h = h;
 		this.repaint_rect = true;
     }
-	this.FormatTime = function(time){
-		time_txt="";
-		timetodraw=time;
+	this.FormatTime = function(time) {
+		time_txt = "";
+		if (time > 0) {
+			totalS = Math.round(time);
 
-		totalMth=Math.floor(timetodraw/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800); r_timetodraw=r_timetodraw-totalW*604800;
-		totalD=Math.floor(r_timetodraw/86400); r_timetodraw=r_timetodraw-totalD*86400;
-		totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
-		totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
-		totalS=Math.round(r_timetodraw);
-		totalS=(totalS>9) ? totalS:'0'+totalS;
+			totalS -= (totalW = Math.floor(totalS / 604800)) * 604800;
+			totalS -= (totalD = Math.floor(totalS / 86400)) * 86400;
+			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
+			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
-		txt_week=(totalW>1)?totalW+' weeks, ':totalW+' week, ';if(totalW==0) txt_week='';
-		txt_day=(totalD>1)?totalD+' days, ':totalD+' day, '; if(totalD==0) txt_day='';
-		txt_hour=(totalH>1)?totalH+' h':totalH+' h'; if(totalH==0) txt_hour='';
-		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min';
-		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min';
-		else if (totalD>0) time_txt=txt_day+((totalH>0)?""+totalH+' h, ':'')+totalM+' min';
-		else if (totalH>0) time_txt=txt_hour+((totalM>0)?", "+totalM+' min':'');
-		else time_txt=totalM+' min';
-
+			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
+			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
+			if (totalH != 0) time_txt += ' ' + totalH + ' h';
+			if (totalM != 0) time_txt += ' ' + totalM + ' min';
+			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+		}
 		return time_txt;
 	}
 	this.showheaderbar = function(){
@@ -4211,13 +4205,6 @@ oBrowser = function(name) {
 		if(circleMode!==null){
 			properties.circleMode = circleMode;
 			window.SetProperty("COVER Circle artwork", properties.circleMode);
-			if(properties.circleMode){
-				properties.centerText = true;
-				window.SetProperty("COVER Center text", properties.centerText);
-			} else {
-				properties.centerText = false;
-				window.SetProperty("COVER Center text", properties.centerText);
-			}
 		}
 
 		if(gridMode!==null){
@@ -4254,13 +4241,11 @@ oBrowser = function(name) {
 	this.on_font_changed();
 	this.on_init = function(){
 		if(properties.CoverGridNoText){
-			this.marginLR = 0;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 0;
 			this.CoverMarginTop = 0;
 		} else {
-			this.marginLR = properties.marginLR;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 2;
@@ -4280,28 +4265,28 @@ oBrowser = function(name) {
 		this.setSizeFirstCall = true;
 
         // Adjust Column
-		this.totalColumns = Math.floor((this.w - this.marginLR * 2) / properties.thumbnailWidth);
+		this.coverRealWith = properties.thumbnailWidth;
 
-		var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-		var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-		this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
+		if (properties.CoverGridNoText) {
+			this.totalColumns = Math.ceil(this.w / this.coverRealWith);
+			this.marginLR = 0;
+			this.rowHeight = this.thumbnailWidth = this.coverRealWith -= Math.round(((this.totalColumns * this.coverRealWith) - this.w) / this.totalColumns);
+		} else {
+			this.marginLR = properties.marginLR;
+			this.totalColumns = Math.floor((this.w - 2 * this.marginLR) / this.coverRealWith);
+			while (this.w - this.totalColumns * this.coverRealWith < this.marginLR * (this.totalColumns + 1)) this.totalColumns--
+			this.marginLR = Math.round((this.w - this.coverRealWith * this.totalColumns) / (this.totalColumns + 1));
+			this.thumbnailWidth = this.coverRealWith + this.marginLR;
+			this.marginLR = Math.round(this.marginLR / 2);
+			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
+		}
+		
+		this.coverHalfWidth = Math.round(this.coverRealWith / 2);
 
 		if(properties.showheaderbar) {
 			g_headerbar.setSize(0,0,this.w,this.headerBarHeight);
 			if(this.showFilterBox) g_filterbox.setSize(ww-g_headerbar.resize_bt_w-g_headerbar.rightpadding-g_headerbar.RightTextLength-g_headerbar.MarginRight-g_headerbar.mainTxtX +20, cFilterBox.h, g_fsize+2);
 		}
-
-		if(properties.CoverGridNoText)
-			this.coverRealWith = this.thumbnailWidth;
-		else
-			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.15);
-
-		this.coverHalfWidth = Math.round(this.coverRealWith/2);
-        // Adjust Row & showList bloc Height
-		if(!properties.CoverGridNoText)
-			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
-		else
-			this.rowHeight = this.coverRealWith;
 
         this.totalRows = Math.ceil(this.h / this.rowHeight);
         this.totalRowsVis = Math.floor(this.h / this.rowHeight);
@@ -5031,10 +5016,10 @@ oBrowser = function(name) {
 							this.groups[this.groups_draw[i]].showToolTip = ( (this.groups[this.groups_draw[i]].firstRowLength > this.coverRealWith) || (this.groups[this.groups_draw[i]].secondRowLength > this.coverRealWith) )
 
 							if(this.groups[this.groups_draw[i]].text_y+this.firstRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, ((properties.centerText | properties.circleMode)?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 							if(this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, ((properties.centerText | properties.circleMode)?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 							if(typeof this.groups[this.groups_draw[i]].firstRowLength == 'undefined') this.groups[this.groups_draw[i]].firstRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].firstRow,g_font.plus2);
 							if(typeof this.groups[this.groups_draw[i]].secondRowLength == 'undefined') this.groups[this.groups_draw[i]].secondRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].secondRow,g_font.normal);
@@ -5318,7 +5303,7 @@ oBrowser = function(name) {
 
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > ((this.thumbnailWidth + this.coverRealWith)/2)) {
 						this.activeColumn = 0;
 						this.activeIndex = -1;
 						this.activeTextIndex = -1;
@@ -5531,7 +5516,7 @@ oBrowser = function(name) {
 
     this.setResizeButton = function (w,h) {
         var gb;
-		this.thumbnailWidthMax = Math.max(((this.w - this.x - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.min(((this.w - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
 			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
@@ -5562,13 +5547,14 @@ oBrowser = function(name) {
 	}
 	this.moveResizeBtn = function (x,y){
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
-		this.thumbnailWidthMax = Math.max(((ww - this.x - this.marginLR)/2),properties.thumbnailWidth);
+		this.thumbnailWidthMax = Math.min(((ww - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
 		properties.thumbnailWidth = Math.round((this.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
 		if(properties.thumbnailWidth>this.thumbnailWidthMax) properties.thumbnailWidth=this.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
 		this.refresh_shadows();
+		this.refreshDates();
 		on_size(window.Width, window.Height);
 	}    
     this.setResizeButton(65,14);	
@@ -5901,7 +5887,7 @@ function on_load_image_done(tid, image){
 				brw.groups[k].load_requested = 2;
 
 				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax);
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,globalProperties.thumbnailWidthMax);
 				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
 
 				if(k <= g_end) {
@@ -6772,6 +6758,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			window.SetProperty("COVER Width", properties.thumbnailWidth);
 			brw.refresh_browser_thumbnails();
 			brw.refresh_shadows();
+			brw.refreshDates();
 			on_size(window.Width, window.Height);
 			return;
 		}
