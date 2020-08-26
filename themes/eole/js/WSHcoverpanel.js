@@ -484,6 +484,9 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};
+    this.resetCache = function () {
+		this.cachelist = Array();
+	}	
     this.resetMetadb = function(metadb) {
         this.cachelist[process_cachekey(metadb)] = null;
     };
