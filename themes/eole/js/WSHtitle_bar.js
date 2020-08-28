@@ -228,6 +228,7 @@ function build_images(){
 	images.nowplaying_on_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"close_icon.png");
 	images.nowplaying_on_hover_icon_hover = gdi.Image(theme_img_path + "\\icons\\white\\"+icon_prefix+"close_icon.png");
 	images.max_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"max_icon.png");
+	images.maxon_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"maxon_icon.png");	
 	images.reduce_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"reduce_icon.png");
 	images.mini_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\minimode_icon.png");
 
@@ -449,6 +450,12 @@ function saveFilterState(){
 	window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
 	window.NotifyOthers("save_filter_state",properties.savedFilterState);
 }
+function setMaxButton(){
+	if(g_uihacks.getMainWindowState()==WindowState.Normal) buttons.Max.H_img = images.max_icon;
+	else buttons.Max.H_img = images.maxon_icon;
+	buttons.Max.N_img = buttons.Max.H_img;
+	buttons.Max.D_img = buttons.Max.H_img;	
+}
 function build_buttons(){
 	if(btn_initialized){
 		buttons.Library.N_img = images.library_img;
@@ -505,9 +512,7 @@ function build_buttons(){
 		buttons.Close.H_img = images.nowplaying_on_hover_icon_hover;
 		buttons.Close.D_img = buttons.Close.H_img;
 
-		buttons.Max.H_img = images.max_icon;
-		buttons.Max.N_img = images.max_icon;
-		buttons.Max.D_img = buttons.Max.H_img;
+		setMaxButton();
 		buttons.Max.hover_color = colors.titlebar_btn_hover_bg;
 
 		buttons.Mini.N_img = images.mini_icon;
@@ -852,6 +857,7 @@ function on_size(w, h) {
 			toggleLayoutMode(0 , 0, false);get_colors();g_searchbox.adapt_look_to_layout();
 		}
 	}
+	setMaxButton();
 	g_panel.on_size_changed();
     // set wallpaper
     if(fb.IsPlaying && properties.showwallpaper) {
