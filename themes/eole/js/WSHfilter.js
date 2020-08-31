@@ -5397,6 +5397,9 @@ function on_notify_data(name, info) {
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
 			window.Reload();
 		break;
+		case "resetCache":
+			g_image_cache.resetCache();
+		break;			
 		case "adapt_to_playlist":
 			if(properties.ParentName!="Library"){
 				properties.adapt_to_playlist = info;

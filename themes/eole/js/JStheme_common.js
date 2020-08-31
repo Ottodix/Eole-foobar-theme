@@ -3148,10 +3148,12 @@ function createDragImg(img, cover_size, count){
 	//drag_img = drag_img.Resize(cover_size, cover_size, 2);
 	return drag_img;
 };
-function freeCacheMemory(){
-	if(window.TotalMemoryUsage>window.MemoryLimit*0.8) {
+function freeCacheMemory(force){
+	force = typeof force !== 'undefined' ? force : false;	
+	if(window.TotalMemoryUsage>window.MemoryLimit*0.8 || force) {
 		g_image_cache.resetCache();
-		brw.freeMemory();
+		if(typeof brw !== 'undefined') brw.freeMemory();
+		window.NotifyOthers("resetCache",true);
 		return true;
 	}
 	return false;
@@ -3265,17 +3267,10 @@ oImageCache = function () {
 					}
 				} else if(!direct_return){
 					debugger_hint("get_albumArt_async"+albumIndex);						
-					if(albumIndex<0) {
-						try{
-							get_albumArt_async(metadb,-1, cachekey);
-							return 'loading';
-						} catch(e){console.log("timers.coverLoad line 5151 failed")}
-					} else {
-						try{
-							get_albumArt_async(metadb,albumIndex, cachekey);
-							return 'loading';
-						} catch(e){console.log("timers.coverLoad line 5157 failed")}
-					}
+					try{
+						get_albumArt_async(metadb,(albumIndex<0)?-1:albumIndex, cachekey);
+						return 'loading';
+					} catch(e){console.log("timers.coverLoad line 5151 failed")}
 				} else {
 					img = utils.GetAlbumArtV2(metadb, 0, false);
 					if(img) {
