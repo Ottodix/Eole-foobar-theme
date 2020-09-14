@@ -2075,15 +2075,18 @@ function get_images(){
 
 	var nowplaying_img = gdi.CreateImage(68, 68);
 	gb = nowplaying_img.GetGraphics();
-		var xpos = 26;
+		var xpos = 25;
 		var ypos = 40;
-		var img_height_bar_1 = 5;
-		var img_height_bar_2 = 15;
-		var img_height_bar_3 = 7;
+		var img_h_add = 4;
+		var img_height_bar_1 = 8 + img_h_add;
+		var img_height_bar_2 = 18 + img_h_add;
+		var img_height_bar_3 = 12 + img_h_add;
+		var img_height_bar_4 = 7 + img_h_add;
 		var colors_anim = colors.animation;
 		gb.FillSolidRect(xpos, ypos-img_height_bar_1, bar_width, img_height_bar_1, colors_anim);
 		gb.FillSolidRect(xpos + bar_margin + bar_width, ypos-img_height_bar_2, bar_width, img_height_bar_2, colors_anim);
 		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors_anim);
+		gb.FillSolidRect(xpos + bar_margin*3 + bar_width*3, ypos-img_height_bar_4, bar_width, img_height_bar_4, colors_anim);
 	nowplaying_img.ReleaseGraphics(gb);
 	images.nowplaying_img = nowplaying_img;
 
