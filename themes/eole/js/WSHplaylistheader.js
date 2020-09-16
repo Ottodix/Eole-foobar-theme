@@ -71,9 +71,11 @@ function setSettingsBtn() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout){
+		//colors.normal_txt = GetGrey(180);			
 		colors.settings_hover_bg = GetGrey(255,40);
 		colors.headerbar_line = GetGrey(51);
 	} else {
+		//colors.normal_txt = GetGrey(0);			
 		colors.settings_hover_bg = GetGrey(230);
 	}
 	setSettingsBtn();

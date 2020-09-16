@@ -1181,7 +1181,7 @@ oBrowser = function(name) {
 									gr.FillSolidRect(icon_x, icon_y, icon_w, icon_h, colors.marker_hover_item);
 								}
 								var rh = this.rows[i].icon.Width;
-								gr.DrawImage(playlist_icon, icon_x, icon_y, icon_w, icon_h, 0, 0, icon_w, icon_h, 0, 255);
+								gr.DrawImage(playlist_icon, icon_x, icon_y, icon_w, icon_h, 0, 0, icon_w, icon_h, 0, is_active?255: colors.icon_opacity);
 							} else var rh = 0;
 
                             // fields
@@ -1202,7 +1202,7 @@ oBrowser = function(name) {
                             if(this.inputboxID == i) {
                                 this.inputbox.draw(gr, tx+2, ay+5);
                             } else {
-                                gr.GdiDrawText(track_name_part, font, colors.normal_txt, tx, ay, aw - tx - cColumns.track_total_part - this.paddingRight - 5, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                gr.GdiDrawText(track_name_part, font, is_active?colors.full_txt:colors.normal_txt, tx, ay, aw - tx - cColumns.track_total_part - this.paddingRight - 5, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 								if(properties.drawItemsCounter)
                                 gr.GdiDrawText(track_total_part, g_font.min2, colors.faded_txt, ax + aw - cColumns.track_total_part - this.paddingRight, ay, cColumns.track_total_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                             };
@@ -2550,6 +2550,9 @@ function get_images() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout){
+		colors.icon_opacity = 200;
+		colors.normal_txt = GetGrey(180);	
+		colors.full_txt = GetGrey(255);		
 		colors.dragdrop_bg_selected_item = GetGrey(0,190);
 		colors.dragdrop_line_selected_item = GetGrey(255,45);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60)
@@ -2558,6 +2561,8 @@ function get_colors() {
 		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 50;
 	} else {
+		colors.icon_opacity = 255;		
+		colors.full_txt = GetGrey(0);				
 		colors.dragdrop_bg_selected_item = GetGrey(220);
 		colors.dragdrop_line_selected_item = GetGrey(205);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60);

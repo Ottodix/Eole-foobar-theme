@@ -205,7 +205,7 @@ oTagSwitcherBar = function() {
 			if(this.items_txt[i].length==1){
 				gr.DrawImage(this.images.library_tree, this.items_x[i]+Math.round(txt_padding_sides/2)-4, this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
-				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.full_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-9, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
@@ -4711,6 +4711,7 @@ function on_focus(is_focused) {
 function get_colors() {
 	get_colors_global();
     if (properties.darklayout) {
+		colors.normal_txt = GetGrey(180);				
 		colors.btn_inactive_opacity = 140;
 		colors.inactive_txt = GetGrey(140);
 
@@ -4731,6 +4732,7 @@ function get_colors() {
 
 		colors.settings_hover_bg = GetGrey(255,40);
     } else {
+		colors.normal_txt = GetGrey(255);		
 		colors.btn_inactive_opacity = 110;
 		colors.inactive_txt = colors.faded_txt;
 
