@@ -1108,7 +1108,7 @@ oRow = function(metadb,itemIndex) {
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
 				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, text_y, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-				if(this.artist_text!=""){
+				if(this.artist_text!="" && !properties.show2lines){
 					gr.GdiDrawText(" - "+this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, text_y, title_w - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
 				if(properties.show2lines) {
