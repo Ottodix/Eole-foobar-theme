@@ -561,7 +561,7 @@ function build_buttons(){
 					}, 100);*/
 				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),
-			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", false, function () {
+			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch"+"\n"+"(double click to switch globally)", false, function () {
 				previous_darkvalue = properties.darklayout;				
 				Lightswitch();
 			}, function () {
