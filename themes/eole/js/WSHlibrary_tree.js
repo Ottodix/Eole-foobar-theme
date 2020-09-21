@@ -4732,7 +4732,7 @@ function get_colors() {
 
 		colors.settings_hover_bg = GetGrey(255,40);
     } else {
-		colors.normal_txt = GetGrey(255);		
+		colors.normal_txt = GetGrey(0);		
 		colors.btn_inactive_opacity = 110;
 		colors.inactive_txt = colors.faded_txt;
 

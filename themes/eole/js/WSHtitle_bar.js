@@ -69,6 +69,7 @@ var g_fsize=12;
 var cSearchBox = {};
 var g_genre_cache = null;
 var main_panel_btns = null;
+var previous_darkvalue = properties.darklayout;
 
 var cSearchBoxMainLight = {
 	width:270,
@@ -456,6 +457,7 @@ function setMaxButton(){
 	buttons.Max.N_img = buttons.Max.H_img;
 	buttons.Max.D_img = buttons.Max.H_img;	
 }
+
 function build_buttons(){
 	if(btn_initialized){
 		buttons.Library.N_img = images.library_img;
@@ -559,9 +561,12 @@ function build_buttons(){
 					}, 100);*/
 				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),
-			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
+			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", false, function () {
+				previous_darkvalue = properties.darklayout;				
 				Lightswitch();
-			}, false, false,images.lightswitch_img,images.lightswitch_img,-1, false, false, true),
+			}, function () {
+				Lightswitch(true,!previous_darkvalue);
+			}, images.lightswitch_img,images.lightswitch_img,-1, false, false, true),
 			Fullscreen: new JSButton(-112, btn.top_m, btn.width_small_btns, btn.height, "", "fullscreen", "Fullscreen", function () {
 				g_uihacks.toggleFullscreen();
 			}, false,false,images.fullscreen_img,images.fullscreen_img,-1, false, false, true),
