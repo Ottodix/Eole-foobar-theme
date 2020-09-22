@@ -5496,7 +5496,7 @@ function get_colors() {
 		colors.progressbar_bg_on = GetGrey(255,20);
 		colors.progressbar_shadow = GetGrey(0,15)
 		colors.albumartprogressbar_txt = GetGrey(255);
-		colors.albumartprogressbar_overlay = GetGrey(0,80);
+		colors.albumartprogressbar_overlay = GetGrey(0,20);
 		colors.albumartprogressbar_rectline = GetGrey(255,40);
 	} else {
 		colors.tracknumber_txt = GetGrey(130);
