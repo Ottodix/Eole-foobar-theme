@@ -2208,11 +2208,13 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 	}
     plman.PlayingPlaylist=playlist_index;
 	if(!g_genre_cache.initialized) g_genre_cache.build_from_library();
-
+	
+	var library_items = fb.GetLibraryItems();
+	var library_items_number=library_items.Count;
+	
+	if(library_items_number==0) return;
 	switch(random_function) {
 		case '20_albums_old':
-			var library_items = fb.GetLibraryItems();
-			var library_items_number=library_items.Count;
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 			var albums_list=new FbMetadbHandleList();
 			var i=0;
@@ -2234,8 +2236,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 			library_items = undefined;
 			break;
 		case '20_albums':
-			var library_items = fb.GetLibraryItems();
-			var library_items_number=library_items.Count;
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 			var albums_list=new FbMetadbHandleList();
 
@@ -2254,9 +2254,9 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 		case '1_genre':
 		case 'same_genre':
 				if(random_function=="same_genre"){
-					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+current_genre);
+					var genre_item_list = fb.GetQueryItems(library_items, "%genre% IS "+current_genre);
 				} else
-					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
+					var genre_item_list = fb.GetQueryItems(library_items, "%genre% IS "+g_genre_cache.genreList[Math.floor(Math.random()*g_genre_cache.genreList.length)][0]);
 				if(number_of_items>0) genre_item_list = pickRandom(genre_item_list, number_of_items)
 				else shuffleList(genre_item_list)
 				plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
@@ -2264,8 +2264,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 				genre_item_list = undefined;
 			break;
 		case '1_artist':
-			var library_items = fb.GetLibraryItems();
-			var library_items_number=library_items.Count;
 			var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 			try {
 				var random_item = library_items[Math.floor(Math.random()*library_items_number)];
@@ -2281,8 +2279,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 			library_items = undefined;
 			break;
 		case '200_tracks':
-			var library_items = fb.GetLibraryItems();
-			var library_items_number=library_items.Count;
 			var tracks_list=new FbMetadbHandleList();
 			var i=0;
 			while(i < number_of_items && i < library_items_number) {
@@ -2298,7 +2294,7 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 			var genreValue=parseInt(random_function);
 			if(genreValue >= 1000 && genreValue < 2001){
 				try {
-					var genre_item_list = fb.GetQueryItems(fb.GetLibraryItems(), "%genre% IS "+g_genre_cache.genreList[genreValue-1000][0]);
+					var genre_item_list = fb.GetQueryItems(library_items, "%genre% IS "+g_genre_cache.genreList[genreValue-1000][0]);
 					if(number_of_items>0) genre_item_list = pickRandom(genre_item_list, number_of_items)
 					else shuffleList(genre_item_list)
 					plman.InsertPlaylistItems(playlist_index, start_index, genre_item_list);
@@ -2306,8 +2302,6 @@ function play_random(random_function, addAtTheEnd, current_played_track){
 					genre_item_list = undefined;
 				} catch(e) {}
 			} else {
-				var library_items = fb.GetLibraryItems();
-				var library_items_number=library_items.Count;
 				var tracks_list=new FbMetadbHandleList();
 				i=0;
 				while(i < number_of_items && i < library_items_number) {
