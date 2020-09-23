@@ -2011,6 +2011,7 @@ function get_colors(){
 	colors.line_bottom = GetGrey(40,200);
 	colors.btn_shadow = GetGrey(0,100);
 	colors.overlay_on_hover = GetGrey(0,130);
+	colors.btns = GetGrey(255);
 }
 function on_font_changed(){
 	get_font();
@@ -2055,7 +2056,7 @@ function get_images(){
 		var pause_height = 32;		
 		var xpos = img_width/2-(bar_space+bar_width*2)/2;
 		var ypos = img_height/2-pause_height/2;		
-		var colors_anim = colors.animation;
+		var colors_anim = colors.btns;
 		gb.FillSolidRect(xpos, ypos, bar_width, pause_height, colors_anim);
 		gb.FillSolidRect(xpos + bar_space, ypos, bar_width, pause_height, colors_anim);
 	pause_img.ReleaseGraphics(gb);
@@ -2063,12 +2064,12 @@ function get_images(){
 
 	var play_img = gdi.CreateImage(70, 70);
 	gb = play_img.GetGraphics();
-		var xpos = 28;
-		var ypos = 25;
+		var xpos = 25;
+		var ypos = 22;
 		var width = 22;
 		var height = 25;
 		gb.SetSmoothingMode(2);
-		gb.FillPolygon(darkcolors.normal_txt, 0, Array(xpos, ypos, xpos+width, ypos+height/2, xpos, ypos+height));
+		gb.FillPolygon(colors.btns, 0, Array(xpos, ypos, xpos+width, ypos+height/2, xpos, ypos+height));
 		gb.SetSmoothingMode(0);
 	play_img.ReleaseGraphics(gb);
 	images.play_img = play_img;
@@ -2082,11 +2083,10 @@ function get_images(){
 		var img_height_bar_2 = 18 + img_h_add;
 		var img_height_bar_3 = 12 + img_h_add;
 		var img_height_bar_4 = 7 + img_h_add;
-		var colors_anim = colors.animation;
-		gb.FillSolidRect(xpos, ypos-img_height_bar_1, bar_width, img_height_bar_1, colors_anim);
-		gb.FillSolidRect(xpos + bar_margin + bar_width, ypos-img_height_bar_2, bar_width, img_height_bar_2, colors_anim);
-		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors_anim);
-		gb.FillSolidRect(xpos + bar_margin*3 + bar_width*3, ypos-img_height_bar_4, bar_width, img_height_bar_4, colors_anim);
+		gb.FillSolidRect(xpos, ypos-img_height_bar_1, bar_width, img_height_bar_1, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin + bar_width, ypos-img_height_bar_2, bar_width, img_height_bar_2, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin*3 + bar_width*3, ypos-img_height_bar_4, bar_width, img_height_bar_4, colors.btns);
 	nowplaying_img.ReleaseGraphics(gb);
 	images.nowplaying_img = nowplaying_img;
 
