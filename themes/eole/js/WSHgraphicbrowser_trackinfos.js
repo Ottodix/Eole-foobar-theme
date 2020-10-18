@@ -1544,10 +1544,10 @@ oShowList = function(parentPanelName) {
 		if(!this.play_bt) {
 			this.play_img = gdi.CreateImage(70, 70);
 			gb = this.play_img.GetGraphics();
-				var xpos = 25;
-				var ypos = 22;
-				var width = 22;
-				var height = 25;
+				var xpos = 26;
+				var ypos = 23;
+				var width = 20;
+				var height = 23;
 				gb.SetSmoothingMode(2);
 				gb.FillPolygon(colors.play_bt, 0, Array(xpos, ypos, xpos+width, ypos+height/2, xpos, ypos+height));
 				gb.SetSmoothingMode(0);

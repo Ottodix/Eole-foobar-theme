@@ -3,7 +3,7 @@ var padding_top_nobio = 17;
 var padding_bottom = 5;
 var padding_left = 35;
 var padding_right = 35;
-var header_height = 35;
+var header_height = 135;
 var ww = 0;
 var wh = 0;
 var lyricsText_Width = -1;
@@ -92,7 +92,7 @@ function on_paint(gr) {
 		lyricsText_Width = gr.CalcTextWidth("Lyrics", font_title)+10;
 		positionButtons();
 	}
-	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, (lyrics_state.isEqual(5)?padding_top_nobio:padding_top), ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, (lyrics_state.isEqual(5)?padding_top_nobio:padding_top), ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_NOPREFIX);
 	drawAllButtons(gr);
 }
 function on_font_changed() {

@@ -3094,9 +3094,9 @@ oBrowser = function(name) {
 					if(text1!='') {
 						gr.GdiDrawText(text1, g_font.plus5, colors.normal_txt, this.x, py - 40, this.w, 36, DT_CENTER | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						gr.FillSolidRect(this.x+Math.round(this.w/2-line_width/2),py, line_width, 1, colors.border);
-						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 5, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py + 5, this.w, 100, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else {
-						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 10, this.w, 20, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(text2, g_font.italicplus1, colors.faded_txt, this.x, py - 50, this.w, 100, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					}
 			} else { // no track, playlist is empty
 					var px = 0;
