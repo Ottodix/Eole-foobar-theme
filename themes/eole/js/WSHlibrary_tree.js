@@ -106,20 +106,24 @@ oTagSwitcherBar = function() {
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");
 		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
-
-		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
-			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
-		}
-		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
-			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
-		}
-		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
-			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
-		}
-
 		properties.album_label = this.items_txt[1];
 		properties.artist_label = this.items_txt[2];
-		properties.genre_label = this.items_txt[3];
+		properties.genre_label = this.items_txt[3];		
+		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
+			properties.album_label = properties.album_customGroup_label;			
+			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
+			this.items_tooltips[1] = properties.album_customGroup_label+" filter";
+		}
+		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
+			properties.artist_label = properties.artist_customGroup_label;			
+			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
+			this.items_tooltips[2] = properties.artist_customGroup_label+" filter";
+		}
+		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
+			properties.genre_label = properties.genre_customGroup_label;			
+			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
+			this.items_tooltips[3] = properties.genre_customGroup_label+" filter";
+		}
 
 		if(!properties.showLibraryTreeSwitch){
 			this.items_txt.shift();
@@ -4847,7 +4851,7 @@ function on_notify_data(name, info) {
 		break;
 		case "genre_customGroup_label":
 			properties.genre_customGroup_label = info;
-			window.SetProperty("_DISPLAY: album customGroup name", properties.genre_customGroup_label);
+			window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 			g_tagswitcherbar.on_init();
 		break;
 		case "artist_customGroup_label":

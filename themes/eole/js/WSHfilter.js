@@ -977,19 +977,26 @@ oTagSwitcherBar = function() {
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");
 		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
-		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
-			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
-		}
-		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
-			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
-		}
-		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
-			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
-		}
-
 		properties.album_label = this.items_txt[1];
 		properties.artist_label = this.items_txt[2];
-		properties.genre_label = this.items_txt[3];
+		properties.genre_label = this.items_txt[3];		
+		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
+			properties.album_label = properties.album_customGroup_label;			
+			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
+			this.items_tooltips[1] = properties.album_customGroup_label+" filter";
+		}
+		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
+			properties.artist_label = properties.artist_customGroup_label;			
+			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
+			this.items_tooltips[2] = properties.artist_customGroup_label+" filter";
+		}
+		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
+			properties.genre_label = properties.genre_customGroup_label;			
+			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
+			this.items_tooltips[3] = properties.genre_customGroup_label+" filter";
+		}
+
+
 
 		if(!properties.showLibraryTreeSwitch){
 			this.items_txt.shift();
@@ -3110,9 +3117,10 @@ oBrowser = function(name) {
 			this.draw_right_line = (properties.DrawRightLine && (!(properties.filterOrder==2) && !(!filter3_state.isActive() && properties.filterOrder==1) && !(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0) || main_panel_state.isEqual(0)));
             // draw top header bar
             if(properties.showHeaderBar) {
-                var item_txt = new Array("", "album", "artist", "genre");
+                var item_txt = new Array("group", "album", "artist", "genre");
                 var nb_groups = (properties.showAllItem && total > 1 ? total - 1 : total);
-                var boxText = nb_groups+" "+item_txt[properties.tagMode]+(nb_groups > 1 ? "s  " : "  ");
+				var txt_id = this.customGroups?0:properties.tagMode;
+                var boxText = nb_groups+" "+item_txt[txt_id]+(nb_groups > 1 ? "s  " : "  ");
 
                 // draw background part above playlist (headerbar)
 				//gr.FillSolidRect(0, 0, ww, brw.y-1, colors.lightgrey_bg);
@@ -3668,9 +3676,9 @@ oBrowser = function(name) {
 				_menu.AppendMenuItem(MF_STRING, 990, "Switch to library tree");
 				_menu.AppendMenuSeparator();
 			}
-            _menu13.AppendTo(_menu1,(properties.tagMode==3)?MF_CHECKED:MF_STRING, "Preset 1 ("+properties.genre_label+")");
-            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Preset 2 ("+properties.artist_label+")");
-            _menu11.AppendTo(_menu1,(properties.tagMode==1)?MF_CHECKED:MF_STRING, "Preset 3 ("+properties.album_label+")");
+            _menu13.AppendTo(_menu1,(properties.tagMode==3)?MF_CHECKED:MF_STRING, "Preset 1 ("+properties.genre_label.toUpperCase()+")");
+            _menu12.AppendTo(_menu1,(properties.tagMode==2)?MF_CHECKED:MF_STRING, "Preset 2 ("+properties.artist_label.toUpperCase()+")");
+            _menu11.AppendTo(_menu1,(properties.tagMode==1)?MF_CHECKED:MF_STRING, "Preset 3 ("+properties.album_label.toUpperCase()+")");
 
             _menu1.AppendTo(_menu,MF_STRING, "Group by");
 
