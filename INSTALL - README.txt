@@ -2,7 +2,7 @@
 
 This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 
-THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
+THIS THEME REQUIRES FOOBAR 1.4 (or superior) !
 
 ## Installation
 
@@ -12,7 +12,7 @@ THIS THEME REQUIRE FOOBAR 1.4 (or superior) !
    - STANDARD foobar2000 installation: your foobar profile directory is there: %AppData%/foobar2000
    - PORTABLE foobar2000 installation: your foobar profile directory is the same than you installation directory.
 
-2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
+2. Run foobar, choose ColumnUI as your user interface (from the prompt, or from File > Preferences > Display)
 
 3. From Columns UI in File > Preferences > Display > Columns UI, click on import, and select the following file: [FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl.
 
