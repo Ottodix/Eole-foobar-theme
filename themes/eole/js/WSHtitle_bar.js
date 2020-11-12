@@ -2516,7 +2516,6 @@ oSearch = function() {
 								this.inputbox.on_key_down(vkey);
 								break;
 							}
-					this.inputbox.on_key_down(vkey);
 				}
                 break;
         };

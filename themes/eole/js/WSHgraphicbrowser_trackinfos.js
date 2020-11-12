@@ -1394,12 +1394,15 @@ oShowList = function(parentPanelName) {
 	this.cover_y = -1;
 	this.links = {
 		album : new SimpleButton(0, 0, 0, 0, "albumLink", "Show this album", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"album");
 		},false,false,false,ButtonStates.normal,255),
 		artist : new SimpleButton(0, 0, 0, 0, "artistLink", "Show all of this artist", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"artist");
 		},false,false,false,ButtonStates.normal,255),
 		genre : new SimpleButton(0, 0, 0, 0, "genreLink", "Show all of this genre", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"genre");
 		},false,false,false,ButtonStates.normal,255),
 	}
