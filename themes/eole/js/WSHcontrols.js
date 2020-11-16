@@ -733,13 +733,20 @@ function get_text(metadb) {
 
     if (metadb) {
 		current_played_track = metadb;
+	
 		if(properties.custom_firstRow=="") {
 			var infos = properties.default_firstRow.Eval();
 			infos = infos.split(" ^^ ");
 			g_text_title = infos[1];		
 			if(infos[2]) g_text_artist = " -  "+infos[2];
 			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
-			if(!mini_controlbar.isActive() && properties.twoLinesDetails) g_text_second_line = properties.default_secondRow.Eval();
+			if(!mini_controlbar.isActive() && properties.twoLinesDetails){
+				if(properties.custom_secondRow==""){
+					g_text_second_line = properties.default_secondRow.Eval();
+				} else {
+					g_text_second_line = properties.tf_custom_secondRow.Eval();
+				}
+			}
 		} else {
 			var first_row = properties.tf_custom_firstRow.Eval();
 			g_text_title_prefix = "";	
