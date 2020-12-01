@@ -167,7 +167,8 @@ var properties = {
 	showlistRowWidthMin:100,
 	showlistRowWidthMax:800,
 	showlistMaxColumns: 0,
-	showlistScrollbar: true,
+	showlistScrollbar: window.GetProperty("TRACKLIST horizontal scrollbar", true),
+	showlistOneColumn: window.GetProperty("TRACKLIST one column", false),
 	showlistheightMin:107,
 	showlistheightMinCover:147,
 	showlistheightMinCoverGrid:107,
@@ -2189,7 +2190,10 @@ oShowList = function(parentPanelName) {
 
 		if(this.heightMin>this.heightMax) this.heightMax=this.heightMin;
 		if(this.totalColsVisMax > properties.showlistMaxColumns && properties.showlistMaxColumns>0) this.totalColsVisMax = properties.showlistMaxColumns;
-
+		
+		if(properties.showlistOneColumn)	
+			this.totalColsVisMax = 1;
+		
 		if(update_tracks){
 			this.isPlaying = false;
 			this.totaltracks = this.pl.Count;
@@ -3251,7 +3255,11 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuTracklist.CheckMenuItem(45, properties.expandOnHover);	*/
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
-	
+	_menuTracklist.AppendMenuItem(MF_STRING, 14, "Display only one column");
+	_menuTracklist.CheckMenuItem(14, properties.showlistOneColumn);
+	_menuTracklist.AppendMenuItem(MF_STRING, 15, "Horizontal scrollbar");
+	_menuTracklist.CheckMenuItem(15, properties.showlistScrollbar);
+	_menuTracklist.AppendMenuSeparator();
 	
 	_menuCover.AppendMenuItem(MF_STRING, 80, "Always");
 	_menuCover.CheckMenuItem(80, properties.showlistShowCover==2);
@@ -3387,21 +3395,16 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			properties.smooth_expand_value = properties.smooth_expand_value > 0 ? 0 : properties.smooth_expand_default_value;
 			window.SetProperty("TRACKLIST Smooth Expand value (0 to disable)", properties.smooth_expand_value);
 			break;
-		case (idx == 14):
-			enableDiskCacheGlobally();
-			brw.populate(0);
+		case (idx == 14):	
+			properties.showlistOneColumn = !properties.showlistOneColumn;
+			window.SetProperty("TRACKLIST one column", properties.showlistOneColumn);
+			g_showlist.refresh();
+			brw.repaint();			
 			break;
 		case (idx == 15):
-			properties.showListColored = true;
-			properties.showListColoredBlurred = false;
-			properties.showListColoredOneColor = true;
-			properties.showListColoredMixedColor = false;
-			get_colors();
-			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);
-			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);
-			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
-			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
-			g_showlist.reset();
+			properties.showlistScrollbar = !properties.showlistScrollbar;
+			window.SetProperty("TRACKLIST horizontal scrollbar", properties.showlistScrollbar);			
+			g_showlist.refresh();
 			brw.repaint();
 			break;
 		case (idx == 16):
@@ -6823,7 +6826,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			} else {
 				scroll -= (intern_step) * brw.rowHeight;
 				scroll = g_scrollbar.check_scroll(scroll);
-				if(g_showlist.idx>-1){
+				if(g_showlist.idx>-1 && properties.showlistScrollbar){
 					var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
 					if(intern_step<0) { //on descend
 						if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
