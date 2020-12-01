@@ -1140,7 +1140,7 @@ function on_notify_data(name, info) {
 			var cachekey = process_cachekey(metadb);
 			g_image_cache.reset(cachekey);
 			if(cachekey==g_cover.cachekey)
-				g_cover.refresh(metadb[0], false, undefined, true, g_cover.isPlaying());
+				g_cover.refresh(metadb[0], true); //g_cover.refresh, false, undefined, true, g_cover.isPlaying());
 		break;
 		case "cover_cache_finalized":
 			//g_image_cache.cachelist = cloneImgs(info);

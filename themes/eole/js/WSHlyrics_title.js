@@ -119,8 +119,10 @@ function get_colors() {
 	esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);
-	esl.ShowDesktopLyric = false;
-	esl.DesktopLyricAlwaysOnTop = false;
+	if(settings_file_not_found){
+		esl.ShowDesktopLyric = false;
+		esl.DesktopLyricAlwaysOnTop = false;
+	}
 };
 function on_mouse_rbtn_up(x, y){
 	var _menu = window.CreatePopupMenu();
