@@ -4828,12 +4828,12 @@ oBrowser = function(name) {
 			this.groups[idx].CoverMainColor = colors.cover_hoverOverlay;
 		}
 	}
-    this.DefineDateCircleBG = function(size){
-		if(properties.showdateOverCover){
+    this.DefineDateCircleBG = function(size,index){
+		if(properties.showdateOverCover || properties.showDiscNbOverCover){
 			var dateCircleBG = gdi.CreateImage(size, size);
 			gb = dateCircleBG.GetGraphics();
 			gb.SetSmoothingMode(2);
-			gb.FillEllipse(-Math.round(size/3), -size+1+this.groups[0].dateHeight, Math.round(size*5/3), size, colors.cover_date_bg);
+			gb.FillEllipse(-Math.round(size/3), -size+1+this.groups[index].dateHeight, Math.round(size*5/3), size, colors.cover_date_bg);
 			dateCircleBG.ReleaseGraphics(gb);
 			dateCircleBG.ApplyMask(this.coverMask);
 			this.dateCircleBG = dateCircleBG;
@@ -4986,6 +4986,7 @@ oBrowser = function(name) {
 						var overlayTxt = "";
 						if(properties.showDiscNbOverCover && this.groups[this.groups_draw[i]].discnb!="?") {
 							if(this.groups[this.groups_draw[i]].discnb!="?") overlayTxt = this.groups[this.groups_draw[i]].discnb;
+							
 						}
 						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?" && !this.custom_groupby) {
 							if(properties.extractYearFromDate) overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].year;
@@ -5000,10 +5001,9 @@ oBrowser = function(name) {
 								}
 							} catch(e){}
 							if(properties.circleMode && !properties.CoverGridNoText) {
-								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith); {
-									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
-									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-								}
+								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith,this.groups_draw[i]); 
+								gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
+								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							}
 							else {
 								gr.FillSolidRect(ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, colors.cover_date_bg);
