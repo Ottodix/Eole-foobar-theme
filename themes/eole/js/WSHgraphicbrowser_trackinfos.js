@@ -7075,6 +7075,8 @@ function get_colors() {
 		colors.showlist_scroll_btns_icon = GetGrey(255);
 		colors.showlist_dragtrackbg = GetGrey(0,175);
 		colors.showlist_dragitemstxt = GetGrey(255);
+		
+		colors.overlay_on_hover = GetGrey(0,130);		
 	}
 }
 
