@@ -2,8 +2,7 @@ window.DefinePanel("Tooltip", { author: "T.P Wang" });
 include(`${fb.ComponentPath}docs\\Helpers.js`);
 
 const g_font = gdi.Font('Segoe UI', 14, 1);
-// Do not create more than one tooltip in one panel
-const g_tooltip = window.CreateTooltip();
+const g_tooltip = window.Tooltip;
 
 let g_down = false;
 let SampleButtons = undefined;

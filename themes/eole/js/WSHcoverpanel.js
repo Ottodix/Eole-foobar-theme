@@ -19,7 +19,6 @@ var properties = {
 	rawBitmap: false,
 	refreshRate: 50,
 }
-
 var visu_margin_left = 0;
 var g_genre_cache = null;
 var cover_path="";
@@ -49,7 +48,7 @@ var border_top=1;
 var border_right=1;
 var border_bottom=0;
 var border_left=0;
-
+var tooltipDoubleClicText = "";
 var ww = 0,
     wh = 0;
 var cur_btn = null;
@@ -116,13 +115,11 @@ function adaptButtons(){
 		buttons.Pause.H_img = images.mini_mini_pause_img;
 		buttons.Pause.D_img = images.mini_mini_pause_img;
 	}
-	//if(typeof g_rating !== 'undefined') setRatingBtn();
 }
 function positionButtons(){
     for (var i in buttons) {
 		buttons[i].x=Math.round(ww/2-buttons[i].w/2);
 		buttons[i].y=Math.round(wh/2-buttons[i].N_img.Height/2+global_vertical_fix);
-		//if(buttons[i].text=='rating') buttons[i].y-=2;
     }
 }
 function resetAnimation(){
@@ -177,7 +174,25 @@ function startAnimation(){
 		}, properties.refreshRate);
 	}
 }
-
+function setTooltipDoubleClicText(){
+	switch(true){
+		case (properties.dble_click_action==0):
+			tooltipDoubleClicText = "pause playback";
+		break;
+		case (properties.dble_click_action==1):
+			tooltipDoubleClicText = "show on all panels";
+		break;
+		case (properties.dble_click_action==2):
+			tooltipDoubleClicText = "open cover in its full/original size";
+		break;
+		case (properties.dble_click_action==3):
+			tooltipDoubleClicText = "open containing folder";
+		break;
+		case (properties.dble_click_action==4):
+			tooltipDoubleClicText = "activate/quit mini player";
+		break;
+	}
+}
 function SimpleButton(x, y, w, h, text, fonClick, fonDbleClick, N_img, H_img, state) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
@@ -361,13 +376,13 @@ function on_mouse_lbtn_down(x, y) {
     } else if(!click_on_btn) {
         showNowPlaying(false);
     }
+	g_tooltip.Deactivate();
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
     g_dble_click=true;
 	if(fb.IsPlaying) {
 		switch(true){
-
 			case (properties.dble_click_action==0):
 				fb.Pause();
 				window.NotifyOthers("stopFlashNowPlaying",true);
@@ -376,7 +391,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 				showNowPlaying(true);
 			break;
 			case (properties.dble_click_action==2):
-				if(!g_cover.isFiller()) showNowPlayingCover();
+				if(!g_cover.isFiller()) openCoverFullscreen(fb.GetNowPlaying());
 			break;
 			case (properties.dble_click_action==3):
 				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
@@ -392,11 +407,20 @@ function on_mouse_move(x, y, m) {
     if(g_cursor.x == x && g_cursor.y == y) return;
 	g_cursor.onMouse("move", x, y, m);
 	g_cover.onMouse("move", x, y, m);
+    if(!fb.IsPlaying) {
+        tooltip_text = "Play randomly"
+    } else if(!fb.IsPaused) {
+        tooltip_text = "Show now playing\nDouble-click : "+tooltipDoubleClicText;
+    } else {
+		tooltip_text = "Resume playback"
+	}
+	g_tooltip.ActivateDelay(tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200, false, 'track_title');
 }
 
 function on_mouse_leave() {
 	g_cursor.onMouse("leave", 0, 0);
 	g_cover.onMouse("leave", 0, 0);
+	g_tooltip.Deactivate();
     g_down = false;
     if (cur_btn) {
         cur_btn.changeState(ButtonStates.normal);
@@ -484,6 +508,9 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};
+    this.resetCache = function () {
+		this.cachelist = Array();
+	}	
     this.resetMetadb = function(metadb) {
         this.cachelist[process_cachekey(metadb)] = null;
     };
@@ -928,7 +955,7 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.AppendMenuSeparator();
 	if(fb.IsPlaying){
 		var now_playing_track = fb.GetNowPlaying();
-		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");
+		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover in its full/original size");
 		main_menu.AppendMenuItem(MF_STRING, 9, "Show on all panels");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
@@ -966,8 +993,8 @@ function on_mouse_rbtn_up(x, y){
 		//Context.InitContext(new FbMetadbHandleList(fb.GetNowPlaying()));
 		//Context.BuildMenu(context_menu, 100, -1);
 		//context_menu.AppendTo(main_menu, MF_STRING, "Track properties");
+		main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	}
-	main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -990,7 +1017,7 @@ function on_mouse_rbtn_up(x, y){
 			window.Reload();
 			break;
 		case (idx == 1):
-			showNowPlayingCover();
+			openCoverFullscreen(fb.GetNowPlaying());
 			break;
 		case (idx == 2):
 			properties.random_function = '20_albums';
@@ -1091,7 +1118,7 @@ function draw_settings_menu(x,y){
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");
+		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover in its full/original size");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
 		_dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);
@@ -1101,12 +1128,11 @@ function draw_settings_menu(x,y){
 		var _visu_menu = window.CreatePopupMenu();
 		_visu_menu.AppendMenuItem(MF_STRING, 8, "Always show");
 		_visu_menu.CheckMenuItem(8,properties.showVisualization==2);
-		_visu_menu.AppendMenuItem(MF_STRING, 9, "Only when main panel animation isn't visible");
-		_visu_menu.CheckMenuItem(9,properties.showVisualization==1);
 		_visu_menu.AppendMenuItem(MF_STRING, 10, "Never");
 		_visu_menu.CheckMenuItem(10,properties.showVisualization==0);
-		_visu_menu.AppendTo(_menu, MF_STRING, "Animation on playback");
-
+		
+		_menu.AppendMenuItem(MF_STRING, 8, "Animation on playback");
+		_menu.CheckMenuItem(8,properties.showVisualization==2);
 
 		_menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
 		_menu.CheckMenuItem(2, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
@@ -1139,30 +1165,17 @@ function draw_settings_menu(x,y){
 				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
                 break;
 			case (idx == 8):
-				properties.showVisualization = 2;
+				if(properties.showVisualization==0) properties.showVisualization = 2;
+				else properties.showVisualization = 0;
 				window.SetProperty("Show Visualization", properties.showVisualization);
 				if(!globalProperties.enable_screensaver) resetAnimation();
 				calculate_visu_margin_left();
 				window.Repaint();
 				break;
-			case (idx == 9):
-				properties.showVisualization = 1;
-				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				calculate_visu_margin_left();
-				window.Repaint();
-				break;
-			case (idx == 10):
-				properties.showVisualization = 0;
-				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				calculate_visu_margin_left();
-				window.Repaint();
-			break;
             default:
 				return true;
         }
-
+		setTooltipDoubleClicText();
         _menu = undefined;
         return true;
 }
@@ -1251,6 +1264,8 @@ function on_init(){
 	g_genre_cache = new oGenreCache();
 	g_cover = new oCover();
 	g_cursor = new oCursor();
+	g_tooltip = new oTooltip();
+	setTooltipDoubleClicText();
 	get_colors();
 	get_images();
 	setButtons();

@@ -3,6 +3,7 @@ var properties = {
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
 	savedFilterState: window.GetProperty("_PROPERTY: Saved filter state", -1),
+    filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),		
 	panelFontAdjustement: -1
 }
 
@@ -70,9 +71,11 @@ function setSettingsBtn() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout){
+		//colors.normal_txt = GetGrey(180);			
 		colors.settings_hover_bg = GetGrey(255,40);
 		colors.headerbar_line = GetGrey(51);
 	} else {
+		//colors.normal_txt = GetGrey(0);			
 		colors.settings_hover_bg = GetGrey(230);
 	}
 	setSettingsBtn();
@@ -645,7 +648,7 @@ playlistInfo = function(){
 		this.plist_items = plman.GetPlaylistItems(plman.ActivePlaylist);
 		this.items_count=this.plist_items.Count;
 		if(this.items_count==0) {this.time_txt=""; this.setTexts(); return;}
-		if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist) {
+		if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist) {
 			i=0;this.totalTime=0;
 			while(i < this.items_count) {this.totalTime+=this.plist_items[i].Length; i++;}
 			this.setTexts(); return;
@@ -719,12 +722,13 @@ playlistInfo = function(){
 			var displayed_count = this.items_count;
 		}
 		if(displayed_count>0) {
-			totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-			totalW=Math.floor(r_timetodraw/604800);
-			totalD=Math.floor((r_timetodraw%604800)/86400);
-			totalH=Math.floor((r_timetodraw%86400)/3600);
-			totalM=Math.floor((r_timetodraw%3600)/60);
-			totalS=Math.round((r_timetodraw%60));
+			
+			totalMth=Math.floor(timetodraw/2592000); r_timetodraw=timetodraw-totalMth*2592000;
+			totalW=Math.floor(r_timetodraw/604800); r_timetodraw=r_timetodraw-totalW*604800;
+			totalD=Math.floor(r_timetodraw/86400); r_timetodraw=r_timetodraw-totalD*86400;
+			totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
+			totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
+			totalS=Math.round(r_timetodraw);
 			totalS=(totalS>9) ? totalS:'0'+totalS;
 
 			txt_month=(totalMth>1)?totalMth+'months, ':totalMth+'month, ';
@@ -739,7 +743,13 @@ playlistInfo = function(){
 			this.items_txt=displayed_count+' items';
 
 			// Main Text, Left justified
-			if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist){
+			var filtered_playlist = "";
+			if(this.playlist_name==globalProperties.filter_playlist && properties.filtred_playlist_idx>-1){
+				var filtered_playlist = plman.GetPlaylistName(properties.filtred_playlist_idx);
+			}
+			if(filtered_playlist!="" && filtered_playlist!=globalProperties.selection_playlist){				
+				this.main_txt='Playlist : '+plman.GetPlaylistName(properties.filtred_playlist_idx)+' (Filtered)';	
+			} else if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist){
 				this.main_txt='Playlist : '+this.playlist_name;
 			} else if(this.albums!=""){
 				if(this.artists!="") this.main_txt=this.albums+' - '+this.artists
@@ -1028,6 +1038,15 @@ function on_notify_data(name, info) {
 			positionButtons();
 			window.Repaint();
 		break;
+		case "refresh_filters":
+			if(typeof info[1] !== 'undefined') {
+				properties.filtred_playlist_idx = info[1];
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
+			} else if(properties.filtred_playlist_idx>-1 && plman.GetPlaylistName(plman.ActivePlaylist)!=globalProperties.filter_playlist) {
+				properties.filtred_playlist_idx = -1;
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx)
+			}
+		break;			
     };
 };
 function on_init(){

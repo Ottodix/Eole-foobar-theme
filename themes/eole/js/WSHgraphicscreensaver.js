@@ -89,7 +89,6 @@ var properties = {
     showheaderbar: window.GetProperty("MAINPANEL Show Header Bar", false),
     showFilterBox: window.GetProperty("MAINPANEL Show filter box", false),
     followNowPlaying: window.GetProperty("TRACKLIST Always Follow Now Playing", true),
-    refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true),
     followActivePlaylist: window.GetProperty("MAINPANEL Follow active playlist", true),
     followPlayingPlaylist: window.GetProperty("MAINPANEL Follow playing playlist", false),
@@ -730,7 +729,6 @@ oRow = function(metadb,itemIndex) {
         this.w = w;
         this.h = this.h;
         var tracknumber_w = 28;
-        var length_w = 55;
 
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
@@ -763,6 +761,10 @@ oRow = function(metadb,itemIndex) {
 			} else var current_size = track_gradient_size+Math.round(total_size*ratio);
 			if(isNaN(current_size) || current_size<0) current_size = track_gradient_size+total_size;
 		}
+		
+		if(typeof brw.max_duration_length == 'undefined' || brw.max_duration_length==0) brw.max_duration_length = gr.CalcTextWidth("00:00:00", g_font.normal);
+		var length_w = duration.length*brw.max_duration_length/8+30;	
+		
 		if(!g_showlist.light_bg){
 			image0 = now_playing_progress0;
 			image1 = now_playing_progress1;
@@ -3054,28 +3056,22 @@ oBrowser = function(name) {
 		this.repaint_h = h;
 		this.repaint_rect = true;
     }		
-	this.FormatTime = function(time){
-		time_txt="";
-		timetodraw=time;
+	this.FormatTime = function(time) {
+		time_txt = "";
+		if (time > 0) {
+			totalS = Math.round(time);
 
-		totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800);
-		totalD=Math.floor((r_timetodraw%604800)/86400);
-		totalH=Math.floor((r_timetodraw%86400)/3600);
-		totalM=Math.floor((r_timetodraw%3600)/60);
-		totalS=Math.round((r_timetodraw%60));
-		totalS=(totalS>9) ? totalS:'0'+totalS;
+			totalS -= (totalW = Math.floor(totalS / 604800)) * 604800;
+			totalS -= (totalD = Math.floor(totalS / 86400)) * 86400;
+			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
+			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
-		txt_week=(totalW>1)?totalW+' weeks, ':totalW+' week, ';if(totalW==0) txt_week='';
-		txt_day=(totalD>1)?totalD+' days, ':totalD+' day, '; if(totalD==0) txt_day='';
-		txt_hour=(totalH>1)?totalH+' h':totalH+' h'; if(totalH==0) txt_hour='';
-		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min ';
-		else if (totalD>0) time_txt=txt_day+txt_hour+", "+totalM+' min ';
-		else if (totalH>0) time_txt=txt_hour+((totalM>0)?", "+totalM+' min':'');
-		else time_txt=totalM+' min';
-
+			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
+			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
+			if (totalH != 0) time_txt += ' ' + totalH + ' h';
+			if (totalM != 0) time_txt += ' ' + totalM + ' min';
+			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+		}
 		return time_txt;
 	}
 	this.showheaderbar = function(){
@@ -3785,7 +3781,7 @@ oBrowser = function(name) {
 							gr.DrawEllipse(ax+1, coverTop+1, this.coverRealWith-2, this.coverRealWith-2, 1.0, cover_border_color);
 
 						//date drawing black
-						if(properties.showdateOverCover && this.groups_draw[i].position_from_playing>=0){
+						if(properties.showdateOverCover && this.groups_draw[i].date!="?" && this.groups_draw[i].position_from_playing>=0){
 							if(properties.circleMode) {
 								if(!this.dateCircleBG) this.DefineCircleMask(this.coverRealWith); {
 									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
@@ -4247,12 +4243,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 
@@ -5838,6 +5834,7 @@ function on_font_changed() {
 	g_filterbox.onFontChanged();
 	brw.get_metrics_called = false;
 	on_size(window.Width, window.Height);
+	brw.max_duration_length = 0;
 }
 
 function on_colours_changed() {

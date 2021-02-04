@@ -28,16 +28,18 @@ var properties = {
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
 	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
+	coverNoPadding : window.GetProperty("_DISPLAY: cover no padding", true),
 	rawBitmap: false,
-	refreshRate: 50,
 	panelFontAdjustement: 0,
+	showInfos:true,
 }
 if(properties.single_click_action>1) properties.single_click_action=1;
 
 var g_wallpaperImg = null;
 var update_wallpaper = false;
-var track_infos_height = 97;
-var track_infos_margin_top = 9;
+var track_infos_height = 85;
+var rating_height = 12;
+var track_infos_margin_top = 0;
 var visu_margin_left = 0;
 var g_genre_cache = null;
 var cover_path="";
@@ -108,13 +110,17 @@ function setButtons(){
 			fb.Pause();
 		},images.pause_img,images.pause_img),
 		Play: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Play", "Play from there", function () {
-			plman.PlayingPlaylist = g_cover.playlistIndex;
-			plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
-			plman.ActivePlaylist = g_cover.playlistIndex;		
-			if(fb.IsPaused) fb.Stop();
-			plman.FlushPlaybackQueue();
-			fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
-			fb.Play();
+			if(g_infos.tracklist){ 
+				sendandplayPlaybackPlaylist(g_infos.tracklist);
+			} else {
+				plman.PlayingPlaylist = g_cover.playlistIndex;
+				plman.SetPlaylistFocusItemByHandle(g_cover.playlistIndex, g_cover.metadb);
+				plman.ActivePlaylist = g_cover.playlistIndex;		
+				if(fb.IsPaused) fb.Stop();
+				plman.FlushPlaybackQueue();
+				fb.RunContextCommandWithMetadb("Add to playback queue", g_cover.metadb);
+				fb.Play();
+			}
 		},function () {},images.play_img,images.play_img),
 		NowPlaying: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "NowPlaying", "Show now playing", function () {
 			window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
@@ -130,12 +136,12 @@ function setButtons(){
 
 function adaptButtons(){
 	if(layout_state.isEqual(0)) {
-		buttons.Random.N_img = images.random_img_mini;
-		buttons.Random.H_img = images.random_img_mini;
-		buttons.Random.D_img = images.random_img_mini;
-		buttons.Pause.N_img = images.mini_mini_pause_img;
-		buttons.Pause.H_img = images.mini_mini_pause_img;
-		buttons.Pause.D_img = images.mini_mini_pause_img;
+		buttons.Random.N_img = images.random_img;
+		buttons.Random.H_img = images.random_img;
+		buttons.Random.D_img = images.random_img;
+		buttons.Pause.N_img = images.pause_img;
+		buttons.Pause.H_img = images.pause_img;
+		buttons.Pause.D_img = images.pause_img;
 	} else {
 		buttons.Random.N_img = images.random_img_mini;
 		buttons.Random.H_img = images.random_img_mini;
@@ -155,63 +161,10 @@ function positionButtons(){
     for (var i in buttons) {
 		buttons[i].w = g_cover.w_resized;
 		buttons[i].h = g_cover.h_resized;
-		buttons[i].x = Math.round(g_cover.w_resized/2-buttons[i].w/2)+g_cover.x+1;
-		buttons[i].y = Math.round(g_cover.h_resized/2-buttons[i].N_img.Height/2)+g_cover.y+2;
+		buttons[i].x = g_cover.x;
+		buttons[i].y = g_cover.y;
     }
 }
-function resetAnimation(){
-	animationTimer && window.ClearInterval(animationTimer);
-	animationTimer = false;
-    height_bar_1=9;
-    height_bar_2=15;
-    height_bar_3=13;
-    direction_bar_1=1;
-    direction_bar_2=1;
-    direction_bar_3=1;
-	coef_bar_1=1.7;
-	coef_bar_2=1.4;
-	coef_bar_3=2.2;
-}
-function startAnimation(){
-	resetAnimation();
-	try{
-		animationStartTime = Date.now();
-	}catch(e){}
-	animationCounter = 0;
-	if((properties.showVisualization && g_cover.isPlaying()) || globalProperties.enable_screensaver){
-		animationTimer = setInterval(function() {
-			animationCounter++;
-			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0) && !main_panel_state.isEqual(3)){
-				current_ms = (new Date).getTime();
-				if(current_ms >= last_mouse_move_notified+globalProperties.mseconds_before_screensaver){
-					screensaver_state.setValue(1);
-				}
-			}
-			if(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && window.IsVisible) {
-				//Restart if the animation is desyncronised
-				/*try{
-					if(Math.abs(animationStartTime+animationCounter*properties.refreshRate-Date.now())>500){
-						resetAnimation();
-						startAnimation();
-					}
-				}catch(e){}		*/
-				if(properties.showVisualization && g_cover.isPlaying()) {
-					if(height_bar_1>height_bar_max) {direction_bar_1=-1;} else if(height_bar_1<bar_height_min) direction_bar_1=1;
-					height_bar_1+=(coef_bar_1*direction_bar_1);
-
-					if(height_bar_2>height_bar_max) {direction_bar_2=-1;} else if(height_bar_2<bar_height_min) direction_bar_2=1;
-					height_bar_2+=(coef_bar_2*direction_bar_2);
-
-					if(height_bar_3>height_bar_max) {direction_bar_3=-1;} else if(height_bar_3<bar_height_min) direction_bar_3=1;
-					height_bar_3+=(coef_bar_3*direction_bar_3);
-
-					window.RepaintRect(visu_margin_left, g_cover.visuY-height_bar_max-3, bar_width * 3 + bar_margin * 2+1, height_bar_max+3);
-				}
-			}
-		}, properties.refreshRate);
-	}
-}
-
 function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_img, H_img, state) {
     this.state = state ? state : ButtonStates.normal;
     this.x = x;
@@ -225,7 +178,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
     this.H_img = H_img;
 	this.tooltip_activated = false;
     this.tooltip_text = tooltip_text;
-
+	
     this.containXY = function (x, y) {
         return (this.x <= x) && (x <= this.x + this.w) && (this.y <= y) && (y <= this.y + this.h);
     }
@@ -234,9 +187,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
         this.state = state;
         return old;
     }
-    this.draw = function (gr) {
-        b_img=this.N_img;
-        var opacity=255;
+	this.setButtonState = function () {
         if(this.text=='Random'){
             if((!Randomsetfocus) || !fb.IsPlaying){
                 this.state = ButtonStates.hide;return;
@@ -253,7 +204,7 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 			this.tooltip_text = fb.IsPaused?"Resume Playback":"Pause playback";
 			var play_pause = (fb.IsPaused || (g_cover.isPlaying() && g_cover.isHover));
             if(!play_pause || Randomsetfocus || !g_cover.isPlaying() || properties.single_click_action!=0){
-                this.state = ButtonStates.hide;return;
+                this.state = ButtonStates.hide;
             } else {
 				if(this.state!=ButtonStates.hover)
 					this.state = ButtonStates.normal;
@@ -263,29 +214,27 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 				}
 			}
         }
-        if (this.state == ButtonStates.hide) return;
+	}
+    this.draw = function (gr) {
+        b_img=this.N_img;
+        var opacity=255;
 
+		this.setButtonState();
         switch (this.state)
         {
 			case ButtonStates.normal:
 				b_img=this.N_img;
 				break;
-
 			case ButtonStates.hover:
 				b_img=this.H_img;
 				break;
-
 			case ButtonStates.down:
 				break;
 			case ButtonStates.hide:
 				return;
         }
 
-		//if (this.state == ButtonStates.normal && opacity!=0 && !(properties.innerCircle)) {
-			//if(!g_cover.cover_shadow_btn || g_cover.cover_shadow_btn==null) g_cover.cover_shadow_btn = g_cover.createCoverShadow(g_cover.w+40, g_cover.w+40, GetGrey(0,250),90, true);
-			//gr.DrawImage(g_cover.cover_shadow_btn, g_cover.x, g_cover.y, g_cover.w, g_cover.h, -20, -20, g_cover.cover_shadow_btn.Width+40, g_cover.cover_shadow_btn.Height+40);
-		//}
-        gr.DrawImage(b_img, this.x+Math.round((this.w-b_img.Width)/2), this.y, b_img.Width, b_img.Height, 0, 0, b_img.Width, b_img.Height,0,opacity);
+        gr.DrawImage(b_img, this.x+Math.round((this.w-b_img.Width)/2), this.y+Math.round((this.h-b_img.Height)/2), b_img.Width, b_img.Height, 0, 0, b_img.Width, b_img.Height,0,opacity);
     }
 
     this.onClick = function () {
@@ -328,7 +277,11 @@ function SimpleButton(x, y, w, h, text, tooltip_text, fonClick, fonDbleClick, N_
 		}
     }
 }
-
+function setButtonStates(gr) {
+    for (var i in buttons) {
+        buttons[i].setButtonState();
+    }	
+}
 function drawAllButtons(gr) {
     for (var i in buttons) {
         buttons[i].draw(gr);
@@ -361,16 +314,13 @@ function on_paint(gr) {
 	}
 
 	// draw background under playlist
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
 		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-	} else {
-		if(g_wallpaperImg && properties.showwallpaper) {
-			gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-			gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-		} else {
-			gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-		}
+	} else if(g_wallpaperImg && properties.showwallpaper) {
+		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
+		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
 	}
 
 	if(!g_cover.isSetArtwork()) {
@@ -380,29 +330,20 @@ function on_paint(gr) {
 			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
 		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
 	}
-
+	setButtonStates();
 	g_cover.draw(gr,0,0);
-
-	if(fb.IsPlaying){
-		if(properties.showVisualization && g_cover.isPlaying() && !fb.IsPaused && !Randomsetfocus && !g_cover.isHover) {
-			if(!properties.innerCircle){
-				if(!g_cover.cover_shadow_btn || g_cover.cover_shadow_btn==null) g_cover.cover_shadow_btn = g_cover.createCoverShadow(g_cover.w+40, g_cover.w+40, GetGrey(0,160),90, true);
-				gr.DrawImage(g_cover.cover_shadow_btn, g_cover.x, g_cover.y, g_cover.w, g_cover.h, -20, -20, g_cover.cover_shadow_btn.Width+40, g_cover.cover_shadow_btn.Height+40);
-			}
-			if(properties.innerCircle) var colors_anim = colors.normal_txt;
-			else  var colors_anim = colors.animation;
-
-			gr.FillSolidRect(visu_margin_left, g_cover.visuY-height_bar_1, bar_width, height_bar_1, colors_anim);
-			gr.FillSolidRect(visu_margin_left + bar_margin + bar_width, g_cover.visuY-height_bar_3, bar_width, height_bar_3, colors_anim);
-			gr.FillSolidRect(visu_margin_left + bar_margin*2 + bar_width*2, g_cover.visuY-height_bar_2, bar_width, height_bar_2, colors_anim);
-		}
-	}
-
+	
 	drawAllButtons(gr);
 
-	g_infos.draw(gr, 0, wh-track_infos_height);
-	var side_padding = 10;
-	gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
+	if(trackinfostext_state.isActive()) g_infos.draw(gr, 0, wh-track_infos_height-(properties.showRating?rating_height:0));
+	if(getTrackInfosState()==1){
+		var side_padding = 10;
+		gr.FillGradRect(side_padding, wh - 1, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);
+	} else {
+		//gr.FillSolidRect(0, 1, ww, 1, colors.sidesline);
+		var side_padding = 5;
+		gr.FillGradRect(side_padding, 0, ww - side_padding*2, 1, 0, RGBA(0, 0, 0, 0), colors.border, 0.5);		
+	}
 
 	if(g_resizing.showResizeBorder()) gr.FillSolidRect(0, 0, 1, wh, colors.dragdrop_marker_line);
 	else gr.FillSolidRect(0, 0, 1, wh, colors.sidesline);
@@ -411,10 +352,9 @@ function on_size(w, h) {
     ww = w;
     wh = h;
 	calculate_visu_margin_left();
-	if((properties.showVisualization && g_cover.isPlaying()) || globalProperties.enable_screensaver) startAnimation();
-	g_cover.setSize(ww,wh-track_infos_height);
+	g_cover.setSize(ww,wh-(trackinfostext_state.isActive()?track_infos_height+(properties.showRating?rating_height:0):0));
 
-	g_infos.setSize(w,track_infos_height);
+	g_infos.setSize(w,track_infos_height+(properties.showRating?rating_height:0));
 
 	rating_spacing = Math.min(10, (ww-imgw*5) / 5);
 
@@ -429,25 +369,19 @@ function on_size(w, h) {
 		index=i-1;
 		rbutton[i].setx(rating_x + imgw * index + rating_spacing * index);
 	}
-	TextBtn_info.setSize(0, wh-track_infos_height, ww, track_infos_height);
+	TextBtn_info.setSize(0, wh-track_infos_height-rating_height, ww, track_infos_height+rating_height);
 }
 
 function on_mouse_lbtn_up(x, y, m) {
     g_down = false;
 	g_resizing.on_mouse("lbtn_up", x, y, m);
-    if (cur_btn && cur_btn.state!=ButtonStates.hide && !g_dble_click) {
+    if (cur_btn && cur_btn.state!=ButtonStates.hide && !g_dble_click && g_cover.isHover) {
         cur_btn.onClick();
         window.Repaint();
     }
 	for (var i = 1; i < rbutton.length + 1; i++) {
 		rbutton[i - 1].MouseUp(x, y, i);
 	}
-	/*if (TextBtn_info.isXYInButton(x, y)) {
-		if (fb.IsPlaying) {
-			window.NotifyOthers("FocusOnNowPlaying", fb.GetNowPlaying());
-			on_notify_data("FocusOnNowPlaying", fb.GetNowPlaying())
-		}
-	}*/
     g_dble_click=false;
 }
 function on_mouse_lbtn_down(x, y, m) {
@@ -456,20 +390,11 @@ function on_mouse_lbtn_down(x, y, m) {
 		g_down = true;
 		click_on_btn = false;
 		cur_btn = chooseButton(x, y);
-		if (cur_btn && cur_btn.state!=ButtonStates.hide) {
+		if (cur_btn && cur_btn.state!=ButtonStates.hide && g_cover.isHover) {
 			cur_btn.changeState(ButtonStates.down);
 			click_on_btn=true;
 			window.Repaint();
 		}
-		/*if(!fb.IsPlaying) {
-			play_random(properties.random_function);
-		} else 
-		if(!click_on_btn) {
-			if(fb.IsPlaying) {
-				window.NotifyOthers("FocusOnNowPlaying",fb.GetNowPlaying());
-				on_notify_data("FocusOnNowPlaying",fb.GetNowPlaying())
-			} else if(g_cover.metadb) window.NotifyOthers("FocusOnTrack",g_cover.metadb);
-		}*/
 	}
 }
 
@@ -485,7 +410,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 				showNowPlaying(true);
 			break;
 			case (properties.dble_click_action==2):
-				if(!g_cover.isFiller()) showNowPlayingCover();
+				if(!g_cover.isFiller()) openCoverFullscreen(g_cover.metadb);
 			break;
 			case (properties.dble_click_action==3):
 				fb.RunContextCommandWithMetadb("Open containing folder", fb.GetNowPlaying(), 8);
@@ -517,15 +442,16 @@ function on_mouse_move(x, y, m) {
 	} else {
 		g_cover.onMouse("move", x, y, m);
 		g_infos.onMouse("move", x, y, m);
-
-		old_rating_hover_id = rating_hover_id;
-		is_hover_rating_old = is_hover_rating;
-		is_hover_rating = false;
-		for (var i = 1; i < rbutton.length + 1; i++) {
-			if(rbutton[i - 1].MouseMove(x, y, i)) is_hover_rating = true;
+		if(properties.showRating){
+			old_rating_hover_id = rating_hover_id;
+			is_hover_rating_old = is_hover_rating;
+			is_hover_rating = false;
+			for (var i = 1; i < rbutton.length + 1; i++) {
+				if(rbutton[i - 1].MouseMove(x, y, i)) is_hover_rating = true;
+			}
+			if(!is_hover_rating) rating_hover_id = false;
+			if(is_hover_rating_old!=is_hover_rating || old_rating_hover_id!=rating_hover_id) window.Repaint();
 		}
-		if(!is_hover_rating) rating_hover_id = false;
-		if(is_hover_rating_old!=is_hover_rating || old_rating_hover_id!=rating_hover_id) window.Repaint();
 	}
 }
 
@@ -548,9 +474,6 @@ function on_mouse_leave() {
 function on_playback_new_track(metadb) {
 	if (metadb)	{
 		g_cover.getArtwork(metadb, true, plman.PlayingPlaylist);
-		if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver) && g_cover.isPlaying()) {
-			startAnimation();
-		}
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			old_cachekey = nowplaying_cachekey;
 			nowplaying_cachekey = process_cachekey(metadb);
@@ -566,16 +489,11 @@ function on_playback_new_track(metadb) {
 	on_item_focus_change(plman.ActivePlaylist);
 }*/
 
-function on_playback_time() {
-	if(!animationTimer && (properties.showVisualization || globalProperties.enable_screensaver) && g_cover.isPlaying()) {startAnimation();}
-}
-
 function on_playback_stop(reason) {
 	switch(reason) {
 	case 0: // user stop
 	case 1: // eof (e.g. end of playlist)
 		g_cover.refreshCurrent(false);
-		if(!globalProperties.enable_screensaver) resetAnimation();
 		// update wallpaper
 		nowplaying_cachekey = '';
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
@@ -662,6 +580,9 @@ oImageCache = function () {
 	this.resetAll = function(){
 		this.cachelist = Array();
 	};
+    this.resetCache = function () {
+		this.cachelist = Array();
+	}	
     this.resetMetadb = function(metadb) {
         this.cachelist[process_cachekey(metadb)] = null;
     };
@@ -681,8 +602,10 @@ oCover = function() {
 	this.tintDrawed = false;
 	this.filler = false;
 	this.buttons_positioned = false;
-	this.padding = Array(20,20,0,20);
-	this.padding_norating = Array(7,7,0,7);	
+	this.padding_default = Array(20,20,0,20);
+	this.padding_norating = Array(20,7,0,7);	
+	this.padding_noinfos = Array(24,24,24,24);
+	this.nopadding = Array(0,0,0,0);	
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -857,13 +780,16 @@ oCover = function() {
 		this.buttons_positioned = false;
 	}
     this.setSize = function(w, h) {
-		if(properties.showRating){
-			this.w = w - this.padding[1] - this.padding[3];
-			this.h = h - this.padding[0] - this.padding[2];
+		if(properties.showRating && trackinfostext_state.isActive()){
+			this.padding = this.padding_default;
+		} else if(trackinfostext_state.isActive()){
+			this.padding = this.padding_norating;
 		} else {
-			this.w = w - this.padding_norating[1] - this.padding_norating[3];
-			this.h = h - this.padding_norating[0] - this.padding_norating[2];
+			if(!properties.coverNoPadding) this.padding = this.padding_noinfos;
+			else this.padding = this.nopadding;
 		}
+		this.w = w - this.padding[1] - this.padding[3];
+		this.h = h - this.padding[0] - this.padding[2];		
 		if(this.isSetArtwork()) {
 			this.resize();
 		}
@@ -897,8 +823,11 @@ oCover = function() {
 	};
 	this.draw = function(gr, x, y) {
 		this.x = Math.round(ww/2-this.w_resized/2);
-		this.y = y + this.padding[0] -1;
-
+		if(trackinfostext_state.isActive())
+			this.y = y + this.padding[0] -1;
+		else
+			this.y = Math.round(wh/2-this.h_resized/2);
+		
 		if(!this.buttons_positioned){
 			positionButtons();
 			this.buttons_positioned = true;
@@ -930,11 +859,11 @@ oCover = function() {
 			this.drawn_w = this.w;
 			gr.DrawImage(cover_to_draw, this.x, this.y, this.w, this.h, 0, 0, cover_to_draw.Width, cover_to_draw.Height);
 		}
-		if(this.borders){
+		if(this.borders && !properties.coverNoPadding){
 			if(properties.circleMode) gr.DrawEllipse(this.x, this.y, this.drawn_w, this.drawn_h, 1.0, colors.border_covers);
 			else gr.DrawRect(this.x, this.y, this.drawn_w-1, this.drawn_h-1, 1, colors.border_covers);
 		}
-		if(properties.tintOnHover && this.isHover){
+		if(properties.tintOnHover && (this.isHover || buttons.Pause.state != ButtonStates.hide || buttons.Random.state != ButtonStates.hide)){
 			if(properties.circleMode) {
 				gr.SetSmoothingMode(2);
 				gr.FillEllipse(this.x, this.y, this.drawn_w, this.drawn_h, colors.overlay_on_hover);
@@ -943,19 +872,8 @@ oCover = function() {
 			this.tintDrawed = true;
 		}
 		if(((g_cover.isPlaying() || (Randomsetfocus && fb.IsPlaying)) && !(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && !properties.showVisualization)) || this.isHover) {
-			this.circle_inner_padding = Math.round(this.drawn_w*0.7);
-			this.inner_circle_size = this.drawn_w-this.circle_inner_padding-2;
-
-			if(properties.innerCircle && !properties.circleMode){
-				gr.FillSolidRect(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
-			} else if(properties.innerCircle){
-				gr.SetSmoothingMode(2);
-				gr.FillEllipse(this.x+Math.round(this.w_resized/2-this.inner_circle_size/2), this.y+Math.round(this.h_resized/2-this.inner_circle_size/2), this.inner_circle_size, this.inner_circle_size, colors.btn_bg);
-				gr.SetSmoothingMode(0);
-			} else {
-				if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50);
-				gr.DrawImage(this.btn_shadow, this.x, this.y, this.drawn_w, this.drawn_w, 0, 0, this.btn_shadow.Width, this.btn_shadow.Height);
-			}
+			if(!this.btn_shadow) this.btn_shadow = this.createBtnShadow(this.drawn_w, this.inner_circle_size, colors.btn_shadow, 50);
+			gr.DrawImage(this.btn_shadow, this.x, this.y, this.drawn_w, this.drawn_w, 0, 0, this.btn_shadow.Width, this.btn_shadow.Height);
 		}
     };
 	this.createBtnShadow = function (sizeCover, sizeInner, color, radius){
@@ -981,7 +899,7 @@ oCover = function() {
 				this.down_y = y;
 			break;
 			case 'move':
-				if(x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h && g_cover.isValid()){
+				if(x>this.x && x<this.x+this.w_resized && y>this.y && y<this.y+this.h_resized && g_cover.isValid()){
 					g_cursor.setCursor(IDC_HAND,"coverpanel");
 					var repaint = false;
 					if(!this.isHover){
@@ -1097,25 +1015,25 @@ function on_notify_data(name, info) {
 			break;
 		case "trigger_on_focus_change_album":
 			metadb = new FbMetadbHandleList(info.metadb);
+			if(info.tracklist) var tracklist = new FbMetadbHandleList(info.tracklist);
+			else var tracklist = null;
 			if(info.cover_img==null) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 				if (properties.follow_cursor) {
-					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0], tracklist);
 				}
 			} else {
 				cover_img = new GdiBitmap(info.cover_img);
 				g_cover.setArtwork(cover_img, true, false, false, metadb[0], info.cachekey, info.playlist);
 				if (properties.follow_cursor) {
-					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true)
+					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
 				} else {
-					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0]);
+					g_infos.on_item_focus_change(info[0], -1, info[1], metadb[0], tracklist);
 				}
 			}
 			window.Repaint();
-			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
-			//g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex);
 			g_avoid_on_focus_change = true;
 			timers.on_focus_change = setTimeout(function() {
 				g_avoid_on_focus_change = false;
@@ -1219,8 +1137,10 @@ function on_notify_data(name, info) {
 		case "RefreshImageCover":
 			var metadb = new FbMetadbHandleList(info);
 			//if(fb.IsPlaying && metadb[0].Compare(fb.GetNowPlaying()))
-			if(process_cachekey(metadb)==g_cover.cachekey)
-				g_cover.refresh(metadb[0], false, undefined, true, g_cover.isPlaying());
+			var cachekey = process_cachekey(metadb);
+			g_image_cache.reset(cachekey);
+			if(cachekey==g_cover.cachekey)
+				g_cover.refresh(metadb[0], true); //g_cover.refresh, false, undefined, true, g_cover.isPlaying());
 		break;
 		case "cover_cache_finalized":
 			//g_image_cache.cachelist = cloneImgs(info);
@@ -1255,6 +1175,18 @@ function on_notify_data(name, info) {
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
 		break;
+		case "trackinfoslib_state":
+			trackinfoslib_state.value=info;
+		break;
+		case "trackinfosplaylist_state":
+			trackinfosplaylist_state.value=info;
+		break;
+		case "trackinfosbio_state":
+			trackinfosbio_state.value=info;
+		break;
+		case "trackinfosvisu_state":
+			trackinfosvisu_state.value=info;
+		break;		
 		case "minimode_dark_theme":
 			properties.minimode_dark_theme=info;
 			window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
@@ -1458,7 +1390,7 @@ function oInfos() {
 	this.line1_width = this.line2_width = this.line3_width = -1;
 	this.tooltip_line1 = this.tooltip_line2 = this.tooltip_line3 = false;
 	this.filler = false;
-	this.padding = Array(10,15,0,15);	this.padding
+	this.padding = Array(10,15,0,15);
 	this.repaint = function() {window.Repaint()}
 	this.is_playing = false;
 	this.metadb = false;
@@ -1489,7 +1421,7 @@ function oInfos() {
 			this.playing_metadb = metadb;
 		}
 	}
-	this.on_item_focus_change = function(playlistIndex, from, to, metadb) {
+	this.on_item_focus_change = function(playlistIndex, from, to, metadb, tracklist) {
 		if (g_avoid_on_focus_change || (to<0 && !metadb)) {
 			g_avoid_on_focus_change = false;
 			return;
@@ -1507,6 +1439,7 @@ function oInfos() {
 				window.Repaint();
 			}
 		}
+		this.tracklist = tracklist;
 		if (this.metadb) {
 			this.setTimerCycle();
 			this.on_metadb_changed(new FbMetadbHandleList(this.metadb));
@@ -1514,7 +1447,7 @@ function oInfos() {
 	}
 	this.on_metadb_changed = function(metadbs, fromhook) {
 		if(window.IsVisible || !this.first_populate_done) {
-
+			if(!properties.showInfos) return;
 			if(!this.metadb || g_avoid_metadb_updated) {
 				g_avoid_metadb_updated = false;
 				return;
@@ -1549,14 +1482,14 @@ function oInfos() {
 		this.show_info = true;
 		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
-	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, cachekey){
+	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, tracklist){
 		this.txt_line1 = row1;
 		this.txt_line2 = row2;
 		this.txt_line3 = row3;
 		this.line1_width = this.line2_width = this.line3_width = -1;
 		this.tooltip_line1 = this.tooltip_line2 = this.tooltip_line3 = false;
 		this.album_infos = album_infos;
-
+		this.tracklist = tracklist;
 		if(this.album_infos) {
 			this.metadb = metadb[0];
 			if(typeof rating == "undefined") this.rating = g_tfo.rating_album.EvalWithMetadb(this.metadb);
@@ -1601,10 +1534,10 @@ function oInfos() {
 
 		if (properties.showRating) {
 			for (var i = 1; i < rbutton.length + 1; i++) {
-				rbutton[i - 1].Paint(gr, i, y+10);
+				rbutton[i - 1].Paint(gr, i, y+9);
 			}
-			var text_y_adj = 10;
-		} else var text_y_adj = 6;
+			var text_y_adj = 18;
+		} else var text_y_adj = 2;
 
 		var double_row = (properties.doubleRowText && this.txt_line3 !="" && this.txt_line2 !="");
 
@@ -1700,7 +1633,7 @@ function on_mouse_rbtn_up(x, y){
 	main_menu.AppendMenuSeparator();
 	if(g_cover.isValid()){
 		var now_playing_track = fb.GetNowPlaying();
-		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover");
+		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover in its full/original size");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
 		var quickSearchMenu = window.CreatePopupMenu();
@@ -1745,14 +1678,6 @@ function on_mouse_rbtn_up(x, y){
 			window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
 			window.Repaint();
 			break;
-		case (idx == 13):
-			properties.innerCircle = !properties.innerCircle;
-			window.SetProperty("Show Inner Cirle", properties.innerCircle);
-			get_images();
-			g_cover.refreshCurrent();
-			adaptButtons();
-			window.Repaint();
-			break;
 		case (idx == 100):
 			window.ShowProperties();
 			break;
@@ -1763,7 +1688,7 @@ function on_mouse_rbtn_up(x, y){
 			window.Reload();
 			break;
 		case (idx == 1):
-			showNowPlayingCover();
+			if(!g_cover.isFiller()) openCoverFullscreen(g_cover.metadb);
 			break;
 		case (idx == 2):
 			properties.random_function = '20_albums';
@@ -1850,17 +1775,17 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(10,properties.follow_cursor);
 		_menu.AppendMenuItem(MF_STRING, 11, "Circle artwork");
 		_menu.CheckMenuItem(11,properties.circleMode);
-		_menu.AppendMenuItem(MF_STRING, 13, "Background under buttons");
-		_menu.CheckMenuItem(13,properties.innerCircle);
-		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion");
+		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion")
 		_menu.CheckMenuItem(12,properties.keepProportion);
-		_menu.AppendMenuItem(MF_STRING, 16, "Show rating");
-		_menu.CheckMenuItem(16,properties.showRating);
-		_menu.AppendMenuItem(MF_STRING, 17, "Show infos on 2 rows");
+		_menu.AppendMenuItem(MF_STRING, 13, "Fill the whole space");
+		_menu.CheckMenuItem(13,!trackinfostext_state.isActive() && properties.coverNoPadding);				
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 18, "Show track details");
+		_menu.CheckMenuItem(18, trackinfostext_state.isActive());		
+		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 17, "Show details on 2 rows");
 		_menu.CheckMenuItem(17, properties.doubleRowText);
-		
-		_menu.AppendMenuItem(MF_STRING, 1, "Show an animation when playing");
-		_menu.CheckMenuItem(1,properties.showVisualization);
+		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 16, "Show rating");
+		_menu.CheckMenuItem(16,properties.showRating);		
 		_menu.AppendMenuSeparator();
 
 		var _single_click_menu = window.CreatePopupMenu();
@@ -1872,7 +1797,7 @@ function draw_settings_menu(x,y){
 		var _dble_click_menu = window.CreatePopupMenu();
 		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover");
+		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover in its full/original size");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
 		_dble_click_menu.AppendMenuItem(MF_STRING, 8, "Edit track properties");		
@@ -1894,14 +1819,6 @@ function draw_settings_menu(x,y){
 
         idx = _menu.TrackPopupMenu(x,y);
         switch(true) {
-			case (idx == 1):
-                properties.showVisualization = !properties.showVisualization;
-                window.SetProperty("Show Visualization", properties.showVisualization);
-				window.NotifyOthers("sidebar_isplaying",properties.showVisualization && g_cover.is_playing);
-				calculate_visu_margin_left();
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				window.Repaint();
-				break;
             case (idx == 2):
 				coverpanel_state_big.toggleValue();
                 break;
@@ -1954,13 +1871,19 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;
 			case (idx == 13):
-				properties.innerCircle = !properties.innerCircle;
-				window.SetProperty("Show Inner Cirle", properties.innerCircle);
+				if(!trackinfostext_state.isActive() && properties.coverNoPadding) {
+					properties.coverNoPadding = false;					
+				} else {
+					properties.coverNoPadding = true;
+					trackinfostext_state.setValue(0);
+				}
 				get_images();
-				g_cover.refreshCurrent();
 				adaptButtons();
+				g_cover.refreshCurrent();
+				on_size(window.Width,window.Height);
+				window.SetProperty("_DISPLAY: cover no padding", properties.coverNoPadding)
 				window.Repaint();
-				break;
+				break;				
             case (idx >= 14 && idx<=15):
 				properties.single_click_action = idx-14;
 				window.SetProperty("PROPERTY single_click_action", properties.single_click_action);
@@ -1979,6 +1902,14 @@ function draw_settings_menu(x,y){
 				window.SetProperty("_DISPLAY: doubleRowText", properties.doubleRowText);
 				window.Repaint();
 				break;				
+			case (idx == 18):
+				trackinfostext_state.toggleValue();
+				get_images();
+				g_cover.refreshCurrent();
+				on_size(window.Width,window.Height);			
+				adaptButtons();				
+				window.Repaint();
+				break;					
 			case (idx == 200):
 				toggleWallpaper();
 				break;
@@ -2080,6 +2011,7 @@ function get_colors(){
 	colors.line_bottom = GetGrey(40,200);
 	colors.btn_shadow = GetGrey(0,100);
 	colors.overlay_on_hover = GetGrey(0,130);
+	colors.btns = GetGrey(255);
 }
 function on_font_changed(){
 	get_font();
@@ -2092,7 +2024,7 @@ function get_images(){
 		var theme_path = "controls_Light";
 		var theme_inverse_path = "controls_Dark";
 	}
-	var theme_btns = (properties.innerCircle)?theme_path:"controls_Dark";
+	var theme_btns = "controls_Dark";
 	images.mini_pause_img = gdi.Image(theme_img_path + "\\"+theme_btns+"\\pause_btn_mini.png");
 	images.mini_mini_pause_img = gdi.Image(theme_img_path + "\\"+theme_btns+"\\pause_btn_mini_mini.png");
 	images.pause_img = gdi.Image(theme_img_path + "\\"+theme_btns+"\\pause_btn.png");
@@ -2115,29 +2047,46 @@ function get_images(){
 	images.rating4_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_4.png");
 	images.rating5_img_hover = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_5_hover.png");
 	images.rating5_img = gdi.Image(theme_img_path + "\\" + theme_path + "\\rating_5.png");
+	
+	var img_width = 70;
+	var img_height = 70;
+	var pause_img = gdi.CreateImage(img_width, img_height);
+	gb = pause_img.GetGraphics();
+		var bar_space = 20;	
+		var pause_height = 32;		
+		var xpos = img_width/2-(bar_space+bar_width*2)/2;
+		var ypos = img_height/2-pause_height/2;		
+		var colors_anim = colors.btns;
+		gb.FillSolidRect(xpos, ypos, bar_width, pause_height, colors_anim);
+		gb.FillSolidRect(xpos + bar_space, ypos, bar_width, pause_height, colors_anim);
+	pause_img.ReleaseGraphics(gb);
+	images.pause_img = pause_img;
 
-	var play_img = gdi.CreateImage(68, 68);
+	var play_img = gdi.CreateImage(70, 70);
 	gb = play_img.GetGraphics();
-		var xpos = 28;
-		var ypos = 25;
+		var xpos = 25;
+		var ypos = 22;
+		var width = 22;
+		var height = 25;
 		gb.SetSmoothingMode(2);
-		gb.FillPolygon((properties.innerCircle?colors.normal_txt:darkcolors.normal_txt), 0, Array(xpos, ypos, 12+xpos, 7+ypos, xpos, 14+ypos));
+		gb.FillPolygon(colors.btns, 0, Array(xpos, ypos, xpos+width, ypos+height/2, xpos, ypos+height));
 		gb.SetSmoothingMode(0);
 	play_img.ReleaseGraphics(gb);
 	images.play_img = play_img;
 
 	var nowplaying_img = gdi.CreateImage(68, 68);
 	gb = nowplaying_img.GetGraphics();
-		var xpos = 26;
+		var xpos = 25;
 		var ypos = 40;
-		var img_height_bar_1 = 5;
-		var img_height_bar_2 = 15;
-		var img_height_bar_3 = 7;
-		if(properties.innerCircle) var colors_anim = colors.normal_txt;
-		else  var colors_anim = colors.animation;
-		gb.FillSolidRect(xpos, ypos-img_height_bar_1, bar_width, img_height_bar_1, colors_anim);
-		gb.FillSolidRect(xpos + bar_margin + bar_width, ypos-img_height_bar_2, bar_width, img_height_bar_2, colors_anim);
-		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors_anim);
+		var img_h_add = 4;
+		var img_height_bar_1 = 8 + img_h_add;
+		var img_height_bar_2 = 18 + img_h_add;
+		var img_height_bar_3 = 12 + img_h_add;
+		var img_height_bar_4 = 7 + img_h_add;
+		gb.FillSolidRect(xpos, ypos-img_height_bar_1, bar_width, img_height_bar_1, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin + bar_width, ypos-img_height_bar_2, bar_width, img_height_bar_2, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin*2 + bar_width*2, ypos-img_height_bar_3, bar_width, img_height_bar_3, colors.btns);
+		gb.FillSolidRect(xpos + bar_margin*3 + bar_width*3, ypos-img_height_bar_4, bar_width, img_height_bar_4, colors.btns);
 	nowplaying_img.ReleaseGraphics(gb);
 	images.nowplaying_img = nowplaying_img;
 

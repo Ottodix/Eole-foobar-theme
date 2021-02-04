@@ -6,7 +6,6 @@ var properties = {
     rowScrollStep: 3,
     drawAlternateBG: window.GetProperty("PROPERTY: Alternate row background", true),
     scrollSmoothness: 3.0,
-    refreshRate: 40,
     showHeaderBar: window.GetProperty("DISPLAY: Show Top Bar", false),
     showNewPlaylistButton: window.GetProperty("DISPLAY: Show new playlist button", true),
     defaultHeaderBarHeight: 40,
@@ -32,6 +31,7 @@ var properties = {
     addedRows_end_default: window.GetProperty("_PROPERTY: empty rows at the end", 1),
     showPlaylistIcons: window.GetProperty("_PROPERTY: show an icon before the playlist name", true),
     sortAlphabetically: window.GetProperty("_PROPERTY: sort playlist alphabetically", false),	
+    filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),	
 	panelFontAdjustement: -1,
 	emphasisOnActive: false,
 };
@@ -165,17 +165,14 @@ function DeletePlaylist(delete_pid){
 
 	function delete_confirmation(status, confirmed) {
 		if(confirmed){
-			if(plman.ActivePlaylist == parent.delete_pid){
-				if(parent.delete_pid==plman.PlaylistCount-1) plman.ActivePlaylist = parent.delete_pid-1;
-				else plman.ActivePlaylist = parent.delete_pid+1;
-			}
+
 			brw.delete_pending = true;
 			timers.deletePlaylist = setTimeout(function(){
 				timers.deletePlaylist && clearTimeout(timers.deletePlaylist);
 				timers.deletePlaylist = false;
 			}, 150);
 			//
-			var updateActivePlaylist = (brw.selectedRow == plman.ActivePlaylist);
+			var updateActivePlaylist = (brw.selectedRow == plman.ActivePlaylist || plman.ActivePlaylist == parent.delete_pid);
 			var row = brw.getRowIdFromIdx(parent.delete_pid);
 			plman.RemovePlaylistSwitch(parent.delete_pid);
 			if(row < brw.rowsCount - 1) {
@@ -185,10 +182,16 @@ function DeletePlaylist(delete_pid){
 			};
 			if(updateActivePlaylist) {
 				if(row < brw.rowsCount - 1) {
-					plman.ActivePlaylist = parent.delete_pid;
+					var new_active_playlist = parent.delete_pid;					 
 				} else if(row > 0) {
-					plman.ActivePlaylist = parent.delete_pid - 1;
+					var new_active_playlist = parent.delete_pid - 1;
 				};
+				var direction = -1;
+				while(ExcludePlaylist(plman.GetPlaylistName(new_active_playlist))){
+					if(new_active_playlist==0) direction=1;
+					new_active_playlist = new_active_playlist + direction;
+				}			
+				if(new_active_playlist>=0 && new_active_playlist<=brw.rowsCount - 1) plman.ActivePlaylist = new_active_playlist;
 			};
 		}
 	}
@@ -204,6 +207,7 @@ oPlaylist = function(idx, rowId, name) {
     this.idx = idx;
     this.rowId = rowId;
     this.name = name;
+	this.update_count_flag = false;
 	try {
 		if(idx>=0)
 			this.isAutoPlaylist = plman.IsAutoPlaylist(idx);
@@ -225,8 +229,16 @@ oPlaylist = function(idx, rowId, name) {
 	} catch(e){
 		this.item_count = 0;
 	}
+	this.getCount = function() {
+		if(this.update_count_flag) {
+			this.update_count_flag = false;			
+			this.update_count();
+		} 
+		return this.item_count;
+	}
 	this.update_count = function() {
-		this.item_count = plman.PlaylistItemCount(idx);
+		if(!window.IsVisible) this.update_count_flag = true;
+		else this.item_count = plman.PlaylistItemCount(idx);
 	}
 	this.setIcon = function() {
 		this.icon = playlistName2icon(this.name, this.isAutoPlaylist, images);
@@ -860,6 +872,7 @@ oBrowser = function(name) {
 	this.playing_icon_y = 0;
 	this.playing_icon_w = 0;
 	this.playing_icon_h = 0;
+	this.filter_results = -1;
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             brw.populate(is_first_populate = true, 2, reset_scroll = true);
@@ -948,6 +961,7 @@ oBrowser = function(name) {
 		
 		for(var i = 0; i < total; i++) {
 			name = plman.GetPlaylistName(i);
+			if(name==globalProperties.filter_playlist) this.filter_results = i;
 			if(ExcludePlaylist(name)){
 				var toAdd = false;
 			} else if(str_filter.length > 0) {
@@ -985,6 +999,7 @@ oBrowser = function(name) {
     this.populate = function(is_first_populate, call_id, reset_scroll) {
 		console.log("--> populate smoothPlaylistManager call_id:"+call_id)
         this.init_groups();
+		if(this.selectedRow > this.rowsCount) this.selectedRow = plman.ActivePlaylist;		
         if(reset_scroll) scroll = scroll_ = 0;
         this.scrollbar.updateScrollbar();
         this.repaint();
@@ -1078,7 +1093,7 @@ oBrowser = function(name) {
 						};
 
                         // active playlist row bg
-                        if(this.rows[i].idx == plman.ActivePlaylist || (i==g_rightClickedIndex && g_rightClickedIndex > -1)) {
+                        if(this.rows[i].idx == plman.ActivePlaylist || (i==g_rightClickedIndex && g_rightClickedIndex > -1) || (this.rows[i].idx == properties.filtred_playlist_idx && properties.filtred_playlist_idx>-1 && plman.ActivePlaylist==this.filter_results)) {
                             gr.FillSolidRect(ax, ay, aw, ah, colors.selected_item_bg);
 							//top
 							if(i>0 ){
@@ -1134,7 +1149,7 @@ oBrowser = function(name) {
                         // =====
                         if(ay >= (0 - ah) && ay < this.y + this.h) {
 
-							if(fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist && this.rows[i].idx>=0) {
+							if(fb.IsPlaying && (this.rows[i].idx == plman.PlayingPlaylist || (this.rows[i].idx == properties.filtred_playlist_idx && properties.filtred_playlist_idx>-1 && plman.PlayingPlaylist==this.filter_results)) && this.rows[i].idx>=0) {
                                 var font = g_font.boldplus1;
 								if(is_active && properties.emphasisOnActive)
 									var playlist_icon = (g_seconds%2==0)?images_inverse.now_playing_0:images_inverse.now_playing_1;
@@ -1166,12 +1181,12 @@ oBrowser = function(name) {
 									gr.FillSolidRect(icon_x, icon_y, icon_w, icon_h, colors.marker_hover_item);
 								}
 								var rh = this.rows[i].icon.Width;
-								gr.DrawImage(playlist_icon, icon_x, icon_y, icon_w, icon_h, 0, 0, icon_w, icon_h, 0, 255);
+								gr.DrawImage(playlist_icon, icon_x, icon_y, icon_w, icon_h, 0, 0, icon_w, icon_h, 0, is_active?255: colors.icon_opacity);
 							} else var rh = 0;
 
                             // fields
                             var track_name_part = this.rows[i].name;
-                            var track_total_part = this.rows[i].item_count;
+                            var track_total_part = this.rows[i].getCount();
 
                             cColumns.track_name_part = gr.CalcTextWidth(track_name_part, font) + 15;
 							if(properties.drawItemsCounter && this.rows[i].idx !=-1)
@@ -1187,7 +1202,7 @@ oBrowser = function(name) {
                             if(this.inputboxID == i) {
                                 this.inputbox.draw(gr, tx+2, ay+5);
                             } else {
-                                gr.GdiDrawText(track_name_part, font, colors.normal_txt, tx, ay, aw - tx - cColumns.track_total_part - this.paddingRight - 5, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                gr.GdiDrawText(track_name_part, font, is_active?colors.full_txt:colors.normal_txt, tx, ay, aw - tx - cColumns.track_total_part - this.paddingRight - 5, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 								if(properties.drawItemsCounter)
                                 gr.GdiDrawText(track_total_part, g_font.min2, colors.faded_txt, ax + aw - cColumns.track_total_part - this.paddingRight, ay, cColumns.track_total_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                             };
@@ -1601,12 +1616,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 
@@ -2535,6 +2550,9 @@ function get_images() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout){
+		colors.icon_opacity = 200;
+		colors.normal_txt = GetGrey(180);	
+		colors.full_txt = GetGrey(255);		
 		colors.dragdrop_bg_selected_item = GetGrey(0,190);
 		colors.dragdrop_line_selected_item = GetGrey(255,45);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60)
@@ -2543,6 +2561,8 @@ function get_colors() {
 		colors.grad_bottom_2 = GetGrey(0,0);
 		colors.fading_bottom_height = 50;
 	} else {
+		colors.icon_opacity = 255;		
+		colors.full_txt = GetGrey(0);				
 		colors.dragdrop_bg_selected_item = GetGrey(220);
 		colors.dragdrop_line_selected_item = GetGrey(205);
 		colors.dragdrop_disabled_item = RGBA(255,0,0,60);
@@ -2910,14 +2930,12 @@ function on_playlists_changed() {
 		};
 		brw.populate(is_first_populate = false, 4, reset_scroll = false);
 
-		if(brw.selectedRow > brw.rowsCount) brw.selectedRow = plman.ActivePlaylist;
-
 		brw.repaint();
 		brw.delete_pending = false;
-	} else if(!g_avoid_on_playlists_changed) set_update_function('on_playlists_changed()');
+	} else if(!g_avoid_on_playlists_changed) set_update_function('brw.populate(false, 4, false)');
 };
 
-function on_playlist_switch() {
+function on_playlist_switch() {	
 	if(window.IsVisible) {
 		g_active_playlist = plman.ActivePlaylist;
 		brw.showActivePlaylist();
@@ -2927,25 +2945,21 @@ function on_playlist_switch() {
 };
 
 function on_playlist_items_added(playlist_idx) {
-	if(window.IsVisible) {
-		try{
-			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
-		} catch(e){
-			console.log('on_playlist_items_added failed');
-		}
-		brw.repaint();
-	} else set_update_function('on_playlist_items_added('+playlist_idx+')');
+	try{
+		brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
+		if(window.IsVisible) brw.repaint();
+	} catch(e){
+		console.log('on_playlist_items_added failed');
+	}
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if(window.IsVisible) {
-		try{
-			brw.rows[brw.getRowIdFromIdx(playlist_idx)].update_count();
-		} catch(e){
-			console.log('on_playlist_items_removed failed');
-		}
-		brw.repaint();
-	} else set_update_function('on_playlist_items_removed('+playlist_idx+','+new_count+')');
+	try{
+		brw.rows[brw.getRowIdFromIdx(playlist_idx)].item_count = new_count;
+		if(window.IsVisible) brw.repaint();
+	} catch(e){
+		console.log('on_playlist_items_removed failed');
+	}
 };
 
 
@@ -3035,7 +3049,9 @@ function on_notify_data(name, info) {
 			g_avoid_on_playlists_changed=info;
 			//if(!g_avoid_on_playlists_changed) on_playlists_changed();
 			break;
+		case "UpdatePlaylistsManager":			
 		case "UpdatePlaylists":
+			g_avoid_on_playlists_changed=false;
 			on_playlists_changed();
 		break;
 		case "enable_screensaver":
@@ -3077,6 +3093,15 @@ function on_notify_data(name, info) {
 		case "WSH_panels_reload":
 			window.Reload();
 		break;
+		case "refresh_filters":
+			if(typeof info[1] !== 'undefined') {
+				properties.filtred_playlist_idx = info[1];
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx);
+			} else if(properties.filtred_playlist_idx>-1 && plman.GetPlaylistName(plman.ActivePlaylist)!=globalProperties.filter_playlist) {
+				properties.filtred_playlist_idx = -1;
+				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx)
+			}
+		break;		
     };
 };
 
@@ -3212,6 +3237,9 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 }
 
 function on_init() {
+	if(plman.GetPlaylistName(plman.ActivePlaylist)==globalProperties.filter_playlist && properties.filtred_playlist_idx>-1)
+		plman.ActivePlaylist = properties.filtred_playlist_idx;
+	
     window.DlgCode = 0x0004;
 
     get_font();

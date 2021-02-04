@@ -23,6 +23,7 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
     this.display_label = true;
     this.opacity = 255;	
 	this.toUpperCase = false;
+	this.dbleClickActivated = false;
 	this.img_x_adjustement = 0;		
 	this.img_y_adjustement = 0;		
 	this.txt_x_adjustement = 0;	
@@ -190,11 +191,17 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
 				if (this.containXY(x, y) && this.isVisible()) {
 					this.changeState(ButtonStates.hover);
 				} else this.changeState(ButtonStates.normal);
+				if(this.dbleClickActivated){
+					this.dbleClickActivated = false;
+					return;
+				}
 				this.fonUp && this.fonUp();				
 			break;
 			case 'dble_click':
-				if(this.fonDbleClick) {this.fonDbleClick();}
-				else {
+				if(this.fonDbleClick) {
+					this.fonDbleClick();
+					this.dbleClickActivated = true;
+				} else {
 					this.onMouse("lbtn_down",x,y);					
 				}			
 			break;
@@ -356,7 +363,7 @@ function JSButtonGroup(alignment, x, y, name, adaptCursor){
 				}
 				if(this.cur_btn && this.cur_btn.tooltip_text && g_tooltip.activeZone != this.cur_btn.name){
 					if(g_tooltip.activated) g_tooltip.Deactivate();
-					g_tooltip.ActivateDelay(this.cur_btn.tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 0, false, this.cur_btn.name);
+					g_tooltip.ActivateDelay(this.cur_btn.tooltip_text, x+10, y+20, globalProperties.tooltip_button_delay, 1200, false, this.cur_btn.name);
 					this.tooltip_activated = true;
 				} else if(this.tooltip_activated && (!this.cur_btn || g_tooltip.activeZone != this.cur_btn.name)){
 					this.tooltip_activated = false;

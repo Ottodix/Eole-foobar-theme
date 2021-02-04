@@ -3,7 +3,7 @@ var padding_top_nobio = 17;
 var padding_bottom = 5;
 var padding_left = 35;
 var padding_right = 35;
-var header_height = 35;
+var header_height = 135;
 var ww = 0;
 var wh = 0;
 var lyricsText_Width = -1;
@@ -92,7 +92,7 @@ function on_paint(gr) {
 		lyricsText_Width = gr.CalcTextWidth("Lyrics", font_title)+10;
 		positionButtons();
 	}
-	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, (lyrics_state.isEqual(5)?padding_top_nobio:padding_top), ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+	gr.GdiDrawText("Lyrics", font_title, colors.normal_txt, padding_left, (lyrics_state.isEqual(5)?padding_top_nobio:padding_top), ww - padding_left-padding_right, header_height, DT_TOP | DT_LEFT | DT_END_ELLIPSIS | DT_NOPREFIX);
 	drawAllButtons(gr);
 }
 function on_font_changed() {
@@ -119,45 +119,47 @@ function get_colors() {
 	esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);
-	esl.ShowDesktopLyric = false;
-	esl.DesktopLyricAlwaysOnTop = false;
+	if(settings_file_not_found){
+		esl.ShowDesktopLyric = false;
+		esl.DesktopLyricAlwaysOnTop = false;
+	}
 };
 function on_mouse_rbtn_up(x, y){
-        var _menu = window.CreatePopupMenu();
-        var idx;
+	var _menu = window.CreatePopupMenu();
+	var idx;
 
-		_menu.AppendMenuItem(MF_STRING, 99, "Stick to dark layout");
-		_menu.CheckMenuItem(99,properties.stick2darklayout);
+	_menu.AppendMenuItem(MF_STRING, 99, "Stick to dark layout");
+	_menu.CheckMenuItem(99,properties.stick2darklayout);
 
-		if(utils.IsKeyPressed(VK_SHIFT)) {
-			_menu.AppendMenuSeparator();
-			_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
-			_menu.AppendMenuItem(MF_STRING, 101, "Configure...");
-            _menu.AppendMenuSeparator();
-			_menu.AppendMenuItem(MF_STRING, 102, "Reload");
-		}
-        idx = _menu.TrackPopupMenu(x,y);
-        switch(true) {
-            case (idx == 99):
-				properties.stick2darklayout=!properties.stick2darklayout;
-				window.SetProperty("_DISPLAY: stick to Dark layout", properties.stick2darklayout);
-				get_colors();
-				window.Repaint();
-                break
-            case (idx == 100):
-                window.ShowProperties();
-                break;
-            case (idx == 101):
-                window.ShowConfigure();
-                break;
-            case (idx == 102):
-                window.Reload();
-                break;
-            default:
-				return true;
-        }
-        _menu = undefined;
-        return true;
+	if(utils.IsKeyPressed(VK_SHIFT)) {
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
+		_menu.AppendMenuItem(MF_STRING, 101, "Configure...");
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 102, "Reload");
+	}
+	idx = _menu.TrackPopupMenu(x,y);
+	switch(true) {
+		case (idx == 99):
+			properties.stick2darklayout=!properties.stick2darklayout;
+			window.SetProperty("_DISPLAY: stick to Dark layout", properties.stick2darklayout);
+			get_colors();
+			window.Repaint();
+			break
+		case (idx == 100):
+			window.ShowProperties();
+			break;
+		case (idx == 101):
+			window.ShowConfigure();
+			break;
+		case (idx == 102):
+			window.Reload();
+			break;
+		default:
+			return true;
+	}
+	_menu = undefined;
+	return true;
 }
 var searching_img = gdi.CreateImage(50, 50);
 gb = searching_img.GetGraphics();

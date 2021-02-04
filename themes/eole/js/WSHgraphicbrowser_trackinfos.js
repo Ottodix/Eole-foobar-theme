@@ -102,7 +102,6 @@ var properties = {
     filterBox_filter_tracks: window.GetProperty("MAINPANEL filter tracks", false),
     followNowPlaying: window.GetProperty("TRACKLIST Always Follow Now Playing", true),
 	right_panel_follow_cursor: window.GetProperty("_MAINPANEL: right_panel_follow_cursor", true),
-    refreshRate: window.GetProperty("MAINPANEL Repaint rate", 35),
     expandInPlace: window.GetProperty("TRACKLIST Expand in place", true),
     expandOnHover: window.GetProperty("TRACKLIST Expand on hover", true),
     showListColored: window.GetProperty("TRACKLIST Color according to albumart", true),
@@ -118,6 +117,8 @@ var properties = {
     showRating: window.GetProperty("TRACKLIST Show rating in Track Row", false),
     showRatingSelected: window.GetProperty("TRACKLIST Show rating in Selected Track Row", false),
     showRatingRated: window.GetProperty("TRACKLIST Show rating in Rated Track Row", false),
+    show2lines: window.GetProperty("TRACKLIST Show track details on 2 rows", false),	
+    show2linesCustomTag: window.GetProperty("TRACKLIST track details on 2 rows - custom tag", ""),
 	showlistShowCover: window.GetProperty("TRACKLIST Show cover", true),
     SortBy: window.GetProperty("MAINPANEL Sort albums by", "standard"),
     SortDescending: window.GetProperty("MAINPANEL sort descending", false),
@@ -133,7 +134,7 @@ var properties = {
     TFtitle: "%artist% ^^ [%discnumber%.] ^^ %tracknumber% ^^ %title% ^^ $if2(" + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + ",0) ^^ $if(%length%,%length_seconds%,'ON AIR')",
     TFbitrate: "$if2(%bitrate% kbit,'')",
     TFcodec: "$if2(%codec%,'')",
-    TFplaycount: "$if2(%play_counter%,$if2(%play_count%,0))",
+    TFplaycount: "$if2(%play_counter%,$if2(%play_count%,0)) plays",
     TFshowlist: "%album artist% ^^ %album% ^^ $ifgreater(%totaldiscs%,1,[' - Disc '%discnumber%],) ^^ %date% ^^ %genre%",
 	TFshowlistReduced: "[%discnumber%]",
     TFgroupinfos: "%genre% ^^ %date% ^^ %discnumber%",
@@ -160,22 +161,24 @@ var properties = {
 	enableAutoSwitchPlaylistMode: window.GetProperty("MAINPANEL Automatically change displayed playlist", false),
 	showTotalTime: window.GetProperty("_DISPLAY: Total time", true),
 	fullPlaylistHistory:false,
-	marginLR: 12,
+	marginLR: window.GetProperty("COVER Side margin min", 12),
 	showlistWidthMax:1300,
 	CoverHoverExtendRect:2,
 	showlistRowWidthMin:100,
 	showlistRowWidthMax:800,
 	showlistMaxColumns: 0,
-	showlistScrollbar: true,
+	showlistScrollbar: window.GetProperty("TRACKLIST horizontal scrollbar", true),
+	showlistOneColumn: window.GetProperty("TRACKLIST one column", false),
 	showlistheightMin:107,
 	showlistheightMinCover:147,
 	showlistheightMinCoverGrid:107,
-	showlistCoverMaxSize:232,
+	showlistCoverMaxSize:300,
 	showlistCoverMinSize:132,
 	showlistCoverMargin:28,
 	load_image_from_cache_direct:true,
-	veryTighCoverActiveZone : false,
+	veryTighCoverActiveZone: window.GetProperty("COVER Small active zone", false),
 }
+properties.show2linesCustomTag_tf = fb.TitleFormat(properties.show2linesCustomTag);
 properties.smooth_scroll_value = properties.smooth_scroll_value < 0 ? 0 : properties.smooth_scroll_value > 0.9 ? 0.9 : properties.smooth_scroll_value;
 properties.smooth_expand_value = properties.smooth_expand_value < 0 ? 0 : properties.smooth_expand_value > 0.9 ? 0.9 : properties.smooth_expand_value;
 
@@ -306,7 +309,6 @@ var cover = {
 	btn_play: play_img,
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
-	marginSide:5,
 	marginBottom:30,
     masks: window.GetProperty("COVER album art masks (for disk cache)","*front*.*;*cover*.*;*folder*.*;*.*"),
 };
@@ -882,20 +884,24 @@ oRow = function(metadb,itemIndex) {
 	this.title_length = 0;
 	this.artist_length = 0;
 	this.playcount_length = 0;
+	this.secondLine_length = 0;
 	this.cursorHand = false;
 	this.isFirstRow = false;
 	this.getTags = function(){
-
-		if(properties.showPlaycount) {
+		this.secondLine = "";
+		if(properties.show2linesCustomTag!=""){
+			var TagsString = TF.title.EvalWithMetadb(metadb);
+			this.secondLine = properties.show2linesCustomTag_tf.EvalWithMetadb(metadb);
+		} else if(properties.showPlaycount) {
 			if(properties.showCodec) {
 				if(properties.showBitrate)
 					var TagsString = TF.titlePCB.EvalWithMetadb(metadb);
 				else
 					var TagsString = TF.titlePC.EvalWithMetadb(metadb);
 			} else if(properties.showBitrate)
-				var TagsString = TF.titlePB.EvalWithMetadb(metadb)
+				var TagsString = TF.titlePB.EvalWithMetadb(metadb);
 			else
-				var TagsString = TF.titleP.EvalWithMetadb(metadb)
+				var TagsString = TF.titleP.EvalWithMetadb(metadb);
 		} else if(properties.showCodec) {
 			if(properties.showBitrate)
 				var TagsString = TF.titleCB.EvalWithMetadb(metadb);
@@ -906,6 +912,7 @@ oRow = function(metadb,itemIndex) {
 		} else
 			var TagsString = TF.title.EvalWithMetadb(metadb);
 		Tags = TagsString.split(" ^^ ");
+		
 		this.artist = Tags[0];
 		if(this.artist=="?") this.artist="Unknown artist";
 		this.discnumber = Tags[1];
@@ -920,7 +927,9 @@ oRow = function(metadb,itemIndex) {
 		this.length_seconds = Tags[5];
 		this.length = Tags[5].toHHMMSS();
 
-		this.playcount = Tags[6];
+		if(Tags[6]) this.playcount = Tags[6];
+		else this.playcount = ""
+		if(!properties.show2lines && properties.showPlaycount) this.playcount = this.playcount.replace(" plays","");
 	}
 	this.getTags();
 	this.repaint = function() {
@@ -934,12 +943,17 @@ oRow = function(metadb,itemIndex) {
         this.y = y-3;
         this.w = w;
         var tracknumber_w = 28;
-        var length_w = 55;
 
 		if(this.tracknumber>9) var select_start=4;
 		else var select_start=0;
 
-		if(properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist")) this.artist_text = " - "+this.artist;
+		if(properties.show2lines) var text_height = Math.ceil(this.h/2);
+		else var text_height = this.h;
+		
+		if(properties.show2lines) var text_y = this.y+3;
+		else var text_y = this.y;
+			
+		if((properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist"))) this.artist_text = this.artist;
 		else this.artist_text = "";
 
         var duration = this.length;
@@ -967,6 +981,10 @@ oRow = function(metadb,itemIndex) {
 			} else var current_size = track_gradient_size+Math.round(total_size*ratio);
 			if(isNaN(current_size) || current_size<0) current_size = track_gradient_size+total_size;
 		}
+		if(typeof brw.max_duration_length == 'undefined' || brw.max_duration_length==0) brw.max_duration_length = gr.CalcTextWidth("00:00:00", g_font.normal);
+		
+		var length_w = duration.length*brw.max_duration_length/8+30;
+		
 		if(!g_showlist.light_bg){
 			image0 = now_playing_progress0;
 			image1 = now_playing_progress1;
@@ -1009,16 +1027,16 @@ oRow = function(metadb,itemIndex) {
         }
 		if(isPlaying) {
             if(elapsed_seconds%2==0)
-				gr.DrawImage(image0, this.x+12,  this.y+Math.ceil((this.h-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
+				gr.DrawImage(image0, this.x+12,  text_y+Math.ceil((text_height-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
 			else
-				gr.DrawImage(image1, this.x+12,  this.y+Math.ceil((this.h-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
+				gr.DrawImage(image1, this.x+12,  text_y+Math.ceil((text_height-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
 		}
 
 		if(properties.showRating && ((properties.showRatingSelected && this.isSelected) || (properties.showRatingRated && this.rating>0) || (!properties.showRatingSelected && !properties.showRatingRated))) {
 			rating_vpadding = 4;
 			if(typeof this.rating_length == 'undefined' || this.rating_length==0) this.rating_length = gr.CalcTextWidth("HHHHH", g_font.plus6);
 			if(!g_showlist.ratingImages) {
-				g_showlist.SetRatingImages(this.rating_length, this.h-rating_vpadding*2, g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
+				g_showlist.SetRatingImages(this.rating_length, text_height-rating_vpadding*(properties.show2lines?1:2), g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
 			}
 			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
 		} else {
@@ -1029,32 +1047,44 @@ oRow = function(metadb,itemIndex) {
 		if(this.tracknumber=="NaN") this.tracknumber="?";
 
 		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
-		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, this.y, this.tracknumber_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, text_y, this.tracknumber_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 		var tx = this.x + this.tracknumber_w + 10;
 		var tw = this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10)
-        gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, this.y, tw, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		var tw2 = this.w - this.tracknumber_w - length_w;
+        gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, text_y, tw, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title, g_font.normal);
 
-		if(this.artist_text!=""){
-			gr.GdiDrawText(this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, this.y, tw - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(this.artist_text, g_font.italic);
+		if(this.artist_text!="" && !properties.show2lines){
+			gr.GdiDrawText(" - "+this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, text_y, tw - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(" - "+this.artist_text, g_font.italic);
 		}
-		if(properties.showPlaycount || properties.showCodec || properties.showBitrate){
+		if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && !properties.show2lines){
 			this.playcount_text = "  ("+this.playcount+")";
 			if(this.playcount_length==0) this.playcount_length = gr.CalcTextWidth(this.playcount_text, g_font.min2);
-			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, tx + this.title_length + this.artist_length, this.y, tw - this.title_length - this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			gr.GdiDrawText(this.playcount_text, g_font.min2, g_showlist.colorSchemeTextFaded, tx + this.title_length + this.artist_length, text_y, tw - this.title_length - this.artist_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 		} else {
 			this.playcount_length = 0;
 			this.playcount_text = '';
 		}
-
-		if(properties.showToolTip && (this.title_length + this.artist_length + this.playcount_length) > tw) {
+		if(properties.show2lines) {
+			if(this.secondLine=="") this.secondLine = this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount;
+			if(this.secondLine_length==0) this.secondLine_length = gr.CalcTextWidth(this.secondLine, g_font.normal);
+			gr.GdiDrawText(this.secondLine, g_font.normal, g_showlist.colorSchemeTextFaded, tx, text_y+text_height-6, tw2, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);			
+		}
+		if(properties.showToolTip && ((this.title_length + this.artist_length + this.playcount_length) > tw || this.secondLine_length>tw2)) {
 			this.showToolTip = true;
-			this.ToolTipText = this.title + this.artist_text + this.playcount_text;
+			this.ToolTipText = this.title;
+			if(this.secondLine_length==0){
+				if(this.artist_text!="") this.ToolTipText += " - "+this.artist_text;
+				this.ToolTipText += this.playcount_text;
+			} else {
+				this.ToolTipText += "\n"+this.secondLine;
+			}
+			
 		} else this.showToolTip = false;
 
-        gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, this.y, length_w, this.h, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+        gr.GdiDrawText(duration, g_font.normal, g_showlist.colorSchemeText, this.x + this.w - length_w, text_y, length_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
         if(isPlaying && properties.AlbumArtProgressbar && properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
 				var playingText = gdi.CreateImage(this.w+10, this.h);
@@ -1068,23 +1098,25 @@ oRow = function(metadb,itemIndex) {
 					if(!g_showlist.light_bg) pt.FillSolidRect (10, 0, this.w, this.h, dark.albumartprogressbar_overlay);  //solid bg
 					else pt.FillSolidRect (10, 0, this.w, this.h, colors.albumartprogressbar_overlay);  //solid bg
 					if(elapsed_seconds%2==0)
-						pt.DrawImage(now_playing_progress0, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
+						pt.DrawImage(now_playing_progress0, 12, text_y-this.y+Math.round(text_height/2-now_playing_progress0.Height/2), now_playing_progress0.Width, now_playing_progress0.Height, 0, 0, now_playing_progress0.Width, now_playing_progress0.Height,0,255);
 					else
-						pt.DrawImage(now_playing_progress1, 12, Math.round(this.h/2-now_playing_progress0.Height/2), now_playing_progress1.Width, now_playing_progress1.Height, 0, 0, now_playing_progress1.Width, now_playing_progress1.Height,0,255);
-					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, 1, length_w, g_showlist.textHeight-g_showlist.textBot, 554696704);
+						pt.DrawImage(now_playing_progress1, 12, text_y-this.y+Math.round(text_height/2-now_playing_progress0.Height/2), now_playing_progress1.Width, now_playing_progress1.Height, 0, 0, now_playing_progress1.Width, now_playing_progress1.Height,0,255);
+					pt.DrawString(duration, g_font.normal, colors.albumartprogressbar_txt, 0 + this.w - length_w, text_y-this.y+1, length_w, text_height-g_showlist.textBot, 554696704);
 				playingText.ReleaseGraphics(pt);
 				gr.DrawImage(playingText, this.x, this.y, current_size+12, this.h, 0, 0, current_size+12, this.h, 0, 255);
 				gr.DrawRect(this.x+10, this.y, Math.min(current_size+1,this.w), this.h-1,1,g_showlist.albumartprogressbar_color_rectline);
-				//gr.FillSolidRect(this.x+10, this.y, Math.min(current_size+1,this.w)+1, this.h,g_showlist.albumartprogressbar_color_overlay);
 
 				if(this.rating_x>0) var title_w = Math.min(current_size-this.tracknumber_w+2,(this.rating_x - this.x - this.tracknumber_w - 20));
 				else var title_w = Math.min(current_size-this.tracknumber_w+2,this.w-this.tracknumber_w+12-length_w);
-				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, this.y, title_w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
-				if(this.artist_text!=""){
-					gr.GdiDrawText(this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, this.y, title_w - this.title_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				gr.GdiDrawText(this.title, g_font.normal, colors.albumartprogressbar_txt, tx, text_y, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				if(this.artist_text!="" && !properties.show2lines){
+					gr.GdiDrawText(" - "+this.artist_text, g_font.italic, colors.albumartprogressbar_txt, tx + this.title_length, text_y, title_w - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
+				if(properties.show2lines) {
+					gr.GdiDrawText(this.artist_text+(this.artist_text!=""?" - ":"")+this.playcount, g_font.normal, colors.albumartprogressbar_txt, tx, text_y+text_height-6, title_w, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+				}				
 				if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && ((tx + this.title_length+ this.artist_length+this.playcount_length+5)<this.rating_x) || (this.rating_x<=0 && (this.tracknumber_w -12 + this.title_length+ this.artist_length+this.playcount_length<this.w - length_w))){
-					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, this.y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
+					gr.GdiDrawText(this.playcount_text, g_font.min2, colors.albumartprogressbar_txt, tx + this.title_length + this.artist_length, text_y, current_size-this.tracknumber_w+2 - this.title_length- this.artist_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 				}
         }
 		// rating Stars
@@ -1257,7 +1289,7 @@ oRow = function(metadb,itemIndex) {
 						if(this.ishover && brw.TooltipRow!=this.itemIndex && !this.ishover_rating) {
 							brw.TooltipRow=this.itemIndex;
 							new_tooltip_text=this.ToolTipText;//+"\n"+this.artist;
-							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay);
+							g_tooltip.ActivateDelay(new_tooltip_text, x+10, y+20, globalProperties.tooltip_delay, 1200);
 						}
 						if(brw.TooltipRow==this.itemIndex && !this.ishover) {
 							brw.TooltipRow = -1;
@@ -1358,14 +1390,20 @@ oShowList = function(parentPanelName) {
 	this.cursor = IDC_ARROW;
 	this.odd_tracks_count = false;
 	this.album_info_sent = true;
+	this.isHoverCover = false;
+	this.cover_x = -1;
+	this.cover_y = -1;
 	this.links = {
 		album : new SimpleButton(0, 0, 0, 0, "albumLink", "Show this album", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"album");
 		},false,false,false,ButtonStates.normal,255),
 		artist : new SimpleButton(0, 0, 0, 0, "artistLink", "Show all of this artist", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"artist");
 		},false,false,false,ButtonStates.normal,255),
 		genre : new SimpleButton(0, 0, 0, 0, "genreLink", "Show all of this genre", function () {
+			scroll = scroll_ = 0;
 			quickSearch(g_showlist.pl[0],"genre");
 		},false,false,false,ButtonStates.normal,255),
 	}
@@ -1386,7 +1424,10 @@ oShowList = function(parentPanelName) {
 		this.margins_plus_paddings = this.paddingTop + this.paddingBot + (this.marginTop+this.marginBot);
 	}
 	this.onFontChanged = function(){
-		this.textHeight = Math.ceil(g_fsize * 1.8)+this.textBot;
+		this.ratingImages = false;
+		this.ratingImgsLight = false;
+		this.ratingImgsDark = false;		
+		this.textHeight = Math.ceil(g_fsize * 1.8)*(properties.show2lines?2:1)+this.textBot;
 		this.on_init();
 	}
 	this.onFontChanged();
@@ -1394,11 +1435,12 @@ oShowList = function(parentPanelName) {
 		if(!isImage(brw.groups[this.idx].cover_img)) {
 			brw.GetAlbumCover(this.idx);
 		}
-		this.showlist_img = FormatCover(brw.groups[this.idx].cover_img, this.coverRealSize, this.coverRealSize, false, "setCover");
+		this.showlist_img = brw.groups[this.idx].cover_img;
 
 		this.setShowListArrow();
 		this.setColumnsButtons(false);
 		this.setCloseButton(false);
+		this.setPlayButton();
 	}
 	this.getColorSchemeFromImage = function() {
         if(!isImage(this.showlist_img)) this.setCover();
@@ -1453,6 +1495,7 @@ oShowList = function(parentPanelName) {
 	this.setImages = function () {
 		this.setShowListArrow();
 		this.setCloseButton(false);
+		this.setPlayButton();
 		this.setColumnsButtons(false);
 		this.cover_shadow = null;
 		this.reset();
@@ -1499,6 +1542,27 @@ oShowList = function(parentPanelName) {
 			}
 			if(this.light_bg && save_imgs) this.ratingImgsLight = this.ratingImages;
 			else if(save_imgs) this.ratingImgsDark = this.ratingImages;
+		}
+	}
+    this.setPlayButton = function () {
+		if(!this.play_bt) {
+			this.play_img = gdi.CreateImage(70, 70);
+			gb = this.play_img.GetGraphics();
+				var xpos = 26;
+				var ypos = 23;
+				var width = 20;
+				var height = 23;
+				gb.SetSmoothingMode(2);
+				gb.FillPolygon(colors.play_bt, 0, Array(xpos, ypos, xpos+width, ypos+height/2, xpos, ypos+height));
+				gb.SetSmoothingMode(0);
+			this.play_img.ReleaseGraphics(gb);
+			if(typeof(this.play_bt) == "undefined") {
+				this.play_bt = new button(this.play_img, this.play_img, this.play_img,"showlist_play","Play album");
+			} else {
+				this.play_bt.img[0] = this.closeTracklist_off;
+				this.play_bt.img[1] = this.closeTracklist_ov;
+				this.play_bt.img[2] = this.closeTracklist_ov;
+			}		
 		}
 	}
     this.setCloseButton = function (save_btns) {
@@ -1643,9 +1707,10 @@ oShowList = function(parentPanelName) {
 				if(this.ishover || brw.activeIndex < 0) changed = this.clearSelection();
 				for (var i in this.links) {
 					if (this.links[i].state == ButtonStates.hover) {
-						this.links[i].onClick();
+						this.links[i].onClick(); return;
 					}
 				}
+				if(this.isHoverCover) brw.playGroup(this.idx);
                 break;
             case "up":
 				if(this.cursor!=IDC_ARROW && !this.scrollbar_cursor_hover) {
@@ -1657,11 +1722,23 @@ oShowList = function(parentPanelName) {
 				for (var i in this.links) {
 					this.links[i].changeState(ButtonStates.normal);
 				}
+				this.isHoverCover = false;
+				this.close_bt.checkstate("leave", 0, 0);
+				if(this.totalCols > this.totalColsVis) {
+					(this.columnsOffset > 0) && this.prev_bt.checkstate("leave", 0, 0);
+					(this.columnsOffset < this.totalCols - this.totalColsVis) && this.next_bt.checkstate("leave", 0, 0);
+				}				
                 break;
             case "move":
 				var hoverLink_save = this.isHoverLink;
+				var hoverCover_save = this.isHoverCover;
 				this.close_bt.checkstate("move", x, y);
+			
 				this.isHoverLink = -1;
+				this.isHoverCover = (this.cover_x>=0 && x>this.cover_x && x<this.cover_x+this.coverRealSize && y>this.cover_y && y<this.cover_y+this.coverRealSize);
+				if(this.isHoverCover) this.play_bt.changeState(ButtonStates.hover);
+				else if(this.play_bt.state == ButtonStates.hover) this.play_bt.changeState(ButtonStates.normal);
+				
 				for (var i in this.links) {
 					if (this.links[i].containXY(x, y) && this.links[i].state != ButtonStates.hide && !this.links[i].hide) {
 						this.links[i].changeState(ButtonStates.hover);
@@ -1672,7 +1749,7 @@ oShowList = function(parentPanelName) {
 						this.links[i].onMouse('leave',-1,-1);
 					}
 				}
-				if(hoverLink_save!=this.isHoverLink) brw.repaint();
+				if(hoverLink_save!=this.isHoverLink || hoverCover_save!=this.isHoverCover) brw.repaint();
 				if(properties.showToolTip && !(g_dragA || g_dragR)){
 					if(!this.ishoverTextTop && this.tooltipActivated) {
 						g_tooltip.Deactivate();
@@ -1760,10 +1837,11 @@ oShowList = function(parentPanelName) {
 		if(!this.album_info_sent && !this.avoid_sending_album_infos && trackinfoslib_state.isActive() && nowplayinglib_state.isActive() && properties.right_panel_follow_cursor && !avoidShowNowPlaying) {
 			window.NotifyOthers("trigger_on_focus_change_album",{
 				playlist:brw.getSourcePlaylist(),
-				trackIndex:brw.groups[this.idx].trackIndex,
+				trackIndex:0,
 				cover_img:brw.groups[this.idx].cover_img,
 				cachekey:brw.groups[this.idx].cachekey,
 				metadb:this.pl[0],
+				tracklist:this.pl,
 				totalTracks:this.total_tracks,
 				genre:this.genre,
 				length:this.length,
@@ -1853,6 +1931,7 @@ oShowList = function(parentPanelName) {
         this.setShowListArrow();
         this.setColumnsButtons();
         this.setCloseButton();
+		this.setPlayButton();
 	}
 	this.setSize = function(){
 		if(this.idx > -1) {
@@ -2024,7 +2103,7 @@ oShowList = function(parentPanelName) {
 		}
 	}
 	this.setMarginRight = function(){
-		if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.MarginRight = this.MarginRightFromCover + this.CoverSize;
 		} else {
 			this.MarginRight = this.MarginRightStandard;
@@ -2081,15 +2160,11 @@ oShowList = function(parentPanelName) {
 			if(properties.filterBox_filter_tracks && g_filterbox.isActive) this.setFilteredPlaylist();
 
 			this.album_info_sent = !send_albums_info;
-			//plman.SetPlaylistFocusItem(brw.getSourcePlaylist(), brw.groups[brw.groups_draw[drawn_idx]].trackIndex);
 		}
 
-		/*if(brw.followActivePlaylist && window.IsVisible && !getRightPlaylistState()) {
-			plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist,this.pl[0]);
-		}		*/
-		if(properties.showlistShowCover && properties.CoverGridNoText && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		if(properties.showlistShowCover>0 && properties.CoverGridNoText && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.heightMin = properties.showlistheightMinCoverGrid;
-		} else if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+		} else if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 			this.heightMin = properties.showlistheightMinCover;
 		} else {
 			this.heightMin = properties.showlistheightMin;
@@ -2115,7 +2190,10 @@ oShowList = function(parentPanelName) {
 
 		if(this.heightMin>this.heightMax) this.heightMax=this.heightMin;
 		if(this.totalColsVisMax > properties.showlistMaxColumns && properties.showlistMaxColumns>0) this.totalColsVisMax = properties.showlistMaxColumns;
-
+		
+		if(properties.showlistOneColumn)	
+			this.totalColsVisMax = 1;
+		
 		if(update_tracks){
 			this.isPlaying = false;
 			this.totaltracks = this.pl.Count;
@@ -2363,9 +2441,14 @@ oShowList = function(parentPanelName) {
 
                     gr.GdiDrawText(this.firstRow, first_row_font, first_row_color, tx+4, ty, this.w - this.MarginRight - 40 - this.timeTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                     gr.GdiDrawText(this.secondRow, second_row_font, second_row_color, tx+4, ty + 8+g_fsize, this.w - this.MarginRight - 25 - this.genreTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                    gr.GdiDrawText(this.length+',  '+this.total_tracks, g_font.normal, this.colorSchemeTextFaded, (brw.groups_draw.length>1) ? tx-32 : tx-13, ty-2, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                    gr.GdiDrawText(genreText, genre_font, genre_color, tx-13, ty + item_height +1, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-
+					//if(!trackinfostext_state.isActive() || !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
+						gr.GdiDrawText(this.length+',  '+this.total_tracks, g_font.normal, this.colorSchemeTextFaded, (brw.groups_draw.length>1) ? tx-32 : tx-13, ty-2, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(genreText, genre_font, genre_color, tx-13, ty + item_height +1, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						// close button
+						if(slh > this.paddingBot*2 && brw.groups_draw.length>1) {
+							this.close_bt.draw(gr, this.x+this.w-this.MarginRight-4-rightfix, ty +17-this.close_bt.img[0].Height, 255);
+						}						
+					//}
 					if(typeof this.firstRowLength == 'undefined') this.firstRowLength = gr.CalcTextWidth(this.firstRow,g_font.italicplus5);
 					if(typeof this.secondRowLength == 'undefined') this.secondRowLength = gr.CalcTextWidth(this.secondRow,g_font.plus2);
 
@@ -2386,13 +2469,19 @@ oShowList = function(parentPanelName) {
                 }
 
 				//draw album cover
-				if(properties.showlistShowCover && !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.showlist_img) && (this.h-this.delta_)<40){
+				if(properties.showlistShowCover>0 && !(properties.showlistShowCover==1 && properties.right_panel_follow_cursor && trackinfoslib_state.isActive() && nowplayinglib_state.isActive()) && this.idx > -1 && isImage(this.showlist_img) && (this.h-this.delta_)<40){
+					this.cover_x = this.x+this.w-this.CoverSize+this.marginCover;
+					this.cover_y = this.y+this.marginTop+this.marginCover;
 					if(properties.showCoverShadow && properties.CoverShadowOpacity>0) {
 						if(!this.cover_shadow || this.cover_shadow==null) this.cover_shadow = createCoverShadowStack(this.coverRealSize, this.coverRealSize, colors.cover_shadow,10);
-						gr.DrawImage(this.cover_shadow, this.x+this.w-this.CoverSize+this.marginCover-8, this.y+this.marginTop+this.marginCover-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
+						gr.DrawImage(this.cover_shadow, this.cover_x-8, this.cover_y-8, this.coverRealSize+20, this.coverRealSize+20, 0, 0, this.cover_shadow.Width, this.cover_shadow.Height);
 					}
-					gr.DrawImage(this.showlist_img, this.x+this.w-this.CoverSize+this.marginCover, this.y+this.marginTop+this.marginCover, this.coverRealSize, this.coverRealSize, 0, 0, this.showlist_img.Width, this.showlist_img.Height);
-				}
+					gr.DrawImage(this.showlist_img, this.cover_x, this.cover_y, this.coverRealSize, this.coverRealSize, 0, 0, this.showlist_img.Width, this.showlist_img.Height);
+					if(this.isHoverCover){
+						gr.FillSolidRect(this.cover_x, this.cover_y, this.coverRealSize, this.coverRealSize, colors.overlay_on_hover);
+						this.play_bt.draw(gr, this.cover_x+ this.coverRealSize/2-35, this.cover_y+ this.coverRealSize/2-35, 255);
+					}
+				} else this.cover_x = -1;
 
                 // draw columns & tracks
                 if(this.idx > -1) {
@@ -2412,11 +2501,6 @@ oShowList = function(parentPanelName) {
                             cy = this.y + this.paddingTop + 11+5;
                         }
                     }
-                }
-
-                // close button
-                if(slh > this.paddingBot*2 && brw.groups_draw.length>1) {
-                    this.close_bt.draw(gr, this.x+this.w-this.MarginRight-4-rightfix, ty +17-this.close_bt.img[0].Height, 255);
                 }
             }
         } else {
@@ -3080,6 +3164,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	var _menuCoverShadow = window.CreatePopupMenu();
 	var _menuFilters = window.CreatePopupMenu();
 	var _menuTracklist = window.CreatePopupMenu();
+	var _menuCover = window.CreatePopupMenu();	
 	var _menuProgressBar = window.CreatePopupMenu();
 	var _menuBackground = window.CreatePopupMenu();
 	var _menuRating = window.CreatePopupMenu();
@@ -3137,10 +3222,6 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuFilters.CheckMenuItem(39, properties.displayToggleBtns);
 	_menuFilters.AppendTo(_menu,MF_STRING, "Left menu");
 
-
-
-
-
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 100, "Square Artwork");
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 101, "Circle Artwork");
 	_menuGroupDisplay.AppendMenuItem(MF_STRING, 102, "Grid mode, no padding, no labels");
@@ -3159,7 +3240,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuGroupDisplay.CheckMenuItem(46, properties.animateShowNowPlaying);
 	_menuGroupDisplay.AppendMenuSeparator();
 
-	_menuGroupDisplay.AppendMenuItem(properties.CoverGridNoText?MF_GRAYED:MF_STRING, 38, "Center text");
+	_menuGroupDisplay.AppendMenuItem((properties.CoverGridNoText | properties.circleMode)?MF_GRAYED:MF_STRING, 38, "Center text");
 	_menuGroupDisplay.CheckMenuItem(38, properties.centerText);
 	_menuCoverShadow.AppendMenuItem(MF_STRING, 47, "Show a shadow under artwork");
 	_menuCoverShadow.CheckMenuItem(47, properties.showCoverShadow);
@@ -3174,24 +3255,45 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menuTracklist.CheckMenuItem(45, properties.expandOnHover);	*/
 	_menuTracklist.AppendMenuItem(MF_STRING, 13, "Animate opening");
 	_menuTracklist.CheckMenuItem(13, properties.smooth_expand_value>0);
-	_menuTracklist.AppendMenuItem(MF_STRING, 29, "Show the cover on the right (when right sidebar doesn't already display it)");
-	_menuTracklist.CheckMenuItem(29, properties.showlistShowCover);
-
+	_menuTracklist.AppendMenuItem(MF_STRING, 14, "Display only one column");
+	_menuTracklist.CheckMenuItem(14, properties.showlistOneColumn);
+	_menuTracklist.AppendMenuItem(MF_STRING, 15, "Horizontal scrollbar");
+	_menuTracklist.CheckMenuItem(15, properties.showlistScrollbar);
+	_menuTracklist.AppendMenuSeparator();
+	
+	_menuCover.AppendMenuItem(MF_STRING, 80, "Always");
+	_menuCover.CheckMenuItem(80, properties.showlistShowCover==2);
+	_menuCover.AppendMenuItem(MF_STRING, 81, "When right sidebar doesn't already display it");
+	_menuCover.CheckMenuItem(81, properties.showlistShowCover==1);
+	_menuCover.AppendMenuItem(MF_STRING, 82, "Never");
+	_menuCover.CheckMenuItem(82, properties.showlistShowCover==0);	
+	_menuCover.AppendTo(_menuTracklist,MF_STRING, "Show the cover on the right");
+	
 	_menuTracklist.AppendMenuSeparator();
 
-	_additionalInfos.AppendMenuItem(MF_STRING, 28, "Show artist name for each track");
+	var custom_tag = properties.show2linesCustomTag!="";
+	_additionalInfos.AppendMenuItem(MF_STRING, 60, "Show infos on 2 rows");
+	_additionalInfos.CheckMenuItem(60, properties.show2lines);		
+	_additionalInfos.AppendMenuItem(MF_STRING, 61, "Customize 2nd row...");
+	_additionalInfos.CheckMenuItem(61, custom_tag);	
+	if(properties.show2linesCustomTag!="")
+	_additionalInfos.AppendMenuItem(MF_STRING, 62, "Reset");
+	_additionalInfos.AppendMenuSeparator();
+	_additionalInfos.AppendMenuItem(custom_tag?MF_GRAYED:MF_STRING, 28, "Show artist name for each track");
 	_additionalInfos.CheckMenuItem(28, properties.showArtistName);
-	_additionalInfos.AppendMenuItem(MF_STRING, 56, "Show play count");
+	_additionalInfos.AppendMenuItem(custom_tag?MF_GRAYED:MF_STRING, 56, "Show play count");
 	_additionalInfos.CheckMenuItem(56, properties.showPlaycount);
-	_additionalInfos.AppendMenuItem(MF_STRING, 44, "Show codec");
+	_additionalInfos.AppendMenuItem(custom_tag?MF_GRAYED:MF_STRING, 44, "Show codec");
 	_additionalInfos.CheckMenuItem(44, properties.showCodec);
-	_additionalInfos.AppendMenuItem(MF_STRING, 43, "Show bitrate");
+	_additionalInfos.AppendMenuItem(custom_tag?MF_GRAYED:MF_STRING, 43, "Show bitrate");
 	_additionalInfos.CheckMenuItem(43, properties.showBitrate);
 	_additionalInfos.AppendMenuSeparator();
 	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "Displayed in this order:");
 	_additionalInfos.AppendMenuItem(MF_GRAYED, 0, "[Artist name] ([Playcount] - [Codec] - [Bitrate])");
-	_additionalInfos.AppendTo(_menuTracklist,MF_STRING, "Additional track infos");
 
+
+	_additionalInfos.AppendTo(_menuTracklist,MF_STRING, "Track details");
+	
 	_menuTracklist.AppendMenuSeparator();
 
 	_menuProgressBar.AppendMenuItem(MF_STRING, 21, "No progress bar");
@@ -3293,21 +3395,16 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			properties.smooth_expand_value = properties.smooth_expand_value > 0 ? 0 : properties.smooth_expand_default_value;
 			window.SetProperty("TRACKLIST Smooth Expand value (0 to disable)", properties.smooth_expand_value);
 			break;
-		case (idx == 14):
-			enableDiskCacheGlobally();
-			brw.populate(0);
+		case (idx == 14):	
+			properties.showlistOneColumn = !properties.showlistOneColumn;
+			window.SetProperty("TRACKLIST one column", properties.showlistOneColumn);
+			g_showlist.refresh();
+			brw.repaint();			
 			break;
 		case (idx == 15):
-			properties.showListColored = true;
-			properties.showListColoredBlurred = false;
-			properties.showListColoredOneColor = true;
-			properties.showListColoredMixedColor = false;
-			get_colors();
-			window.SetProperty("TRACKLIST Color according to albumart", properties.showListColored);
-			window.SetProperty("TRACKLIST Color according to albumart (main color)", properties.showListColoredOneColor);
-			window.SetProperty("TRACKLIST Color according to albumart (blurred)", properties.showListColoredBlurred);
-			window.SetProperty("TRACKLIST Color according to albumart (mix of both)", properties.showListColoredMixedColor);
-			g_showlist.reset();
+			properties.showlistScrollbar = !properties.showlistScrollbar;
+			window.SetProperty("TRACKLIST horizontal scrollbar", properties.showlistScrollbar);			
+			g_showlist.refresh();
 			brw.repaint();
 			break;
 		case (idx == 16):
@@ -3345,13 +3442,27 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_showlist.reset();
 			brw.repaint();
 			break;
-		case (idx == 29):
-			properties.showlistShowCover = !properties.showlistShowCover;
+		case (idx == 80):
+			properties.showlistShowCover = 2;
 			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
 			g_showlist.refresh();
 			brw.refresh_browser_thumbnails();
 			brw.repaint();
 			break;
+		case (idx == 81):
+			properties.showlistShowCover = 1;
+			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
+			g_showlist.refresh();
+			brw.refresh_browser_thumbnails();
+			brw.repaint();
+			break;
+		case (idx == 82):
+			properties.showlistShowCover = 0;
+			window.SetProperty("TRACKLIST Show cover", properties.showlistShowCover);
+			g_showlist.refresh();
+			brw.refresh_browser_thumbnails();
+			brw.repaint();
+			break;			
 		case (idx == 26):
 			properties.showDiscNbOverCover = !properties.showDiscNbOverCover;
 			window.SetProperty("COVER Show Disc number over album art", properties.showDiscNbOverCover);
@@ -3468,6 +3579,30 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			g_showlist.refresh();
 			brw.repaint();
 			break;
+		case (idx == 60):
+			properties.show2lines = !properties.show2lines;
+			window.SetProperty("TRACKLIST Show track details on 2 rows", properties.show2lines);
+			g_showlist.onFontChanged();
+			g_showlist.refresh();
+			brw.repaint();
+			break;		
+		case (idx == 61):
+			customTracklistDetails("Customize 2nd line"
+								,"<div class='titleBig'>Customize 2nd line</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting.<br/>"
+								,'Default is %artist% - %play_count% - %codec% - %bitrate%.'
+								,'2nd line title formatting script:'
+								,properties.show2linesCustomTag);
+			properties.show2linesCustomTag_tf = fb.TitleFormat(properties.show2linesCustomTag);
+			g_showlist.refresh();
+			brw.repaint();
+			break;		
+		case (idx == 62):
+			properties.show2linesCustomTag = "";
+			window.SetProperty("TRACKLIST track details on 2 rows - custom tag", properties.show2linesCustomTag);
+			properties.show2linesCustomTag_tf = fb.TitleFormat(properties.show2linesCustomTag);
+			g_showlist.refresh();
+			brw.repaint();
+			break;				
 		case (idx == 31):
 			properties.showToolTip = !properties.showToolTip;
 			window.SetProperty("MAINPANEL Show tooltips", properties.showToolTip);
@@ -3653,6 +3788,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 	_menu2A = undefined;
 	//_menuDisplayedPlaylist = undefined;
 	_menuTracklist = undefined;
+	_menuCover = undefined;	
 	_menuProgressBar = undefined;
 	_menuRating = undefined;
 	_menuHeaderBar = undefined;
@@ -4085,28 +4221,22 @@ oBrowser = function(name) {
 		this.repaint_h = h;
 		this.repaint_rect = true;
     }
-	this.FormatTime = function(time){
-		time_txt="";
-		timetodraw=time;
+	this.FormatTime = function(time) {
+		time_txt = "";
+		if (time > 0) {
+			totalS = Math.round(time);
 
-		totalMth=Math.floor((timetodraw)/2592000); r_timetodraw=timetodraw-totalMth*2592000;
-		totalW=Math.floor(r_timetodraw/604800);
-		totalD=Math.floor((r_timetodraw%604800)/86400);
-		totalH=Math.floor((r_timetodraw%86400)/3600);
-		totalM=Math.floor((r_timetodraw%3600)/60);
-		totalS=Math.round((r_timetodraw%60));
-		totalS=(totalS>9) ? totalS:'0'+totalS;
+			totalS -= (totalW = Math.floor(totalS / 604800)) * 604800;
+			totalS -= (totalD = Math.floor(totalS / 86400)) * 86400;
+			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
+			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-		txt_month=(totalMth>1)?totalMth+' months, ':totalMth+' month, ';
-		txt_week=(totalW>1)?totalW+' weeks, ':totalW+' week, ';if(totalW==0) txt_week='';
-		txt_day=(totalD>1)?totalD+' days, ':totalD+' day, '; if(totalD==0) txt_day='';
-		txt_hour=(totalH>1)?totalH+' h':totalH+' h'; if(totalH==0) txt_hour='';
-		if(totalMth>0) time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+' min';
-		else if (totalW>0) time_txt=txt_week+txt_day+txt_hour+totalM+' min';
-		else if (totalD>0) time_txt=txt_day+((totalH>0)?""+totalH+' h, ':'')+totalM+' min';
-		else if (totalH>0) time_txt=txt_hour+((totalM>0)?", "+totalM+' min':'');
-		else time_txt=totalM+' min';
-
+			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
+			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
+			if (totalH != 0) time_txt += ' ' + totalH + ' h';
+			if (totalM != 0) time_txt += ' ' + totalM + ' min';
+			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+		}
 		return time_txt;
 	}
 	this.showheaderbar = function(){
@@ -4127,13 +4257,6 @@ oBrowser = function(name) {
 		if(circleMode!==null){
 			properties.circleMode = circleMode;
 			window.SetProperty("COVER Circle artwork", properties.circleMode);
-			if(properties.circleMode){
-				properties.centerText = true;
-				window.SetProperty("COVER Center text", properties.centerText);
-			} else {
-				properties.centerText = false;
-				window.SetProperty("COVER Center text", properties.centerText);
-			}
 		}
 
 		if(gridMode!==null){
@@ -4165,17 +4288,16 @@ oBrowser = function(name) {
 	this.on_font_changed = function(refreshDates) {
 		this.fontDate = gdi.Font("Arial", g_fsize-1, 2);
 		if(refreshDates) this.refreshDates();
+		this.max_duration_length = 0;
 	}
 	this.on_font_changed();
 	this.on_init = function(){
 		if(properties.CoverGridNoText){
-			this.marginLR = 0;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 0;
 			this.CoverMarginTop = 0;
 		} else {
-			this.marginLR = properties.marginLR;
 			// set margins betweens album stamps
 			this.marginTop = 0;
 			this.marginBot = 2;
@@ -4195,40 +4317,28 @@ oBrowser = function(name) {
 		this.setSizeFirstCall = true;
 
         // Adjust Column
-		this.totalColumns = Math.floor((this.w - this.marginLR * 2) / properties.thumbnailWidth);
+		this.coverRealWith = properties.thumbnailWidth;
 
-		var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-		var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-		this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
-		while(this.thumbnailWidth>globalProperties.coverCacheWidthMax){
-			this.totalColumns = this.totalColumns+1;
-			var gapeWidth = (this.w - this.marginLR * 2) - (this.totalColumns * properties.thumbnailWidth);
-			var deltaToAdd = Math.round(gapeWidth / this.totalColumns);
-			this.thumbnailWidth = properties.thumbnailWidth + deltaToAdd;
+		if (properties.CoverGridNoText) {
+			this.totalColumns = Math.ceil(this.w / this.coverRealWith);
+			this.marginLR = 0;
+			this.rowHeight = this.thumbnailWidth = this.coverRealWith -= Math.round(((this.totalColumns * this.coverRealWith) - this.w) / this.totalColumns);
+		} else {
+			this.marginLR = properties.marginLR;
+			this.totalColumns = Math.floor((this.w - 2 * this.marginLR) / this.coverRealWith);
+			while (this.w - this.totalColumns * this.coverRealWith < this.marginLR * (this.totalColumns + 1)) this.totalColumns--
+			this.marginLR = Math.round((this.w - this.coverRealWith * this.totalColumns) / (this.totalColumns + 1));
+			this.thumbnailWidth = this.coverRealWith + this.marginLR;
+			this.marginLR = Math.round(this.marginLR / 2);
+			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
 		}
-
-		if(properties.CoverGridNoText)
-			this.marginSide = 0;
-		else
-			this.marginSide = Math.round(this.thumbnailWidth/10 + deltaToAdd/10);
+		
+		this.coverHalfWidth = Math.round(this.coverRealWith / 2);
 
 		if(properties.showheaderbar) {
 			g_headerbar.setSize(0,0,this.w,this.headerBarHeight);
 			if(this.showFilterBox) g_filterbox.setSize(ww-g_headerbar.resize_bt_w-g_headerbar.rightpadding-g_headerbar.RightTextLength-g_headerbar.MarginRight-g_headerbar.mainTxtX +20, cFilterBox.h, g_fsize+2);
 		}
-        // calc size of the cover art
-        //this.coverRealWith = (this.thumbnailWidth - (this.marginSide * 2));
-		if(properties.CoverGridNoText)
-			this.coverRealWith = this.thumbnailWidth;
-		else
-			this.coverRealWith = (this.thumbnailWidth - deltaToAdd)-Math.round(properties.thumbnailWidth*0.16);
-
-		this.coverHalfWidth = Math.round(this.coverRealWith/2);
-        // Adjust Row & showList bloc Height
-		if(!properties.CoverGridNoText)
-			this.rowHeight = g_fsize*2 + this.coverRealWith + cover.marginBottom;
-		else
-			this.rowHeight = this.coverRealWith;
 
         this.totalRows = Math.ceil(this.h / this.rowHeight);
         this.totalRowsVis = Math.floor(this.h / this.rowHeight);
@@ -4245,6 +4355,7 @@ oBrowser = function(name) {
 		this.get_metrics_called = true;
 	   	this.firstRowHeight = gr.CalcTextHeight("Wcgregor", g_font.plus2);
 	   	this.secondRowHeight = gr.CalcTextHeight("Wcgregor", g_font.italic);
+		this.setResizeButton(65,14);
 	}
 
     this.get_albums = function(start, str_comp){
@@ -4270,7 +4381,7 @@ oBrowser = function(name) {
         }
 
         var i = this.groups.length, k = start, temp = "", string_compare = str_comp;
-
+		var currentCallIndex = 0;
         this.gTime.Reset();
         var trackinfos = "", arr = [], group = "";
 
@@ -4302,7 +4413,7 @@ oBrowser = function(name) {
 				}
             }
 
-            temp = group_string.toUpperCase();
+            temp = group_string;
 
             if(string_compare != temp){
                 string_compare = temp;
@@ -4390,9 +4501,9 @@ oBrowser = function(name) {
 					this.found_albumIdx=this.groups_draw.length-1;
 				}
 			}
-            k++;
+            k++;currentCallIndex++;
 			//Set a timer to avoid freezing on really big libraries
-            if(k%500 == 0 && this.gTime.Time > 150){
+            if(currentCallIndex > 500 && this.gTime.Time > 150){
 				string_compare_timeout=string_compare;
 				if(this.firstInitialisation) this.get_albums(k, string_compare_timeout);
 				else {
@@ -4672,6 +4783,9 @@ oBrowser = function(name) {
 		}
 		brw.repaint();
 	}
+	this.freeMemory = function () {
+		this.refresh_all_images();
+	}
 	this.GetFilteredTracks = function(idx){
 		if(properties.filterBox_filter_tracks && g_filterbox.isActive){
 			var playlist = new FbMetadbHandleList();
@@ -4714,12 +4828,12 @@ oBrowser = function(name) {
 			this.groups[idx].CoverMainColor = colors.cover_hoverOverlay;
 		}
 	}
-    this.DefineDateCircleBG = function(size){
-		if(properties.showdateOverCover){
+    this.DefineDateCircleBG = function(size,index){
+		if(properties.showdateOverCover || properties.showDiscNbOverCover){
 			var dateCircleBG = gdi.CreateImage(size, size);
 			gb = dateCircleBG.GetGraphics();
 			gb.SetSmoothingMode(2);
-			gb.FillEllipse(-Math.round(size/3), -size+1+this.groups[0].dateHeight, Math.round(size*5/3), size, colors.cover_date_bg);
+			gb.FillEllipse(-Math.round(size/3), -size+1+this.groups[index].dateHeight, Math.round(size*5/3), size, colors.cover_date_bg);
 			dateCircleBG.ReleaseGraphics(gb);
 			dateCircleBG.ApplyMask(this.coverMask);
 			this.dateCircleBG = dateCircleBG;
@@ -4735,6 +4849,8 @@ oBrowser = function(name) {
 		this.coverMask = Mimg;
 	}
     this.draw = function(gr) {
+		//gTime_draw = fb.CreateProfiler();
+		//gTime_draw.Reset();	
         if(repaint_main || repaint_f || !repaintforced){
             repaint_main = false;
             repaint_f = false;
@@ -4745,7 +4861,7 @@ oBrowser = function(name) {
             var ax, ay, by, rowStart, row, coverTop;
             var aw = this.coverRealWith;
 			var awhalf = this.coverHalfWidth;
-            var firstalbum_x = this.x + this.marginSide + this.marginLR;
+            var firstalbum_x = this.x + this.marginLR;
             var firstalbum_y = Math.floor(this.y + this.marginTop - scroll_);
 
 			//Force showlist if there is only one group
@@ -4808,7 +4924,7 @@ oBrowser = function(name) {
             for(var i = start_;i < end_;i++){
 				row = Math.floor(i/this.totalColumns);
 
-				ax = firstalbum_x + (rowPosition * this.thumbnailWidth);
+				ax = firstalbum_x + (rowPosition * this.thumbnailWidth)+ (this.thumbnailWidth-this.coverRealWith)/2;
 				ay = firstalbum_y + (row * this.rowHeight);
 
 				if(g_showlist.delta_ > 0) {
@@ -4870,6 +4986,7 @@ oBrowser = function(name) {
 						var overlayTxt = "";
 						if(properties.showDiscNbOverCover && this.groups[this.groups_draw[i]].discnb!="?") {
 							if(this.groups[this.groups_draw[i]].discnb!="?") overlayTxt = this.groups[this.groups_draw[i]].discnb;
+							
 						}
 						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?" && !this.custom_groupby) {
 							if(properties.extractYearFromDate) overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].year;
@@ -4884,10 +5001,9 @@ oBrowser = function(name) {
 								}
 							} catch(e){}
 							if(properties.circleMode && !properties.CoverGridNoText) {
-								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith); {
-									gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
-									gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-								}
+								if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith,this.groups_draw[i]); 
+								gr.DrawImage(this.dateCircleBG,ax,coverTop, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
+								gr.GdiDrawText(overlayTxt, this.fontDate, colors.cover_date_txt, ax, coverTop+2, this.coverRealWith, this.groups[this.groups_draw[i]].dateHeight, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							}
 							else {
 								gr.FillSolidRect(ax, coverTop, this.groups[this.groups_draw[i]].dateWidth, this.groups[this.groups_draw[i]].dateHeight, colors.cover_date_bg);
@@ -4952,10 +5068,10 @@ oBrowser = function(name) {
 							this.groups[this.groups_draw[i]].showToolTip = ( (this.groups[this.groups_draw[i]].firstRowLength > this.coverRealWith) || (this.groups[this.groups_draw[i]].secondRowLength > this.coverRealWith) )
 
 							if(this.groups[this.groups_draw[i]].text_y+this.firstRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.GdiDrawText(this.groups[this.groups_draw[i]].firstRow, g_font.plus2, colors.normal_txt, ax, this.groups[this.groups_draw[i]].text_y, this.coverRealWith, 50+g_fsize, ((properties.centerText | properties.circleMode)?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 							if(this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines + this.secondRowHeight<g_headerbar.h || this.groups[this.groups_draw[i]].text_y>g_headerbar.h)
-								gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, (properties.centerText?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
+								gr.GdiDrawText(this.groups[this.groups_draw[i]].secondRow, g_font.italic, colors.faded_txt, ax, this.groups[this.groups_draw[i]].text_y + this.firstRowHeight + space_between_lines, this.coverRealWith, 50+g_fsize, ((properties.centerText | properties.circleMode)?DT_CENTER:DT_LEFT) | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 							if(typeof this.groups[this.groups_draw[i]].firstRowLength == 'undefined') this.groups[this.groups_draw[i]].firstRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].firstRow,g_font.plus2);
 							if(typeof this.groups[this.groups_draw[i]].secondRowLength == 'undefined') this.groups[this.groups_draw[i]].secondRowLength = gr.CalcTextWidth(this.groups[this.groups_draw[i]].secondRow,g_font.normal);
@@ -5020,7 +5136,7 @@ oBrowser = function(name) {
             }
 
         }
-
+		//console.log("draw albums finished time:"+gTime_draw.Time);	
     }
 	this.stopResizing = function() {
 		if(this.resize_click || this.resize_drag) {
@@ -5053,7 +5169,36 @@ oBrowser = function(name) {
 		g_dragC = false;
 		this.setActiveRow(x,y);
 	}
-
+	this.playGroup = function(group_id){
+		if(group_id > -1 && !this.avoidDlbePlay){
+			plman.FlushPlaybackQueue();
+			var PlaybackPlaylist = this.getPlaybackPlaylist();
+			if(!getRightPlaylistState() || this.SourcePlaylistIdx==plman.PlayingPlaylist){
+				if(!this.followActivePlaylist){
+					plman.ActivePlaylist = this.SourcePlaylistIdx;
+				}
+				plman.ActivePlaylist = this.SourcePlaylistIdx;
+				plman.PlayingPlaylist = this.SourcePlaylistIdx;
+				plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups[this.groups_draw[group_id]].pl[0]);
+				if(fb.IsPaused) fb.Stop();
+				plman.FlushPlaybackQueue();
+				fb.RunContextCommandWithMetadb("Add to playback queue", this.groups[this.groups_draw[group_id]].pl[0]);
+				fb.Play();
+			} else {
+				plman.ClearPlaylist(PlaybackPlaylist);
+				plman.InsertPlaylistItems(PlaybackPlaylist, 0, this.GetFilteredTracks(this.groups_draw[group_id]));
+				plman.PlayingPlaylist = PlaybackPlaylist;
+				plman.ExecutePlaylistDefaultAction(PlaybackPlaylist,0);
+				fb.Stop();fb.Play();
+			}
+			this.avoidDlbePlay = true;
+			timers.showItem = setTimeout(function(brw){
+				brw.avoidDlbePlay = false;
+				clearTimeout(timers.showItem);
+				timers.showItem=false;
+			}, 300, this);
+		}		
+	}
     this.on_mouse = function(event, x, y) {
         this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
 
@@ -5115,35 +5260,7 @@ oBrowser = function(name) {
 				}
                 break;
             case "lbtn_dblclk":
-                var a = this.activeIndexFirstClick;
-                if(a > -1 && !this.avoidDlbePlay){
-					plman.FlushPlaybackQueue();
-					var PlaybackPlaylist = this.getPlaybackPlaylist();
-					if(!getRightPlaylistState() || this.SourcePlaylistIdx==plman.PlayingPlaylist){
-						if(!this.followActivePlaylist){
-							plman.ActivePlaylist = this.SourcePlaylistIdx;
-						}
-						plman.ActivePlaylist = this.SourcePlaylistIdx;
-						plman.PlayingPlaylist = this.SourcePlaylistIdx;
-						plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, this.groups[this.groups_draw[a]].pl[0]);
-						if(fb.IsPaused) fb.Stop();
-						plman.FlushPlaybackQueue();
-						fb.RunContextCommandWithMetadb("Add to playback queue", this.groups[this.groups_draw[a]].pl[0]);
-						fb.Play();
-					} else {
-						plman.ClearPlaylist(PlaybackPlaylist);
-						plman.InsertPlaylistItems(PlaybackPlaylist, 0, this.GetFilteredTracks(this.groups_draw[a]));
-						plman.PlayingPlaylist = PlaybackPlaylist;
-						plman.ExecutePlaylistDefaultAction(PlaybackPlaylist,0);
-						fb.Stop();fb.Play();
-					}
-					this.avoidDlbePlay = true;
-					timers.showItem = setTimeout(function(brw){
-						brw.avoidDlbePlay = false;
-						clearTimeout(timers.showItem);
-						timers.showItem=false;
-					}, 300, this);
-                }
+                this.playGroup(this.activeIndexFirstClick);
                 break;
             case "mbtn_down":
                 if(this.activeIndex > -1){
@@ -5239,7 +5356,7 @@ oBrowser = function(name) {
 
             if(y > this.y && x > this.x && x < this.x + this.w - g_scrollbar.w && this.activeRow > -10) {
 				if(properties.veryTighCoverActiveZone){
-					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith-this.marginSide)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > this.coverRealWith+((this.thumbnailWidth - this.coverRealWith)/2))  {
+					if((x - this.x - this.marginLR)%this.thumbnailWidth < ((this.thumbnailWidth - this.coverRealWith)/2) || (x - this.x - this.marginLR)%this.thumbnailWidth > ((this.thumbnailWidth + this.coverRealWith)/2)) {
 						this.activeColumn = 0;
 						this.activeIndex = -1;
 						this.activeTextIndex = -1;
@@ -5285,12 +5402,12 @@ oBrowser = function(name) {
 			brw.timerCounter++;
 			//Restart if the animation is desyncronised
 			try{
-				if(Math.abs(brw.timerStartTime+brw.timerCounter*properties.refreshRate-Date.now())>500){
+				if(Math.abs(brw.timerStartTime+brw.timerCounter*globalProperties.refreshRate-Date.now())>500){
 					brw.startTimer();
 				}
 			}catch(e){}
 			brw.timerScript();
-		}, properties.refreshRate);
+		}, globalProperties.refreshRate);
 	}
     this.timerScript = function() {
 
@@ -5408,8 +5525,8 @@ oBrowser = function(name) {
 				repaintIndex = (brw.activeIndex>=0)?brw.activeIndex:brw.activeIndexSaved;
 
 				if(repaintIndex>=0){
-					active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x;
-					active_x = brw.groups[brw.groups_draw[repaintIndex]].x;
+					active_x_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].x-8;
+					active_x = brw.groups[brw.groups_draw[repaintIndex]].x-8;
 					if(active_x > active_x_saved) {
 						repaint_x = active_x_saved;
 						repaint_x_end = active_x + brw.coverRealWith;
@@ -5417,8 +5534,8 @@ oBrowser = function(name) {
 						repaint_x = active_x;
 						repaint_x_end = active_x_saved + brw.coverRealWith;
 					}
-					active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y;
-					active_y = brw.groups[brw.groups_draw[repaintIndex]].y;
+					active_y_saved = brw.groups[brw.groups_draw[repaintIndexSaved]].y-8;
+					active_y = brw.groups[brw.groups_draw[repaintIndex]].y-8;
 					if(active_y > active_y_saved) {
 						repaint_y = active_y_saved;
 						repaint_y_end = active_y + brw.coverRealWith;
@@ -5426,7 +5543,7 @@ oBrowser = function(name) {
 						repaint_y = active_y;
 						repaint_y_end = active_y_saved + brw.coverRealWith;
 					}
-					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x, repaint_y_end-repaint_y);
+					brw.RepaintRect(repaint_x, repaint_y, repaint_x_end-repaint_x+20, repaint_y_end-repaint_y+20);
 				} else repaint_1 = true;
 			} catch(e){
 				repaint_1 = true;
@@ -5452,6 +5569,7 @@ oBrowser = function(name) {
 
     this.setResizeButton = function (w,h) {
         var gb;
+		this.thumbnailWidthMax = Math.min(((this.w - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
         this.ResizeButton_off = gdi.CreateImage(w, h);
         gb = this.ResizeButton_off.GetGraphics();
 			gb.FillSolidRect(0,Math.round(h/2)-1, w, 1, colors.faded_txt);
@@ -5474,7 +5592,7 @@ oBrowser = function(name) {
     }
 	this.drawResizeButton = function (gr,x,y){
 		 this.resize_bt.draw(gr,x,y,255);
-		 resizeCursorPos=Math.round(this.resize_bt.w*(properties.thumbnailWidth-properties.thumbnailWidthMin)/(globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin));
+		 resizeCursorPos=Math.round(this.resize_bt.w*(properties.thumbnailWidth-properties.thumbnailWidthMin)/(this.thumbnailWidthMax-properties.thumbnailWidthMin));
 		 if(this.resize_bt.state==ButtonStates.hover || this.resize_bt.state==ButtonStates.down)
 			gr.FillSolidRect(x+resizeCursorPos, y+Math.round(this.resize_bt.h/2)-6, 1, 10, colors.normal_txt);
 		 else
@@ -5482,15 +5600,17 @@ oBrowser = function(name) {
 	}
 	this.moveResizeBtn = function (x,y){
 		var new_value = Math.max(x-this.resize_bt.x,0)/(this.resize_bt.w);
-		properties.thumbnailWidth = Math.round((globalProperties.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
-		if(properties.thumbnailWidth>globalProperties.thumbnailWidthMax) properties.thumbnailWidth=globalProperties.thumbnailWidthMax;
+		this.thumbnailWidthMax = Math.min(((ww - this.x - this.marginLR)/2),globalProperties.thumbnailWidthMax);
+		properties.thumbnailWidth = Math.round((this.thumbnailWidthMax-properties.thumbnailWidthMin)*(new_value)+properties.thumbnailWidthMin);
+		if(properties.thumbnailWidth>this.thumbnailWidthMax) properties.thumbnailWidth=this.thumbnailWidthMax;
 		else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 		window.SetProperty("COVER Width", properties.thumbnailWidth);
 		this.refresh_browser_thumbnails();
 		this.refresh_shadows();
+		this.refreshDates();
 		on_size(window.Width, window.Height);
-	}
-    this.setResizeButton(65,14);
+	}    
+    this.setResizeButton(65,14);	
 	this.stopFlashNowPlaying = function (){
 		cNowPlaying.flashEnable = false;
 		cNowPlaying.flashescounter = 0;
@@ -5820,7 +5940,7 @@ function on_load_image_done(tid, image){
 				brw.groups[k].load_requested = 2;
 
 				if(image.Width>globalProperties.thumbnailWidthMax || image.Height>globalProperties.thumbnailWidthMax) {
-					g_image_cache.addToCache(image,brw.groups[k].cachekey,lobalProperties.thumbnailWidthMax);
+					g_image_cache.addToCache(image,brw.groups[k].cachekey,globalProperties.thumbnailWidthMax);
 				} else g_image_cache.addToCache(image,brw.groups[k].cachekey);
 
 				if(k <= g_end) {
@@ -6013,12 +6133,11 @@ function on_paint(gr) {
 		update_wallpaper = false;
     };
 	if(update_headerbar) g_headerbar.setDisplayedInfo();
-
+	
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	if(g_wallpaperImg && properties.showwallpaper) {
 		gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
 		gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
-	} else {
-		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
 	}
 
     brw && brw.draw(gr);
@@ -6687,14 +6806,12 @@ function on_mouse_wheel(step, stepstrait, delta){
 	} else {
 		if(utils.IsKeyPressed(VK_SHIFT) || brw.resize_bt.checkstate("hover", g_cursor.x, g_cursor.y)) {
 			properties.thumbnailWidth += (intern_step)*4;
-			if(properties.thumbnailWidth < properties.thumbnailWidthMin) properties.thumbnailWidth = properties.thumbnailWidthMin;
-			if(properties.thumbnailWidth > globalProperties.thumbnailWidthMax) properties.thumbnailWidth = globalProperties.thumbnailWidthMax;
+			if(properties.thumbnailWidth>brw.thumbnailWidthMax) properties.thumbnailWidth=brw.thumbnailWidthMax;
+			else if(properties.thumbnailWidth<properties.thumbnailWidthMin) properties.thumbnailWidth=properties.thumbnailWidthMin;
 			window.SetProperty("COVER Width", properties.thumbnailWidth);
 			brw.refresh_browser_thumbnails();
-			if(properties.CoverShadowOpacity>0 && this.cover_shadow != null){
-				this.cover_shadow = undefined;
-				this.cover_shadow = null;
-			}
+			brw.refresh_shadows();
+			brw.refreshDates();
 			on_size(window.Width, window.Height);
 			return;
 		}
@@ -6709,7 +6826,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 			} else {
 				scroll -= (intern_step) * brw.rowHeight;
 				scroll = g_scrollbar.check_scroll(scroll);
-				if(g_showlist.idx>-1){
+				if(g_showlist.idx>-1 && properties.showlistScrollbar){
 					var g_showlist_futur_y = Math.round(brw.y + ((g_showlist.rowIdx + 1) * brw.rowHeight)  - scroll);
 					if(intern_step<0) { //on descend
 						if(g_showlist_futur_y < brw.rowHeight && g_showlist_futur_y > -brw.rowHeight) {
@@ -6744,11 +6861,7 @@ function on_mouse_leave() {
 
     // buttons
     if(g_showlist.idx > -1) {
-        g_showlist.close_bt.checkstate("leave", 0, 0);
-        if(g_showlist.totalCols > g_showlist.totalColsVis) {
-            (g_showlist.columnsOffset > 0) && g_showlist.prev_bt.checkstate("leave", 0, 0);
-            (g_showlist.columnsOffset < g_showlist.totalCols - g_showlist.totalColsVis) && g_showlist.next_bt.checkstate("leave", 0, 0);
-        }
+		g_showlist.check("leave", -1, -1);
     }
 
     brw.on_mouse("leave", 0, 0);
@@ -6821,7 +6934,7 @@ function get_colors() {
 			colors.showlist_arrow = GetGrey(25,255);
 			colors.showlist_border_color = GetGrey(255,30);
 		} else if(globalProperties.colorsMainPanel==2){
-			colors.showlist_bg = GetGrey(0);
+			colors.showlist_bg = GetGrey(25);
 			colors.showlist_border_color = GetGrey(255,50);
 		}
 		colors.grad_bottom_1 = GetGrey(0,70);
@@ -6848,7 +6961,8 @@ function get_colors() {
 		colors.covergrad_hoverOverlay = GetGrey(0,255);
 		colors.cover_rectline = GetGrey(255,20);
 		colors.cover_nocover_rectline = GetGrey(255,45);
-
+		colors.play_bt = GetGrey(255);
+		
 		colors.cover_ellipse_before_rectline = GetGrey(255,30);
 		colors.cover_ellipse_nowplaying_rectline = GetGrey(255,30);
 		colors.cover_ellipse_after_rectline = GetGrey(255,10);
@@ -6885,6 +6999,8 @@ function get_colors() {
 		colors.showlist_scroll_btns_icon = GetGrey(0);
 		colors.showlist_dragtrackbg = GetGrey(255,175);
 		colors.showlist_dragitemstxt = GetGrey(0);
+		
+		colors.overlay_on_hover = GetGrey(0,130);
 	} else {
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
 			colors.showlist_bg = GetGrey(255,70);
@@ -6922,7 +7038,8 @@ function get_colors() {
 		colors.covergrad_hoverOverlay = GetGrey(0,255);
 		colors.cover_rectline = GetGrey(0,25);
 		colors.cover_nocover_rectline = GetGrey(0,35);
-
+		colors.play_bt = GetGrey(255);
+		
 		colors.cover_ellipse_before_rectline = GetGrey(255,30);
 		colors.cover_ellipse_nowplaying_rectline = GetGrey(255,30);
 		colors.cover_ellipse_after_rectline = GetGrey(255,10);
@@ -6958,14 +7075,14 @@ function get_colors() {
 		colors.showlist_scroll_btns_icon = GetGrey(255);
 		colors.showlist_dragtrackbg = GetGrey(0,175);
 		colors.showlist_dragitemstxt = GetGrey(255);
+		
+		colors.overlay_on_hover = GetGrey(0,130);		
 	}
 }
 
 function on_font_changed() {
     get_font();
 	brw.on_font_changed(true);
-	g_showlist.ratingImgsLight = false;
-	g_showlist.ratingImgsDark = false;
 	g_showlist.onFontChanged();
 	brw.get_metrics_called = false;
 	g_filterbox.onFontChanged();
@@ -7145,7 +7262,7 @@ function on_playlist_items_selection_change() {
 function on_playlist_items_added(playlist) {
 	source_playlist_idx = brw.calculateSourcePlaylist();
 	if(brw.followActivePlaylist || source_playlist_idx==playlist){
-		if(!g_avoid_on_items_added && !g_avoid_on_playlists_changed){
+		if(!g_avoid_on_items_added){
 			g_avoid_on_items_removed=true;
 			g_avoid_on_playlist_switch=true;
 			//brw.calculateSourcePlaylist();
@@ -7328,6 +7445,7 @@ function on_notify_data(name, info) {
 			window.SetProperty("_MAINPANEL: right_panel_follow_cursor", properties.right_panel_follow_cursor);
 			g_showlist.refresh();
 			brw.refresh_browser_thumbnails();
+			brw.repaint();
 			break;
 		case "MemSolicitation":
 			globalProperties.mem_solicitation = info;
@@ -7439,6 +7557,10 @@ function on_notify_data(name, info) {
 		case "nowplayingvisu_state":
 			nowplayingvisu_state.value=info;
 		break;
+		case "trackinfostext_state":
+			trackinfostext_state.value=info;
+			g_showlist.refresh();
+		break;		
 		case "trackinfoslib_state":
 			trackinfoslib_state.value=info;
 			if(getRightPlaylistState()) {
