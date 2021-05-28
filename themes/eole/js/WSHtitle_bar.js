@@ -69,6 +69,7 @@ var g_fsize=12;
 var cSearchBox = {};
 var g_genre_cache = null;
 var main_panel_btns = null;
+var previous_darkvalue = properties.darklayout;
 
 var cSearchBoxMainLight = {
 	width:270,
@@ -228,6 +229,7 @@ function build_images(){
 	images.nowplaying_on_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"close_icon.png");
 	images.nowplaying_on_hover_icon_hover = gdi.Image(theme_img_path + "\\icons\\white\\"+icon_prefix+"close_icon.png");
 	images.max_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"max_icon.png");
+	images.maxon_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"maxon_icon.png");	
 	images.reduce_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\"+icon_prefix+"reduce_icon.png");
 	images.mini_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\minimode_icon.png");
 
@@ -251,7 +253,7 @@ function get_colors(){
 	setDarkLayout();
 	get_colors_global();
 	if (properties.darklayout) {
-		colors.wallpaper_overlay = GetGrey(0,233);
+		colors.wallpaper_overlay = GetGrey(0,203);
 		colors.wallpaper_overlay_blurred = GetGrey(0,140);
 		colors.albumartbg_overlay = GetGrey(0,80);
 
@@ -279,8 +281,8 @@ function get_colors(){
 		cSearchBox.marginBottom = 3;
 	}
 	else {
-		colors.wallpaper_overlay = GetGrey(255,252);
-		colors.wallpaper_overlay_blurred = GetGrey(255,252);
+		colors.wallpaper_overlay = GetGrey(255,232);
+		colors.wallpaper_overlay_blurred = GetGrey(255,232);
 		colors.albumartbg_overlay = GetGrey(0,80);
 
 		colors.btn_inactive_opacity = 255;
@@ -411,10 +413,10 @@ function toggleTrackInfosState(switch_all,new_state, refresh_panel){
 
 	if(switch_all){
 		if(new_state===false) {
-			trackinfoslib_state.toggleValue(refresh_panel);
-			trackinfosplaylist_state.toggleValue(refresh_panel);
-			trackinfosbio_state.toggleValue(refresh_panel);
-			trackinfosvisu_state.toggleValue(refresh_panel);
+			trackinfoslib_state.cycleIncrement(1,refresh_panel);
+			trackinfosplaylist_state.cycleIncrement(1,refresh_panel);
+			trackinfosbio_state.cycleIncrement(1,refresh_panel);
+			trackinfosvisu_state.cycleIncrement(1,refresh_panel);
 		} else {
 			trackinfoslib_state.setValue(new_state,refresh_panel);
 			trackinfosplaylist_state.setValue(new_state,refresh_panel);
@@ -425,19 +427,19 @@ function toggleTrackInfosState(switch_all,new_state, refresh_panel){
 		switch(main_panel_state.value){
 			case 0:
 				if(new_state!==false) trackinfoslib_state.setValue(new_state,refresh_panel);
-				else trackinfoslib_state.toggleValue(refresh_panel);
+				else trackinfoslib_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 1:
 				if(new_state!==false) trackinfosplaylist_state.setValue(new_state,refresh_panel);
-				else trackinfosplaylist_state.toggleValue(refresh_panel);
+				else trackinfosplaylist_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 2:
 				if(new_state!==false) trackinfosbio_state.setValue(new_state,refresh_panel);
-				else trackinfosbio_state.toggleValue(refresh_panel);
+				else trackinfosbio_state.cycleIncrement(1,refresh_panel);
 			break;
 			case 3:
 				if(new_state!==false) trackinfosvisu_state.setValue(new_state,refresh_panel);
-				else trackinfosvisu_state.toggleValue(refresh_panel);
+				else trackinfosvisu_state.cycleIncrement(1,refresh_panel);
 			break;
 		}
 	}
@@ -449,6 +451,13 @@ function saveFilterState(){
 	window.SetProperty("_PROPERTY: Saved filter state", properties.savedFilterState);
 	window.NotifyOthers("save_filter_state",properties.savedFilterState);
 }
+function setMaxButton(){
+	if(g_uihacks.getMainWindowState()==WindowState.Normal) buttons.Max.H_img = images.max_icon;
+	else buttons.Max.H_img = images.maxon_icon;
+	buttons.Max.N_img = buttons.Max.H_img;
+	buttons.Max.D_img = buttons.Max.H_img;	
+}
+
 function build_buttons(){
 	if(btn_initialized){
 		buttons.Library.N_img = images.library_img;
@@ -480,7 +489,7 @@ function build_buttons(){
 		buttons.Idle.N_img = images.idle_img;
 		buttons.Idle.D_img = buttons.Idle.H_img;
 
-		if(getTrackInfosState()==1) {
+		if(getTrackInfosState()>=1) {
 			buttons.RightSidebar.H_img = images.trackinfos_off;
 			buttons.RightSidebar.N_img = images.trackinfos_off;
 		} else {
@@ -505,9 +514,7 @@ function build_buttons(){
 		buttons.Close.H_img = images.nowplaying_on_hover_icon_hover;
 		buttons.Close.D_img = buttons.Close.H_img;
 
-		buttons.Max.H_img = images.max_icon;
-		buttons.Max.N_img = images.max_icon;
-		buttons.Max.D_img = buttons.Max.H_img;
+		setMaxButton();
 		buttons.Max.hover_color = colors.titlebar_btn_hover_bg;
 
 		buttons.Mini.N_img = images.mini_icon;
@@ -545,7 +552,7 @@ function build_buttons(){
 				if(getNowPlayingState()==1) {
 					toggleTrackInfosState();
 				} else {
-					if(getTrackInfosState()==0) toggleTrackInfosState(false,undefined,false);
+					if(getTrackInfosState()==0) toggleTrackInfosState(false,1,false);
 					toggleNowPlayingState();
 					/*trigger_refresh_PSS = setTimeout(function(){
 						RefreshPSS();
@@ -554,9 +561,12 @@ function build_buttons(){
 					}, 100);*/
 				}
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),
-			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch", function () {
+			Lightswitch: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "lightswitch", "Dark/light switch"+"\n"+"(double click to switch globally)", false, function () {
+				previous_darkvalue = properties.darklayout;				
 				Lightswitch();
-			}, false, false,images.lightswitch_img,images.lightswitch_img,-1, false, false, true),
+			}, function () {
+				Lightswitch(true,!previous_darkvalue);
+			}, images.lightswitch_img,images.lightswitch_img,-1, false, false, true),
 			Fullscreen: new JSButton(-112, btn.top_m, btn.width_small_btns, btn.height, "", "fullscreen", "Fullscreen", function () {
 				g_uihacks.toggleFullscreen();
 			}, false,false,images.fullscreen_img,images.fullscreen_img,-1, false, false, true),
@@ -852,6 +862,7 @@ function on_size(w, h) {
 			toggleLayoutMode(0 , 0, false);get_colors();g_searchbox.adapt_look_to_layout();
 		}
 	}
+	setMaxButton();
 	g_panel.on_size_changed();
     // set wallpaper
     if(fb.IsPlaying && properties.showwallpaper) {
@@ -883,10 +894,7 @@ function SetPseudoCaption(){
 function on_paint(gr) {
 	gr.SetTextRenderingHint(globalProperties.TextRendering);
 
-    //BG
-	if(!properties.showwallpaper){
-		gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
-	}
+	gr.FillSolidRect(0, 0, ww, wh, colors.normal_bg);
     // BG wallpaper
     if(properties.showwallpaper && (typeof(g_wallpaperImg) == "undefined" || !g_wallpaperImg || update_wallpaper)) {
         g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
@@ -2508,7 +2516,6 @@ oSearch = function() {
 								this.inputbox.on_key_down(vkey);
 								break;
 							}
-					this.inputbox.on_key_down(vkey);
 				}
                 break;
         };

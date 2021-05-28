@@ -5,7 +5,7 @@ This theme require Foobar2000 1.4 (or superior).
 
 ## Participate to the theme
 
-If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request, I'll review it and merge it to the master code. I can also add your github account to the collaborators of this repository, just ask.
+If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request.
 
 ## Preview
 
@@ -17,7 +17,7 @@ If you've got some knowledge in javascript, feel free to suggest code performanc
 
 1. Download this [github repository](https://github.com/Ottodix/Eole-foobar-theme/zipball/master/) and copy everything into your foobar profile directory (so the 3 folders: user-components, themes and plugins).
    - STANDARD foobar2000 installation: your foobar profile directory is there: %AppData%/foobar2000
-   - PORTABLE foobar2000 installation: your foobar profile directory is the same than you installation directory.
+   - PORTABLE foobar2000 installation: your foobar profile directory is a folder named "profile" inside your installation directory.
 
 2. Run foobar, choose ColumnUI as user interface (from the prompt, or from File > Preferences > Display)
 

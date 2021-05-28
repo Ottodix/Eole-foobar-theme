@@ -177,7 +177,7 @@ function _thumbs() {
 		if (this.properties.auto_download.enabled && this.counter == 2 && this.images.length == 0) {
 			var np = fb.GetNowPlaying();
 			// check selection matches playing item
-			if (panel.metadb.Path == np.Path && panel.metadb.Subsong == np.Subsong) {
+			if (panel.metadb.Path == np.Path && panel.metadb.SubSong == np.SubSong) {
 				this.download();
 			}
 		}

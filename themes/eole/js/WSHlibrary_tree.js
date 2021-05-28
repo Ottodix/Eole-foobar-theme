@@ -106,20 +106,24 @@ oTagSwitcherBar = function() {
 		this.items_x = new Array(0, 0, 0, 0);
 		this.items_txt = new Array("T","ALBUM", "ARTIST", "GENRE");
 		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
-
-		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
-			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
-		}
-		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
-			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
-		}
-		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
-			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
-		}
-
 		properties.album_label = this.items_txt[1];
 		properties.artist_label = this.items_txt[2];
-		properties.genre_label = this.items_txt[3];
+		properties.genre_label = this.items_txt[3];		
+		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
+			properties.album_label = properties.album_customGroup_label;			
+			this.items_txt[1] = properties.album_customGroup_label.toUpperCase();
+			this.items_tooltips[1] = properties.album_customGroup_label+" filter";
+		}
+		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
+			properties.artist_label = properties.artist_customGroup_label;			
+			this.items_txt[2] = properties.artist_customGroup_label.toUpperCase();
+			this.items_tooltips[2] = properties.artist_customGroup_label+" filter";
+		}
+		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
+			properties.genre_label = properties.genre_customGroup_label;			
+			this.items_txt[3] = properties.genre_customGroup_label.toUpperCase();
+			this.items_tooltips[3] = properties.genre_customGroup_label+" filter";
+		}
 
 		if(!properties.showLibraryTreeSwitch){
 			this.items_txt.shift();
@@ -205,7 +209,7 @@ oTagSwitcherBar = function() {
 			if(this.items_txt[i].length==1){
 				gr.DrawImage(this.images.library_tree, this.items_x[i]+Math.round(txt_padding_sides/2)-4, this.txt_top_margin+Math.floor((this.h-this.images.library_tree.Height)/2)-1, this.images.library_tree.Width, this.images.library_tree.Height, 0, 0, this.images.library_tree.Width, this.images.library_tree.Height, 0, (i==this.activeItem || i==this.hoverItem)?255:colors.btn_inactive_opacity);
 			} else {
-				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.normal_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+				gr.GdiDrawText(this.items_txt[i], g_font.min1, (i==this.activeItem || i==this.hoverItem)?colors.full_txt:colors.inactive_txt, this.items_x[i], this.txt_top_margin, this.items_width[i], this.h, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 			}
 			if(i==this.activeItem || i==this.hoverItem) gr.FillSolidRect(this.items_x[i]+Math.round(txt_padding_sides/2)-9, this.y+this.h-1,  this.items_width[i]-Math.round(txt_padding_sides/2)*2+16, 1, colors.normal_txt);
 		}
@@ -1636,7 +1640,7 @@ function library_manager() {
             if (!this.list.Count) return;
             this.none = "";
             try {
-                p.list = fb.GetQueryItems(this.list, p.s_txt)
+                p.list = fb.GetQueryItems(this.list, p.s_txt.toLowerCase())
             } catch (e) {};
             if (!p.list.Count) {
                 pop.tree = [];
@@ -2331,6 +2335,13 @@ function populate() {
                 plman.InsertPlaylistItems(this.pln, 0, items);
             }
         } else */
+		if(plman.PlayingPlaylist == this.pln) { // playing playlist is this.name_to_send
+			var new_playlist = renamePlaybackPlaylist();
+			if(new_playlist!==false) {
+				this.pln = new_playlist;
+				plman.ActivePlaylist = this.pln;
+			}
+		}		
 		if (!add) {
             plman.UndoBackup(this.pln);
             plman.ClearPlaylist(this.pln);
@@ -2433,7 +2444,7 @@ function populate() {
             if (this.line_l && ui.linestyle<2) gr.FillSolidRect(ln_x, ln_y, 1, ln_h, ui.linecol);
         }
         for (i = s; i < e; i++) {
-            if ((this.tree[i].sel && ui.backcolsel != 0 && (plman.GetPlaylistName(plman.ActivePlaylist)==lib_playlist || ui.force_SelectedDraw)) || g_rightClickedIndex == i) {
+            if ((this.tree[i].sel && ui.backcolsel != 0) || g_rightClickedIndex == i) {
                 item_y = ui.row_h * i + p.s_h - sbar.delta;
                 item_x = Math.round(ui.pad * this.tree[i].tr + ui.margin);
                 if (ui.node_style>=0 || !this.tree[i].track) item_x = item_x + ui.symbol_w;
@@ -3004,6 +3015,7 @@ function searchLibrary() {
     }
 
     this.lbtn_dn = function(x, y) {
+		
         p.search_paint();
         this.lbtn_down = (y < p.s_h && y > this.y && x > ui.margin + ui.row_h * 0.6 && x < p.s_x + p.s_w2);
         if (!this.lbtn_down) {
@@ -3013,7 +3025,7 @@ function searchLibrary() {
 			p.search_paint();
             return;
         } else {
-            this.activate();
+            this.activate(x,y);
         }
     }
 	this.activate = function(x, y) {
@@ -3042,7 +3054,7 @@ function searchLibrary() {
         switch (code) {
             case v.enter:
                 if (p.s_txt.length < 3) break;
-                var items = fb.GetQueryItems(lib.list, p.s_txt);
+                var items = fb.GetQueryItems(lib.list, p.s_txt.toLowerCase());
                 pop.load(items, false, false, false, pop.gen_pl, false);
                 items = undefined;
                 break;
@@ -4443,14 +4455,14 @@ function on_playlists_changed() {
 	}
 };
 function on_playlist_switch() {
-	ui.force_SelectedDraw = false;
     if(window.IsVisible) {
 		pman.populate(exclude_active = false, reset_scroll = false);
-		if(pop.pln != plman.ActivePlaylist){
+		if(pop.pln != plman.ActivePlaylist && !ui.force_SelectedDraw){
 			pop.clearSelectedItem();
 		}
 		window.Repaint();
 	} else set_update_function('on_playlist_switch()');
+	ui.force_SelectedDraw = false;	
 };
 //=================================================// Playback Callbacks
 function on_playback_new_track(metadb){
@@ -4703,6 +4715,7 @@ function on_focus(is_focused) {
 function get_colors() {
 	get_colors_global();
     if (properties.darklayout) {
+		colors.normal_txt = GetGrey(180);				
 		colors.btn_inactive_opacity = 140;
 		colors.inactive_txt = GetGrey(140);
 
@@ -4723,6 +4736,7 @@ function get_colors() {
 
 		colors.settings_hover_bg = GetGrey(255,40);
     } else {
+		colors.normal_txt = GetGrey(0);		
 		colors.btn_inactive_opacity = 110;
 		colors.inactive_txt = colors.faded_txt;
 
@@ -4837,7 +4851,7 @@ function on_notify_data(name, info) {
 		break;
 		case "genre_customGroup_label":
 			properties.genre_customGroup_label = info;
-			window.SetProperty("_DISPLAY: album customGroup name", properties.genre_customGroup_label);
+			window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 			g_tagswitcherbar.on_init();
 		break;
 		case "artist_customGroup_label":

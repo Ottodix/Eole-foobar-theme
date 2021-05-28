@@ -168,6 +168,7 @@ window.MinHeight
 window.MinWidth
 window.Name
 window.PanelMemoryUsage
+window.Tooltip
 window.TotalMemoryUsage
 window.Width
 
