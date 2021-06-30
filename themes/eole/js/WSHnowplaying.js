@@ -992,6 +992,9 @@ function on_layout_change() {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "setGlobalParameter":
+			setGlobalParameter(info[0],info[1]);
+		break;	
 		case "use_ratings_file_tags":
 			globalProperties.use_ratings_file_tags = info;
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
@@ -1672,11 +1675,10 @@ function on_mouse_rbtn_up(x, y){
 			window.Repaint();
 			break;
 		case (idx == 12):
-			globalProperties.keepProportion = !globalProperties.keepProportion;
+			setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
 			get_images();
 			adaptButtons();
 			g_cover.refreshCurrent();
-			window.SetProperty("GLOBAL keepProportion", globalProperties.keepProportion);
 			window.Repaint();
 			break;
 		case (idx == 100):
@@ -1864,11 +1866,10 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;
 			case (idx == 12):
-				globalProperties.keepProportion = !globalProperties.keepProportion;
+				setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
 				get_images();
 				adaptButtons();
 				g_cover.refreshCurrent();
-				window.SetProperty("GLOBAL keepProportion", globalProperties.keepProportion);
 				window.Repaint();
 				break;
 			case (idx == 13):

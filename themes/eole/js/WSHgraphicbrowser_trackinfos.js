@@ -4988,7 +4988,7 @@ oBrowser = function(name) {
 							if(this.groups[this.groups_draw[i]].discnb!="?") overlayTxt = this.groups[this.groups_draw[i]].discnb;
 							
 						}
-						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?" && !this.custom_groupby) {
+						if(properties.showdateOverCover && this.groups[this.groups_draw[i]].date!="?") {
 							if(properties.extractYearFromDate) overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].year;
 							else overlayTxt += ((overlayTxt!="")?" - ":"")+this.groups[this.groups_draw[i]].date;
 						}
@@ -7422,6 +7422,9 @@ function on_drag_over(action, x, y, mask) {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "setGlobalParameter":
+			setGlobalParameter(info[0],info[1]);
+		break;			
 		case "use_ratings_file_tags":
 			globalProperties.use_ratings_file_tags = info;
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);

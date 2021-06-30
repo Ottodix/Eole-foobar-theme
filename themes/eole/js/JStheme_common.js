@@ -132,7 +132,12 @@ function setMemoryParameters(){
 	}
 }
 setMemoryParameters();
-
+function setGlobalParameter(parameter_name, parameter_value, notify_others){
+	var notify_others = typeof notify_others !== 'undefined' ? notify_others : false;	
+	window.SetProperty("GLOBAL "+parameter_name, parameter_value);
+	eval("globalProperties."+parameter_name+" = "+parameter_value);
+	if(notify_others) window.NotifyOthers("setGlobalParameter",Array(parameter_name,parameter_value));
+}
 var cScrollBar = {
     enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
     visible: true,
@@ -2872,7 +2877,7 @@ function get_font() {
 
 // ========================================= IMAGES =========================================
 function FormatCover(image, w, h, rawBitmap, callID, keepratio) {
-	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;	
+	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;		
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
 		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
@@ -3083,7 +3088,8 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
     if(freeCacheMemory()) return;
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
-			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion)
+			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion);
+			
 			//image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
 		if(!g_files.FileExists(filename) && save2cache){
