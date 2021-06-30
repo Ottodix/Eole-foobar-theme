@@ -52,6 +52,7 @@ var globalProperties = {
 	colorsMainPanel: window.GetProperty("GLOBAL colorsMainPanel",0),
 	colorsControls: window.GetProperty("GLOBAL colorsControls",0),
 	colorsMiniPlayer: window.GetProperty("GLOBAL colorsMiniPlayer",0),
+	keepProportion: window.GetProperty("GLOBAL keepProportion", false),	
 	record_move_every_x_ms:3000,
 	refreshRate:40,
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
@@ -3082,7 +3083,8 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
     if(freeCacheMemory()) return;
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
-			image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
+			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion)
+			//image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
 		if(!g_files.FileExists(filename) && save2cache){
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
@@ -3160,7 +3162,7 @@ oImageCache = function () {
 		if(!globalProperties.loaded_covers2memory || freeCacheMemory()) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
 		if(cachekey!="undefined") {
-			if(this.coverCacheWidthMax>0) this.cachelist[cachekey] = FormatCover(image, this.coverCacheWidthMax, this.coverCacheWidthMax, false, "addToCache", true);
+			if(this.coverCacheWidthMax>0) this.cachelist[cachekey] = FormatCover(image, this.coverCacheWidthMax, this.coverCacheWidthMax, false, "addToCache", globalProperties.keepProportion);
 			else this.cachelist[cachekey] = image;
 		}
 	}

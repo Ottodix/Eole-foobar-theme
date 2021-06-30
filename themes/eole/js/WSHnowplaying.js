@@ -19,7 +19,6 @@ var properties = {
 	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),
 	follow_cursor: window.GetProperty("_DISPLAY: cover follow cursor", false),
 	circleMode: window.GetProperty("_DISPLAY: circle mode", true),
-	keepProportion: window.GetProperty("_DISPLAY: keepProportion", true),
 	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
@@ -677,6 +676,7 @@ oCover = function() {
 		this.setPlaying(is_playing===true, metadb);
 		this.metadb = metadb;
 		if(!isImage(image)) return;
+		
 		if(resize && this.w>0 && this.h>0) {
 			this.resize();
 		}
@@ -753,8 +753,9 @@ oCover = function() {
 		//w = w - this.padding[1] - this.padding[3];
 		//h = h - this.padding[0] - this.padding[2];
 
-		if(properties.keepProportion) {
+		if(globalProperties.keepProportion) {
 			if(this.artwork.Height>=this.artwork.Width) {
+				
 				this.resize_ratio = this.artwork.Width / this.artwork.Height;
 				//this.h = Math.min(h,w);
 			//	this.w = this.h * this.resize_ratio;
@@ -1671,11 +1672,11 @@ function on_mouse_rbtn_up(x, y){
 			window.Repaint();
 			break;
 		case (idx == 12):
-			properties.keepProportion = !properties.keepProportion;
+			globalProperties.keepProportion = !globalProperties.keepProportion;
 			get_images();
 			adaptButtons();
 			g_cover.refreshCurrent();
-			window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
+			window.SetProperty("GLOBAL keepProportion", globalProperties.keepProportion);
 			window.Repaint();
 			break;
 		case (idx == 100):
@@ -1776,7 +1777,7 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuItem(MF_STRING, 11, "Circle artwork");
 		_menu.CheckMenuItem(11,properties.circleMode);
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion")
-		_menu.CheckMenuItem(12,properties.keepProportion);
+		_menu.CheckMenuItem(12,globalProperties.keepProportion);
 		_menu.AppendMenuItem(MF_STRING, 13, "Fill the whole space");
 		_menu.CheckMenuItem(13,!trackinfostext_state.isActive() && properties.coverNoPadding);				
 		_menu.AppendMenuSeparator();
@@ -1863,11 +1864,11 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;
 			case (idx == 12):
-				properties.keepProportion = !properties.keepProportion;
+				globalProperties.keepProportion = !globalProperties.keepProportion;
 				get_images();
 				adaptButtons();
 				g_cover.refreshCurrent();
-				window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
+				window.SetProperty("GLOBAL keepProportion", globalProperties.keepProportion);
 				window.Repaint();
 				break;
 			case (idx == 13):
