@@ -1013,7 +1013,6 @@ function setVolume(val){
 	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
 	
 	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
-	back_to_volume = (volume_log==0)?0:Math.pow(10,2*(volume_log-1));
 	
 	fb.Volume = 100 * (Math.pow(volume_log,1/2) - 1);
 }
