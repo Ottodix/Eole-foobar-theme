@@ -1008,10 +1008,19 @@ function is_hover_track_info(x,y){
     return false;
 }
 function setVolume(val){
+	// fb.volume goes from -100 to 0
 	var volume = (val-volume_vars.margin_left) / volume_vars.width;
 	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
-	volume = 100 * (Math.pow(volume,1/2) - 1);
-	fb.Volume = volume;
+	
+	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
+	back_to_volume = (volume_log==0)?0:Math.pow(10,2*(volume_log-1));
+	
+	fb.Volume = 100 * (Math.pow(volume_log,1/2) - 1);
+}
+function getVolume(){
+	volume_log = Math.pow(fb.Volume/100 + 1,2);
+	volume_linear = (volume_log==0)?0:Math.pow(10,2*(volume_log-1));
+	return volume_linear;
 }
 function on_mouse_lbtn_down(x,y,m){
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);
@@ -1286,7 +1295,7 @@ function on_volume_change(val) {
 	window.Repaint();
 }
 function calculateVolumeSize(){
-	volume_vars.gradvolume = Math.pow((100+fb.Volume)/100,2);
+	volume_vars.gradvolume = getVolume();
 	volume_vars.volumesize = Math.round((volume_vars.width*volume_vars.gradvolume>volume_vars.width_min) ? volume_vars.width*volume_vars.gradvolume :volume_vars.width_min);
 	return volume_vars.volumesize;
 }
