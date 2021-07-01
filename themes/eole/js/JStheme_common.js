@@ -718,6 +718,7 @@ var cover_img_cache = data_global_path+"\\"+theme_name+"-img-cache";
 if(!g_files.FolderExists(cover_img_cache))
 g_files.CreateFolder(cover_img_cache);
 
+/*
 var square_img_cache = cover_img_cache+"\\square";
 if(!g_files.FolderExists(square_img_cache))
 g_files.CreateFolder(square_img_cache);
@@ -725,13 +726,14 @@ g_files.CreateFolder(square_img_cache);
 var keepProportion_img_cache = cover_img_cache+"\\keepProportion";
 if(!g_files.FolderExists(keepProportion_img_cache))
 g_files.CreateFolder(keepProportion_img_cache);
-
+*/
 function setImageCachePath(){
-	cover_img_cache=keepProportion_img_cache;
+	//cover_img_cache=keepProportion_img_cache;
 	//if(globalProperties.keepProportion) cover_img_cache=keepProportion_img_cache;
 	//else cover_img_cache=square_img_cache;
 }
 setImageCachePath();
+
 
 var SettingsPath = data_global_path+"\\"+theme_name+"-settings\\";
 if (!g_files.FolderExists(SettingsPath))
