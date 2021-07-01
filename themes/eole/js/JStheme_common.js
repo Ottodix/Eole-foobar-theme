@@ -727,8 +727,9 @@ if(!g_files.FolderExists(keepProportion_img_cache))
 g_files.CreateFolder(keepProportion_img_cache);
 
 function setImageCachePath(){
-	if(globalProperties.keepProportion) cover_img_cache=keepProportion_img_cache;
-	else cover_img_cache=square_img_cache;
+	cover_img_cache=keepProportion_img_cache;
+	//if(globalProperties.keepProportion) cover_img_cache=keepProportion_img_cache;
+	//else cover_img_cache=square_img_cache;
 }
 setImageCachePath();
 
@@ -3106,8 +3107,8 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
     if(freeCacheMemory()) return;
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
-			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion);
-			
+			//image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion);
+			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", true);
 			//image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
 		if(!g_files.FileExists(filename) && save2cache){
