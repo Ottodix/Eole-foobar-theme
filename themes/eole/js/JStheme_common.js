@@ -137,6 +137,10 @@ function setGlobalParameter(parameter_name, parameter_value, notify_others){
 	window.SetProperty("GLOBAL "+parameter_name, parameter_value);
 	eval("globalProperties."+parameter_name+" = "+parameter_value);
 	if(notify_others) window.NotifyOthers("setGlobalParameter",Array(parameter_name,parameter_value));
+	if(parameter_name=="keepProportion") {
+		setImageCachePath();
+		g_image_cache.resetCache();
+	}
 }
 var cScrollBar = {
     enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
@@ -713,6 +717,20 @@ g_files.CreateFolder(data_global_path);
 var cover_img_cache = data_global_path+"\\"+theme_name+"-img-cache";
 if(!g_files.FolderExists(cover_img_cache))
 g_files.CreateFolder(cover_img_cache);
+
+var square_img_cache = cover_img_cache+"\\square";
+if(!g_files.FolderExists(square_img_cache))
+g_files.CreateFolder(square_img_cache);
+
+var keepProportion_img_cache = cover_img_cache+"\\keepProportion";
+if(!g_files.FolderExists(keepProportion_img_cache))
+g_files.CreateFolder(keepProportion_img_cache);
+
+function setImageCachePath(){
+	if(globalProperties.keepProportion) cover_img_cache=keepProportion_img_cache;
+	else cover_img_cache=square_img_cache;
+}
+setImageCachePath();
 
 var SettingsPath = data_global_path+"\\"+theme_name+"-settings\\";
 if (!g_files.FolderExists(SettingsPath))

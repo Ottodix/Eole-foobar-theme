@@ -676,7 +676,6 @@ oCover = function() {
 		this.setPlaying(is_playing===true, metadb);
 		this.metadb = metadb;
 		if(!isImage(image)) return;
-		
 		if(resize && this.w>0 && this.h>0) {
 			this.resize();
 		}
@@ -701,7 +700,6 @@ oCover = function() {
 			}
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
-
 		if(this.is_playing!=is_playing_old) this.ResetMask();
 		if(this.metadb && this.metadb.Compare(metadb)) {
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
@@ -716,13 +714,14 @@ oCover = function() {
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;
 		}
+		
 		if(isImage(img) && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();
 		this.setArtwork(img,true,false,this.is_playing, metadb);
 	}
 	this.reset = function(reset_artwork) {
 		if(reset_artwork) {
 			this.artwork = null;
-			this.metadb = null;
+			this.metadb = null;		
 		}
 		this.artwork_resized = null;
 		this.resized = false;
@@ -743,8 +742,9 @@ oCover = function() {
 		if(isImage(this.artwork)) this.resize();
 		window.Repaint();
 	}
-	this.refreshCurrent = function (is_playing) {
-		this.refresh(this.metadb, false, this.playing_cachekey, false, is_playing);
+	this.refreshCurrent = function (is_playing, reset_artwork) {
+		reset_artwork = typeof reset_artwork !== 'undefined' ? reset_artwork : false;		
+		this.refresh(this.metadb, false, this.playing_cachekey, reset_artwork, is_playing);
 	}
 	this.resize = function(w,h) {
 		var w = typeof w !== 'undefined' ? w : this.w;
@@ -1678,7 +1678,7 @@ function on_mouse_rbtn_up(x, y){
 			setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
 			get_images();
 			adaptButtons();
-			g_cover.refreshCurrent();
+			g_cover.refreshCurrent(undefined,true);
 			window.Repaint();
 			break;
 		case (idx == 100):
@@ -1869,7 +1869,7 @@ function draw_settings_menu(x,y){
 				setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
 				get_images();
 				adaptButtons();
-				g_cover.refreshCurrent();
+				g_cover.refreshCurrent(undefined,true);
 				window.Repaint();
 				break;
 			case (idx == 13):
