@@ -635,7 +635,7 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
-		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device & DSP presets", function () {
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device && DSP presets", function () {
 			g_tooltip.Deactivate();
 			menuOutputAndDSP(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,device_img,device_img_hover),		
@@ -3136,7 +3136,7 @@ function draw_settings_menu(x,y){
 		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);		
 		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
 		_menu_button.CheckMenuItem(3023, properties.displayOpen);
-		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device");
+		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device && DSP presets");
 		_menu_button.CheckMenuItem(3029, properties.displayDevice);				
 		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
 		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	
