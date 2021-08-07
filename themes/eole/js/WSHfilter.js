@@ -97,6 +97,10 @@ var properties = {
     showHeaderBar1: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 1", true),
     showHeaderBar2: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 2", true),
     showHeaderBar3: window.GetProperty("_PROPERTY: Show Top Bar for tag mode 3", true),
+	removePrefix: window.GetProperty("_PROPERTY: ignore prefix", false),
+	removePrefix1: window.GetProperty("_PROPERTY: ignore prefix for tag mode 1", false),
+	removePrefix2: window.GetProperty("_PROPERTY: ignore prefix for tag mode 2", false),
+	removePrefix3: window.GetProperty("_PROPERTY: ignore prefix for tag mode 3", false),	
 	showToolTip: window.GetProperty("_PROPERTY: Show tooltips", true),
 	showLibraryTreeSwitch: window.GetProperty("_PROPERTY: Show library tree switch", false),
     rowHeight: 22,
@@ -128,7 +132,6 @@ var properties = {
 	panelFontAdjustement: -1,
 	load_image_from_cache_direct: true,
 	adapt_to_playlist: window.GetProperty("_PROPERTY: populate from active playlist", false),
-	removePrefix: window.GetProperty("_PROPERTY: ignore artist prefix", false),
 };
 if(properties.adapt_to_playlist && properties.ParentName=="Library") properties.adapt_to_playlist = false;
 	
@@ -2005,7 +2008,7 @@ oBrowser = function(name) {
                 this.groups[0].finalize(t_all, tr_all, pl_all);
             };
         };
-		if(properties.removePrefix && properties.tagMode==2) this.sort();
+		if(properties.removePrefix) this.sort();
         // free memory
         tr.splice(0, tr.length);
         tr_all.splice(0, tr_all.length);
@@ -3770,7 +3773,7 @@ oBrowser = function(name) {
 			_menu.AppendMenuItem(MF_STRING, 2997, "Show playlist panel on drag and drop");
 			_menu.CheckMenuItem(2997, properties.DropInplaylist);
 			
-			_menu.AppendMenuItem(MF_STRING, 2998, "Sort artists ignoring the/les/los");
+			_menu.AppendMenuItem(MF_STRING, 2998, "Sort ignoring the/les/los");
 			_menu.CheckMenuItem(2998, properties.removePrefix);			
 
 			if(main_panel_state.isEqual(1)) {
@@ -4106,7 +4109,9 @@ oBrowser = function(name) {
 					break;
 				case (idx == 2998):
 					properties.removePrefix = !properties.removePrefix;
-					window.SetProperty("_PROPERTY: ignore artist prefix", properties.removePrefix);
+					window.SetProperty("_PROPERTY: ignore prefix", properties.removePrefix);
+					eval("properties.removePrefix"+properties.tagMode+" = "+properties.removePrefix);
+					window.SetProperty("_PROPERTY: ignore prefix for tag mode "+properties.tagMode, properties.removePrefix);
 					brw.populate(true,"NoPrefix");				
 					break;					
             };
@@ -4684,6 +4689,7 @@ function get_metrics() {
     properties.showAllItem = eval("properties.showAllItem"+properties.tagMode);
     properties.drawItemsCounter = eval("properties.drawItemsCounter"+properties.tagMode);
     properties.showHeaderBar = eval("properties.showHeaderBar"+properties.tagMode);
+    properties.removePrefix = eval("properties.removePrefix"+properties.tagMode);	
 	properties.thumbnailWidth = eval("properties.thumbnailWidth"+properties.tagMode);
 	properties.default_lineHeightMin = eval("properties.default_lineHeightMin"+properties.tagMode);
 	properties.AlbumArtFallback = eval("properties.AlbumArtFallback"+properties.tagMode);
