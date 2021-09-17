@@ -4790,7 +4790,7 @@ function get_colors() {
 	if(properties.darklayout){
 		colors.normal_txt = GetGrey(180);
 		colors.grid_txt = GetGrey(255)
-		colors.grid_bg = GetGrey(200,190)
+		colors.grid_bg = GetGrey(0,190)
 		colors.gridselected_txt = GetGrey(0)
 		colors.gridselected_bg = GetGrey(255,155)
 		colors.gridselected_rect = GetGrey(255,245)
@@ -4803,7 +4803,6 @@ function get_colors() {
 		colors.grad_bottom_color2 = GetGrey(0,0);
 		colors.fading_bottom_height = 50;
 	} else {
-
 		colors.grid_txt = GetGrey(255)
 		colors.grid_bg = GetGrey(0,190)
 		colors.gridselected_txt = GetGrey(0)
