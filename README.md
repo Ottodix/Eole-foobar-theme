@@ -2,6 +2,7 @@
 
 This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 This theme require Foobar2000 1.4 (or superior).
+Follow the [instructions below](https://github.com/Ottodix/Eole-foobar-theme#installation) to install it properly
 
 ## Participate to the theme
 
