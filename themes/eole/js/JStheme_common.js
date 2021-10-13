@@ -18,7 +18,6 @@ var sort_by_rating = "$sub(10,%rating%)|%album artist%|%album%";
 var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
-var PlaylistExclude = Array("Whole Library","Filter Results");
 var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
@@ -57,16 +56,19 @@ var globalProperties = {
 	refreshRate:40,
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
 	crc_artist: "$crc32('artists'$meta(artist))",
+	create_playlist : "Create Playlist",
 	selection_playlist : "Library Selection",
 	playing_playlist : "Library Playback",
 	filter_playlist : "Filter Results",	
 	whole_library : "Whole Library",
+	media_library : "Media Library",
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
 	ResizeQLY: 2,
 	use_ratings_file_tags: window.GetProperty("GLOBAL use ratings in file tags", false),
 }
+var PlaylistExclude = Array(globalProperties.whole_library,globalProperties.filter_playlist);
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 globalProperties.tf_genre = fb.TitleFormat("%genre%");
 globalProperties.tf_album = fb.TitleFormat("%album%");

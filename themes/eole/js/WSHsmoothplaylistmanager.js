@@ -34,6 +34,13 @@ var properties = {
     filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),	
 	panelFontAdjustement: -1,
 	emphasisOnActive: false,
+	newly_added : "Newly Added",
+	history : "History",
+	top_rated : "Top Rated",
+	radios : "Radios",
+	most_played : "Most Played",
+	podcasts : "Podcasts",
+	external_files : "External Files",
 };
 var cover = {
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
@@ -949,7 +956,7 @@ oBrowser = function(name) {
 
 		// draw Create playlist Button
 		 if(properties.showNewPlaylistButton) {
-			this.rows.push(new oPlaylist(-1, rowId, "Create Playlist"));
+			this.rows.push(new oPlaylist(-1, rowId, globalProperties.create_playlist));
 			rowId++;
 		 }
 	
@@ -1712,9 +1719,9 @@ oBrowser = function(name) {
         _autoplaylist.AppendMenuItem(MF_STRING, 207, "Top Rated tracks");
         _autoplaylist.AppendMenuItem(MF_STRING, 210, "Newly added tracks");
 		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
-        _autoplaylist.AppendMenuItem(MF_STRING, 211, "Radios");
-        _autoplaylist.AppendMenuItem(MF_STRING, 212, "External Files");
-        _autoplaylist.AppendMenuItem(MF_STRING, 213, "Podcasts");
+        _autoplaylist.AppendMenuItem(MF_STRING, 211, properties.radios);
+        _autoplaylist.AppendMenuItem(MF_STRING, 212, properties.external_files);
+        _autoplaylist.AppendMenuItem(MF_STRING, 213, properties.podcasts);
         //_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
         //_autoplaylist.AppendMenuItem(MF_STRING, 250, "Loved Tracks");
         _menu.AppendMenuItem(MF_SEPARATOR, 0, "");
@@ -1829,56 +1836,56 @@ oBrowser = function(name) {
         case (idx==200):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "Media Library", "ALL", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 0);
+            plman.CreateAutoPlaylist(total, globalProperties.media_library, "ALL", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 0);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==205):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "History", "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "",1);
+            plman.CreateAutoPlaylist(total, properties.history, "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "",1);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==206):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "Most Played", "%play_count% GREATER 2 SORT DESCENDING BY %play_count%", "", 1);
+            plman.CreateAutoPlaylist(total, properties.most_played, "%play_count% GREATER 2 SORT DESCENDING BY %play_count%", "", 1);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==207):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "Top Rated", (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 1 SORT DESCENDING BY " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%"), "", 1);
+            plman.CreateAutoPlaylist(total, properties.top_rated, (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 1 SORT DESCENDING BY " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%"), "", 1);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==210):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreateAutoPlaylist(total, "Newly Added", "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "",1);
+            plman.CreateAutoPlaylist(total, properties.newly_added, "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "",1);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==211):
             var total = plman.PlaylistCount;
             //brw.inputboxID = -1;
-            plman.CreatePlaylist(total, "Radios");
+            plman.CreatePlaylist(total, properties.radios);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==212):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreatePlaylist(total, "External Files");
+            plman.CreatePlaylist(total, properties.external_files);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
         case (idx==213):
             var total = plman.PlaylistCount;
             //p.playlistManager.inputboxID = -1;
-            plman.CreatePlaylist(total, "Podcasts");
+            plman.CreatePlaylist(total, properties.podcasts);
             plman.MovePlaylist(total, pl_idx);
             plman.ActivePlaylist = pl_idx;
             break;
@@ -2479,15 +2486,15 @@ function playlistName2icon(name, auto_playlist, images_array){
 	if(name==globalProperties.selection_playlist) return images_array.library_icon;
 	if(name==globalProperties.playing_playlist) return images_array.library_playback_icon;
 	if(name==globalProperties.whole_library) return images_array.whole_library_icon;
-	if(name=="Newly Added") return images_array.newly_added_icon;
-	if(name=="Create Playlist") return images_array.create_playlist;
-	if(name=="History") return images_array.history_icon;
-	if(name=="Top Rated") return images_array.top_rated;
-	if(name=="Radios") return images_array.radios_icon;
-	if(name=="Most Played") return images_array.most_played_icon;
-	if(name=="Podcasts") return images_array.podcasts_icon;
-	if(name=="External Files") return images_array.external_files_icon;
-	if(name=="Search" || name=="Search Results") return images_array.search_icon;
+	if(name==properties.newly_added) return images_array.newly_added_icon;
+	if(name==globalProperties.create_playlist) return images_array.create_playlist;
+	if(name==properties.history) return images_array.history_icon;
+	if(name==properties.top_rated) return images_array.top_rated;
+	if(name==properties.radios) return images_array.radios_icon;
+	if(name==properties.most_played) return images_array.most_played_icon;
+	if(name==properties.podcasts) return images_array.podcasts_icon;
+	if(name==properties.external_files) return images_array.external_files_icon;
+	if(name==globalProperties.filter_playlist) return images_array.search_icon;
 	if(auto_playlist) {
 		return images_array.icon_auto_pl;
 	} else {
@@ -2979,7 +2986,7 @@ function checkMediaLibrayPlaylist() {
     var isMediaLibraryFound = false;
     var total = plman.PlaylistCount;
     for (var i = 0; i < total; i++) {
-        if(plman.GetPlaylistName(i) == "Media Library") {
+        if(plman.GetPlaylistName(i) == globalProperties.media_library) {
             var mediaLibraryIndex = i;
             isMediaLibraryFound = true;
             break;
@@ -2990,8 +2997,8 @@ function checkMediaLibrayPlaylist() {
         // > sort: sort string expression.
         // > flags: 1 - always sort.
         // > boolean CreateAutoPlaylist(idx, name, query, sort = "", flags = 0);
-        plman.CreateAutoPlaylist(total, "Media Library", "%path% PRESENT", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 1);
-        //plman.CreateAutoPlaylist(total, "Media Library", "%album% PRESENT", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%", 1);
+        plman.CreateAutoPlaylist(total, globalProperties.media_library, "%path% PRESENT", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 1);
+        //plman.CreateAutoPlaylist(total, globalProperties.media_library, "%album% PRESENT", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%", 1);
         // Move it to the top
         plman.MovePlaylist(total, 0);
     } else if(mediaLibraryIndex > 0) {

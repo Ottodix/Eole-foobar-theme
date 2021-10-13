@@ -6549,7 +6549,7 @@ function checkMediaLibrayPlaylist() {
     var isMediaLibraryFound = false;
     var total = plman.PlaylistCount;
     for (var i = 0; i < total; i++) {
-        if(plman.GetPlaylistName(i) == "Media Library") {
+        if(plman.GetPlaylistName(i) == globalProperties.media_library) {
             var mediaLibraryIndex = i;
             isMediaLibraryFound = true;
             break;
@@ -6560,8 +6560,8 @@ function checkMediaLibrayPlaylist() {
         // > sort: sort string expression.
         // > flags: 1 - always sort.
         // > boolean CreateAutoPlaylist(idx, name, query, sort = "", flags = 0);
-        plman.CreateAutoPlaylist(total, "Media Library", "%path% PRESENT", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 1);
-        //plman.CreateAutoPlaylist(total, "Media Library", "%album% PRESENT", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%", 1);
+        plman.CreateAutoPlaylist(total, globalProperties.media_library, "%path% PRESENT", "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", 1);
+        //plman.CreateAutoPlaylist(total, globalProperties.media_library, "%album% PRESENT", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%", 1);
         // Move it to the top
         plman.MovePlaylist(total, 0);
     } else if(mediaLibraryIndex > 0) {
