@@ -1822,7 +1822,7 @@ function populate() {
     var dbl_action = window.GetProperty("Double-Click Action: ExplorerStyle-0 Play-1", 1);
     var alt_lbtn_pl = btn_pl[3] == 1 ? true : false,
         mbtn_pl = btn_pl[5] == 1 ? true : false;
-    var lib_playlist = window.GetProperty("Playlist", "Library Selection");
+	var lib_playlist = globalProperties.selection_playlist;
     this.show_counts = window.GetProperty("Node: Show Item Counts", false);
 	this.autoExpandSingleChild = window.GetProperty("Node: Auto Expand Single Childs", false);
     this.show_aggregate_item = window.GetProperty("Node: Show Aggregate Item", false);

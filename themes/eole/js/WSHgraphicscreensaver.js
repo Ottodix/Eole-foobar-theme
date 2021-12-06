@@ -2002,7 +2002,7 @@ oHeaderbar = function(name) {
 
 				// Main Text, Left justified
 				if(brw.playlistName==globalProperties.whole_library){
-					this.mainTxt='Whole Library';
+					this.mainTxt=globalProperties.whole_library;
 				} else if(brw.playlistName!=globalProperties.selection_playlist && brw.playlistName!=globalProperties.playing_playlist){
 					this.mainTxt='Playlist : '+brw.playlistName;
 				} else if(brw.artistName!="" && brw.artistName!="?") {
