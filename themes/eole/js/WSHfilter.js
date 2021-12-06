@@ -2920,7 +2920,7 @@ oBrowser = function(name) {
 														var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Web Radios)");
 													} else {
 														var arr_t = this.groups[i].tra[0].split(" ^^ ");
-														var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[2];
+														var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[0];
 													};
 												} else {
 													var album_name = this.groups[i].album;
