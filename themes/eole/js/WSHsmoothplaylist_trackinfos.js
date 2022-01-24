@@ -3660,7 +3660,7 @@ oBrowser = function(name) {
 								timers.showPlaylistManager = setInterval(pman.showPanel, 25);
 							};
 							var items = plman.GetPlaylistSelectedItems(g_active_playlist);
-							if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
+							if(this.activeRow>-1 && (this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1)){
 								album_info=this.rows[this.activeRow].groupkeysplit;
 								if(items.Count>1) {
 									var line1 = "Dragging";
@@ -3695,7 +3695,8 @@ oBrowser = function(name) {
 								g_tooltip.Deactivate();
 								on_drag_over(null, x, y, null);
 								var items = plman.GetPlaylistSelectedItems(g_active_playlist);
-								if(this.activeRow>-1 && this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1){
+								console.log(this.activeRow);
+								if(this.activeRow>-1 && (this.rows[this.activeRow].type==2 || this.rows[this.activeRow].type==1)){
 									album_info=this.rows[this.activeRow].groupkeysplit;
 									if(items.Count>1) {
 										var line1 = "Dragging";

@@ -2,6 +2,13 @@
 
 #### Table of Contents
 - [Unreleased](#unreleased)
+- [1.6.1](#161---2022-01-14)
+- [1.6.0](#160---2021-09-11)
+- [1.5.2](#152---2021-08-10)
+- [1.5.1](#151---2021-07-03)
+- [1.5.0](#150---2021-06-30)
+- [1.4.1](#141---2021-02-14)
+- [1.4.0](#140---2021-02-11)
 - [1.3.1](#131---2020-07-18)
 - [1.3.0](#130---2020-07-10)
 - [1.2.3](#123---2020-01-04)
@@ -25,6 +32,154 @@ ___
 
 ## [Unreleased][]
 
+## [1.6.1][] - 2022-01-14
+### Changed
+- API changes:
+  - Reverted changes in `window.NotifyOthers()` behaviour. Now it's executed synchronously as before.
+
+### Fixed
+- Fixed various bugs in the event handling system, which were causing unexpected behaviour and crashes.
+- Fixed right-mouse-btn-down and middle-mouse-btn-down events not being processed.
+
+## [1.6.0][] - 2021-09-11
+
+### Added
+- Added WIC support in image and art loaders, which enables WebP support (see FAQ for more info).
+- API changes:
+  - Added `IsInternal` field to `action` argument (that is passed to `on_drag_*` callbacks).
+  - Added ability to generate main menu items dynamically and handle it via the following API:
+    - `fb.RegisterMainMenuCommand()`.
+    - `fb.UnregisterMainMenuCommand()`.
+    - `on_main_menu_dynamic()` callback.
+  - Expanded playlist *undo* API:
+    - `plman.Undo()`.
+    - `plman.Redo()`.
+    - `plman.IsUndoAvailable()`.
+    - `plman.IsRedoAvailable()`.
+- Added `spectrogram seekbar.js` sample (by marc2003).
+
+### Changed
+- Reimplemented event handling system.
+- API changes:
+  - `window.NotifyOthers()` is now executed asynchronously.
+  - `fb.DoDragDrop()` is now executed asynchronously.
+  - `on_main_menu()` callback is marked as **\[Deprecated]**. Use dynamically generated main menu items instead.
+
+### Fixed
+- Removed unneeded writes to script package `.json`.
+- Fixed (?) drag-n-drop sometimes not working ([#60](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/60)).
+- Fixed timers not stopping when they should ([#135](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/135)).
+
+## [1.5.2][] - 2021-08-10
+### Changed
+- Rollbacked the fix for timers from [1.5.0](#150---2021-06-30), since it was causing fb2k freezes ([#135](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/135)).
+
+### Fixed
+- Fixed unicode handling in script paths.
+
+## [1.5.1][] - 2021-07-03
+### Added
+- API changes:
+  - Added `plman.GetPlaylistLockName()` method.
+
+### Fixed
+- Fixed fb2k freeze that could happen when using `ActiveXObject`.
+
+## [1.5.0][] - 2021-06-30
+### Added
+- API changes:
+  - Added fine-grained playlist lock control via `plman.GetPlaylistLockedActions()` and `plman.SetPlaylistLockedActions()` ([#144](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/144)).
+  - Added `utils.GetPackageInfo()` method.
+  - Added `fb.Restart()` method.
+
+### Changed
+- `utils.InputBox()` now automatically resizes to fit the text ([#71](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/71)).
+- Additional properties provided by component are no longer displayed when not set ([#141](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/141)).
+- API changes:
+  - Added `use_exact` argument to `GdiGraphics.CalcTextWidth()` to improve width calculation accuracy in certain cases ([#140](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/140)).
+  - `utils.GetPackagePath()` is marked as **\[Deprecated]**. Use `utils.GetPackageInfo()` instead.
+  - `plman.IsPlaylistLocked()` is marked as **\[Deprecated]**. Use `plman.GetPlaylistLockedActions()` instead.
+
+### Fixed
+- Fixed various bugs and crashes in `Configure` dialog.
+- Revamped package update process to avoid potential problems when that package is being in use ([#137](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/137)).
+- Fixed inability to import package if there are no packages installed ([#134](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/134)).
+- `Enable drag-n-drop` checkbox value in `Configure` dialog is no longer ignored.
+- Slow script detection now works inside script-editing modals ([#143](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/143)).
+- Fixed incorrect relative path calculation when `include` is called from methods defined in another file ([#142](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/142)).
+- Fixed timers not stopping when they should ([#135](https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/135)).
+- Fixed various errors in `complete` samples (by marc2003):
+  - Fixed crash on invalid query in auto-playlist script.
+  - Thumbs script now downloads images only when the corresponding mode is set.
+
+## [1.4.1][] - 2021-02-14
+### Changed
+- Changed casing of `window.JsMemoryStats` fields for consistency with the rest of API.
+- Added indicator when panel name is overriden by the script in `Configure` dialog.
+- Improved package manager behaviour in various scenarios.
+
+### Fixed
+- Fixed various bugs in `Package` tab of `Configure` dialog.
+- Fixed sorting of package files.
+- Fixed conflict with `foo_wave_seekbar`.
+- Fixed `foo_acfu` integration.
+- Fixed data not refreshing on `Apply` in `Configure` dialog.
+
+## [1.4.0][] - 2021-02-11
+### Added
+- Added a brand new `Configure` dialog!
+- Added more ways to consume scripts:
+  - Quick access to built-in script samples.
+  - Load scripts by path.
+  - Use script packages (see below for more info).
+- Implemented script package support:
+  - Can contain multiple scripts and assets.
+  - Can be easily exported and imported as a single file.
+  - Has a package manager to view and manage all installed packages.
+- Panel name can be changed now via `Configure` dialog.
+- Default script editor can be changed now via drop-down menu of `Edit` button in `Configure` dialog.
+- Added a link to component docs to foobar2000 `Help` main menu.
+- API changes:
+  - Added iterator protocol support to `FbMetadbHandleList`.
+  - Added `type` argument to `FbUiSelectionHolder.SetSelection()`.
+  - Added `fb.Version` property.
+  - Added `utils.DetectCharset()` method.
+  - Added `utils.EditTextFile()` method.
+  - Added `utils.FileExists()` method.
+  - Added `utils.GetFileSize()` method.
+  - Added `utils.GetPackagePath()` method.
+  - Added `utils.IsDirectory()` method.
+  - Added `utils.IsFile()` method.
+  - Added `utils.SplitFilePath()` method.
+  - Added `window.DefineScript()` method.
+  - Added `window.EditScript()` method.
+  - Added `window.ShowConfigureV2()` method.
+  - Added `window.JsMemoryStats` property.
+  - Added `window.ScriptInfo` property.
+
+### Changed 
+- Moved `Properties` dialog to a separate tab of `Configure` dialog.
+- `Grab focus` is now a script property and is defined via `window.DefineScript()`.
+- Extracted `Edge style` and `Pseudo-transparency` options to a separate tab of `Configure` dialog.
+- API changes:
+  - `utils.FileTest()` is marked as **\[Deprecated]**. Use new corresponding methods instead.
+  - `window.ID` is now optional and unused in all methods that required it.
+  - `window.DefinePanel()` is marked as **\[Deprecated]**. Use `window.DefineScript()` instead.
+  - `window.MemoryLimit`, `window.PanelMemoryUsage` and `window.TotalMemoryUsage` are marked as **\[Deprecated]**. Use `window.JsMemoryStats` instead.
+  - `window.Name` now returns panel name instead of script name. Use `window.ScriptInfo.Name` to retrieve script name.
+  - `window.ShowConfigure()` is marked as **\[Deprecated]**. Use `window.ShowConfigureV2()` to configure panel and `window.EditScript` to edit script.
+
+### Fixed
+- Fixed component crash when passing objects to `console.log()`.
+- Fixed component crash when there is a stack overflow in JS.
+- Fixed the weird image offset when using `fb.DoDragDrop()` with custom image and theming disabled.
+- Fixed `utils.ShowHtmlDialog()` not applying IE mode, when HTML code is passed directly to the method.
+- Various `ActiveXObject` fixes:
+  - Errors in callbacks passed to `ActiveXObject` objects and methods are now properly propagated to the script. 
+  - Fixed inability to use subscripts with some `ActiveXObject` objects.
+  - Added iterator protocol support to enumerable `ActiveXObject` objects.
+- Fixed various errors in `complete` samples (by marc2003).
+
 ## [1.3.1][] - 2020-07-18
 ### Fixed
 - Fixed `FbTooltip.SetFont()` not working.
@@ -40,7 +195,7 @@ ___
   - Added `ActiveXObject.ActiveX_CreateArray()` method.
   - Added `window.Tooltip` property.
   - Added `FbTooltip.SetFont()` method.
-  - Deprecated `window.CreateTooltip()` method.
+  - `window.CreateTooltip()` method is marked as **\[Deprecated]**. Use `window.Tooltip` instead.
 
 ### Changed
 - Updated SpiderMonkey JavaScript engine to 68.8.0 ESR:
@@ -207,7 +362,7 @@ ___
 ### Changed
 - API changes:
   - `fb.DoDragDrop()` now requires an additional `window.ID` argument.
-  - `fb.CreateHandleList()` is marked as **\[Deprecated]** and will be removed in v2.0.0.
+  - `fb.CreateHandleList()` is marked as **\[Deprecated]**. Use `FbMetadbHandleList` constructor instead.
 - Reimplemented SMP call handling so as to conform with `Run to completion` rule.
 - Made adjustment to GC policies.
 
@@ -308,7 +463,14 @@ ___
   - More rigorous error checks.
 - Updated samples with compatibility fixes.
 
-[unreleased]: https://github.com/theqwertiest/foo_spider_monkey_panel/compare/v1.3.1...HEAD
+[unreleased]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.5.2...v1.6.0
+[1.5.2]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.5.1...v1.5.2
+[1.5.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/TheQwertiest/foo_spider_monkey_panel/compare/v1.2.2-preview...v1.2.3

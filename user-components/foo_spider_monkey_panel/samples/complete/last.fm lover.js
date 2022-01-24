@@ -1,6 +1,6 @@
 'use strict';
 
-window.DefinePanel('Last.fm Lover', {author:'marc2003'});
+window.DefineScript('Last.fm Lover', {author:'marc2003', options:{grab_focus:false}});
 include(fb.ComponentPath + 'samples\\complete\\js\\lodash.min.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\helpers.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\panel.js');
@@ -61,18 +61,27 @@ buttons.update = () => {
 	buttons.buttons.lover = new _button(0, 0, 36, 36, {normal : n, hover : h}, func, tooltip);
 }
 
-function on_colours_changed() {
-	panel.colours_changed();
-	window.Repaint();
+function on_notify_data(name, data) {
+	lastfm.notify_data(name, data);
 }
 
-function on_item_focus_change() {
-	panel.item_focus_change();
+function on_size() {
+	panel.size();
+	buttons.update();
+}
+
+function on_paint(gr) {
+	panel.paint(gr);
+	buttons.paint(gr);
 }
 
 function on_metadb_changed() {
 	buttons.update();
 	window.Repaint();
+}
+
+function on_mouse_move(x, y) {
+	buttons.move(x, y);
 }
 
 function on_mouse_leave() {
@@ -81,10 +90,6 @@ function on_mouse_leave() {
 
 function on_mouse_lbtn_up(x, y) {
 	buttons.lbtn_up(x, y);
-}
-
-function on_mouse_move(x, y) {
-	buttons.move(x, y);
 }
 
 function on_mouse_rbtn_up(x, y) {
@@ -123,13 +128,13 @@ function on_mouse_rbtn_up(x, y) {
 	return true;
 }
 
-function on_notify_data(name, data) {
-	lastfm.notify_data(name, data);
+function on_colours_changed() {
+	panel.colours_changed();
+	window.Repaint();
 }
 
-function on_paint(gr) {
-	panel.paint(gr);
-	buttons.paint(gr);
+function on_item_focus_change() {
+	panel.item_focus_change();
 }
 
 function on_playback_dynamic_info_track() {
@@ -150,7 +155,3 @@ function on_playlist_switch() {
 	panel.item_focus_change();
 }
 
-function on_size() {
-	panel.size();
-	buttons.update();
-}

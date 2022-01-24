@@ -3620,30 +3620,27 @@ function on_char(code) {
 		g_filterbox.on_char(code);
 	};
 
-	if (cSettings.visible) {} else {
-		if (g_filterbox.inputbox.edit) {
-			//g_filterbox.on_char(code);
-		} else {
-			if (brw.list.Count > 0) {
-				brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length * 13) + (10 * 2)) / 2);
-				brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
-				brw.tt_w = ((cList.search_string.length * 13) + (10 * 2));
-				brw.tt_h = 60;
-				if (code == 32 && cList.search_string.length == 0)
-					return true; // SPACE Char not allowed on 1st char
-				if (cList.search_string.length <= 20 && brw.tt_w <= brw.w - 20) {
-					if (code > 31) {
-						cList.search_string = cList.search_string + String.fromCharCode(code).toUpperCase();
-						brw.repaint();
-						cList.clear_incsearch_timer && window.ClearTimeout(cList.clear_incsearch_timer);
-						cList.clear_incsearch_timer = false;
-						cList.incsearch_timer && window.ClearTimeout(cList.incsearch_timer);
-						cList.incsearch_timer = window.SetTimeout(function () {
-								brw.incrementalSearch();
-								window.ClearTimeout(cList.incsearch_timer);
-								cList.incsearch_timer = false;
-							}, 400);
-					};
+	if (!cSettings.visible) {
+		if (ppt.sourceMode == 1) return; // doesn't work on playlist mode
+		if (brw.list.Count > 0) {
+			brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length * 13) + (10 * 2)) / 2);
+			brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
+			brw.tt_w = ((cList.search_string.length * 13) + (10 * 2));
+			brw.tt_h = 60;
+			if (code == 32 && cList.search_string.length == 0)
+				return; // SPACE Char not allowed on 1st char
+			if (cList.search_string.length <= 20 && brw.tt_w <= brw.w - 20) {
+				if (code > 31) {
+					cList.search_string = cList.search_string + String.fromCharCode(code).toUpperCase();
+					brw.repaint();
+					cList.clear_incsearch_timer && window.ClearTimeout(cList.clear_incsearch_timer);
+					cList.clear_incsearch_timer = false;
+					cList.incsearch_timer && window.ClearTimeout(cList.incsearch_timer);
+					cList.incsearch_timer = window.SetTimeout(function () {
+							brw.incrementalSearch();
+							window.ClearTimeout(cList.incsearch_timer);
+							cList.incsearch_timer = false;
+						}, 400);
 				};
 			};
 		};

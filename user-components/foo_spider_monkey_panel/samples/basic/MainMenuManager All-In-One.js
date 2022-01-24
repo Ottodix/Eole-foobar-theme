@@ -1,8 +1,8 @@
-window.DefinePanel("MainMenuManager All-In-One", { author: "YBStone / T.P Wang / marc2003" });
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('MainMenuManager All-In-One', { author: 'YBStone / T.P Wang / marc2003' });
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
-const img = gdi.Image(fb.ComponentPath + 'samples\\basic\\images\\cog.png');
+const img = gdi.Image(`${fb.ComponentPath}samples/basic/images/cog.png`);
 
 function on_paint(gr) {
     gr.DrawImage(img, 0, 0, img.Width, img.Height, 0, 0, img.Width, img.Height);
@@ -34,7 +34,7 @@ function menu() {
     let menuman5 = fb.CreateMainMenuManager();
     let menuman6 = fb.CreateMainMenuManager();
     
-    // MF_STRING is defined in docs\\Flags.js
+    // MF_STRING is defined in docs/Flags.js
     child1.AppendTo(basemenu, MF_STRING, 'File');
     child2.AppendTo(basemenu, MF_STRING, 'Edit');
     child3.AppendTo(basemenu, MF_STRING, 'View');

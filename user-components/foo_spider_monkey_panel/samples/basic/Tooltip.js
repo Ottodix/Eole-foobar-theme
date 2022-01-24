@@ -1,5 +1,5 @@
-window.DefinePanel("Tooltip", { author: "T.P Wang" });
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('Tooltip', { author: 'T.P Wang' });
+include('docs/Helpers.js');
 
 const g_font = gdi.Font('Segoe UI', 14, 1);
 const g_tooltip = window.Tooltip;
@@ -31,7 +31,7 @@ function SampleButton(x, y, w, h, caption, func, tiptext) {
 
     this.draw = function(gr) {
         // Draw border
-        // RGB function is defined in docs\\Helpers.js
+        // RGB function is defined in docs/Helpers.js
         gr.FillRoundRect(this.left, this.top, this.w, this.h, 3, 3, RGB(19, 30, 38));
         gr.DrawRoundRect(this.left, this.top, this.w, this.h, 3, 3, 1, RGB(151, 180, 202));
         // Draw caption

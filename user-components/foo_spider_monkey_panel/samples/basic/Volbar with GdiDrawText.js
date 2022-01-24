@@ -1,9 +1,9 @@
-window.DefinePanel("Volbar with GdiDrawText", {author: "T.P Wang"});
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+﻿window.DefineScript('Volbar with GdiDrawText', {author: 'T.P Wang'});
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 const g_font = gdi.Font('Segoe UI', 12, 0);
-let g_drag = 0;
+let g_drag = false;
 let ww = 0, wh = 0;
 
 function on_size() {
@@ -26,17 +26,17 @@ function on_paint(gr) {
 }
 
 function on_mouse_lbtn_down(x, y) {
-    g_drag = 1;
+    g_drag = true;
 }
 
 function on_mouse_lbtn_up(x, y) {
     on_mouse_move(x, y);
-    g_drag = 0;
+    g_drag = false;
 }
 
 function on_mouse_move(x, y) {
     if (g_drag) {
-        let pos = (x < 0 ? 0 : x > (ww ? 1 : x / ww));
+        let pos = (x < 0 ? 0 : (x > ww ? 1 : x / ww));
         fb.Volume = pos2vol(pos);
     }
 }

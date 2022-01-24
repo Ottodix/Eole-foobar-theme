@@ -1,0 +1,9 @@
+﻿{
+  "author": "TheQwertiest",
+  "description": "This is an example package that illustrates the package structure and basic features.",
+  "enableDragDrop": false,
+  "id": "{A584FDEF-C88A-4849-94D5-F33C71649927}",
+  "name": "Example package",
+  "shouldGrabFocus": true,
+  "version": "1.0.0"
+}

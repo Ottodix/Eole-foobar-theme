@@ -1,6 +1,6 @@
 'use strict';
 
-window.DefinePanel('Rating', {author:'marc2003'});
+window.DefineScript('Rating', {author:'marc2003', options:{grab_focus:false}});
 include(fb.ComponentPath + 'samples\\complete\\js\\lodash.min.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\helpers.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\panel.js');
@@ -18,6 +18,33 @@ let rating = new _rating(0, 0, 24, _RGB(255, 128, 0)); // x, y, size, colour
 
 panel.item_focus_change();
 
+function on_size() {
+	panel.size();
+}
+function on_paint(gr) {
+	panel.paint(gr);
+	rating.paint(gr);
+}
+
+function on_metadb_changed() {
+	rating.metadb_changed();
+}
+
+function on_mouse_move(x, y) {
+	rating.move(x, y);
+}
+function on_mouse_leave() {
+	rating.leave();
+}
+
+function on_mouse_lbtn_up(x, y) {
+	rating.lbtn_up(x, y);
+}
+
+function on_mouse_rbtn_up(x, y) {
+	return panel.rbtn_up(x, y, rating);
+}
+
 function on_colours_changed() {
 	panel.colours_changed();
 	window.Repaint();
@@ -25,31 +52,6 @@ function on_colours_changed() {
 
 function on_item_focus_change() {
 	panel.item_focus_change();
-}
-
-function on_metadb_changed() {
-	rating.metadb_changed();
-}
-
-function on_mouse_lbtn_up(x, y) {
-	rating.lbtn_up(x, y);
-}
-
-function on_mouse_leave() {
-	rating.leave();
-}
-
-function on_mouse_move(x, y) {
-	rating.move(x, y);
-}
-
-function on_mouse_rbtn_up(x, y) {
-	return panel.rbtn_up(x, y, rating);
-}
-
-function on_paint(gr) {
-	panel.paint(gr);
-	rating.paint(gr);
 }
 
 function on_playback_dynamic_info_track() {
@@ -70,6 +72,3 @@ function on_playlist_switch() {
 	panel.item_focus_change();
 }
 
-function on_size() {
-	panel.size();
-}

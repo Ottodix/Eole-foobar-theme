@@ -150,7 +150,7 @@ function _lastfm() {
 			data = _jsonParse(this.xmlhttp.responseText);
 			if (data.token) {
 				_run('https://last.fm/api/auth/?api_key=' + this.api_key + '&token=' + data.token);
-				if (WshShell.Popup('If you granted permission successfully, click Yes to continue.', 0, window.Name, popup.question + popup.yes_no) == popup.yes) {
+				if (WshShell.Popup('If you granted permission successfully, click Yes to continue.', 0, window.ScriptInfo.Name, popup.question + popup.yes_no) == popup.yes) {
 					this.post('auth.getSession', data.token);
 				}
 				return;
@@ -169,7 +169,7 @@ function _lastfm() {
 	}
 	
 	this.update_username = () => {
-		const username = utils.InputBox(window.ID, 'Enter your Last.fm username', window.Name, this.username);
+		const username = utils.InputBox(window.ID, 'Enter your Last.fm username', window.ScriptInfo.Name, this.username);
 		if (username != this.username) {
 			this.write_ini('username', username);
 			this.update_sk('');
@@ -197,7 +197,11 @@ function _lastfm() {
 	this.tfo = {
 		key : fb.TitleFormat('$lower(%artist% - %title%)'),
 		artist : fb.TitleFormat('%artist%'),
-		title : fb.TitleFormat('%title%')
+		title : fb.TitleFormat('%title%'),
+		album : fb.TitleFormat('[%album%]'),
+		loved : fb.TitleFormat('$if2(%SMP_LOVED%,0)'),
+		playcount : fb.TitleFormat('$if2(%SMP_PLAYCOUNT%,0)'),
+		first_played : fb.TitleFormat('%SMP_FIRST_PLAYED%')
 	};
 	
 	_createFolder(folders.data);

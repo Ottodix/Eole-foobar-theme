@@ -1,7 +1,7 @@
-window.DefinePanel("LoadImageAsyncV2", { author: "TheQwertiest" });
+﻿window.DefineScript('LoadImageAsyncV2', { author: 'TheQwertiest' });
 
 // Get a list of jpg files from a folder
-const g_image_list = utils.Glob('c:\\wallpaper\\*.jpg');
+const g_image_list = utils.Glob(`${fb.ComponentPath}samples/basic/images/*.jpg`);
 let ww = 0, wh = 0;
 let g_img = null;
 
@@ -14,7 +14,7 @@ const load_random_image_async = async (metadb, art_id) =>
 {
     // Load a random image from the list
     let path = g_image_list[Math.floor(Math.random() * g_image_list.length)];
-    g_img = await gdi.LoadImageAsyncV2(window.ID, path);
+    g_img = await gdi.LoadImageAsyncV2(0, path);
     window.Repaint();
 };
 

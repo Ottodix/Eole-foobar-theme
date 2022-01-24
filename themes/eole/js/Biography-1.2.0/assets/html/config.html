@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+
+	<meta http-equiv="x-ua-compatible" content="IE=8"/>
+	<link rel="stylesheet" type="text/css" href="styles10.css">
+	<style type="text/css">
+
+	body, html {height:100%; margin:0;}
+
+	.tablink {background-color:#e5e5e5; overflow:hidden; font:1em Arial;}
+	.tablink a {margin:0; background-color:#555; color:white; text-align:center; float:left; border:none; border-bottom:1px solid #d0d0d0; border-top:0.31em solid #329932; outline:none; cursor:pointer; padding:0.31em 2px; width:16%;}
+	.tablink a:hover {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tablink a:focus {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tablink a:focus a:hover {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tabcontent {display:none; padding:1px;}
+
+	.tablink2 {background-color:#e5e5e5; overflow:hidden; font:1em Arial;}
+	.tablink2 a {margin:0; background-color:#A9A9A9; color:white; text-align:center; float:left; border:none; outline:none; cursor:pointer; padding:0.31em 2px; min-width:16%;}
+	.tablink2 a:hover {padding:0.31em 2px; border:none; background-color:#777;}
+	.tablink2 a:focus {padding:0.31em 2px; border:none; background-color:#777;}
+	.tablink2 a:focus a:hover {padding:0.31em 2px; border:none; background-color:#777;}
+	.tabcontent2 {display:none; padding:1px;}
+
+	input[type="checkbox"] {vertical-align:middle; position:relative; width:17px; height:15px; border:0; padding:2px 1px; margin:5px 0;}
+	input[type="checkbox"]:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="checkbox"]:hover:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="checkbox"]:hover {border:1px solid #000000; padding:1px 0;}
+	input[readonly] {background-color:#E1E1E1;}
+	.checkbox_label {padding:0;  margin:0; vertical-align:middle; margin-left:0.31em;}
+
+	input[type="radio"] {vertical-align:middle; position:relative; width:17px; height:15px; border:0; padding:2px 1px; margin:5px 0;}
+	input[type="radio"]:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="radio"]:hover:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="radio"]:hover {border:1px solid #000000; padding:1px 0;}
+
+	.alignLH {width:18%; padding:1.25em 0 0; float:left;}
+	.alignRH {padding:1.25em 0 0; float:left;}
+	.alignLeftH {width:25%; padding:1.01em 0 0; float:left;}
+	.alignRightH {padding:1.01em 0 0; float:left;}	
+	.div_text2 {padding:1.01em 0 0;}
+	.div_text3 {padding: 1.25em 0 0;}
+	.div_text6 {padding:1.25em 0 0.5em;}
+	.div_text7 {padding:1.25em 0 0.7em;}
+	.div_text8 {padding:1.25em 0 0.31em;}
+	.div_text9 {padding:1.57em 0 0;}
+	.div_text10 {padding:0 0 0.7em;}
+	.div_text11 {padding:5em 0 0.5em;}
+	.div_text12 {padding:1.57em 0 0.31em;}
+	.div_text14 {padding:1.25em 0 0.91em;}
+	.alignLH, .alignRH, .alignLeftH, .alignRightH, .div_text1, .div_text2, .div_text3, .div_text6, .div_text7, .div_text8, .div_text9, .div_text10, .div_text11, .div_text12, .div_text14 {
+		font:bold 1.15em Segoe UI; color:#0066CC; word-wrap:break-word; white-space:pre-wrap;
+	}
+	
+	.info2 {padding:0.7em 0 0.31em;}
+	.info3 {margin:0 2% 0 0;}
+	.info4 {padding:0.7em 0 0;}
+	.info6 {padding:0.7em 0;}
+	.info7 {padding-top:0.7em; text-align: right;}
+	.info8 {padding-top:0.7em; float:right;}
+	.info9 {padding-top:0.7em; padding-bottom:3.77em;}
+	.info10 {padding-top:0.7em; padding-bottom:0.94em;}
+	.info11 {padding-top:0.63em;}
+	.info12 {padding:0.31em 0 0;}
+	.info5 {padding:0.85em 0 0.31em;}
+	.info1, .info2, .info3, .info4, .info5, .info6, .info7, .info8, .info9, .info10, .info11, .info12 {
+		word-wrap:break-word; white-space:pre-wrap;
+	}
+
+	.alignLeft1 {width:18%; margin-top:0.7em; float:left;}
+	.alignRight1 {margin-top:0.7em; float:left;}
+	.alignLeft1, .alignRight1 {
+		font:bold 1em Segoe UI; word-wrap:break-word; white-space:pre-wrap;
+	}
+
+	.pad {height:1.57em;}
+	.padMedium {height:10em;}
+	.top {display:block; margin-top:1.57em;}
+
+	.input_cnt1 {margin-top:0.58em; margin-bottom:0.58em;}
+	.input_cnt2 {margin:0; padding:0;}
+	.input_cnt3 {padding-top:0.7em;}
+	.input_cnt4 {padding-top:0.31em;}
+	.input_cnt5 {padding-top:1em;}
+	.input2 {width:2em; text-align:center;}
+	.input3 {width:3em;}
+	.input15 {width:15%;}
+	.input60 {width:54%}
+	.input70 {width:70%;}
+
+	.input50 {width:5em;}
+	.input76 {width:76%;}
+	.input82 {float:right; width:82%;}
+	.input50, .input76, .input82 {
+		vertical-align:middle;
+	}
+	.input66 {width:66%}
+
+	.input98 {width:98%;}
+	.input66, input98 {
+		display:block;
+	}
+
+	.input35 {width:35%; margin-bottom:0.31em;}
+	.input40 {width:40%; margin-left:5%;}
+	.input73 {width:73%; margin-bottom:0.46em;}
+	.input96 {width:96%;}
+	.input35, .input40, .input73, .input96 {
+		display:inline-block; vertical-align:middle;
+	}
+
+	.inp_label1 {display:block; margin:0.31em 0;}
+	.inp_label2 {padding-left:0.46em;}
+	.inp_label3 {padding-right:0.31em; margin:0.31em 0;}
+	.inp_label4 {display:inline-block; width:25%;}
+	.inp_label5 {vertical-align:middle; padding-left:0.46em;}
+	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;}
+	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right;}
+	#btn_cnt_left {text-align:left;}
+	#btn_cnt_center {text-align:center;}
+	#mainMargin {margin: 0 2%}
+
+	table {width: 100%; text-align:center; border-collapse:collapse; border:1px solid Gainsboro; empty-cells:show;}
+	th {border:0;}
+	td {border:0;}
+	tr {border:0;}
+	.table75 {width:75%;}
+	.table92 {width:92%;}
+
+	.dropbtn {white-space:nowrap; width:100px; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
+	.dropbtn:after {font-family: FontAwesome; content: "\f107"; padding-left:0.5em; padding-right:0.19em;}
+	.dropdown {margin-top: 10px; position:static; display:inline-block;}
+	.dropdown-content {display:none; position:absolute; background-color:#f9f9f9; min-width:160px; box-shadow:0 8px 1.01em 0 rgba(0,0,0,0.2); z-index:1;}
+ 	.dropdown-content a {padding:0.13em 5px; color:black; text-decoration:none; display:block;}
+	.dropdown-content a:hover {background-color:#f1f1f1;}
+	.dropdown .dropdown-content {display:none;}
+	.dropdown:hover .dropbtn {background-color:#4CAF50;}
+
+	.column19 {width:19%;}
+	.column25 {width:25%;}
+	.column29 {width:29%;}
+	.column31 {width:31%;}
+	.column40 {width:40%;}
+	.column43 {width:43%;}
+	.column50 {width:50%;}
+	.column64 {width:64%;}
+	
+	.column19, .column25, .column29, .column31, .column40, .column43, .column50, .column64 {
+		margin:0; padding:0; float:left;
+	}
+
+	.columnf1 {margin:0; padding:0; float:left; width:50%;}
+	.columnf2 {margin:0.6em 0 0; padding:0; float:left; width:20%;}
+	.columnf3 {margin:0.44em 0 0; padding:0; float:left; width:20%;}
+
+	.row:after {content:""; display:table; clear:both;}
+						
+	</style>
+	</head>
+	<body>
+		<div style="background-color:#e5e5e5; clear:both;">
+		<div id="tablink2" class="tablink2">
+			<a onclick="openTab('PanelCfg', this, 'green')" id="PanelCfg">Panel Settings</a>
+			<a onclick="openTab('ServerCfg', this, '#004BD2')" id="ServerCfg"> Server Settings (All Panels) </a>
+		</div>
+		
+		
+		<div id="tablink" class="tablink">
+			<a onclick="openPage('behaviour', this, 'green')" id="behaviourCfg">Behaviour</a>
+			<a onclick="openPage('display', this, 'green')" id="displayCfg">Display</a>
+			<a onclick="openPage('headings', this, 'green')" id="headingsCfg">Headings</a>
+			<a onclick="openPage('image', this, 'green')" id="imageCfg">Image</a>
+			<a onclick="openPage('custom', this, 'green')" id="customCfg">Custom</a>
+			<a onclick="openPage('advanced', this, 'green')" id="advancedCfg">Advanced</a>
+			
+			<a onclick="openPage('title_format', this, '#004BD2')" id="title_formatCfg">Title Format</a>
+			<a onclick="openPage('download', this, '#004BD2')" id="downloadCfg">Download</a>
+			<a onclick="openPage('photo', this, '#004BD2')" id="photoCfg">Photo</a>
+			<a onclick="openPage('cover', this, '#004BD2')" id="coverCfg">Cover</a>
+			<a onclick="openPage('tagger', this, '#004BD2')" id="taggerCfg">Tagger</a>
+			<a onclick="openPage('misc', this, '#004BD2')" id="miscCfg">Miscellaneous</a>
+		</div>
+		</div>
+<div id="mainMargin">
+
+		<div style="clear:both;"></div>
+		<div id="btn_cnt_right" class="btn_cnt"> 
+			<button id="btn_ok" >OK</button>
+			<button class="button_apply" id="btn_apply">Apply</button>
+			<button id="btn_cancel">Cancel</button>
+		</div>
+		<div id="btn_cnt_left" class="btn_cnt">
+			<button id="btn_reset" >Reset all panel settings</button>
+			<button id="btn_resetPage" >Reset page</button>
+		</div>
+
+		<div id="behaviour" class="tabcontent">
+		<div class="row">
+			<div class="column50">
+				<div class="div_text6">Layout</div>
+				<div id="layout"></div>
+				<div class="div_text6">Look-up button</div>
+				<div id="look_up"></div>
+				<div class="div_text1" style="padding:1.25em 0 0.15em;">Fallback text: Heading|NoHeading</div>
+				<div id="fall_back"></div>	
+				<div class="div_text14">Scroll</div>
+				<span class="info3">Bar:</span>
+				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarShow_dropdown" class="dropbtn" href="#" onclick="toggle('sbarShow');"></a>
+				<span id="sbarShow" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarType_dropdown" class="dropbtn" href="#" onclick="toggle('sbarType');"></a>
+				<span id="sbarType" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" id="sbar_col_dropdown" class="dropdown"><a id="sbarCol_dropdown" class="dropbtn" href="#" onclick="toggle('sbarCol');"></a>
+				<span id="sbarCol" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" id="sbar_icon_dropdown" class="dropdown"><a id="sbarIcon_dropdown" class="dropbtn" href="#" onclick="toggle('sbarIcon');"></a>
+				<span id="sbarIcon" class="dropdown-content"></span>
+				</span>
+				<div id="scrolling"></div>
+
+			</div>
+
+			<div class="column50">
+				<div class="div_text6">Overlay</div>
+				<span class="dropdown" style="width:auto%;"><a id="overlay_dropdown" class="dropbtn" href="#" onclick="toggle('overlayType');"></a>
+				<span id="overlayType" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap; min-width:10em;"></span>
+				</span>
+				<div id="overlayMetrics"></div>
+				<div style= "margin-right:10%;" class="info2"><i>Used by overlay & custom layouts. Flat & rounded support custom colours.</i></div>
+				<div class="div_text7">Extra menu items</div>
+				<table id="menu" class="table75">
+					<colgroup>
+					<col span="6" style="width:16%">
+					</colgroup>
+				</table>
+				<div style="padding:1.25em 0;"><a id="setWinSize" style="text-decoration:none;" href="#" onclick="setWindowSize();return false;">Click to reset window size</a></div>				
+			</div>
+		</div>
+		</div>
+
+		<div id="display" class="tabcontent">
+		<div class="row">
+			<div class="column31">
+				<div class="div_text3">Metrics</div>
+				<div class="info6"><b>Main margins (px)</b></div>
+				<table id="imageMarginTable" class="table" style="width:1%; border:none"></table>
+				<table id="textMarginTable" class="table" style="margin-top:1.01em; width:1%; border:none"></table>
+				<div id="metrics"style="padding:1.01em 0 0;"></div>
+				<div id="metrics2"></div>		
+				<div class="div_text6">Text style</div>
+				<div id="textStyle"></div>
+			</div>				
+						
+			<div class="column31">
+				<div class="div_text6">Theme</div>
+				<span class="dropdown"><a id="theme_dropdown" class="dropbtn" href="#" onclick="toggle('themeBg');"></a>
+				<span id="themeBg" class="dropdown-content"></span>
+				</span>
+				<div id="themeStyle" style="padding-top:0.5em;"></div>
+				<div class="div_text6">Highlight</div>
+				<div id="highlight"></div>
+				<div class="div_text11" style="color:red;">Image and filmStrip size</div>
+				<div class="info3">Press Ctrl and drag lines to adjust image:text ratio or filmstrip size (panel needs focus, e.g. click it).</div>
+			</div>
+					
+			<div class="column31">
+			<div class="div_text3">Album rating</div>
+				<div class="info2"><b>Show</b></div>
+				<div id="rating1"></div>
+				<div class="info2"><b>Location</b></div>
+				<div id="rating2"></div>
+				<div class="info2"><b>Text position</b></div>
+				<div id="rating3"></div>	
+				<div class="info2"><b>Text name</b></div>
+				<div id="rating4"></div>
+			</div>
+		</div>
+		</div>
+
+		<div id="headings" class="tabcontent">	
+		<div class="row">
+			<div style="padding-right:6%; "class="column64">
+				<span class="alignLeftH">Main</span>
+				<span class="alignRightH">Title format</span>
+				<div style="clear:both;"></div>
+				<div id="heading_title_format"></div>
+				<span class="alignLeftH">Track</span>
+				<span class="alignRightH">Title format</span>
+				<div style="clear:both;"></div>
+				<div id="sub_titleformat"></div>
+				<div id="title_formatPreview"></div>	
+				<span class="alignLeftH">Source</span>
+				<span class="alignRightH">Name (Heading|No Heading)</span>
+				<div style="clear:both;"></div>
+				<div id="sub_name"></div>	
+			</div>			
+			<div class="row">
+			<div class="div_text2">Main</div>
+				<div class="column50">
+					<div class="info2"><b>Format</b></div>
+					<div id="headingStyle"></div>
+				</div>
+				<div class="column50">
+					<div class="info2"><b>Button Style</b></div>
+					<div id="btn"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="column50">
+					<div class="info2"><b>Line</b></div>
+					<div id="line"></div>	
+				</div>		
+				<div class="column50">
+					<div class="info2"><b>Padding +/-</b></div>
+					<div id="headingPadding"></div>
+				</div>	
+			</div>
+			<div class="column29" style="margin-top:1.4em;">
+				<span style="margin:0 0 0.7em;" class="dropdown"><a id="heading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('mainShow');"></a>
+				<span id="mainShow" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="headFontStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('mainFont');"></a>
+				<span id="mainFont" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<div style="clear:both;"></div>
+		
+				<span style="margin:0 0 0.7em;" class="dropdown"><a id="trackHeading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('trackShow');"></a>
+				<span id="trackShow" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="trackStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('trackFont');"></a>
+				<span id="trackFont" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<div style="clear:both;"></div>
+
+				<span style="margin:0 0 0.7em;" class="dropdown"><a id="sourceHeading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('sourceShow');"></a>
+				<span id="sourceShow" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="sourceStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('sourceFont');"></a>
+				<span id="sourceFont" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap;"></span>
+				</span>
+				<div class="padMedium"></div>
+			</div>
+		</div>
+		</div>	
+			
+		<div id="image" class="tabcontent">
+		<div class="row">
+			<div class="column31">
+				<div class="div_text6">Main image</div>
+				<div id="mainImage"></div>
+					<div class="div_text9">Filter</div>
+					<div class="info2"><i>Applies to last.fm photo download folder</i></div>
+					<div class="info5"><b>Type</b></div>
+					<div id="input_cntf1"></div>
+					<div class="info5"><b>Size</b></div>
+					<div id="input_cntf2"></div>
+			</div>
+			<div class="column25">
+			<div class="div_text6">Filmstrip</div>
+				<div id="filmStripShow"></div>
+				<span class="dropdown" style="width:auto%;"><a id="film_dropdown" class="dropbtn" href="#" onclick="toggle('filmStripAlign');"></a>
+				<span id="filmStripAlign" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap; min-width:10em;"></span>
+				</span>
+				<div id="gap"></div>
+				<div class="div_text6"><b>Seeker & counter</b></div>
+				<span class="dropdown"><a id="seeker_dropdown" class="dropbtn" href="#" onclick="toggle('seeker');"></a>
+				<span id="seeker" class="dropdown-content"></span>
+				</span>
+				<div id="seekerStyle" style="padding-top:0.5em;"></div>
+			
+			</div>
+
+
+			<div class="column43" style="margin-top:1.4em;">
+				<table id="imageFormat" class="table75">
+					<colgroup>
+						<col span="6" style="width:13%">
+					</colgroup>
+					<tr>
+						<th colspan="2" id="dualAuto" style="color:#008000;">Auto</th>
+						<th colspan="2" style="color:#008000;">Image only</th>
+						<th colspan="2" style="color:#008000;">Filmstrip</th>
+						<th></th>
+					</tr>
+				</table>
+				<div class="div_text12">Reflection</div>
+				<span class="dropdown" style="width:auto%;"><a id="reflection_dropdown" class="dropbtn" href="#" onclick="toggle('reflPos');"></a>
+				<span id="reflPos" class="dropdown-content" style="padding:0 0.31em; white-space:nowrap; min-width:10em;"></span>
+				</span>
+				<div id="reflectionMetrics"></div>
+			</div>
+		</div>
+		</div>		
+
+		<div id="custom" class="tabcontent">
+		<div class="row">
+			<div class="div_text6">Colours and fonts</div>
+			<div class="info1">
+User interface or theme settings are used by default. Enable & configure custom items if required.
+Ctrl+wheel over text or buttons can also be used to change their size [reset: menu\layout\reset zoom].</div>
+			<div class="column50">
+				<div class="info4"><b>Fonts</b></div>
+				<div class="info2" style="margin-left:8.5%">Name,Size,Style(0-4)</div>
+				<div id="fonts"></div>
+				<div class="info6"><b>Colours (R,G,B):</b></div>
+				<div id="colours1"></div>
+				<div class="info3">
+
+Selected colours and fonts will be used.
+Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
+		</div>
+			</div>
+			<div class="column50">
+				<p style="font:1.2em Arial;" "><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool#ColorPicker_tool" target=\"_blank\">Colour picker</a></p>
+				<div class="info3">
+<i>Colours</i>: flexible entry, e.g. 255,0,0 or 0-255-0 or rgba(255,0,0,64)
+<i>Alpha</i>: 0-255 or 0-1 scale
+<i>Transparent</i>: background N/A; transparent fill can be used
+				</div>
+				<div class="info6"><b>Colours (R,G,B or R,G,B,A):</b></div>
+				<div id="colours2"></div>
+			</div>
+		</div>
+		</div>
+		
+		
+		<div id="advanced" class="tabcontent">
+		<div class="row">
+			<div class="column50">
+				<div class="div_text6">Scrolling</div>
+				<div class="info2"><b>Behaviour</b></div>
+				<div id="cusScroll"></div>
+				<div class="info2"><b>Scrollbar</b></div>
+				<div id="scrollbar"></div>
+				<div class="info2"><i>*Select in 'Behaviour Tab' under 'Scroll: Arrows' (N/A if windows scrollbar set). Ensure icon is supported by font.</i></div>
+			</div>
+					
+			<div class="column50">
+				<div class="div_text6"class>Miscellaneous</div>
+				<div class="info2"><b>Theme blur</b></div>
+				<div id="themeBlur"></div>
+				<div class="info2"><b>Image: Smooth transition level</b></div>
+				<div id="smoothTransLevel"></div>
+				<div class="info2"><b>Tagger: Last.fm genre tag</b></div>
+				<div id="lfmGenreTag"></div>
+<div class="info3">
+Edit find>replace: easiest in a text editor
+</div>
+		</div>
+
+		</div>
+		</div>
+
+
+		<div id="title_format" class="tabcontent">
+			<div class="div_text3">Title format</div>
+			<div id="titleformat"></div>
+			<div id="titleformatPreview"></div>
+			<div class="div_text3">Info</div>
+			<div class="info8">
+The defined title format is used for searching and in folder names, file names and headings. %BIO_ALBUMARTIST%, %BIO_ARTIST%, %BIO_ALBUM% and %BIO_TITLE% define titleformat used for albumartist, artist, album and title, respectively. The variables are specific to Biography. Change default title formatting if required.
+
+Always use the variables, if applicable, to ensure correct functionality. In particular, they automatically remap with look up items like similar artists and top albums.</div>
+			<div style="clear:both;"></div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="download" class="tabcontent">
+			<div class="top"></div>
+			<span class="div_text1">Auto-download</span>
+			<span class="dropdown" style="float:right;"><a id="btn_dropdown" class="dropbtn" href="#" onclick="toggle('language');">Last.fm language: English</a>
+			<span id="language" class="dropdown-content"></span>
+			</span>
+			<div style="clear:both;"></div>
+			<div id="fallback" style="float:right;"></div>
+			<span class="alignLeft1">AllMusic</span>
+			<span class="alignRight1">Save folder</span>
+			<div style="clear:both;"></div>
+			<div id="allmusic"></div>
+			<span class="alignLeft1">Last.fm</span>
+			<span class="alignRight1">Save folder</span>
+			<div style="clear:both;"></div>
+			<div id="lastfm"></div>
+			<div class="info7">File names are auto-generated.</div>
+			<div style="clear:both;"></div>
+			<div class="div_text10">Supplementary cache</div>
+			<div id="supplemental"></div>
+			<div class="info8">Look-up items like similar artists and top albums can be saved separately. If enabled, the find and replace is applied to the save folders above. Default yields extra folder: bio_supplemental. Preview shows result for last.fm biography.</div>
+			<div style="clear:both;"></div>
+			<div class="div_text3">Preview</div>
+			<div id="prev"></div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="photo" class="tabcontent">
+			<div class="div_text7">Initial download number (1-20)</div>
+			<div id="photo_num"></div>
+			<div class="div_text8">Auto-add new</div>
+			<div id="input_cnt" class="input_cnt3">
+				<input id="photo_checkbox" name="photo_checkbox" type="checkbox" />
+				<label id="label_for_checkbox">Disable for a fixed number of images per artist</label>
+			</div>
+			<div class="div_text7">Limit per artist</div>
+			<div id="photo_limit"></div>
+			<div class="info9">Limit is designed for use with auto-add new. If set, new images replace old. Excess are moved to the recycler. 0 = No limit.</div>
+			<div style="padding:1.25em 0;"><a id="setSize" href="#" onclick="showPhotoSyntax();return false;">Display of artist photos in other artwork viewers and playlists</a></div>
+			<div id="photo_help" style="display: none;">
+<div class="info12"><i>Simple string suitable for most uses</i>
+</div>
+<div class="input_cnt3"><input class="input98" style="border:none; background:none;" value="*YOUR PATH*\foobar2000\yttm\art_img\$cut(%artist%,1)\%artist%\*"/></div>
+<div class="info12">	
+<i>More complex string that works with artists with a leading dot, e.g. .38 Special. Biography always replaces leading dots with an underscore to stop foobar2000 choking on them</i>
+</div>
+<div class="input_cnt3"><input class="input98" style="border:none; background:none;" value="*YOUR PATH*\foobar2000\yttm\art_img\$replace($cut(%artist%,1),.,_)\$if($stricmp($cut(%artist%,1),.),_$substr(%artist%,2,$len(%artist%)),%artist%)\*"/></div>
+<div class="info12"><b>
+Put the string in, e.g.</b>
+Default user interface: file>preferences>display>album art>artist pattern
+Columns user interface: artwork sources 
+</div>
+<div class="info12"><b><i>
+CHANGE *YOUR PATH* as required; patterns assume biography is saving to default location</i></b>
+</div>
+				</div>	
+			<div id="pad" class="pad"></div>
+			<div id="btn_cnt_center" class="btn_cnt">
+			<button id="btn_empty">Empty recycler</button>
+			<button id="btn_open">Open recycler</button>
+			</div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="cover" class="tabcontent">
+			<div class="div_text3">Covers: Music files</div>
+			<div class="info4">Covers for music files are normally obtained through fb2k (Preferences: Display) or from saved locations. Enabling auto-download can obtain missing covers.</div>
+			<div id="cov"></div>
+			<div style="clear:both;"></div>
+			<div class="div_text3">Covers: cycle folder</div>
+			<div id="covCycleFolder"></div>
+			<div class="info4">Folder that enables cycling through images in album view. Default loads artist photos.</div>
+			<div class="div_text3">Covers: custom paths</div>
+			<div id="covCustom"></div>
+			<div class="info4">Most users should not need this feature as covers are auto-loaded by fb2k (Preferences: Display) or from save locations. Enable if required. Use full path minus extension.</div>
+			<div class="div_text3">Preview</div>
+			<div id="covPreview"></div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="tagger" class="tabcontent">
+			<span class="alignLH">AllMusic tags</span>
+			<span class="alignRH">Tag name</span>
+			<div style="clear:both;"></div>
+			<div id="tagAllmusic"></div>
+			<span class="alignLH">Last.fm tags</span>
+			<span class="alignRH">Tag name</span>
+			<div style="clear:both;"></div>
+			<div id="tagLastfm"></div>
+			<span class="alignLH">Notify tags</span>
+			<span class="alignRH">Number of similar artists (1-6)</span>
+			<div style="clear:both;"></div>
+			<div id="notifyTags"></div>
+			<span style="display:inline-block; padding-top:1.25em; padding-bottom:0.7em; width:18%"><a id="setSize" href="#" onclick="showTaggerHelp();return false;">Tagger help</a></span>
+			<span style="display:inline-block; padding-top:1.25em; padding-bottom:0.7em;">Note: tagging listeners requires files created or updated with biography v1.2.0 or later</span>
+			<div id="tagger_help" style="display: none;">
+			<div class="info4"><b>Source</b></div>
+			<div class="info4">All tag writing is from saved sources (i.e. only existing info in already saved bios and reviews is written). This is to comply with constraints of certain sites. The tagger should work best if Biography has been used for a while. Tags are multi-value except rating and listeners.
+			
+Remove number punctuation from listeners if you need to sort, e.g. $replace(%Artist Listeners Last.fm%,',',,.,, ,).</div>
+			<div class="info4"><b>Notify tags</b></div>
+			<div class="info4">If checked, tags for the current track are notified to other Spider Monkey Panels. This includes artist data for radio streams. Notifications are sent on track change and when new or updated data is received.
+
+The current track will be the playing track or selected track depending on the panel display mode. This may differ between panels if there is more than one biography panel. The selection mode and the handle are sent. Default tag names are used instead of any custom names above. This is so third party scripts know what to expect.
+
+Use on_notify_data(name, info) in the receiving panel to process the notification, where:
+name is 'biographyTags'
+info is an object:
+	{
+		handle: handle of current track,
+		selectionMode: biography selectionMode - string either 'Prefer nowplaying' or 'Follow selected track (playlist)'
+		tags: {
+			{name: value}, {name: value}...
+		}
+	}
+
+The receiving panel can check the selectionMode & compare the handle to that expected, e.g.
+
+function on_notify_data(name, info) {
+	if (name == 'biographyTags') {
+		console.log('Biography selection mode: ', info.selectionMode)
+		const cur_handle = fb.GetNowPlaying(); // set required handle
+		if (cur_handle && cur_handle.Compare(info.handle)) { // info.handle: should never be null: no notification is sent if there isn't a handle
+			// do something
+			const tags = JSON.parse(JSON.stringify(info.tags)); // to store the data from 'info' you have to perform a deep copy
+			Object.entries(tags).forEach(([key, value], i) => {
+				if (!i) console.log("To access individual tags use, e.g: tags['Locale Last.fm'] value: " + tags['Locale Last.fm'])
+				console.log(`${i + 1}. ${key}: ${value}`); // print all tag values
+			});
+		}
+	}
+}
+
+Multi-value tags notifed are arrays; others are strings.
+The example can be copied by opening config.html in a text editor (search for example).
+
+Third party scripts can set the biography selection mode by using window.NotifyOthers('bio_followSelectedTrack', boolean), where boolean is either true [Follow selected track (playlist)] or false [Prefer nowplaying].
+</div>
+</div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="misc" class="tabcontent">
+			<div class="div_text3">Miscellaneous</div>
+			<div id="miscl"></div>
+			<div id="miscellaneous"></div>
+			<div class="div_text3">Info</div>
+			<div class="info10">
+Album name auto-clean shouldn't be needed if album version info is in its own tag.
+
+If enabled, key words are stripped from the album name, as required, before web searching, e.g. "Deluxe Version", "[2011 - Remaster]", "Expanded Edition" + many more.
+
+Improves search results if such phrases are used in album names.</div>
+			<div id="pad" class="pad"></div>
+		</div>	
+</div>
+<div id="div" style="height:0; width:0;outline:none; border:none; padding:none; margin:none; box-sizing:content-box;"></div>
+		<script>
+			var em, i = 0, is_closed_manually = false, j = 0, height, left, top, window_h, window_w;
+			function getValue(id) {
+				var div = document.getElementById(id);
+				div.style.height = '1em';
+				return (em = Math.max(div.offsetHeight, 13.6));
+			}
+			getValue('div');
+
+			function setWindowSize() {
+				window_w = cur.def_w * em || screen.width * 0.67;
+				window_h = cur.def_h * em || screen.height * 0.85;
+				window_w = Math.min(window_w, screen.width * 0.67);
+				window_h = Math.min(window_h, screen.height * 0.85);
+				left = (screen.width - window_w) / 2;
+				top = (screen.height - window_h) / 2;
+				window.resizeTo(window_w, window_h);
+				window.moveTo(left, top);
+				height = document.documentElement.clientHeight || document.body.clientHeight;	
+			}
+
+			function openTab(tabName,elmnt,color) {
+				cur.tab = tabName;
+				var cur_id = document.getElementById(cur.tab);
+				if (cur.tab == 'PanelCfg') {
+					cur_id.style.borderLeft = "0.31em solid #329932";
+					cur_id.style.borderRight = "0.31em solid #329932";
+					var gray_id = document.getElementById("ServerCfg");
+					gray_id.style.borderLeft = "none";
+					gray_id.style.borderRight = "none";
+				} else if (cur.tab == 'ServerCfg') {
+					cur_id.style.borderLeft = "0.31em solid #326edb";
+					cur_id.style.borderRight = "0.31em solid #326edb";
+					var gray_id = document.getElementById("PanelCfg");
+					gray_id.style.borderLeft = "none";
+					gray_id.style.borderRight = "none";
+					
+				}
+				var tabcontent2, tablinks2;
+				tabcontent2 = document.querySelectorAll(".tabcontent2");
+				tablinks2 = document.getElementsByTagName("a");
+				for (i = 0; i < tablinks2.length; i++) {
+					tablinks2[i].style.backgroundColor = "";
+				}
+				document.getElementById(tabName).style.display = "block";
+				elmnt.style.backgroundColor = color;
+				
+				if (tabName == 'PanelCfg') {
+					document.getElementById("behaviourCfg").style.display = "block";
+					document.getElementById("displayCfg").style.display = "block";
+					document.getElementById("headingsCfg").style.display = "block";
+					document.getElementById("imageCfg").style.display = "block";
+					document.getElementById("customCfg").style.display = "block";
+					document.getElementById("advancedCfg").style.display = "block";
+
+					document.getElementById("title_formatCfg").style.display = "none";
+					document.getElementById("downloadCfg").style.display = "none";
+					document.getElementById("photoCfg").style.display = "none";
+					document.getElementById("coverCfg").style.display = "none";
+					document.getElementById("taggerCfg").style.display = "none";
+					document.getElementById("miscCfg").style.display = "none";
+					tabcontent2 = document.querySelectorAll(".tabcontent2");
+					for (i = 0; i < tabcontent2.length; i++) {
+						tabcontent2[i].style.display = "none";
+					}					
+				} else {
+					document.getElementById("title_formatCfg").style.display = "block";
+					document.getElementById("downloadCfg").style.display = "block";
+					document.getElementById("photoCfg").style.display = "block";
+					document.getElementById("coverCfg").style.display = "block";
+					document.getElementById("taggerCfg").style.display = "block";
+					document.getElementById("miscCfg").style.display = "block";
+
+					document.getElementById("behaviourCfg").style.display = "none";
+					document.getElementById("displayCfg").style.display = "none";
+					document.getElementById("headingsCfg").style.display = "none";
+					document.getElementById("imageCfg").style.display = "none";
+					document.getElementById("customCfg").style.display = "none";
+					document.getElementById("advancedCfg").style.display = "none";
+					tabcontent = document.querySelectorAll(".tabcontent");
+					for (i = 0; i < tabcontent.length; i++) {
+						tabcontent[i].style.display = "none";
+					}
+				}
+
+				window.btn_reset.innerHTML = cur.tab == 'PanelCfg' ? 'Reset all Panel Settings' : 'Reset all Server Settings';
+				var target = cur.tab == 'PanelCfg' ? cur.panelPage : cur.serverPage;
+				document.getElementById(target + 'Cfg').click();
+
+			}
+
+			function openPage(pageName,elmnt,color) {
+				cur.page = pageName;
+				if (cur.tab == 'PanelCfg') cur.panelPage = cur.page;
+				else cur.serverPage = cur.page;
+				var tabcontent, tablinks;
+				tabcontent = document.querySelectorAll(".tabcontent");
+				for (i = 0; i < tabcontent.length; i++) {
+					tabcontent[i].style.display = "none";
+				}
+				tablinks = document.getElementsByTagName("a");
+				for (i = 0; i < tablinks.length; i++) {
+					if (tablinks[i].parentNode.id == 'tablink') {
+						tablinks[i].style.backgroundColor = "";
+						tablinks[i].style.borderColor = cur.tab == 'PanelCfg' ? "#329932" : "#326edb";
+					}
+				}
+				document.getElementById(pageName).style.display = "block";
+				elmnt.style.backgroundColor = color;
+				document.getElementById(pageName).style.height = height - window.tablink.offsetHeight * 2 - window.btn_cnt_right.offsetHeight;
+				document.getElementById(pageName).style.overflow = "auto";
+				document.getElementById("btn_ok").focus();
+			}
+
+			document.getElementsByTagName("BODY")[0].onresize = function() {				
+				height = document.documentElement.clientHeight || document.body.clientHeight;
+				document.getElementById(cur.page).style.height = height - window.tablink.offsetHeight * 2 - window.btn_cnt_right.offsetHeight;
+				window_w = (document.documentElement.clientWidth || document.body.clientWidth) + widthOffset;
+				window_h = height + heightOffset;
+				cur.w = Math.round(window_w / em);
+				cur.h = Math.round(window_h / em);
+				checkWindowDefaultSize();
+				set_btn_apply_state();
+			}
+			
+			function checkWindowDefaultSize() {
+				var def_w = cur.def_w * em || screen.width * 0.67;
+				var def_h = cur.def_h * em || screen.height * 0.85;
+				def_w = Math.min(def_w, screen.width * 0.67);
+				def_h = Math.min(def_h, screen.height * 0.85);
+				window.setWinSize.disabled = window_w == def_w && window_h == def_h;
+			}
+
+			function close_window() {
+				is_closed_manually = true;
+				window.open('', '_self', '');
+				window.close();
+			}
+
+			function getPreview(id, value) {
+				if (cur.page == "title_format"  ||cur.page == "download" ||cur.page == "cover") {
+					var sFind = null;
+					var sReplace = null;
+					if (id == 'dld_container7') {
+						sFind = value;
+						sReplace = document.getElementById('dld_container8').value;
+					}
+					if (id == 'dld_container8') {
+						sFind = document.getElementById('dld_container7').value;
+						sReplace = value;
+					}
+					var tf = /tf_/.test(id);
+					var excludeStream = id == 'cov_container0';
+					var tfAll = '';
+					for (i = 0; i < input.title_format.name.length; i++) {
+						tfAll += document.getElementById('tf_container' + i).value;
+						if (i < 3) tfAll += '~#~'
+					}
+					var ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
+					if (tf) ev = ev.slice(0, -1);
+					if (cur.page == "title_format" && document.getElementById("tf_preview")) document.getElementById("tf_preview").value = ev;
+					if (cur.page == "download" && document.getElementById("dld_preview")) document.getElementById("dld_preview").value = ev;
+					if (cur.page == "cover" && document.getElementById("cov_preview")) document.getElementById("cov_preview").value = ev;
+				}
+
+				if (cur.page == "headings") {
+					var t_id = id.slice(-1);
+					var artistType = t_id < 2;
+					var trackType = t_id > 3;
+					var ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
+					if (document.getElementById("tf_heading_preview")) document.getElementById("tf_heading_preview").value = ev;
+				}
+			}
+
+			function set_btn_apply_state() {
+				getValues();
+				document.getElementById("btn_apply").disabled = JSON.stringify(ppt) != parsed_args[0] || JSON.stringify(cfg) != parsed_args[1] ? false : true;
+
+				var el = document.activeElement;
+				var id = el.id;
+				if (/scrollbar_container6/.test(id)) {
+					window.scrollbar_container5.style.fontFamily = window.scrollbar_container6.value;
+				}
+				
+				var previewable = /tf_|dld_|cov_/.test(id);
+				if (previewable) {
+					getPreview(id, el.value);
+				}
+
+				var needCustomCol = /colour_container/.test(id);
+				if (needCustomCol) setCustomColours('value');
+				
+			}
+
+			function assign(c, t) {
+				c = c.replace(/[^0-9.,-]/g, '').replace(/-/g, ',').split(',');
+				var cc = ''; if (c.length != 3 && c.length != 4) return [255, 255, 255];
+				for (i = 0; i < c.length; i++) {
+					c[i] = parseFloat(c[i]);
+					if (i < 3) c[i] = clamp(Math.round(c[i]), 0, 255);
+					else if (i == 3) {
+						if (c[i] <= 1) c[i] = Math.round(255 * c[i]);
+						else c[i] = clamp(Math.round(c[i]), 0, 255);
+					}
+				}
+				switch (t) {
+					case 0: cc = [c[0], c[1], c[2]]; break;
+					case 1: switch (c.length) {
+						case 3: cc = [c[0], c[1], c[2]]; break;
+						case 4: cc = RGBAtoRGB([c[0], c[1], c[2], c[3]], [255, 255, 255, 255]); break;
+					} break;}
+				return cc;
+			}
+			
+			function clamp(num, min, max) {
+				num = num <= max ? num : max; num = num >= min ? num : min; return num;
+			}
+
+			function getSelCol(c) {
+				var cc = [], v = 1;
+				for (i = 0; i < c.length; i++) {
+					v = c[i] / 255;
+					cc.push(v <= 0.03928 ? v /= 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4));
+				}
+				var L = 0.2126 * cc[0] + 0.7152 * cc[1] + 0.0722 * cc[2]; if (L > 0.31) return 'black'; else return 'white';
+			}
+
+			function RGBAtoRGB(c, bg) {
+				var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, a = c[3] / 255, bgr = bg[0] / 255, bgg = bg[1] / 255, bgb = bg[2] / 255; var nR = ((1 - a) * bgr) + (a * r), nG = ((1 - a) * bgg) + (a * g), nB = ((1 - a) * bgb) + (a * b); nR = clamp(Math.round(nR * 255), 0, 255); nG = clamp(Math.round(nG * 255), 0, 255); nB = clamp(Math.round(nB * 255), 0, 255); return [nR, nG, nB];
+			}
+
+			var callback;
+			var cbox_h = 15;
+			var cbox_w = 17;
+			var cfg = {};
+			var cur = {};
+			var ix = {filter: -1, view: -1}
+			var lang_ix = 0;
+			var parsed_args;
+			var tf_callback;
+			var ppt = {};
+			var scale = 1;
+			var sizes = [];
+			var isTransparent = false;
+
+			try {
+				parsed_args = window.external.dialogArguments.toArray();
+			}
+			catch(e) {}
+
+			if (parsed_args) {
+				cur = JSON.parse(parsed_args[2]);
+				if (!/PanelCfg|ServerCfg/.test(cur.tab)) cur.tab = 'PanelCfg'; // guard against bad user edits of ppt
+				if (cur.tab == 'PanelCfg') {
+					if (!/behaviour|display|headings|image|custom|advanced/.test(cur.panelPage)) cur.panelPage = 'display'
+				}
+				else {
+					if (!/title_format|download|photo|cover|tagger|misc/.test(cur.serverPage)) cur.serverPage = 'download'
+				}
+				document.title = 'Biography Options';
+				ppt = JSON.parse(parsed_args[0]);
+				cfg = JSON.parse(parsed_args[1]);				
+				cbox_h = Math.round(Math.max(em, 13));
+				cbox_w = cbox_h + 2;
+				var cbox = "width:" + cbox_w + "px; height:" + cbox_h + "px;"
+				window_w = cur.w * em || screen.width * 0.67;
+				window_h = cur.h * em || screen.height * 0.85;
+				if (cur.w == cur.def_w) window_w = Math.min(window_w, screen.width * 0.67);
+				if (cur.h == cur.def_h) window_h = Math.min(window_h, screen.height * 0.85);
+				left = (screen.width - window_w) / 2;
+				top = (screen.height - window_h) / 2;		
+				window.resizeTo(window_w, window_h);
+				window.moveTo(left, top);
+				height = document.documentElement.clientHeight || document.body.clientHeight;
+				var heightOffset = window_h - height;
+				var widthOffset = window_w - (document.documentElement.clientWidth || document.body.clientWidth);
+				checkWindowDefaultSize();
+				document.getElementById(cur.tab).click();
+
+				var btnLabels = ['No label', 'Text', 'Icon', 'Background', 'Red last.fm'];
+				var clickLabels = ['Single-click of panel', 'Double-click of panel'];
+				var colourLabels = ['Text', 'Highlight', 'Overlay fill', 'Overlay border', 'Background', 'Transparent fill', 'Film selected'];
+				var covLabels = ['Auto-download [lastfm best quality]', 'Save folder', 'Save file name', 'Check custom paths', 'Custom path 1', 'Custom path 2', 'Custom path 3'];
+				var cusScrollLabels = ['Step (0 = page)', 'Smooth duration Max (ms)', 'Touch duration Max (ms)', 'Touch sensitivity 0-10'];
+				var dlLabels = ['Album review', 'Biography', 'Album review', 'Biography', 'Photo', 'Review albumart', 'Similar artists', 'Enable'];
+				var fallbackLabels = ['Biography', 'Review'];
+				var filmStripLabels = ['Flush', 'Align with image', 'Apply image margins','Align with text', 'Apply text margins', ]
+				var filterLabels = ['KB Max size', 'KB Min size', 'PX Min resolution', 'Min number (top priority)'];
+				var fontLabels = ['Main', 'Heading'];
+				var headingFontLabels = ['Regular', 'Bold', 'Italic', 'Bold Italic', 'Semibold', 'Semibold Italic'];
+				var headingFormatlabels = ['Left', 'Right', 'Center', 'Show title', 'Show button', 'Full width'];
+				var headingPaddingLabels = ['Heading', 'Bottom Line', 'Button'];
+				var highlightLabels = ['Heading button', 'Heading text', 'Heading line', 'Overlay border', 'Rating stars', 'Subheadings', 'Text'];
+				var langLabels = ['English', 'German', 'Spanish', 'French', 'Italian', 'Japanese', 'Polish', 'Portugese', 'Russian', 'Swedish', 'Turkish', 'Chinese'];
+				var layoutLabels = ['Double-click toggle', 'Same layout for artist & album', 'Enable look-up of related items'];
+				var lookupLabels = ['Hide', 'Top left', 'Prefer heading', 'Auto-cycle time (seconds; min 30)'];
+				var lfmGenreTagLabels = ['Strip source artist & album names', 'Clean-up number format', 'Clean-up names by Find>Replace:'];
+				var lineLabels = ['None', 'Bottom', 'Center'];
+				var mainImgLabels = ['Enlarge on hover', 'Smooth transition', 'Auto-cycle time (seconds)'];
+				var metricsLabels = ['Margin between image & text', 'Line padding'];
+				var miscLabels = ['Album name auto-clean', 'Review albumart high quality', 'Search: include partial matches', 'Show console messages', 'Cache expiry (days: minimum 28)', 'Similar artists: number on menu (0-10)', 'Various artists'];
+				var overlayLabels = ['Gradient', 'Flat', 'Flat with border', 'Rounded', 'Rounded with border', 'Strength % [shift + wheel]', 'Gradient level %', 'Border width (px)'];
+				var ratingLabels = ['AllMusic', 'Last.fm', 'Prefer heading', 'Prefer text', 'Auto', 'Embed', 'Own line', 'AllMusic', 'Last.fm'];
+				var reflPosLabels = ['Auto-position', 'Top', 'Right', 'Bottom', 'Left', 'Strength % [shift + wheel over <i>main</i> image]', 'Size %', 'Gradient level %'];	
+				var sbarColLabels = ['Grey', 'Blend'];
+				var sbarIconLabels = ['Arrows', 'Triangles', 'Custom'];
+				var sbarShowLabels = ['Hide', 'Auto', 'Show'];
+				var sbarTypeLabels = ['Default', 'Styled', 'Windows'];
+				var scrollbarLabels = ['Bar Width', 'Narrow bar width (0 = auto)', 'Arrow width', 'Arrow padding (+/-)', 'Grip min height', 'Custom icon*', 'Custom icon font name', 'Custom icon offset (%)', 'Prefer full height scrollbar'];				
+				var scrollLabels = ['Use windows metrics', 'Smooth scroll', 'Touch control'];
+				var seekerLabels = ['Hide', 'Auto', 'Show', 'Dots', 'Counter'];
+				var tagLabel = ['Album Genre', 'Album mood', 'Album rating', 'Album theme', 'Artist genre', 'Album genre', 'Album listeners', 'Artist genre', 'Artist listeners', 'Locale', 'Similar artists', 'Current track'];
+				var textStyleLabels = ['Top align', 'Show summary first', 'Expand lists'];
+				var tfLabels = ['Biography [allmusic]', 'Biography [last.fm]', 'Review [allmusic]', 'Review [last.fm]', 'Track [last.fm]', 'Track [last.fm]'];
+				var tfServLabels = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%'];
+				var themeLabels = ['User interface', 'Dark', 'Blend', 'Light', 'Always cover based', 'Swap colours'];
+				var themeBlurLabels = ['Auto-fill', 'Level (%)', 'Opacity (%)', '%'];
+
+				var imgTable1 = ['artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'];
+				var imgTable2 = [['artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', '', 'Reflection'], ['artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', '', 'Border'], ['artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly', '', 'Shadow']];
+				var menuTable = ['menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'];
+
+				isTransparent = parsed_args[3];
+				callback = parsed_args[4];
+				tf_callback = parsed_args[5];
+
+				var input = {
+					behaviour: {
+						name: ['cycTimeItem', 'bioFallbackText', 'revFallbackText', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
+						type: ['float', 'text', 'text', 'float', 'float', 'float']
+					},
+					display: {
+						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'allmusic_name', 'lastfm_name'],
+						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'text', 'text']
+						
+					},
+					headings: {
+						name: ['amBioHeading', 'lfmBioHeading', 'amRevHeading', 'lfmRevHeading', 'lfmTrackHeading', 'lfmTrackSubHeading', 'amBioSubHead', 'lfmBioSubHead', 'amRevSubHead', 'lfmRevSubHead', 'hdPad', 'hdLinePad', 'hdBtnPad'],
+						type: ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'int', 'int', 'int']
+					},
+					image: {
+						name: ['cycTimePic', 'imgFilterMaxSz', 'imgFilterMinSz', 'imgFilterMinPx', 'imgFilterMinNo', 'thumbNailGap', 'reflStrength', 'reflSize', 'reflGradient'],
+						type : ['int', 'int', 'int', 'int', 'int', 'int', 'float', 'float', 'float']
+					},
+					custom: {
+						name: ['custFont', 'custHeadFont', 'text', 'text_h', 'rectOv', 'rectOvBor', 'bg', 'bgTrans', 'frame'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
+					},
+					advanced: {
+						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'arrowSymbol', 'butCustIconFont', 'sbarButPad', 'blurTemp', 'blurAlpha', 'transLevel', 'replace'],
+						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'text', 'text', 'float', 'float', 'float', 'float', 'text']
+					},
+					title_format: {
+						name: ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle'],
+						type : ['text', 'text', 'text', 'text']
+					},
+					download: {
+						name: ['foAmRev', 'foAmBio', 'foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'supFind', 'supReplace'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
+					},
+					photo: {
+						name: ['photoNum', 'photoLimit'],
+						type : ['int', 'int']
+					},
+					cover: {
+						name: ['foImgCov', 'fnImgCov', 'foCycCov', 'cusCov0', 'cusCov1', 'cusCov2'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text']
+					},
+					tagger: {
+						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagName8', 'tagName9', 'tagName10', 'tagEnabled11'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float']
+					},
+					misc: {
+						name: ['exp', 'menuSimilarNum', 'va'],
+						type : ['int', 'int', 'text']
+					},
+					all: {}
+				}
+				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.custom.name, input.advanced.name, input.title_format.name, input.download.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
+				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.custom.type, input.advanced.type, input.title_format.type, input.download.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
+				var box = {
+					behaviour: ['dblClickToggle', 'sameStyle', 'sbarWinMetrics', 'smooth', 'touchControl'],
+					display: ['topAlign', 'summaryFirst', 'expandLists', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightText', 'amRating', 'lfmRating'],
+					headings: ['hdShowTitle', 'hdBtnShow', 'fullWidthHeading', 'hdShowBtnBg', 'hdShowRedLfm'],
+					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'autoFilm', 'imgSeekerDots', 'imgCounter', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
+					custom: ['custFontUse', 'custHeadFontUse', 'textUse', 'text_hUse', 'rectOvUse', 'rectOvBorUse', 'bgUse', 'bgTransUse', 'frameUse'],
+					advanced: ['sbarFullHeight', 'blurAutofill', 'stripNames', 'cleanNo', 'runReplace'],
+					title_format: [],
+					download: ['langLfmFallback', 'dlAmRev', 'dlAmBio', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'supCache'],
+					photo: ['photoAutoAdd'],
+					cover: ['dlLfmCov', 'cusCov'],
+					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'tagEnabled8', 'tagEnabled9', 'tagEnabled10', 'notifyTags'],
+					misc: ['albStrip', 'imgRevHQ', 'partialMatch', 'showConsoleMessages']
+				}
+				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.custom, box.advanced, box.download, box.photo, box.cover, box.tagger, box.misc);
+				var radio = {
+					behaviour: ['lookUp', 'menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'],
+					display: ['star', 'ratingTextPos'],
+					headings: ['hdPos', 'hdShowBtnLabel', 'hdLine'],
+					image: ['artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'],
+					custom: [],
+					advanced: [],
+					title_format: [],
+					download: [],
+					photo: [],
+					cover: [],
+					tagger: [],
+					misc: []
+				}
+				radio.all = radio.behaviour.concat(radio.behaviour, radio.display, radio.headings, radio.image);
+				lang_ix = parsed_args[6];
+
+				function getTableData(id) {
+					var cells = [];
+					var headings = [];
+					var columnCount = 0;
+					switch (id) {
+						case 'imageFormat':
+							headers = [];
+							cells.push(headers);
+							var subHeaders = ['Photo', 'Cover', 'Photo', 'Cover', 'Photo', 'Cover', ''];
+							cells.push(subHeaders);
+							var radioLabels = ['Regular', 'Auto-fill', 'Circular'];
+							var cboxLabels = ['Reflection', 'Border', 'Shadow'];
+							var items = [];
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < imgTable1.length; i++) {
+									var n = imgTable1[i]; 
+									var id = imgTable1[i] + j; 
+									items[j].push('<input id="'+id+'" name="'+n+'" style="'+cbox+'" type="radio" />');
+									if (i == 5) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left">'+radioLabels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < imgTable2[j].length; i++) {
+									var id = imgTable2[j][i]; 
+									items[j].push(i < 4 ? '<input id="'+id+'" name="image_checkbox" style="'+cbox+'" type="checkbox" />' : '');
+									if (i == 5) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left">'+cboxLabels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							columnCount = 7;
+						break;
+					
+						case 'menu':
+							headers = ['Paste', 'Playlists', 'Tagger', 'Missing data', 'Inactivate', ''];
+							cells.push(headers);
+							var labels = ['Hide', 'Require&nbspShift&nbsp', 'Show'];
+							var items = [];
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < menuTable.length; i++) {
+									
+									var n = menuTable[i];
+									var id = n + j; 
+									items[j].push('<input id="'+id+'" name="'+n+'" style="'+cbox+'" type="radio" />');
+									if (i == 4) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left">'+labels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							columnCount = 6;
+							break;
+						
+						case 'imageMarginTable':
+							var input0 = '<label for="image_metrics0" >Top</label><input id="image_metrics0" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input1 = '<input id="image_metrics1" name="display_input" style="padding:0; margin-left:0.31em;" class="input2" />'
+							var input2 = '<input id="image_metrics2" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input3 = '<input id="image_metrics3" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" /><label for="image_metrics3" >Bottom</label>'
+								headers = [];
+								cells = [
+									headers,
+									['', '', input0, '', ''],
+									['Left', input1, '<b> Image </b>', input2, 'Right'],
+									['', '', input3, '', '']
+								];
+							columnCount = 5;
+							break;
+
+						case 'textMarginTable':
+							var input0 = '<label for="text_metrics'+i+'" >Top</label><input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input1 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-left:0.31em;" class="input2" />'
+							var input2 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input3 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" /><label for="text_metrics'+i+'" >Bottom</label>'
+								headers = [];
+								cells = [
+									headers,
+									['', '', input0, '', ''],
+									['Left', input1, '<b> Text </b>', input2, ' Right'],
+									['', '', input3, '', '']
+								];
+							columnCount = 5;
+							break;
+					}
+					return [cells, headers.length, columnCount]
+				}
+
+				function generateTable(tb) {
+					var items = getTableData(tb);
+					var cells = items[0];
+					var headerCount = items[1];
+					var table = document.getElementById(tb);
+					// Get the count of columns.
+					var columnCount = items[2];
+					var noInternalBorder = tb == 'imageMarginTable' || tb == 'textMarginTable';
+
+					// Add the header row.
+					var row;
+					if (headerCount) {
+						row = table.insertRow(-1);
+						for (i = 0; i < headerCount; i++) {
+							var headerCell = document.createElement("TH");
+							headerCell.innerHTML = cells[0][i]; 
+							headerCell.style.color = "green";
+							row.appendChild(headerCell);
+						}
+					}
+			 
+					// Add the data rows.
+					for (var i = 1; i < cells.length; i++) {
+						row = table.insertRow(-1);
+						for (j = 0; j < columnCount; j++) {
+							var cell = row.insertCell(-1);
+							cell.innerHTML = cells[i][j];
+							if (tb == 'imageFormat') {if (i % 2 == 0) cell.style.background = '#E8E8E8';}
+							else if (tb == 'menu') {if(i % 2 == 1) cell.style.background = '#E8E8E8';}
+							if (tb == 'imageFormat' && i == 5) cell.style.borderTop = "1px solid green";
+							if (j == 3) {
+								if (tb == 'imageMarginTable' && i == 3) cell.style.color = "green";
+							}
+							if (j == 2 && (tb == 'textMarginTable' || tb == 'imageMarginTable') && i == 2) cell.style.color = "green";
+						}
+					}
+					if (!ppt.imgText_internal.value) window.dualAuto.innerHTML = 'Image+text';
+				}
+				
+				function setFilmAlignment(n) {
+					window.film_dropdown.innerHTML = filmStripLabels[n];
+					ppt['filmStripMargin_internal'].value = n;
+					window.filmStripAlign.style.display = 'none';
+				}
+
+				function setHeadingShow(n, type) {
+					var prop = ['heading', 'trackHeading', 'sourceHeading'][type];
+					window[prop + '_dropdown'].innerHTML = '<b>' + ['Main', 'Track', 'Source'][type] + ': </b>' + sbarShowLabels[n];
+					ppt[prop + '_internal'].value = n;
+					switch (type) {
+						case 0: window.mainShow.style.display = 'none'; break;
+						case 1: window.trackShow.style.display = 'none'; break;
+						case 2: window.sourceShow.style.display = 'none'; break;
+					
+					}
+				}
+				
+				function setHeadingFont(n, type) {
+					var prop = ['headFontStyle', 'trackStyle', 'sourceStyle'][type];
+					window[prop + '_dropdown'].innerHTML = headingFontLabels[n];
+					ppt[prop + '_internal'].value = n;
+					setHeadingFontStyle(n, type);
+					switch (type) {
+						case 0: window.mainFont.style.display = 'none'; break;
+						case 1: window.trackFont.style.display = 'none'; break;
+						case 2: window.sourceFont.style.display = 'none'; break;
+					
+					}
+				}
+				
+				function setHeadingFontStyle(n, type) {
+					var prop = ['headFontStyle', 'trackStyle', 'sourceStyle'][type];
+					window[prop + '_dropdown'].style.fontWeight = n == 1 || n == 3 ? 'bold' : 'normal';
+					window[prop + '_dropdown'].style.fontFamily = n == 4 || n == 5 ? 'Segoe UI Semibold' : 'caption';
+					window[prop + '_dropdown'].style.fontStyle = n == 2 || n == 3 || n == 5 ? 'italic' : 'normal';
+				}
+				
+				function setOverlayType(n) {
+					window.overlay_dropdown.innerHTML = overlayLabels[n];
+					ppt['typeOverlay_internal'].value = n;
+					window.overlayType.style.display = 'none';
+				}
+				
+				function setReflectionType(n) {
+					window.reflection_dropdown.innerHTML = reflPosLabels[n];
+					ppt['imgReflType_internal'].value = n;
+					window.reflPos.style.display = 'none';
+				}
+
+				function setSbarShow(n) {
+					window.sbarShow_dropdown.innerHTML = sbarShowLabels[n];
+					ppt['sbarShow_internal'].value = n;
+					window.sbarShow.style.display = 'none';
+				}
+
+				function setsbarType(n) {
+					window.sbarType_dropdown.innerHTML = sbarTypeLabels[n];
+					ppt['sbarType_internal'].value = n;
+					sbar_col_dropdown.style.display = n != 2 ? "inline-block" : "none";
+					sbar_icon_dropdown.style.display = n != 2 ? "inline-block" : "none";
+					window.sbarType.style.display = 'none';
+				}
+
+				function setSbarCol(n) {
+					window.sbarCol_dropdown.innerHTML = sbarColLabels[n];
+					ppt['sbarCol_internal'].value = n;
+					window.sbarCol.style.display = 'none';
+				}
+
+				function setSbarIcon(n) {
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[n];
+					ppt['sbarButType_internal'].value = n;
+					window.sbarIcon.style.display = 'none';
+				}
+
+				function setSeekerShow(n) {
+					window.seeker_dropdown.innerHTML = seekerLabels[n];
+					ppt['imgSeeker_internal'].value = n;
+					window.seeker.style.display = 'none';
+				}
+				
+				function setTheme(n) {
+					window.theme_dropdown.innerHTML = themeLabels[n];
+					ppt['theme_internal'].value = n;
+					window.themeBg.style.display = 'none';
+				}
+
+				function setBehaviour() {
+					for (i = 0; i < 2; i++) {window.layout.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="layout_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="layout_checkbox'+i+'" class="checkbox_label">'+layoutLabels[i]+'</label></div>');}
+					window.sbarShow_dropdown.innerHTML = sbarShowLabels[ppt['sbarShow_internal'].value];
+					for (i = 0; i < 3; i++) {window.sbarShow.insertAdjacentHTML('beforeend', '<a onclick="setSbarShow(' + i + ');">'+sbarShowLabels[i]+'</a>');}
+					window.sbarType_dropdown.innerHTML = sbarTypeLabels[ppt['sbarType_internal'].value];
+					for (i = 0; i < 3; i++) {window.sbarType.insertAdjacentHTML('beforeend', '<a onclick="setsbarType(' + i + ');">'+sbarTypeLabels[i]+'</a>');}
+					window.sbarCol_dropdown.innerHTML = sbarColLabels[ppt['sbarCol_internal'].value];
+					for (i = 0; i < 2; i++) {window.sbarCol.insertAdjacentHTML('beforeend', '<a onclick="setSbarCol(' + i + ');">'+sbarColLabels[i]+'</a>');}
+					sbar_col_dropdown.style.display = ppt['sbarType_internal'].value != 2 ? "inline-block" : "none";
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[ppt['sbarButType_internal'].value];
+					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
+					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value != 2 ? "inline-block" : "none";
+					for (i = 0; i < 3; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
+					for (i = 0; i < 2; i++) {window.fall_back.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="fallback_container'+i+'" name="behaviour_input" class="input60" /><label for="fallback_container'+i+'" class="inp_label2">'+fallbackLabels[i]+'</label></div>');}
+					window.overlay_dropdown.innerHTML = overlayLabels[ppt['typeOverlay_internal'].value];
+					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}
+					
+					
+					for (i = 5; i < 8; i++) {window.overlayMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="overlayMetrics_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input3" /><label for="overlayMetrics_container'+i+'" class="inp_label2">'+overlayLabels[i]+'</label></div>');}
+					generateTable('menu');
+					for (i = 0; i < 3; i++) {window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lookUp'+i+'" name="lookUp" style="'+cbox+'" type="radio" /><label for="lookUp'+i+'" class="checkbox_label">'+lookupLabels[i]+'</label></div>');}
+					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookupLabels[i]+'</label></div>');
+				}
+
+				function setDisplay() {
+					generateTable('imageMarginTable');
+					generateTable('textMarginTable');
+					i = 4; window.metrics.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[0]+'</b></label></div>');
+					i = 5; window.metrics2.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[1]+'</b></label></div>');				
+					for (i = 0; i < 3; i++) {window.textStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="textStyle_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="textStyle_checkbox'+i+'" class="checkbox_label">'+textStyleLabels[i]+'</label></div>');}
+
+					window.theme_dropdown.innerHTML = themeLabels[ppt['theme_internal'].value];
+					for (i = 0; i < 4; i++) {window.themeBg.insertAdjacentHTML('beforeend', '<a onclick="setTheme(' + i + ');">'+themeLabels[i]+'</a>');}
+
+					for (i = 4; i < 6; i++) {window.themeStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="theme_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="theme_checkbox'+i+'" class="checkbox_label">'+themeLabels[i]+'</label></div>');}
+					for (i = 0; i < 7; i++) {window.highlight.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="highlight_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="highlight_checkbox'+i+'" class="checkbox_label">'+highlightLabels[i]+'</label></div>');}
+					for (i = 0; i < 2; i++) {window.rating1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="rating_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="rating_checkbox'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+					for (i = 2; i < 4; i++) {window.rating2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="star'+i+'" name="star" style="'+cbox+'" type="radio" /><label for="star'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+					for (i = 4; i < 7; i++) {window.rating3.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="ratingTextPos'+i+'" name="ratingTextPos" style="'+cbox+'" type="radio" /><label for="ratingTextPos'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+					for (i = 7; i < 9; i++) {window.rating4.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="ratingName_container'+i+'" name="display_input" style="padding:0; margin:0;" class="input70" /><label for="ratingName_container'+i+'" class="inp_label2">'+ratingLabels[i]+'</label></div>');}
+				}
+
+				function setHeading() {
+					for (i = 0; i < 5; i++) {window.heading_title_format.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_heading_container'+i+'" class="inp_label4">'+tfLabels[i]+'</label><input id="tf_heading_container'+i+'" name="headings_input" class="input73" /></div>');}
+					i = 5;	window.sub_titleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_heading_container'+i+'" class="inp_label4">'+tfLabels[i]+'</label><input id="tf_heading_container'+i+'" name="headings_input" class="input73" /></div>');
+					i = 6; window.title_formatPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="tf_heading_container'+i+'""><label for="tf_heading_preview" class="inp_label4">Preview</label><input id="tf_heading_preview" name="previewTf" type="text" class="input73" readonly/></div>')
+					for (i = 0; i < 4; i++) {window.sub_name.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="name_container'+i+'" class="inp_label4">'+tfLabels[i]+'</label><input id="name_container'+i+'" name="headings_input" class="input73" /></div>');}
+
+					for (i = 0; i < 3; i++) {window.headingStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdPos'+i+'" name="hdPos" style="'+cbox+'" type="radio" /><label for="hdPos'+i+'" class="checkbox_label">'+headingFormatlabels[i]+'</label></div>');}
+					for (i = 3; i < 6; i++) {window.headingStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="headingFormat_checkbox'+i+'" name="headings_checkbox" style="'+cbox+'" type="checkbox" /><label for="headingFormat_checkbox'+i+'" class="checkbox_label">'+headingFormatlabels[i]+'</label></div>');}
+					for (i = 0; i < 3; i++) {window.btn.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdShowBtnLabel'+i+'" name="hdShowBtnLabel" style="'+cbox+'" type="radio" /><label for="hdShowBtnLabel'+i+'" class="checkbox_label">'+btnLabels[i]+'</label></div>');}
+					for (i = 3; i < 5; i++) window.btn.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="btn_checkbox'+i+'" name="headings_checkbox" style="'+cbox+'" type="checkbox" /><label for="btn_checkbox'+i+'" class="checkbox_label">'+btnLabels[i]+'</label></div>');
+					for (i = 0; i < 3; i++) {window.line.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdLine'+i+'" name="hdLine" style="'+cbox+'" type="radio" /><label for="hdLine'+i+'" class="checkbox_label">'+lineLabels[i]+'</label></div>');}
+					for (i = 0; i < 3; i++) {window.headingPadding.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="headingPadding_container'+i+'" name="headings_input" style="padding:0; margin:0;" class="input15" /><label for="headingPadding_container'+i+'" class="inp_label2">'+headingPaddingLabels[i]+'</label></div>');}			
+					
+					window.heading_dropdown.innerHTML = '<b>Main: </b>' + sbarShowLabels[ppt['heading_internal'].value];
+					for (i = 0; i < 3; i++) {window.mainShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 0 + ');">'+sbarShowLabels[i]+'</a>');}
+					window.trackHeading_dropdown.innerHTML = '<b>Track: </b>' + sbarShowLabels[ppt['trackHeading_internal'].value];
+					for (i = 0; i < 3; i++) {window.trackShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 1 + ');">'+sbarShowLabels[i]+'</a>');}
+					window.sourceHeading_dropdown.innerHTML = '<b>Source: </b>' + sbarShowLabels[ppt['sourceHeading_internal'].value];
+					for (i = 0; i < 3; i++) {window.sourceShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 2 + ');">'+sbarShowLabels[i]+'</a>');}
+
+					window.headFontStyle_dropdown.innerHTML = headingFontLabels[ppt['headFontStyle_internal'].value];
+					setHeadingFontStyle(ppt['headFontStyle_internal'].value, 0);			
+					for (i = 0; i < 6; i++) {window.mainFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 0 + ');">'+headingFontLabels[i]+'</a>');}
+					window.trackStyle_dropdown.innerHTML = headingFontLabels[ppt['trackStyle_internal'].value];
+					setHeadingFontStyle(ppt['trackStyle_internal'].value, 2);			
+					for (i = 0; i < 6; i++) {window.trackFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 1 + ');">'+headingFontLabels[i]+'</a>');}
+					window.sourceStyle_dropdown.innerHTML = headingFontLabels[ppt['sourceStyle_internal'].value];
+					setHeadingFontStyle(ppt['sourceStyle_internal'].value, 1);			
+					for (i = 0; i < 6; i++) {window.sourceFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 2 + ');">'+headingFontLabels[i]+'</a>');}
+				}
+
+				function setImage() {
+					for (i = 0; i < 2; i++) {window.mainImage.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="mainImg_checkbox'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="mainImg_checkbox'+i+'" class="checkbox_label">'+mainImgLabels[i]+'</label></div>');}
+					i = 2; window.mainImage.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="cycleTime_container'+i+'" name="image_input" style="padding:0; margin:0;" class="input2" /><label for="cycleTime_container'+i+'" class="inp_label2">'+mainImgLabels[i]+'</label></div>');
+					
+					window.seeker_dropdown.innerHTML = seekerLabels[ppt['imgSeeker_internal'].value];
+					for (i = 0; i < 3; i++) {window.seeker.insertAdjacentHTML('beforeend', '<a onclick="setSeekerShow(' + i + ');">'+seekerLabels[i]+'</a>');}
+
+					for (i = 3; i < 5; i++) {window.seekerStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="mainImg_checkbox'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="mainImg_checkbox'+i+'" class="checkbox_label">'+seekerLabels[i]+'</label></div>');}
+					i = 0; window.filmStripShow.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="filmStrip_checkbox'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="filmStrip_checkbox'+i+'" class="checkbox_label">Only show if > 1 thumbnail</label></div>');
+
+					window.film_dropdown.innerHTML = filmStripLabels[ppt['filmStripMargin_internal'].value];
+					for (i = 0; i < 5; i++) {window.filmStripAlign.insertAdjacentHTML('beforeend', '<a onclick="setFilmAlignment(' + i + ');">'+filmStripLabels[i]+'</a>');}
+
+					i = 0; window.gap.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="gap_container'+i+'" name="image_input" class="input2" /><label for="gap_container'+i+'" class="inp_label2">Thumbnail gap</label></div>');
+					var cboxMargin = "width:" + cbox_w + "px; height:" + cbox_h + "px; margin-right:5px;"
+					window.input_cntf1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="f_checkbox1" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="f_checkbox1" class="checkbox_label">Last.fm photos only</label></div>');
+					for (i = 0; i < 3; i++) {window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');}
+					i = 3; window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'; visibility:hidden;" name="image_checkbox_hidden" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');
+					generateTable('imageFormat');
+					
+					window.reflection_dropdown.innerHTML = reflPosLabels[ppt['imgReflType_internal'].value];
+					for (i = 0; i < 5; i++) {window.reflPos.insertAdjacentHTML('beforeend', '<a onclick="setReflectionType(' + i + ');">'+reflPosLabels[i]+'</a>');}
+					for (i = 5; i < 8; i++) {window.reflectionMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="reflectionMetrics_container'+i+'" name="image_input" class="input2" /><label for="reflectionMetrics_container'+i+'" class="inp_label2">'+reflPosLabels[i]+'</label></div>');}
+				}
+				var bg = [];
+				var fg = [];
+				function setCustomColours(value) {
+					var items = ['text', 'text_h', 'rectOv', 'rectOvBor', 'bg', 'bgTrans', 'frame'];
+					for (var i= 0; i < items.length; i++) {
+						bg[i] = assign(ppt[items[i] + '_internal'][value], i < 4 ? 0 : 1);
+						fg[i] = getSelCol(bg[i]);
+						bg[i] = "rgb("+bg[i][0]+","+bg[i][1]+","+bg[i][2]+")";
+						var el = document.getElementById('colour_container'+i);
+						el.style.background = bg[i];
+						el.style.color = fg[i];
+					}
+				}
+
+				function setCustom() {
+					for (i = 0; i < 2; i++) {window.fonts.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="font_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="font_container'+i+'" name="custom_input" class="input40" /><label for="font_container'+i+'" class="inp_label2">'+fontLabels[i]+'</label></div>');}
+					for (i = 0; i < 4; i++) {window.colours1.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="colour_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="colour_container'+i+'" name="custom_input" class="input40" /><label for="colour_container'+i+'" class="inp_label2">'+colourLabels[i]+'</label></div>');}
+					for (i = 4; i < 7; i++) {window.colours2.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="colour_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="colour_container'+i+'" name="custom_input" class="input40" /><label for="colour_container'+i+'" class="inp_label2">'+colourLabels[i]+'</label></div>');}
+				}
+
+				function setAdvanced() {
+					for (i = 0; i < 4; i++) {window.cusScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scroll_container'+i+'" name="advanced_input" class="input35" /><label for="scroll_container'+i+'" class="inp_label2">'+cusScrollLabels[i]+'</label></div>');}
+					for (i = 0; i < 5; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
+					var fFamily = ppt['butCustIconFont_internal'].value;
+					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" style="font-family:'+fFamily+'" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');
+					for (i = 6; i < 8; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
+					i = 8; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
+					i = 0; window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="themeBlur_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="themeBlur_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
+					for (i = 1; i < 3; i++) {window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="themeBlur_container'+i+'" name="advanced_input" class="input35" /><label for="themeBlur_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');}
+					i = 3; window.smoothTransLevel.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="smoothing_container'+i+'" name="advanced_input" class="input2" /><label for="smoothing_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
+					for (i = 0; i < 3; i++) {window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lfmGenreTag_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="lfmGenreTag_checkbox'+i+'" class="checkbox_label">'+lfmGenreTagLabels[i]+'</label></div>');}
+					i = 3; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="advanced_input" class="input96" /></div>');
+				}
+
+				function setServer() {
+					var labelInnerHtml = window.btn_dropdown.innerHTML;
+					window.btn_dropdown.innerHTML = labelInnerHtml.replace(/Last.fm language: English/g, 'Last.fm language: ' + langLabels[lang_ix]);
+					for (i = 0; i < 4; i++) {
+						window.titleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_container'+i+'" class="inp_label1">'+tfServLabels[i]+'</label><input id="tf_container'+i+'" name="title_format_input" class="input98" /></div>');
+					}
+					window.fallback.insertAdjacentHTML('beforeend', '<div class="input_cnt3" style="padding:0;"><input id="lang_checkbox" name="download_checkbox" type="checkbox" /><label for="lang_checkbox" class="checkbox_label">Fallback to English server</label></div>');
+					for (i = 0; i < 2; i++) {
+						window.allmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" type="text" class="input82" /></div>');
+					}
+					for (i = 2; i < 7; i++) {
+						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" type="text" class="input82" /></div>');
+					}
+					window.dnld_checkbox6.parentNode.style.display = 'none';
+					window.supplemental.insertAdjacentHTML('beforeend', '<div class="row"><div class="column19"><input id="dnld_checkbox7" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox7" class="checkbox_label">'+dlLabels[7]+'</label></div><div class="column40"><label for="dld_container7" class="inp_label3">Find what:</label><input id="dld_container7" name="download_input" type="text" class="input76" /></div><div class="column40"><label for="dld_container8" class="inp_label3">Replace with:</label><input id="dld_container8" name="download_input" type="text" class="input76" /></div></div>')
+					window.photo_num.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container0" name="photo_input" class="input98" /></div>');
+					window.photo_limit.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container1" name="photo_input" class="input98" /></div>');
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox0" name="cover_checkbox" type="checkbox" /><label for="input_checkbox0" class="checkbox_label">'+covLabels[0]+'</label></div>')	
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cov_container0" class="inp_label3">'+covLabels[1]+'</label><input id="cov_container0" name="cover_input" type="text" class="input82" /></div>')
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><label for="tf_cov_container" class="inp_label3">'+covLabels[2]+'</label><input id="tf_cov_container" name="cover_input" type="text" class="input82" /></div>')
+					window.covCycleFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container2" name="cover_input" type="text" class="input82" /></div>')
+					window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox1" name="cover_checkbox" type="checkbox" /><label for="input_checkbox1" class="checkbox_label">'+covLabels[3]+'</label></div>')
+					for (i = 3; i < 6; i++) {
+						window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container'+i+'" name="cover_input" type="text" class="input82" /><label for="custom_container'+i+'" class="inp_label3">'+covLabels[i + 1]+'</label></div>');
+					}
+					for (i = 0; i < 5; i++) {
+						window.tagAllmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" type="text" class="input82" /></div>');
+					}
+					for (i = 5; i < 11; i++) {
+						window.tagLastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" type="text" class="input82" /></div>');
+					}
+					i = 11; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" type="text" class="input82" /></div>');
+					for (i = 0; i < 4; i++) {	
+						window.miscl.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="misc_checkbox'+i+'" name="misc_checkbox" type="checkbox" /><label for="misc_checkbox'+i+'" class="checkbox_label">'+miscLabels[i]+'</label></div>');
+					}
+					for (i = 4; i < 7; i++) {	
+						window.miscellaneous.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="misc_container'+i+'" class="inp_label1">'+miscLabels[i]+'</label><input id="misc_container'+i+'" name="misc_input" type="text" class="input66" /></div>');
+					}
+					window.titleformatPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="input_cnt3"><label for="tf_preview" class="inp_label1">Preview</label><input id="tf_preview" name="previewTf" type="text" class="input98" readonly/></div>');
+					for (i = 0; i < 12; i++) {
+						window.language.insertAdjacentHTML('beforeend', '<a onclick="setLanguage(' + i + ')" >'+langLabels[i]+'</a>');
+					}		
+					window.lang_checkbox.parentNode.disabled = !lang_ix ? true : false;
+					window.prev.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="preview_cnt"><input id="dld_preview" name="preview" type="text" readonly class="input82"/><label for="dld_container1000" class="inp_label3">Current Item:</label></div>');
+					window.covPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="custom3"><input id="cov_preview" name="preview" type="text" class="input82" readonly/><label for="preview_container" class="inp_label3">Current Item:</label></div>');
+				}
+
+				document.getElementById("btn_empty").disabled = !parsed_args[7];
+				document.getElementById("btn_open").disabled = !parsed_args[7];
+				setBehaviour();
+				setDisplay();
+				setHeading();
+				setImage();
+				setCustom();
+				setAdvanced();
+				setServer();
+				setCustomColours('value');
+				setCheckboxes('all', 'value');
+				setRadioBtns('all', 'value');
+				setInputs('all', 'value');
+				setCheckboxStates();
+				document.getElementById("btn_apply").disabled = true;
+			}
+
+			function setInputs(page, value) {
+				var nm = page.toString()+'_input', inputs = document.querySelectorAll(page == 'all' ? "[name$='_input']" : "[name="+nm+"]");
+				for (i = 0; i < inputs.length; i++) {
+					inputs[i].value = (ppt[input[page].name[i] + '_internal'] || cfg[input[page].name[i] + '_internal'])[value];
+				}
+			}
+
+			function setCheckboxStates() {
+				window.theme_checkbox4.parentNode.disabled = ppt['theme_internal'].value == 0;
+				window.theme_checkbox5.parentNode.disabled = ppt['theme_internal'].value == 1;
+				window.ratingTextPos5.parentNode.disabled = window.textStyle_checkbox1.checked;
+				window.ratingTextPos6.parentNode.disabled = window.textStyle_checkbox1.checked;
+				window.headFontStyle_dropdown.style.display = window.font_checkbox1.checked && window.font_container1.value.length ? "none" : "inline-block";
+				window.btn_checkbox3.parentNode.disabled = window.btn_checkbox4.checked;
+				window.artReflDual.disabled = window.artShadowDual.checked;
+				window.artShadowDual.disabled = window.artReflDual.checked;
+				window.covReflDual.disabled = window.covShadowDual.checked;
+				window.covShadowDual.disabled = window.covReflDual.checked;
+				window.artReflImgOnly.disabled = window.artShadowImgOnly.checked;
+				window.artShadowImgOnly.disabled = window.artReflImgOnly.checked;
+				window.covReflImgOnly.disabled = window.covShadowImgOnly.checked;
+				window.colour_checkbox4.disabled = isTransparent;
+				window.filterCheckbox3.parentNode.disabled = !window.filterCheckbox0.checked && !window.filterCheckbox1.checked && !window.filterCheckbox2.checked
+			}
+			
+			function setLanguage(n) {
+				window.btn_dropdown.innerHTML = 'Last.fm language: ' + langLabels[n];
+				cfg['langLfm_internal'].value = ['EN', 'DE', 'ES', 'FR', 'IT', 'JA', 'PL', 'PT', 'RU', 'SV', 'TR', 'ZH'][n];
+				window.lang_checkbox.parentNode.disabled = !n ? true : false;
+			}
+
+			function setCheckboxes(page, value) {
+				var nm = page.toString()+'_checkbox', boxes = document.querySelectorAll(page == 'all' ? "[name$='_checkbox']" : "[name="+nm+"]");
+				for (i = 0; i < boxes.length; i++) {
+					boxes[i].checked = (ppt[box[page][i] + '_internal'] || cfg[box[page][i] + '_internal'])[value];
+				}
+			}
+
+			setInterval(inputChanged, 500);
+			function inputChanged() {
+				set_btn_apply_state();
+			}
+
+			function setRadioBtns(page, value) {
+				var radios = radio[page];
+				for (i = 0; i < radios.length; i++) {
+					var radioBtns = document.getElementsByName(radios[i]);
+					for (j = 0; j < radioBtns.length; j++) {
+						if (j == ppt[radios[i] + '_internal'][value]) {
+							radioBtns[j].checked = true;
+							radioBtns[j].value = j;	
+						}
+					}
+				}
+			}
+
+			function getValues() {
+				var inputs = document.querySelectorAll("[name$='_input']");
+				for (i = 0; i < inputs.length; i++) {
+					(ppt[input.all.name[i] + '_internal'] || cfg[input.all.name[i] + '_internal']).value = input.all.type[i] == 'text' ? inputs[i].value : input.all.type[i] == 'int' ? parseInt(inputs[i].value) : parseFloat(inputs[i].value);
+				}
+
+				var boxes = document.querySelectorAll("[name$='_checkbox']");
+				for (i = 0; i < boxes.length; i++) {
+					(ppt[box.all[i] + '_internal'] || cfg[box.all[i] + '_internal']).value = boxes[i].checked;
+				}
+
+				for (i = 0; i < radio.all.length; i++) {
+					var radioBtns = document.getElementsByName(radio.all[i]);
+					for (j = 0; j < radioBtns.length; j++) {
+						if (radioBtns[j].checked) {
+							ppt[radio.all[i] + '_internal'].value = j;
+							break;
+						}
+					}
+				}
+			}
+
+			window.btn_ok.onclick = function () {
+				getValues();
+				var new_ppt = JSON.stringify(ppt);
+				var new_cfg = JSON.stringify(cfg);
+				var new_cur = JSON.stringify(cur);
+				if (new_ppt == parsed_args[0]) new_ppt = '';
+				if (new_cfg == parsed_args[1]) new_cfg = '';
+				if (new_cur == parsed_args[2]) new_cur = '';
+				if (new_ppt || new_cfg || new_cur) {
+					callback && callback(new_ppt, new_cfg, '' , new_cur);
+				} else {
+				if (new_cur) callback && callback('', '', '', new_cur);
+				}
+				close_window();
+			}
+
+			window.btn_apply.onclick = function () {
+				getValues();
+				var new_ppt = JSON.stringify(ppt);
+				var new_cfg = JSON.stringify(cfg);
+				if (new_ppt == parsed_args[0]) new_ppt = ''; else parsed_args[0] = new_ppt;
+				if (new_cfg == parsed_args[1]) new_cfg = ''; else parsed_args[1] = new_cfg;
+				if (new_ppt || new_cfg) {
+					callback && callback(new_ppt, new_cfg);
+				}
+			}
+
+			window.btn_resetPage.onclick = function () {
+				setCheckboxes(cur.page, 'default_value');
+				setInputs(cur.page, 'default_value');
+				setRadioBtns(cur.page, 'default_value');
+				if (cur.page == 'behaviour') {
+					setOverlayType(ppt['typeOverlay_internal'].default_value);
+					setSbarShow(ppt['sbarShow_internal'].default_value);
+					setsbarType(ppt['sbarType_internal'].default_value);
+					setSbarCol(ppt['sbarCol_internal'].default_value);
+					setSbarIcon(ppt['sbarButType_internal'].default_value);
+				}
+				if (cur.page == 'display') {
+					setTheme(ppt['theme_internal'].default_value);
+				}
+				if (cur.page == 'headings') {
+					setHeadingShow(ppt['heading_internal'].default_value, 0);
+					setHeadingShow(ppt['trackHeading_internal'].default_value, 1);
+					setHeadingShow(ppt['sourceHeading_internal'].default_value, 2);
+					setHeadingFont(ppt['headFontStyle_internal'].default_value, 0);
+					setHeadingFont(ppt['trackStyle_internal'].default_value, 1);
+					setHeadingFont(ppt['sourceStyle_internal'].default_value, 2);
+				}
+				if (cur.page == 'image') {
+					setFilmAlignment(ppt['filmStripMargin_internal'].default_value);
+					setReflectionType(ppt['imgReflType_internal'].default_value);
+					setSeekerShow(ppt['imgSeeker_internal'].default_value);
+				}
+				if (cur.page == 'custom') setCustomColours('default_value');
+				set_btn_apply_state();
+			}
+
+			window.btn_reset.onclick = function () {
+				var msg = cur.tab == 'PanelCfg' ? 'Reset panel settings to default\\nContinue?' : 'Reset server settings to default\\n\\nOriginal (biography.cfg ) will be backed up\\n\\nContinue?';
+				var r = window.confirm(msg);
+				if (r == true) {
+					var new_cur = JSON.stringify(cur);
+					if (new_cur == parsed_args[2]) new_cur = '';
+					close_window();
+					callback && callback('', '', 'reset' + cur.tab, new_cur);
+				}
+			}
+
+				window.btn_empty.onclick = function () {
+					callback && callback('', '', "empty");
+					
+				}
+
+				window.btn_open.onclick = function () {
+					callback && callback('', '', "open");
+					
+				}
+
+			function showPhotoSyntax() {
+				var divTogglePho = document.getElementById('photo_help');
+					if (divTogglePho.style.display === 'none') {
+						divTogglePho.style.display = 'block';
+					} else {
+						divTogglePho.style.display = 'none';
+					}
+			}
+			
+			function showTaggerHelp() {
+				var divToggleTag = document.getElementById('tagger_help');
+					if (divToggleTag.style.display === 'none') {
+						divToggleTag.style.display = 'block';
+					} else {
+						divToggleTag.style.display = 'none';
+					}
+			}
+			
+			function toggle(item) {
+				if (window[item].style.display != 'block') window[item].style.display = 'block'
+				else window[item].style.display = 'none';
+			}
+
+			var h = [
+				['btn_dropdown', 'language'],
+				['film_dropdown', 'filmStripAlign'],
+				['heading_dropdown', 'mainShow'],
+				['headFontStyle_dropdown', 'mainFont'],
+				['trackHeading_dropdown', 'trackShow'],
+				['trackStyle_dropdown', 'trackFont'],
+				['sourceHeading_dropdown', 'sourceShow'],
+				['sourceStyle_dropdown', 'sourceFont'],
+				['overlay_dropdown', 'overlayType'],
+				['reflection_dropdown', 'reflPos'],
+				['sbarShow_dropdown', 'sbarShow'],
+				['sbarType_dropdown', 'sbarType'],
+				['sbarCol_dropdown', 'sbarCol'],
+				['sbarIcon_dropdown', 'sbarIcon'],
+				['seeker_dropdown', 'seeker'],
+				['theme_dropdown', 'themeBg']
+			];
+			
+			function hide() {
+				var id = document.activeElement.id;
+				for (i = 0; i < h.length; i++) {
+					if (id != h[i][0]) window[h[i][1]].style.display = 'none';
+				}
+			}
+
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.btn_ok.onclick) {
+					window.btn_ok.onclick();
+				}
+			}
+			
+			document.onkeyup = function () {
+				set_btn_apply_state();
+			}
+
+			document.onclick = function () {
+				set_btn_apply_state();
+				setCheckboxStates();
+				hide();
+			}
+
+			window.btn_cancel.onclick = function () {
+				var new_cur = JSON.stringify(cur);
+				if (new_cur != parsed_args[2]) callback && callback('', '', '', new_cur);
+				close_window();
+			}
+
+			window.onunload = function () {
+				if (!is_closed_manually) {
+					var new_cur = JSON.stringify(cur);
+					if (new_cur != parsed_args[2]) callback && callback('', '', '', new_cur);
+				}
+			}
+
+			window.document.body.focus();
+			document.getElementById("btn_ok").focus();
+		</script>
+	</body>
+	</html>

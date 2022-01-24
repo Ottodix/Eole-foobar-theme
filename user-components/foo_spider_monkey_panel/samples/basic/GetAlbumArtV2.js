@@ -1,6 +1,6 @@
-window.DefinePanel("GetAlbumArtV2", { author: "T.P Wang" });
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('GetAlbumArtV2', { author: 'T.P Wang' });
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 // Nothing will show until you start playing a new track
 

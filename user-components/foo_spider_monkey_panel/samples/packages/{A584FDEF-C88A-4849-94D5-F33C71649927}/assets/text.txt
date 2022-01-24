@@ -1,0 +1,1 @@
+﻿This is the content of an asset file that is included in and distributed with the package.
