@@ -2155,6 +2155,7 @@ function on_notify_data(name, info) {
 		case "library_dark_theme":
 			properties.library_dark_theme=info;
 			window.SetProperty("LIBRARY dark theme", properties.library_dark_theme);
+			darklib_state.setValue((properties.library_dark_theme)?1:0);
 			get_colors()
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
@@ -2166,6 +2167,7 @@ function on_notify_data(name, info) {
 		case "bio_stick_to_dark_theme":
 			properties.bio_stick2darklayout=info;
 			window.SetProperty("BIO stick to Dark layout", properties.bio_stick2darklayout);
+			darkbiostick_state.setValue((properties.bio_stick2darklayout)?1:0);
 			window.Repaint();
 		break;
 		case "libraryfilter_state":
@@ -2182,6 +2184,7 @@ function on_notify_data(name, info) {
 		case "bio_dark_theme":
 			properties.bio_dark_theme=info;
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);
+			darkbio_state.setValue((properties.bio_dark_theme)?1:0);
 			get_colors();
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
@@ -2189,6 +2192,7 @@ function on_notify_data(name, info) {
 		case "visualization_dark_theme":
 			properties.visualization_dark_theme=info;
 			window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
+			darkvisu_state.setValue((properties.visualization_dark_theme)?1:0);
 			get_colors();
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
@@ -2247,6 +2251,7 @@ function on_notify_data(name, info) {
 			if(layout_state.isEqual(1)){
 				properties.minimode_dark_theme=info;
 				window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+				darkmini_state.setValue((properties.minimode_dark_theme)?1:0);
 				get_colors()
 				window.Repaint();
 			}

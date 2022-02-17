@@ -133,7 +133,13 @@ function RefreshPSS_old2() {
 var main_panel_state = new oPanelSetting("main_panel_state", "MAINPANEL_", 0, 0, 3);
 var layout_state = new oPanelSetting("layout_state", "LAYOUT_", 0, 0, 1);
 
+var darklib_state = new oPanelSetting("darklib_state", "DARKLIB_", 0, 0, 1);
 var darkplaylist_state = new oPanelSetting("darkplaylist_state", "DARKPLAYLIST_", 0, 0, 1);
+var darkbio_state = new oPanelSetting("darkbio_state", "DARKBIO_", 0, 0, 1);
+var darkbiostick_state = new oPanelSetting("darkbiostick_state", "DARKBIOSTICK_", 0, 0, 1);
+var darkvisu_state = new oPanelSetting("darkvisu_state", "DARKVISU_", 0, 0, 1);
+var darkmini_state = new oPanelSetting("darkmini_state", "DARKMINI_", 0, 0, 1);
+
 var showtrackinfo_big = new oPanelSetting("showtrackinfo_big", "SHOWTRACKINFOBIG_", 1, 0, 1);
 var showtrackinfo_small = new oPanelSetting("showtrackinfo_small", "SHOWTRACKINFOSMALL_", 0, 0, 1);
 
