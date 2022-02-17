@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 const requiredVersionStr = '1.2.1'; function is_compatible(requiredVersionStr) {const requiredVersion = requiredVersionStr.split('.'), currentVersion = utils.Version.split('.'); if (currentVersion.length > 3) currentVersion.length = 3; for (let i = 0; i < currentVersion.length; ++i) if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i]; return true;} if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`Biography requires v${requiredVersionStr}. Current component version is v${utils.Version}.`);
 
 const $ = {
@@ -3899,9 +3899,11 @@ function Server() {
 					case 3:
 						s.htmlParse(div.getElementsByTagName('dd'), 'className', 'catalogue-metadata-description', v => {itemValue[2] = v.innerText.trim().split(',')[0]; return true});
 						s.doc.close();
-						if (itemValue[0].length) {
-							const item = itemDate.length && itemValue[2].length && itemDate.length != itemValue[2].length ? " (" + itemDate + " - " + itemValue[2] + ")" : itemValue[2].length ? " (" + itemValue[2] + ")" : itemDate.length ? " (" + itemDate + ")" : "";
-							if (item) pop += item;
+						if (typeof itemValue[2] !== 'undefined') {
+							if (itemValue[0].length) {
+								const item = itemDate.length && itemValue[2].length && itemDate.length != itemValue[2].length ? " (" + itemDate + " - " + itemValue[2] + ")" : itemValue[2].length ? " (" + itemValue[2] + ")" : itemDate.length ? " (" + itemDate + ")" : "";
+								if (item) pop += item;
+							}
 						}
 						break;
 				}
