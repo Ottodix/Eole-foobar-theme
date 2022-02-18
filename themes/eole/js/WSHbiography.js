@@ -3899,7 +3899,7 @@ function Server() {
 					case 3:
 						s.htmlParse(div.getElementsByTagName('dd'), 'className', 'catalogue-metadata-description', v => {itemValue[2] = v.innerText.trim().split(',')[0]; return true});
 						s.doc.close();
-						if (typeof itemValue[2] !== 'undefined') {
+						if (itemValue[0].length & itemValue[2] != "" & itemValue[2] != null) {
 							if (itemValue[0].length) {
 								const item = itemDate.length && itemValue[2].length && itemDate.length != itemValue[2].length ? " (" + itemDate + " - " + itemValue[2] + ")" : itemValue[2].length ? " (" + itemValue[2] + ")" : itemDate.length ? " (" + itemDate + ")" : "";
 								if (item) pop += item;
