@@ -323,6 +323,7 @@ function Lightswitch(switch_all,new_state){
 		else properties.minimode_dark_theme=!properties.minimode_dark_theme;
         window.NotifyOthers("minimode_dark_theme",properties.minimode_dark_theme);
 		window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+		on_notify_data("minimode_dark_theme",properties.minimode_dark_theme);
 		get_colors();g_searchbox.adapt_look_to_layout();
         if(!switch_all) window.Repaint();
 	}
@@ -362,6 +363,7 @@ function Lightswitch(switch_all,new_state){
 		properties.screensaver_dark_theme=new_state;
 		window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
 		window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
+		on_notify_data("screensaver_dark_theme",properties.screensaver_dark_theme);
 	}
 	if(switch_all) window.Repaint();
 }
@@ -2160,10 +2162,6 @@ function on_notify_data(name, info) {
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
 		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-		break;
 		case "bio_stick_to_dark_theme":
 			properties.bio_stick2darklayout=info;
 			window.SetProperty("BIO stick to Dark layout", properties.bio_stick2darklayout);
@@ -2189,6 +2187,11 @@ function on_notify_data(name, info) {
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
 		break;
+		case "screensaver_dark_theme":
+			properties.screensaver_dark_theme=info;
+			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
+			darkscreensafer_state.setValue((properties.screensaver_dark_theme)?1:0);
+		break;		
 		case "visualization_dark_theme":
 			properties.visualization_dark_theme=info;
 			window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
