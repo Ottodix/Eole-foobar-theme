@@ -1016,6 +1016,14 @@ function setVolume(val){
 	
 	fb.Volume = 100 * (Math.pow(volume_log,1/2) - 1);
 }
+function fbVolumeFromX(x){
+	var volume = (x-volume_vars.margin_left) / volume_vars.width;
+	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
+	
+	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
+	
+	return 100 * (Math.pow(volume_log,1/2) - 1);	
+}
 function getVolume(){
 	volume_log = Math.pow(fb.Volume/100 + 1,2);
 	volume_linear = (volume_log==0)?0:Math.pow(10,2*(volume_log-1));
@@ -1123,7 +1131,11 @@ function on_mouse_move(x,y,m){
 					volume_vars.height=volume_vars.height_hover;
 					repaint = true;
 				}
-			}
+				var volume = fbVolumeFromX(x);
+				if(isNaN(volume)) volume = -100;					
+				new_tooltip_text=volume.toFixed(2) + ' dB';
+				g_tooltip.Activate(new_tooltip_text, Math.min(Math.max(x-17,volume_vars.margin_left),volume_vars.margin_left+volume_vars.volumesize), volume_vars.margin_top-35, 0, false, 'volume_level');
+			} else if (g_tooltip.activeZone == 'volume_level') g_tooltip.Deactivate();
 			else if(!volume_vars.drag){ResetVolume();}
 		} else if(hoovervolume && !volume_vars.drag){
 			ResetVolume();
@@ -1133,10 +1145,12 @@ function on_mouse_move(x,y,m){
 			showVolumeSlider(false);
 		}
 
-		if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {showVolumeSlider(true);repaint = true;}
+		if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {
+			showVolumeSlider(true);repaint = true;		
+		}
 
 		if(volume_vars.drag){
-			setVolume(x);
+			setVolume(x);	
 		}
 	}
 	if(is_hover_time_elapsed(x,y) && TimeTotalSeconds!="ON AIR"){
