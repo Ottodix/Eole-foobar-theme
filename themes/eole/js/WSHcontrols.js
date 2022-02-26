@@ -1021,8 +1021,9 @@ function fbVolumeFromX(x){
 	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
 	
 	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
-	
-	return 100 * (Math.pow(volume_log,1/2) - 1);	
+	volum_return = 100 * (Math.pow(volume_log,1/2) - 1)
+	if(isNaN(volum_return)) volum_return = -100;	
+	return volum_return;	
 }
 function getVolume(){
 	volume_log = Math.pow(fb.Volume/100 + 1,2);
@@ -1131,8 +1132,7 @@ function on_mouse_move(x,y,m){
 					volume_vars.height=volume_vars.height_hover;
 					repaint = true;
 				}
-				var volume = fbVolumeFromX(x);
-				if(isNaN(volume)) volume = -100;					
+				var volume = fbVolumeFromX(x);			
 				new_tooltip_text=volume.toFixed(2) + ' dB';
 				g_tooltip.Activate(new_tooltip_text, Math.min(Math.max(x-17,volume_vars.margin_left),volume_vars.margin_left+volume_vars.volumesize), volume_vars.margin_top-35, 0, false, 'volume_level');
 			} else if (g_tooltip.activeZone == 'volume_level') g_tooltip.Deactivate();

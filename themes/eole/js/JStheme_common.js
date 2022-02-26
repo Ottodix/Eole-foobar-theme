@@ -830,10 +830,6 @@ oTooltip = function (varName) {
 		maxWith = typeof maxWith !== 'undefined' ? maxWith : 0;
 		this.activeZone = activeZone;
 		this.followMouse = typeof followMouse !== 'undefined' ? followMouse : false;
-		if(x != this.x || y != this.y){
-			this.tooltip.TrackActivate = true;
-			this.tooltip.TrackPosition(x, y);
-		}
 		if(this.tooltip.Text != new_text || !this.activated){
 			this.offset_x = x - g_cursor.x;
 			this.offset_y = y - g_cursor.y;
