@@ -830,6 +830,10 @@ oTooltip = function (varName) {
 		maxWith = typeof maxWith !== 'undefined' ? maxWith : 0;
 		this.activeZone = activeZone;
 		this.followMouse = typeof followMouse !== 'undefined' ? followMouse : false;
+		if(x != this.x || y != this.y){
+			this.tooltip.TrackActivate = true;
+			this.tooltip.TrackPosition(x, y);
+		}
 		if(this.tooltip.Text != new_text || !this.activated){
 			this.offset_x = x - g_cursor.x;
 			this.offset_y = y - g_cursor.y;
@@ -1379,10 +1383,10 @@ function shutdown_computer(){
 var MF_SEPARATOR = 0x00000800;
 var MF_ENABLED = 0x00000000;
 var MF_GRAYED = 0x00000001;
+var MF_STRING = 0x00000000;
 var MF_DISABLED = 0x00000002;
 var MF_UNCHECKED = 0x00000000;
 var MF_CHECKED = 0x00000008;
-var MF_STRING = 0x00000000;
 var MFT_RADIOCHECK = 0x00000200;
 var MFS_CHECKED = 0x00000008;
 var MF_POPUP = 0x00000010;
@@ -1412,8 +1416,6 @@ var DT_WORD_ELLIPSIS = 0x00040000;
 var DT_NOFULLWIDTHCHARBREAK = 0x00080000;
 var DT_HIDEPREFIX = 0x00100000;
 var DT_PREFIXONLY = 0x00200000;
-var MF_SEPARATOR = 0x00000800;
-var MF_STRING = 0x00000000;
 var VK_F1 = 0x70;
 var VK_F2 = 0x71;
 var VK_F3 = 0x72;
