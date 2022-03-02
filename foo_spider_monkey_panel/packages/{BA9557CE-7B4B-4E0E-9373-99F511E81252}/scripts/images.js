@@ -1682,11 +1682,11 @@ class Seeker {
 			gr.SetSmoothingMode(2);
 			prog = this.dn ? $.clamp(panel.m.x - this.bar.x2 - this.bar.grip_h / 2, this.prog.min, this.prog.max) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo - (this.bar.grip_h - this.bar.dot_w) / 2;
 			for (let i = 0; i < this.imgNo; i++) {
-				gr.FillEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, RGB(245, 245, 245));
-				gr.DrawEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+				gr.FillEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, colors.imgseekbar);
+				//gr.DrawEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
 			}
-			gr.FillEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
-			gr.DrawEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			gr.FillEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, colors.imgseekbar);
+			//gr.DrawEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
 			gr.SetSmoothingMode(0);
 		}
 

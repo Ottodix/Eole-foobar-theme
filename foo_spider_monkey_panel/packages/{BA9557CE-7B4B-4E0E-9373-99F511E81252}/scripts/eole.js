@@ -383,11 +383,13 @@ function get_colors() {
 	if(ui.blur.dark){	
 		colors.bg = GetGrey(40);			
 		colors.faded_txt = GetGrey(245);
-		colors.normal_txt = GetGrey(245);	
+		colors.normal_txt = GetGrey(245);
+		colors.imgseekbar = GetGrey(255);
 	} else {	
 		colors.bg = GetGrey(40);				
 		colors.faded_txt = GetGrey(100);
 		colors.normal_txt = GetGrey(245);		
+		colors.imgseekbar = GetGrey(50);
 	}	
 };
 properties = {
