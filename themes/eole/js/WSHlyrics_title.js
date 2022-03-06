@@ -119,9 +119,11 @@ function get_colors() {
 	esl.SetPanelTextNormalColor(colors.normal_txt);
 	esl.SetPanelTextHighlightColor(colors.highlight_txt);
 	esl.SetPanelTextBackgroundColor(colors.normal_bg);
-	if(settings_file_not_found){
+	lyrics_first_load = utils.Glob(SettingsPath+""+"LYRICSFIRSTLOAD_*");
+	if(lyrics_first_load.length<1){
 		esl.ShowDesktopLyric = false;
 		esl.DesktopLyricAlwaysOnTop = false;
+		g_files.CreateTextFile(SettingsPath+"LYRICSFIRSTLOAD_0", true).Close();			
 	}
 };
 function on_mouse_rbtn_up(x, y){
@@ -256,6 +258,10 @@ function on_notify_data(name, info) {
 			window.SetProperty("_DISPLAY: stick to Dark layout", properties.stick2darklayout);
 			get_colors();
 			window.Repaint();
+            break;
+		case "settings_file_not_found":
+			esl.ShowDesktopLyric = false;
+			esl.DesktopLyricAlwaysOnTop = false;
             break;
     }
 }

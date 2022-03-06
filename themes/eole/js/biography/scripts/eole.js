@@ -1,13 +1,28 @@
-// ================================================== // Lyrics Buttons 
-// add to biography/main.js
-//at the beggining, after "use strict";
+// ================================================== // Biography changes for Eole
+// update SMPbiography.js with biography/main.js, with the following changes:
+// in const files = [ add 'eole.js', and add this file inside biography/scripts
+
+// Replace biography/utils.js code with the following
 /*
-include(fb.ProfilePath + 'themes\\eole\\js\\JStheme_common.js');
-include(fb.ProfilePath + 'themes\\eole\\js\\JSpss_switch.js');
-include(fb.ProfilePath + 'themes\\eole\\js\\JSbutton.js');
+let my_utils = {}
+
+biography_root = theme_scripts_path+"\\biography";
+biography_assets = biography_root+"\\assets\\";
+biography_scripts = biography_root+"\\scripts\\";
+
+my_utils.packagePath = biography_root;
+my_utils.getAsset = assetFile => utils.ReadTextFile(biography_assets+`${assetFile}`);
+my_utils.getImageAsset = assetFile => gdi.Image(biography_assets+`/images/${assetFile}`);
+my_utils.getScriptPath = biography_scripts;
+
+//my_utils.scriptInfo = window.ScriptInfo;
+//my_utils.packageInfo = utils.GetPackageInfo(my_utils.scriptInfo.PackageId);
+//my_utils.packagePath = `${my_utils.packageInfo.Directories.Root}/`;
+
+//my_utils.getAsset = assetFile => utils.ReadTextFile(`${my_utils.packageInfo.Directories.Assets}/${assetFile}`);
+//my_utils.getImageAsset = assetFile => gdi.Image(`${my_utils.packageInfo.Directories.Assets}/images/${assetFile}`);
+//my_utils.getScriptPath = `${my_utils.packageInfo.Directories.Scripts}/`;
 */
-// in const files = [ add'eole.js', and add the files to the package
-//
 
 // Update on_mouse_lbtn_down, on_mouse_lbtn_up, on_mouse_leave, on_mouse_move {
 /*
@@ -44,6 +59,8 @@ function on_size(w, h) {
 	txt.repaint = false;
 	panel.w = window.Width;
 	panel.h = window.Height;
+	ww = window.Width;
+	wh = window.Height;		
 	if (!panel.w || !panel.h) return;
 	if(!window.IsVisible) {on_size_2Call = true;return;}	
 	// previous code
@@ -80,7 +97,11 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 // Add to on_notify_data
 // case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
 
-// Comment window.NotifyOthers("img_chg_bio", 0)
+// Comment window.NotifyOthers("bio_imgChange", 0) in scripts/timers.js
+
+/* ------------------------------------------------------------------------------------------------------------------------------- */
+/* ---------------------- BELOW ARE CHANGES MADE TO PREVIOUS VERSION, NOT USED ANYMORE.... WAITING FOR WILB UPDATE ----------------*/
+/* ------------------------------------------------------------------------------------------------------------------------------- */
 
 // For the image seekbar vertical position, create a new function 
 /*

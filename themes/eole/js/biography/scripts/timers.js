@@ -35,7 +35,7 @@ class Timers {
 		this.img.id = setInterval(() => {
 			img.fresh();
 			men.fresh();
-			window.NotifyOthers('bio_imgChange', 0);
+			//window.NotifyOthers('bio_imgChange', 0);
 		}, 1000);
 	}
 
