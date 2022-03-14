@@ -3061,10 +3061,6 @@ function on_notify_data(name, info) {
 			g_avoid_on_playlists_changed=false;
 			on_playlists_changed();
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
 		case "set_font":
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),

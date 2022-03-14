@@ -40,9 +40,6 @@ var globalProperties = {
 	fontAdjustement_max:5,
     fontAdjustement: window.GetProperty("GLOBAL Font Adjustement", 0),
 	mem_solicitation:window.GetProperty("GLOBAL memory solicitation", 0),
-	enable_screensaver:window.GetProperty("GLOBAL enable screensaver", false),
-	escape_on_mouse_move:window.GetProperty("GLOBAL screensaver escape on mouse move", false),
-	mseconds_before_screensaver:window.GetProperty("GLOBAL screensaver mseconds before activation", 60000),
 	loaded_covers2memory:window.GetProperty("COVER keep loaded covers in memory", false),
     load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),
     load_artist_img_at_startup: window.GetProperty("ARTIST IMG Load all at startup", true),
@@ -207,12 +204,6 @@ var oCursor = function () {
 				if(this.y==-10) this.first_y = y;
 				this.x = x;
 				this.y = y;
-				if(!globalProperties.enable_screensaver) return;
-				var current_ms = (new Date).getTime();
-				if(current_ms >= last_mouse_move_notified+globalProperties.record_move_every_x_ms){
-					window.NotifyOthers("mouse_move",current_ms);
-					last_mouse_move_notified = current_ms;
-				}
 			break;
 			case 'leave':
 				this.x = -10;
@@ -579,7 +570,7 @@ function get_colors_global(){
 		colors.highlight = RGB(255,175,050);
 
 		colors.headerbar_bg = GetGrey(255,240);
-		colors.headerbar_line = GetGrey(0,37);
+		colors.headerbar_line = GetGrey(0,36);
 
 		colors.scrollbar_normal_cursor = GetGrey(0,120);
 		colors.scrollbar_hover_cursor = GetGrey(0);
@@ -1183,23 +1174,6 @@ function PlaylistRename(name){
 		if(PlaylistRename[i]==name) return PlaylistRename[i+1];
 	}
 	return name;
-}
-function setScreensaverTime(new_time){
-	globalProperties.mseconds_before_screensaver = new_time;
-	window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
-	window.NotifyOthers("mseconds_before_screensaver",globalProperties.mseconds_before_screensaver);
-}
-function escapeOnMouseMove(new_state){
-	new_state = typeof new_state !== 'undefined' ? new_state : !globalProperties.escape_on_mouse_move;
-	globalProperties.escape_on_mouse_move = new_state;
-	window.SetProperty("GLOBAL screensaver escape on mouse move", globalProperties.escape_on_mouse_move);
-	window.NotifyOthers("escape_on_mouse_move",globalProperties.escape_on_mouse_move);
-}
-function enableScreensaver(new_state){
-	new_state = typeof new_state !== 'undefined' ? new_state : !globalProperties.enable_screensaver;
-	globalProperties.enable_screensaver = new_state;
-	window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-	window.NotifyOthers("enable_screensaver",globalProperties.enable_screensaver);
 }
 
 function check_playlist(name){

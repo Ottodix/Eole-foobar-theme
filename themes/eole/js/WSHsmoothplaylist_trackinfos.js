@@ -17,7 +17,6 @@ var properties_big = {
     expandBySingleClick: window.GetProperty("BIG:expandBySingleClick", true),
     minimode_dark_theme: window.GetProperty("BIG:minimode_dark_theme", true),
     library_dark_theme: window.GetProperty("BIG:library_dark_theme", false),
-    screensaver_dark_theme: window.GetProperty("BIG:screensaver_dark_theme", false),
     playlists_dark_theme: window.GetProperty("BIG:playlists_dark_theme", false),
     bio_dark_theme: window.GetProperty("BIG:bio_dark_theme", false),
 	bio_stick2darklayout: window.GetProperty("BIG:bio_stick2darklayout",true),
@@ -74,7 +73,6 @@ var properties_mini = {
 	darklayout: window.GetProperty("MINI:darklayout", true),
     minimode_dark_theme: window.GetProperty("MINI:minimode_dark_theme", true),
     library_dark_theme: window.GetProperty("MINI:library_dark_theme", false),
-    screensaver_dark_theme: window.GetProperty("MINI:screensaver_dark_theme", false),
     playlists_dark_theme: window.GetProperty("MINI:playlists_dark_theme", false),
     bio_dark_theme: window.GetProperty("MINI:bio_dark_theme", false),
 	bio_stick2darklayout: window.GetProperty("MINI:bio_stick2darklayout",false),
@@ -6679,10 +6677,6 @@ function on_notify_data(name, info) {
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
 			on_font_changed();
-		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
 		break;
         case "FocusOnNowPlayingForce":
         case "FocusOnNowPlaying":

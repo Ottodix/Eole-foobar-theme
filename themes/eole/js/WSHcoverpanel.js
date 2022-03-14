@@ -9,7 +9,6 @@ var properties = {
 	minidarklayout: window.GetProperty("_DISPLAY: Mini layout:Dark", true),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", true),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", true),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", true),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", true),
     bio_dark_theme: window.GetProperty("BIO dark theme", true),
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),
@@ -141,15 +140,9 @@ function startAnimation(){
 		animationStartTime = Date.now();
 	}catch(e){}
 	animationCounter = 0;
-	if(properties.showVisualization>0 || globalProperties.enable_screensaver){
+	if(properties.showVisualization>0){
 		animationTimer = setInterval(function() {
 			animationCounter++;
-			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0) && !main_panel_state.isEqual(3)){
-				current_ms = (new Date).getTime();
-				if(current_ms >= last_mouse_move_notified+globalProperties.mseconds_before_screensaver){
-					screensaver_state.setValue(1);
-				}
-			}
 			if(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && window.IsVisible) {
 				//Restart if the animation is desyncronised
 				try{
@@ -348,7 +341,7 @@ function on_size(w, h) {
     wh = h;
 	calculate_visu_margin_left();
 	text_height=wh-8;
-	if(properties.showVisualization>0 || globalProperties.enable_screensaver) startAnimation();
+	if(properties.showVisualization>0) startAnimation();
     positionButtons();
 	g_cover.setSize(ww,wh);
 }
@@ -429,7 +422,7 @@ function on_mouse_leave() {
 }
 
 function on_playback_stop(){
-	if(!globalProperties.enable_screensaver) resetAnimation();
+	resetAnimation();
 	window.Repaint();
 }
 
@@ -645,13 +638,13 @@ function on_playback_new_track(metadb) {
 	if (metadb)	{
 		//current_played_track = metadb;
 		g_cover.getArtwork(metadb);
-		if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) startAnimation();
+		if(!animationTimer && properties.showVisualization>0) startAnimation();
 		//setRatingBtn(metadb);
 	}
 	window.Repaint();
 }
 function on_playback_time() {
-	if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) {startAnimation();}
+	if(!animationTimer && properties.showVisualization>0) {startAnimation();}
 }
 function on_layout_change() {
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
@@ -735,17 +728,6 @@ function on_notify_data(name, info) {
 		case "mini_controlbar":
 			mini_controlbar.value = info;
 			on_layout_change()
-		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "escape_screensaver":
-			last_mouse_move_notified = (new Date).getTime();
-		break;
-		case "mseconds_before_screensaver":
-			globalProperties.mseconds_before_screensaver = info;
-			window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
 		break;
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
@@ -850,15 +832,6 @@ function on_notify_data(name, info) {
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);
 			on_layout_change();
 			window.Repaint();
-		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-			on_layout_change();
-			window.Repaint();
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
 		break;
 		case "Randomsetfocus":
 			Randomsetfocus = info;
@@ -1171,7 +1144,7 @@ function draw_settings_menu(x,y){
 				if(properties.showVisualization==0) properties.showVisualization = 2;
 				else properties.showVisualization = 0;
 				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
+				resetAnimation();
 				calculate_visu_margin_left();
 				window.Repaint();
 				break;

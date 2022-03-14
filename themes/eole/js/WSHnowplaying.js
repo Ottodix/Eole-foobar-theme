@@ -9,7 +9,6 @@ var properties = {
 	darklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", true),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", true),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", true),
     visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", true),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", true),
@@ -1122,17 +1121,6 @@ function on_notify_data(name, info) {
 			mini_controlbar.value = info;
 			on_layout_change()
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "escape_screensaver":
-			last_mouse_move_notified = (new Date).getTime();
-		break;
-		case "mseconds_before_screensaver":
-			globalProperties.mseconds_before_screensaver = info;
-			window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
-		break;
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
@@ -1226,15 +1214,6 @@ function on_notify_data(name, info) {
 			window.SetProperty("BIO dark theme", properties.bio_dark_theme);
 			on_layout_change();
 			window.Repaint();
-		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-			on_layout_change();
-			window.Repaint();
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
 		break;
 		case "Randomsetfocus":
 			Randomsetfocus = info;

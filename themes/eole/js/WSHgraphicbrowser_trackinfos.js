@@ -7491,10 +7491,6 @@ function on_notify_data(name, info) {
 		case "nowPlayingTrack":
 			g_avoid_on_playlist_switch = true;
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
 		case "left_filter_state":
 			properties.leftFilterState = info;
 			window.SetProperty("MAINPANEL Left filter state", properties.leftFilterState);

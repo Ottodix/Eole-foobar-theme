@@ -25,7 +25,6 @@ var properties = {
 	compact_titlebar_height:36,
     searchHistory_max_items: window.GetProperty("Max items in search history", 6),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", false),
 	bio_stick2darklayout: window.GetProperty("BIO stick to Dark layout",false),
@@ -40,7 +39,6 @@ var properties = {
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
 	tracktitle_ontop: window.GetProperty("_DISPLAY: Track title", true),
 	tracktitle_format: window.GetProperty("_DISPLAY: Track title format", "[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]"),
-	showIdleScreenBtn: window.GetProperty("_DISPLAY: show idle screen btn", true),
 	showRightSidebarBtn: window.GetProperty("_DISPLAY: show right sidebar btn", true),
 	showLightswitchBtn: window.GetProperty("_DISPLAY: show light switch btn", true),
 	showPanelBtnText: window.GetProperty("_DISPLAY: show panels btn text", true),
@@ -211,8 +209,6 @@ function build_images(){
 
 	images.lightswitch_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\lightswitch_icon3.png");
 
-	images.idle_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\idle_icon.png");
-
 	images.minimode_on_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\minimode_on_icon.png");
 	images.minimode_off_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\minimode_off_icon.png");
 
@@ -359,12 +355,6 @@ function Lightswitch(switch_all,new_state){
 		window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
 		on_notify_data("visualization_dark_theme",properties.visualization_dark_theme);
 	}
-	if(screensaver_state.isActive()){
-		properties.screensaver_dark_theme=new_state;
-		window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-		window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
-		on_notify_data("screensaver_dark_theme",properties.screensaver_dark_theme);
-	}
 	if(switch_all) window.Repaint();
 }
 function toggleNowPlayingState(switch_all,new_state, refresh_panel){
@@ -487,10 +477,6 @@ function build_buttons(){
 		buttons.NowPlaying.N_img = buttons.NowPlaying.H_img;
 		buttons.NowPlaying.D_img = buttons.NowPlaying.H_img;
 
-		buttons.Idle.H_img = images.idle_img;
-		buttons.Idle.N_img = images.idle_img;
-		buttons.Idle.D_img = buttons.Idle.H_img;
-
 		if(getTrackInfosState()>=1) {
 			buttons.RightSidebar.H_img = images.trackinfos_off;
 			buttons.RightSidebar.N_img = images.trackinfos_off;
@@ -572,9 +558,6 @@ function build_buttons(){
 			Fullscreen: new JSButton(-112, btn.top_m, btn.width_small_btns, btn.height, "", "fullscreen", "Fullscreen", function () {
 				g_uihacks.toggleFullscreen();
 			}, false,false,images.fullscreen_img,images.fullscreen_img,-1, false, false, true),
-			Idle: new JSButton(-74, btn.top_m, btn.width_small_btns, btn.height, "", "idle", "Show idle screen", function () {
-				screensaver_state.setValue(1);g_panel.on_size_changed();
-			}, false,false,images.idle_img,images.idle_img,-1, false, false, true),
 			ShowSearch: new JSButton(-150, btn.top_m, btn.width_small_btns, btn.height, "", "search", "Show search input", function () {
 				toggleSearch();
 				g_cursor.setCursor(IDC_ARROW,2);
@@ -620,10 +603,10 @@ function build_buttons(){
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
 
 		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m, 'additional_btns', true);
-		additional_btns.addButtons([buttons.NowPlaying,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.Idle,buttons.ShowSearch], [0,9,0,0]);
+		additional_btns.addButtons([buttons.NowPlaying,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.ShowSearch], [0,9,0,0]);
 
 		compact_btns = new JSButtonGroup("top-left", 0, -1, 'compact_btns', true);
-		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.RightSidebar,buttons.Lightswitch,buttons.Idle,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);
+		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.RightSidebar,buttons.Lightswitch,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);
 		compact_btns.addButtons([buttons.Library], [0,0,0,btn.margin+5]);
 		compact_btns.addButtons([buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,0,0,btn.margin]);
 	}
@@ -691,7 +674,6 @@ function adapt_buttons_to_layout(){
 	if(layout_state.isEqual(1)) {
 		main_panel_btns.hide = true;
 		buttons.Fullscreen.setVisibility(false);
-		buttons.Idle.setVisibility(false);
 		buttons.Mini.setVisibility(false);
 		buttons.NowPlaying.setVisibility(false);
 		buttons.RightSidebar.setVisibility(false);
@@ -736,10 +718,6 @@ function adapt_buttons_to_layout(){
 
 		buttons.Settings.calculate_size = true;
 
-		if(!properties.showIdleScreenBtn)
-			buttons.Idle.setVisibility(false);
-		else buttons.Idle.setVisibility(true);
-
 		if(!properties.showRightSidebarBtn)
 			buttons.RightSidebar.setVisibility(false);
 		else buttons.RightSidebar.setVisibility(true);
@@ -781,7 +759,7 @@ function adapt_buttons_to_layout(){
 		}
 		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true) - (!properties.alwaysShowSearch?buttons.ShowSearch.w+5:0);
 
-		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showIdleScreenBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
+		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
 			cSearchBoxMainLight.marginRight -= 10;
 			cSearchBoxMainDark.marginRight -= 10;
 		}
@@ -872,9 +850,7 @@ function on_size(w, h) {
     }
 }
 function SetPseudoCaption(){
-	if(screensaver_state.isActive()){
-		g_uihacks.SetPseudoCaption(0, 8, ww-128, 25);
-	} else if(layout_state.isEqual(0)) {
+	if(layout_state.isEqual(0)) {
 		if(!compact_titlebar.isActive()){
 			var topleft_btns_w = topleft_btns.getWidth();
 			g_uihacks.SetPseudoCaption(topleft_btns_w, 8, ww-280, 25);
@@ -1019,7 +995,6 @@ function on_mouse_wheel(step, stepstrait, delta){
 }
 function on_mouse_rbtn_up(x, y){
         var _menu = window.CreatePopupMenu();
-        var _screensaver = window.CreatePopupMenu();
         var idx;
 
 		_menu.AppendMenuItem(MF_STRING, 103, "Settings...");
@@ -1032,19 +1007,6 @@ function on_mouse_rbtn_up(x, y){
 			if(properties.show_visualization) _menu.AppendMenuItem(MF_STRING, 4, "Visualization");
 			_menu.CheckMenuRadioItem(1, 4, (parseInt(main_panel_state.value)+1));
 			_menu.AppendMenuSeparator();
-			_screensaver.AppendMenuItem(MF_STRING, 8, "Activate Now");
-			_screensaver.AppendMenuSeparator();
-			_screensaver.AppendMenuItem(MF_GRAYED, 0, "Screensaver:");
-			_screensaver.AppendMenuItem(MF_STRING, 9, "Enable");
-			_screensaver.CheckMenuItem(9,globalProperties.enable_screensaver);
-			_screensaver.AppendMenuItem(MF_STRING, 11, "Set time (current: "+Math.round(globalProperties.mseconds_before_screensaver/1000)+"s)");
-			_screensaver.AppendMenuItem(MF_STRING, 10, "Escape on mouse move");
-			_screensaver.CheckMenuItem(10,globalProperties.escape_on_mouse_move);
-			_screensaver.AppendMenuSeparator();
-			_screensaver.AppendMenuItem(MF_STRING, 13, "Light theme");
-			_screensaver.AppendMenuItem(MF_STRING, 12, "Dark theme");
-			_screensaver.CheckMenuRadioItem(12, 13, (properties.screensaver_dark_theme)?12:13);
-			_screensaver.AppendTo(_menu,MF_STRING, "Idle screen / Screensaver");
 			_menu.AppendMenuItem(MF_STRING, 6, "Compact player");
 			if(g_uihacks.getFullscreenState())
 				_menu.AppendMenuItem(MF_STRING, 5, "Quit Fullscreen");
@@ -1088,37 +1050,6 @@ function on_mouse_rbtn_up(x, y){
             case (idx == 7):
 				toggleLayoutMode(0);get_colors();g_searchbox.adapt_look_to_layout();
                 break;
-            case (idx == 8):
-				screensaver_state.setValue(1); g_panel.on_size_changed();
-                break;
-            case (idx == 9):
-				enableScreensaver(!globalProperties.enable_screensaver);
-                break;
-            case (idx == 10):
-				escapeOnMouseMove(!globalProperties.escape_on_mouse_move);
-                break;
-            case (idx == 11):
-				try {
-					new_mseconds_before_screensaver = utils.InputBox(window.ID, "Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000, true);
-					if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
-						globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
-						if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
-						globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
-						setScreensaverTime(globalProperties.mseconds_before_screensaver);
-					}
-				} catch(e) {
-				}
-                break;
-            case (idx == 12):
-				properties.screensaver_dark_theme=true;
-				window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-				window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
-                break;
-            case (idx == 13):
-				properties.screensaver_dark_theme=false;
-				window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-				window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
-                break;
             case (idx == 100):
                 window.ShowProperties();
                 break;
@@ -1135,7 +1066,6 @@ function on_mouse_rbtn_up(x, y){
 				return true;
         }
         _menu = undefined;
-		_screensaver = undefined;
         return true;
 }
 function draw_settings_menu(x,y){
@@ -1169,8 +1099,6 @@ function draw_settings_menu(x,y){
 		_menu_button.CheckMenuItem(1806, properties.showNowPlayingBtn);
 		_menu_button.AppendMenuItem(MF_STRING, 1807, "Right sidebar function");
 		_menu_button.CheckMenuItem(1807, properties.showRightSidebarBtn);
-		_menu_button.AppendMenuItem(MF_STRING, 1802, "Idle screen");
-		_menu_button.CheckMenuItem(1802, properties.showIdleScreenBtn);
 		_menu_button.AppendMenuItem(MF_STRING, 1803, "Light switch");
 		_menu_button.CheckMenuItem(1803, properties.showLightswitchBtn);
 		_menu_button.AppendMenuItem(MF_STRING, 1804, "Fullscreen");
@@ -1204,12 +1132,6 @@ function draw_settings_menu(x,y){
 				properties.alwaysShowSearch = !properties.alwaysShowSearch;
 				window.SetProperty("_DISPLAY: always show search box", properties.alwaysShowSearch);
 				g_searchbox.toggleVisibility(true);
-				adapt_buttons_to_layout();
-				window.Repaint();
-				break;
-			case (idx == 1802):
-				properties.showIdleScreenBtn = !properties.showIdleScreenBtn;
-				window.SetProperty("_DISPLAY: show idle screen btn", properties.showIdleScreenBtn);
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;
@@ -1354,8 +1276,7 @@ function draw_main_menu(x,y){
     var child5 = window.CreatePopupMenu(); //Library
     var child6 = window.CreatePopupMenu(); //Help
     var child7 = window.CreatePopupMenu(); //Now playing
-    var _screensaver = window.CreatePopupMenu();
-
+	
     var menuman1 = fb.CreateMainMenuManager();
     var menuman2 = fb.CreateMainMenuManager();
     var menuman3 = fb.CreateMainMenuManager();
@@ -1613,21 +1534,6 @@ function draw_main_menu(x,y){
 	schedulerMenu.CheckMenuRadioItem(3018, 3023, checked_item);
 	schedulerMenu.AppendTo(skin_settings_menu, MF_STRING, "Scheduler");
 
-	_screensaver.AppendMenuItem(MF_STRING, 4015, "Activate Now");
-	_screensaver.AppendMenuSeparator();
-	_screensaver.AppendMenuItem(MF_GRAYED, 0, "Screensaver:");
-	_screensaver.AppendMenuItem(MF_STRING, 4016, "Enable");
-	_screensaver.CheckMenuItem(4016,globalProperties.enable_screensaver);
-	_screensaver.AppendMenuItem(MF_STRING, 4018, "Set time (current: "+Math.round(globalProperties.mseconds_before_screensaver/1000)+"s)");
-	_screensaver.AppendMenuItem(MF_STRING, 4017, "Escape on mouse move");
-	_screensaver.CheckMenuItem(4017,globalProperties.escape_on_mouse_move);
-
-	_screensaver.AppendMenuSeparator();
-	_screensaver.AppendMenuItem(MF_STRING, 4020, "Light theme");
-	_screensaver.AppendMenuItem(MF_STRING, 4019, "Dark theme");
-	_screensaver.CheckMenuRadioItem(4019, 4020, (properties.screensaver_dark_theme)?4019:4020);
-	_screensaver.AppendTo(skin_settings_menu,MF_STRING, "Idle screen / Screensaver");
-
 	if(layout_state.isEqual(0)) {
 		skin_settings_menu.AppendMenuItem(MF_STRING, 4010, "Compact player");
 		if(g_uihacks.getFullscreenState())
@@ -1808,37 +1714,6 @@ function draw_main_menu(x,y){
 		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
 		on_font_changed();
 		break;
-	case (idx == 4015):
-		screensaver_state.setValue(1);	g_panel.on_size_changed();
-		break;
-	case (idx == 4016):
-		enableScreensaver(!globalProperties.enable_screensaver);
-		break;
-	case (idx == 4017):
-		escapeOnMouseMove(!globalProperties.escape_on_mouse_move);
-		break;
-	case (idx == 4018):
-		try {
-			new_mseconds_before_screensaver = utils.InputBox(window.ID, "Seconds of mouse inactivity before activation of the idle screen", "Idle screen", globalProperties.mseconds_before_screensaver/1000, true);
-			if (!(new_mseconds_before_screensaver == "" || typeof new_mseconds_before_screensaver == 'undefined')) {
-				globalProperties.mseconds_before_screensaver = Number(new_mseconds_before_screensaver);
-				if(globalProperties.mseconds_before_screensaver<=0) globalProperties.mseconds_before_screensaver = 60;
-				globalProperties.mseconds_before_screensaver = globalProperties.mseconds_before_screensaver*1000;
-				setScreensaverTime(globalProperties.mseconds_before_screensaver);
-			}
-		} catch(e) {
-		}
-		break;
-	case (idx == 4019):
-		properties.screensaver_dark_theme=true;
-		window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-		window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
-		break;
-	case (idx == 4020):
-		properties.screensaver_dark_theme=false;
-		window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-		window.NotifyOthers('screensaver_dark_theme',properties.screensaver_dark_theme);
-		break;
 	case (idx == 4021):
 		Lightswitch(true,true);
 		break;
@@ -2012,7 +1887,6 @@ function draw_main_menu(x,y){
     menuman4 = undefined;
     menuman5 = undefined;
     menuman6 = undefined;
-	_screensaver = undefined;
 	minimode_menu = undefined;
 	font_size = undefined;
 	if(FiltersMenu) FiltersMenu = undefined;
@@ -2140,14 +2014,6 @@ function on_notify_data(name, info) {
 		case "mini_controlbar":
 			mini_controlbar.value = info;
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "escape_on_mouse_move":
-			globalProperties.escape_on_mouse_move = info;
-			window.SetProperty("GLOBAL screensaver escape on mouse move", globalProperties.escape_on_mouse_move);
-		break;
 		case "set_font":
 			globalProperties.fontAdjustement = info;
 			window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement),
@@ -2186,12 +2052,7 @@ function on_notify_data(name, info) {
 			get_colors();
 			g_searchbox.adapt_look_to_layout();
 			window.Repaint();
-		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-			darkscreensafer_state.setValue((properties.screensaver_dark_theme)?1:0);
-		break;		
+		break;	
 		case "visualization_dark_theme":
 			properties.visualization_dark_theme=info;
 			window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
@@ -2264,12 +2125,6 @@ function on_notify_data(name, info) {
 				main_panel_state.value = info;
 				get_colors()
 				window.Repaint();
-			}
-		break;
-		case "screensaver_state":
-			if(screensaver_state.value!=info) {
-				screensaver_state.value = info;
-				g_panel.on_size_changed();
 			}
 		break;
 		case "giveMeGenreList":
@@ -2347,7 +2202,7 @@ oSearch = function() {
     };
 	this.on_size = function() {
 		if(layout_state.isEqual(0) && compact_titlebar.isActive()){
-			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showIdleScreenBtn)?buttons.Idle.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
+			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
 			this.setSize(ww - window_btns.getWidth() - buttons.Settings.w - 10 - btns_width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);
 		} else if(layout_state.isEqual(0)){
 			this.setSize(cSearchBox.width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);
@@ -2707,8 +2562,6 @@ function toggleBlurWallpaper(wallpaper_blur_state){
 	window.Repaint();
 }
 function on_init(){
-	if(screensaver_state.isActive())
-		screensaver_state.setValue(0);
 	if(properties.Remember_previous_state && main_panel_state.isEqual(3)) {
 		main_panel_state.setValue(0);
 	} else if(!properties.Remember_previous_state){

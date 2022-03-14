@@ -11,7 +11,6 @@ var properties = {
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     displayDevice: window.GetProperty("_DISPLAY device", false),	
@@ -858,7 +857,6 @@ function on_paint(gr) {
 	}
 
 	switch(true){
-		case (layout_state.isEqual(0) && screensaver_state.isActive() && properties.screensaver_dark_theme && properties.darklayout):
 		case (layout_state.isEqual(1) && properties.minimode_dark_theme && properties.darklayout):
 		case (main_panel_state.isEqual(0) && properties.library_dark_theme && layout_state.isEqual(0) && properties.darklayout):
 		case (main_panel_state.isEqual(1) && properties.playlists_dark_theme && layout_state.isEqual(0) && properties.darklayout):
@@ -1748,18 +1746,6 @@ function on_notify_data(name, info) {
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
-			window.Repaint();
-		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
-		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
 			window.Repaint();
 		break;
 		case "RefreshImageCover":
