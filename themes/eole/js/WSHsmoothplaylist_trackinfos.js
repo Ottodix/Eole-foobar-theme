@@ -2778,7 +2778,7 @@ oBrowser = function(name) {
 													};
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)
-
+													pt.SetTextRenderingHint(5);
 													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 1, total_size+6, ah_1, 554696704);
 												playingText.ReleaseGraphics(pt);
 
@@ -3126,7 +3126,7 @@ oBrowser = function(name) {
 													};
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)
-
+													pt.SetTextRenderingHint(5);
 													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 0, total_size+6, ah, 554696704);
 												playingText.ReleaseGraphics(pt);
 												var progress_x = ax+22-properties.track_gradient_size

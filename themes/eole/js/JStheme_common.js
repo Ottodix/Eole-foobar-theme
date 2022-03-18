@@ -1551,11 +1551,11 @@ FontTypeDUI = {
     console: 5
 };
 function RGB(r, g, b) {
-    return (0xff000000 | (r << 16) | (g << 8) | (b))
-}
+    return (0xff000000 | (r << 16) | (g << 8) | (b));
+};
 function RGBA(r, g, b, a) {
-    return ((a << 24) | (r << 16) | (g << 8) | (b))
-}
+    return ((a << 24) | (r << 16) | (g << 8) | (b));
+};
 function GetGrey(grey,alpha){
 	alpha = typeof alpha !== 'undefined' ? alpha : 255;
 	return RGBA(grey,grey,grey,alpha);
@@ -1638,7 +1638,37 @@ function RGB2HSL(RGB_colour) {
     HSL_colour.L = Math.round(L * 100);
     return HSL_colour;
 };
+function getRed(color) {
+    return ((color >> 16) & 0xff);
+};
+function getGreen(color) {
+    return ((color >> 8) & 0xff);
+};
 
+function getBlue(color) {
+    return (color & 0xff);
+};
+function setAlpha(color, alpha) {
+	colorRGB = toRGB(color);
+    return RGBA(colorRGB[0], colorRGB[1], colorRGB[2],alpha);
+};
+function toRGB(d){ // convert back to RGB values
+	var d = d - 0xff000000;
+	var r = d >> 16;
+	var g = d >> 8 & 0xFF;
+	var b = d & 0xFF;
+	return [r,g,b];
+};
+
+function blendColors(c1, c2, factor) {
+	// When factor is 0, result is 100% color1, when factor is 1, result is 100% color2.
+	var c1 = toRGB(c1);
+	var c2 = toRGB(c2);
+	var r = Math.round(c1[0] + factor * (c2[0] - c1[0]));
+	var g = Math.round(c1[1] + factor * (c2[1] - c1[1]));
+	var b = Math.round(c1[2] + factor * (c2[2] - c1[2]));
+	return (0xff000000 | (r << 16) | (g << 8) | (b));
+};
 oGenreCache = function () {
     this.genreList = Array();
 	this.tf_genre = globalProperties.tf_genre;
@@ -2403,60 +2433,6 @@ function StringFormat() {
 
 
 // Used everywhere!
-function RGB(r, g, b) {
-    return (0xff000000 | (r << 16) | (g << 8) | (b));
-};
-function RGBA(r, g, b, a) {
-    return ((a << 24) | (r << 16) | (g << 8) | (b));
-};
-function getAlpha(color) {
-    return ((color >> 24) & 0xff);
-};
-
-function getRed(color) {
-    return ((color >> 16) & 0xff);
-};
-
-function getGreen(color) {
-    return ((color >> 8) & 0xff);
-};
-
-function getBlue(color) {
-    return (color & 0xff);
-};
-function setAlpha(color, alpha) {
-	colorRGB = toRGB(color);
-    return RGBA(colorRGB[0], colorRGB[1], colorRGB[2],alpha);
-};
-function negative(colour) {
-	var R = getRed(colour);
-	var G = getGreen(colour);
-	var B = getBlue(colour);
-	return RGB(Math.abs(R-255), Math.abs(G-255), Math.abs(B-255));
-};
-
-function toRGB(d){ // convert back to RGB values
-	var d = d - 0xff000000;
-	var r = d >> 16;
-	var g = d >> 8 & 0xFF;
-	var b = d & 0xFF;
-	return [r,g,b];
-};
-
-function blendColors(c1, c2, factor) {
-	// When factor is 0, result is 100% color1, when factor is 1, result is 100% color2.
-	var c1 = toRGB(c1);
-	var c2 = toRGB(c2);
-	var r = Math.round(c1[0] + factor * (c2[0] - c1[0]));
-	var g = Math.round(c1[1] + factor * (c2[1] - c1[1]));
-	var b = Math.round(c1[2] + factor * (c2[2] - c1[2]));
-	return (0xff000000 | (r << 16) | (g << 8) | (b));
-};
-function return_colors_from_string(string) {
-    var arr;
-    arr = string.split("-");
-    return RGB(arr[0], arr[1], arr[2]);
-};
 function TrackType(metadb) {
     var taggable;
     var type;
