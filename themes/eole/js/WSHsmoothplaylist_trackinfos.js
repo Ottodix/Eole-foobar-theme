@@ -1751,6 +1751,7 @@ oBrowser = function(name) {
     };
 
     this.getAlbumIdfromTrackId = function(valeur) { // fixed!
+	console.log("getAlbumIdfromTrackId"+valeur)
         if(valeur < 0) {
             return -1;
         } else {
@@ -1795,6 +1796,7 @@ oBrowser = function(name) {
             } else {
                 // 1 . rech album id contenant le focus_id
                 g_focus_album_id = this.getAlbumIdfromTrackId(fid);
+				console.log("getOffsetFocusItem "+fid)
                 // 2. rech row id
 				var tot = this.rows.length;
                 for(i = 0; i < tot; i++) {
@@ -1963,7 +1965,7 @@ oBrowser = function(name) {
 					if(!(properties.autocollapse && properties.showGroupHeaders)) {
 						this.rows[r] = new Object();
 						this.rows[r].type = 0; // track
-						this.rows[r].metadb = this.list[this.groups[g-1].start + j];
+						this.rows[r].metadb = this.list[i];
 						this.rows[r].albumId = g-1;
 						this.rows[r].albumTrackId = j;
 						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
@@ -6438,11 +6440,13 @@ function on_item_focus_change(playlist, from, to) {
 				if(properties.autocollapse && focus_changes.collapse) {
 					if(from > -1 && from < brw.list.Count) {
 						var old_focused_group_id = brw.getAlbumIdfromTrackId(from);
+						console.log("old_focused_group_id "+old_focused_group_id)
 					} else {
 						var old_focused_group_id = -1;
 					};
 					if(to > -1 && to < brw.list.Count) {
 						var new_focused_group_id = brw.getAlbumIdfromTrackId(to);
+						console.log("new_focused_group_id "+new_focused_group_id)
 					} else {
 						var old_focused_group_id = -1;
 					};
