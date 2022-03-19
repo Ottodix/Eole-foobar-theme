@@ -1875,7 +1875,7 @@ oBrowser = function(name) {
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
-
+		console.log("init_groups")
         var str_filter = process_string(filter_text);
 		for(var i = 0; i < total; i++) {
 			handle = this.list[i];
@@ -1888,6 +1888,7 @@ oBrowser = function(name) {
             };
             if(toAdd) {
 				this.totaltracks++;
+				//console.log(this.list[i]);
                 if(current != previous) {
                     if(g > 0) {
                         // finalize current group
@@ -1920,9 +1921,11 @@ oBrowser = function(name) {
 								this.rows[r] = new Object();
 								this.rows[r].type = k + 1; // 1st line of group header
 								this.rows[r].metadb = this.groups[g].metadb;
+								//console.log(this.groups[g].metadb);
 								this.rows[r].albumId = g;
 								this.rows[r].albumTrackId = 0;
 								this.rows[r].playlistTrackId = this.groups[g].start;
+								this.rows[r].playlistTrackId_fixed = this.groups[g].start;								
 								this.rows[r].groupkey = this.groups[g].groupkey;;
 								this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
@@ -1937,6 +1940,7 @@ oBrowser = function(name) {
 							this.rows[r].albumId = g;
 							this.rows[r].albumTrackId = 0;
 							this.rows[r].playlistTrackId = this.groups[g].start;
+							this.rows[r].playlistTrackId_fixed = this.groups[g].start;							
 							this.rows[r].groupkey = this.groups[g].groupkey;
 							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 							this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -1958,10 +1962,11 @@ oBrowser = function(name) {
 					if(!(properties.autocollapse && properties.showGroupHeaders)) {
 						this.rows[r] = new Object();
 						this.rows[r].type = 0; // track
-						this.rows[r].metadb = this.list[i];//this.list[this.groups[g-1].start + j];
+						this.rows[r].metadb = this.list[this.groups[g-1].start + j];
 						this.rows[r].albumId = g-1;
 						this.rows[r].albumTrackId = j;
-						this.rows[r].playlistTrackId = i;//this.groups[g-1].start + j;
+						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
+						this.rows[r].playlistTrackId_fixed = i;						
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;
 						this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -1969,13 +1974,14 @@ oBrowser = function(name) {
 						//if(this.rows[r].selected)
 							//this.groups[g-1].selected = true;
 						this.rows[r].rating = -1;
+						if(r==3) console.log(this.rows[r].metadb);
 						j++;
 						r++;
 						
 					}
                     t++;
                 };
-            };
+            }
 		};
 
         this.rowsCount = r;
@@ -2056,6 +2062,7 @@ oBrowser = function(name) {
         this.rows.splice(0, this.rows.length);
         var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0;
         var headerTotalRows = properties.groupHeaderRowsNumber;
+console.log("setlist")
         var end = this.groups.length;
 		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
@@ -3619,9 +3626,10 @@ oBrowser = function(name) {
                         case (rowType == 0): // track
 							plman.FlushPlaybackQueue();
 							plman.PlayingPlaylist = g_active_playlist;
-							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId);
+							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId_fixed);
+							console.log(this.activeRow+" - "+this.rows[this.activeRow].metadb.RawPath);
 							focus_changes.collapse = true;
-							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId);
+							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId_fixed);
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();
 							else fb.Play();
 							//previous_active_playlist = plman.ActivePlaylist;
