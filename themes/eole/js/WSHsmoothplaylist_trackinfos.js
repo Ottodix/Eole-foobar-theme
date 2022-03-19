@@ -1644,6 +1644,7 @@ oBrowser = function(name) {
 
     this.showNowPlaying = function(flash_nowplaying) {
 		var flash_nowplaying = typeof flash_nowplaying !== 'undefined' ? flash_nowplaying : true;
+
         if(fb.IsPlaying) {
 			g_filterbox.clearInputbox();
             try {
@@ -1692,7 +1693,7 @@ oBrowser = function(name) {
 
     this.showFocusedItem = function(g_focus_row) {
 		g_focus_row = typeof g_focus_row !== 'undefined' ? g_focus_row : this.getOffsetFocusItem(g_focus_id);
-
+		console.log("showFocusedItem "+g_focus_row)
        // if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + this.totalRowsVis) {
 		   if(properties.showGroupHeaders) {
 				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis/4)) * properties.rowHeight;
@@ -1925,7 +1926,7 @@ oBrowser = function(name) {
 								this.rows[r].albumId = g;
 								this.rows[r].albumTrackId = 0;
 								this.rows[r].playlistTrackId = this.groups[g].start;
-								this.rows[r].playlistTrackId_fixed = this.groups[g].start;								
+								this.rows[r].playlistTrackId_original = i;								
 								this.rows[r].groupkey = this.groups[g].groupkey;;
 								this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
@@ -1940,7 +1941,7 @@ oBrowser = function(name) {
 							this.rows[r].albumId = g;
 							this.rows[r].albumTrackId = 0;
 							this.rows[r].playlistTrackId = this.groups[g].start;
-							this.rows[r].playlistTrackId_fixed = this.groups[g].start;							
+							this.rows[r].playlistTrackId_original = i;							
 							this.rows[r].groupkey = this.groups[g].groupkey;
 							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 							this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -1966,7 +1967,7 @@ oBrowser = function(name) {
 						this.rows[r].albumId = g-1;
 						this.rows[r].albumTrackId = j;
 						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
-						this.rows[r].playlistTrackId_fixed = i;						
+						this.rows[r].playlistTrackId_original = i;						
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;
 						this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -2690,7 +2691,7 @@ console.log("setlist")
                                     var ay_2 = ay + ah_1 - 2;
                                     var ah_2 = ah - Math.floor(ah /2);
 
-                                    if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex){ // now playing track
+                                    if(this.nowplaying && this.rows[i].playlistTrackId_original == this.nowplaying.PlaylistItemIndex){ // now playing track
 
 										this.groups[this.rows[i].albumId].isPlaying = true;
 										this.isPlayingIdx = this.rows[i].albumId;
@@ -3009,7 +3010,7 @@ console.log("setlist")
                                 } else {
 
                                     // calc text part width + dtaw text
-                                    if(this.nowplaying && this.rows[i].playlistTrackId == this.nowplaying.PlaylistItemIndex) { // now playing track
+                                    if(this.nowplaying && this.rows[i].playlistTrackId_original == this.nowplaying.PlaylistItemIndex) { // now playing track
 										this.groups[this.rows[i].albumId].isPlaying = true;
 										this.isPlayingIdx = this.rows[i].albumId;
 										if(cNowPlaying.flashEnable && cNowPlaying.flash){
@@ -3626,10 +3627,10 @@ console.log("setlist")
                         case (rowType == 0): // track
 							plman.FlushPlaybackQueue();
 							plman.PlayingPlaylist = g_active_playlist;
-							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId_fixed);
+							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId_original);
 							console.log(this.activeRow+" - "+this.rows[this.activeRow].metadb.RawPath);
 							focus_changes.collapse = true;
-							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId_fixed);
+							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId_original);
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();
 							else fb.Play();
 							//previous_active_playlist = plman.ActivePlaylist;
@@ -6264,6 +6265,7 @@ function on_playback_new_track(metadb) {
 		if((((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) || (brw.expanded_group<0 && properties.autocollapse && plman.PlayingPlaylist == g_active_playlist)) {		
 			brw.dontFlashNowPlaying=true;
 			brw.showNowPlaying();
+			console.log("showNowPlaying")
 		}
 		g_total_seconds =  properties.tf_total_seconds.Eval(true);
 		if(g_total_seconds!="ON AIR") g_time_remaining = "-"+g_total_seconds.toHHMMSS();
