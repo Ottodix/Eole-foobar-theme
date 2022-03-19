@@ -1875,6 +1875,7 @@ oBrowser = function(name) {
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
+
         var str_filter = process_string(filter_text);
 		for(var i = 0; i < total; i++) {
 			handle = this.list[i];
@@ -1957,10 +1958,10 @@ oBrowser = function(name) {
 					if(!(properties.autocollapse && properties.showGroupHeaders)) {
 						this.rows[r] = new Object();
 						this.rows[r].type = 0; // track
-						this.rows[r].metadb = this.list[this.groups[g-1].start + j];
+						this.rows[r].metadb = this.list[i];//this.list[this.groups[g-1].start + j];
 						this.rows[r].albumId = g-1;
 						this.rows[r].albumTrackId = j;
-						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
+						this.rows[r].playlistTrackId = i;//this.groups[g-1].start + j;
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;
 						this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -1970,6 +1971,7 @@ oBrowser = function(name) {
 						this.rows[r].rating = -1;
 						j++;
 						r++;
+						
 					}
                     t++;
                 };
@@ -2054,7 +2056,6 @@ oBrowser = function(name) {
         this.rows.splice(0, this.rows.length);
         var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0;
         var headerTotalRows = properties.groupHeaderRowsNumber;
-
         var end = this.groups.length;
 		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
@@ -3617,7 +3618,6 @@ oBrowser = function(name) {
                             break;
                         case (rowType == 0): // track
 							plman.FlushPlaybackQueue();
-
 							plman.PlayingPlaylist = g_active_playlist;
 							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId);
 							focus_changes.collapse = true;
