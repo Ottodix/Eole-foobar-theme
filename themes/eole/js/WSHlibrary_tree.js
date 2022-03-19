@@ -4845,7 +4845,7 @@ function on_drag_over(action, x, y, mask) {
 		pman.on_mouse("move", x, y);
 	};
 	try{
-		action.Text = "Insert";
+		//action.Text = "Insert";
 	} catch(e){}
     p.m_x = x;
     p.m_y = y;

@@ -4939,7 +4939,7 @@ function on_drag_over(action, x, y, mask) {
 	if(brw.drag_moving && !timers.hidePlaylistManager && !timers.showPlaylistManager) {
 		pman.on_mouse("move", x, y);
 		try{
-			action.Text = "Insert";
+			//action.Text = "Insert";
 		} catch(e){}
 	}
 

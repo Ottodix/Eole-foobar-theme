@@ -2065,7 +2065,7 @@ oBrowser = function(name) {
         this.rows.splice(0, this.rows.length);
         var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0;
         var headerTotalRows = properties.groupHeaderRowsNumber;
-console.log("setlist")
+
         var end = this.groups.length;
 		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
@@ -2081,6 +2081,7 @@ console.log("setlist")
 					this.rows[r].albumId = i;
 					this.rows[r].albumTrackId = 0;
 					this.rows[r].playlistTrackId = this.groups[i].start;
+					this.rows[r].playlistTrackId_original = this.groups[i].start;						
 					this.rows[r].groupkey = this.groups[i].groupkey;
 					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
 					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
@@ -2098,6 +2099,7 @@ console.log("setlist")
                     this.rows[r].albumId = i;
                     this.rows[r].albumTrackId = j;
                     this.rows[r].playlistTrackId = this.groups[i].start + j;
+					this.rows[r].playlistTrackId_original = this.groups[i].start + j;					
                     this.rows[r].groupkey = this.groups[i].groupkey;
 					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
                     this.rows[r].tracktype = TrackType(this.rows[r].metadb);
@@ -7006,8 +7008,8 @@ function on_drag_over(action, x, y, mask) {
     g_dragndrop_bottom = false;
     brw.on_mouse("drag_over", x, y);
 	try{
-		if(brw.drag_tracks) action.Text = "Move";
-		else action.Text = "Insert";
+		//if(brw.drag_tracks) action.Text = "Move";
+		//else action.Text = "Insert";
 	} catch(e){}
 	if(scroll > 0 && y < brw.y + ((properties.doubleRowText)?properties.rowHeight:properties.rowHeight*2)) {
 		if(!brw.buttonclicked) {
