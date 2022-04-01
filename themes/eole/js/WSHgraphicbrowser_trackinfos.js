@@ -2480,7 +2480,7 @@ oShowList = function(parentPanelName) {
 					gr.DrawImage(this.showlist_img, this.cover_x, this.cover_y, this.coverRealSize, this.coverRealSize, 0, 0, this.showlist_img.Width, this.showlist_img.Height);
 					if(this.isHoverCover){
 						gr.FillSolidRect(this.cover_x, this.cover_y, this.coverRealSize, this.coverRealSize, colors.overlay_on_hover);
-						this.play_bt.draw(gr, this.cover_x+ this.coverRealSize/2-35, this.cover_y+ this.coverRealSize/2-35, 255);
+						this.play_bt.draw(gr, this.cover_x+ Math.round(this.coverRealSize/2)-35, this.cover_y+ Math.round(this.coverRealSize/2)-35, 255);
 					}
 				} else this.cover_x = -1;
 
@@ -3711,6 +3711,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 					window.SetProperty("COVER Shadow Opacity", properties.default_CoverShadowOpacity);
 					get_colors();
 					brw.refresh_shadows();
+					brw.refresh_thumbnails();
 					brw.repaint();
 				}
 			} catch(e) {
@@ -4908,7 +4909,7 @@ oBrowser = function(name) {
 					if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith,idx); 
 					gb.DrawImage(this.dateCircleBG,8,8, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
 					gb.SetTextRenderingHint(5);
-					gb.DrawString(overlayTxt,  this.fontDate,  GetGrey(255), 8+(this.coverRealWith-this.groups[idx].dateWidth+8)/2, 10, this.coverRealWith, this.groups[idx].dateHeight,  0x00004000)
+					gb.DrawString(overlayTxt,  this.fontDate,  GetGrey(255), 12+Math.round((this.coverRealWith-this.groups[idx].dateWidth)/2), 10, this.coverRealWith, this.groups[idx].dateHeight,  0x00004000)
 				}
 				else {
 					gb.FillSolidRect(8, 8, this.groups[idx].dateWidth, this.groups[idx].dateHeight, colors.cover_date_bg);
@@ -4990,7 +4991,7 @@ oBrowser = function(name) {
 				ay = firstalbum_y + (row * this.rowHeight);
 				coverTop = ay + this.CoverMarginTop;
 
-				gr.FillEllipse(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
+				gr.FillEllipse(ax+1-Math.round((this.ellipse_size-this.coverRealWith)/2), coverTop+1-Math.round((this.ellipse_size-this.coverRealWith)/2), this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
 				//else gr.FillSolidRect(ax+1-(this.ellipse_size-this.coverRealWith)/2, coverTop+1-(this.ellipse_size-this.coverRealWith)/2, this.ellipse_size-2, this.ellipse_size-2, colors.nowplaying_animation_circle);
 			}
 
@@ -5128,26 +5129,25 @@ oBrowser = function(name) {
                 var py = this.y + Math.floor(this.h / 2);
 				if(this.firstInitialisation) {
 					gr.GdiDrawText("Loading...",  g_font.plus10, colors.normal_txt, px, py - 80, this.w, 35, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-					gr.FillSolidRect(this.w/2 -125, py-46, 250, 1, colors.border);
+					gr.FillSolidRect(Math.round(this.w/2) -125, py-46, 250, 1, colors.border);
 					gr.GdiDrawText("Library browser", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 				}
 				else {
 					var playlistname=plman.GetPlaylistName(this.SourcePlaylistIdx);
 					if(LibraryItems_counter<1){
 						gr.GdiDrawText("No music found.",  g_font.plus10, colors.normal_txt, px, py - 80, this.w, 35, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-						gr.FillSolidRect(this.w/2 -125, py-46, 250, 1, colors.border);
+						gr.FillSolidRect(Math.round(this.w/2) -125, py-46, 250, 1, colors.border);
 						gr.GdiDrawText("Click here to configure the Media Library.", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else if(playlistname==globalProperties.selection_playlist || playlistname==globalProperties.playing_playlist) {
-						gr.FillSolidRect(this.w/2 -150, py-46, 300, 1, colors.border);
+						gr.FillSolidRect(Math.round(this.w/2) -150, py-46, 300, 1, colors.border);
 						gr.GdiDrawText(playlistname+" :",  g_font.plus10, colors.normal_txt, px, py - 80, this.w, 35, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						gr.GdiDrawText("Nothing to show.", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					} else {
 						gr.GdiDrawText(playlistname+" :", g_font.plus10, colors.normal_txt, px, py - 80, this.w, 35, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-						gr.FillSolidRect(this.w/2 -125, py-46, 250, 1, colors.border);
+						gr.FillSolidRect(Math.round(this.w/2) -125, py-46, 250, 1, colors.border);
 						gr.GdiDrawText("This playlist is empty.", g_font.italicplus2, colors.faded_txt, px, py - 38, this.w, 20, DT_CENTER | DT_TOP | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 					}
 				}
-
             }
 
         }

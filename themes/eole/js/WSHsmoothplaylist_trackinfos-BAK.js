@@ -1548,7 +1548,6 @@ oBrowser = function(name) {
 	this.rating_rowId = -1;
 	this.dont_scroll_to_focus = false;
 	this.expanded_group = -1;
-	this.playlistId2row = Array();
     this.launch_populate = function() {
         var launch_timer = setTimeout(function(){
             // populate browser with items
@@ -1637,7 +1636,7 @@ oBrowser = function(name) {
 		var tot = this.rows.length;
 		for(r = 0; r < tot; r++) {
 			if(this.rows[r].type != 99)
-				this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+				this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 				if(this.rows[r].selected)
 					this.groups[this.rows[r].albumId].selected = true;
 		}
@@ -1752,16 +1751,14 @@ oBrowser = function(name) {
     };
 
     this.getAlbumIdfromTrackId = function(valeur) { // fixed!
-		console.log("getAlbumIdfromTrackId"+valeur)
-		//return this.playlistId2row[valeur].albumId;
+	console.log("getAlbumIdfromTrackId"+valeur)
         if(valeur < 0) {
             return -1;
         } else {
             var mediane = 0; var deb = 0; var fin = this.groups.length - 1;
             while(deb <= fin){
                 mediane = Math.floor((fin + deb)/2);
-                if(valeur >= this.groups[mediane].start && valeur <= this.groups[mediane].end) {
-					console.log("getAlbumIdfromTrackId return"+mediane)
+                if(valeur >= this.groups[mediane].start && valeur < this.groups[mediane].start + this.groups[mediane].count) {
                     return mediane;
                 } else if(valeur < this.groups[mediane].start) {
                     fin = mediane - 1;
@@ -1772,33 +1769,11 @@ oBrowser = function(name) {
             return -1;
         };
     };
-    this.getRowIdfromPlaylistTrackId = function(valeur) { // fixed!
-        if(valeur < 0) {
-            return -1;
-        } else {
-            var diff = 0;
-			var albumId = this.getAlbumIdfromTrackId(valeur);
-			console.log(albumId)
-			var return_row = this.groups[albumId].rowId;
-			var fin = this.rows.length-1;//rowId + this.groups[albumId].count - 1;
-            while(return_row <= fin){
-				while(this.rows[return_row].type != 0) {
-					return_row = return_row+1;
-				};				
-				if(valeur == this.rows[return_row].playlistTrackId_original) {
-					return return_row;
-				} else return_row = return_row+1;
-            };
-            return -1;
-        };
-    };
+
     this.getOffsetFocusItem = function(fid) { // fixed!
         var row_idx = 0;
 
         if(fid > -1) {
-			return this.playlistId2row[fid];
-			
-			//return this.getRowIdfromPlaylistTrackId(fid);
             if(properties.showGroupHeaders) {
                 // fid = no item dans la playlist (focus id)
                 // this.rows[] => albumId
@@ -1891,7 +1866,7 @@ oBrowser = function(name) {
         var g = 0, t = 0, r = 0, j = 0;
         var arr = [];
         var tr = [];
-		
+
         var total = this.list.Count;
         this.totaltracks = 0;
 		if(plman.PlaylistItemCount(g_active_playlist) > 0) {
@@ -1903,6 +1878,7 @@ oBrowser = function(name) {
 		this.groups.splice(0, this.groups.length);
 		this.rows.splice(0, this.rows.length);
         var tf = properties.tf_groupkey;
+		console.log("init_groups")
         var str_filter = process_string(filter_text);
 		for(var i = 0; i < total; i++) {
 			handle = this.list[i];
@@ -1915,6 +1891,7 @@ oBrowser = function(name) {
             };
             if(toAdd) {
 				this.totaltracks++;
+				//console.log(this.list[i]);
                 if(current != previous) {
                     if(g > 0) {
                         // finalize current group
@@ -1947,13 +1924,14 @@ oBrowser = function(name) {
 								this.rows[r] = new Object();
 								this.rows[r].type = k + 1; // 1st line of group header
 								this.rows[r].metadb = this.groups[g].metadb;
+								//console.log(this.groups[g].metadb);
 								this.rows[r].albumId = g;
 								this.rows[r].albumTrackId = 0;
 								this.rows[r].playlistTrackId = this.groups[g].start;
 								this.rows[r].playlistTrackId_original = i;								
 								this.rows[r].groupkey = this.groups[g].groupkey;;
 								this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
-								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+								this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 								r++;
 							};
 							this.groups[g].headerTotalRows = properties.groupHeaderRowsNumber;
@@ -1962,7 +1940,6 @@ oBrowser = function(name) {
 							this.rows[r] = new Object();
 							this.rows[r].type = 0; // track
 							this.rows[r].metadb = this.list[this.groups[g].start];
-							this.playlistId2row[i] = r;
 							this.rows[r].albumId = g;
 							this.rows[r].albumTrackId = 0;
 							this.rows[r].playlistTrackId = this.groups[g].start;
@@ -1970,7 +1947,7 @@ oBrowser = function(name) {
 							this.rows[r].groupkey = this.groups[g].groupkey;
 							this.rows[r].groupkeysplit = this.groups[g].groupkeysplit;
 							this.rows[r].tracktype = TrackType(this.rows[r].metadb);
-							this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+							this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 							//if(this.rows[r].selected)
 								//this.groups[g-1].selected = true;
 							this.rows[r].rating = -1;
@@ -1989,7 +1966,6 @@ oBrowser = function(name) {
 						this.rows[r] = new Object();
 						this.rows[r].type = 0; // track
 						this.rows[r].metadb = this.list[i];
-						this.playlistId2row[i] = r;
 						this.rows[r].albumId = g-1;
 						this.rows[r].albumTrackId = j;
 						this.rows[r].playlistTrackId = this.groups[g-1].start + j;
@@ -1997,10 +1973,11 @@ oBrowser = function(name) {
 						this.rows[r].groupkey = this.groups[g-1].groupkey;
 						this.rows[r].groupkeysplit = this.groups[g-1].groupkeysplit;
 						this.rows[r].tracktype = TrackType(this.rows[r].metadb);
-						this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+						this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 						//if(this.rows[r].selected)
 							//this.groups[g-1].selected = true;
 						this.rows[r].rating = -1;
+						if(r==3) console.log(this.rows[r].metadb);
 						j++;
 						r++;
 						
@@ -2093,7 +2070,7 @@ oBrowser = function(name) {
 		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks,this.rows[r-1].playlistTrackId_original);
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
 
 			this.groups[i].rowId = r;
 			if(properties.showGroupHeaders) {
@@ -2107,7 +2084,7 @@ oBrowser = function(name) {
 					this.rows[r].playlistTrackId_original = this.groups[i].start;						
 					this.rows[r].groupkey = this.groups[i].groupkey;
 					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
-					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 					r++;
 				};
 			};
@@ -2119,7 +2096,6 @@ oBrowser = function(name) {
                     this.rows[r] = new Object();
                     this.rows[r].type = 0; // track
                     this.rows[r].metadb = this.list[this.groups[i].start + j];
-					this.playlistId2row[this.groups[i].start + j] = r;
                     this.rows[r].albumId = i;
                     this.rows[r].albumTrackId = j;
                     this.rows[r].playlistTrackId = this.groups[i].start + j;
@@ -2127,7 +2103,7 @@ oBrowser = function(name) {
                     this.rows[r].groupkey = this.groups[i].groupkey;
 					this.rows[r].groupkeysplit = this.groups[i].groupkeysplit;
                     this.rows[r].tracktype = TrackType(this.rows[r].metadb);
-					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId_original);
+					this.rows[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[r].playlistTrackId);
 					if(this.rows[r].selected)
 						this.groups[i].selected = true;
                     this.rows[r].rating = -1;
@@ -2149,7 +2125,6 @@ oBrowser = function(name) {
     this.populate = function(is_first_populate,call_id, set_active_playlist) {
 		var set_active_playlist = typeof set_active_playlist !== 'undefined' ? set_active_playlist : true;
         if(this.list) this.list = undefined;
-        this.playlistId2row.splice(0, this.playlistId2row.length);		
 		if(this.playlist_on_next_populate>-1){
 			g_active_playlist = this.playlist_on_next_populate;
 			this.playlist_on_next_populate = -1;
@@ -3517,7 +3492,7 @@ oBrowser = function(name) {
 							}							
                             break;
                         case (rowType == 0):                    // ----------------> track row
-                            var playlistTrackId = this.rows[this.activeRow].playlistTrackId_original;
+                            var playlistTrackId = this.rows[this.activeRow].playlistTrackId;
                             if(utils.IsKeyPressed(VK_SHIFT)) {
                                 if(g_focus_id != playlistTrackId) {
                                     if (this.SHIFT_start_id != null) {
@@ -3591,7 +3566,7 @@ oBrowser = function(name) {
                             //var playlistTrackId = this.rows[this.activeRow].playlistTrackId;
                             break;
                         case (rowType == 0):                    // ----------------> track row
-                            var playlistTrackId = this.rows[this.activeRow].playlistTrackId_original;
+                            var playlistTrackId = this.rows[this.activeRow].playlistTrackId;
                             if(!utils.IsKeyPressed(VK_SHIFT) && !utils.IsKeyPressed(VK_CONTROL)) {
                                 if(plman.IsPlaylistItemSelected(g_active_playlist, playlistTrackId)) {
                                     if(this.metadblist_selection.Count > 1 && !this.track_rating) {
@@ -3657,6 +3632,7 @@ oBrowser = function(name) {
 							plman.FlushPlaybackQueue();
 							plman.PlayingPlaylist = g_active_playlist;
 							plman.SetPlaylistFocusItem(g_active_playlist,this.rows[this.activeRow].playlistTrackId_original);
+							console.log(this.activeRow+" - "+this.rows[this.activeRow].metadb.RawPath);
 							focus_changes.collapse = true;
 							plman.AddPlaylistItemToPlaybackQueue(g_active_playlist, this.rows[this.activeRow].playlistTrackId_original);
 							if(fb.IsPaused || fb.IsPlaying) fb.Next();
@@ -5619,7 +5595,6 @@ function on_script_unload() {
 
 //=================================================// Keyboard Callbacks
 function on_key_up(vkey) {
-	//console.log("g_focus_row"+g_focus_row+"  getRowIdfromPlaylistTrackId"+brw.getRowIdfromPlaylistTrackId(g_focus_id)); 
     if(cSettings.visible) {
 
     } else {
@@ -5645,8 +5620,7 @@ function vk_up() {
     var scrollstep = 1;
     var new_focus_id = 0, new_row = 0;
 
-    //new_row = g_focus_row - scrollstep;
-	new_row = brw.playlistId2row[g_focus_id] - scrollstep; //brw.getRowIdfromPlaylistTrackId(g_focus_id) - scrollstep;
+    new_row = g_focus_row - scrollstep;
     if(new_row < 0) {
         if(brw.groups[0].collapsed) {
             new_row = 0;
@@ -5680,11 +5654,10 @@ function vk_up() {
         };
     };
     if(new_row >= 0) {
-			
         while(brw.rows[new_row].type == 99) {
             if(new_row > 0) new_row -= 1;
         };
-        new_focus_id = brw.rows[new_row].playlistTrackId_original;
+        new_focus_id = brw.rows[new_row].playlistTrackId;
         plman.ClearPlaylistSelection(g_active_playlist);
         plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
         plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
@@ -5700,8 +5673,7 @@ function vk_up() {
 function vk_down() {
     var scrollstep = 1;
     var new_focus_id = 0, new_row = 0;	
-    //new_row = g_focus_row + scrollstep;
-	new_row = brw.playlistId2row[g_focus_id] + 1; //new_row = brw.getRowIdfromPlaylistTrackId(g_focus_id) + 1;
+    new_row = g_focus_row + scrollstep;
     if(new_row > brw.rowsCount - 1) {
         new_row = brw.rowsCount - 1;
         if(brw.groups[brw.rows[new_row].albumId].collapsed) {
@@ -5748,14 +5720,13 @@ function vk_down() {
         };
     };
     if(new_row < brw.rowsCount) {
-		
         while(brw.rows[new_row].type == 99) {
             if(new_row < brw.rowsCount - 1) new_row += 1;
         };
         new_focus_id = brw.rows[new_row].playlistTrackId_original;
         plman.ClearPlaylistSelection(g_active_playlist);
-        plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
-        plman.SetPlaylistFocusItem(g_active_playlist, new_focus_id);
+       // plman.SetPlaylistSelectionSingle(g_active_playlist, new_focus_id, true);
+        plman.SetPlaylistFocusItemByHandle(g_active_playlist, brw.rows[new_row].metadb);
 		focus_changes.collapse = true;
     } else {
         // kill timer
@@ -6298,6 +6269,7 @@ function on_playback_new_track(metadb) {
 		if((((fb.CursorFollowPlayback || properties.FollowNowPlaying) && (!(window.Name=="BottomPlaylist" && g_active_playlist!=plman.PlayingPlaylist) || properties.lockOnNowPlaying)) && !(g_filterbox.inputbox.edit || g_filterbox.inputbox.length > 0)) || (brw.expanded_group<0 && properties.autocollapse && plman.PlayingPlaylist == g_active_playlist)) {		
 			brw.dontFlashNowPlaying=true;
 			brw.showNowPlaying();
+			console.log("showNowPlaying")
 		}
 		g_total_seconds =  properties.tf_total_seconds.Eval(true);
 		if(g_total_seconds!="ON AIR") g_time_remaining = "-"+g_total_seconds.toHHMMSS();
@@ -6470,11 +6442,13 @@ function on_item_focus_change(playlist, from, to) {
 				if(properties.autocollapse && focus_changes.collapse) {
 					if(from > -1 && from < brw.list.Count) {
 						var old_focused_group_id = brw.getAlbumIdfromTrackId(from);
+						console.log("old_focused_group_id "+old_focused_group_id)
 					} else {
 						var old_focused_group_id = -1;
 					};
 					if(to > -1 && to < brw.list.Count) {
 						var new_focused_group_id = brw.getAlbumIdfromTrackId(to);
+						console.log("new_focused_group_id "+new_focused_group_id)
 					} else {
 						var old_focused_group_id = -1;
 					};
