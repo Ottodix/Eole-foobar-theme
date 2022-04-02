@@ -1751,14 +1751,13 @@ oBrowser = function(name) {
     };
 
     this.getAlbumIdfromTrackId = function(valeur) { // fixed!
-		//return this.playlistId2row[valeur].albumId;
         if(valeur < 0) {
             return -1;
         } else {
             var mediane = 0; var deb = 0; var fin = this.groups.length - 1;
             while(deb <= fin){
                 mediane = Math.floor((fin + deb)/2);
-                if(valeur >= this.groups[mediane].start && valeur <= this.groups[mediane].end) {
+                if(valeur >= this.groups[mediane].start && valeur < this.groups[mediane].start + this.groups[mediane].count) {
                     return mediane;
                 } else if(valeur < this.groups[mediane].start) {
                     fin = mediane - 1;
@@ -5645,6 +5644,8 @@ function vk_down() {
         cScrollBar.timerID && clearTimeout(cScrollBar.timerID);
         cScrollBar.timerID = false;
     } else {
+		//console.log("new_row"+new_row+" g_focus_id"+g_focus_id+" brw.row lenght"+brw.rows.length+" brw.rows[new_row].albumId"+brw.rows[new_row].albumId+" brw.rows[new_row].type"+brw.rows[new_row].type+"brw.groups[brw.rows[new_row]"+brw.groups[brw.rows[new_row]]+"brw.groups length"+brw.groups.length+" brw.groups[new_row]"+brw.groups[new_row].collapsed)		
+		if(typeof brw.rows[new_row] == 'undefined') return;
         switch(brw.rows[new_row].type) {
             case 0: // track row
                 // RAS
