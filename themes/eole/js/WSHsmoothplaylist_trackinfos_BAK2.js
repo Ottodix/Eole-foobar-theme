@@ -5660,6 +5660,7 @@ function vk_up() {
         cScrollBar.timerID && clearTimeout(cScrollBar.timerID);
         cScrollBar.timerID = false;
     } else {
+		console.log(new_row)
         switch(brw.rows[new_row].type) {
             case 0: // track row
                 // RAS

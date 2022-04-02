@@ -1796,7 +1796,7 @@ oBrowser = function(name) {
         var row_idx = 0;
 
         if(fid > -1) {
-			return this.playlistId2row[fid];
+			if(!(properties.autocollapse && properties.showGroupHeaders)) return this.playlistId2row[fid];
 			
 			//return this.getRowIdfromPlaylistTrackId(fid);
             if(properties.showGroupHeaders) {
@@ -1821,7 +1821,6 @@ oBrowser = function(name) {
             } else {
                 // 1 . rech album id contenant le focus_id
                 g_focus_album_id = this.getAlbumIdfromTrackId(fid);
-				console.log("getOffsetFocusItem "+fid)
                 // 2. rech row id
 				var tot = this.rows.length;
                 for(i = 0; i < tot; i++) {
@@ -1926,6 +1925,7 @@ oBrowser = function(name) {
 								this.rows[r] = new Object();
 								this.rows[r].selected = false;
 								this.rows[r].type = 99; // extra row at bottom of the album/group
+								this.rows[r].albumId = g;
 								r++;
 							};
 						}
@@ -2003,7 +2003,6 @@ oBrowser = function(name) {
 						this.rows[r].rating = -1;
 						j++;
 						r++;
-						
 					}
                     t++;
                 };
@@ -2018,70 +2017,6 @@ oBrowser = function(name) {
 		if(brw.groups.length==1) {
 			this.expand_group(0);
 		}
-    };
-    this.setList_nolist = function(finalize_groups) {
-		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;
-        this.rows_new = [];
-        var r = 0, i = 0, j = 0, m = 0, n = 0, p = 0, r_beggining = 0;
-        var headerTotalRows = properties.groupHeaderRowsNumber;
-
-        var end = this.groups.length;
-        for(i = 0; i < end; i++) {
-
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
-
-			r_beggining = r;
-			if(properties.showGroupHeaders) {
-				for(k=0; k < headerTotalRows; k++) {
-					this.rows_new[r] = new Object();
-					this.rows_new[r].type = k + 1; // 1st line of group header
-					this.rows_new[r].metadb = this.groups[i].metadb;
-					this.rows_new[r].albumId = i;
-					this.rows_new[r].albumTrackId = 0;
-					this.rows_new[r].playlistTrackId = this.groups[i].start;
-					this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + k].playlistTrackId);
-					r++;
-				};
-			};
-
-            if(!(this.groups[i].collapsed && properties.showGroupHeaders)) {
-                // tracks
-                m = this.groups[i].count;
-                for(j = 0; j < m; j++) {
-                    this.rows_new[r] = new Object();
-                    this.rows_new[r].type = 0; // track
-                    this.rows_new[r].metadb = this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].metadb;  //this.list[this.groups[i].start + j];
-                    this.rows_new[r].albumId = i;
-                    this.rows_new[r].albumTrackId = j;
-                    this.rows_new[r].playlistTrackId = this.groups[i].start + j;
-                    this.rows_new[r].groupkey = this.groups[i].groupkey;
-					this.rows_new[r].groupkeysplit = this.groups[i].groupkeysplit;
-                    this.rows_new[r].tracktype = TrackType(this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j]);
-					this.rows_new[r].selected = plman.IsPlaylistItemSelected(g_active_playlist, this.rows[this.groups[i].rowId + this.groups[i].headerTotalRows + j].playlistTrackId);
-					if(this.rows_new[r].selected)
-						this.groups[i].selected = true;
-                    this.rows_new[r].rating = -1;
-                    r++;
-                };
-            };
-
-			this.groups[i].rowId = r_beggining;
-
-			if(properties.showGroupHeaders)
-				this.groups[i].headerTotalRows = headerTotalRows;
-			else this.groups[i].headerTotalRows = 0;
-
-			p = this.groups[i].rowsToAdd;
-			for(n = 0; n < p; n++) {
-				this.rows_new[r] = new Object();
-				this.rows_new[r].selected = false;
-				this.rows_new[r].type = 99; // extra row at bottom of the album/group
-				r++;
-			};
-        };
-        this.rowsCount = r;
     };
     this.setList = function(finalize_groups) {
 		var finalize_groups = typeof finalize_groups !== 'undefined' ? finalize_groups : false;
@@ -2140,6 +2075,7 @@ oBrowser = function(name) {
 				this.rows[r] = new Object();
 				this.rows[r].selected = false;
 				this.rows[r].type = 99; // extra row at bottom of the album/group
+				this.rows[r].albumId = i;
 				r++;
 			};
         };
@@ -5646,7 +5582,8 @@ function vk_up() {
     var new_focus_id = 0, new_row = 0;
 
     //new_row = g_focus_row - scrollstep;
-	new_row = brw.playlistId2row[g_focus_id] - scrollstep; //brw.getRowIdfromPlaylistTrackId(g_focus_id) - scrollstep;
+	new_row = brw.getOffsetFocusItem(g_focus_id) - scrollstep; //brw.getRowIdfromPlaylistTrackId(g_focus_id) - scrollstep;
+	console.log("new_row"+new_row+" g_focus_id"+g_focus_id)
     if(new_row < 0) {
         if(brw.groups[0].collapsed) {
             new_row = 0;
@@ -5662,6 +5599,7 @@ function vk_up() {
         cScrollBar.timerID && clearTimeout(cScrollBar.timerID);
         cScrollBar.timerID = false;
     } else {
+		
         switch(brw.rows[new_row].type) {
             case 0: // track row
                 // RAS
@@ -5701,7 +5639,7 @@ function vk_down() {
     var scrollstep = 1;
     var new_focus_id = 0, new_row = 0;	
     //new_row = g_focus_row + scrollstep;
-	new_row = brw.playlistId2row[g_focus_id] + 1; //new_row = brw.getRowIdfromPlaylistTrackId(g_focus_id) + 1;
+	new_row = brw.getOffsetFocusItem(g_focus_id) + 1; //new_row = brw.getRowIdfromPlaylistTrackId(g_focus_id) + 1;
     if(new_row > brw.rowsCount - 1) {
         new_row = brw.rowsCount - 1;
         if(brw.groups[brw.rows[new_row].albumId].collapsed) {
