@@ -1694,7 +1694,6 @@ oBrowser = function(name) {
 
     this.showFocusedItem = function(g_focus_row) {
 		g_focus_row = typeof g_focus_row !== 'undefined' ? g_focus_row : this.getOffsetFocusItem(g_focus_id);
-		console.log("showFocusedItem "+g_focus_row)
        // if(g_focus_row < scroll / properties.rowHeight || g_focus_row > scroll / properties.rowHeight + this.totalRowsVis) {
 		   if(properties.showGroupHeaders) {
 				scroll_to_track = (g_focus_row - Math.floor(this.totalRowsVis/4)) * properties.rowHeight;
@@ -1752,7 +1751,6 @@ oBrowser = function(name) {
     };
 
     this.getAlbumIdfromTrackId = function(valeur) { // fixed!
-		console.log("getAlbumIdfromTrackId"+valeur)
 		//return this.playlistId2row[valeur].albumId;
         if(valeur < 0) {
             return -1;
@@ -1761,7 +1759,6 @@ oBrowser = function(name) {
             while(deb <= fin){
                 mediane = Math.floor((fin + deb)/2);
                 if(valeur >= this.groups[mediane].start && valeur <= this.groups[mediane].end) {
-					console.log("getAlbumIdfromTrackId return"+mediane)
                     return mediane;
                 } else if(valeur < this.groups[mediane].start) {
                     fin = mediane - 1;
@@ -1778,7 +1775,6 @@ oBrowser = function(name) {
         } else {
             var diff = 0;
 			var albumId = this.getAlbumIdfromTrackId(valeur);
-			console.log(albumId)
 			var return_row = this.groups[albumId].rowId;
 			var fin = this.rows.length-1;//rowId + this.groups[albumId].count - 1;
             while(return_row <= fin){
@@ -5583,7 +5579,6 @@ function vk_up() {
 
     //new_row = g_focus_row - scrollstep;
 	new_row = brw.getOffsetFocusItem(g_focus_id) - scrollstep; //brw.getRowIdfromPlaylistTrackId(g_focus_id) - scrollstep;
-	console.log("new_row"+new_row+" g_focus_id"+g_focus_id)
     if(new_row < 0) {
         if(brw.groups[0].collapsed) {
             new_row = 0;
