@@ -24,6 +24,9 @@ my_utils.getScriptPath = biography_scripts;
 //my_utils.getScriptPath = `${my_utils.packageInfo.Directories.Scripts}/`;
 */
 
+// In callbacks.js
+// at the very beggining add : 
+// var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
 // Update on_mouse_lbtn_down, on_mouse_lbtn_up, on_mouse_leave, on_mouse_move {
 /*
 function on_mouse_lbtn_down(x, y) {
@@ -53,6 +56,14 @@ function on_mouse_move(x, y, m) {
 	btns_manager.on_mouse("move",x, y);
 }
 */
+// Add to on_notify_data
+/*
+	case 'show_lyrics_btns':
+		show_lyrics_btns = info;
+		window.SetProperty("show lyrics btns", show_lyrics_btns);
+		window.Repaint();
+		break;	
+*/
 // Modify on_size
 /*
 function on_size(w, h) {
@@ -72,7 +83,7 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 */
 // Add to on_paint, at the end :
 /*
-	btns_manager.draw(gr);
+	if(show_lyrics_btns) btns_manager.draw(gr);		
 */
 
 

@@ -1,4 +1,6 @@
-﻿function on_colours_changed() {
+﻿var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+
+function on_colours_changed() {
 	ui.getColours();
 	alb_scrollbar.setCol();
 	art_scrollbar.setCol();
@@ -280,6 +282,11 @@ function on_notify_data(name, info) {
 		on_cui_notify(name, clone);
 	}
 	switch (name) {
+		case 'show_lyrics_btns':
+			show_lyrics_btns = info;
+			window.SetProperty("show lyrics btns", show_lyrics_btns);
+			window.Repaint();
+			break;		
 		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
 		case 'bio_chkTrackRev':
 			if (!panel.server && panel.style.inclTrackRev) {
@@ -391,7 +398,7 @@ function on_paint(gr) {
 	but.draw(gr);
 	resize.drawEd(gr);
 	ui.lines(gr);
-	btns_manager.draw(gr);		
+	if(show_lyrics_btns) btns_manager.draw(gr);		
 }
 
 function on_playback_dynamic_info_track() {

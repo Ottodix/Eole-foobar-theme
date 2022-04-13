@@ -40,6 +40,7 @@ var properties = {
 	tracktitle_ontop: window.GetProperty("_DISPLAY: Track title", true),
 	tracktitle_format: window.GetProperty("_DISPLAY: Track title format", "[%artist%  -  ][%album%[  -  %tracknumber%] : ]%title%[  -  %date%]"),
 	showRightSidebarBtn: window.GetProperty("_DISPLAY: show right sidebar btn", true),
+	showConfigLayoutBtn: window.GetProperty("_DISPLAY: show configure layout btn", true),	
 	showLightswitchBtn: window.GetProperty("_DISPLAY: show light switch btn", true),
 	showPanelBtnText: window.GetProperty("_DISPLAY: show panels btn text", true),
 	showNowPlayingBtn: window.GetProperty("_DISPLAY: show now playing btn", true),
@@ -192,7 +193,7 @@ var images = {}
 function build_images(){
 	if(properties.darklayout) colors.icons_folder = "white"; else colors.icons_folder = "";
 
-	images.track_infos_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\track_infos_icon.png");
+	images.config_layout_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\panel_settings.png");
 
 	images.artist_bio_img = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\artist_bio_icon.png");
 
@@ -476,6 +477,10 @@ function build_buttons(){
 		else buttons.NowPlaying.H_img = images.nowplaying_off_icon;
 		buttons.NowPlaying.N_img = buttons.NowPlaying.H_img;
 		buttons.NowPlaying.D_img = buttons.NowPlaying.H_img;
+		
+		buttons.ConfigLayout.H_img = images.config_layout_img;
+		buttons.ConfigLayout.N_img = images.config_layout_img;
+		buttons.ConfigLayout.D_img = buttons.ConfigLayout.H_img;
 
 		if(getTrackInfosState()>=1) {
 			buttons.RightSidebar.H_img = images.trackinfos_off;
@@ -536,6 +541,9 @@ function build_buttons(){
 			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right sidebar", function () {
 				toggleNowPlayingState();
 			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),
+			ConfigLayout: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "Configlayout", "Configure Layout", function () {
+				draw_layout_menu(this.x+this.w,this.y+this.h-1);
+			}, false, false,images.config_layout_img,images.config_layout_img,-1, false, false, true),			
 			RightSidebar: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "rightsidebar", "Hide/show track infos", function () {
 				if(getNowPlayingState()==1) {
 					toggleTrackInfosState();
@@ -603,10 +611,10 @@ function build_buttons(){
 		window_btns.addButtons([buttons.Close,buttons.Max,buttons.Mini,buttons.Reduce], [0,0,0,0]);
 
 		additional_btns = new JSButtonGroup("top-right", 11, btn.top_m, 'additional_btns', true);
-		additional_btns.addButtons([buttons.NowPlaying,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.ShowSearch], [0,9,0,0]);
+		additional_btns.addButtons([buttons.NowPlaying,buttons.ConfigLayout,buttons.RightSidebar,buttons.Fullscreen,buttons.Lightswitch,buttons.ShowSearch], [0,9,0,0]);
 
 		compact_btns = new JSButtonGroup("top-left", 0, -1, 'compact_btns', true);
-		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.RightSidebar,buttons.Lightswitch,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);
+		compact_btns.addButtons([buttons.Settings,buttons.NowPlaying,buttons.ConfigLayout,buttons.RightSidebar,buttons.Lightswitch,buttons.Fullscreen,buttons.ShowSearch], [0,0,0,0]);
 		compact_btns.addButtons([buttons.Library], [0,0,0,btn.margin+5]);
 		compact_btns.addButtons([buttons.Playlists,buttons.Artist_Bio,buttons.Visualization], [0,0,0,btn.margin]);
 	}
@@ -675,6 +683,7 @@ function adapt_buttons_to_layout(){
 		main_panel_btns.hide = true;
 		buttons.Fullscreen.setVisibility(false);
 		buttons.Mini.setVisibility(false);
+		buttons.ConfigLayout.setVisibility(false);		
 		buttons.NowPlaying.setVisibility(false);
 		buttons.RightSidebar.setVisibility(false);
 		buttons.Settings.calculate_size = true;
@@ -717,10 +726,14 @@ function adapt_buttons_to_layout(){
 		else buttons.Fullscreen.setVisibility(true);
 
 		buttons.Settings.calculate_size = true;
-
+		
+		if(!properties.showConfigLayoutBtn)
+			buttons.ConfigLayout.setVisibility(false);
+		else buttons.ConfigLayout.setVisibility(true);
+		
 		if(!properties.showRightSidebarBtn)
 			buttons.RightSidebar.setVisibility(false);
-		else buttons.RightSidebar.setVisibility(true);
+		else buttons.RightSidebar.setVisibility(true);		
 
 		if(!properties.showLightswitchBtn)
 			buttons.Lightswitch.setVisibility(false);
@@ -730,7 +743,7 @@ function adapt_buttons_to_layout(){
 			buttons.NowPlaying.setVisibility(false);
 		else buttons.NowPlaying.setVisibility(true);
 
-		additional_btns.x = 11;
+		additional_btns.x = 13;
 
 
 		window_btns.setBtnsWidth(45);
@@ -759,7 +772,7 @@ function adapt_buttons_to_layout(){
 		}
 		cSearchBoxMainDark.marginRight = cSearchBoxMainLight.marginRight = 18 + additional_btns.getWidth(true) - (!properties.alwaysShowSearch?buttons.ShowSearch.w+5:0);
 
-		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn){
+		if(!properties.showRightSidebarBtn && !properties.showLightswitchBtn && !properties.showFullscreenBtn && !properties.showNowPlayingBtn && !properties.showConfigLayoutBtn){
 			cSearchBoxMainLight.marginRight -= 10;
 			cSearchBoxMainDark.marginRight -= 10;
 		}
@@ -1097,6 +1110,8 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuSeparator();
 		_menu_button.AppendMenuItem(MF_STRING, 1806, "Right sidebar visibility");
 		_menu_button.CheckMenuItem(1806, properties.showNowPlayingBtn);
+		_menu_button.AppendMenuItem(MF_STRING, 1808, "Panel layout");
+		_menu_button.CheckMenuItem(1808, properties.showConfigLayoutBtn);		
 		_menu_button.AppendMenuItem(MF_STRING, 1807, "Right sidebar function");
 		_menu_button.CheckMenuItem(1807, properties.showRightSidebarBtn);
 		_menu_button.AppendMenuItem(MF_STRING, 1803, "Light switch");
@@ -1167,6 +1182,12 @@ function draw_settings_menu(x,y){
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;
+			case (idx == 1808):
+				properties.showConfigLayoutBtn = !properties.showConfigLayoutBtn;
+				window.SetProperty("_DISPLAY: show configure layout btn", properties.showConfigLayoutBtn);
+				adapt_buttons_to_layout();
+				window.Repaint();
+				break;				
 			case (idx == 1809):
 				try {
 					new_caption_format = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom windows title", properties.tracktitle_format, true);
@@ -1261,7 +1282,350 @@ function draw_settings_menu(x,y){
 		_menu_button = undefined;
         return true;
 }
+function draw_layout_menu(x,y){
+    var basemenu = window.CreatePopupMenu();
+	library_menu = window.CreatePopupMenu();
+	playlists_menu = window.CreatePopupMenu();
+	bio_menu = window.CreatePopupMenu();
+	visu_menu = window.CreatePopupMenu();
+	minimode_menu = window.CreatePopupMenu();
+	right_menu_trackdetails = window.CreatePopupMenu();
+	
+	wallpaper_visibility = window.CreatePopupMenu();
+	wallpaper_visibility.AppendMenuItem(MF_STRING, 4005, "Enable");
+	wallpaper_visibility.AppendMenuItem(MF_STRING, 4006, "Disable");
+	wallpaper_blur = window.CreatePopupMenu();
+	wallpaper_blur.AppendMenuItem(MF_STRING, 4007, "Enable");
+	wallpaper_blur.AppendMenuItem(MF_STRING, 4008, "Disable");
 
+	nowplaying = window.CreatePopupMenu();
+	var now_playing_state = getNowPlayingState();
+	if(now_playing_state==1) nowplaying.AppendMenuItem(MF_STRING, 4027, "Hide");
+	else nowplaying.AppendMenuItem(MF_STRING, 4027, "Show");
+	
+	right_menu_trackdetails.AppendMenuItem(MF_STRING, 202, "Show on top");	
+	right_menu_trackdetails.AppendMenuItem(MF_STRING, 203, "Show on bottom");			
+	right_menu_trackdetails.AppendMenuItem(MF_STRING, 204, "Hide");
+	var track_infos_state = getTrackInfosState();
+	if(track_infos_state==0) var checked = 204;
+	else if(track_infos_state==1) var checked = 202;
+	else if(track_infos_state==2) var checked = 203;
+	right_menu_trackdetails.CheckMenuRadioItem(202, 204, checked);				
+	right_menu_trackdetails.AppendTo(nowplaying,MF_STRING, "Album art / track infos");	
+		
+	nowplaying.AppendMenuSeparator();
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4030, "Increase width");
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4031, "Decrease width");
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4033, "Custom width...");
+	nowplaying.AppendMenuItem((now_playing_state?MF_STRING:MF_GRAYED), 4032, "Reset");
+
+	if(layout_state.isEqual(1)){
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Minimode Layout");
+		basemenu.AppendMenuSeparator();		
+		basemenu.AppendMenuItem(MF_STRING, 3990, "Dark theme");
+		basemenu.CheckMenuItem(3990, properties.minimode_dark_theme);
+		wallpaper_visibility.AppendTo(basemenu,MF_STRING, "Wallpapers visibility");
+		wallpaper_blur.AppendTo(basemenu,MF_STRING, "Wallpapers blur");
+	} else if(main_panel_state.isEqual(0)){
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Library Layout");
+		basemenu.AppendMenuSeparator();				
+		nowplaying.AppendTo(basemenu,MF_STRING, "Right playlist");
+		left_menu = window.CreatePopupMenu();
+		left_menu.AppendTo(basemenu,MF_STRING, "Left menu");
+		if(libraryfilter_state.isActive()) left_menu.AppendMenuItem(MF_STRING, 4028, "Hide");
+		else left_menu.AppendMenuItem(MF_STRING, 4028, "Show");
+		left_menu.AppendMenuSeparator();
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4034, "Increase width");
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4035, "Decrease width");
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4037, "Custom width...");
+		left_menu.AppendMenuItem((libraryfilter_state.isActive()?MF_STRING:MF_GRAYED), 4036, "Reset");
+		basemenu.AppendMenuSeparator();
+		basemenu.AppendMenuItem(MF_STRING, 4000, "Dark theme");
+		basemenu.CheckMenuItem(4000, properties.library_dark_theme);
+		wallpaper_visibility.AppendTo(basemenu,MF_STRING, "Wallpapers visibility");
+		wallpaper_blur.AppendTo(basemenu,MF_STRING, "Wallpapers blur");
+	} else if(main_panel_state.isEqual(1)){
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Playlists Layout");
+		basemenu.AppendMenuSeparator();				
+		nowplaying.AppendTo(basemenu,MF_STRING, "Right playlist");
+		playlistpanel_menu = window.CreatePopupMenu();
+		playlistpanel_menu.AppendTo(basemenu,MF_STRING, "Playlist panel");
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4038, "Increase width");
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4039, "Decrease width");
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4041, "Custom width...");
+		playlistpanel_menu.AppendMenuItem(MF_STRING, 4040, "Reset");
+		var FiltersMenu = window.CreatePopupMenu();
+		if(filters_panel_state.value>0)
+			FiltersMenu.AppendMenuItem(MF_STRING, 4990, "Hide");
+		else
+			FiltersMenu.AppendMenuItem(MF_STRING, 4988, "Show");
+		FiltersMenu.AppendMenuItem(MF_STRING, 4992, "Increase height");
+		FiltersMenu.AppendMenuItem((filters_panel_state.isActive()? MF_STRING : MF_GRAYED), 4991, "Decrease height");
+		FiltersMenu.AppendMenuSeparator();
+		FiltersMenu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 4993, "Enable 1st filter");
+		FiltersMenu.CheckMenuItem(4993, (filter1_state.isActive()));
+		FiltersMenu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 4994, "Enable 2nd filter");
+		FiltersMenu.CheckMenuItem(4994, (filter2_state.isActive()));
+		FiltersMenu.AppendMenuItem((filters_panel_state.isActive() ? MF_STRING : MF_GRAYED | MF_DISABLED), 4995, "Enable 3rd filter");
+		FiltersMenu.CheckMenuItem(4995, (filter3_state.isActive()));
+		FiltersMenu.AppendTo(basemenu, MF_STRING, "Filters");
+		if(!filters_panel_state.isMaximumValue()) basemenu.AppendMenuItem(MF_STRING, 4996, "Hide bottom playlist");
+		else basemenu.AppendMenuItem(MF_STRING, 4997, "Show bottom playlist");
+		basemenu.AppendMenuSeparator();
+		basemenu.AppendMenuItem(MF_STRING, 4001, "Dark theme");
+		basemenu.CheckMenuItem(4001, properties.playlists_dark_theme);
+		wallpaper_visibility.AppendTo(basemenu,MF_STRING, "Wallpapers visibility");
+		wallpaper_blur.AppendTo(basemenu,MF_STRING, "Wallpapers blur");
+	} else if(main_panel_state.isEqual(2)){
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Now playing Layout");
+		basemenu.AppendMenuSeparator();				
+		nowplaying.AppendTo(basemenu,MF_STRING, "Right playlist");
+
+		if(!lyrics_state.isActive()){
+			basemenu.AppendMenuItem(MF_STRING, 4999, "Show lyrics");
+		} else {
+			var LyricsMenu = window.CreatePopupMenu();
+			LyricsMenu.AppendMenuItem(MF_STRING, 5000, "Hide");
+			LyricsMenu.AppendMenuSeparator();
+			LyricsMenu.AppendMenuItem((!lyrics_state.isMaximumValue())?MF_STRING:MF_GRAYED, 4999, "Increase width");
+			LyricsMenu.AppendMenuItem(MF_STRING, 4998, "Decrease width");
+			LyricsMenu.AppendTo(basemenu, MF_STRING, "Lyrics panel");
+			LyricsMenu.AppendMenuSeparator();
+			LyricsMenu.AppendMenuItem(MF_STRING, 6000, "Show toggle buttons");
+			LyricsMenu.AppendMenuItem(MF_STRING, 6001, "Hide toggle buttons");			
+		}
+		basemenu.AppendMenuSeparator();
+		basemenu.AppendMenuItem(MF_STRING, 4002, "Dark theme");
+		basemenu.CheckMenuItem(4002, properties.bio_dark_theme);
+		wallpaper_visibility.AppendTo(basemenu,MF_STRING, "Wallpapers visibility");
+		wallpaper_blur.AppendTo(basemenu,MF_STRING, "Wallpapers blur");
+	} else if(main_panel_state.isEqual(3)){
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Visualization Layout");
+		basemenu.AppendMenuSeparator();				
+		nowplaying.AppendTo(basemenu,MF_STRING, "Right playlist");
+		basemenu.AppendMenuSeparator();
+		basemenu.AppendMenuItem(MF_STRING, 4003, "Dark theme");
+		basemenu.CheckMenuItem(4003, properties.visualization_dark_theme);
+	}
+
+    idx = basemenu.TrackPopupMenu(x, y, 0x0008);
+
+    switch (true) {
+	case (idx == 202):
+		if(getNowPlayingState()==1) {
+			toggleTrackInfosState(false,1,true);
+		} else {
+			toggleTrackInfosState(false,1,false);
+			toggleNowPlayingState();
+		}
+		window.Repaint();
+		break;
+	case (idx == 203):
+		if(getNowPlayingState()==1) {
+			toggleTrackInfosState(false,2,true);
+		} else {
+			toggleTrackInfosState(false,2,false);
+			toggleNowPlayingState();
+		}			
+		window.Repaint();
+		break;	
+	case (idx == 204):
+		if(getNowPlayingState()==1) {
+			toggleTrackInfosState(false,0,true);
+		} else {
+			toggleTrackInfosState(false,0,false);
+		}				
+		window.Repaint();
+		break;			
+   case (idx == 3990):
+		properties.minimode_dark_theme=!properties.minimode_dark_theme;
+        window.NotifyOthers("minimode_dark_theme",properties.minimode_dark_theme);
+		window.SetProperty("MINIMODE dark theme", properties.minimode_dark_theme);
+		get_colors();g_searchbox.adapt_look_to_layout();
+        window.Repaint();
+        break;
+   case (idx == 4000):
+		properties.library_dark_theme=!properties.library_dark_theme;
+        window.NotifyOthers("library_dark_theme",properties.library_dark_theme);
+		window.SetProperty("LIBRARY dark theme", properties.library_dark_theme);
+		on_notify_data("library_dark_theme",properties.library_dark_theme);
+        window.Repaint();
+        break;
+   case (idx == 4001):
+		properties.playlists_dark_theme=!properties.playlists_dark_theme;
+        window.NotifyOthers("playlists_dark_theme",properties.playlists_dark_theme);
+		window.SetProperty("PLAYLISTS dark theme", properties.playlists_dark_theme);
+		on_notify_data("playlists_dark_theme",properties.playlists_dark_theme);
+		fb.RunMainMenuCommand("View/ElPlaylist/Refresh");
+        window.Repaint();
+        break;
+   case (idx == 4002):
+		properties.bio_dark_theme=!properties.bio_dark_theme;
+        window.NotifyOthers("bio_dark_theme",properties.bio_dark_theme);
+		window.SetProperty("BIO dark theme", properties.bio_dark_theme);
+		on_notify_data("bio_dark_theme",properties.bio_dark_theme);
+        window.Repaint();
+        break;
+   case (idx == 4003):
+		properties.visualization_dark_theme=!properties.visualization_dark_theme;
+        window.NotifyOthers("visualization_dark_theme",properties.visualization_dark_theme);
+		window.SetProperty("VISUALIZATION dark theme", properties.visualization_dark_theme);
+		on_notify_data("visualization_dark_theme",properties.visualization_dark_theme);
+        break;
+   case (idx == 4005):
+        window.NotifyOthers("wallpaperVisibility",true);
+		//on_notify_data("wallpaperVisibility",true);
+        break;
+   case (idx == 4006):
+        window.NotifyOthers("wallpaperVisibility",false);
+		//on_notify_data("wallpaperVisibility",false);
+        break;
+   case (idx == 4007):
+        window.NotifyOthers("wallpaperBlur",true);
+		on_notify_data("wallpaperBlur",true);
+        break;
+   case (idx == 4008):
+        window.NotifyOthers("wallpaperBlur",false);
+		on_notify_data("wallpaperBlur",false);
+        break;
+	case (idx == 4012):
+		globalProperties.fontAdjustement++;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+		on_font_changed();
+		break;
+	case (idx == 4013):
+		globalProperties.fontAdjustement--;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+		on_font_changed();
+		break;
+	case (idx == 4014):
+		globalProperties.fontAdjustement = 0;
+		window.SetProperty("GLOBAL Font Adjustement", globalProperties.fontAdjustement);
+		window.NotifyOthers('set_font',globalProperties.fontAdjustement);
+		on_font_changed();
+		break;
+	case (idx == 4021):
+		Lightswitch(true,true);
+		break;
+	case (idx == 4022):
+		Lightswitch(true,false);
+		break;
+	case (idx == 4027):
+		toggleNowPlayingState();
+		break;
+	case (idx == 4028):
+		libraryfilter_state.toggleValue();
+		build_buttons();
+		window.Repaint();
+		break;
+	case (idx == 4030):
+		rightplaylist_width.increment(10);
+		break;
+	case (idx == 4031):
+		rightplaylist_width.decrement(10);
+		break;
+	case (idx == 4032):
+		rightplaylist_width.setDefault();
+		break;
+	case (idx == 4033):
+		rightplaylist_width.userInputValue("Enter the desired width in pixel.\nDefault width is 270px.\nMinimum width: 100px. Maximum width: 900px", "Custom playlist width");
+		break;
+	case (idx == 4034):
+		libraryfilter_width.increment(10);
+		break;
+	case (idx == 4035):
+		libraryfilter_width.decrement(10);
+		break;
+	case (idx == 4036):
+		libraryfilter_width.setDefault();
+		break;
+	case (idx == 4037):
+		libraryfilter_width.userInputValue("Enter the desired width in pixel.\nDefault width is 210px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+		break;
+	case (idx == 4038):
+		playlistpanel_width.increment(10);
+		break;
+	case (idx == 4039):
+		playlistpanel_width.decrement(10);
+		break;
+	case (idx == 4040):
+		playlistpanel_width.setDefault();
+		break;
+	case (idx == 4041):
+		playlistpanel_width.userInputValue("Enter the desired width in pixel.\nDefault width is 180px.\nMinimum width: 100px. Maximum width: 900px", "Custom left menu width");
+		break;
+    case (idx == 4988):
+		if(properties.savedFilterState>=0 && !properties.displayToggleBtns) filters_panel_state.setValue(properties.savedFilterState);
+		else filters_panel_state.setValue(1);
+        break;
+    case (idx == 4990):
+		saveFilterState();
+		filters_panel_state.setValue(0);
+        break;
+    case (idx == 4991):
+		filters_panel_state.decrement(1);
+        break;
+    case (idx == 4992):
+		filters_panel_state.increment(1);
+        break;
+    case (idx == 4993):
+		if(!filter2_state.isActive() && !filter3_state.isActive()) filters_panel_state.setValue(0);
+		else filter1_state.toggleValue();
+        break;
+    case (idx == 4994):
+		if(!filter1_state.isActive() && !filter3_state.isActive()) filters_panel_state.setValue(0);
+		else filter2_state.toggleValue();
+        break;
+    case (idx == 4995):
+		if(!filter1_state.isActive() && !filter2_state.isActive()) filters_panel_state.setValue(0);
+		else filter3_state.toggleValue();
+        break;
+    case (idx == 4996):
+		saveFilterState();
+		filters_panel_state.setValue(filters_panel_state.max_value);
+        break;
+    case (idx == 4997):
+		if(properties.savedFilterState>=0) filters_panel_state.setValue(properties.savedFilterState);
+		else filters_panel_state.setValue(1);
+        break;
+    case (idx == 4998):
+		lyrics_state.decrement(1);
+        break;
+    case (idx == 4999):
+		lyrics_state.increment(1);
+        break;
+    case (idx == 6000):
+		window.NotifyOthers("show_lyrics_btns",true);
+        break;		
+    case (idx == 6001):
+		window.NotifyOthers("show_lyrics_btns",false);
+        break;			
+    case (idx == 5000):
+		lyrics_state.setValue(0);
+        break;
+    }
+
+    basemenu = undefined;
+    contextman = undefined;
+    menuman1 = undefined;
+    menuman2 = undefined;
+    menuman3 = undefined;
+    menuman4 = undefined;
+    menuman5 = undefined;
+    menuman6 = undefined;
+	minimode_menu = undefined;
+	font_size = undefined;
+	if(FiltersMenu) FiltersMenu = undefined;
+	right_menu_trackdetails = undefined;
+    library_menu = undefined;
+    playlists_menu = undefined;
+    bio_menu = undefined;
+    wallpaper_visibility = undefined;
+    wallpaper_blur = undefined;
+	return true;
+}
 function draw_main_menu(x,y){
 
     var basemenu = window.CreatePopupMenu();
@@ -2202,7 +2566,7 @@ oSearch = function() {
     };
 	this.on_size = function() {
 		if(layout_state.isEqual(0) && compact_titlebar.isActive()){
-			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
+			var btns_width = ((properties.showLightswitchBtn)?buttons.Lightswitch.w:0) + ((properties.showConfigLayoutBtn)?buttons.ConfigLayout.w:0) + ((properties.showRightSidebarBtn)?buttons.RightSidebar.w:0) + ((properties.showFullscreenBtn)?buttons.Fullscreen.w:0) + ((properties.showNowPlayingBtn)?buttons.NowPlaying.w:0);
 			this.setSize(ww - window_btns.getWidth() - buttons.Settings.w - 10 - btns_width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);
 		} else if(layout_state.isEqual(0)){
 			this.setSize(cSearchBox.width, wh-cSearchBox.marginTop-cSearchBox.marginBottom, g_fsize);

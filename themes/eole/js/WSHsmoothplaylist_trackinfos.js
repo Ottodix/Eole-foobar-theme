@@ -2023,7 +2023,7 @@ oBrowser = function(name) {
 		this.isPlayingIdx = -1;
         for(i = 0; i < end; i++) {
 
-			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks,this.rows[r-1].playlistTrackId_original);
+			if(finalize_groups) this.groups[i].finalize(this.groups[i].count, this.groups[i].tracks);
 
 			this.groups[i].rowId = r;
 			if(properties.showGroupHeaders) {
