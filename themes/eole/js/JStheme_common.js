@@ -418,6 +418,23 @@ function customGraphicBrowserGrouping(title, top_msg, bottom_msg, input_default_
 		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
 	});
 }
+function customNowPlayingInfos(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			var input_values = input_values.split('##');
+			if (!(properties.customInfos==input_values[0]+" ^^ "+input_values[1])) {
+				if((input_values[0] == "" || typeof input_values[0] == 'undefined') && (input_values[1] == "" || typeof input_values[1] == 'undefined')) properties.customInfos = "";				
+				else properties.customInfos = input_values[0]+" ^^ "+input_values[1];
+				setCustominfos();
+				window.SetProperty("_DISPLAY: infos titleformat", properties.customInfos);
+				g_infos.getTrackInfos();
+			}
+		}
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+	});
+}
 function customControlDetails(title, top_msg, bottom_msg, input_default_values, input_labels){
 	function ok_callback(status, input_values) {
 		if(status!="cancel"){

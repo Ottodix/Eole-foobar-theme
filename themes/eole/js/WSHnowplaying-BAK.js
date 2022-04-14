@@ -19,7 +19,6 @@ var properties = {
 	follow_cursor: window.GetProperty("_DISPLAY: cover follow cursor", false),
 	circleMode: window.GetProperty("_DISPLAY: circle mode", true),
 	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),
-	customInfos: window.GetProperty("_DISPLAY: infos titleformat", ""),	
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
@@ -96,13 +95,11 @@ g_tfo = {
 	title: fb.TitleFormat("$if2(%title%,)"),
 	artist: fb.TitleFormat("$if2(%artist%,)"),
 	album: fb.TitleFormat("$if(%album%,  |  %album%,)"),
+	codec: fb.TitleFormat("%codec%"),
+	playcount: fb.TitleFormat("$if2(%play_count%,0)"),
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
-	defaultinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,)$if(%album%,  |  %album%,)$if(%date%,' ('%date%')') ^^ %codec%$if(%codec_profile%, | %codec_profile%)$if(%bitrate%, | %bitrate%K) ^^ $if2(%play_count%,0)"),
+	allinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile%)$if(%bitrate%, | %bitrate%K)"),
 }
-function setCustominfos(){
-	g_tfo.customInfos = fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ "+properties.customInfos);
-}
-setCustominfos();
 function setButtons(){
 	buttons = {
 		Pause: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Pause", "Resume Playback", function () {
@@ -1455,37 +1452,18 @@ function oInfos() {
 		}
 	}
 	this.getTrackInfos = function(){
-		if(properties.customInfos!="") {
-			this.getTrackInfosCustom();
-		} else {
-			var defaultinfos = g_tfo.defaultinfos.EvalWithMetadb(this.metadb);
-			defaultinfos = defaultinfos.split(" ^^ ");
+		var allinfos = g_tfo.allinfos.EvalWithMetadb(this.metadb);
+		allinfos = allinfos.split(" ^^ ");
 
-			this.rating = defaultinfos[0];
+		this.rating = allinfos[0];
 
-			var row1 = defaultinfos[1];
-			var row2 = defaultinfos[2];
-			var _playcount = defaultinfos[4];
-			if(foo_playcount) var row3 = defaultinfos[3] + " | " + _playcount + (_playcount > 1 ? " plays" : " play");
-			else var row3 = defaultinfos[3];
-			this.show_info = true;
-			this.updateInfos(row1, row2, row3, this.metadb, false, this.rating);
-		}		
-	}
-	this.getTrackInfosCustom = function(metadb, album_infos, rating, tracklist){
-		var customInfos = g_tfo.customInfos.EvalWithMetadb(this.metadb);
-		customInfos = customInfos.split(" ^^ ");
-		this.rating = customInfos[0];
-		var row1 = customInfos[1];
-		var row2 = customInfos[2];
-		var row3 = customInfos[3];
+		var txt_title = allinfos[1];
+		var txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
+		var _playcount = allinfos[6];
+		if(foo_playcount) var txt_profile = allinfos[5] + allinfos[7] + " | " + _playcount + (_playcount > 1 ? " plays" : " play");
+		else var txt_profile = allinfos[5] + allinfos[7];
 		this.show_info = true;
-		if(typeof metadb != "undefined") this.metadb = metadb;
-		if(typeof album_infos != "undefined") this.album_infos = album_infos;
-		else this.album_infos = false;
-		if(typeof rating != "undefined") this.rating = rating;		
-		if(typeof tracklist != "undefined") this.tracklist = tracklist;			
-		this.updateInfos(row1, row2, row3, this.metadb, this.album_infos, this.rating, this.tracklist);
+		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
 	}
 	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, tracklist){
 		this.txt_line1 = row1;
@@ -1788,8 +1766,6 @@ function draw_settings_menu(x,y){
 		_menu.CheckMenuItem(18, trackinfostext_state.isActive());		
 		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 17, "Show details on 2 rows");
 		_menu.CheckMenuItem(17, properties.doubleRowText);
-		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 19, "Edit displayed infos");	
-		_menu.CheckMenuItem(19, properties.customInfos!="");
 		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 16, "Show rating");
 		_menu.CheckMenuItem(16,properties.showRating);		
 		_menu.AppendMenuSeparator();
@@ -1913,17 +1889,6 @@ function draw_settings_menu(x,y){
 				g_cover.refreshCurrent();
 				on_size(window.Width,window.Height);			
 				adaptButtons();				
-				window.Repaint();
-				break;					
-			case (idx == 19):
-					var customInfos_splitted = properties.customInfos.split(" ^^ ");
-					if(typeof customInfos_splitted[1] === "undefined") customInfos_splitted[1] = "";
-					customNowPlayingInfos("Custom Grouping"
-										,"<div class='titleBig'>Custom Grouping</div><div class='separator'></div><br/>Enter a title formatting script for each line of informations displayed. Leave the lines empty for default informations. Default informations are:\n\n     Line 1: %artist% - %album%\n     Line 2: %codec% - %bitrate%\n\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
-										,''
-										,'First line:##Second line:'
-										,customInfos_splitted[0]+'##'+customInfos_splitted[1]);
-		
 				window.Repaint();
 				break;					
 			case (idx == 200):
