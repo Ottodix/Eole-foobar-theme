@@ -1915,11 +1915,11 @@ function draw_settings_menu(x,y){
 				adaptButtons();				
 				window.Repaint();
 				break;					
-			case (idx == 19):
+			case (idx == 19): 
 					var customInfos_splitted = properties.customInfos.split(" ^^ ");
 					if(typeof customInfos_splitted[1] === "undefined") customInfos_splitted[1] = "";
 					customNowPlayingInfos("Custom Grouping"
-										,"<div class='titleBig'>Custom Grouping</div><div class='separator'></div><br/>Enter a title formatting script for each line of informations displayed. Leave the lines empty for default informations. Default informations are:\n\n     Line 1: %artist% - %album%\n     Line 2: %codec% - %bitrate%\n\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
+										,"<div class='titleBig'>Custom Grouping</div><div class='separator'></div><br/>Enter a title formatting script for each line of informations displayed. Leave the lines empty for default informations. Default informations are:\n\n     Line 1: %artist%  |  %album% (%date%)\n     Line 2: %codec% | %codec_profile% | %bitrate%K | %play_count%\n\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 										,''
 										,'First line:##Second line:'
 										,customInfos_splitted[0]+'##'+customInfos_splitted[1]);
