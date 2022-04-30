@@ -3701,6 +3701,8 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 47):
 			properties.showCoverShadow = !properties.showCoverShadow;
 			window.SetProperty("COVER show shadow", properties.showCoverShadow);
+			brw.refresh_shadows();
+			brw.refresh_thumbnails();			
 			brw.repaint();
 			break;
 		case (idx == 48):
