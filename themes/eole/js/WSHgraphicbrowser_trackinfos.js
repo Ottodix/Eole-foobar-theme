@@ -78,7 +78,7 @@ var already_saved=false;
 //=================================================// Properties
 var properties = {
 	panelName: 'WSHgraphicbrowser',
-    thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 50),
+    thumbnailWidthMin: window.GetProperty("COVER Width Minimal", 40),
     thumbnailWidth: window.GetProperty("COVER Width", 100),
 	showCoverResizer: window.GetProperty("_DISPLAY: Cover resizer", true),
 	showGridModeButton: window.GetProperty("_DISPLAY: grid mode button", true),

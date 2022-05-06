@@ -28,6 +28,7 @@ var properties = {
 	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
 	coverNoPadding : window.GetProperty("_DISPLAY: cover no padding", true),
+	disableCoverCache : window.GetProperty("_DISPLAY: disable cover cache", false),
 	rawBitmap: false,
 	panelFontAdjustement: 0,
 	showInfos:true,
@@ -568,11 +569,12 @@ oImageCache = function () {
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {
 			cache_filename = check_cache(metadb, 0, g_cover.cachekey);
 			// load img from cache
-			if(cache_filename) {
+			if(cache_filename && !properties.disableCoverCache) {
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
-			} else get_albumArt_async(metadb,AlbumArtId.front, g_cover.cachekey, false, false, false, {isplaying:is_playing});
-		} else if(nowPlaying_cachekey==old_cachekey) return "unchanged";
+			} else
+				get_albumArt_async(metadb,AlbumArtId.front, g_cover.cachekey, false, false, false, {isplaying:is_playing});
+		} else if(typeof(nowPlaying_cachekey) !== "undefined" && nowPlaying_cachekey==old_cachekey) return "unchanged";
 		return img;
     };
     this.reset = function(key) {
@@ -607,6 +609,7 @@ oCover = function() {
 	this.padding_norating = Array(20,7,0,7);	
 	this.padding_noinfos = Array(24,24,24,24);
 	this.nopadding = Array(0,0,0,0);	
+	this.padding = this.padding_default;
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -671,7 +674,10 @@ oCover = function() {
 	}
 	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey, playlistIndex) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;
-		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;
+		if(typeof cachekey !== 'undefined') {
+			this.cachekey = cachekey;
+			g_image_cache.cachelist[cachekey] = image;
+		}
 		if(typeof playlistIndex !== 'undefined') this.playlistIndex = playlistIndex;
 		this.resized = false;
 		this.artwork = image;
@@ -1023,7 +1029,7 @@ function on_notify_data(name, info) {
 			metadb = new FbMetadbHandleList(info.metadb);
 			if(info.tracklist) var tracklist = new FbMetadbHandleList(info.tracklist);
 			else var tracklist = null;
-			if(info.cover_img==null) {
+			if(info.cover_img==null || properties.disableCoverCache) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 				if (properties.follow_cursor) {
 					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
@@ -1314,6 +1320,7 @@ var TextBtn_info = new TextBtn();
  *****************************************/
 function ButtonUI_R() {
 	this.y = 10;
+	this.x = 10;	
 	this.width = imgw;
 	this.height = imgh;
 
@@ -1782,6 +1789,8 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion")
 		_menu.CheckMenuItem(12,globalProperties.keepProportion);
 		_menu.AppendMenuItem(MF_STRING, 13, "Fill the whole space");
+		_menu.AppendMenuItem(MF_STRING, 20, "Disable cover cache for this artwork");
+		_menu.CheckMenuItem(20,properties.disableCoverCache);		
 		_menu.CheckMenuItem(13,!trackinfostext_state.isActive() && properties.coverNoPadding);				
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 18, "Show track details");
@@ -1863,6 +1872,7 @@ function draw_settings_menu(x,y){
 			case (idx == 11):
 				properties.circleMode = !properties.circleMode;
 				window.SetProperty("_DISPLAY: circle mode", properties.circleMode);
+				g_image_cache.resetCache();				
 				get_images();
 				adaptButtons();
 				g_cover.refreshCurrent();
@@ -1870,6 +1880,7 @@ function draw_settings_menu(x,y){
 				break;
 			case (idx == 12):
 				setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
+				g_image_cache.resetCache();
 				get_images();
 				adaptButtons();
 				g_cover.refreshCurrent(undefined,true);
@@ -1924,6 +1935,15 @@ function draw_settings_menu(x,y){
 										,'First line:##Second line:'
 										,customInfos_splitted[0]+'##'+customInfos_splitted[1]);
 		
+				window.Repaint();
+				break;				
+			case (idx == 20): 
+				properties.disableCoverCache = !properties.disableCoverCache;
+				window.SetProperty("_DISPLAY: disable cover cache", properties.disableCoverCache);
+				get_images();
+				adaptButtons();
+				g_image_cache.resetCache();
+				g_cover.refreshCurrent(undefined,true);
 				window.Repaint();
 				break;					
 			case (idx == 200):

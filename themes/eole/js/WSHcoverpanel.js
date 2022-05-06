@@ -283,6 +283,7 @@ function calculate_visu_margin_left(){
 
 function on_paint(gr) {
 	dont_resize = false;
+	if(ww == 0 || wh == 0) return;
 	if(!fb.IsPlaying){
 		if(layout_state.isEqual(0) && mini_controlbar.isActive() && showtrackinfo_big.isActive()) {
 			g_cover.setArtwork(images.nothing_played_compact,false,true);
