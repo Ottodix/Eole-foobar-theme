@@ -3036,7 +3036,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
-			save_image_to_cache(result.image, albumIndex, cachekey, metadb);
+			if(properties.disableCoverCache !== true) save_image_to_cache(result.image, albumIndex, cachekey, metadb);
 			if (typeof g_cover == "object") {
 				if(addArgs && addArgs.isplaying) g_cover.setArtwork(result.image,true,false,addArgs.isplaying,metadb,cachekey);
 				else g_cover.setArtwork(result.image,true,false,false,metadb,cachekey);
@@ -3055,6 +3055,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				brw.repaint();
 			}
 		} else if (typeof g_cover == "object") {
+			console.log("fallback")
 			img = get_fallbackCover(metadb,undefined);
 			g_cover.setArtwork(img,true,false,addArgs.isplaying,metadb,cachekey);
 			window.Repaint();

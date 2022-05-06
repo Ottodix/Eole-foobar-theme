@@ -329,8 +329,10 @@ function on_paint(gr) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying());
 			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
-			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
-		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
+			else g_cover.setArtwork(img_blank_cover,true,true);
+		} catch (e){
+			g_cover.setArtwork(img_blank_cover,true,true)
+		}
 	}
 	setButtonStates();
 	g_cover.draw(gr,0,0);
@@ -2145,6 +2147,11 @@ function get_images(){
 		gb.FillPolygon(colors.rating_icon_off, 0, pointArr.p1);
 		gb.SetSmoothingMode(0);
 	img_rating_off.ReleaseGraphics(gb);
+	
+	img_blank_cover = gdi.CreateImage(10, 10);
+	gb = img_blank_cover.GetGraphics();
+		gb.FillSolidRect(0,0,10,10,colors.normal_bg);
+	img_blank_cover.ReleaseGraphics(gb);	
 }
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
