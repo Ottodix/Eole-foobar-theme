@@ -4911,12 +4911,12 @@ oBrowser = function(name) {
 					if(!this.dateCircleBG) this.DefineDateCircleBG(this.coverRealWith,idx); 
 					gb.DrawImage(this.dateCircleBG,8,8, this.dateCircleBG.Width, this.dateCircleBG.Height, 0, 0, this.dateCircleBG.Width, this.dateCircleBG.Height);
 					gb.SetTextRenderingHint(5);
-					gb.DrawString(overlayTxt,  this.fontDate,  GetGrey(255), 12+Math.round((this.coverRealWith-this.groups[idx].dateWidth)/2), 10, this.coverRealWith, this.groups[idx].dateHeight,  0x00004000)
+					gb.DrawString(overlayTxt,  this.fontDate,  colors.cover_date_txt, 12+Math.round((this.coverRealWith-this.groups[idx].dateWidth)/2), 10, this.coverRealWith, this.groups[idx].dateHeight,  0x00004000)
 				}
 				else {
 					gb.FillSolidRect(8, 8, this.groups[idx].dateWidth, this.groups[idx].dateHeight, colors.cover_date_bg);
 					gb.SetTextRenderingHint(5);
-					gb.DrawString(overlayTxt, this.fontDate, GetGrey(255), 12, 9, this.groups[idx].dateWidth, this.groups[idx].dateHeight, 0x00004000);
+					gb.DrawString(overlayTxt, this.fontDate, colors.cover_date_txt, 12, 9, this.groups[idx].dateWidth, this.groups[idx].dateHeight, 0x00004000);
 				}
 			}							
 		Thumb.ReleaseGraphics(gb);
@@ -7110,9 +7110,9 @@ function on_font_changed() {
 
 function on_colours_changed() {
     get_colors();
-	brw.cover_shadow=null;
-	brw.cover_shadow_hover=null;
-	brw.dateCircleBG=null;
+	brw.refresh_thumbnails();
+	brw.refresh_shadows();
+	brw.refreshDates();	
 	g_showlist.setImages();
 	g_filterbox.on_init();
 	g_headerbar.onColorsChanged();
