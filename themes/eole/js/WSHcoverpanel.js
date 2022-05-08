@@ -933,7 +933,7 @@ function on_mouse_rbtn_up(x, y){
 	if(fb.IsPlaying){
 		var now_playing_track = fb.GetNowPlaying();
 		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover in its full/original size");
-		main_menu.AppendMenuItem(MF_STRING, 9, "Show on all panels");
+		main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing on all panels");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
 		var quickSearchMenu = window.CreatePopupMenu();

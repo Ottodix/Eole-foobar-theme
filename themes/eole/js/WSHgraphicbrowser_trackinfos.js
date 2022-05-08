@@ -7075,7 +7075,7 @@ function get_colors() {
 		colors.cover_shadow_bg = GetGrey(255);
 
 		colors.cover_date_bg = GetGrey(0,115);
-		colors.cover_date_txt = GetGrey(255,155);
+		colors.cover_date_txt = GetGrey(255);
 		colors.cover_date_bg_fast = GetGrey(0,155);
 		colors.cover_date_txt_fast = GetGrey(255,155);
 		colors.dragcover_overlay = GetGrey(0,85);

@@ -1009,6 +1009,11 @@ function on_notify_data(name, info) {
 			filters_panel_state.value=info;
 			positionButtons();
 			window.Repaint();
+			timer_repaint = setTimeout(function(){
+				window.Repaint();
+				clearTimeout(timer_repaint);
+				timer_repaint = false;
+			},150);			
 		break;
 		case "save_filter_state":
 			properties.savedFilterState = info;
