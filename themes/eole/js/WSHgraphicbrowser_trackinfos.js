@@ -4775,7 +4775,7 @@ oBrowser = function(name) {
 		this.groups[albumIndex].cover_img=null;
 		if(g_showlist.idx == albumIndex) g_showlist.showlist_img=null;
 		this.groups[albumIndex].mask_applied=false;
-		this.groups[i].thumb_created = false;
+		this.groups[albumIndex].thumb_created = false;
 		this.groups[albumIndex].cover_img_thumb=null;
 		this.groups[albumIndex].tid=-1;
 		this.groups[albumIndex].load_requested = 0;
