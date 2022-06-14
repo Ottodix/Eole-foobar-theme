@@ -1,3 +1,5 @@
+﻿'use strict';
+
 class Scrollbar {
 	constructor() {
 		this.active = true;
@@ -299,7 +301,7 @@ class Scrollbar {
 			this.scrollbar.zone = true;
 			this.narrow.show = false;
 			if (ppt.sbarShow == 1 && this.scrollbar.zone != this.scrollbar.cur_zone) {
-				but.setScrollBtnsHide(!this.scrollbar.zone || this.scrollable_lines < 1 || ppt.img_only, this.type);
+				but.setScrollBtnsHide(!this.scrollbar.zone || this.scrollable_lines < 1 || ppt.img_only || txt.lyricsDisplayed(), this.type); 
 				this.scrollbar.cur_zone = this.scrollbar.zone;
 			}
 		} else this.scrollbar.zone = false;

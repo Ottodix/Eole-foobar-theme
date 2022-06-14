@@ -1,8 +1,6 @@
-﻿"use strict";
-include(fb.ProfilePath + 'themes\\eole\\js\\JStheme_common.js');
-include(fb.ProfilePath + 'themes\\eole\\js\\JSpss_switch.js');
-include(fb.ProfilePath + 'themes\\eole\\js\\JSbutton.js');
-if (typeof my_utils === 'undefined') include('scripts\\utils.js');
+﻿'use strict';
+
+if (typeof my_utils === 'undefined') include('utils.js');
 
 const loadAsync = window.GetProperty('Load Biography Asynchronously', true);
 
@@ -15,17 +13,22 @@ async function readFiles(files) {
 }
 
 const files = [
+	'so.js',
 	'helpers.js',
 	'properties.js',
 	'settings.js',
 	'interface.js',
 	'panel.js',
-	'web.js',
+	'server.js',
+	'allmusic.js',
+	'lastfm.js',
+	'wikipedia.js',
 	'names.js',
 	'scrollbar.js',
 	'buttons.js',
 	'menu.js',
 	'text.js',
+	'lyrics.js',
 	'tagger.js',
 	'resize.js',
 	'library.js',
@@ -34,9 +37,9 @@ const files = [
 	'timers.js',
 	'popupbox.js',
 	'initialise.js',
-	'callbacks.js',
-	'eole.js'	
+	'callbacks.js'
 ];
+
 if (loadAsync) {
 	readFiles(files).then(() => {
 		if (!window.ID) return; // fix pss issue

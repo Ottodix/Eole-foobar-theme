@@ -1,14 +1,25 @@
-﻿class Buttons {
+﻿'use strict';
+
+class Buttons {
 	constructor() {
 		this.alpha = 255;
 		this.btns = {};
 		this.cur = null;
 		this.Dn = false;
-		this.transition
+		this.transition;
+		
+		this.flag = {
+			x: panel.heading.x,
+			w: Math.round(ui.font.heading_h * 0.9)
+		}
+		this.flag.h = Math.round(this.flag.w * 0.6);
+		this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
+		this.flag.sp = Math.round(this.flag.w * 1.42);
 
 		this.lookUp = {
 			baseSize: 15 * $.scale,
 			col: $.toRGB(ui.col.text),
+			gap: 9,
 			img: null,
 			imgLock: null,
 			pos: 1,
@@ -22,6 +33,7 @@
 		this.rating = {
 			h1: 0,
 			h2: 0,
+			hash: '',
 			images: [],
 			scale: 2,
 			show: false,
@@ -41,8 +53,6 @@
 
 		this.src = {
 			amBio: '',
-			amlfmBio: '',
-			amlfmRev: '',
 			amRev: '',
 			allmusic: 0,
 			bahn: 'Bahnschrift SemiBold SemiConden',
@@ -54,17 +64,16 @@
 			icon: false,
 			item_w: {
 				amBio: 30,
-				amlfmBio: 30,
-				amlfmRev: 30,
 				amRev: 30,
 				lfmBio: 30,
 				lfmRev: 30,
 				space: 4,
 				spaceIconFont: 4,
-				splitter: 8
+				txtBio: 30,
+				txtRev: 30,
+				wikiBio: 30,
+				wikiRev: 30
 			},
-			lfmamBio: '',
-			lfmamRev: '',
 			lfmBio: '',
 			lfmRev: '',
 			pxShift: false,
@@ -72,15 +81,23 @@
 			name_w: 40,
 			text: false,
 			space: ' ',
+			txtBio: '',
+			txtRev: '',
 			visible: false,
 			w: 50,
+			wikiBio: '',
+			wikiRev: '',
 			x: 0,
 			y: 0
 		}
 
 		this.tooltip = {
+			heading: '',
+			name: false,
 			show: true,
-			start: Date.now() - 2000
+			start: Date.now() - 2000,
+			x: 0,
+			w: 100
 		}
 
 		this.lookUp.zoomSize = Math.max(Math.round(this.lookUp.baseSize * ppt.zoomLookUpBtn / 100), 7);
@@ -103,42 +120,30 @@
 
 	check(refresh) {
 		if (!refresh) {
-			ppt.sbarShow != 1 || !this.scr.init ? this.setScrollBtnsHide() : this.setScrollBtnsHide(true, 'both');
-			this.setSrcBtnHide();
+			(ppt.sbarShow != 1 || !this.scr.init) && !txt.lyricsDisplayed() ? this.setScrollBtnsHide() : this.setScrollBtnsHide(true, 'both');
 		}
-		if (!this.btns.heading || !ppt.heading) return;
-		this.src.allmusic = ppt.artistView && txt.bio.allmusic || !ppt.artistView && txt.rev.allmusic ? 1 : 0;
-		this.rating.show = ui.stars == 1 && !ppt.artistView && (txt.rev.allmusic && (!txt.rev.both ? txt.rating.am != -1 : txt.rating.avg != -1) || !txt.rev.allmusic && (!txt.rev.both ? txt.rating.lfm != -1 : txt.rating.avg != -1));
+		this.rating.show = ui.stars == 1 && !ppt.artistView && (txt.rev.loaded.am && txt.rating.am != -1 || txt.rev.loaded.lfm && txt.rating.lfm != -1);
 		this.src.name = ui.show.btnBg ? ' ' : '';
-		switch (this.src.allmusic) {
-			case 0:
-				switch (true) {
-					case !ppt.artistView:
-						this.src.name += !txt.rev.both ? this.src.lfmRev : this.src.lfmamRev;
-						break;
-					case ppt.artistView:
-						this.src.name += !txt.bio.both ? this.src.lfmBio : this.src.lfmamBio;
-						break;
-				}
+		switch (true) {
+			case !ppt.artistView: {
+				const ix = txt.rev.loaded.ix == -1 ? ppt.sourcerev : txt.rev.loaded.ix;
+				this.src.name += [this.src.amRev, this.src.lfmRev, this.src.wikiRev, this.src.txtRev][ix];
 				break;
-			case 1:
-				switch (true) {
-					case !ppt.artistView:
-						this.src.name += !txt.rev.both ? this.src.amRev : this.src.amlfmRev;
-						break;
-					case ppt.artistView:
-						this.src.name += !txt.bio.both ? this.src.amBio : this.src.amlfmBio;
-						break;
-				}
+			}
+			case ppt.artistView: {
+				const ix = txt.bio.loaded.ix == -1 ? ppt.sourcebio : txt.bio.loaded.ix;
+				this.src.name += [this.src.amBio, this.src.lfmBio, this.src.wikiBio, this.src.txtBio][ix];
 				break;
+			}
 		}
 		this.src.name += ui.show.btnBg || this.rating.show ? ' ' : '';
-		this.src.text = this.src.icon || this.src.name.trim().length ? true : false;
+		this.src.text = ppt.heading && this.btns.heading && ppt.hdBtnShow && (this.src.icon || this.src.name.trim().length ? true : false);
+		if (!this.btns.heading || !ppt.heading) return;
 		this.src.visible = ppt.hdBtnShow && (this.rating.show || this.src.text) && ppt.hdPos != 2;
 		if (!this.src.visible) this.src.w = 0;
 		else {
 			this.src.name_w = 0;
-			if (this.rating.show) this.src.name_w = txt.rev.allmusic ? (!txt.rev.both ? this.src.item_w.amRev : this.src.item_w.amlfmRev) : (!txt.rev.both ? this.src.item_w.lfmRev : this.src.item_w.amlfmRev);
+			if (this.rating.show) this.src.name_w = txt.rev.loaded.am ? this.src.item_w.amRev : this.src.item_w.lfmRev;
 			this.src.name_w = this.src.name_w + this.src.item_w.space * (ui.show.btnBg ? (this.src.name_w ? 2 : 1) : 0);
 			this.src.w = 0;
 			switch (true) {
@@ -147,12 +152,16 @@
 					break;
 				case this.src.text:
 					switch (true) {
-						case !ppt.artistView:
-							this.src.w = txt.rev.allmusic ? (!txt.rev.both ? this.src.item_w.amRev : this.src.item_w.amlfmRev) : (!txt.rev.both ? this.src.item_w.lfmRev : this.src.item_w.amlfmRev);
+						case !ppt.artistView: {
+							const ix = txt.rev.loaded.ix == -1 ? ppt.sourcerev : txt.rev.loaded.ix;
+							this.src.w = [this.src.item_w.amRev, this.src.item_w.lfmRev, this.src.item_w.wikiRev, this.src.item_w.txtRev][ix];
 							break;
-						case ppt.artistView:
-							this.src.w = txt.bio.allmusic ? (!txt.bio.both ? this.src.item_w.amBio : this.src.item_w.amlfmBio) : (!txt.bio.both ? this.src.item_w.lfmBio : this.src.item_w.amlfmBio);
+						}
+						case ppt.artistView: {
+							const ix = txt.bio.loaded.ix == -1 ? ppt.sourcebio : txt.bio.loaded.ix;
+							this.src.w = [this.src.item_w.amBio, this.src.item_w.lfmBio, this.src.item_w.wikiBio, this.src.item_w.txtBio][ix];
 							break
+						}
 					}
 					this.src.w += this.src.item_w.space * (ui.show.btnBg ? 2 : 0);
 					break;
@@ -217,7 +226,7 @@
 		}
 		if (n == 'all' || n == 'lookUp') {
 			this.lookUp.col = $.toRGB(ui.col.text);
-			$.gr(1, 1, true, g => {
+			$.gr(1, 1, false, g => {
 				this.lookUp.sz = Math.max(g.CalcTextWidth('\uF107', this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight('\uF107', this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
 			});
 		}
@@ -234,59 +243,57 @@
 		});
 		switch (this.src.icon) {
 			case 0:
-				this.src.amBio = ppt.amBioBtn;
-				this.src.amRev = ppt.amRevBtn;
-				this.src.lfmBio = ppt.lfmBioBtn;
-				this.src.lfmRev = ppt.lfmRevBtn;
-				this.src.amlfmBio = '';
-				this.src.amlfmRev = '';
-				this.src.lfmamBio = '';
-				this.src.lfmamRev = '';
+				this.src.amBio = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.lfmBio = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.lfmRev = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.wikiBio = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.wikiRev = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 				if (!ui.show.btnLabel) {
 					this.src.amBio = '';
 					this.src.amRev = '';
 					this.src.lfmBio = '';
 					this.src.lfmRev = '';
-				} else {
-					this.src.amlfmBio = this.src.amBio + ' | ' + this.src.lfmBio;
-					this.src.amlfmRev = this.src.amRev + ' | ' + this.src.lfmRev;
-					this.src.lfmamBio = this.src.lfmBio + ' | ' + this.src.amBio;
-					this.src.lfmamRev = this.src.lfmRev + ' | ' + this.src.amRev;
+					this.src.wikiBio = '';
+					this.src.wikiRev = '';
+					this.src.txtBio = '';
+					this.src.txtRev = '';
 				}
 				$.gr(1, 1, false, g => {
-					['space', 'amRev', 'lfmRev', 'amBio', 'lfmBio', 'amlfmRev', 'amlfmBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font))
+					['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font))
 				});
 				break;
 			case 1: {
-				this.src.amBio = this.src.amRev = 'allmusic';
-				this.src.lfmBio = this.src.lfmRev = '\uF202';
+				this.src.amBio = this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.lfmBio = this.src.lfmRev = '\uF202' + (!ppt.sourceAll ? '' : '... ');
+				this.src.wikiBio = this.src.wikiRev = '\uF266' + (!ppt.sourceAll ? '' : '... ');
+				this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+				this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 				this.src.font = gdi.Font(this.src.bahnInstalled ? this.src.bahn : 'Segoe UI Semibold', this.src.fontSize, 0);
 				this.src.iconFont = gdi.Font('FontAwesome', Math.round(this.src.fontSize * (this.src.bahnInstalled ? 1.09 : 1.16)), 0);
 				const alt_w = [];
-				alt_w[5] = '0';
-				alt_w[6] = '0';
-				alt_w[7] = ' | ';
-				alt_w[8] = ' ';
-				const fonts = [this.src.font, this.src.font, this.src.iconFont, this.src.font, this.src.iconFont, this.src.font, this.src.font, this.src.font, this.src.iconFont];
+				alt_w[9] = ' ';
+				const fonts = [this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont];
 				$.gr(1, 1, false, g => {
-					['space', 'amRev', 'lfmRev', 'amBio', 'lfmBio', 'amlfmRev', 'amlfmBio', 'splitter', 'spaceIconFont'].forEach((v, i) => this.src.item_w[v] = g.CalcTextWidth(i < 5 ? this.src[v] : alt_w[i], fonts[i]))
+					['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio', 'spaceIconFont'].forEach((v, i) => {
+						this.src.item_w[v] = g.CalcTextWidth(i < 9 ? this.src[v] : alt_w[i], fonts[i]);
+					})
 				});
 				this.src.item_w.space = Math.max(this.src.item_w.space, this.src.item_w.spaceIconFont);
-				this.src.item_w.amlfmRev = this.src.item_w.amRev + this.src.item_w.splitter + this.src.item_w.lfmRev;
-				this.src.item_w.amlfmBio = this.src.item_w.amBio + this.src.item_w.splitter + this.src.item_w.lfmBio;
-				this.src.y = this.src.fontSize > 11 ? 0 : 1;
+				const n = ppt.artistView ? 'bio' : 'rev';
+				this.src.y = this.src.fontSize < 12 || txt[n].loaded.ix == 2 ? 1 : 0;
 				break;
 			}
 		}
-		this.rating.images = [];
-		if (ui.stars == 1 && ui.show.btnRedLastfm) this.rating.imagesLfm = [];
 		if (ui.stars == 1) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), ui.col.starOn, ui.col.starOff, ui.col.starBor, false);
 		else if (ui.stars == 2) {
 			this.setRatingImages(Math.round(ui.font.main_h / 1.75) * 5, Math.round(ui.font.main_h / 1.75), ui.col.starOn, ui.col.starOff, ui.col.starBor, false);
 		}
-		if (ui.stars == 1 && ui.show.btnRedLastfm) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), RGBA(225, 225, 245, 255), RGB(225, 225, 245, 60), ui.col.starBor, true);
+		if (ui.stars == 1 && ui.show.btnRedLastfm) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), RGBA(225, 225, 245, 255), RGBA(225, 225, 245, 60), ui.col.starBor, true);
 
-		this.src.pxShift = /[gjpqy]/.test(this.src.amRev + this.src.lfmRev + this.src.amBio + this.src.lfmBio);
+		this.src.pxShift = /[gjpqy]/.test(this.src.amRev + this.src.lfmRev + this.src.wikiRev + this.src.txtRev + this.src.amBio + this.src.lfmBio + this.src.wikiBio + this.src.txtBio);
 	}
 
 	draw(gr) {
@@ -295,26 +302,46 @@
 		});
 	}
 
-	drawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, line_color, fill_color) {
+	drawStar(g, col, pts, line_thickness) {
+		g.SetSmoothingMode(2);
+		g.FillPolygon(col, 1, pts);
+		if (line_thickness > 0) g.DrawPolygon(col, line_thickness, pts);
+	}
+
+	getStarPoints(star_size, star_padding, star_indent, star_vpadding, points, line_thickness) {
 		const point_arr = [];
 		let rr = 0;
 		for (let i = 0; i != points; i++) {
-			i % 2 ? rr = Math.round((out_radius - line_thickness * 4) / 2) / in_radius : rr = Math.round((out_radius - line_thickness * 4) / 2);
+			i % 2 ? rr = Math.round((star_size - line_thickness * 4) / 2) / star_indent : rr = Math.round((star_size - line_thickness * 4) / 2);
 			const x_point = Math.floor(rr * Math.cos(Math.PI * i / points * 2 - Math.PI / 2));
 			const y_point = Math.ceil(rr * Math.sin(Math.PI * i / points * 2 - Math.PI / 2));
-			point_arr.push(x_point + out_radius / 2);
-			point_arr.push(y_point + out_radius / 2);
+			point_arr.push(x_point + star_size / 2);
+			point_arr.push(y_point + star_size / 2);
 		}
-		const img = $.gr(out_radius, out_radius, true, g => {
-			g.SetSmoothingMode(2);
-			g.FillPolygon(fill_color, 1, point_arr);
-			if (line_thickness > 0) g.DrawPolygon(line_color, line_thickness, point_arr);
+		const pts = [];
+		for (let i = 0; i < 5; i++) {
+			pts[i] = point_arr.map((v, j) => {
+				if (j % 2 === 0) return v + i * (star_size + star_padding);
+				else return v + star_vpadding;
+			});
+		}
+		return pts;
+	}
+
+	isNextSourceAvailable() {
+		let n = ppt.artistView ? 'Bio' : 'Rev';
+		if (ppt[`lock${n}`] && !ppt.sourceAll) return true;
+		n = ppt.artistView ? 'bio' : 'rev';
+		const types = txt[n].reader && panel.stndItem() ? $.source.amLfmWikiTxt : $.source.amLfmWiki;
+		let found = 0;
+		return types.some(type => {
+			if (txt[n][type]) found++;
+			if (found == 2) return true;
 		});
-		gr.DrawImage(img, x, y, out_radius, out_radius, 0, 0, out_radius, out_radius);
 	}
 
 	lbtn_dn(x, y) {
-		this.move(x, y);
+		this.move(x, y, true);
 		if (!this.cur || this.cur.hide) {
 			this.Dn = false;
 			return false
@@ -344,7 +371,7 @@
 		this.cur = null;
 	}
 
-	move(x, y) {
+	move(x, y, lDn) {
 		const hover_btn = Object.values(this.btns).find(v => {
 			if (!this.Dn || this.Dn == v.name) return v.trace(x, y);
 		});
@@ -352,6 +379,7 @@
 		this.scr.init = false;
 		this.checkScrollBtns(x, y, hover_btn);
 		if (hover_btn) hand = hover_btn.hand;
+
 		if (!resize.down) {
 			if(!hand && seeker.hand) {
 				window.SetCursor(32512);
@@ -360,8 +388,8 @@
 				window.SetCursor(32649);
 				this.hand = true;
 			}
-		}
-		//if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
+		}			
+		
 		if (hover_btn && hover_btn.hide) {
 			if (this.cur) {
 				this.cur.cs('normal');
@@ -370,14 +398,23 @@
 			this.cur = null;
 			return null;
 		} // btn hidden, ignore
-		if (this.cur === hover_btn) return this.cur;
+		if (this.cur === hover_btn) {
+			if (this.cur && this.cur.name == 'heading') {
+				const new_tt = hover_btn.tiptext();
+				if (this.tooltip.heading != new_tt) {
+					if (this.tooltip.show && hover_btn.tiptext && !lDn) hover_btn.tt.show(new_tt);
+					this.tooltip.heading = new_tt;
+				}
+			}
+			return this.cur;
+		}
 		if (this.cur) {
 			this.cur.cs('normal');
 			this.transition.start();
 		} // return prev btn to normal state
 		if (hover_btn && !(hover_btn.down && hover_btn.type < 6)) {
 			hover_btn.cs('hover');
-			if (this.tooltip.show && hover_btn.tiptext) hover_btn.tt.show(hover_btn.tiptext());
+			if (this.tooltip.show && hover_btn.tiptext && !lDn) hover_btn.tt.show(hover_btn.tiptext());
 			this.transition.start();
 		}
 		this.cur = hover_btn;
@@ -386,16 +423,6 @@
 
 	on_script_unload() {
 		this.tt('');
-	}
-	
-	setLookUpPos() {
-		this.lookUp.pos = ppt.hdLine == 2 && ppt.hdPos == 2 ? 0 : ui.sbar.type < panel.sbar.style || !ppt.text_only ? ppt.lookUp : 0;
-		this.lookUp.x = [0, 1 * $.scale, (!txt.head || ppt.img_only ? panel.w - 1 * $.scale - this.lookUp.sz - 1 : panel.heading.x + panel.heading.w - this.lookUp.sz) - 9 * $.scale][this.lookUp.pos];
-		this.lookUp.y = [0, 0, !txt.head || ppt.img_only ? 0 : panel.text.t - ui.heading.h + (ui.font.heading_h - this.lookUp.sz) / 2][this.lookUp.pos];
-		this.lookUp.w = [12, this.lookUp.sz * 1.5, this.lookUp.sz + 9 * $.scale][this.lookUp.pos];
-		this.lookUp.h = [12, this.lookUp.sz * 1.5, Math.max(ui.font.heading_h, this.lookUp.sz)][this.lookUp.pos];
-		this.lookUp.p1 = [12, this.lookUp.sz + 1, this.lookUp.sz + 1 + 9 * $.scale][this.lookUp.pos];
-		this.lookUp.p2 = this.lookUp.sz + 1;
 	}
 
 	refresh(upd) {
@@ -411,23 +438,46 @@
 			}
 			this.setLookUpPos();
 		}
+		this.check();
 		if (ppt.heading) {
-			this.check();
-			this.btns.heading = new Btn(panel.heading.x, panel.text.t - ui.heading.h, panel.heading.w - (this.lookUp.pos == 2 ? this.lookUp.sz + 10 * $.scale : 0), ui.font.heading_h, 6, $.clamp(Math.round(panel.text.t - ui.heading.h + (ui.font.heading_h - this.src.h) / 2 + ppt.hdBtnPad), panel.text.t - ui.heading.h, panel.text.t - ui.heading.h + ui.font.heading_h - this.src.h), '', '', '', !txt.head || ppt.img_only, '', () => {
-				txt.toggle(ppt.artistView ? (!ppt.bothBio ? 0 : 6) : (!ppt.bothRev ? 1 : 7));
+			this.btns.heading = new Btn(panel.heading.x, panel.text.t - ui.heading.h, panel.heading.w - (this.lookUp.pos == 2 ? this.lookUp.sz + (ppt.hdPos != 2 ? this.lookUp.gap : 10) * $.scale : 0), ui.font.heading_h, 6, $.clamp(Math.round(panel.text.t - ui.heading.h + (ui.font.heading_h - this.src.h) / 2 + ppt.hdBtnPad), panel.text.t - ui.heading.h, panel.text.t - ui.heading.h + ui.font.heading_h - this.src.h), '', '', '', !ppt.heading || ppt.img_only, '', () => {
+				if (this.isNextSourceAvailable()) {
+					txt.na = '';
+					men.toggle('', ppt.artistView ? 'Bio' : 'Rev', '', panel.m.x > panel.heading.x + panel.heading.w / 2 ? 1 : -1);
+				} else {
+					txt.na = panel.m.x > panel.heading.x + panel.heading.w / 2 ? 'Next N/A: ' : 'Previous N/A: ';
+					txt.paint();
+					timer.clear(timer.source);
+					timer.source.id = setTimeout(() => {
+						txt.na = '';
+						txt.paint();
+						timer.source.id = null;
+					}, 5000);
+				}
 				this.check(true);
 				if (ui.style.isBlur) window.Repaint();
 			}, () => this.srcTiptext(), true, 'heading');
+			const n = ppt.artistView ? 'bio' : 'rev';
 			this.src.col = {
-				normal: this.src.allmusic || (!ui.show.btnRedLastfm || ui.show.btnRedLastfm && !ui.show.btnBg) ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light ? ui.col.btn : RGB(255, 255, 255) : RGB(225, 225, 245),
-				hover: this.src.allmusic || (!ui.show.btnRedLastfm || ui.show.btnRedLastfm && !ui.show.btnBg) ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light ? ui.col.text_h : RGB(255, 255, 255) : RGB(225, 225, 245)
+				normal: txt[n].loaded.ix != 1 || !ui.show.btnRedLastfm ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light || ui.col.headingBtn !== '' ? ui.col.headBtn : RGB(255, 255, 255) : RGB(225, 225, 245),
+				hover: txt[n].loaded.ix != 1 || !ui.show.btnRedLastfm ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light || ui.col.headingBtn !== '' ? ui.col.text_h : RGB(255, 255, 255) : RGB(225, 225, 245)
 			};
+			if (!ppt.hdPos) {
+				this.flag = {
+					x: panel.heading.x,
+					w: Math.round(ui.font.heading_h * 0.9)
+				}
+				this.flag.h = Math.round(this.flag.w * 0.6);
+				this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
+				if (ui.font.heading_h >= 28 && ui.font.heading_h % 2 == 0) this.flag.y++;
+				this.flag.sp = Math.round(this.flag.w * 1.42);
+			} else this.flag.sp = 0;
 		} else delete this.btns.heading;
-		if (ppt.lookUp) {
+		if (panel.id.lookUp) {
 			this.btns.lookUp = new Btn(this.lookUp.x, this.lookUp.y, this.lookUp.w, this.lookUp.h, 7, this.lookUp.p1, this.lookUp.p2, '', {
 				normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
 				hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
-			}, !ppt.lookUp, '', () => men.buttonMenu(this.lookUp.x + this.lookUp.w, this.lookUp.y + this.lookUp.h), () => 'Click: look up...\r\nMiddle click: ' + (!panel.lock ? 'lock: stop track change updates' : 'Unlock') + '...', true, 'lookUp');
+			}, !panel.id.lookUp, '', () => men.buttonMenu(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => 'Click: look up...\r\n' + (!panel.id.lyricsSource ? 'Middle click: ' + (!panel.lock ? 'lock: stop track change updates' : 'Unlock') + '...' : 'Lock N/A with enabled lyrics source'), true, 'lookUp');
 		} else delete this.btns.lookUp;
 		if (ppt.sbarShow) {
 			switch (ui.sbar.type) {
@@ -483,22 +533,33 @@
 		this.setTooltipFont();
 		this.refresh(true);
 		txt.refresh(4);
+		const n = ppt.artistView ? 'bio' : 'rev';
+		if (txt[n].loaded.txt && txt.reader.lyrics) txt.getText();
 	}
 
 	scrollAlb() {
-		return ppt.sbarShow && !ppt.artistView && !ppt.img_only && txt.rev.text && alb_scrollbar.scrollable_lines > 0 && alb_scrollbar.active && !alb_scrollbar.narrow.show;
+		return ppt.sbarShow && !ppt.artistView && !ppt.img_only && txt.rev.text && alb_scrollbar.scrollable_lines > 0 && alb_scrollbar.active && !alb_scrollbar.narrow.show && !txt.lyricsDisplayed();
 	}
 
 	scrollArt() {
-		return ppt.sbarShow && ppt.artistView && !ppt.img_only && txt.bio.text && art_scrollbar.scrollable_lines > 0 && art_scrollbar.active && !art_scrollbar.narrow.show;
+		return ppt.sbarShow && ppt.artistView && !ppt.img_only && txt.bio.text && art_scrollbar.scrollable_lines > 0 && art_scrollbar.active && !art_scrollbar.narrow.show && !txt.lyricsDisplayed();
 	}
 
-	setSrcBtnHide() {
-		const o = this.btns.heading;
-		if (o) o.hide = !txt.head || ppt.img_only;
+	setLookUpPos() {
+		this.lookUp.pos = ppt.hdLine == 2 && ppt.hdPos == 2 ? 0 : ui.sbar.type < panel.sbar.style || !ppt.text_only ? panel.id.lookUp : 0;
+		this.lookUp.x = [0, 1 * $.scale, (!ppt.heading || ppt.img_only ? panel.w - 1 * $.scale - this.lookUp.sz - 1 : panel.heading.x + panel.heading.w - this.lookUp.sz) - 9 * $.scale][this.lookUp.pos];
+		this.lookUp.y = [0, 0, !ppt.heading || ppt.img_only ? 0 : panel.text.t - ui.heading.h + (ui.font.heading_h - this.lookUp.sz) / 2][this.lookUp.pos];
+		this.lookUp.w = [12, this.lookUp.sz * 1.5, panel.w - this.lookUp.x][this.lookUp.pos];
+		this.lookUp.h = [12, this.lookUp.sz * 1.5, Math.max(ui.font.heading_h, this.lookUp.sz)][this.lookUp.pos];
+		this.lookUp.p1 = [12, this.lookUp.sz + 1, this.lookUp.sz + 1 + 9 * $.scale][this.lookUp.pos];
+		this.lookUp.p2 = this.lookUp.sz + 1;
 	}
 
 	setRatingImages(w, h, onCol, offCol, borCol, lfm) {
+		const hash = w + '-' + h + '-' + onCol + '-' + offCol + '-' + borCol + '-' + lfm;
+		if (hash == this.rating.hash) return;
+		else this.rating.hash = hash;
+		if (lfm) this.rating.imagesLfm = [];
 		if (this.src.icon && ui.stars == 1) onCol = onCol & 0xe0ffffff;
 		w = w * this.rating.scale;
 		h = h * this.rating.scale;
@@ -513,15 +574,17 @@
 			star_padding = Math.round((w - 5 * star_size) / 4);
 			star_height--;
 		}
+		const line_thickness = 0;
 		const star_vpadding = star_height < h ? Math.floor((h - star_height) / 2) : 0;
+		const pts = this.getStarPoints(star_size, star_padding, star_indent, star_vpadding, 10, line_thickness);
 		for (let rating = 0; rating < 11; rating++) {
 			real_rating = rating / 2;
 			if (Math.round(real_rating) != real_rating) {
 				const img_off = $.gr(w, h, true, g => {
-					for (let i = 0; i < 5; i++) this.drawPolyStar(g, i * (star_size + star_padding), star_vpadding, star_size, star_indent, 10, 0, borCol, offCol);
+					for (let i = 0; i < 5; i++) this.drawStar(g, offCol, pts[i], line_thickness)
 				});
 				const img_on = $.gr(w, h, true, g => {
-					for (let i = 0; i < 5; i++) this.drawPolyStar(g, i * (star_size + star_padding), star_vpadding, star_size, star_indent, 10, 0, borCol, onCol);
+					for (let i = 0; i < 5; i++) this.drawStar(g, onCol, pts[i], line_thickness);
 				});
 				const half_mask_left = $.gr(w, h, true, g => {
 					g.FillSolidRect(0, 0, w, h, RGBA(255, 255, 255, 255));
@@ -538,7 +601,8 @@
 					g.DrawImage(img_on, 0, 0, w, h, 0, 0, w, h);
 				});
 			} else img = $.gr(w, h, true, g => {
-				for (let i = 0; i < 5; i++) this.drawPolyStar(g, i * (star_size + star_padding), star_vpadding, star_size, star_indent, 10, 0, borCol, i < real_rating ? onCol : offCol);
+				for (let i = 0; i < 5; i++) this.drawStar(g, i < real_rating ? onCol : offCol, pts[i], line_thickness);
+
 			});
 			!lfm ? this.rating.images[rating] = img : this.rating.imagesLfm[rating] = img;
 		}
@@ -602,9 +666,11 @@
 	setTooltipFont() {
 		tooltip.SetFont('Segoe UI', 15 * $.scale * ppt.zoomTooltip / 100, 0);
 	}
-
+	
 	srcTiptext() {
-		return 'Switch to ' + (ppt.artistView ? (!ppt.allmusic_bio ? (!ppt.lockBio || ppt.bothBio ? 'prefer ' : '') + 'allmusic' + (ppt.bothBio ? ' first' : '') : (!ppt.lockBio || ppt.bothBio ? 'prefer ' : '') + 'last.fm' + (ppt.bothBio ? ' first' : '')) : (!ppt.allmusic_alb ? (!ppt.lockRev || ppt.bothRev ? 'prefer ' : '') + 'allmusic' + (ppt.bothRev ? ' first' : '') : (!ppt.lockRev || ppt.bothRev ? 'prefer ' : '') + 'last.fm' + (ppt.bothRev ? ' first' : '')));
+		const suffix = this.isNextSourceAvailable() ? 'text' : 'N/A';
+		const type = panel.m.x > panel.heading.x + panel.heading.w / 2 ? 'Next ' : 'Previous ';
+		return this.src.visible && this.trace_src(panel.m.x, panel.m.y) || !but.tooltip.name ? `${type}${suffix}` : but.tooltip.name;
 	}
 
 	trace(btn, x, y) {
@@ -690,18 +756,19 @@ class Btn {
 
 	drawHeading(gr) {
 		let dh, dx1, dx2;
-		let dw = this.w + (but.lookUp.pos == 2 ? but.lookUp.sz + 10 * $.scale : 0);
+		let dw = this.w + (but.lookUp.pos == 2 ? but.lookUp.sz + (ppt.hdLine != 2 ? but.lookUp.gap : 10) * $.scale : 0);
+		let spacer = 0;
 		if (ppt.hdPos != 2) {
 			if (!ppt.hdBtnShow || ppt.hdPos == 1) {
-				dh = ppt.hdPos == 1 ? (but.rating.show || but.src.text ? (ppt.hdPos != 1 && ui.show.btnBg ? '' : (ppt.hdLine != 2 ? '  ' : ' ')) : '') + txt.heading + txt.na : txt.heading + txt.na;
+				dh = ppt.hdPos == 1 ? (but.rating.show || but.src.text ? (ppt.hdPos != 1 && ui.show.btnBg ? '' : (ppt.hdLine != 2 ? '  ' : ' ')) : '') + txt.na + txt.heading : txt.na + txt.heading;
 				dx1 = this.x + but.src.w;
 				dx2 = but.src.x = this.x;
 			} else {
-				dh = txt.heading + txt.na;
+				dh = txt.na + txt.heading;
 				dx1 = this.x;
 				dx2 = but.src.x = this.x + this.w - but.src.w;
 			}
-		} else dh = txt.heading + txt.na;
+		} else dh = txt.na + txt.heading;
 		dh = dh.trim();
 
 		switch (true) {
@@ -718,9 +785,8 @@ class Btn {
 					else if ((!ppt.hdBtnShow || ppt.hdPos != 0) && src_w + but.src.item_w.space * 2 + dh_w < dw) {
 						gr.DrawLine(dx1 + (but.src.visible ? but.src.item_w.space * (!ui.show.btnBg ? 2 : 3) : ppt.hdPos == 1 ? 0 : dh_w), Math.ceil(this.y + this.h / 2), this.x + dw - (ppt.hdBtnShow ? dh_w : ppt.hdPos == 1 ? dh_w : 0), Math.ceil(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
 					} else if (but.src.visible) {
-						const spacer = but.src.item_w.space * (!ui.show.btnBg ? 2 : 3);
+						spacer = but.src.item_w.space * (!ui.show.btnBg ? 2 : 3);
 						dx1 += spacer;
-						this.w -= spacer;
 					}
 				} else {
 					let dh_w = gr.CalcTextWidth(dh, ui.font.heading) + but.src.item_w.space * 4;
@@ -732,12 +798,36 @@ class Btn {
 				}
 				break;
 		}
-		gr.GdiDrawText(dh, ui.font.heading, ui.col.head, ppt.hdPos != 2 ? dx1 : this.x, this.y, ppt.hdPos != 2 ? this.w - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
+		const n = ppt.artistView ? 'bio' : 'rev';
+		const flag = txt[n].flag;
+		if (flag) {
+			gr.SetInterpolationMode(7);
+			if (!ppt.hdPos) {
+				const w = ui.style.l_w;
+				const o = Math.floor(w / 2);
+				gr.DrawImage(flag, but.flag.x, but.flag.y, but.flag.w, but.flag.h, 0, 0, flag.Width, flag.Height, '', 212);
+				gr.DrawRect(but.flag.x + o, but.flag.y + o, but.flag.w - w, but.flag.h - w + 1, w, ui.col.imgBor);
+			}
+			gr.SetInterpolationMode(0);
+			const h_x = (ppt.hdPos != 2 ? dx1 : this.x) + but.flag.sp;
+			const h_w = (ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer) - but.flag.sp;
+			gr.GdiDrawText(dh, ui.font.heading, ui.col.headingText, h_x, this.y, h_w, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
+			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? dh : '';
+			but.tooltip.x = h_x;
+			but.tooltip.w = h_w;
+		} else {
+			const h_x = (ppt.hdPos != 2 ? dx1 : this.x);
+			const h_w = ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer;
+			gr.GdiDrawText(dh, ui.font.heading, ui.col.headingText, (ppt.hdPos != 2 ? dx1 : this.x), this.y, ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
+			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? dh : '';
+			but.tooltip.x = h_x;
+			but.tooltip.w = h_w;
+		}
 		if (!but.src.visible) return;
 		let col;
 		if (ui.show.btnBg) {
 			gr.SetSmoothingMode(2);
-			if (but.src.allmusic || !ui.show.btnRedLastfm) {
+			if (txt[n].loaded.ix != 1 || !ui.show.btnRedLastfm) {
 				if (this.state !== 'down') gr.FillRoundRect(dx2, this.p1 - (but.src.pxShift ? 1 : 0), but.src.w, but.src.h + (but.src.pxShift ? 2 : 0), 2, 2, RGBA(ui.col.blend4[0], ui.col.blend4[1], ui.col.blend4[2], ui.col.blend4[3] * (1 - this.transition_factor)));
 				col = this.state !== 'down' ? ui.getBlend(ui.col.blend2, ui.col.blend1, this.transition_factor) : ui.col.blend2;
 				gr.FillRoundRect(dx2, this.p1 - (but.src.pxShift ? 1 : 0), but.src.w, but.src.h + (but.src.pxShift ? 2 : 0), 2, 2, col);
@@ -753,40 +843,19 @@ class Btn {
 			case 0:
 				gr.GdiDrawText(but.src.name, but.src.font, col, dx2, this.p1, but.src.w, but.src.h, !but.rating.show ? txt.cc : txt.c[0]);
 				break;
-			case 1:
-				if (!ppt.artistView && !txt.rev.both || ppt.artistView && !txt.bio.both) gr.GdiDrawText(but.src.name, but.src.allmusic ? but.src.font : but.src.iconFont, col, dx2, this.p1 + (but.src.allmusic ? 0 : but.src.y), but.src.w, but.src.h, !but.rating.show ? txt.cc : txt.c[0]);
-				else {
-					if (ui.show.btnBg) dx2 += but.src.item_w.space;
-					if (!ppt.artistView && txt.rev.both) {
-						switch (but.src.allmusic) {
-							case 0:
-								gr.GdiDrawText(but.src.lfmRev, but.src.iconFont, col, dx2, this.p1 + but.src.y, but.src.item_w.lfmRev, but.src.h, txt.c[0]);
-								gr.GdiDrawText(' | ' + but.src.amRev, but.src.font, col, dx2 + but.src.item_w.lfmRev, this.p1, but.src.item_w.amRev + but.src.item_w.splitter, but.src.h, txt.c[0]);
-								break;
-							case 1:
-								gr.GdiDrawText(but.src.amRev + ' | ', but.src.font, col, dx2, this.p1, but.src.item_w.amRev + but.src.item_w.splitter, but.src.h, txt.c[0]);
-								gr.GdiDrawText(but.src.lfmRev, but.src.iconFont, col, dx2 + but.src.item_w.amRev + but.src.item_w.splitter, this.p1 + but.src.y, but.src.item_w.lfmRev, but.src.h, txt.c[0]);
-								break;
-						}
-					}
-					if (ppt.artistView && txt.bio.both) {
-						switch (but.src.allmusic) {
-							case 0:
-								gr.GdiDrawText(but.src.lfmBio, but.src.iconFont, col, dx2, this.p1 + but.src.y, but.src.item_w.lfmBio, but.src.h, txt.c[0]);
-								gr.GdiDrawText(' | ' + but.src.amBio, but.src.font, col, dx2 + but.src.item_w.lfmBio, this.p1, but.src.item_w.amBio + but.src.item_w.splitter, but.src.h, txt.c[0]);
-								break;
-							case 1:
-								gr.GdiDrawText(but.src.amBio + ' | ', but.src.font, col, dx2, this.p1, but.src.item_w.amBio + but.src.item_w.splitter, but.src.h, txt.c[0]);
-								gr.GdiDrawText(but.src.lfmBio, but.src.iconFont, col, dx2 + but.src.item_w.amBio + but.src.item_w.splitter, this.p1 + but.src.y, but.src.item_w.lfmBio, but.src.h, txt.c[0]);
-								break;
-						}
-					}
-				}
+			case 1: {
+				let iconFont = false;
+				const b = ppt.artistView ? 'Bio' : 'Rev';
+				if (!ppt[`lock${b}`] || ppt.sourceAll) iconFont = txt[n].loaded.ix == 1 || txt[n].loaded.ix == 2;
+				else iconFont = ppt[`source${n}`] == 1 || ppt[`source${n}`] == 2;
+				gr.GdiDrawText(but.src.name, !iconFont ? but.src.font : but.src.iconFont, col, dx2, this.p1 + (!iconFont ? 0 : but.src.y), but.src.w, but.src.h, !but.rating.show ? txt.cc : txt.c[0]);
 				break;
+			}
 		}
 		if (but.rating.show) {
-			const ratingImg = txt.rev.allmusic ? but.rating.images[!txt.rev.both ? txt.rating.am : txt.rating.avg] : ui.show.btnBg && ui.show.btnRedLastfm ? but.rating.imagesLfm[!txt.rev.both ? txt.rating.lfm : txt.rating.avg] : but.rating.images[!txt.rev.both ? txt.rating.lfm : txt.rating.avg];
-			if (ratingImg) gr.DrawImage(ratingImg, !ppt.hdPos ? this.x + this.w - but.rating.w2 - (ui.show.btnBg ? but.src.item_w.space : 0) : dx2 + but.src.name_w, this.p1 + (Math.round(but.src.h - but.rating.h2) / 2), but.rating.w2, but.rating.h2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
+			const rating = txt.rev.loaded.am ? txt.rating.am : txt.rating.lfm;
+			const ratingImg = !ui.show.btnRedLastfm || txt.rev.loaded.am ? but.rating.images[rating] : but.rating.imagesLfm[rating];
+			if (ratingImg) gr.DrawImage(ratingImg, !ppt.hdPos ? this.x + this.w - spacer - but.rating.w2 - (ui.show.btnBg ? but.src.item_w.space : 0) : dx2 + but.src.name_w, this.p1 + (Math.round(but.src.h - but.rating.h2) / 2), but.rating.w2, but.rating.h2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
 		}
 	}
 

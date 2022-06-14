@@ -1,3 +1,5 @@
+﻿'use strict';
+
 class Library {
 	constructor() {
 		this.db_lib;

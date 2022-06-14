@@ -1,4 +1,6 @@
-﻿class Images {
+﻿'use strict';
+
+class Images {
 	constructor() {
 		this.artist = '';
 		this.blur = null;
@@ -13,8 +15,8 @@
 		this.removed = 0;
 		this.x = 0;
 		this.y = 0;
-		this.exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 35875, 37235, 47700, 68626, 86884, 92172];
-		this.ext = ['.jpg', '.png', '.gif', '.bmp', '.jpeg'];
+		this.exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 29520, 35875, 37235, 47700, 52526, 68626, 86884, 92172];
+		this.ext = ['.jpg', '.png', 'webp', '.gif', '.bmp', '.jpeg'];
 
 		this.art = {
 			allFilesLength: 0,
@@ -27,7 +29,21 @@
 			images: [],
 			ix: 0,
 			list: [],
+			cusPhotoLocation: false,
 			validate: []
+		}
+
+		this.blackList = {
+			file: `${cfg.storageFolder}blacklist_image.json`,
+			artist: '',
+			cur: '',
+			item: [],
+			undo: []
+		}
+
+		this.bor = {
+			w1: 0,
+			w2: 0
 		}
 
 		this.cov = {
@@ -43,19 +59,6 @@
 			newBlur: false,
 			blur: null,
 			selection: $.jsonParse(ppt.loadCovSelFb, [0, 1, 2, 3, 4])
-		}
-
-		this.blackList = {
-			file: `${fb.ProfilePath}yttm\\blacklist_image.json`,
-			artist: '',
-			cur: '',
-			item: [],
-			undo: []
-		}
-
-		this.bor = {
-			w1: 0,
-			w2: 0
 		}
 
 		this.filter = {
@@ -111,15 +114,39 @@
 		}
 
 		this.stub = {
+			0: {
+				panel: false,
+				path: '',
+				user: null
+			},
+			1: {
+				panel: false,
+				path: '',
+				user: null
+			},
+			2: {
+				path: '',
+				user: null
+			},
+			3: {
+				panel: false,
+				path: '',
+				user: null
+			},
+			4: {
+				panel: false,
+				path: '',
+				user: null
+			},
 			art: {
-				file: `${fb.ProfilePath}yttm\\artist_stub_user.png`,
-				folder: `${fb.ProfilePath}yttm\\artist_stub_user`,
+				file: `${cfg.storageFolder}artist_stub_user.png`,
+				folder: `${cfg.storageFolder}artist_stub_user`,
 				path: '',
 				user: null
 			},
 			cov: {
-				file: `${fb.ProfilePath}yttm\\front_cover_stub_user.png`,
-				folder: `${fb.ProfilePath}yttm\\front_cover_stub_user`,
+				file: `${cfg.storageFolder}front_cover_stub_user.png`,
+				folder: `${cfg.storageFolder}front_cover_stub_user`,
 				path: '',
 				user: null
 			},
@@ -160,24 +187,30 @@
 
 		this.cycImages = this.cov.folderSameAsArt ? this.artImages : v => {
 			if (!$.file(v)) return false;
-			return /(?:jpe?g|gif|png|bmp)$/i.test(fso.GetExtensionName(v));
+			return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		}
 
-		this.ext.some(v => {
-			this.stub.art.path = this.stub.art.folder + v;
-			if ($.file(this.stub.art.path)) {
-				this.stub.art.user = gdi.Image(this.stub.art.path);
-				return true;
+		['Front', 'Back', 'Disc', 'Icon', 'Art'].forEach((v, i) => {
+			const f = ppt[`panel${v}Stub`].replace(/%profile%\\/i, fb.ProfilePath);
+			if ($.file(f)) {
+				this.stub[i].panel = true;
+				this.stub[i].path = f;
+				this.stub[i].user = gdi.Image(this.stub[i].path);
 			}
 		});
 
-		this.ext.some(v => {
-			this.stub.cov.path = this.stub.cov.folder + v;
-			if ($.file(this.stub.cov.path)) {
-				this.stub.cov.user = gdi.Image(this.stub.cov.path);
-				return true;
+		for (let i = 0; i < 5; i++) {
+			if (!this.stub[i].user) {
+				const pth = i != 4 ? 'cov' : 'art';
+				this.ext.some(v => {
+					this.stub[i].path = this.stub[pth].folder + v;
+					if ($.file(this.stub[i].path)) {
+						this.stub[i].user = gdi.Image(this.stub[i].path);
+						return true;
+					}
+				});
 			}
-		});
+		}
 
 		this.setCov = $.debounce(() => {
 			filmStrip.logScrollPos();
@@ -209,18 +242,28 @@
 	artImages(v) {
 		if (!$.file(v)) return false;
 		const fileSize = utils.GetFileSize(v);
-		return (name.isLfmImg(fso.GetFileName(v)) || !ppt.imgFilterLfm && /(?:jpe?g|gif|png|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
+		return (name.isLfmImg(fso.GetFileName(v)) || !ppt.imgFilterLfm && /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
 	}
 
 	artistReset(force) {
 		if (panel.lock) return;
 		this.blurCheck();
 		this.cur_artist = this.artist;
-		this.artist = name.artist(ppt.focus);
+		this.artist = name.artist(panel.id.focus);
 		const new_artist = this.artist && this.artist != this.cur_artist || !this.artist || ppt.covBlur && ui.style.isBlur && this.id.blur != this.id.curBlur || force;
 		if (new_artist) {
 			this.art.folderSup = '';
-			this.art.folder = panel.cleanPth(cfg.pth.foImgArt, ppt.focus);
+			let files = [];
+			if (ppt.cycPhotoLocation == 1) {
+				this.art.folder = panel.cleanPth(cfg.artCusImgFolder, panel.id.focus);
+				files = utils.Glob(this.art.folder + '*');
+			}
+			if (files.length && files.some(v => /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)))) {
+				this.art.cusPhotoLocation = true;
+			} else {
+				this.art.folder = panel.cleanPth(cfg.pth.foImgArt, panel.id.focus);
+				this.art.cusPhotoLocation = false;
+			}
 			this.clearArtCache(true);
 			if (ppt.cycPhoto) this.art.done = false;
 			if (!this.art.images.length) {
@@ -239,7 +282,7 @@
 
 	blackListed(v) {
 		img.blackList.cur = this.blackList.artist;
-		this.blackList.artist = this.artist || name.artist(ppt.focus);
+		this.blackList.artist = this.artist || name.artist(panel.id.focus);
 		if (this.blackList.artist && this.blackList.artist != img.blackList.cur) {
 			img.blackList.item = this.blacklist($.clean(this.blackList.artist).toLowerCase());
 		}
@@ -249,7 +292,7 @@
 	blurCheck() {
 		if (!(ppt.covBlur && ui.style.isBlur) && !ppt.imgSmoothTrans) return;
 		this.id.curBlur = this.id.blur;
-		this.id.blur = name.albID(ppt.focus, 'stnd');
+		this.id.blur = name.albID(panel.id.focus, 'stnd');
 		this.id.blur += ppt.covType;
 		if (this.id.blur != this.id.curBlur) {
 			this.cov.newBlur = true;
@@ -266,11 +309,11 @@
 				this.chkPths(cfg.cusCovPaths, '', 1, true);
 			}
 			if (!this.cov.blur) {
-				handle = $.handle(ppt.focus);
+				handle = $.handle(panel.id.focus);
 				if (handle) this.cov.blur = utils.GetAlbumArtV2(handle, ppt.covType, !ppt.covType ? false : true);
 			}
 			if (!this.cov.blur && !ppt.covType) {
-				const pth_cov = panel.getPth('cov', ppt.focus).pth;
+				const pth_cov = panel.getPth('cov', panel.id.focus).pth;
 				this.ext.some(v => {
 					if ($.file(pth_cov + v)) {
 						this.cov.blur = gdi.Image(pth_cov + v);
@@ -279,9 +322,9 @@
 				});
 			}
 			if (!this.cov.blur && !ppt.covType) {
-				const a = name.albumArtist(ppt.focus);
-				const l = name.album(ppt.focus);
-				const pth_cov = [panel.getPth('cov', ppt.focus).pth, panel.getPth('img', ppt.focus, a, l).pth];
+				const a = name.albumArtist(panel.id.focus);
+				const l = name.album(panel.id.focus);
+				const pth_cov = [panel.getPth('cov', panel.id.focus).pth, panel.getPth('img', panel.id.focus, a, l).pth];
 				this.chkPths(pth_cov, '', 1);
 			}
 			if (!this.cov.blur && !ppt.covType)
@@ -295,14 +338,23 @@
 		const i = $.gr(panel.w, panel.h, true, (g, gi) => {
 			g.SetInterpolationMode(0);
 			if (ui.blur.blend) {
-				const iSmall = image.Resize(Math.max(panel.w * ui.blur.level / 100, 1), Math.max(panel.h * ui.blur.level / 100, 2, 1), 2);
-				const iFull = iSmall.Resize(panel.w, panel.h, 2);
-				const offset = 90 - ui.blur.level;
-				g.DrawImage(iFull, 0 - offset, 0 - offset, panel.w + offset * 2, panel.h + offset * 2, 0, 0, iFull.Width, iFull.Height, 0, ui.blur.blendAlpha);
+				if (ppt.blurTemp) {
+					const iSmall = image.Resize(Math.max(panel.w * ui.blur.level / 100, 1), Math.max(panel.h * ui.blur.level / 100, 2, 1), 2);
+					const iFull = iSmall.Resize(panel.w, panel.h, 2);
+					const offset = 90 - ui.blur.level;
+					g.DrawImage(iFull, 0 - offset, 0 - offset, panel.w + offset * 2, panel.h + offset * 2, 0, 0, iFull.Width, iFull.Height, 0, ui.blur.blendAlpha);
+				} else g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height, 0, ui.blur.blendAlpha); // no blur
 			} else {
-				g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height);
-				if (ui.blur.level > 1) gi.StackBlur(ui.blur.level);
-				g.FillSolidRect(0, 0, panel.w, panel.h, this.isImageDark(gi) ? ui.col.bg_light : ui.col.bg_dark);
+				if (ppt.theme == 1 || ppt.theme == 3) {
+					g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height);
+					if (ui.blur.level > 1) gi.StackBlur(ui.blur.level);
+					g.FillSolidRect(0, 0, panel.w, panel.h, this.isImageLight(gi) ? ui.col.bg_light : ui.col.bg_dark);
+				}
+				if (ppt.theme == 4) {
+					g.FillSolidRect(0, 0, panel.w, panel.h, this.getRandomCol());
+					g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height, 0, this.getImgAlpha(image));
+					if (ui.blur.level > 1) gi.StackBlur(ui.blur.level);
+				}
 			}
 		});
 		return i;
@@ -373,22 +425,22 @@
 	checkUserStub(type, handle) {
 		switch (type) {
 			case 'art': {
-				if (this.stub.art.user) break;
+				if (this.stub[4].user) break;
 				const stubArtUser = utils.GetAlbumArtV2(handle, 4);
 				if (stubArtUser) stubArtUser.SaveAs(this.stub.art.file);
 				if ($.file(this.stub.art.file)) {
-					this.stub.art.user = gdi.Image(this.stub.art.file);
-					this.stub.art.path = this.stub.art.file;
+					this.stub[4].user = gdi.Image(this.stub.art.file);
+					this.stub[4].path = this.stub.art.file;
 				}
 				break;
 			}
 			case 'cov': {
-				if (this.stub.cov.user) break;
+				if (this.stub[0].user) break;
 				const stubCovUser = utils.GetAlbumArtV2(handle, 0);
 				if (stubCovUser) stubCovUser.SaveAs(this.stub.cov.file);
 				if ($.file(this.stub.cov.file)) {
-					this.stub.cov.user = gdi.Image(this.stub.cov.file);
-					this.stub.cov.path = this.stub.cov.file;
+					this.stub[0].user = gdi.Image(this.stub.cov.file);
+					this.stub[0].path = this.stub.cov.file;
 				}
 				break;
 			}
@@ -399,7 +451,7 @@
 		let h = false;
 		pths.some(v => {
 			if (h) return true;
-			const ph = !cusCovPaths ? v + fn : $.eval(v + fn, ppt.focus);
+			const ph = !cusCovPaths ? v + fn : $.eval(v + fn, panel.id.focus);
 			this.ext.some(w => {
 				const ep = ph + w;
 				if ($.file(ep)) {
@@ -450,7 +502,7 @@
 	}
 
 	createImages() {
-		const bg = this.isType('AnyBor') || !ui.blur.dark && !ui.blur.light;
+		const bg = this.isType('AnyBorShadow') || !ui.blur.dark && !ui.blur.light;
 		const cc = StringFormat(1, 1);
 		const font1 = gdi.Font('Segoe UI', 230, 1);
 		const font2 = gdi.Font('Segoe UI', 120, 1);
@@ -484,7 +536,10 @@
 	}
 
 	draw(gr) {
-		if (ppt.text_only && !ui.style.isBlur) return;
+		if (ppt.text_only && !ui.style.isBlur) {
+			if (ppt.showFilmStrip && this.get) this.getImgFallback();
+			return;
+		}
 		if (ui.style.isBlur && this.blur) gr.DrawImage(this.blur, 0, 0, this.blur.Width, this.blur.Height, 0, 0, this.blur.Width, this.blur.Height);
 		if (this.get) return this.getImgFallback();
 		if (!ppt.text_only && this.cur) gr.DrawImage(this.cur, this.x, this.y, this.cur.Width, this.cur.Height, 0, 0, this.cur.Width, this.cur.Height, 0, this.style.alpha);
@@ -573,7 +628,7 @@
 
 	fresh() {
 		this.counter++;
-		if (this.counter < ppt.cycTimePic) return;
+		if (this.counter < ppt.cycTimePic || panel.id.lyricsSource && lyrics.scroll) return;
 		this.counter = 0;
 		if (panel.block() || !ppt.cycPic || ppt.text_only || seeker.dn || panel.zoom()) return;
 		if (ppt.artistView) {
@@ -584,10 +639,28 @@
 			this.changeCov(1);
 		}
 	}
+
 	filmOK(newArr) {
 		return newArr && this.art.list.length && ppt.showFilmStrip && filmStrip.scroll.pos.art[this.artist] && filmStrip.scroll.pos.art[this.artist].arr && filmStrip.scroll.pos.art[this.artist].arr.length;
-		
 	}
+
+	getImgAlpha(image) {
+		const colorSchemeArray = JSON.parse(image.GetColourSchemeJSON(15));
+		let rTot = 0;
+		let gTot = 0;
+		let bTot = 0;
+		let freqTot = 0;
+		colorSchemeArray.forEach(v => {
+			const col = $.toRGB(v.col);
+			rTot += col[0] ** 2 * v.freq;
+			gTot += col[1] ** 2 * v.freq;
+			bTot += col[2] ** 2 * v.freq;
+			freqTot += v.freq;
+		});
+		const avgCol = ($.clamp(Math.round(Math.sqrt(rTot / freqTot)), 0, 255) + $.clamp(Math.round(Math.sqrt(gTot / freqTot)), 0, 255) + $.clamp(Math.round(Math.sqrt(bTot / freqTot)), 0, 255)) / 3;
+		return $.clamp(avgCol * -0.32 +  128, 64, 128);
+	}
+
 	getArtImages() {
 		let allFiles = this.art.folder ? utils.Glob(this.art.folder + '*') : [];
 		if (!allFiles.length && this.art.folderSup) allFiles = utils.Glob(this.art.folderSup + '*');
@@ -651,10 +724,10 @@
 		let bor_img = $.gr(Math.floor(w + bor_w2 + imgb), Math.floor(h + bor_w2 + imgb), true, g => {
 			if (this.style.border > 1 && !this.style.reflection) g.DrawImage(sh_img, 0, 0, Math.floor(w + bor_w2 + imgb), Math.floor(h + bor_w2 + imgb), 0, 0, sh_img.Width, sh_img.Height);
 			if (this.style.border == 1 || this.style.border == 3) {
-				if (!this.style.circular) g.FillSolidRect(0, 0, w + bor_w2, h + bor_w2, RGB(255, 255, 255));
+				if (!this.style.circular) g.FillSolidRect(0, 0, w + bor_w2, h + bor_w2, !ppt.highlightImgBor ? RGB(255, 255, 255) : ui.col.text_h);
 				else {
 					g.SetSmoothingMode(2);
-					g.FillEllipse(0, 0, w + bor_w2, h + bor_w2, RGB(255, 255, 255));
+					g.FillEllipse(0, 0, w + bor_w2, h + bor_w2, !ppt.highlightImgBor ? RGB(255, 255, 255) : ui.col.text_h);
 				}
 			}
 			g.DrawImage(image, bor_w1, bor_w1, w, h, 0, 0, image.Width, image.Height);
@@ -676,7 +749,7 @@
 		if (ppt.artistView || !this.cov.cycle || panel.alb.ix) return false;
 		if (!panel.lock) this.setAlbID();
 		const new_album = this.id.albCyc != this.id.curAlbCyc || !this.id.albCyc;
-		if (ppt.loadCovFolder && !panel.lock) this.cov.folder = panel.cleanPth(cfg.albCovFolder, ppt.focus);
+		if (ppt.loadCovFolder && !panel.lock) this.cov.folder = panel.cleanPth(cfg.albCovFolder, panel.id.focus);
 		if (new_album) {
 			this.clearCovCache();
 			this.cov.counter = 0;
@@ -703,8 +776,8 @@
 				filmStrip.check();
 			}
 			if (ppt.loadCovAllFb) {
-				const handle = $.handle(ppt.focus);
-				if (handle) img.cov.selFiltered.forEach(v => this.getImg(handle, v, false));
+				const handle = $.handle(panel.id.focus);
+				if (handle) this.cov.selFiltered.forEach(v => this.getImg(handle, v, false));
 				else if (!ppt.loadCovFolder || !this.cov.images.length) return false;
 			}
 		}
@@ -730,16 +803,16 @@
 				return;
 			}
 			else {
-				const pth = panel.getPth('img', ppt.focus, a, l, '', cfg.supCache);
+				const pth = panel.getPth('img', panel.id.focus, a, l, '', cfg.supCache);
 				if (this.chkPths(pth.pe, pth.fe, 0)) return;
 				if (pth.fe != this.cov.done && cfg.dlRevImg) {
 					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
 					const fn_cov = pth_cov + pth.fe;
-					if (panel.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
+					if ($.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
 					else window.NotifyOthers('bio_getRevImg', [a, l, pth_cov, fn_cov]);
 					this.cov.done = pth.fe;
 				}
-				this.setStub(cov, this.stub.cov.path, false, 0, this.stub.cov.user);
+				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
 				return;
 			}
 		}
@@ -752,23 +825,33 @@
 				this.getImg(a_handle, 4, false);
 				return;
 			}
-			this.setStub(art, this.stub.art.path, false, 1, this.stub.art.user);
+			this.setStub(art, this.stub[4].path, false, 1, this.stub[4].user);
 			return;
 		}
 		// stndAlb
-		const handle = $.handle(ppt.focus);
+		const handle = $.handle(panel.id.focus);
 		if (handle) {
-			this.getImg(handle, ppt.artistView ? 4 : ppt.covType, !ppt.covType || ppt.artistView ? false : true);
+			let id = ppt.artistView ? 4 : ppt.covType;
+			if (!ppt.loadCovAllFb || ppt.artistView) this.getImg(handle, id, this.stub[id].panel ? false : !ppt.covType || ppt.artistView ? false : true);
+			else {
+				id = this.cov.selFiltered[0];
+				let image = null;
+				if (cov.cacheHit(this.stub[id].path)) return;
+				if (this.stub[id].user) {
+					image = this.stub[id].user;
+					if (image) this.cache().cacheIt(image, this.stub[id].path);
+				}
+				if (!image) this.setStub(this.cache(), 'cover', true, 0);
+			}
 			return;
 		}
 		if (fb.IsPlaying && handle) return;
-		if (panel.id.imgText) txt.text = true;
 		this.setStub(this.cache(), 'noitem', true, 2);
 	}
 
 	getImg(handle, id, needStub) {
 		this.cur_handle = handle;
-		utils.GetAlbumArtAsync(window.ID, handle, id, needStub);
+		utils.GetAlbumArtAsync(0, handle, id, needStub);
 	}
 
 	getImgFallback() {
@@ -788,7 +871,7 @@
 				if (ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return;
 				this.cur_artist = this.artist;
 				const stndBio = panel.stnd(art_ix, panel.art.list);
-				this.artist = !stndBio ? panel.art.list[art_ix].name : !panel.lock ? name.artist(ppt.focus) : panel.art.list.length ? panel.art.list[0].name : this.artist;
+				this.artist = !stndBio ? panel.art.list[art_ix].name : !panel.lock ? name.artist(panel.id.focus) : panel.art.list.length ? panel.art.list[0].name : this.artist;
 				const new_artist = this.artist && this.artist != this.cur_artist || !this.artist || force;
 				if (new_artist) {
 					men.counter.bio = 0;
@@ -797,9 +880,9 @@
 				if (ppt.cycPhoto) {
 					if (new_artist) {
 						this.counter = 0;
-						this.art.folder = panel.lock ? panel.cleanPth(cfg.remap.foImgArt, ppt.focus, 'remap', this.artist, '', 1) : stndBio ? panel.cleanPth(cfg.pth.foImgArt, ppt.focus) : panel.cleanPth(cfg.remap.foImgArt, ppt.focus, 'remap', this.artist, '', 1);
+						this.art.folder = panel.lock ? panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1) : stndBio ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 						this.art.folderSup = '';
-						if (!stndBio && cfg.supCache && !$.folder(this.art.folder)) this.art.folderSup = panel.cleanPth(cfg.sup.foImgArt, ppt.focus, 'remap', this.artist, '', 1);
+						if (!stndBio && cfg.supCache && !$.folder(this.art.folder)) this.art.folderSup = panel.cleanPth(cfg.sup.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 						this.clearArtCache(true);
 						this.art.done = false;
 						if (!this.art.images.length) this.art.allFilesLength = 0;
@@ -830,9 +913,10 @@
 	}
 
 	getOrientation() {
-		this.style.horizontal = (ppt.style == 0 || ppt.style == 2 || ppt.style > 3) && !ppt.img_only && txt.text;
-		this.style.vertical = (ppt.style == 1 || ppt.style == 3 || ppt.style > 3 && !ppt.alignAuto) && !ppt.img_only && txt.text;
+		this.style.horizontal = (ppt.style == 0 || ppt.style == 2 || ppt.style > 3) && !ppt.img_only;
+		this.style.vertical = (ppt.style == 1 || ppt.style == 3 || ppt.style > 3 && !ppt.alignAuto) && !ppt.img_only;
 		this.style.circular = this.isType('Circ');
+		this.style.reflection = this.isType('Refl');
 	}
 
 	getOverlayMetrics(image) {
@@ -848,6 +932,15 @@
 		}
 	}
 
+	getRandomCol() {
+		const rc = () => {
+			return Math.floor(Math.random() * 256);
+		};
+		let c = [rc(), rc(), rc()];
+		while (!this.isColOk(c)) c = [rc(), rc(), rc()];
+		return $.RGBAtoRGB(RGBA(c[0], c[1], c[2], Math.min(80 / ui.blur.alpha, 255)), RGB(0, 0, 0));
+	}
+
 	grab(force) {
 		if (panel.block()) return this.get = true;
 		this.getArtImg(true);
@@ -856,8 +949,18 @@
 
 	images(v) {
 		if (!$.file(v)) return false;
+		if (this.art.cusPhotoLocation) return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		const fileSize = utils.GetFileSize(v);
-		return (name.isLfmImg(fso.GetFileName(v), this.artist) || !ppt.imgFilterLfm && /(?:jpe?g|gif|png|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
+		return (name.isLfmImg(fso.GetFileName(v), this.artist) || !ppt.imgFilterLfm && /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
+	}
+
+	isColOk(c) {
+		const hsp = Math.sqrt(
+			0.299 * (c[0] * c[0]) +
+			0.587 * (c[1] * c[1]) +
+			0.114 * (c[2] * c[2])
+		);
+		return hsp > 55;
 	}
 
 	isEmbedded(type, ix) { // also identifies yt etc
@@ -872,7 +975,7 @@
 		}
 	}
 
-	isImageDark(image) {
+	isImageLight(image) {
 		const colorSchemeArray = JSON.parse(image.GetColourSchemeJSON(15));
 		let rTot = 0;
 		let gTot = 0;
@@ -891,14 +994,16 @@
 
 	isType(n, image) {
 		switch (n) { // init before createImages & this.setCrop
-			case 'AnyBor':
+			case 'AnyBorShadow':
 				return ['artBorderImgOnly', 'artShadowImgOnly', 'artBorderDual', 'artShadowDual', 'covBorderImgOnly', 'covShadowImgOnly', 'covBorderDual', 'covShadowDual'].some(v => ppt[v]);
 			case 'Blur':
 				return ui.style.isBlur && !(ppt.img_only && this.style.crop && this.style.border < 2) ? image.Clone(0, 0, image.Width, image.Height) : null;
+			case 'AnyBor':
+				return ['artBorderImgOnly', 'artBorderDual', 'covBorderImgOnly', 'covBorderDual'].some(v => ppt[v]);
 			case 'Fade':
-				return !ppt.typeOverlay && ppt.style > 3 && txt.text && !ppt.img_only;
+				return !ppt.typeOverlay && ppt.style > 3 && !ppt.img_only;
 			case 'Overlay':
-				return ppt.style > 3 && ppt.alignAuto && txt.text && !ppt.img_only;
+				return ppt.style > 3 && ppt.alignAuto && !ppt.img_only;
 			case 'Circ':
 				switch (ppt.artistView) {
 					case true:
@@ -907,21 +1012,21 @@
 						return !ppt.img_only ? ppt.covStyleDual == 2 : ppt.covStyleImgOnly == 2;
 				}
 				break;
-				case 'Border':
-					switch (ppt.artistView) {
-						case true:
-							return ppt.artBorderDual && ppt.artShadowDual || ppt.artBorderImgOnly && ppt.artShadowImgOnly ? 3 : ppt.artShadowDual || ppt.artShadowImgOnly ? 2 : ppt.artBorderDual || ppt.artBorderImgOnly ? 1 : 0;
-						case false:
-							return ppt.covBorderDual && ppt.covShadowDual || ppt.covBorderImgOnly && ppt.covShadowImgOnly ? 3 : ppt.covShadowDual || ppt.covShadowImgOnly ? 2 : ppt.covBorderDual || ppt.covBorderImgOnly ? 1 : 0;
-					}
-					break;
-					default:
-						switch (ppt.artistView) {
-							case true:
-								return !ppt.img_only ? ppt[`art${n}Dual`] : ppt[`art${n}ImgOnly`];
-							case false:
-								return !ppt.img_only ? ppt[`cov${n}Dual`] : ppt[`cov${n}ImgOnly`];
-						}
+			case 'Border':
+				switch (ppt.artistView) {
+					case true:
+						return !ppt.img_only && ppt.artBorderDual && ppt.artShadowDual || ppt.img_only && ppt.artBorderImgOnly && ppt.artShadowImgOnly ? 3 : !ppt.img_only && ppt.artShadowDual || ppt.img_only && ppt.artShadowImgOnly ? 2 : !ppt.img_only && ppt.artBorderDual || ppt.img_only && ppt.artBorderImgOnly ? 1 : 0;
+					case false:
+						return !ppt.img_only && ppt.covBorderDual && ppt.covShadowDual || ppt.img_only && ppt.covBorderImgOnly && ppt.covShadowImgOnly ? 3 : !ppt.img_only && ppt.covShadowDual || ppt.img_only && ppt.covShadowImgOnly ? 2 : !ppt.img_only && ppt.covBorderDual || ppt.img_only && ppt.covBorderImgOnly ? 1 : 0;
+				}
+				break;
+			default:
+				switch (ppt.artistView) {
+					case true:
+						return !ppt.img_only ? ppt[`art${n}Dual`] : ppt[`art${n}ImgOnly`];
+					case false:
+						return !ppt.img_only ? ppt[`cov${n}Dual`] : ppt[`cov${n}ImgOnly`];
+				}
 		}
 	}
 
@@ -946,25 +1051,25 @@
 		let a, l;
 		switch (n) {
 			case 0: // stndAlb !fbImg: chkCov save pths: if !found chk/save stubCovUser
-				a = name.albumArtist(ppt.focus);
-				l = name.album(ppt.focus);
-				if (this.chkPths([panel.getPth('cov', ppt.focus).pth, panel.getPth('img', ppt.focus, a, l).pth], '', 0)) return true;
+				a = name.albumArtist(panel.id.focus);
+				l = name.album(panel.id.focus);
+				if (this.chkPths([panel.getPth('cov', panel.id.focus).pth, panel.getPth('img', panel.id.focus, a, l).pth], '', 0)) return true;
 				if (cov.cacheHit(this.stub.cov.path)) return true;
 				this.checkUserStub('cov', handle);
 				return false;
 			case 1: { // !stndAlb inLib !fbImg: chkCov save pths: if !found getRevImg else load stub || metadb
 				a = panel.alb.list[panel.alb.ix].artist;
 				l = panel.alb.list[panel.alb.ix].album;
-				const pth = panel.getPth('img', ppt.focus, a, l, '', cfg.supCache);
+				const pth = panel.getPth('img', panel.id.focus, a, l, '', cfg.supCache);
 				if (this.chkPths(pth.pe, pth.fe, 0)) return;
 				if (pth.fe != this.cov.done && cfg.dlRevImg) {
 					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
 					const fn_cov = pth_cov + pth.fe;
-					if (panel.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
+					if ($.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
 					else window.NotifyOthers('bio_getRevImg', [a, l, pth_cov, fn_cov]);
 					this.cov.done = pth.fe;
 				}
-				this.setStub(cov, this.stub.cov.path, false, 0, this.stub.cov.user);
+				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
 				return;
 			}
 		}
@@ -978,17 +1083,20 @@
 	loadCycCov(handle, art_id, image, image_path) { // stndAlb
 		if (!this.cov.cycle) return false;
 		if (this.blackListed(image_path)) image_path = '';
+		if ($.file(image_path)) {
+			const fileSize = utils.GetFileSize(image_path);
+			if (this.exclArr.includes(fileSize)) image_path = '';
+		}
 		if (ppt.loadCovAllFb) {
 			if (this.cov.list.every(v => {
 					return v.id !== art_id
-
 				})) {
 				this.cov.counter++;
 				if (!art_id) {
 					let path = '';
 					if (cfg.cusCov) path = this.chkPths(cfg.cusCovPaths, '', 3, true);
 					if (image_path && !cfg.cusCov || !path) path = image_path;
-					if (!path) path = this.chkPths([panel.getPth('cov', ppt.focus).pth, panel.getPth('img', ppt.focus, name.albumArtist(ppt.focus), name.album(ppt.focus)).pth], '', 3);
+					if (!path) path = this.chkPths([panel.getPth('cov', panel.id.focus).pth, panel.getPth('img', panel.id.focus, name.albumArtist(panel.id.focus), name.album(panel.id.focus)).pth], '', 3);
 					if (path) {
 						const ln = this.cov.list.length;
 						this.cov.list[ln] = {};
@@ -1008,7 +1116,7 @@
 					this.cov.list[ln].pth = image_path;
 				}
 				this.cov.list = this.cov.list.filter(Boolean);
-				this.sort(this.cov.list, 'id');
+				$.sort(this.cov.list, 'id', 'num');
 				this.cov.list = this.uniqPth(this.cov.list);
 				this.cov.images = this.cov.list.map(v => v.pth);
 				filmStrip.check();
@@ -1019,7 +1127,7 @@
 			const key = this.cov.images[this.cov.ix];
 			if (this.cov.counter > (ppt.loadCovAllFb ? img.cov.selFiltered.length : 0) - 1) {
 				if (key) this.loadImg(cov, key, false, this.cov.ix, this.isEmbedded('stnd', this.cov.ix));
-				seeker.metrics(this.style.circular, this.style.crop, this.style.horizontal, this.style.vertical);
+				seeker.metrics(this.style.circular, this.style.crop, this.style.horizontal, this.style.reflection, this.style.vertical);
 				if (!this.cov.list.length) return false; // load stub
 			}
 			return true;
@@ -1032,7 +1140,7 @@
 			ca.cache[key] = {
 				id: id
 			};
-			gdi.LoadImageAsync(window.ID, key);
+			gdi.LoadImageAsync(0, key);
 		} else cov.cacheIt(embeddedImg, key);
 
 	}
@@ -1044,23 +1152,24 @@
 		}
 		if (!image) {
 			if (ppt.artistView) {
-				if (art.cacheHit(this.stub.art.path)) return;
+				if (art.cacheHit(this.stub[art_id].path)) return;
 				this.checkUserStub('art', handle);
-				if (this.stub.art.user) {
-					image = this.stub.art.user;
-					image_path = this.stub.art.path;
-				} // chk/save/load stubArtUser
+				if (this.stub[art_id].user) {
+					image = this.stub[art_id].user;
+					image_path = this.stub[art_id].path;
+				}
 			} else {
-				if (cov.cacheHit(this.stub.cov.path)) return;
+				if (ppt.loadCovAllFb) art_id = this.cov.selFiltered[0];
+				if (cov.cacheHit(this.stub[art_id].path)) return;
 				this.checkUserStub('cov', handle);
-				if (this.stub.cov.user) {
-					image = this.stub.cov.user;
-					image_path = this.stub.cov.path;
+				if (this.stub[art_id].user) {
+					image = this.stub[art_id].user;
+					image_path = this.stub[art_id].path;
 				}
 			}
 		}
 		if (!image) {
-			this.setStub(this.cache(), 'stub' + art_id, true, ppt.artistView ? 1 : 0);
+			this.setStub(this.cache(), 'stub' + art_id, true, ppt.artistView || art_id == 4 ? 1 : 0);
 			return;
 		}
 		if (!txt.rev.lookUp) this.clearCovCache();
@@ -1075,7 +1184,7 @@
 	metrics() {
 		this.setAutoDisplayVariables();
 		this.getOrientation();
-		seeker.metrics(this.style.circular, this.style.crop, this.style.horizontal, this.style.vertical);
+		seeker.metrics(this.style.circular, this.style.crop, this.style.horizontal, this.style.reflection, this.style.vertical);
 	}
 
 	move(p_x, p_y) {
@@ -1103,11 +1212,12 @@
 		if (!this.cur_handle || !this.cur_handle.Compare(handle) || image && this.cache().cacheHit(image_path + (!embedded ? '' : art_id))) return;
 		if (this.loadCycCov(handle, art_id, image, image_path)) return;
 		if (panel.alb.ix && panel.alb.ix < panel.alb.list.length && !image && !ppt.artistView) return this.loadAltCov(handle, 1);
-		if (!image && !ppt.artistView && !art_id && !panel.alb.ix) {
+		if (!image && !ppt.artistView && (!art_id || ppt.loadCovAllFb) && !panel.alb.ix) {
 			if (this.loadAltCov(handle, 0)) return;
-			if (this.stub.cov.user) {
-				image = this.stub.cov.user;
-				image_path = this.stub.cov.path;
+			if (ppt.loadCovAllFb) art_id = this.cov.selFiltered[0];
+			if (this.stub[art_id].user) {
+				image = this.stub[art_id].user;
+				image_path = this.stub[art_id].path;
 			}
 		}
 		this.loadStndCov(handle, art_id, image, image_path, embedded);
@@ -1176,9 +1286,15 @@
 		if (ppt.artistView) {
 			if (this.init) this.artistReset();
 			this.getArtImg();
-		} else this.getFbImg();
+		} else {
+			this.getFbImg();
+			if (this.init) {
+				this.id.albCyc = '';
+				this.id.curAlbCyc = '';
+			}
+		}
 		this.init = false;
-		if (ppt.img_only) panel.getList(true);
+		if (ppt.img_only) panel.getList(true, true);
 		but.refresh(true);
 	}
 
@@ -1204,7 +1320,7 @@
 		const cur_pth = this.cur_pth();
 		return {
 			imgPth: (ppt.text_only && !panel.style.showFilmStrip) || !$.file(cur_pth) ? '' : cur_pth,
-			artist: this.artist || name.artist(ppt.focus),
+			artist: this.artist || name.artist(panel.id.focus),
 			blk: name.isLfmImg(fso.GetFileName(cur_pth))
 		};
 	}
@@ -1214,7 +1330,6 @@
 		this.style.blur = this.isType('Blur', image);
 		this.style.fade = this.isType('Fade');
 		this.style.overlay = this.isType('Overlay');
-		this.style.reflection = this.isType('Refl');
 		let type = this.style.circular ? 'circular' : !this.style.crop ? 'default' : 'crop';
 		switch (type) {
 			case 'circular':
@@ -1227,7 +1342,7 @@
 				this.im.h = this.nh;
 				break;
 			case 'crop':
-				if (ppt.style > 3 && txt.text) this.nh = Math.max(panel.h - panel.img.t - panel.img.b - this.bor.w2, 10);
+				if (ppt.style > 3 && !ppt.img_only) this.nh = Math.max(panel.h - panel.img.t - panel.img.b - this.bor.w2, 10);
 				this.im.w = this.nw;
 				this.im.h = this.nh;
 				break;
@@ -1353,13 +1468,13 @@
 	resetCounters() {
 		if (panel.lock) return;
 		this.id.curAlbCounter = this.id.albCounter;
-		this.id.albCounter = name.albID(ppt.focus, 'full');
+		this.id.albCounter = name.albID(panel.id.focus, 'full');
 		if (this.id.albCounter != this.id.curAlbCounter || !this.id.albCounter) {
 			this.counter = 0;
 			men.counter.rev = 0;
 		}
 		this.id.curArtCounter = this.id.artCounter;
-		this.id.artCounter = name.artist(ppt.focus);
+		this.id.artCounter = name.artist(panel.id.focus);
 		if (this.id.artCounter && this.id.artCounter != this.id.curArtCounter || !this.id.artCounter) {
 			this.counter = 0;
 			men.counter.bio = 0;
@@ -1373,7 +1488,7 @@
 
 	setAlbID() {
 		this.id.curAlbCyc = this.id.albCyc;
-		this.id.albCyc = name.albID(ppt.focus, 'full');
+		this.id.albCyc = name.albID(panel.id.focus, 'full');
 	}
 
 	setAlignment() {
@@ -1382,40 +1497,40 @@
 		} else this.im.l = Math.round((this.nw - this.im.w) / 2 + this.im.l);
 		if (this.style.vertical && ppt.alignV != 1) {
 			if (ppt.alignV == 2) this.im.t = Math.round(panel.h - panel.img.b - this.im.h - this.bor.w2);
-		} else if (ppt.style < 4 || !ppt.alignAuto || !txt.text || ppt.img_only) this.im.t = Math.round((this.nh - this.im.h) / 2 + this.im.t);
+		} else if (ppt.style < 4 || !ppt.alignAuto || ppt.img_only) this.im.t = Math.round((this.nh - this.im.h) / 2 + this.im.t);
 	}
 
 	setAutoDisplayVariables() {
-		if (!ppt.img_only && txt.text && ppt.textAlign && ppt.style < 4) {
+		if (!ppt.img_only && ppt.textAlign && ppt.style < 4) {
 			if (ppt.style == 0) {
 				panel.img.l = panel.heading.x;
 				panel.img.r = panel.w - panel.heading.x - panel.heading.w;
 			}
 			if (ppt.style == 2) {
-				panel.img.l = !panel.style.fullWidthHeading ? panel.heading.x : panel.heading.x + panel.filmStripSize.l;
-				panel.img.r = !panel.style.fullWidthHeading ? panel.w - panel.heading.x - panel.heading.w : panel.w - panel.img.l - panel.heading.w + panel.filmStripSize.r;
+				panel.img.l = !panel.style.fullWidthHeading ? panel.heading.x : panel.heading.x + (!ppt.filmStripOverlay ? panel.filmStripSize.l : 0);
+				panel.img.r = !panel.style.fullWidthHeading ? panel.w - panel.heading.x - panel.heading.w : panel.w - panel.img.l - panel.heading.w + (!ppt.filmStripOverlay ? panel.filmStripSize.r : 0);
 			}
 			if ((ppt.style == 1 || ppt.style == 3)) {
-				panel.img.t = !panel.style.fullWidthHeading ? ppt.textT + panel.filmStripSize.t : panel.text.t;
-				panel.img.b = !panel.style.fullWidthHeading ? ppt.textB + panel.filmStripSize.b : panel.h - panel.text.t - panel.text.h;
+				panel.img.t = !panel.style.fullWidthHeading ? ppt.textT + (!ppt.filmStripOverlay ? panel.filmStripSize.t : 0) : panel.text.t;
+				panel.img.b = !panel.style.fullWidthHeading ? ppt.textB + (!ppt.filmStripOverlay ? panel.filmStripSize.b : 0) : panel.h - panel.text.t - panel.text.h;
 			}
 		}
-		if (!ppt.img_only && txt.text && ppt.style == 0 && panel.style.fullWidthHeading) {
-			if (panel.filmStripSize.l) panel.img.l = panel.bor.l;
-			if (panel.filmStripSize.r) panel.img.r = panel.bor.r;
+		if (!ppt.img_only && ppt.style == 0 && panel.style.fullWidthHeading) {
+			if (panel.filmStripSize.l && !ppt.filmStripOverlay) panel.img.l = panel.bor.l;
+			if (panel.filmStripSize.r && !ppt.filmStripOverlay) panel.img.r = panel.bor.r;
 		}
 
 		$.key.forEach(v => {
-			this.im[v] = !txt.text ? panel.bor[v] + (!this.style.crop ? panel.filmStripSize[v] : 0) : panel.img[v]
+			this.im[v] = ppt.img_only ? panel.bor[v] + (!this.style.crop ? (!ppt.filmStripOverlay ? panel.filmStripSize[v] : 0) : 0) : panel.img[v]
 		});
 
-		this.nw = txt.text && (!ppt.style || ppt.style == 2 || ppt.style > 3) ? panel.w - panel.img.l - panel.img.r : !ppt.img_only && txt.text ? panel.style.imgSize : panel.w - this.im.l - this.im.r;
-		this.nh = txt.text && (ppt.style == 1 || ppt.style == 3 || ppt.style > 3 && !ppt.alignAuto) ? panel.h - panel.img.t - panel.img.b : !ppt.img_only && txt.text ? panel.style.imgSize : panel.h - this.im.t - this.im.b;
+		this.nw = !ppt.img_only && (!ppt.style || ppt.style == 2 || ppt.style > 3) ? panel.w - panel.img.l - panel.img.r : !ppt.img_only ? panel.style.imgSize : panel.w - this.im.l - this.im.r;
+		this.nh = !ppt.img_only && (ppt.style == 1 || ppt.style == 3 || ppt.style > 3 && !ppt.alignAuto) ? panel.h - panel.img.t - panel.img.b : !ppt.img_only ? panel.style.imgSize : panel.h - this.im.t - this.im.b;
 
 		this.style.border = this.isType('Border');
 		if (this.style.border == 1 || this.style.border == 3) {
 			const i_sz = $.clamp(this.nh, 0, this.nw) / $.scale;
-			this.bor.w1 = !i_sz || i_sz > 500 ? 5 * $.scale : Math.ceil(5 * $.scale * i_sz / 500);
+			this.bor.w1 = !i_sz || i_sz > 500 ? 5 * $.scale : Math.max(Math.ceil(5 * $.scale * i_sz / 500), 3);
 		} else this.bor.w1 = 0;
 		this.bor.w2 = this.bor.w1 * 2;
 		this.nw = Math.max(this.nw - this.bor.w2, 10);
@@ -1428,7 +1543,7 @@
 	}
 
 	setCrop(sz) {
-		const imgRefresh = ppt.img_only || !ppt.text_only && !txt.text;
+		const imgRefresh = ppt.img_only;
 		this.style.crop = this.isType('Circ') ? false :
 			ppt.artistView && (ppt.artStyleImgOnly == 1 && imgRefresh || ppt.artStyleDual == 1 && !ppt.img_only) || !ppt.artistView && (ppt.covStyleImgOnly == 1 && imgRefresh || ppt.covStyleDual == 1 && !ppt.img_only);
 		panel.setBorder(imgRefresh && this.style.crop, this.isType('Border'), this.isType('Refl'));
@@ -1468,10 +1583,6 @@
 		this.removed++;
 	}
 
-	sort(data, prop) {
-		data.sort((a, b) => a[prop] - b[prop]);
-		return data;
-	}
 	sortCache(o, prop) {
 		const sorted = {};
 		Object.keys(o).sort((a, b) => o[a][prop] - o[b][prop]).forEach(key => sorted[key] = o[key]);
@@ -1541,6 +1652,7 @@
 					this.changeCov(-step);
 					if (this.cov.cycle) this.timeStamp.cov = Date.now();
 				}
+				seeker.debounce();
 				break;
 			case true:
 				if (!panel || but.trace('lookUp', panel.m.x, panel.m.y) || panel.trace.text || panel.trace.film || !this.isType('Refl')) break;
@@ -1580,7 +1692,6 @@ class ImageCache {
 				const start = Date.now();
 				const o = this.cache[key] = {};
 				o.img = img.cur = img.process(image, this.type, o);
-				o.text = txt.text;
 				o.filmID = filmStrip.id();
 				o.time = Date.now() - start;
 			}
@@ -1601,7 +1712,7 @@ class ImageCache {
 			return;
 		}
 		const o = this.cache[key];
-		if (!o || !o.img || !ppt.img_only && o.text != txt.text || o.filmID != filmStrip.id() || img.refl.adjust) return false;
+		if (!o || !o.img || o.filmID != filmStrip.id() || img.refl.adjust) return false;
 		img.x = o.x;
 		seeker.counter.x = o.counter_x;
 		img.y = o.y;
@@ -1626,15 +1737,15 @@ const cov = new ImageCache(false);
 class Seeker {
 	constructor() {
 		this.dn = false;
-		this.disabled = false;
 		this.hand = false;
 		this.l_dn = false;
 		this.imgNo = 0;
-		ppt.imgSeeker = $.clamp(ppt.imgSeeker, 0, 2);
-		this.imgSeeker = ppt.imgSeeker;
+		ppt.imgSeekerShow = $.clamp(ppt.imgSeekerShow, 0, 2);
+		this.imgSeeker = (!ppt.imgSeeker && !ppt.imgCounter) ? 0 : ppt.imgSeekerShow;
 		this.nh = 10;
 		this.nw = 10;
 		this.overlap = false;
+		this.seekerBelowImg = false;
 		this.show = this.imgSeeker == 2 ? true : false;
 		this.bar = {
 			dot_w: 4,
@@ -1642,6 +1753,9 @@ class Seeker {
 			gripOffset: 2,
 			h: 6 * $.scale,
 			l: 0,
+			offset: 18,
+			overlapCorr: 0,
+			reflCorr: 0,
 			x1: 25,
 			x2: 26,
 			x3: 25,
@@ -1652,22 +1766,21 @@ class Seeker {
 			y5: 200,
 			w1: 100,
 			w2: 110
-		};
+		}
+
 		this.counter = {
+			h: 8,
 			x: 0,
 			y: 0
-		};
-		this.corr = {
-			overlap: 0,
-			vertical: 1.1565
-		};
+		}
+
 		this.prog = {
 			min: 0,
 			max: 200
 		}
 
 		this.debounce = $.debounce(() => {
-			if (this.imgSeeker == 2 || panel.m.x > this.bar.x1 && panel.m.x < this.bar.x1 + this.bar.w1 && panel.m.y > this.bar.y1 + this.bar.y4 && panel.m.y < this.bar.y1 + this.bar.y5) return;
+			if (panel.imgBoxTrace(panel.m.x, panel.m.y) || this.imgSeeker == 2) return;
 			this.show = false;
 			img.paint();
 			filmStrip.paint();
@@ -1676,33 +1789,47 @@ class Seeker {
 
 	draw(gr) {
 		if (this.imgNo < 2 || !this.show) return;
-
 		let prog = 0;
-		if (ppt.imgSeekerDots) {
+		if (this.seekerBelowImg && img.cur) {
+			this.bar.y2 = Math.round(Math.min(img.y + img.cur.Height / (1 + this.bar.reflCorr) + this.bar.offset, (panel.h - panel.filmStripSize.b) * 0.9) - this.bar.h / 2);
+			this.bar.y3 = this.bar.y2 + Math.ceil(ui.style.l_w / 2);
+			this.bar.y5 = (panel.h - panel.filmStripSize.b) * 0.97;
+		}
+		if (ppt.imgSeeker && ppt.imgSeekerDots == 1) { // dots
 			gr.SetSmoothingMode(2);
 			prog = this.dn ? $.clamp(panel.m.x - this.bar.x2 - this.bar.grip_h / 2, this.prog.min, this.prog.max) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo - (this.bar.grip_h - this.bar.dot_w) / 2;
 			for (let i = 0; i < this.imgNo; i++) {
-				gr.FillEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, colors.imgseekbar);
-				//gr.DrawEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+				gr.FillEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, RGB(245, 245, 245));
+				gr.DrawEllipse(this.bar.x2 + ((i + 0.5) / this.imgNo) * this.bar.w1, this.bar.y2, this.bar.dot_w, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
 			}
-			gr.FillEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, colors.imgseekbar);
-			//gr.DrawEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			gr.FillEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+			gr.DrawEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
 			gr.SetSmoothingMode(0);
 		}
+		
+		if (ppt.imgSeeker && ppt.imgSeekerDots == 0) { // bar
+			prog = this.dn ? $.clamp(panel.m.x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo;
+			//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.style.l_w, this.bar.h - ui.style.l_w, RGBA(0, 0, 0, 75));
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, Math.max(prog,2) - ui.style.l_w, this.bar.h - ui.style.l_w, RGB(255, 255, 255));
+			//gr.SetSmoothingMode(2);
+			//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+			//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			//gr.SetSmoothingMode(0);
+		}
 
-		if (ppt.imgCounter) {
-			if (ppt.imgSeekerDots) prog += Math.round(this.bar.grip_h / 2 - this.bar.dot_w / 2);
+		if (ppt.imgCounter) { // counter
+			if (ppt.imgSeekerDots == 1) prog += Math.round(this.bar.grip_h / 2 - this.bar.dot_w / 2);
 			const count = (ppt.artistView ? img.art.ix + 1 : img.cov.ix + 1) + (' / ' + this.imgNo);
 			const count_m = (this.imgNo + (' / ' + this.imgNo)) + ' ';
 			if (count) {
 				const count_w = Math.max(gr.CalcTextWidth(count_m, ui.font.small), 8);
-				const count_x = ppt.imgSeekerDots ? Math.round($.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + this.nw - count_w - 4)) : this.counter.x + ui.style.l_w * 2 + img.bor.w1;
-				const count_h = Math.max(gr.CalcTextHeight(count, ui.font.small), 8);
-				const count_y = ppt.imgSeekerDots ? Math.round(this.bar.y2 - this.bar.gripOffset - count_h * 1.5) : this.counter.y + ui.style.l_w * 2 + img.bor.w1;
-				gr.FillRoundRect(count_x, count_y, count_w + 2, count_h + 2, 3, 3, RGBA(0, 0, 0, 210));
-				gr.DrawRoundRect(count_x + 1, count_y + 1, count_w, count_h, 1, 1, 1, RGBA(255, 255, 255, 60));
-				gr.DrawRoundRect(count_x, count_y, count_w + 2, count_h + 2, 1, 1, 1, RGBA(0, 0, 0, 200));
-				gr.GdiDrawText(count, ui.font.small, RGB(250, 250, 250), count_x + 1, count_y, count_w, count_h + 2, txt.cc);
+				const count_x = ppt.imgSeeker ? Math.round($.clamp(this.bar.x1 - count_w / 2 + prog, this.bar.l + 2, this.bar.l + this.nw - count_w - 4)) : this.counter.x + ui.style.l_w * 2 + img.bor.w1;
+				const count_y = ppt.imgSeeker ? Math.round(this.bar.y2 - this.bar.gripOffset - ui.font.small_h * 1.5) : this.counter.y + ui.style.l_w * 2 + img.bor.w1;
+				gr.FillRoundRect(count_x, count_y, count_w + 2, ui.font.small_h + 2, 3, 3, RGBA(0, 0, 0, 210));
+				gr.DrawRoundRect(count_x + 1, count_y + 1, count_w, ui.font.small_h, 1, 1, 1, RGBA(255, 255, 255, 60));
+				gr.DrawRoundRect(count_x, count_y, count_w + 2, ui.font.small_h + 2, 1, 1, 1, RGBA(0, 0, 0, 200));
+				gr.GdiDrawText(count, ui.font.small, RGB(250, 250, 250), count_x + 1, count_y, count_w, ui.font.small_h + 2, txt.cc);
 			}
 		}
 	}
@@ -1718,7 +1845,7 @@ class Seeker {
 			ui.id.touch_dn = filmStrip.get_ix(p_x, p_y);
 		}
 		if (this.imgSeeker) {
-			if (this.imgNo > 1) this.dn = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y1 + this.bar.y4 && p_y < this.bar.y1 + this.bar.y5;
+			if (this.imgNo > 1) this.dn = this.hand;
 			if (this.dn) {
 				const prog = $.clamp(p_x - this.bar.x1, 0, this.bar.w1);
 				if (ppt.artistView) {
@@ -1748,9 +1875,9 @@ class Seeker {
 		filmStrip.paint();
 	}
 
-	metrics(circular, crop, horizontal, vertical) {
-		this.disabled = ppt.style > 3 && !ppt.img_only && txt.text && !panel.clip && this.intersectRect();
-		this.imgSeeker = !this.disabled ? ppt.imgSeeker : 0;
+	metrics(circular, crop, horizontal, reflection, vertical) {
+		ppt.imgSeekerDisabled = ppt.style > 3 && !ppt.img_only && !panel.clip && this.intersectRect() || (ppt.filmStripOverlay && !ppt.text_only);
+		this.imgSeeker = !ppt.imgSeekerDisabled ? ((!ppt.imgSeeker && !ppt.imgCounter) ? 0 : ppt.imgSeekerShow) : 0;
 		if (!this.imgSeeker) {
 			this.show = false;
 			img.paint();
@@ -1761,47 +1888,56 @@ class Seeker {
 		this.imgNo = ppt.text_only ? 0 : ppt.cycPhoto && ppt.artistView ? img.art.images.length : img.cov.cycle && !ppt.artistView && !panel.alb.ix ? img.cov.images.length : 0;
 		if (this.imgNo < 2) return;
 
-		this.overlap = ppt.style > 3 && !ppt.img_only && txt.text && panel.clip;
-		this.corr.overlap = this.overlap ? panel.bor.t : 0;
+		this.overlap = ppt.style > 3 && !ppt.img_only && panel.clip;
+		this.bar.overlapCorr = this.overlap ? panel.bor.t : 0;
 
 		const alignBottom = vertical && !crop && ppt.alignV == 2 && !this.overlap;
 		const alignCenter = vertical && !crop && ppt.alignV == 1 && !this.overlap;
 		const alignLeft = horizontal && !crop && ppt.alignH == 0;
 		const alignRight = horizontal && !crop && ppt.alignH == 2;
 
-		this.corr.vertical = circular ? img.style.border == 1 || img.style.border == 3 ? 1 : 1 : 1.1565;
-		this.nw = (!txt.text || ppt.img_only) && crop ? img.nw - panel.filmStripSize.l - panel.filmStripSize.r : img.nw;
-		this.nh = !txt.text || ppt.img_only ? img.nh - (!crop ? 0 : panel.filmStripSize.b) : ppt.style < 4 ? Math.min(!crop ? this.nw * (!alignBottom ? this.corr.vertical : 1) : img.nh, img.nh) : this.overlap ? panel.style.imgSize : Math.min(!crop ? (panel.ibox.w - panel.bor.l - panel.bor.r) * (!alignBottom ? this.corr.vertical : 1) : panel.ibox.h - panel.bor.t - panel.bor.b, panel.ibox.h - panel.bor.t - panel.bor.b);
-		const seeker_img_t = this.nw * (!alignBottom ? this.corr.vertical : 1) < img.nh ? alignCenter ? (img.nh - this.nw) / 2 : alignBottom ? img.nh - this.nw : 0 : 0;
-		this.bar.h = 6 * $.scale;
-		this.bar.grip_h = 10 * $.scale;
+		this.nw = ppt.img_only && crop ? img.nw - panel.filmStripSize.l - panel.filmStripSize.r : img.nw;
+		this.nh = ppt.img_only ? img.nh - (!crop ? 0 : panel.filmStripSize.b) : ppt.style < 4 ? Math.min(!crop ? this.nw : img.nh, img.nh) : this.overlap ? panel.style.imgSize : Math.min(!crop ? (panel.ibox.w - panel.bor.l - panel.bor.r) : panel.ibox.h - panel.bor.t - panel.bor.b, panel.ibox.h - panel.bor.t - panel.bor.b);
+		const seeker_img_t = !alignBottom || this.nw >= img.nh ? 0 : img.nh - this.nw;
+
+		this.bar.h = (ppt.imgSeekerDots == 1 ? 6 : 5) * $.scale;
+		this.bar.grip_h = (ppt.imgSeekerDots == 1 ? 10 : 9) * $.scale;
 		this.bar.gripOffset = Math.round((this.bar.grip_h - this.bar.h) / 2) + Math.ceil(ui.style.l_w / 2);
 		const circ_sz = ppt.style < 4 ? Math.min(this.nw, this.nh) : Math.min(panel.ibox.w - panel.bor.l - panel.bor.r, panel.ibox.h - panel.bor.t - panel.bor.b);
 		this.bar.w1 = circular && (alignLeft || alignRight) ? Math.min(this.imgNo * 30 * $.scale, circ_sz) : Math.min(this.imgNo * 30 * $.scale, (!img.style.crop ? Math.min(this.nw, this.nh) : this.nw) - 30 * $.scale);
 		this.bar.w2 = this.bar.w1 + Math.round(this.bar.grip_h);
-		this.bar.l = !txt.text ? panel.bor.l + panel.filmStripSize.l : panel.img.l;
-		this.bar.x1 = circular ? (alignLeft ? this.bar.l + (circ_sz - this.bar.w1) / 2 : alignRight ? this.bar.l + this.nw - circ_sz + (circ_sz - this.bar.w1) / 2 : Math.round(this.bar.l + (this.nw - this.bar.w1) / 2)) : (alignLeft ? Math.round(this.bar.l + 15 * $.scale) : alignRight ? Math.round(panel.w - (!txt.text ? panel.bor.r : panel.img.r) - 15 * $.scale - this.bar.w1) : Math.round(this.bar.l + (this.nw - this.bar.w1) / 2));
+		this.bar.l = ppt.img_only ? panel.bor.l + panel.filmStripSize.l : panel.img.l;
+		this.bar.x1 = circular ? (alignLeft ? this.bar.l + (circ_sz - this.bar.w1) / 2 : alignRight ? this.bar.l + this.nw - circ_sz + (circ_sz - this.bar.w1) / 2 : Math.round(this.bar.l + (this.nw - this.bar.w1) / 2)) : (alignLeft ? Math.round(this.bar.l + 15 * $.scale) : alignRight ? Math.round(panel.w - (ppt.img_only ? panel.bor.r : panel.img.r) - 15 * $.scale - this.bar.w1) : Math.round(this.bar.l + (this.nw - this.bar.w1) / 2));
 		this.bar.x3 = this.bar.x1 - Math.round(this.bar.grip_h / 2);
-		this.bar.y1 = !txt.text ? panel.bor.t + seeker_img_t + panel.filmStripSize.t : panel.img.t + seeker_img_t;
-		this.bar.y2 = Math.round(this.bar.y1 + this.nh * 0.9 - this.bar.h / 2) - this.corr.overlap;
+		this.bar.y1 = ppt.img_only ? panel.bor.t + seeker_img_t + panel.filmStripSize.t : panel.img.t + seeker_img_t;
+		this.bar.y2 = Math.round(this.bar.y1 + this.nh * 0.9 - this.bar.h / 2) - this.bar.overlapCorr;
 		this.bar.y3 = this.bar.y2 + Math.ceil(ui.style.l_w / 2);
-		this.bar.y4 = this.nh * 0.8 - this.corr.overlap;
-		this.bar.y5 = this.nh - this.corr.overlap;
+		this.bar.y4 = this.nh * 0.8 - this.bar.overlapCorr;
+		this.bar.y5 = this.nh - this.bar.overlapCorr;
 
-		if (ppt.imgSeekerDots) {
+		this.seekerBelowImg = ppt.imgSeeker && this.nh < 0.8 * panel.h - panel.filmStripSize.b && (vertical && !crop && ppt.alignV == 0 && !this.overlap || alignCenter);
+		this.bar.reflCorr = this.seekerBelowImg && reflection ? ppt.reflSize / 100 : 0;
+		this.bar.offset = ppt.imgCounter ? ui.font.small_h * 2 + this.bar.gripOffset + 2 : ui.font.small_h * 1.5 + this.bar.gripOffset;
+
+		if (ppt.imgSeekerDots == 1) {
 			this.bar.dot_w = Math.floor($.clamp(this.bar.w1 / this.imgNo, 2, this.bar.h));
 			this.bar.x2 = this.bar.x1 - Math.round(this.bar.dot_w / 2);
 			this.prog.min = 0.5 / this.imgNo * this.bar.w1 - (this.bar.grip_h - this.bar.dot_w) / 2;
 			this.prog.max = ((this.imgNo - 0.5) / this.imgNo) * this.bar.w1 - (this.bar.grip_h - this.bar.dot_w) / 2;
-		}	
+		} else {
+			this.bar.x2 = this.bar.x1 + Math.ceil(ui.style.l_w / 2);
+		}
 	}
 
 	move(p_x, p_y) {
 		this.hand = false;
 		if (this.imgSeeker) {
-			const trace = p_x > this.bar.l && p_x < this.bar.l + this.nw && p_y > this.bar.y1 && p_y < this.bar.y1 + this.bar.y5;
+			const trace = panel.imgBoxTrace(p_x, p_y);
 			const show = !ppt.text_only && (ppt.artistView || !panel.alb.ix) && (this.imgSeeker == 2 || trace);
-			if (this.imgNo > 1 && (!this.l_dn || this.dn)) this.hand = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y1 + this.nh * 0.8 - this.corr.overlap && p_y < this.bar.y1 + this.bar.y5;
+			if (this.imgNo > 1 && (!this.l_dn || this.dn)) {
+				if (!this.seekerBelowImg) this.hand = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y1 + this.bar.y4 && p_y < this.bar.y1 + this.bar.y5;
+				else this.hand = p_x > this.bar.x3 && p_x < this.bar.x3 + this.bar.w2 && p_y > this.bar.y2 - ui.font.small_h && p_y < this.bar.y5;
+			}
 			if (show != this.show && !ppt.text_only && trace) {
 				img.paint();
 				filmStrip.paint();
@@ -1831,7 +1967,7 @@ class Seeker {
 	}
 
 	upd(force, clearCov, repaint) {
-		if (ppt.imgSeeker && (!this.dn && (!ppt.text_only || ui.style.isBlur || force))) {
+		if ((ppt.imgSeeker || ppt.imgCounter) && ppt.imgSeekerShow && (!this.dn && (!ppt.text_only || ui.style.isBlur || force))) {
 			if (clearCov) img.cov.images = [];
 			img.metrics();
 			if (repaint) txt.paint();

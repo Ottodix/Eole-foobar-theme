@@ -3033,7 +3033,7 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     }
 	g_image_cache.loadCounter++;			
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
-    let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
+    let result = await utils.GetAlbumArtAsyncV2(0, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
 			if(properties.disableCoverCache !== true) save_image_to_cache(result.image, albumIndex, cachekey, metadb);

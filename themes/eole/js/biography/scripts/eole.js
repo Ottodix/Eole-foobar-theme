@@ -26,7 +26,11 @@ my_utils.getScriptPath = biography_scripts;
 
 // In callbacks.js
 // at the very beggining add : 
-// var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+/*
+	var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+	var ww = 0,
+		wh = 0;
+*/
 // Update on_mouse_lbtn_down, on_mouse_lbtn_up, on_mouse_leave, on_mouse_move {
 /*
 function on_mouse_lbtn_down(x, y) {
@@ -58,34 +62,31 @@ function on_mouse_move(x, y, m) {
 */
 // Add to on_notify_data
 /*
-	case 'show_lyrics_btns':
-		show_lyrics_btns = info;
-		window.SetProperty("show lyrics btns", show_lyrics_btns);
-		window.Repaint();
-		break;	
+		case 'show_lyrics_btns':
+			show_lyrics_btns = info;
+			window.SetProperty("show lyrics btns", show_lyrics_btns);
+			window.Repaint();
+			break;	
+		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
 */
 // Modify on_size
 /*
-function on_size(w, h) {
-	txt.repaint = false;
-	panel.w = window.Width;
-	panel.h = window.Height;
+function on_size() {
 	ww = window.Width;
-	wh = window.Height;		
-	if (!panel.w || !panel.h) return;
-	if(!window.IsVisible) {on_size_2Call = true;return;}	
+	wh = window.Height;
 	// previous code
 }
 */
-// Add to on_paint, at the beggining :
-/*
-if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
-*/
+
 // Add to on_paint, at the end :
 /*
 	if(show_lyrics_btns) btns_manager.draw(gr);		
 */
 
+// Add to function on_key_down(vkey) {switch(vkey) {
+// case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 
+
+// Comment window.NotifyOthers("bio_imgChange", 0) in scripts/timers.js
 
 // In move(x, y) { function of buttons.js 
 // replace if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
@@ -102,14 +103,20 @@ if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}
 	}	
 */
 
-// Add to function on_key_down(vkey) {switch(vkey) {
-// case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 
-
-// Add to on_notify_data
-// case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
-
-// Comment window.NotifyOthers("bio_imgChange", 0) in scripts/timers.js
-
+// In draw(gr) function of images.js, in if (ppt.imgSeeker && ppt.imgSeekerDots == 0) {
+// comment some line as below and make the seeker minimal width 2 px using this code : Math.max(prog,2)
+/*
+		if (ppt.imgSeeker && ppt.imgSeekerDots == 0) { // bar
+			prog = this.dn ? $.clamp(panel.m.x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo;
+			//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.style.l_w, this.bar.h - ui.style.l_w, RGBA(0, 0, 0, 75));
+			gr.FillSolidRect(this.bar.x2, this.bar.y3, Math.max(prog,2) - ui.style.l_w, this.bar.h - ui.style.l_w, RGB(255, 255, 255));
+			//gr.SetSmoothingMode(2);
+			//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+			//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			//gr.SetSmoothingMode(0);
+		}
+*/
 /* ------------------------------------------------------------------------------------------------------------------------------- */
 /* ---------------------- BELOW ARE CHANGES MADE TO PREVIOUS VERSION, NOT USED ANYMORE.... WAITING FOR WILB UPDATE ----------------*/
 /* ------------------------------------------------------------------------------------------------------------------------------- */

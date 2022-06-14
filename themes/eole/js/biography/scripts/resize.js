@@ -1,3 +1,5 @@
+﻿'use strict';
+
 class ResizeHandler {
 	constructor() {
 		this.down = false;
@@ -34,7 +36,7 @@ class ResizeHandler {
 		if (vk.k('ctrl') && this.focus && panel.m.y != -1 || panel.style.new) {
 			const ed = gr.MeasureString(this.editText(), this.editorFont, 15, 15, panel.w - 15, panel.h - 15, this.lc);
 			gr.FillSolidRect(10, 10, ed.Width + 10, ed.Height + 10, ui.col.edBg);
-			if (!ppt.text_only && !ppt.img_only && txt.text) {
+			if (!ppt.text_only && !ppt.img_only) {
 				if (ppt.style > 3) {
 					if (!vk.k('shift')) gr.DrawRect(panel.ibox.l + 2, panel.ibox.t + 2, panel.ibox.w - 4, panel.ibox.h - 4, 5, RGB(0, 255, 0));
 					if (!vk.k('alt')) gr.DrawRect(panel.tbox.l + 2, panel.tbox.t + 2, panel.tbox.w - 4, panel.tbox.h - 4, 5, RGB(255, 0, 0));
@@ -78,7 +80,7 @@ class ResizeHandler {
 	}
 
 	editText() {
-		return (ppt.text_only ? 'Type: Text Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : (ppt.img_only ? 'Type: Image Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : 'Name: ' + panel.style.name[ppt.style] + (ppt.style < 4 ? '\n\nType: Auto\n - Layout Adjust: Drag Line' + (panel.style.showFilmStrip && txt.text ? 's' : '') : '\n\nType: Freestyle\n - Layout Adjust: Drag Lines or Boxes: Ctrl (Any), Ctrl + Alt (Image) or Ctrl + Shift (Text)\n - Overlay Strength: Shift + Wheel Over Text'))) + (img.isType('Refl') && !ppt.text_only ? '\n - Reflection Strength: Shift + Wheel Over Main Image' : '') + (!ppt.img_only ? '\n - Text Size: Ctrl + Wheel Over Text' : '') + '\n - Padding: Display Tab';
+		return (ppt.text_only ? 'Type: Text Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : (ppt.img_only ? 'Type: Image Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : 'Name: ' + panel.style.name[ppt.style] + (ppt.style < 4 ? '\n\nType: Auto\n - Layout Adjust: Drag Line' + (panel.style.showFilmStrip && !ppt.img_only ? 's' : '') : '\n\nType: Freestyle\n - Layout Adjust: Drag Lines or Boxes: Ctrl (Any), Ctrl + Alt (Image), Ctrl + Shift (Text) or Ctrl + Alt + Shift (Filmstrip)\n - Overlay Strength: Shift + Wheel Over Text'))) + (img.isType('Refl') && !ppt.text_only ? '\n - Reflection Strength: Shift + Wheel Over Main Image' : '') + (!ppt.img_only ? '\n - Text Size: Ctrl + Wheel Over Text' : '') + '\n - Padding: Display Tab';
 	}
 
 	filmMove(x, y) {
@@ -107,19 +109,19 @@ class ResizeHandler {
 		switch (ppt.filmStripPos) {
 			case 0:
 				ppt.filmStripSize = (ppt.filmStripSize * panel.h + y - this.y_start) / panel.h;
-				ppt.filmStripSize = $.clamp(ppt.filmStripSize, 0.02, filmStrip.max_sz / panel.h);
+				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
 				break;
 			case 1:
 				ppt.filmStripSize = (ppt.filmStripSize * panel.w + this.x_start - x) / panel.w;
-				ppt.filmStripSize = $.clamp(ppt.filmStripSize, 0.02, filmStrip.max_sz / panel.w);
+				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
 				break;
 			case 2:
 				ppt.filmStripSize = (ppt.filmStripSize * panel.h + this.y_start - y) / panel.h;
-				ppt.filmStripSize = $.clamp(ppt.filmStripSize, 0.02, filmStrip.max_sz / panel.h);
+				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
 				break;
 			case 3:
 				ppt.filmStripSize = (ppt.filmStripSize * panel.w + x - this.x_start) / panel.w;
-				ppt.filmStripSize = $.clamp(ppt.filmStripSize, 0.02, filmStrip.max_sz / panel.w);
+				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
 				break;
 		}
 		filmStrip.logScrollPos();
@@ -187,12 +189,13 @@ class ResizeHandler {
 			}
 		}
 		filmStrip.clearCache();
+		if (panel.style.showFilmStrip && ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
 		txt.refresh(this.updFilm ? 0 : 5);
 		filmStrip.paint();
 	}
 
 	imgMove(x, y) {
-		if (!this.focus || ppt.img_only || !txt.text || ppt.text_only) return;
+		if (!this.focus || ppt.img_only || ppt.text_only) return;
 		switch (true) {
 			case ppt.style > 3: {
 				if (!vk.k('ctrl') || vk.k('shift')) break;
@@ -209,57 +212,63 @@ class ResizeHandler {
 					this.setCursor(this.si);
 				}
 				if (!this.down || !this.si) return;
-				let imT = Math.round(panel.im.t * panel.h) + panel.filmStripSize.t;
-				let imB = Math.round(panel.im.b * panel.h) + panel.filmStripSize.b;
-				let imL = Math.round(panel.im.l * panel.w) + panel.filmStripSize.l;
-				let imR = Math.round(panel.im.r * panel.w) + panel.filmStripSize.r;
+				const filmStrip = {
+					t: !ppt.filmStripOverlay ? panel.filmStripSize.t : 0,
+					b: !ppt.filmStripOverlay ? panel.filmStripSize.b : 0,
+					l: !ppt.filmStripOverlay ? panel.filmStripSize.l : 0,
+					r: !ppt.filmStripOverlay ? panel.filmStripSize.r : 0
+				}
+				let imT = Math.round(panel.im.t * panel.h) + filmStrip.t;
+				let imB = Math.round(panel.im.b * panel.h) + filmStrip.b;
+				let imL = Math.round(panel.im.l * panel.w) + filmStrip.l;
+				let imR = Math.round(panel.im.r * panel.w) + filmStrip.r;
 				switch (this.si) {
 					case 'top':
 						if (y > panel.h - imB - 30) break;
-						panel.im.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+						panel.im.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 						break;
 					case 'nw':
-						if (y < panel.h - imB - 30) panel.im.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+						if (y < panel.h - imB - 30) panel.im.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 						if (x > panel.w - imR - 30) break;
-						panel.im.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+						panel.im.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 						break;
 					case 'ne':
-						if (y < panel.h - imB - 30) panel.im.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+						if (y < panel.h - imB - 30) panel.im.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 						if (x < imL + 30) break;
-						panel.im.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+						panel.im.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 						break;
 					case 'left':
 						if (x > panel.w - imR - 30) break;
-						panel.im.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+						panel.im.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 						break;
 					case 'bottom':
 						if (y < imT + 30) break;
-						panel.im.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+						panel.im.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 						break;
 					case 'sw':
-						if (x < panel.w - imR - 30) panel.im.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+						if (x < panel.w - imR - 30) panel.im.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 						if (y < imT + 30) break;
-						panel.im.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+						panel.im.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 						break;
 					case 'se':
-						if (y > imT + 30) panel.im.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+						if (y > imT + 30) panel.im.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 						if (x < imL + 30) break;
-						panel.im.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+						panel.im.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 						break;
 					case 'right':
 						if (x < imL + 30) break;
-						panel.im.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+						panel.im.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 						break;
 					case 'all':
-						if (imT <= panel.filmStripSize.t && y - this.init_y < 0 || imB <= panel.filmStripSize.b && y - this.init_y > 0 || imL <= panel.filmStripSize.l && x - this.init_x < 0 || imR <= panel.filmStripSize.r && x - this.init_x > 0) break;
+						if (imT <= filmStrip.t && y - this.init_y < 0 || imB <= filmStrip.b && y - this.init_y > 0 || imL <= filmStrip.l && x - this.init_x < 0 || imR <= filmStrip.r && x - this.init_x > 0) break;
 						imT += (y - this.y_init);
-						panel.im.t = $.clamp((imT - panel.filmStripSize.t) / panel.h, 0, 1);
+						panel.im.t = $.clamp((imT - filmStrip.t) / panel.h, 0, 1);
 						imB = panel.h - Math.max(imT, 0) - panel.ibox.h;
-						panel.im.b = $.clamp((imB - panel.filmStripSize.b) / panel.h, 0, 1);
+						panel.im.b = $.clamp((imB - filmStrip.b) / panel.h, 0, 1);
 						imL += (x - this.x_init);
-						panel.im.l = $.clamp((imL - panel.filmStripSize.l) / panel.w, 0, 1);
+						panel.im.l = $.clamp((imL - filmStrip.l) / panel.w, 0, 1);
 						imR = panel.w - Math.max(imL, 0) - panel.ibox.w;
-						panel.im.r = $.clamp((imR - panel.filmStripSize.r) / panel.w, 0, 1);
+						panel.im.r = $.clamp((imR - filmStrip.r) / panel.w, 0, 1);
 						break;
 				}
 				this.sizes(true);
@@ -288,8 +297,14 @@ class ResizeHandler {
 					}
 				}
 				if (!this.down || !this.si) return;
-				const ph = panel.h - panel.filmStripSize.t - panel.filmStripSize.b;
-				const pw = panel.w - panel.filmStripSize.l - panel.filmStripSize.r;
+				const filmStrip = {
+					t: !ppt.filmStripOverlay ? panel.filmStripSize.t : 0,
+					b: !ppt.filmStripOverlay ? panel.filmStripSize.b : 0,
+					l: !ppt.filmStripOverlay ? panel.filmStripSize.l : 0,
+					r: !ppt.filmStripOverlay ? panel.filmStripSize.r : 0
+				}
+				const ph = panel.h - filmStrip.t - filmStrip.b;
+				const pw = panel.w - filmStrip.l - filmStrip.r;
 				switch (ppt.style) {
 					case 0:
 						ppt.rel_imgs = (ppt.rel_imgs * ph + y - this.y_init) / ph;
@@ -304,7 +319,7 @@ class ResizeHandler {
 						ppt.rel_imgs = (ppt.rel_imgs * pw + x - this.x_init) / pw;
 						break;
 				}
-				ppt.rel_imgs = $.clamp(ppt.rel_imgs, 0.1, 0.9);
+				ppt.rel_imgs = $.clamp(parseFloat(ppt.rel_imgs.toFixed(15)), 0.1, 0.9);
 				this.sizes();
 				break;
 			}
@@ -314,7 +329,7 @@ class ResizeHandler {
 	}
 
 	move(x, y) {
-		if (ppt.style < 4 || ppt.img_only || !txt.text || ppt.text_only || !vk.k('ctrl') || vk.k('alt') || !this.focus) return;
+		if (ppt.style < 4 || ppt.img_only || ppt.text_only || !vk.k('ctrl') || vk.k('alt') || !this.focus) return;
 		if (!this.down) {
 			this.st = y > panel.tbox.t - 5 && y < panel.tbox.t + 5 && x > panel.tbox.l + 10 && x < panel.tbox.l + panel.tbox.w - 10 ? 'top' :
 				y > panel.tbox.t - 5 && y < panel.tbox.t + 15 && x > panel.tbox.l && x < panel.tbox.l + 10 ? 'nw' :
@@ -328,57 +343,63 @@ class ResizeHandler {
 			this.setCursor(this.st);
 		}
 		if (!this.down || !this.st) return;
-		let txT = Math.round(panel.tx.t * panel.h) + panel.filmStripSize.t;
-		let txB = Math.round(panel.tx.b * panel.h) + panel.filmStripSize.b;
-		let txL = Math.round(panel.tx.l * panel.w) + panel.filmStripSize.l;
-		let txR = Math.round(panel.tx.r * panel.w) + panel.filmStripSize.r;
+		const filmStrip = {
+			t: !ppt.filmStripOverlay ? panel.filmStripSize.t : 0,
+			b: !ppt.filmStripOverlay ? panel.filmStripSize.b : 0,
+			l: !ppt.filmStripOverlay ? panel.filmStripSize.l : 0,
+			r: !ppt.filmStripOverlay ? panel.filmStripSize.r : 0
+		}
+		let txT = Math.round(panel.tx.t * panel.h) + filmStrip.t;
+		let txB = Math.round(panel.tx.b * panel.h) + filmStrip.b;
+		let txL = Math.round(panel.tx.l * panel.w) + filmStrip.l;
+		let txR = Math.round(panel.tx.r * panel.w) + filmStrip.r;
 		switch (this.st) {
 			case 'top':
 				if (y > panel.h - txB - panel.style.minH) break;
-				panel.tx.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+				panel.tx.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 				break;
 			case 'nw':
-				if (y < panel.h - txB - panel.style.minH) panel.tx.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+				if (y < panel.h - txB - panel.style.minH) panel.tx.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 				if (x > panel.w - txR - 30) break;
-				panel.tx.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+				panel.tx.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 				break;
 			case 'ne':
-				if (y < panel.h - txB - panel.style.minH) panel.tx.t = $.clamp((y - panel.filmStripSize.t) / panel.h, 0, 1);
+				if (y < panel.h - txB - panel.style.minH) panel.tx.t = $.clamp((y - filmStrip.t) / panel.h, 0, 1);
 				if (x < txL + 30) break;
-				panel.tx.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+				panel.tx.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 				break;
 			case 'left':
 				if (x > panel.w - txR - 30) break;
-				panel.tx.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+				panel.tx.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 				break;
 			case 'bottom':
 				if (y < txT + panel.style.minH) break;
-				panel.tx.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+				panel.tx.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 				break;
 			case 'sw':
-				if (x < panel.w - txR - 30) panel.tx.l = $.clamp((x - panel.filmStripSize.l) / panel.w, 0, 1);
+				if (x < panel.w - txR - 30) panel.tx.l = $.clamp((x - filmStrip.l) / panel.w, 0, 1);
 				if (y < txT + panel.style.minH) break;
-				panel.tx.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+				panel.tx.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 				break;
 			case 'se':
-				if (y > txT + panel.style.minH) panel.tx.b = $.clamp((panel.h - y - panel.filmStripSize.b) / panel.h, 0, 1);
+				if (y > txT + panel.style.minH) panel.tx.b = $.clamp((panel.h - y - filmStrip.b) / panel.h, 0, 1);
 				if (x < txL + 30) break;
-				panel.tx.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+				panel.tx.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 				break;
 			case 'right':
 				if (x < txL + 30) break;
-				panel.tx.r = $.clamp((panel.w - x - panel.filmStripSize.r) / panel.w, 0, 1);
+				panel.tx.r = $.clamp((panel.w - x - filmStrip.r) / panel.w, 0, 1);
 				break;
 			case 'all':
-				if (txT <= panel.filmStripSize.t && y - this.init_y < 0 || txB <= panel.filmStripSize.b && y - this.init_y > 0 || txL <= panel.filmStripSize.l && x - this.init_x < 0 || txR <= panel.filmStripSize.r && x - this.init_x > 0) break;
+				if (txT <= filmStrip.t && y - this.init_y < 0 || txB <= filmStrip.b && y - this.init_y > 0 || txL <= filmStrip.l && x - this.init_x < 0 || txR <= filmStrip.r && x - this.init_x > 0) break;
 				txT += (y - this.init_y);
-				panel.tx.t = $.clamp((txT - panel.filmStripSize.t) / panel.h, 0, 1);
+				panel.tx.t = $.clamp((txT - filmStrip.t) / panel.h, 0, 1);
 				txL += (x - this.init_x);
-				panel.tx.l = $.clamp((txL - panel.filmStripSize.l) / panel.w, 0, 1);
+				panel.tx.l = $.clamp((txL - filmStrip.l) / panel.w, 0, 1);
 				txB = panel.h - Math.max(txT, 0) - panel.tbox.h;
-				panel.tx.b = $.clamp((txB - panel.filmStripSize.b) / panel.h, 0, 1);
+				panel.tx.b = $.clamp((txB - filmStrip.b) / panel.h, 0, 1);
 				txR = panel.w - Math.max(txL, 0) - panel.tbox.w;
-				panel.tx.r = $.clamp((txR - panel.filmStripSize.r) / panel.w, 0, 1);
+				panel.tx.r = $.clamp((txR - filmStrip.r) / panel.w, 0, 1);
 				break;
 		}
 		this.sizes(true);

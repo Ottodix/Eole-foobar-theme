@@ -1,7 +1,12 @@
-﻿var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+﻿'use strict';
 
+var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+var ww = 0,
+	wh = 0;
+	
 function on_colours_changed() {
 	ui.getColours();
+	if (panel.id.lyricsSource) lyrics.setCol();
 	alb_scrollbar.setCol();
 	art_scrollbar.setCol();
 	img.createImages();
@@ -15,6 +20,10 @@ function on_colours_changed() {
 	if (ui.font.heading && ui.font.heading.Size) but.createStars();
 	img.clearCache();
 	img.getImages();
+	txt.rev.cur = '';
+	txt.bio.cur = '';
+	txt.albCalc();
+	txt.artCalc();
 	txt.paint();
 }
 
@@ -39,18 +48,18 @@ function on_get_album_art_done(handle, art_id, image, image_path) {
 
 function on_item_focus_change() {
 	if (!ppt.panelActive) return;
-	if (fb.IsPlaying && !ppt.focus) return;
+	if (fb.IsPlaying && !panel.id.focus) return;
 	txt.notifyTags();
-	if (ppt.lookUp) panel.getList(true);
+	if (panel.id.lookUp) panel.getList(true, true);
 	else if (!panel.updateNeeded()) return;
-	if (panel.block() && !panel.server) {
+	if (panel.block() && !$.server) {
 		img.get = true;
-		txt.get = ppt.focus ? 2 : 1;
+		txt.get = panel.id.focus ? 2 : 1;
 		img.artistReset();
 		txt.albumReset();
 		txt.artistReset();
 	} else {
-		if (panel.block() && panel.server) {
+		if (panel.block() && $.server) {
 			img.get = true;
 			txt.get = 1;
 			img.artistReset();
@@ -73,20 +82,24 @@ function on_key_down(vkey) {
 			window.Repaint();
 			break;
 		case 0x21:
-			if (panel.trace.text) txt.scrollbar_type().pageThrottle(1);
-			else if (panel.trace.film) filmStrip.scrollerType().pageThrottle(1);
+			if (panel.trace.text) {
+				if (!txt.lyricsDisplayed()) txt.scrollbar_type().pageThrottle(1);
+			} else if (panel.trace.film) filmStrip.scrollerType().pageThrottle(1);
 			break;
 		case 0x22:
-			if (panel.trace.text) txt.scrollbar_type().pageThrottle(-1);
-			else if (panel.trace.film) filmStrip.scrollerType().pageThrottle(-1);
+			if (panel.trace.text) {
+				if (!txt.lyricsDisplayed()) txt.scrollbar_type().pageThrottle(-1);
+			} else if (panel.trace.film) filmStrip.scrollerType().pageThrottle(-1);
 			break;
 		case 35:
-			if (panel.trace.text) txt.scrollbar_type().scrollToEnd();
-			else if (panel.trace.film) filmStrip.scrollerType().scrollToEnd();
+			if (panel.trace.text) {
+				if (!txt.lyricsDisplayed()) txt.scrollbar_type().scrollToEnd();
+			} else if (panel.trace.film) filmStrip.scrollerType().scrollToEnd();
 			break;
 		case 36:
-			if (panel.trace.text) txt.scrollbar_type().checkScroll(0, 'full');
-			else if (panel.trace.film) filmStrip.scrollerType().checkScroll(0, 'full');
+			if (panel.trace.text) {
+				if (!txt.lyricsDisplayed()) txt.scrollbar_type().checkScroll(0, 'full');
+			} else if (panel.trace.film) filmStrip.scrollerType().checkScroll(0, 'full');
 			break;
 		case 37:
 		case 38:
@@ -98,7 +111,7 @@ function on_key_down(vkey) {
 			if (panel.imgBoxTrace(panel.m.x, panel.m.y)) img.wheel(-1);
 			else if (panel.trace.film) filmStrip.scrollerType().wheel(-1);
 			break;
-		case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 
+		case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 			
 	}
 }
 
@@ -131,8 +144,8 @@ function on_load_image_done(task_id, image, image_path) {
 
 function on_metadb_changed() {
 	if (!ppt.panelActive) return;
-	if (panel.isRadio(ppt.focus) || panel.block() && !panel.server || !panel.updateNeeded()) return;
-	panel.getList(true);
+	if (panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
+	panel.getList(true, true);
 	panel.focusLoad();
 	panel.focusServer();
 }
@@ -140,7 +153,7 @@ function on_metadb_changed() {
 function on_mouse_lbtn_dblclk(x, y) {
 	if (!ppt.panelActive) return;
 	but.lbtn_dn(x, y);
-	txt.scrollbar_type().lbtn_dblclk(x, y);
+	if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_dblclk(x, y);
 	if (!ppt.dblClickToggle) return;
 	if (ppt.touchControl) panel.id.last_pressed_coord = {
 		x: x,
@@ -161,7 +174,7 @@ function on_mouse_lbtn_down(x, y) {
 		};
 		resize.lbtn_dn(x, y);
 		but.lbtn_dn(x, y);
-		txt.scrollbar_type().lbtn_dn(x, y);
+		if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_dn(x, y);
 		filmStrip.scrollerType().lbtn_dn(x, y);
 		seeker.lbtn_dn(x, y);
 		img.lbtn_dn(x);
@@ -177,7 +190,7 @@ function on_mouse_lbtn_up(x, y) {
 		art_scroller.lbtn_drag_up();
 		cov_scroller.lbtn_drag_up();
 		if (!ppt.dblClickToggle && !but.Dn && !seeker.dn && !panel.trace.film) panel.click(x, y);
-		txt.scrollbar_type().lbtn_up();
+		if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_up();
 		panel.clicked = false;
 		resize.lbtn_up();
 		but.lbtn_up(x, y);
@@ -200,7 +213,7 @@ function on_mouse_leave() {
 	panel.m.y = -1;
 	btns_manager.on_mouse("leave");
 	g_cursor.x = 0;
-    g_cursor.y = 0;		
+    g_cursor.y = 0;	
 }
 
 function on_mouse_mbtn_up(x, y, mask) {
@@ -227,7 +240,7 @@ function on_mouse_move(x, y, m) {
 	if (panel.m.x == x && panel.m.y == y) return;
 	panel.move(x, y);
 	but.move(x, y);
-	txt.scrollbar_type().move(x, y);
+	if (!txt.lyricsDisplayed()) txt.scrollbar_type().move(x, y);
 	filmStrip.scrollerType().move(x, y);
 	resize.imgMove(x, y);
 	resize.move(x, y);
@@ -257,7 +270,8 @@ function on_mouse_wheel(step) {
 					filmStrip.scrollerType().wheel(step, false);
 					break;
 				case panel.trace.text:
-					txt.scrollbar_type().wheel(step, false);
+					if (!txt.lyricsDisplayed()) txt.scrollbar_type().wheel(step, false);
+					else if (panel.id.lyricsSource) lyrics.on_mouse_wheel(step);
 					break;
 				default:
 					img.wheel(step);
@@ -289,14 +303,14 @@ function on_notify_data(name, info) {
 			break;		
 		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
 		case 'bio_chkTrackRev':
-			if (!panel.server && panel.style.inclTrackRev) {
+			if (!$.server && ppt.showTrackRevOptions) {
 				clone = JSON.parse(JSON.stringify(info));
 				clone.inclTrackRev = true;
 				window.NotifyOthers('bio_isTrackRev', clone);
 			}
 			break;
 		case 'bio_isTrackRev':
-			if (panel.server && info.inclTrackRev == true) {
+			if ($.server && info.inclTrackRev == true) {
 				clone = JSON.parse(JSON.stringify(info));
 				server.getTrack(clone);
 			}
@@ -309,21 +323,27 @@ function on_notify_data(name, info) {
 			clone = JSON.parse(JSON.stringify(info));
 			img.checkArr(clone);
 			break;
+		case 'bio_checkNumServers':
+			window.NotifyOthers('bio_serverName', ppt.serverName);
+			break;
+		case 'bio_serverName':
+			if (info != ppt.serverName) ppt.multiServer = true;
+			break;
 		case 'bio_customStyle':
 			clone = String(info);
 			panel.on_notify(clone);
 			break;
 		case 'bio_forceUpdate':
-			if (panel.server) {
+			if ($.server) {
 				clone = JSON.parse(JSON.stringify(info));
 				server.download(1, clone[0], clone[1]);
 			}
 			break;
 		case 'bio_getLookUpList':
-			panel.getList();
+			panel.getList('', true);
 			break;
 		case 'bio_getRevImg':
-			if (panel.server) {
+			if ($.server) {
 				clone = JSON.parse(JSON.stringify(info));
 				server.getRevImg(clone[0], clone[1], clone[2], clone[3], false);
 			}
@@ -335,26 +355,34 @@ function on_notify_data(name, info) {
 			txt.grab();
 			break;
 		case 'bio_lookUpItem':
-			if (panel.server) {
+			if ($.server) {
 				clone = JSON.parse(JSON.stringify(info));
-				server.download(false, clone[0], clone[1]);
+				server.download(false, clone[0], clone[1], name);
 			}
 			break;
-		case 'bio_newCfg':
+		case `bio_newCfg${ppt.serverName}`:
 			cfg.updateCfg($.jsonParse(info, {}));
 			break;
-		case 'bio_notServer':
-			panel.server = false;
-			timer.clear(timer.img);
-			timer.clear(timer.zSearch);
+		case `bio_notServer${ppt.serverName}`: {
+			const recTimestamp = info;
+			if (recTimestamp >= panel.notifyTimestamp) {
+				$.server = false;
+				timer.clear(timer.img);
+				timer.clear(timer.zSearch);
+			}
 			break;
+		}
 		case 'bio_blacklist':
 			img.blackList.artist = '';
 			img.check();
 			break;
-		case 'bio_scriptUnload':
-			panel.server = true;
-			window.NotifyOthers('bio_notServer', 0);
+		case `bio_scriptUnload${ppt.serverName}`:
+			$.server = true;
+			panel.notifyTimestamp = Date.now();
+			window.NotifyOthers(`bio_notServer${ppt.serverName}`, panel.notifyTimestamp);
+			break;
+		case 'bio_checkTimerSync':
+			timer.image()
 			break;
 		case 'bio_refresh':
 			window.Reload();
@@ -369,22 +397,28 @@ function on_notify_data(name, info) {
 			}
 			break;
 		case 'bio_followSelectedTrack':
-			if (ppt.focus !== info) {
-				ppt.focus = info;
-				panel.changed();
-				txt.on_playback_new_track();
-				img.on_playback_new_track();
+			if (!panel.id.lyricsSource) { // if there is a lyricsSource enabled, panel has to be in prefer nowplaying mode
+				if (panel.id.focus !== info) {
+					panel.id.focus = ppt.focus = info;
+					panel.changed();
+					txt.on_playback_new_track();
+					img.on_playback_new_track();
+				}
 			}
 			break;
 		case 'bio_status':
 			ppt.panelActive = info;
 			window.Reload();
 			break;
+		case 'bio_webRequest':
+			clone = String(info);
+			server.urlRequested[info] = Date.now(); // if multiServer enabled, limit URL requests for same item to one
+			break;
 	}
 }
 
 function on_paint(gr) {
-	if(on_size_2Call){ on_size(window.Width, window.Height);on_size_2Call=false;}	
+	if (ui.pss.checkOnSize) on_size();
 	ui.draw(gr);
 	if (!ppt.panelActive) {
 		panel.draw(gr);
@@ -392,32 +426,53 @@ function on_paint(gr) {
 	}
 	img.draw(gr);
 	seeker.draw(gr);
-	filmStrip.draw(gr);
 	txt.draw(gr);
-	txt.drawMessage(gr);
+	if (panel.id.lyricsSource) lyrics.draw(gr);
+	filmStrip.draw(gr);
 	but.draw(gr);
 	resize.drawEd(gr);
 	ui.lines(gr);
-	if(show_lyrics_btns) btns_manager.draw(gr);		
+	if(show_lyrics_btns) btns_manager.draw(gr);			
 }
 
 function on_playback_dynamic_info_track() {
 	if (!ppt.panelActive) return;
-	if (panel.server) server.downloadDynamic();
+	txt.rev.amFallback = true;
+	txt.rev.wikiFallback = true;
+	if ($.server) server.downloadDynamic();
+	txt.reader.lyrics3Saved = false;
+	txt.reader.openLyricsSaved = false;
+	txt.reader.trackStartTime = fb.PlaybackTime;
 	txt.on_playback_new_track();
 	img.on_playback_new_track();
 }
 
 function on_playback_new_track() {
 	if (!ppt.panelActive) return;
-	if (panel.server) server.on_playback_new_track();
-	if (ppt.focus) return;
+	if ($.server) server.on_playback_new_track();
+	if (panel.id.focus) return;
+	txt.rev.amFallback = true;
+	txt.rev.wikiFallback = true;
+	txt.reader.lyrics3Saved = false;
+	txt.reader.openLyricsSaved = false;
+	txt.reader.trackStartTime = 0;
 	txt.on_playback_new_track();
 	img.on_playback_new_track();
 }
 
+function on_playback_pause(state) {
+	if (panel.id.lyricsSource) lyrics.on_playback_pause(state);
+}
+
+function on_playback_seek() {
+	if (panel.id.lyricsSource) lyrics.seek();
+}
+
 function on_playback_stop(reason) {
 	if (!ppt.panelActive) return;
+	const n = ppt.artistView ? 'bio' : 'rev';
+    if (reason != 2 && txt[n].loaded.txt && txt.reader.lyrics) txt.getText();
+	if (panel.id.lyricsSource) lyrics.clear();
 	if (reason == 2) return;
 	on_item_focus_change();
 }
@@ -443,8 +498,8 @@ function on_playlists_changed() {
 }
 
 function on_script_unload() {
-	if (panel.server) {
-		window.NotifyOthers('bio_scriptUnload', 0);
+	if ($.server) {
+		window.NotifyOthers(`bio_scriptUnload${ppt.serverName}`, 0);
 		timer.clear(timer.img);
 	}
 	but.on_script_unload();
@@ -455,9 +510,13 @@ function on_size() {
 	panel.w = window.Width;
 	panel.h = window.Height;
 	ww = window.Width;
-	wh = window.Height;	
+	wh = window.Height;		
+	if (!window.IsVisible && ui.pss.installed) {
+		ui.pss.checkOnSize = true;
+		return;
+	}
+	ui.pss.checkOnSize = false;
 	if (!panel.w || !panel.h) return;
-	if(!window.IsVisible) {on_size_2Call = true;return;}	
 	ui.getFont();
 	panel.getLogo();
 	if (!ppt.panelActive) return;
