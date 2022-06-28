@@ -45,7 +45,7 @@ var properties = {
     filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),	
     albumsTFsortingdefault: window.GetProperty("Sort Order - ALBUM", "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
     artistsTFsortingdefault: "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%",//window.GetProperty("Sort Order - ARTIST", "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
-    genresTFsortingdefault: window.GetProperty("Sort Order - GENRE", "$meta(genre,0) | %album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%"),
+    genresTFsortingdefault: window.GetProperty("Sort Order - GENRE", "$meta(genre,0) | %album artist% | %album% | %date% | %discnumber% | %tracknumber% | %title%"),
 	deleteSpecificImageCache : window.GetProperty("COVER cachekey of covers to delete on next startup", ""),
     showAllItem: window.GetProperty("_PROPERTY: Show ALL item", true),
     showAllItem1: window.GetProperty("_PROPERTY: Show ALL item for tag mode 1", true),
