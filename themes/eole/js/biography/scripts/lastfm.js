@@ -148,6 +148,7 @@ class DldLastfmBio {
 				}
 				case 2: {
 					const popAlbums = [];
+					this.topAlbums = [];
 					i = 0;
 					$.htmlParse(div.getElementsByTagName('h3'), 'className', 'resource-list--release-list-item-name', v => {
 						i < 4 ? popAlbums.push($.titlecase(v.innerText.trim())) : this.topAlbums.push($.titlecase(v.innerText.trim()));

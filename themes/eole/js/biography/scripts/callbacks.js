@@ -3,7 +3,7 @@
 var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
 var ww = 0,
 	wh = 0;
-	
+		
 function on_colours_changed() {
 	ui.getColours();
 	if (panel.id.lyricsSource) lyrics.setCol();
@@ -76,6 +76,7 @@ function on_item_focus_change() {
 
 function on_key_down(vkey) {
 	switch (vkey) {
+		case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -111,7 +112,6 @@ function on_key_down(vkey) {
 			if (panel.imgBoxTrace(panel.m.x, panel.m.y)) img.wheel(-1);
 			else if (panel.trace.film) filmStrip.scrollerType().wheel(-1);
 			break;
-		case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 			
 	}
 }
 
@@ -213,7 +213,7 @@ function on_mouse_leave() {
 	panel.m.y = -1;
 	btns_manager.on_mouse("leave");
 	g_cursor.x = 0;
-    g_cursor.y = 0;	
+    g_cursor.y = 0;		
 }
 
 function on_mouse_mbtn_up(x, y, mask) {
@@ -300,8 +300,8 @@ function on_notify_data(name, info) {
 			show_lyrics_btns = info;
 			window.SetProperty("show lyrics btns", show_lyrics_btns);
 			window.Repaint();
-			break;		
-		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;
+			break;	
+		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;		
 		case 'bio_chkTrackRev':
 			if (!$.server && ppt.showTrackRevOptions) {
 				clone = JSON.parse(JSON.stringify(info));
@@ -506,11 +506,11 @@ function on_script_unload() {
 }
 
 function on_size() {
+	ww = window.Width;
+	wh = window.Height;
 	txt.repaint = false;
 	panel.w = window.Width;
 	panel.h = window.Height;
-	ww = window.Width;
-	wh = window.Height;		
 	if (!window.IsVisible && ui.pss.installed) {
 		ui.pss.checkOnSize = true;
 		return;

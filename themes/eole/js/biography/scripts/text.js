@@ -337,7 +337,7 @@ class Text {
 						if (v[`${w}Line`]) {
 							const v_w = g.CalcTextWidth(v.text + ' ', this.ratingPos.line ? ui.font.main : ui.font.subHeadSource);
 							v[`${w}LineX1`] = i < 2 ? panel.text.l + v_w + (this.rating[w] >= 0 && (this.ratingPos.subHeading || this.ratingPos.line) ? but.rating.w2 : 0) + this.bio.sp : panel.text.l + this.rev[`${w}_w`].nohd + this.bio.sp; // noHd
-							v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);;
+							v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);
 						}
 					});
 					v.offset = 0;
@@ -489,6 +489,9 @@ class Text {
 				if (!isNaN(this.rating.am) && this.rating.am != 0 && this.rating.am != -1) this.rating.am *= 2;
 				else this.rating.am = -1;
 				this.getRatingStyle('am');
+			} else {
+				this.rating.amStr = '';
+				if (f != -1) this.rev.amAlb = this.rev.amAlb.slice(f + 3);
 			}
 		}
 		this.rev.am = this.rev.amAlb;
@@ -1309,8 +1312,9 @@ class Text {
 				switch (true) {
 					case !ppt.sourceAll:
 						if (ppt.artistView ? !ppt.lockBio : !ppt.lockRev) { // get target else fallback source
+							const isMainAvail = this.isMainAvail(n);
 							[type, types_1[source], types_2[source], types_3[source]].some(v => {
-								if (this[n][v] && (v != 'txt' || !this.isMainAvail(n, v))) { // favour amLfmWiki fallback if !prefer textreader/lyrics
+								if (this[n][v] && (v != 'txt' || !isMainAvail)) { // favour amLfmWiki fallback if !prefer textreader/lyrics
 									this[n].text = this[n][v];
 									return this[n].loaded[v] = true;
 								}
@@ -1320,7 +1324,7 @@ class Text {
 							if (this[n][type]) this[n].loaded[type] = true;
 						}
 						break;
-					case ppt.sourceAll:
+					case ppt.sourceAll: {
 						let setLoaded = false;
 						[types, types_1, types_2, types_3][ppt[`source${n}`]].forEach((v, i, arr) => {
 							const splitter = i < arr.length - 1 ? '<---------->' : '';
@@ -1334,6 +1338,7 @@ class Text {
 							}
 						});
 						break;
+					}
 				}
 
 				Object.values(this[n].loaded).some((v, i) => {
@@ -1448,7 +1453,7 @@ class Text {
 		return !ppt.artistView && ppt.classicalMusicMode && (this.rev.loaded.am && !this.rev.amFallback || this.rev.loaded.wiki && !this.rev.wikiFallback) && !panel.alb.ix;
 	}
 
-	isMainAvail(n, v) {
+	isMainAvail(n) {
 		return $.source.amLfmWiki.some(v => this[n][v] && ppt[`source${n}`] != 3);
 	}
 
@@ -1532,6 +1537,8 @@ class Text {
 					this.rating.lfm *= 2;
 					this.getRatingStyle('lfm');
 				}
+			} else {
+				this.rating.lfmStr = '';
 			}
 			this.rev.lfmAlb = ppt.score ? this.rev.lfmAlb.replace('Rating: ', '') : this.rev.lfmAlb.replace(/^Rating: .*$/m, '').trim();
 		}

@@ -78,9 +78,13 @@ function on_size() {
 }
 */
 
-// Add to on_paint, at the end :
+// Modify on_paint
 /*
+function on_paint() {
+	// previous code
 	if(show_lyrics_btns) btns_manager.draw(gr);		
+}
+	
 */
 
 // Add to function on_key_down(vkey) {switch(vkey) {
@@ -117,6 +121,9 @@ function on_size() {
 			//gr.SetSmoothingMode(0);
 		}
 */
+
+//In menu.js, delete MF_STRING and MF_GRAYED at the beggining
+
 /* ------------------------------------------------------------------------------------------------------------------------------- */
 /* ---------------------- BELOW ARE CHANGES MADE TO PREVIOUS VERSION, NOT USED ANYMORE.... WAITING FOR WILB UPDATE ----------------*/
 /* ------------------------------------------------------------------------------------------------------------------------------- */

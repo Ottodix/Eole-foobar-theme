@@ -168,8 +168,6 @@ class MenuItems {
 		bMenu = new MenuManager;
 		bMenu.newMenu({});
 		const artist = panel.art.list.length ? panel.art.list[0].name : name.artist(panel.id.focus);
-		const n = ppt.artistView ? 'bio' : 'rev';
-		const isLyrics = txt[n].loaded.txt && txt.reader.lyrics;
 		switch (ppt.artistView) {
 			case true:
 				panel.art.list.forEach((v, i) => bMenu.newItem({
@@ -359,7 +357,6 @@ class MenuItems {
 						ppt.toggle('showTrackRevOptions');
 						txt.logScrollPos();
 						panel.style.inclTrackRev = ppt.inclTrackRev = 0;
-						console.log('call SERVER ppt.showTrackRevOptions',ppt.showTrackRevOptions)
 						if (ppt.showTrackRevOptions) server.checkTrack({
 							focus: panel.id.focus,
 							force: false,
@@ -827,7 +824,7 @@ class MenuItems {
 	isRevAvail() {
 		const type = ['alb', 'trk'];
 		type.forEach(w => {
-			this[`${w}Avail`] = $.source.amLfmWiki.some((v, i) => {
+			this[`${w}Avail`] = $.source.amLfmWiki.some(v => {
 				return ppt.lockRev ? txt.rev.loaded.ix == txt.avail[`${v}${w}`] : txt.avail[`${v}${w}`] != -1;
 			});
 		});

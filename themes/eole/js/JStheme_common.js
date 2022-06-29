@@ -343,6 +343,7 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax,inter_text],
 	});
 }
+
 function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
 	function ok_callback(status, input_values) {
 		if(status!="cancel"){
@@ -351,7 +352,7 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 			switch(properties.tagMode) {
 				case 1:
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
-						properties.album_customGroup_label = input_values[0].substring(0, 10);
+						properties.album_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
 						window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);
 						refresh_filters = true;
@@ -361,10 +362,15 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
 						refresh_filters = true;
 					}
+					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_album==input_values[2])) {
+						properties.tf_sort_album = input_values[2];
+						window.SetProperty("Sort Order - Album TitleFormat", properties.tf_sort_album);
+						refresh_filters = true;
+					}					
 				break;
 				case 2:
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {
-						properties.artist_customGroup_label = input_values[0].substring(0, 10);
+						properties.artist_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
 						window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);
 						refresh_filters = true;
@@ -374,10 +380,15 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 						window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);
 						refresh_filters = true;
 					}
+					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_artist==input_values[2])) {
+						properties.tf_sort_artist = input_values[2];
+						window.SetProperty("Sort Order - Artist TitleFormat", properties.tf_sort_artist);
+						refresh_filters = true;
+					}					
 				break;
 				case 3:
 					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
-						properties.genre_customGroup_label = input_values[0].substring(0, 10);
+						properties.genre_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);
 						refresh_filters = true;
@@ -385,6 +396,11 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
 						properties.tf_groupkey_genre = input_values[1];
 						window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);
+						refresh_filters = true;
+					}
+					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_genre==input_values[2])) {
+						properties.tf_sort_genre = input_values[2];
+						window.SetProperty("Sort Order - Genre TitleFormat", properties.tf_sort_genre);
 						refresh_filters = true;
 					}
 				break;
