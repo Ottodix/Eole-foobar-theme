@@ -381,7 +381,7 @@ class Buttons {
 		if (hover_btn) hand = hover_btn.hand;
 		//if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
 		if (!resize.down) {
-			if(!hand && seeker.hand) {
+			if(!hand && !seeker.hand && !filmStrip.hand && !(btns_manager.cur_btn && btns_manager.cur_btn.state == ButtonStates.hover)) {
 				window.SetCursor(32512);
 				this.hand = false;
 			} else if(hover_btn){

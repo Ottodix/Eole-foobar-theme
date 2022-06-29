@@ -97,14 +97,14 @@ function on_paint() {
 // with code below :
 /*
 	if (!resize.down) {
-		if(!hand && seeker.hand) {
+		if(!hand && !seeker.hand && !filmStrip.hand && !(btns_manager.cur_btn && btns_manager.cur_btn.state == ButtonStates.hover)) {
 			window.SetCursor(32512);
 			this.hand = false;
 		} else if(hover_btn){
 			window.SetCursor(32649);
 			this.hand = true;
 		}
-	}	
+	}
 */
 
 // In draw(gr) function of images.js, in if (ppt.imgSeeker && ppt.imgSeekerDots == 0) {
