@@ -3937,19 +3937,21 @@ oBrowser = function(name) {
 
 
             _menu13.AppendMenuItem(MF_STRING, 113, "Default (%genre%)");
-            _menu13.CheckMenuItem(113, properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "" && properties.tf_sort_genre == properties.tf_sort_genre_default);
+			console.log(properties.tf_sort_genre == properties.tf_sort_genre_default)
+            _menu13.CheckMenuItem(113, properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "" && (properties.tf_sort_genre == properties.tf_sort_genre_default||properties.tf_sort_genre==''));
             _menu13.AppendMenuItem(MF_STRING, 116, "Custom titleformat...");
-            _menu13.CheckMenuItem(116, !(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "" && properties.tf_sort_genre == properties.tf_sort_genre_default));
+            _menu13.CheckMenuItem(116, !(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default && properties.genre_customGroup_label == "" && (properties.tf_sort_genre == properties.tf_sort_genre_default||properties.tf_sort_genre=='')));
 
             _menu12.AppendMenuItem(MF_STRING, 112, "Default (%artist%)");
-            _menu12.CheckMenuItem(112, properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "" && properties.tf_sort_artist == properties.tf_sort_artist_default);
+            _menu12.CheckMenuItem(112, properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "" && (properties.tf_sort_artist == properties.tf_sort_artist_default||properties.tf_sort_artist==''));
             _menu12.AppendMenuItem(MF_STRING, 115, "Custom titleformat...");
-            _menu12.CheckMenuItem(115, !(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "" && properties.tf_sort_artist == properties.tf_sort_artist_default));
+            _menu12.CheckMenuItem(115, !(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default && properties.artist_customGroup_label == "" && (properties.tf_sort_artist == properties.tf_sort_artist_default||properties.tf_sort_artist=='')));
 
             _menu11.AppendMenuItem(MF_STRING, 111, "Default (%album%)");
-            _menu11.CheckMenuItem(111, properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "" && properties.tf_sort_album == properties.tf_sort_album_default);
+			
+            _menu11.CheckMenuItem(111, properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "" && (properties.tf_sort_album == properties.tf_sort_album_default||properties.tf_sort_album==''));
             _menu11.AppendMenuItem(MF_STRING, 114, "Custom titleformat...");
-            _menu11.CheckMenuItem(114, !(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "" && properties.tf_sort_album == properties.tf_sort_album_default));
+            _menu11.CheckMenuItem(114, !(properties.tf_groupkey_album == properties.tf_groupkey_album_default && properties.album_customGroup_label == "" && (properties.tf_sort_album == properties.tf_sort_album_default||properties.tf_sort_album=='')));
 
 			if(properties.showLibraryTreeSwitch) {
 				_menu.AppendMenuItem(MF_STRING, 990, "Switch to library tree");
@@ -4144,7 +4146,7 @@ oBrowser = function(name) {
 								customFilterGrouping(properties.tagMode
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
-													,'Label (20 chars max):##Grouping pattern:##Sorting pattern:'
+													,'Label (20 chars max):##Grouping pattern (empty: reset to default value):##Sorting pattern (empty: reset to default value):'
 													,properties.album_label+'##'+properties.tf_groupkey_album+'##'+((properties.tf_sort_album=='')?properties.tf_sort_album_default:properties.tf_sort_album));
 								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Album grouping", properties.tf_groupkey_album, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined' || properties.tf_groupkey_album==new_TFgrouping)) {
@@ -4163,7 +4165,7 @@ oBrowser = function(name) {
 								customFilterGrouping(properties.tagMode
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
-													,'Label (20 chars max):##Grouping pattern:##Sorting pattern:'
+													,'Label (20 chars max):##Grouping pattern (empty: reset to default value):##Sorting pattern (empty: reset to default value):'
 													,properties.artist_label+'##'+properties.tf_groupkey_artist+'##'+((properties.tf_sort_artist=='')?properties.tf_sort_artist_default:properties.tf_sort_artist));
 								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Artist grouping", properties.tf_groupkey_artist, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {
@@ -4182,7 +4184,7 @@ oBrowser = function(name) {
 								customFilterGrouping(properties.tagMode
 													,"<div class='titleBig'>Custom Filter</div><div class='separator'></div><br/>Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
 													,''
-													,'Label (20 chars max):##Grouping pattern:##Sorting pattern:'
+													,'Label (20 chars max):##Grouping pattern (empty: reset to default value):##Sorting pattern (empty: reset to default value):'
 													,properties.genre_label+'##'+properties.tf_groupkey_genre+'##'+((properties.tf_sort_genre=='')?properties.tf_sort_genre_default:properties.tf_sort_genre));
 								/*new_TFgrouping = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Genre grouping", properties.tf_groupkey_genre, true);
 								if (!(new_TFgrouping == "" || typeof new_TFgrouping == 'undefined')) {

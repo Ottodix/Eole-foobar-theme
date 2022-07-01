@@ -351,54 +351,57 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 			var refresh_filters = false;
 			switch(properties.tagMode) {
 				case 1:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
 						properties.album_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
 						window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
-						properties.tf_groupkey_album = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_album = properties.tf_groupkey_album_default;
+						else properties.tf_groupkey_album = input_values[1];
 						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
 						refresh_filters = true;
 					}
-					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_album==input_values[2])) {
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_album==input_values[2])) {
 						properties.tf_sort_album = input_values[2];
 						window.SetProperty("Sort Order - Album TitleFormat", properties.tf_sort_album);
 						refresh_filters = true;
 					}					
 				break;
 				case 2:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {
 						properties.artist_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
 						window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
-						properties.tf_groupkey_artist = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_artist = properties.tf_groupkey_artist_default;
+						else properties.tf_groupkey_artist = input_values[1];
 						window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);
 						refresh_filters = true;
 					}
-					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_artist==input_values[2])) {
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_artist==input_values[2])) {
 						properties.tf_sort_artist = input_values[2];
 						window.SetProperty("Sort Order - Artist TitleFormat", properties.tf_sort_artist);
 						refresh_filters = true;
 					}					
 				break;
 				case 3:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
 						properties.genre_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
-						properties.tf_groupkey_genre = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_genre = properties.tf_groupkey_genre_default;
+						else properties.tf_groupkey_genre = input_values[1];
 						window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);
 						refresh_filters = true;
 					}
-					if (!(input_values[2] == "" || typeof input_values[2] == 'undefined' || properties.tf_sort_genre==input_values[2])) {
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_genre==input_values[2])) {
 						properties.tf_sort_genre = input_values[2];
 						window.SetProperty("Sort Order - Genre TitleFormat", properties.tf_sort_genre);
 						refresh_filters = true;
