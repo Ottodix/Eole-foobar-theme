@@ -6,7 +6,7 @@ Follow the [instructions below](https://github.com/Ottodix/Eole-foobar-theme#ins
 
 ## Contribute to the theme
 
-If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request. If you'd like to support the projet, you can also [make a small donation](https://www.buymeacoffee.com/Ottodix)
+If you've got some knowledge in javascript, feel free to suggest code performance improvements, to report bugs and their fixes. Open an issue ticket, share the code, or do a pull request. If you'd like to support the projet, you can also make a small donation [on buymeacoffee.com there](https://www.buymeacoffee.com/Ottodix) or [through paypal there](https://www.paypal.com/donate/?business=LHYLTTECU7RSA&no_recurring=0&item_name=Hey%21+If+you+enjoyed+the+Eole+theme%2C+consider+donating+any+amount+you+feel+confortable+with%2C+it+would+make+my+day.+Thanks%21&currency_code=USD).
 
 ## Preview
 
