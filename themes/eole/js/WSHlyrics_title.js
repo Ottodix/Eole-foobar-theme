@@ -8,7 +8,8 @@ var ww = 0;
 var wh = 0;
 var lyricsText_Width = -1;
 var esl = new ActiveXObject("ESLyric");
-//esl.SetLyricCallback(lyrics_callback);
+var eslPanel = esl.GetAll();
+//eslPanel.SetPlayingLyricChangedCallback(lyrics_callback);
 var Update_Required_function= "";
 var btn_initialized = false;
 var images = {};
@@ -116,13 +117,18 @@ function get_colors() {
 	}
 	images.lyrics_off_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_on.png");
 	images.lyrics_off_hover_icon = gdi.Image(theme_img_path + "\\icons\\"+colors.icons_folder+"\\nowplaying_on_hover.png");
-	esl.SetPanelTextNormalColor(colors.normal_txt);
-	esl.SetPanelTextHighlightColor(colors.highlight_txt);
-	esl.SetPanelTextBackgroundColor(colors.normal_bg);
+	eslPanel.SetTextColor(colors.normal_txt);
+	eslPanel.SetTextHighlightColor(colors.highlight_txt);
+	eslPanel.SetBackgroundColor(colors.normal_bg);
 	lyrics_first_load = utils.Glob(SettingsPath+""+"LYRICSFIRSTLOAD_*");
 	if(lyrics_first_load.length<1){
-		esl.ShowDesktopLyric = false;
-		esl.DesktopLyricAlwaysOnTop = false;
+	// 	esl.ShowDesktopLyric = false;
+	// 	esl.DesktopLyricAlwaysOnTop = false;
+		eslPanel.SetTextFont("Segoe UI", 12, 0);
+		eslPanel.SetVertMargin(0);
+		eslPanel.SetHorizMargin(13);
+		eslPanel.SetLineSpace(8);
+		eslPanel.SetSentenceSpace(0);
 		g_files.CreateTextFile(SettingsPath+"LYRICSFIRSTLOAD_0", true).Close();			
 	}
 };
@@ -173,17 +179,17 @@ searching_img.ReleaseGraphics(gb);
 
 function on_playback_new_track(){
 	if(window.IsVisible) {
-		//esl.SetPanelTextNormalColor(colors.normal_bg);
-		//esl.SetPanelBackgroundType(1);
-		//esl.SetPanelBackgroundSource(1);
+		//eslPanel.SetTextColor(colors.normal_bg);
+		//eslPanel.SetBackgroundType(1);
+		//eslPanel.SetBackgroundImageSource(1);
 		//esl.SetPanelBackgroundPos(3);
-		//esl.SetPanelBackgroundImagePath(globalProperties.default_wallpaper);
-		esl.RunPanelContextMenu("Reload Lyric");
+		//eslPanel.SetBackgroundImagePath(globalProperties.default_wallpaper);
+		eslPanel.RunContextMenu("Reload Lyric");
 	} else set_update_function("on_playback_new_track()");
 }
 function lyrics_callback(){
-	//esl.SetPanelBackgroundType(0);
-	//esl.SetPanelTextNormalColor(colors.normal_txt);
+	//eslPanel.SetBackgroundType(0);
+	//eslPanel.SetTextColor(colors.normal_txt);
 }
 function set_update_function(string){
 	if(string=="") Update_Required_function=string;
@@ -256,8 +262,8 @@ function on_notify_data(name, info) {
 			window.Repaint();
             break;
 		case "settings_file_not_found":
-			esl.ShowDesktopLyric = false;
-			esl.DesktopLyricAlwaysOnTop = false;
+			// esl.ShowDesktopLyric = false;
+			// esl.DesktopLyricAlwaysOnTop = false;
             break;
     }
 }
