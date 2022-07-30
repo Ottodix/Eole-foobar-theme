@@ -14,13 +14,11 @@ Follow the instructions below to install it properly.
 
 2. Run foobar, choose `ColumnUI` as user interface (from the prompt, or in `File` > `Preferences` > `Display`).
 
-3. Open the advanced settings for ESLyric (File > Preferences > Tools > ESLyric > Advanced) and double-click the number next to `pref.script.expose` so that it changes to `1`. Then reopen Foobar2000.
+3. From the Columns UI settings in `File` > `Preferences` > `Display` > `Columns UI`, click on `Import`, and select the following file: `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl`.
 
-4. From the Columns UI settings in `File` > `Preferences` > `Display` > `Columns UI`, click on `Import`, and select the following file: `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl`.
+4. Configure the Winamp directory in Shpeck for the visualisations, it's at the bottom of the preferences window: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Visualisations` > `Shpeck`. Click on the `...` button in the top right to browse and select the directory `[FOOBAR_PROFILE_DIRECTORY]\plugins\winamp`. Validate, close the preferences, and go to the `Visualization` tab of the skin. Right click and select `Milkdrop` in the `Autostart Plugin` submenu.
 
-5. Configure the Winamp directory in Shpeck for the visualisations, it's at the bottom of the preferences window: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Visualisations` > `Shpeck`. Click on the `...` button in the top right to browse and select the directory `[FOOBAR_PROFILE_DIRECTORY]\plugins\winamp`. Validate, close the preferences, and go to the `Visualization` tab of the skin. Right click and select `Milkdrop` in the `Autostart Plugin` submenu.
-
-6. Optionally, if you want some extra polish you can change the systray icon: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Display` > `Columns UI`. Go to the `Notification area` tab and tick `Use custom icon`, then click `Select icon...` and select the file `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico` (or any of the alternative icons in this folder).
+5. Optionally, if you want some extra polish you can change the systray icon: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Display` > `Columns UI`. Go to the `Notification area` tab and tick `Use custom icon`, then click `Select icon...` and select the file `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico` (or any of the alternative icons in this folder).
 
 That's it! Enjoy your music!
 
@@ -33,8 +31,6 @@ WARNING: The visualization tab is powered by Shpeck, which can be unstable. So i
 - The library browser panel has an option to load every cover from the image cache at startup, which is enabled by default and allows to browse your library without waiting for the covers to load. Foobar memory usage is higher when this option is enabled, because all the covers are loaded into memory. This option has an effect only once the image cache is already built, which is done little by little: when a cover is displayed, if it isn't stored yet in the cache, it will be added to the cache.
 
 - Most panels have a settings menu which can be accessed with a right click. You can also look for the hamburger (3 dots) menu icons. And if you want to get your hands dirty and edit a panel, press `SHIFT` when right clicking and click `Configure` to see which files contain the related scripts.
-
-- For ESLyric to function, scripts need to be enabled or else you will get an error message. You can enable scripts by opening the advanced settings for ESLyric (File > Preferences > Tools > ESLyric > Advanced) and double-clicking the number next to `pref.script.expose` so that it changes to `1`. Then reopen Foobar2000.
 
 ## Credits
 - [TheQwertiest](https://github.com/TheQwertiest): Spider Monkey Panel, which powers most of this theme [foo_spider_monkey_panel](https://github.com/TheQwertiest/foo_spider_monkey_panel)
