@@ -382,10 +382,9 @@ oPlaylistHistory = function() {
 		this.history = Array();
 	}
 }
+
 oFilterBox = function() {
 	// inputbox variables
-	var g_timer_cursor = false;
-	var g_cursor_state = true;
 	this.w = 0;
 	this.h = 0;
 	this.paddingLeft = 30;
@@ -399,94 +398,84 @@ oFilterBox = function() {
         resetIcon_ov: null
 	}
 
-	this.getImages = function() {
-		var gb;
+	this.getImages = () => {
+		let gb;
+		let w = 18;
 
-        var w = 18;
-
-		if(properties.darklayout) icon_theme_subfolder = "\\white";
-		else icon_theme_subfolder = "";
+		icon_theme_subfolder = properties.darklayout ? "\\white" : "";
 
 		this.images.search_icon = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\search_icon.png");
 		this.search_bt = new button(this.images.search_icon, this.images.search_icon, this.images.search_icon,"search_bt", "Filter groups"+(properties.filterBox_filter_tracks?" & tracks":''));
 
-        this.images.resetIcon_off = gdi.CreateImage(w, w);
-        gb = this.images.resetIcon_off.GetGraphics();
-            gb.SetSmoothingMode(2);
-            gb.DrawLine(5, 5, w-5, w-5, 1.0, colors.normal_txt);
-            gb.DrawLine(5, w-5, w-5, 5, 1.0, colors.normal_txt);
-            gb.SetSmoothingMode(0);
-        this.images.resetIcon_off.ReleaseGraphics(gb);
+		this.images.resetIcon_off = gdi.CreateImage(w, w);
+		gb = this.images.resetIcon_off.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.DrawLine(5, 5, w-5, w-5, 1.0, colors.normal_txt);
+		gb.DrawLine(5, w-5, w-5, 5, 1.0, colors.normal_txt);
+		gb.SetSmoothingMode(0);
+		this.images.resetIcon_off.ReleaseGraphics(gb);
 
-        this.images.resetIcon_ov = gdi.CreateImage(w, w);
-        gb = this.images.resetIcon_ov.GetGraphics();
-            gb.SetSmoothingMode(2);
-            gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.normal_txt);
-            gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.normal_txt);
-            gb.SetSmoothingMode(0);
-        this.images.resetIcon_ov.ReleaseGraphics(gb);
+		this.images.resetIcon_ov = gdi.CreateImage(w, w);
+		gb = this.images.resetIcon_ov.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.normal_txt);
+		gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.normal_txt);
+		gb.SetSmoothingMode(0);
+		this.images.resetIcon_ov.ReleaseGraphics(gb);
 
-        this.images.resetIcon_dn = gdi.CreateImage(w, w);
-        gb = this.images.resetIcon_dn.GetGraphics();
-            gb.SetSmoothingMode(2);
-            gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.reseticon_down);
-            gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.reseticon_down);
-            gb.SetSmoothingMode(0);
-        this.images.resetIcon_dn.ReleaseGraphics(gb);
+		this.images.resetIcon_dn = gdi.CreateImage(w, w);
+		gb = this.images.resetIcon_dn.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.DrawLine(4, 4, w-4, w-4, 1.0, colors.reseticon_down);
+		gb.DrawLine(4, w-4, w-4, 4, 1.0, colors.reseticon_down);
+		gb.SetSmoothingMode(0);
+		this.images.resetIcon_dn.ReleaseGraphics(gb);
 
-        if(typeof(this.reset_bt) == "undefined") {
-            this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt", "Reset filter");
-        } else {
-            this.reset_bt.img[0] = this.images.resetIcon_off;
-            this.reset_bt.img[1] = this.images.resetIcon_ov;
-            this.reset_bt.img[2] = this.images.resetIcon_dn;
-        }
-	}
+		if(typeof(this.reset_bt) == "undefined") {
+			this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn,"reset_bt", "Reset filter");
+		} else {
+			this.reset_bt.img[0] = this.images.resetIcon_off;
+			this.reset_bt.img[1] = this.images.resetIcon_ov;
+			this.reset_bt.img[2] = this.images.resetIcon_dn;
+		}
+	};
 
-	this.on_init = function() {
+	this.on_init = () => {
 		var old_x = 0;
 		if(typeof this.inbutbox != 'undefined') var old_x = this.inputbox.x;
 		var old_y = 0;
 		if(typeof this.inbutbox != 'undefined') var old_y = this.inputbox.y;
 		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter groups below ...", colors.normal_txt, 0, 0, colors.selected_bg, g_sendResponse, "brw", undefined, "g_font.italicplus2");
 		g_headerbar.RightTextLength = -1;
-        this.inputbox.autovalidation = true;
+				this.inputbox.autovalidation = true;
 		this.inputbox.visible = true;
 		this.getImages();
 		this.inputbox.x = old_x;
 		this.inputbox.y = old_y;
-    }
+	};
+
 	this.on_init();
-    this.onFontChanged = function() {
+
+	this.onFontChanged = () => {
 		this.inputbox.onFontChanged();
-	}
-	this.draw = function(gr, x , y) {
+	};
+
+	this.draw = (gr, x , y) => {
 		this.x = x;
 		this.y = y;
-        //gr.FillSolidRect(this.x, this.y, this.w, this.h, RGB(255,255,255));
-        //gr.FillSolidRect(this.x-2, this.y, this.w+2, 20, blendColors(brw.bgColor, brw.fgColor, 0.2));
-        /*if(this.inputbox.edit) {
-            gr.DrawRect(this.x, this.y, this.w, this.h, 1.0, GetGrey(0));
-        } else {
-            gr.DrawRect(this.x, this.y, this.w, this.h, 1.0, colors.border);
-        }*/
-		if(brw.playlistName != globalProperties.whole_library && !libraryfilter_state.isActive()) {
-			this.btn_left_margin = 0;
-		} else {
-			this.btn_left_margin = -7;
-		}
-        if(this.inputbox.text.length > 0) {
-            this.reset_bt.draw(gr, this.x+2+this.btn_left_margin, this.y+10, 255);
-        } else {
-			this.search_bt.draw(gr, this.x+this.btn_left_margin, this.y+Math.round(this.h/2-this.images.search_icon.Height/2)-1, 255);
-			//gr.DrawImage(this.images.search_icon, this.x+this.btn_left_margin, this.y+Math.round(this.h/2-this.images.search_icon.Height/2), this.images.search_icon.Width, this.images.search_icon.Height, 0, 0, this.images.search_icon.Width, this.images.search_icon.Height, 0, 255);
-		}
-        //gr.DrawImage(this.images.search_icon, this.x+1, this.y+2, 16, 16, 0, 0, 16, 16, 0, 255);
+
+		this.btn_left_margin = (brw.playlistName !== globalProperties.whole_library && !libraryfilter_state.isActive())
+			? 0
+			: -7;
+
+		this.inputbox.text.length > 0
+			? this.reset_bt.draw(gr, this.x+2+this.btn_left_margin, this.y+10, 255)
+			: this.search_bt.draw(gr, this.x+this.btn_left_margin, this.y+Math.round(this.h/2-this.images.search_icon.Height/2)-1, 255);
 
 		this.inputbox.draw(gr, this.x+this.paddingLeft+this.btn_left_margin, this.y+this.paddingTop, 0, 0);
-       // if(this.inputbox.text.length > 0) this.reset_bt.draw(gr, this.x+this.inputbox.w+3+20, this.y+1, 255);
-    }
-    this.clearInputbox = function(){
+	};
+
+	this.clearInputbox = () => {
 		if(this.inputbox.text.length > 0) {
 			this.inputbox.text = "";
 			this.inputbox.offset = 0;
@@ -494,63 +483,57 @@ oFilterBox = function() {
 			this.isActive = false;
 		}
 		this.inputbox.check("down", -1, -1);
-	}
-    this.setSize = function(w, h, font_size) {
+	};
+
+	this.setSize = (w, h, font_size) => {
 		this.w = w;
 		this.h = h;
 		this.inputbox.paddingVertical = cFilterBox.paddingInboxCursor;
-        this.inputbox.setSize(w-this.paddingLeft, h-this.paddingTop-this.paddingBottom, font_size);
-    };
-    this.on_mouse = function(event, x, y, delta) {
-        switch(event) {
-            case "lbtn_down":
+		this.inputbox.setSize(w-this.paddingLeft, h-this.paddingTop-this.paddingBottom, font_size);
+	};
+
+	this.on_mouse = (event, x, y, delta) => {
+		switch(event) {
+			case "lbtn_down":
 				var force_activate = (x>this.x && x<this.x+this.w && y>this.y && y<this.y+this.h);
 				this.inputbox.check("down", x, y, force_activate);
-                if(this.inputbox.text.length > 0) this.reset_bt.checkstate("down", x, y);
+				if(this.inputbox.text.length > 0) this.reset_bt.checkstate("down", x, y);
 				else this.search_bt.checkstate("down", x, y);
-                break;
-            case "lbtn_up":
-				if(this.reset_bt.checkstate("up", x, y) == ButtonStates.hover && this.inputbox.text.length > 0) {
-					this.clearInputbox();
-                }
+				break;
+			case "lbtn_up":
+				(this.reset_bt.checkstate("up", x, y) === ButtonStates.hover && this.inputbox.text.length > 0) && this.clearInputbox();
 				this.search_bt.checkstate("up", x, y);
-				/*if(this.search_bt.checkstate("up", x, y) == ButtonStates.hover && !this.inputbox.drag) {
-					this.inputbox.activate(x,y);
-					this.inputbox.repaint();
-				}*/
 				this.inputbox.check("up", x, y);
-                break;
-            case "lbtn_dblclk":
+				break;
+			case "lbtn_dblclk":
 				this.inputbox.check("dblclk", x, y);
-                break;
-            case "rbtn_down":
+				break;
+			case "rbtn_down":
 				this.inputbox.check("right", x, y);
-                break;
-            case "move":
+				break;
+			case "move":
 				this.inputbox.check("move", x, y);
-                if(this.inputbox.text.length > 0) this.reset_bt.checkstate("move", x, y);
-				else this.search_bt.checkstate("move", x, y);
-                break;
-        }
-    }
+				this.inputbox.text.length > 0
+					? this.reset_bt.checkstate("move", x, y)
+					: this.search_bt.checkstate("move", x, y);
+				break;
+		}
+	};
 
-    this.on_key = function(event, vkey) {
-        switch(event) {
-            case "down":
-				this.inputbox.on_key_down(vkey);
-                break;
-        }
-    }
+	this.on_key = (event, vkey) => {
+		event === 'down' && this.inputbox.on_key_down(vkey);
+	};
 
-    this.on_char = function(code) {
-        this.inputbox.on_char(code);
+	this.on_char = (code) => {
+		this.inputbox.on_char(code);
 		this.isActive = (g_filterbox.inputbox.text.length > 0);
-    }
+	};
 
-	this.on_focus = function(is_focused) {
+	this.on_focus = (is_focused) => {
 		this.inputbox.on_focus(is_focused);
-	}
-	this.search = function(string) {
+	};
+
+	this.search = (string) => {
 		str = process_string(string);
 		brw.groups_draw.splice(0, brw.groups_draw.length);
 
@@ -581,7 +564,7 @@ oFilterBox = function() {
 		brw.rowsCount = Math.ceil(brw.groups_draw.length / brw.totalColumns);
 		g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount + g_showlist.h, scroll_);
 		brw.repaint();
-	}
+	};
 }
 
 function g_sendResponse() {
@@ -873,11 +856,11 @@ oPlaylistItem = function (id, name, parentObjName) {
 }
 
 oRow = function(metadb,itemIndex) {
-    this.metadb = metadb;
-    this.itemIndex = itemIndex;
+	this.metadb = metadb;
+	this.itemIndex = itemIndex;
 	this.showToolTip = false;
-    this.h = g_showlist.textHeight;
-    this.g_wallpaperImg = null;
+	this.h = g_showlist.textHeight;
+	this.g_wallpaperImg = null;
 	this.isSelected = false;
 	this.select_on_mouse_up = false;
 	this.hover_rating = -1;
@@ -888,7 +871,7 @@ oRow = function(metadb,itemIndex) {
 	this.secondLine_length = 0;
 	this.cursorHand = false;
 	this.isFirstRow = false;
-	this.getTags = function(){
+	this.getTags = function() {
 		this.secondLine = "";
 		if(properties.show2linesCustomTag!=""){
 			var TagsString = TF.title.EvalWithMetadb(metadb);
@@ -933,32 +916,26 @@ oRow = function(metadb,itemIndex) {
 		if(!properties.show2lines && properties.showPlaycount) this.playcount = this.playcount.replace(" plays","");
 	}
 	this.getTags();
-	this.repaint = function() {
-		window.RepaintRect(this.x,this.y,this.w,this.h);
-	}
-	this.refresh = function() {
+	this.repaint = () => {
+		window.RepaintRect(this.x, this.y, this.w, this.h);
+	};
+	this.refresh = () => {
 		this.getTags();
-	}
-    this.draw = function(gr, x, y, w) {
-        this.x = x;
-        this.y = y-3;
-        this.w = w;
-        var tracknumber_w = 28;
+	};
+  this.draw = (gr, x, y, w) => {
+		this.x = x;
+		this.y = y-3;
+		this.w = w;
 
-		if(this.tracknumber>9) var select_start=4;
-		else var select_start=0;
-
-		if(properties.show2lines) var text_height = Math.ceil(this.h/2);
-		else var text_height = this.h;
-		
-		if(properties.show2lines) var text_y = this.y+3;
-		else var text_y = this.y;
+		var select_start = this.tracknumber > 9 ? 4: 0;
+		var text_height = properties.show2lines ? Math.ceil(this.h/2) : this.h;
+		var text_y = properties.show2lines ? this.y+3 : this.y;
 			
 		if((properties.showArtistName || (properties.TFgrouping!="" && properties.TFgrouping.indexOf("artist%")==-1) || (this.artist!=brw.groups[g_showlist.idx].artist && this.artist!="Unknown artist"))) this.artist_text = this.artist;
 		else this.artist_text = "";
 
-        var duration = this.length;
-        var isPlaying = false;
+		var duration = this.length;
+		var isPlaying = false;
 
 		if(fb.IsPlaying && fb.GetNowPlaying()!=null && this.metadb.Compare(fb.GetNowPlaying())) {
 			isPlaying = true;
@@ -993,72 +970,72 @@ oRow = function(metadb,itemIndex) {
 			image0 = now_playing_img0;
 			image1 = now_playing_img1;
 		}
+
 		if(isPlaying && !(properties.AlbumArtProgressbar) && properties.drawProgressBar) var color_selected = g_showlist.showlist_selected_grad2_play;
 		else var color_selected = g_showlist.showlist_selected_grad2;
-        if(this.isSelected) {
-				if(!(g_showlist.rows_[this.itemIndex-1] && g_showlist.rows_[this.itemIndex-1].isSelected) || this.isFirstRow) {
-					//top
-					gr.FillGradRect(this.x+20-track_gradient_size, this.y, track_gradient_size, 1, 0, g_showlist.showlist_selected_grad1,  color_selected, 1.0);
-					gr.FillGradRect(this.x+20+this.w+5-(track_gradient_size*2), this.y, track_gradient_size, 1, 0, color_selected, g_showlist.showlist_selected_grad1, 1.0);
-					gr.FillSolidRect(this.x+20, this.y, this.w+5-(track_gradient_size*2), 1, color_selected);
-				}
-				//bottom
-				gr.FillGradRect(this.x+20-track_gradient_size, this.y+this.h-1, track_gradient_size, 1, 0, g_showlist.showlist_selected_grad1, color_selected, 1.0);
-				gr.FillGradRect(this.x+20+this.w+5-(track_gradient_size*2), this.y+this.h-1, track_gradient_size, 1, 0, color_selected, g_showlist.showlist_selected_grad1, 1.0);
-				gr.FillSolidRect(this.x+20, this.y+this.h-1, this.w+5-(track_gradient_size*2), 1, color_selected);
+			if(this.isSelected) {
+			if(!(g_showlist.rows_[this.itemIndex-1] && g_showlist.rows_[this.itemIndex-1].isSelected) || this.isFirstRow) {
+				//top
+				gr.FillGradRect(this.x+20-track_gradient_size, this.y, track_gradient_size, 1, 0, g_showlist.showlist_selected_grad1,  color_selected, 1.0);
+				gr.FillGradRect(this.x+20+this.w+5-(track_gradient_size*2), this.y, track_gradient_size, 1, 0, color_selected, g_showlist.showlist_selected_grad1, 1.0);
+				gr.FillSolidRect(this.x+20, this.y, this.w+5-(track_gradient_size*2), 1, color_selected);
+			}
+			//bottom
+			gr.FillGradRect(this.x+20-track_gradient_size, this.y+this.h-1, track_gradient_size, 1, 0, g_showlist.showlist_selected_grad1, color_selected, 1.0);
+			gr.FillGradRect(this.x+20+this.w+5-(track_gradient_size*2), this.y+this.h-1, track_gradient_size, 1, 0, color_selected, g_showlist.showlist_selected_grad1, 1.0);
+			gr.FillSolidRect(this.x+20, this.y+this.h-1, this.w+5-(track_gradient_size*2), 1, color_selected);
 
-        }
-		if(isPlaying && cNowPlaying.flashEnable && cNowPlaying.flash){
+			}
+		if(isPlaying && cNowPlaying.flashEnable && cNowPlaying.flash) {
 			gr.FillSolidRect(this.x+10, y-2, this.w, this.h-2, g_showlist.g_color_flash_bg);
 			gr.DrawRect(this.x+9, y-3, this.w+1, this.h-1, 1.0, g_showlist.g_color_flash_rectline);
 		}
-        if(isPlaying && properties.drawProgressBar && !(properties.AlbumArtProgressbar) && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
-				gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, this.h, 0, g_showlist.progressbar_color_bg_off, g_showlist.progressbar_color_bg_on, 1.0); //grad bg
-				gr.FillSolidRect(this.x+20, y-3, current_size-7, this.h, g_showlist.progressbar_color_bg_on); //solid bg
+		if (isPlaying && properties.drawProgressBar && !(properties.AlbumArtProgressbar) && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)) {
+			gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, this.h, 0, g_showlist.progressbar_color_bg_off, g_showlist.progressbar_color_bg_on, 1.0); //grad bg
+			gr.FillSolidRect(this.x+20, y-3, current_size-7, this.h, g_showlist.progressbar_color_bg_on); //solid bg
 
-				gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad top
-				gr.FillSolidRect(this.x+20, y-3, current_size-7, 1, g_showlist.progressbar_linecolor1); //line top
-				if(!g_showlist.light_bg) gr.FillSolidRect(this.x+20-track_gradient_size, y-4, current_size-5+track_gradient_size, 1, g_showlist.progressbar_color_shadow); //horizontal top shadow
+			gr.FillGradRect(this.x+20-track_gradient_size, y-3, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad top
+			gr.FillSolidRect(this.x+20, y-3, current_size-7, 1, g_showlist.progressbar_linecolor1); //line top
+			if(!g_showlist.light_bg) gr.FillSolidRect(this.x+20-track_gradient_size, y-4, current_size-5+track_gradient_size, 1, g_showlist.progressbar_color_shadow); //horizontal top shadow
 
-				gr.FillGradRect(this.x+20-track_gradient_size, y-4+this.h, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad bottom
-				gr.FillSolidRect(this.x+20, y-4+this.h, current_size-7, 1, g_showlist.progressbar_linecolor1); //line bottom
-				gr.FillSolidRect(this.x+current_size+12, y-2, 1, this.h-2, g_showlist.progressbar_linecolor1);	//vertical line
-				gr.FillSolidRect(this.x+current_size+13, y-4, 2, this.h+1, g_showlist.progressbar_color_shadow);	//vertical shadow
-				gr.FillSolidRect(this.x+20-track_gradient_size, y-3+this.h, current_size-5+track_gradient_size, 2, g_showlist.progressbar_color_shadow);	//horizontal bottom shadow
-        }
-		if(isPlaying) {
-            if(elapsed_seconds%2==0)
-				gr.DrawImage(image0, this.x+12,  text_y+Math.ceil((text_height-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255);
-			else
-				gr.DrawImage(image1, this.x+12,  text_y+Math.ceil((text_height-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
+			gr.FillGradRect(this.x+20-track_gradient_size, y-4+this.h, (track_gradient_size>current_size+6)?current_size+6:track_gradient_size, 1, 0, g_showlist.progressbar_linecolor2, g_showlist.progressbar_linecolor1, 1.0); //grad bottom
+			gr.FillSolidRect(this.x+20, y-4+this.h, current_size-7, 1, g_showlist.progressbar_linecolor1); //line bottom
+			gr.FillSolidRect(this.x+current_size+12, y-2, 1, this.h-2, g_showlist.progressbar_linecolor1);	//vertical line
+			gr.FillSolidRect(this.x+current_size+13, y-4, 2, this.h+1, g_showlist.progressbar_color_shadow);	//vertical shadow
+			gr.FillSolidRect(this.x+20-track_gradient_size, y-3+this.h, current_size-5+track_gradient_size, 2, g_showlist.progressbar_color_shadow);	//horizontal bottom shadow
 		}
 
-		if(properties.showRating && ((properties.showRatingSelected && this.isSelected) || (properties.showRatingRated && this.rating>0) || (!properties.showRatingSelected && !properties.showRatingRated))) {
+		if (properties.showRating && ((properties.showRatingSelected && this.isSelected) || (properties.showRatingRated && this.rating>0) || (!properties.showRatingSelected && !properties.showRatingRated))) {
 			rating_vpadding = 4;
-			if(typeof this.rating_length == 'undefined' || this.rating_length==0) this.rating_length = gr.CalcTextWidth("HHHHH", g_font.plus6);
-			if(!g_showlist.ratingImages) {
-				g_showlist.SetRatingImages(this.rating_length, text_height-rating_vpadding*(properties.show2lines?1:2), g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
-			}
+			(typeof this.rating_length === 'undefined' || this.rating_length === 0) && (this.rating_length = gr.CalcTextWidth("HHHHH", g_font.plus6));
+			!g_showlist.ratingImages && g_showlist.SetRatingImages(this.rating_length, text_height-rating_vpadding*(properties.show2lines?1:2), g_showlist.rating_icon_on, g_showlist.rating_icon_off, g_showlist.rating_icon_border, typeof(this.light_bg!=='undefined'));
 			this.rating_x = this.x + this.w - length_w - this.rating_length + 15;
 		} else {
 			this.rating_length = 0;
 			this.rating_x = 0;
 		};
 
-		if(this.tracknumber=="NaN") this.tracknumber="?";
+		this.tracknumber === "NaN" && (this.tracknumber = "?");
+		this.tracknumber_w === 0 && (this.tracknumber_w = gr.CalcTextWidth(this.discnumber + this.tracknumber, g_font.normal) + 22);
 
-		if(this.tracknumber_w==0) this.tracknumber_w = gr.CalcTextWidth(this.discnumber+this.tracknumber, g_font.normal)+22;
-		if(!isPlaying) gr.GdiDrawText(this.discnumber+this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x-2, text_y, this.tracknumber_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		if (isPlaying) {
+			elapsed_seconds % 2 === 0
+				? gr.DrawImage(image0, this.x+12,  text_y+Math.ceil((text_height-image0.Height)/2), image0.Width, image0.Height, 0, 0, image0.Width, image0.Height,0,255)
+				: gr.DrawImage(image1, this.x+12,  text_y+Math.ceil((text_height-image1.Height)/2), image1.Width, image1.Height, 0, 0, image1.Width, image1.Height,0,255);
+		} else {
+			gr.GdiDrawText(this.discnumber + this.tracknumber, g_font.normal, g_showlist.colorSchemeTextFaded, this.x - 2, text_y, this.tracknumber_w, text_height, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+		}
 
 		var tx = this.x + this.tracknumber_w + 10;
 		var tw = this.w - this.tracknumber_w - length_w - (this.rating_length==0?0:this.rating_length+10)
 		var tw2 = this.w - this.tracknumber_w - length_w;
         gr.GdiDrawText(this.title, g_font.normal, g_showlist.colorSchemeText, tx, text_y, tw, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-		if(this.title_length==0) this.title_length = gr.CalcTextWidth(this.title, g_font.normal);
 
-		if(this.artist_text!="" && !properties.show2lines){
-			gr.GdiDrawText(" - "+this.artist_text, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, text_y, tw - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-			if(this.artist_length==0) this.artist_length = gr.CalcTextWidth(" - "+this.artist_text, g_font.italic);
+		this.title_length === 0 && (this.title_length = gr.CalcTextWidth(this.title, g_font.normal));
+
+		if (this.artist_text !== "" && !properties.show2lines) {
+			gr.GdiDrawText(` - ${this.artist_text}`, g_font.italic, g_showlist.colorSchemeTextFaded, tx + this.title_length, text_y, tw - this.title_length, text_height, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+			this.artist_length === 0 && (this.artist_length = gr.CalcTextWidth(` - ${this.artist_text}`, g_font.italic));
 		}
 		if((properties.showPlaycount || properties.showCodec || properties.showBitrate) && !properties.show2lines){
 			this.playcount_text = "  ("+this.playcount+")";
@@ -4249,11 +4226,12 @@ oBrowser = function(name) {
 			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
 			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
-			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
-			if (totalH != 0) time_txt += ' ' + totalH + ' h';
-			if (totalM != 0) time_txt += ' ' + totalM + ' min';
-			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''}, ` : '';
+			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''}, ` : '';
+			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
+			txt_mins = (totalM > 0) ? `${totalM} min${totalM > 1 ? 's' : ''}, ` : '';
+
+			time_txt = `${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS} sec`;
 		}
 		return time_txt;
 	}
@@ -4264,8 +4242,7 @@ oBrowser = function(name) {
 			this.headerBarHeight = (properties.CoverGridNoText?0:4);
 		if(properties.showheaderbar){
 			g_headerbar.setDisplayedInfo();
-			g_headerbar.setSize(0,0,this.w,this.headerBarHeight)
-			//brw.setSize(0, brw.headerBarHeight, ww, wh-brw.headerBarHeight);
+			g_headerbar.setSize(0,0,this.w,this.headerBarHeight);
 		}
 	}
 	this.toggle_grid_mode = function(circleMode, gridMode) {

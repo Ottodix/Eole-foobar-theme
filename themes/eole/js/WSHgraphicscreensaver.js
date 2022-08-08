@@ -3066,11 +3066,12 @@ oBrowser = function(name) {
 			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
 			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-			if (totalW != 0) time_txt += totalW + ((totalW > 1)? ' weeks': ' week');
-			if (totalD != 0) time_txt += ' ' + totalD + ((totalD > 1)? ' days': ' day');
-			if (totalH != 0) time_txt += ' ' + totalH + ' h';
-			if (totalM != 0) time_txt += ' ' + totalM + ' min';
-			if (time_txt == '' || totalS != 0) time_txt += ' ' + totalS +' sec';
+			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''}, ` : '';
+			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''}, ` : '';
+			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
+			txt_mins = (totalM > 0) ? `${totalM} min${totalM > 1 ? 's' : ''}, ` : '';
+
+			time_txt = `${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS} sec`;
 		}
 		return time_txt;
 	}
