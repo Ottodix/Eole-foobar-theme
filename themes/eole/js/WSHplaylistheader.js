@@ -647,23 +647,31 @@ playlistInfo = function(){
 		this.playlist_name=plman.GetPlaylistName(plman.ActivePlaylist);
 		this.plist_items = plman.GetPlaylistItems(plman.ActivePlaylist);
 		this.items_count=this.plist_items.Count;
-		if(this.items_count==0) {this.time_txt=""; this.setTexts(); return;}
-		if(this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist) {
+		if (this.items_count === 0) {
+			this.time_txt = '';
+			this.setTexts();
+			return;
+		}
+		if (this.playlist_name!=globalProperties.playing_playlist && this.playlist_name!=globalProperties.selection_playlist && this.playlist_name!=globalProperties.filter_playlist) {
 			i=0;this.totalTime=0;
-			while(i < this.items_count) {this.totalTime+=this.plist_items[i].Length; i++;}
-			this.setTexts(); return;
+			while (i < this.items_count) {
+				this.totalTime += this.plist_items[i].Length;
+				i++;
+			}
+			this.setTexts(); 
+			return;
 		}
 
-		multiples_genres=false;
-		multiples_artist=false;
-		multiples_albums=false;
-		multiples_dates=false;
+		multiples_genres = false;
+		multiples_artist = false;
+		multiples_albums = false;
+		multiples_dates = false;
 
-		this.genres="";
-		this.artists="";
-		this.albums="";
-		this.dates="";
-		this.totalTime=this.plist_items[0].Length;
+		this.genres = "";
+		this.artists = "";
+		this.albums = "";
+		this.dates = "";
+		this.totalTime = this.plist_items[0].length;
 
 		all_metas = TF.genre_artist_album_date.EvalWithMetadb(this.plist_items[0]).split(" ^^ ");
 
@@ -729,17 +737,15 @@ playlistInfo = function(){
 			totalH=Math.floor(r_timetodraw/3600); r_timetodraw=r_timetodraw-totalH*3600;
 			totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
 			totalS=Math.round(r_timetodraw);
-			totalS=(totalS>9) ? totalS:'0'+totalS;
+			totalS = (totalS > 9) ? totalS : '0' + totalS;
 
-			txt_month=(totalMth>1)?totalMth+'months, ':totalMth+'month, ';
-			txt_week=(totalW>1)?totalW+'weeks, ':totalW+'week, ';if(totalW==0) txt_week='';
-			txt_day=(totalD>1)?totalD+'days, ':totalD+'day, '; if(totalD==0) txt_day='';
-			txt_hour=(totalH>1)?totalH+'hours, ':totalH+'hour, '; if(totalH==0) txt_hour='';
-			if(totalMth>0) this.time_txt=txt_month+txt_week+txt_day+txt_hour+totalM+'min ';
-			else if (totalW>0) this.time_txt=txt_week+txt_day+txt_hour+totalM+'min ';
-			else if (totalD>0) this.time_txt=txt_day+txt_hour+totalM+'min ';
-			else if (totalH>0) this.time_txt=txt_hour+totalM+'min, '+totalS+'sec';
-			else this.time_txt=totalM+'min, '+totalS+'sec';
+			txt_month = (totalMth > 0) ? `${totalMth} month${totalMth > 1 ? 's' : ''}, `: '';
+			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''}, ` : '';
+			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''}, ` : '';
+			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
+			txt_mins = (totalM > 0) ? `${totalM} minute${totalM > 1 ? 's' : ''}, ` : '';
+
+			time_txt = `${txt_month}${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}sec`;
 			this.items_txt=displayed_count+' items';
 
 			// Main Text, Left justified
@@ -805,38 +811,37 @@ function on_size(w, h) {
 }
 
 function on_paint(gr) {
-	if(g_pinfo.refresh_needed>0) {
-		g_pinfo.refresh(true,10+g_pinfo.refresh_needed);
+	if(g_pinfo.refresh_needed > 0) {
+		g_pinfo.refresh(true, 10 + g_pinfo.refresh_needed);
 		g_pinfo.refresh_needed = 0;
 	}
-    gr.FillSolidRect(0,0,ww,wh,colors.normal_bg);
 
+  gr.FillSolidRect(0,0, ww, wh,colors.normal_bg);
 	gr.FillSolidRect(0, wh-1, ww, 1, colors.headerbar_line);
 
-	if(g_pinfo.items_width<0)
-		g_pinfo.items_width = gr.CalcTextWidth(g_pinfo.time_txt+' '+g_pinfo.items_txt,g_font.italic);
-	if(g_pinfo.main_txt_width<0)
-		g_pinfo.main_txt_width = gr.CalcTextWidth(g_pinfo.main_txt,g_font.italicplus2);
+	if(g_pinfo.items_width < 0) {
+		g_pinfo.items_width = gr.CalcTextWidth(`${g_pinfo.time_txt} ${g_pinfo.items_txt}`, g_font.italic);
+	}
+	if(g_pinfo.main_txt_width < 0) {
+		g_pinfo.main_txt_width = gr.CalcTextWidth(g_pinfo.main_txt, g_font.italicplus2);
+	}
 
-
-	if(properties.displayToggleBtns)
-		main_txt_space = ww-70-margin_left-rightpadding-buttons.filtersToggle.w-g_pinfo.items_width;//-buttons.NowPlayingToggle.w
-	else
+	if (properties.displayToggleBtns) {
+		main_txt_space = ww-70-margin_left-rightpadding-buttons.filtersToggle.w-g_pinfo.items_width;
+		time_txt_right_margin = rightpadding+buttons.filtersToggle.w+59;
+	} else {
 		main_txt_space = ww-70-margin_left-rightpadding-buttons.Settings.w-g_pinfo.items_width;
+		time_txt_right_margin = 115;
+	}
 
-	if(!properties.displayToggleBtns) time_txt_right_margin = 115;
-	else time_txt_right_margin = rightpadding+buttons.filtersToggle.w+59;//+buttons.NowPlayingToggle.w
-
-    gr.GdiDrawText(g_pinfo.main_txt, g_font.italicplus2, colors.normal_txt, margin_left, 1, main_txt_space, wh-2, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
-    gr.GdiDrawText(g_pinfo.time_txt+((g_pinfo.time_txt!="")?",  ":"")+g_pinfo.items_txt, g_font.italic, colors.faded_txt, 53, 0, ww-time_txt_right_margin, wh, DT_VCENTER | DT_END_ELLIPSIS | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX);
+	gr.GdiDrawText(g_pinfo.main_txt, g_font.italicplus2, colors.normal_txt, margin_left, 1, main_txt_space, wh - 2, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+	gr.GdiDrawText(g_pinfo.time_txt+((g_pinfo.time_txt !== "") ? ",  " : "") + g_pinfo.items_txt, g_font.italic, colors.faded_txt, 53, 0, ww - time_txt_right_margin, wh, DT_VCENTER | DT_END_ELLIPSIS | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX);
 
 	showTitleTooltip = (g_pinfo.main_txt_width >  main_txt_space);
 
 	drawAllButtons(gr);
 
-	//if(nowplayingplaylist_state.isActive()) gr.FillSolidRect(ww-1, 0, 1, wh, colors.sidesline);
-
-	if(filters_panel_state.isActive()) gr.FillSolidRect(0,0,ww,1,colors.headerbar_line);
+	filters_panel_state.isActive() && gr.FillSolidRect(0, 0, ww, 1, colors.headerbar_line);
 }
 var callback_avoid_populate=false;
 function on_playlist_items_added(playlist){

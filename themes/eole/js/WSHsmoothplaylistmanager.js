@@ -55,7 +55,6 @@ var first_on_size = true;
 var g_rightClickedIndex = -1;
 var Update_Required_function = "";
 var avoidDbleClick = avoidDbleClickTimer = false;
-//var isHoverCreatePlaylist = isHoverCreatePlaylistSaved = false;
 
 cPlaylistManager = {
     playlist_switch_pending: false,
@@ -138,8 +137,9 @@ function renamePlaylist() {
         brw.repaint();
     };
     brw.inputboxID = -1;
-};
-function CreatePlaylist(pl_place, pl_name){
+}
+
+function CreatePlaylist(pl_place, pl_name) {
 	try {
 		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Playlist", "New Playlist", true);
 		if (result){
@@ -152,7 +152,8 @@ function CreatePlaylist(pl_place, pl_name){
 	} catch(e) {
 	}
 }
-function CreateAutoPlaylist(pl_place, pl_name, query){
+
+function CreateAutoPlaylist(pl_place, pl_name, query) {
 	try {
 		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Autoplaylist", "New Autoplaylist", true);
 		if (result){
@@ -166,11 +167,11 @@ function CreateAutoPlaylist(pl_place, pl_name, query){
 	}
 }
 
-function DeletePlaylist(delete_pid){
+function DeletePlaylist(delete_pid) {
 	this.delete_pid = delete_pid;
     var parent = this;
 
-	function delete_confirmation(status, confirmed) {
+	delete_confirmation = (status, confirmed) => {
 		if(confirmed){
 
 			brw.delete_pending = true;
@@ -201,7 +202,8 @@ function DeletePlaylist(delete_pid){
 				if(new_active_playlist>=0 && new_active_playlist<=brw.rowsCount - 1) plman.ActivePlaylist = new_active_playlist;
 			};
 		}
-	}
+	};
+
 	parsed_tabname = plman.GetPlaylistName(delete_pid);
 	HtmlDialog("Delete this playlist", "Delete the playlist '"+parsed_tabname+"' ?", 'Yes', 'No', delete_confirmation);
 }
@@ -888,12 +890,14 @@ oBrowser = function(name) {
         }, 50);
     };
 
-    this.repaint = function() {
-        if(!window.IsVisible) return;
+    this.repaint = () => {
+        if (!window.IsVisible) {
+            return;
+        }
         repaint_main1 = repaint_main2;
     };
 
-    this.setSize = function(x, y, w, h) {
+    this.setSize = (x, y, w, h) => {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -923,9 +927,8 @@ oBrowser = function(name) {
         // scrollbar update
         this.scrollbar.updateScrollbar();
     };
-	this.sort = function(){
-        var total = this.rows.length;
-		function sortPlaylistAlphabetically(a,b) {
+	this.sort = () => {
+		sortPlaylistAlphabetically = (a,b) => {
 			if(a.name < b.name) return -1;
 			if(a.name > b.name) return 1;
 			return 0;
@@ -934,19 +937,16 @@ oBrowser = function(name) {
 		if(properties.showNewPlaylistButton) this.rows.shift();
 		this.rows.sort(sortPlaylistAlphabetically);
 		var order = [];
-		for(var i = this.rows.length-1; i > 0; i--) {
+		for(var i = this.rows.length - 1; i > 0; i--) {
 			order[this.rows[i].idx] = i;
 			g_avoid_on_playlists_changed = true;
-			//console.log(this.rows[i].name+" - from:"+this.rows[i].idx+" to:"+i);
-			//plman.MovePlaylist(this.rows[i].idx, i);
 		}
 		order.forEach((v, i) => {
 			plman.MovePlaylist(v, i);
-			console.log(this.rows[i].name+" - from:"+v+" to:"+i);
 		});
 		this.populate(true,14);
 	}
-    this.init_groups = function() {
+    this.init_groups = () => {
         var rowId = 0;
         var name = "";
         var total = plman.PlaylistCount;
@@ -955,15 +955,9 @@ oBrowser = function(name) {
         var str_filter = process_string(filter_text);
 
 		// draw Create playlist Button
-		 if(properties.showNewPlaylistButton) {
+		if(properties.showNewPlaylistButton) {
 			this.rows.push(new oPlaylist(-1, rowId, globalProperties.create_playlist));
 			rowId++;
-		 }
-	
-		function sortPlaylistAlphabetically(a,b) {
-			if(a.name < b.name) return -1;
-			if(a.name > b.name) return 1;
-			return 0;
 		}
 		
 		for(var i = 0; i < total; i++) {
@@ -986,7 +980,7 @@ oBrowser = function(name) {
         this.getlimits();
     };
 
-    this.getlimits = function() {
+    this.getlimits = () => {
         if(this.rowsCount <= this.totalRowsVis) {
             var start_ = 0;
             var end_ = this.rowsCount - 1;
@@ -1003,8 +997,7 @@ oBrowser = function(name) {
         g_end_ = end_;
     };
 
-    this.populate = function(is_first_populate, call_id, reset_scroll) {
-		console.log("--> populate smoothPlaylistManager call_id:"+call_id)
+    this.populate = (is_first_populate, call_id, reset_scroll) => {
         this.init_groups();
 		if(this.selectedRow > this.rowsCount) this.selectedRow = plman.ActivePlaylist;		
         if(reset_scroll) scroll = scroll_ = 0;
@@ -1014,7 +1007,7 @@ oBrowser = function(name) {
 		Update_Required_function = "";
     };
 	
-    this.getRowIdFromIdx = function(idx) {
+    this.getRowIdFromIdx = (idx) => {
         var total = this.rows.length;
         var rowId = -1;
         if(plman.PlaylistCount > 0) {
@@ -1027,13 +1020,13 @@ oBrowser = function(name) {
         };
         return rowId;
     };
-    this.setIcons = function(idx) {
+    this.setIcons = () => {
         var total = this.rows.length;
 		for(var i=0; i < total; i++) {
 			this.rows[i].setIcon();
 		};
     };
-    this.isVisiblePlaylist = function(idx) {
+    this.isVisiblePlaylist = (idx) => {
         var rowId = this.getRowIdFromIdx(idx);
         var offset_active_pl = properties.rowHeight * rowId;
         if(offset_active_pl < scroll || offset_active_pl + properties.rowHeight > scroll + this.h) {
@@ -1043,7 +1036,7 @@ oBrowser = function(name) {
         };
     };
 
-    this.showSelectedPlaylist = function() {
+    this.showSelectedPlaylist = () => {
         var rowId = this.getRowIdFromIdx(brw.selectedRow);
 
         if(!this.isVisiblePlaylist(brw.selectedRow)) {
@@ -1053,7 +1046,7 @@ oBrowser = function(name) {
         };
     };
 
-    this.showActivePlaylist = function() {
+    this.showActivePlaylist = () => {
         var rowId = this.getRowIdFromIdx(plman.ActivePlaylist);
 
         if(!this.isVisiblePlaylist(plman.ActivePlaylist)) {
@@ -1062,10 +1055,12 @@ oBrowser = function(name) {
             this.scrollbar.updateScrollbar();
         };
     };
-	this.FindPlayingPlaylist = function() {
+
+	this.FindPlayingPlaylist = () => {
 		if(!fb.IsPlaying) this.PlayingPlaylist = -1;
 		this.PlayingPlaylist = this.getRowIdFromIdx(plman.PlayingPlaylist);
-	}
+	};
+
     this.draw = function(gr) {
 
         if(cPlaylistManager.playlist_switch_pending) {
@@ -2127,10 +2122,10 @@ var g_avoid_on_playlist_items_reordered = false;
 // mouse actions
 var g_lbtn_click = false;
 var g_rbtn_click = false;
-//
+
 var g_first_populate_done = false;
 var g_first_populate_launched = false;
-//
+
 var repaintforced = false;
 var launch_time = fb.CreateProfiler("launch_time");
 var form_text = "";
@@ -2151,57 +2146,62 @@ function on_size(w, h) {
     if(!ww || !wh) {
         ww = 1;
         wh = 1;
-    };
-	if(window.IsVisible || first_on_size){
+    }
+	if(window.IsVisible || first_on_size) {
 		window.MinWidth = 1;
 		window.MinHeight = 1;
 
 		// set wallpaper
-		if(properties.showwallpaper){
+		if (properties.showwallpaper){
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
-		} else update_wallpaper = true;
+		} else {
+            update_wallpaper = true;
+        }
 
 		// set Size of browser
 		brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop));
 		update_size = false;
 		first_on_size = false;
-	} else update_size = true;
+	} else {
+        update_size = true;
+    }
 };
 function set_update_function(string){
-	if( Update_Required_function.indexOf("brw.populate(true")!=-1) return;
-	else if(Update_Required_function.indexOf("brw.populate(false")!=-1) {
-		if(string.indexOf("brw.populate(true")!=-1) Update_Required_function=string;
-	}
-	else if(Update_Required_function.indexOf("playlists_changed")!=-1) {
-		if(string.indexOf("brw.populate")!=-1) Update_Required_function=string;
-	}
-	else Update_Required_function=string;
+	if( Update_Required_function.indexOf("brw.populate(true") !== -1) {
+        return;
+    } else if(Update_Required_function.indexOf("brw.populate(false") !== -1) {
+		string.indexOf("brw.populate(true") !== -1 && (Update_Required_function = string);
+	} else if(Update_Required_function.indexOf("playlists_changed")!=-1) {
+		string.indexOf("brw.populate") !== -1 && (Update_Required_function = string);
+	} else {
+        Update_Required_function = string;
+    }
 }
 function get_update_function(){
 	var to_return = Update_Required_function;
-	Update_Required_function="";
+	Update_Required_function = '';
 	return to_return;
 }
 function on_paint(gr) {
-	if(update_size) on_size(window.Width, window.Height);
-	if(Update_Required_function!="") {
-		eval(get_update_function());
-	}
-    if(!ww) return;
+	update_size && on_size(window.Width, window.Height);
+	Update_Required_function !== '' && eval(get_update_function());
 
-	if(update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
+    if (!ww) {
+        return;
+    }
+
+	if (update_wallpaper && properties.showwallpaper && properties.wallpapermode == 0){
 		g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, fb.GetNowPlaying());
 		update_wallpaper = false;		
 	}
 
-    if(!g_1x1) {
+    if (!g_1x1) {
         // draw background under playlist
 		gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg)
         if(fb.IsPlaying && g_wallpaperImg && properties.showwallpaper) {
             gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
             gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
         } else {
-            //gr.FillSolidRect(0, 0, ww, wh, colors.lightgrey_bg);
             if(g_wallpaperImg && properties.showwallpaper) {
                 gr.DrawImage(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
                 gr.FillSolidRect(0, 0, ww, wh, (properties.wallpaperblurred)?colors.wallpaper_overlay_blurred:colors.wallpaper_overlay);
@@ -2343,10 +2343,12 @@ function on_mouse_rbtn_up(x, y){
 };
 
 function on_mouse_move(x, y, m) {
-	if(g_cursor.x==x && g_cursor.y==y) return;
+	if(g_cursor.x === x && g_cursor.y === y) {
+        return;
+    }
 	g_cursor.onMouse("move", x, y, m);
 	var isResizing = g_resizing.on_mouse("move", x, y, m, !brw.scrollbar.cursorHover && !brw.scrollbar.cursorDrag);
-	if(isResizing){
+	if (isResizing){
 		if(g_resizing.resizing_x>x+5){
 			g_resizing.resizing_x = x;
 			playlistpanel_width.decrement(5);
@@ -2356,15 +2358,15 @@ function on_mouse_move(x, y, m) {
 		}
 	} else {
 		// inputBox
-		if(!cPlaylistManager.drag_moved) {
+		if (!cPlaylistManager.drag_moved) {
 			if(properties.showHeaderBar && properties.showFilterBox && g_filterbox.inputbox.visible) {
 				g_filterbox.on_mouse("move", x, y);
-			};
-		};
+			}
+		}
 
 		g_resizing.on_mouse("move", x, y, m);
 
-		if(g_dragndrop_status){
+		if (g_dragndrop_status){
 			if(y < brw.y) {
 				if(!timers.movePlaylist) {
 					timers.movePlaylist = setInterval(function() {
@@ -2379,10 +2381,10 @@ function on_mouse_move(x, y, m) {
 						scroll = check_scroll(scroll);
 					}, 100);
 				}
-			};
+			}
 		}
 
-		if(cTouch.down) {
+		if (cTouch.down) {
 			cTouch.y_current = y;
 			cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
 			if(x < brw.w) {
@@ -2393,21 +2395,21 @@ function on_mouse_move(x, y, m) {
 			};
 		} else {
 			brw.on_mouse("move", x, y);
-		};
-	};
-};
+		}
+	}
+}
 
 function on_mouse_wheel(step){
+    intern_step = (typeof(stepstrait) == "undefined" || typeof(delta) == "undefined")
+        ? step
+        : stepstrait / delta;
 
-	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
-	else intern_step = stepstrait/delta;
-
-    if(cTouch.timer) {
+    if (cTouch.timer) {
         window.ClearInterval(cTouch.timer);
         cTouch.timer = false;
-    };
+    }
 
-	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
+	if (utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
 		var zoomStep = 1;
 		var previous = globalProperties.fontAdjustement;
 		if(!timers.mouseWheel) {
@@ -2417,7 +2419,7 @@ function on_mouse_wheel(step){
 			} else {
 				globalProperties.fontAdjustement -= zoomStep;
 				if(globalProperties.fontAdjustement < globalProperties.fontAdjustement_min) globalProperties.fontAdjustement = globalProperties.fontAdjustement_min;
-			};
+			}
 			if(previous != globalProperties.fontAdjustement) {
 				timers.mouseWheel = setTimeout(function() {
 					on_notify_data('set_font',globalProperties.fontAdjustement);
@@ -2425,18 +2427,17 @@ function on_mouse_wheel(step){
 					timers.mouseWheel && clearTimeout(timers.mouseWheel);
 					timers.mouseWheel = false;
 				}, 100);
-			};
+			}
 		}
-    } else if(utils.IsKeyPressed(VK_SHIFT)) { // increase/decrease row height
+    } else if (utils.IsKeyPressed(VK_SHIFT)) { // increase/decrease row height
 		brw.setRowHeight(intern_step);
-    } else if(cScrollBar.visible) {
+    } else if (cScrollBar.visible) {
         var rowStep = properties.rowScrollStep;
         scroll -= intern_step * properties.rowHeight * rowStep;
         scroll = check_scroll(scroll);
         brw.on_mouse("wheel", g_cursor.x, g_cursor.y, intern_step);
-    };
-
-};
+    }
+}
 
 function on_mouse_leave() {
 	g_resizing.on_mouse("leave", -1, -1);
@@ -2445,7 +2446,7 @@ function on_mouse_leave() {
         g_filterbox.on_mouse("leave", 0, 0);
     };
     brw.on_mouse("leave", 0, 0);
-};
+}
 
 //=================================================// Metrics & Fonts & Colors & Images
 function get_metrics() {
@@ -2465,66 +2466,76 @@ function get_metrics() {
     cFilterBox.h = Math.round(cFilterBox.default_h * g_zoom_percent / 100);
 
     properties.addedRows_end = properties.addedRows_end_default;
-
-	/*if(properties.showNewPlaylistButton) {
-		properties.paddingTop = properties.rowHeight;
-	} else */
 	properties.paddingTop = 0;
     if(brw) {
         if(cScrollBar.enabled)  {
-            //brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight : 0), ww - cScrollBar.width, wh - (properties.showHeaderBar ? properties.headerBarHeight : 0));
 			brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop));
         } else {
             brw.setSize(0, (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop), ww, wh - (properties.showHeaderBar ? properties.headerBarHeight + properties.paddingTop: properties.paddingTop));
         };
         if(brw.rowsCount > 0) brw.getlimits();
-    };
-};
+    }
+}
 
-function playlistName2icon(name, auto_playlist, images_array){
-	var inverse = '';
-	if(name==globalProperties.selection_playlist) return images_array.library_icon;
-	if(name==globalProperties.playing_playlist) return images_array.library_playback_icon;
-	if(name==globalProperties.whole_library) return images_array.whole_library_icon;
-	if(name==properties.newly_added) return images_array.newly_added_icon;
-	if(name==globalProperties.create_playlist) return images_array.create_playlist;
-	if(name==properties.history) return images_array.history_icon;
-	if(name==properties.top_rated) return images_array.top_rated;
-	if(name==properties.radios) return images_array.radios_icon;
-	if(name==properties.most_played) return images_array.most_played_icon;
-	if(name==properties.podcasts) return images_array.podcasts_icon;
-	if(name==properties.external_files) return images_array.external_files_icon;
-	if(name==globalProperties.filter_playlist) return images_array.search_icon;
+function playlistName2icon(name, auto_playlist, images_array) {
+    switch (name) {
+        case (globalProperties.selection_playlist):
+            return images_array.library_icon;
+        case (globalProperties.playing_playlist):
+            return images_array.library_playback_icon;
+        case (globalProperties.whole_library):
+            return images_array.whole_library_icon;
+        case (properties.newly_added):
+            return images_array.newly_added_icon;
+        case (globalProperties.create_playlist):
+            return images_array.create_playlist;
+        case (properties.history):
+            return images_array.history_icon;
+        case (properties.top_rated):
+            return images_array.top_rated;
+        case (properties.radios):
+            return images_array.radios_icon;
+        case (properties.most_played):
+            return images_array.most_played_icon;
+        case (properties.podcasts):
+            return images_array.podcasts_icon;
+        case (properties.external_files):
+            return images_array.external_files_icon;
+        case (globalProperties.filter_playlist):
+            return images_array.search_icon;
+    }
+
 	if(auto_playlist) {
 		return images_array.icon_auto_pl;
 	} else {
 		return images_array.icon_normal_pl;
-	};
+	}
 }
 
 function get_images() {
-    function get_images_from_colors_theme(images_array,adapted_color_theme){
-		images_array.icon_normal_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon2.png");
-		images_array.icon_normal_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon2.png");
-		images_array.icon_normal_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
-		images_array.icon_normal_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
-		images_array.icon_auto_pl = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");
-		images_array.icon_auto_pl_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"playlist_icon.png");
-		images_array.icon_auto_pl_playing = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
-		images_array.icon_auto_pl_playing_sel = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"auto_playlist_icon.png");
-
-		images_array.create_playlist = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"create_playlist.png");
-		images_array.newly_added_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"newly_added_icon.png");
-		images_array.top_rated = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"fav_icon.png");
-		images_array.history_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"history_icon.png");
-		images_array.whole_library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"whole_library_icon.png");
-		images_array.library_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_icon.png");
-		images_array.library_playback_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"library_playback_icon.png");
-		images_array.radios_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"radios_icon.png");
-		images_array.most_played_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"most_played_icon.png");
-		images_array.podcasts_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"podcasts_icon.png");
-		images_array.external_files_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"external_files_icon.png");
-		images_array.search_icon = gdi.Image(theme_img_path + "\\icons\\"+adapted_color_theme+"search_icon.png");
+    get_images_from_colors_theme = (images_array, adapted_color_theme) => {
+        images_array = Object.assign(images_array, {
+            icon_normal_pl: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}playlist_icon2.png`),
+            icon_normal_pl_sel: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}playlist_icon2.png`),
+            icon_normal_pl_playing: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}auto_playlist_icon.png`),
+            icon_normal_pl_playing_sel: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}auto_playlist_icon.png`),
+            icon_auto_pl: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}playlist_icon.png`),
+            icon_auto_pl_sel: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}playlist_icon.png`),
+            icon_auto_pl_playing: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}auto_playlist_icon.png`),
+            icon_auto_pl_playing_sel: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}auto_playlist_icon.png`),
+            create_playlist: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}create_playlist.png`),
+            newly_added_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}newly_added_icon.png`),
+            top_rated: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}fav_icon.png`),
+            history_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}history_icon.png`),
+            whole_library_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}whole_library_icon.png`),
+            library_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}library_icon.png`),
+            library_playback_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}library_playback_icon.png`),
+            radios_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}radios_icon.png`),
+            most_played_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}most_played_icon.png`),
+            podcasts_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}podcasts_icon.png`),
+            external_files_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}external_files_icon.png`),
+            search_icon: gdi.Image(`${theme_img_path}\\icons\\${adapted_color_theme}search_icon.png`)
+        });
 
 		if(!properties.emphasisOnActive){
 			if(!properties.darklayout){
@@ -2551,7 +2562,7 @@ function get_images() {
 
 	images = get_images_from_colors_theme(images,color_theme);
 	images_inverse = get_images_from_colors_theme(images_inverse,color_theme_inverse);
-};
+}
 
 
 function get_colors() {
@@ -2582,7 +2593,7 @@ function get_colors() {
 			colors.headerbar_line = GetGrey(0,40);
 		}
 	}
-};
+}
 
 function on_font_changed() {
     get_font();
@@ -2590,7 +2601,7 @@ function on_font_changed() {
 	g_filterbox.onFontChanged();
     get_metrics();
     brw.repaint();
-};
+}
 
 function on_colours_changed() {
     get_colors();
@@ -2600,11 +2611,11 @@ function on_colours_changed() {
     g_filterbox.getImages();
     g_filterbox.reset_colors();
     brw.repaint();
-};
+}
 
 function on_script_unload() {
     //brw.resetTimer();
-};
+}
 
 //=================================================// Keyboard Callbacks
 function on_key_up(vkey) {
@@ -2627,7 +2638,7 @@ function on_key_up(vkey) {
         };
     };
     brw.repaint();
-};
+}
 
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
@@ -2878,7 +2889,7 @@ function on_key_down(vkey) {
         };
 
     };
-};
+}
 
 function on_char(code) {
     // rename inputbox
@@ -2890,7 +2901,7 @@ function on_char(code) {
             g_filterbox.on_char(code);
         };
     };
-};
+}
 
 //=================================================// Playback Callbacks
 function on_playback_stop(reason) {
@@ -2910,23 +2921,27 @@ function on_playback_stop(reason) {
 			break;
 		};
 	} else set_update_function('on_playback_stop('+reason+')');
-};
+}
 
 function on_playback_new_track(metadb) {
 	g_seconds = 0;
 	brw.FindPlayingPlaylist();
-	if(window.IsVisible) {
+	if (window.IsVisible) {
 		g_metadb = metadb;
 		if(properties.showwallpaper && properties.wallpapermode == 0) {
 			g_wallpaperImg = setWallpaperImg(globalProperties.default_wallpaper, g_metadb);
 		};
 		brw.repaint();
-	} else if(properties.wallpapermode == 0) update_wallpaper = true;
-};
+	} else if (properties.wallpapermode == 0) {
+        update_wallpaper = true;
+    }
+}
+
 function on_playback_time(time) {
 	g_seconds = time;
 	if(window.IsVisible) window.RepaintRect(brw.playing_icon_x,brw.playing_icon_y,brw.playing_icon_w,brw.playing_icon_h);
 }
+
 //=================================================// Playlist Callbacks
 function on_playlists_changed() {
 	if(!g_avoid_on_playlists_changed && g_first_populate_done && window.IsVisible){
@@ -2940,7 +2955,7 @@ function on_playlists_changed() {
 		brw.repaint();
 		brw.delete_pending = false;
 	} else if(!g_avoid_on_playlists_changed) set_update_function('brw.populate(false, 4, false)');
-};
+}
 
 function on_playlist_switch() {	
 	if(window.IsVisible) {
@@ -2949,7 +2964,7 @@ function on_playlist_switch() {
 		if(brw.selectedRow > brw.rowsCount) brw.selectedRow = plman.ActivePlaylist;
 		brw.repaint();
 	} else set_update_function('on_playlist_switch()');
-};
+}
 
 function on_playlist_items_added(playlist_idx) {
 	try{
@@ -2958,7 +2973,7 @@ function on_playlist_items_added(playlist_idx) {
 	} catch(e){
 		console.log('on_playlist_items_added failed');
 	}
-};
+}
 
 function on_playlist_items_removed(playlist_idx, new_count) {
 	try{
@@ -2967,7 +2982,7 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 	} catch(e){
 		console.log('on_playlist_items_removed failed');
 	}
-};
+}
 
 
 function on_focus(is_focused) {
@@ -2976,7 +2991,7 @@ function on_focus(is_focused) {
 		g_filterbox.inputbox.on_focus(is_focused)
         brw.repaint();
     };
-};
+}
 
 //=================================================// Custom functions
 function checkMediaLibrayPlaylist() {
@@ -3007,34 +3022,25 @@ function checkMediaLibrayPlaylist() {
     };
 
     g_avoid_on_playlists_changed = false;
-};
+}
 
 function check_scroll(scroll___){
-    if(scroll___ < 0)
-        scroll___ = 0;
-    var g1 = brw.h - (brw.totalRowsVis * properties.rowHeight);
-    //var scroll_step = Math.ceil(properties.rowHeight / properties.scroll_divider);
-    //var g2 = Math.floor(g1 / scroll_step) * scroll_step;
-
-    var end_limit = ((brw.rowsCount+properties.addedRows_end) * properties.rowHeight) - (brw.totalRowsVis * properties.rowHeight) - g1;
-    if(scroll___ != 0 && scroll___ > end_limit) {
-        scroll___ = end_limit;
-    };
+    scroll___ < 0 && (scroll___ = 0);
+    let g1 = brw.h - (brw.totalRowsVis * properties.rowHeight);
+    let end_limit = ((brw.rowsCount+properties.addedRows_end) * properties.rowHeight) - (brw.totalRowsVis * properties.rowHeight) - g1;
+    scroll___ !== 0 && scroll___ > end_limit && (scroll___ = end_limit);
     return scroll___;
-};
+}
 
 function g_sendResponse() {
-
-	if(g_filterbox.inputbox.text.length == 0) {
-        filter_text = "";
-    } else {
-	    filter_text = g_filterbox.inputbox.text;
-    };
+	filter_text = g_filterbox.inputbox.text.length === 0
+        ? ''
+        : g_filterbox.inputbox.text;
 
     // filter in current panel
     brw.populate(true, 1);
     if(brw.selectedRow < 0 || brw.selectedRow > brw.rowsCount - 1) brw.selectedRow = 0;
-};
+}
 
 function on_notify_data(name, info) {
     switch(name) {
@@ -3106,12 +3112,12 @@ function on_notify_data(name, info) {
 			}
 		break;		
     };
-};
+}
 
 //=================================================// Drag'n'Drop Callbacks
 function on_drag_enter() {
     g_dragndrop_status = true;
-};
+}
 
 function on_drag_leave() {
 	g_resizing.on_drag("leave", 0, 0, null);
@@ -3124,7 +3130,7 @@ function on_drag_leave() {
     cScrollBar.timerID = false;
 	brw.on_mouse("leave", 0, 0);
     brw.repaint();
-};
+}
 
 function on_drag_over(action, x, y, mask) {
 
@@ -3151,7 +3157,7 @@ function on_drag_over(action, x, y, mask) {
 
     g_dragndrop_x = x;
     g_dragndrop_y = y;
-};
+}
 
 function on_drag_drop(action, x, y, mask) {
     if(y > brw.y) {
@@ -3219,7 +3225,7 @@ function on_drag_drop(action, x, y, mask) {
     }
     g_dragndrop_status = false;
     brw.repaint();
-};
+}
 
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;
@@ -3231,6 +3237,7 @@ function toggleWallpaper(wallpaper_state){
 	}
 	brw.repaint();
 }
+
 function toggleBlurWallpaper(wallpaper_blur_state){
 	wallpaper_blur_state = typeof wallpaper_blur_state !== 'undefined' ? wallpaper_blur_state : !properties.wallpaperblurred;
 	properties.wallpaperblurred = wallpaper_blur_state; on_colours_changed();
@@ -3260,5 +3267,6 @@ function on_init() {
 
     g_filterbox = new oFilterBox();
     g_filterbox.inputbox.visible = true;
-};
+}
+
 on_init();

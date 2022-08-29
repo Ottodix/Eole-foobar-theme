@@ -1,5 +1,5 @@
 var properties = {
-	panelName: 'WSHlibrary_tree',
+    panelName: 'WSHlibrary_tree',
     darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
@@ -11,12 +11,12 @@ var properties = {
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),
     showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),
-	headerbar_height:39,
-	TagSwitcherBarHeight: 40,
+    headerbar_height:39,
+    TagSwitcherBarHeight: 40,
     TagSwitcherBarHeight_old: 30,		
-	panelFontAdjustement: -1,
-	showLibraryTreeSwitch:true,
-	DropInplaylist: true
+    panelFontAdjustement: -1,
+    showLibraryTreeSwitch:true,
+    DropInplaylist: true
 };
 
 function setShowInLibrary(){

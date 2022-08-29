@@ -1487,16 +1487,16 @@ function Scheduler(callBackName){
 function oPanel(){
 	this.title_length = -1;
 	this.title_prefix_length = -1;
-    this.title_secondary_length = -1;
+	this.title_secondary_length = -1;
 	this.artist_length = -1;
 	this.time_length = -1;
 	this.fullTitle_length = -1;
 	this.title_txt = '';
-    this.title_prefix_txt = '';
-    this.title_secondary_txt = '';
+	this.title_prefix_txt = '';
+	this.title_secondary_txt = '';
 	this.artist_txt = '';
 	this.time_txt = '';
-	this.on_font_changed = function(){
+	this.on_font_changed = () => {
 		this.title_length = -1;
 		this.artist_length = -1;
 		this.time_length = -1;
@@ -1557,7 +1557,7 @@ function oPanel(){
 		this.time_length = -1;
 	}
 	this.get_time_length = function(gr){
-		if(this.time_length<0){
+		if (this.time_length < 0) {
 			this.time_length = gr.CalcTextWidth(this.time_txt, g_font.plus1) + 10;
 		}
 		return this.time_length;
@@ -1576,15 +1576,18 @@ function on_drag_leave() {
 }
 
 function on_drag_over(action, x, y, mask) {
-    if(x == g_dragndrop_x && y == g_dragndrop_y) return true;
+	if(x == g_dragndrop_x && y == g_dragndrop_y) {
+		return true;
+	}
 
-	try{
-		if(fb.IsPlaying || fb.IsPaused) action.Text = "Play next";
-		else action.Text = "Play";
-	} catch(e){}
+	try {
+		action.Text = fb.IsPlaying || fb.IsPaused
+			? 'Play next'
+			: 'Play';
+	} catch (e) {}
 
-    g_dragndrop_x = x;
-    g_dragndrop_y = y;
+	g_dragndrop_x = x;
+	g_dragndrop_y = y;
 };
 
 function on_drag_drop(action, x, y, mask) {
