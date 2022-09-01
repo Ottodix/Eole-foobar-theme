@@ -1102,9 +1102,6 @@ function on_mouse_rbtn_up(x, y) {
         return true;
     }
   }
-
-  main_menu = undefined;
-  genrePopupMenu = undefined;
   return true;
 }
 
