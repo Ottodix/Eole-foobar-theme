@@ -1342,7 +1342,7 @@ oShowList = function(parentPanelName) {
     this.playing_row_y = 0;
     this.playing_row_w = 0;
     this.playing_row_h = 0;
-
+	
     this.playing_row_x = 0;
     this.playing_row_y = 0;
     this.playing_row_w = 0;
