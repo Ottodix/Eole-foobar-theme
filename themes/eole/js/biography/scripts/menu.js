@@ -265,6 +265,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: loadName,
+			str: 'Load',
 			hide: ppt.img_only
 		});
 
@@ -319,7 +320,8 @@ class MenuItems {
 		});
 
 		menu.newMenu({
-			menuName: 'Display'
+			menuName: 'Display',
+			str: 'Display'
 		});
 
 		for (let i = 0; i < 10; i++) menu.newItem({
@@ -337,11 +339,13 @@ class MenuItems {
 		});
 
 		menu.newMenu({
-			menuName: 'Sources'
+			menuName: 'Sources',
+			str: 'Sources'
 		});
 
 		menu.newMenu({
 			menuName: 'Text',
+			str: 'Text',
 			appendTo: 'Sources'
 		});
 
@@ -428,6 +432,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Open file location',
+			str: 'Open file location',
 			appendTo: 'Sources',
 			flags: this.path.img || this.path.am[3] || this.path.lfm[3] || this.path.wiki[3] || this.path.txt[3] || this.path.tracksAm[3] || this.path.tracksLfm[3] || this.path.tracksWiki[3] ? MF_STRING : MF_GRAYED,
 		});
@@ -471,7 +476,8 @@ class MenuItems {
 
 		const style_arr = panel.style.name.slice();
 		menu.newMenu({
-			menuName: 'Layout'
+			menuName: 'Layout',
+			str: 'Layout'
 		});
 
 		style_arr.forEach((v, i) => menu.newItem({
@@ -492,6 +498,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Create && manage styles',
+			str: 'Create && manage styles',
 			appendTo: 'Layout'
 		});
 
@@ -510,6 +517,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Filmstrip',
+			str: 'Filmstrip',
 			appendTo: 'Layout'
 		});
 
@@ -537,7 +545,8 @@ class MenuItems {
 		}));
 
 		menu.newMenu({
-			menuName: 'Image'
+			menuName: 'Image',
+			str: 'Image',
 		});
 
 		menu.newItem({
@@ -550,6 +559,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Alignment',
+			str: 'Alignment',
 			appendTo: 'Image',
 			hide: ppt.style > 3
 		});
@@ -580,6 +590,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Alignment horizontal',
+			str: 'Alignment horizontal',
 			appendTo: 'Image',
 			hide: ppt.style < 4
 		});
@@ -597,6 +608,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Alignment vertical',
+			str: 'Alignment vertical',
 			appendTo: 'Image',
 			hide: ppt.style < 4
 		});
@@ -632,6 +644,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: 'Black list',
+			str: 'Black list',
 			appendTo: 'Image'
 		});
 
