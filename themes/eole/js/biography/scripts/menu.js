@@ -265,6 +265,7 @@ class MenuItems {
 
 		menu.newMenu({
 			menuName: loadName,
+			str: 'Load',
 			hide: ppt.img_only
 		});
 
