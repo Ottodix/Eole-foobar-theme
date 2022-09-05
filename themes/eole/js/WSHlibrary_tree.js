@@ -1369,7 +1369,7 @@ function panel_operations() {
 		window.SetProperty("View 02: Name // Pattern", "View by Album Artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
 		window.SetProperty("View 03: Name // Pattern", "View by Album Artist - Album // [%album artist% - ]['['%date%']' ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
 		window.SetProperty("View 04: Name // Pattern", "View by Album // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
-		window.SetProperty("View 05: Name // Pattern", ""View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 05: Name // Pattern", "View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
 		window.SetProperty("View 06: Name // Pattern", "View by Year // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
 		
 		window.SetProperty("View Filter 01: Name // Query", "No // Query Not Configurable");
