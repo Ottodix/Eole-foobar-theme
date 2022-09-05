@@ -1360,6 +1360,32 @@ function scrollbar() {
 }
 
 function panel_operations() {
+	ViewIsInited = window.GetProperty("View: View Is Inited", false);
+	if(!ViewIsInited)
+	{
+		window.SetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
+		
+		window.SetProperty("View 01: Name // Pattern", "View by Artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 02: Name // Pattern", "View by Album Artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 03: Name // Pattern", "View by Album Artist - Album // [%album artist% - ]['['%date%']' ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 04: Name // Pattern", "View by Album // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 05: Name // Pattern", ""View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 06: Name // Pattern", "View by Year // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		
+		window.SetProperty("View Filter 01: Name // Query", "No // Query Not Configurable");
+		window.SetProperty("View Filter 02: Name // Query", "Lossless // \"$info(encoding)\" IS lossless");
+		window.SetProperty("View Filter 03: Name // Query", "Lossy // \"$info(encoding)\" IS lossy");
+		window.SetProperty("View Filter 04: Name // Query", "Missing Replaygain // %replaygain_track_gain% MISSING");
+		window.SetProperty("View Filter 05: Name // Query", "Never Played // %play_count% MISSING");
+		window.SetProperty("View Filter 06: Name // Query", "Played Often // %play_count% GREATER 9");
+		window.SetProperty("View Filter 07: Name // Query", "Recently Added // %added% DURING LAST 2 WEEKS");
+		window.SetProperty("View Filter 08: Name // Query", "Recently Played // %last_played% DURING LAST 2 WEEKS");
+		window.SetProperty("View Filter 09: Name // Query", "Top Rated // " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 3");
+		
+		window.SetProperty("View: View Is Inited", true);
+	}
+	
+	
     var def_ppt = window.GetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
     var DT_LEFT = 0x00000000,
         DT_CENTER = 0x00000001,
