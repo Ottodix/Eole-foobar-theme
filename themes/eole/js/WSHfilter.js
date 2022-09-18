@@ -833,7 +833,9 @@ oFilterBox = function() {
         this.inputbox.backselectioncolor = colors.selected_bg;
 
 		var item_txt = new Array("", "Albums...", "Artists...", "Genres...");
-		if(!properties.showTagSwitcherBar) var boxText = item_txt[properties.tagMode];
+		if(!properties.showTagSwitcherBar) {
+			var boxText = g_tagswitcherbar.items_txt[properties.tagMode-((properties.showLibraryTreeSwitch)?0:1)]+"...";
+		}
 		else var boxText = "Filter...";
 		this.inputbox.empty_text = boxText;
     };
@@ -1012,7 +1014,6 @@ oTagSwitcherBar = function() {
 		}
 	}
 
-	this.setItems_infos();
 	this.hoverItem = -1;
 	this.txt_top_margin = 0;
 	this.margin_right = 2;
@@ -1280,7 +1281,6 @@ oTagSwitcherBar_old = function() {
 		}
 	}
 
-	this.setItems_infos();
 	this.hoverItem = -1;
 	this.txt_top_margin = 0;
 	this.margin_right = 2;
