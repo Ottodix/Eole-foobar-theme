@@ -3575,7 +3575,7 @@ function openCoverFullscreen(metadb){
 	img.SaveAs(filepath, globalProperties.ImageCacheFileType);
 	var WshShell = new ActiveXObject("WScript.Shell");		
 	try {
-		WshShell.Run("\"" + filepath + "\"", 0);
+		WshShell.Run("\"" + filepath + "\"");
 	} catch(e) {
 		//HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file."+filepath,"Ok");
 	}		
