@@ -1688,6 +1688,7 @@ oShowList = function(parentPanelName) {
 						this.links[i].onClick(); return;
 					}
 				}
+				//console.log("oShowlist idx"+this.idx+" brw.groups.length"+brw.groups.length)
 				if(this.isHoverCover) brw.playGroup(this.idx);
                 break;
             case "up":
@@ -1915,7 +1916,7 @@ oShowList = function(parentPanelName) {
 		if(this.idx > -1) {
 				this.rowIdx = Math.floor(this.idx / brw.totalColumns);
 				// set size of new showList of the selected album
-				var playlist = brw.groups_draw[this.idx].pl;
+				var playlist = brw.groups[this.idx].pl;
 				this.calcHeight(playlist, this.idx, 0, false);
 				this.reset(this.idx, this.rowIdx, false);
 				//brw.repaint();
@@ -4778,6 +4779,7 @@ oBrowser = function(name) {
 	this.GetFilteredTracks = function(idx){
 		if(properties.filterBox_filter_tracks && g_filterbox.isActive){
 			var playlist = new FbMetadbHandleList();
+				//console.log("oShowlist idx"+idx+" brw.groups.length"+brw.groups.length)			
 			for(var i = 0; i < brw.groups[idx].filtered_tr.length; i++) {
 				playlist.Add(brw.groups[idx].pl[brw.groups[idx].filtered_tr[i]]);
 			}
@@ -5164,6 +5166,7 @@ oBrowser = function(name) {
 		this.setActiveRow(x,y);
 	}
 	this.playGroup = function(group_id){
+		
 		if(group_id > -1 && !this.avoidDlbePlay){
 			plman.FlushPlaybackQueue();
 			var PlaybackPlaylist = this.getPlaybackPlaylist();
@@ -5180,7 +5183,7 @@ oBrowser = function(name) {
 				fb.Play();
 			} else {
 				plman.ClearPlaylist(PlaybackPlaylist);
-				plman.InsertPlaylistItems(PlaybackPlaylist, 0, this.GetFilteredTracks(this.groups_draw[group_id]));
+				plman.InsertPlaylistItems(PlaybackPlaylist, 0, this.GetFilteredTracks(group_id));
 				plman.PlayingPlaylist = PlaybackPlaylist;
 				plman.ExecutePlaylistDefaultAction(PlaybackPlaylist,0);
 				fb.Stop();fb.Play();

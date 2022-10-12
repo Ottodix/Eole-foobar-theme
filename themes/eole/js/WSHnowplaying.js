@@ -1287,21 +1287,6 @@ function on_notify_data(name, info) {
 		break;
 	}
 }
-function showNowPlayingCover(){
-	if (globalProperties.enableDiskCache) {
-		cache_filename = check_cache(fb.GetNowPlaying(), 0, g_cover.cachekey);
-		// load img from cache
-		if(cache_filename) {
-			cover_path = cache_filename;
-		} else cover_path = "sfsfsf##";
-	} else if(fb.GetNowPlaying().path == cover_path) cover_path = cover_path.substring(0, cover_path.lastIndexOf("\\")) + "\\folder.jpg";
-	var WshShell = new ActiveXObject("WScript.Shell");
-	try {
-		WshShell.Run("\"" + cover_path + "\"", 0);
-	} catch(e) {
-		HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
-	}
-}
 
 /* ======================= RATING AND TRACK INFO ========================== */
 TextBtn = function() {
