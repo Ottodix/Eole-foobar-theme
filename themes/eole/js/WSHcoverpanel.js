@@ -979,11 +979,8 @@ function on_mouse_rbtn_up(x, y) {
 		main_menu.AppendMenuItem(MF_STRING, 102, "Reload");
 	}
 
-  let idx = main_menu.TrackPopupMenu(x, y, 0x0020);
+	let idx = main_menu.TrackPopupMenu(x, y, 0x0020);
 
-  if (idx >= 100 && idx < 800) {
-    Context.ExecuteByID(idx - 100)
-  } else {
     switch (idx) {
       case 100:
         window.ShowProperties();
@@ -1079,13 +1076,16 @@ function on_mouse_rbtn_up(x, y) {
       case 200:
         fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
       break;
+	  case (idx >= 100 && idx < 800):
+		Context.ExecuteByID(idx - 100);
+	  break;
       case 10000:
         g_genre_cache.build_from_library();
         break;
       default:
         return true;
     }
-  }
+
   return true;
 }
 
