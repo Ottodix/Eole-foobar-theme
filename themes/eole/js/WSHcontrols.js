@@ -642,7 +642,7 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.AddFiles()
 		},false,open_img,open_img_hover),
-		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", "Play randomly a selection of tracks...", function () {
+		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", "Play a random selection of tracks...", function () {
 			g_tooltip.Deactivate();
 			randomPlayMenu(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,random_img,random_img_hover),
