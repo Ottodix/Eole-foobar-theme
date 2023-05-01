@@ -4,6 +4,10 @@ This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 This theme requires Foobar2000 version 1.4 (or newer).
 Follow the [instructions below](https://github.com/Ottodix/Eole-foobar-theme#installation) to install it properly.
 
+```bash
+  WARNING: Required components for this theme doesn't work with foobar 64bit
+```
+
 ## Contribute to the theme
 
 If you've got some knowledge in Javascript, feel free to suggest code performance improvements, report bugs, or submit fixes.
