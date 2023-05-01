@@ -5,7 +5,7 @@ This theme requires Foobar2000 32bit version 1.4 (or newer).
 Follow the [instructions below](https://github.com/Ottodix/Eole-foobar-theme#installation) to install it properly.
 
 ```bash
-  WARNING: Required components for this theme doesn't work with foobar 64bit
+  WARNING: The components required for this theme do not work with foobar 64bit
 ```
 
 ## Contribute to the theme
