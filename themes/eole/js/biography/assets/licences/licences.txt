@@ -1,4 +1,4 @@
-========== Weighted Damerau–Levenshtein distance ==========
+﻿========== Weighted Damerau–Levenshtein distance ==========
 
 Copyright 2019 Marek Suppa
 

@@ -46,6 +46,10 @@ class Settings {
 		this.storageFolder = `${my_utils.packageInfo.Directories.Storage}\\`;
 		$.buildPth(this.storageFolder);
 		this.bio = `${this.storageFolder + this.cfgBaseName}.cfg`;
+		this.item_properties = `${this.storageFolder}item_properties.json`;
+		this.item_properties_alternative_grouping = `${this.storageFolder}item_properties_alternative_grouping.json`;
+		this.nowplaying = `${this.storageFolder}nowplaying.txt`;
+		this.radioParser = `${this.storageFolder}advanced_radio_stream_parser.js`;
 
 		this.cacheTime = 0;
 		this.cfg = $.jsonParse(this.bio, {}, 'file');
@@ -58,6 +62,7 @@ class Settings {
 		}
 
 		this.local = $.file('C:\\check_local\\1450343922.txt');
+		if (!this.local) ppt.themed = false;
 		this.remap = {}
 		this.pth = {}
 		this.sup = {}
@@ -170,6 +175,10 @@ class Settings {
 	}
 
 	checkCfg() {
+		if (!$.file(this.item_properties)) $.save(this.item_properties, item_properties, true);
+		if (!$.file(this.item_properties_alternative_grouping)) $.save(this.item_properties_alternative_grouping, item_properties_alternative_grouping, true);
+		if (!$.file(this.nowplaying)) $.save(this.nowplaying, nowplaying, true);
+		if (!$.file(this.radioParser)) $.save(this.radioParser, radioParser, true);
 		if ($.file(this.bio)) return;
 		const orig_cfg = `${fb.ProfilePath}yttm\\biography.cfg`;
 		const orig_cfg_copied = $.file(`${cfg.storageFolder}foo_lastfm_img.vbs`);
@@ -364,7 +373,7 @@ class Settings {
 					break;
 			}
 		}
-		const dialogWindow = ppt.get('Biography Dialog Box', JSON.stringify({
+		let dialogWindow = ppt.get('Biography Dialog Box', JSON.stringify({
 			w: 85,
 			h: 60,
 			def_w: 85,
@@ -372,13 +381,17 @@ class Settings {
 			tab: 'PanelCfg',
 			panelPage: 'display',
 			serverPage: 'download',
-			displaySaveFolders: false
+			displaySaveFolders: false,
+			version: `v${window.ScriptInfo.Version}`
 		}));
+		dialogWindow = $.jsonParse(dialogWindow);
+		dialogWindow.version = `v${window.ScriptInfo.Version}`;
+		dialogWindow = JSON.stringify(dialogWindow);
 		if (!panel.id.numServersChecked) panel.checkNumServers();
-		if (soFeatures.gecko && soFeatures.clipboard) popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
+		if (popUpBox.isHtmlDialogSupported()) popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
 		else {
 			popUpBox.ok = false;
-			$.trace('options dialog isn\'t available with current operating system. All settings in options are available elsewhere: 1) panel settings are in panel properties; 2) server settings that apply to all panels are in the cfg file - default settings should be fine for most users, but can be changed by careful editing in a text editor. Common settings are on the menu.');	
+			$.trace('the options html dialog doesn\'t appear to be available with the current operating system. All settings in options are available elsewhere: 1) panel settings are in panel properties; 2) server settings that apply to all panels are in the cfg file - default settings should be fine for most users, but can be changed by careful editing in a text editor. Common settings are on the menu.');	
 		}
 	}
 
@@ -434,8 +447,9 @@ class Settings {
 			this.suffix.foLfmBio = this.suffix.foAmBio = this.suffix.foWikiBio = '';
 		}
 
-		this.albCovFolder = this.substituteTf(this.foCycCov.replace(/%profile%\\/i, fb.ProfilePath));
-		this.artCusImgFolder = this.substituteTf(this.foCycPhoto.replace(/%profile%\\/i, fb.ProfilePath));
+		this.albCovFolder = this.substituteTf(this.expandPath(this.foCycCov));
+		this.artCusImgFolder = this.substituteTf(this.expandPath(this.foCycPhoto));
+
 		this.exp = Math.max(this.exp, 28);
 		this.getLangIndex();
 		if (!this.lang.ok) this.language = 'EN';
@@ -492,12 +506,16 @@ class Settings {
 			for (let i = 0; i < 3; i++) {
 				let nm = this[`cusCov${i}`];
 				if (nm.length) {
-					nm = nm.replace(/%profile%\\/i, fb.ProfilePath);
-					nm = this.substituteTf(nm);
+					nm = this.substituteTf(this.expandPath(nm));
 					this.cusCovPaths.push(nm);
 				}
 			}
 		}
+	}
+
+	expandPath(pth) {
+		if (/%profile%\\/i.test(pth) && /%storage_folder%\\/i.test(pth)) pth = pth.replace(/%profile%\\/gi, '');
+		return pth.replace(/^%profile%\\?/i, $.tfEscape(fb.ProfilePath)).replace(/^%storage_folder%\\?/i, $.tfEscape(cfg.storageFolder));
 	}
 
 	preview(n, tfAll, excludeStream, sFind, sReplace, artistView, trackReview) {
@@ -508,7 +526,7 @@ class Settings {
 			const covCanBeSaved = !handle.RawPath.startsWith('fy+') && !handle.RawPath.startsWith('3dydfy:') && !handle.RawPath.startsWith('http');
 			if (!covCanBeSaved) return 'Stream: Covers Not Saved';
 		}
-		n = n.replace(/%profile%\\/i, fb.ProfilePath);
+		n = this.expandPath(n);
 		const tf = tfAll.split('~#~');
 		const tfNames = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%'];
 
@@ -526,12 +544,7 @@ class Settings {
 		tfNames.forEach((v, i) => n = n.replace(RegExp(v, 'gi'), tf[i]));
 
 		const wildCard = /[*?]/.test(n);
-		if (!wildCard) return panel.cleanPth(n, false);
-		
-		let p = panel.cleanPth(n.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), false).slice(0, -1);
-		p = p.replace(/@!@/g, '*').replace(/!@!/g, '?');
-		const arr = utils.Glob(p);
-		return arr.length ? arr[0] + ' ' : '';	
+		return !wildCard ? panel.cleanPth(n, false) : panel.cleanPth(n.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), false).replace(/@!@/g, '*').replace(/!@!/g, '?');
 	}
 
 	move(n) {
@@ -644,7 +657,7 @@ class Settings {
 				}
 				const caption = 'Tag Files:';
 				const prompt = handles.Count < 2000 ? `Update ${handles.Count} ${handles.Count > 1 ? 'tracks' : 'track'}.\n\nContinue?` : `Update ${handles.Count} tracks.\n\nADVISORY: This operation analyses a lot of data.\n\nContinue?`;
-				const wsh = soFeatures.gecko && soFeatures.clipboard ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', continue_confirmation) : true;
+				const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
 				if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 				break;
 			}
@@ -704,8 +717,8 @@ let settings = [
 	['Auto-Save Folder', '$directory_path(%path%)', 'text', 'foImgCov'],
 	['Auto-Save File Name', 'cover', 'text', 'fnImgCov'],
 
-	['Folder', '%profile%\\foo_spider_monkey_panel\\package_data\\{BA9557CE-7B4B-4E0E-9373-99F511E81252}\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
-	['Folder', '%profile%\\foo_spider_monkey_panel\\package_data\\{BA9557CE-7B4B-4E0E-9373-99F511E81252}\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
+	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
+	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
 	['Album Name Auto-Clean', false, 'boolean', 'albStrip'],
 	['Cache Expiry (days: minimum 28)', 28, 'num', 'exp'],
 
@@ -753,6 +766,7 @@ let settings = [
 	['Tag Name: Artist Genre Wikipedia', 'Artist Genre Wikipedia', 'text', 'tagName12'],
 
 	['Tagger Show Confirm PopUp Box', true, 'boolean', 'taggerConfirm'],
+	['Tagger Last.fm Genre Use Whitelist', 1, 'num', 'useWhitelist'],
 	['Tagger Last.fm Genre Custom Genres', '', 'text', 'customGenres'],
 	['Tagger Last.fm Genre Translate', 'alt country>alternative country, canterbury>canterbury scene, chanson francaise>chanson fran\u00e7aise, christmas>christmas music, christmas songs>christmas music, eletronica>electronica, motown soul>motown, musicals>musical, neoclassical>neoclassicism, orchestra>orchestral, popular>pop, prog>progressive, rnb>r&b, rhythm and blues>r&b, rb>r&b, relaxing>relaxation, relax>relaxation, rock & roll>rock and roll, rock n roll>rock and roll, tropicalia>tropic\u00e1lia, xmas>christmas music, ye ye>y\u00e9-y\u00e9', 'text', 'translate'],
 
@@ -771,5 +785,282 @@ let settings = [
 	['Show console messages', true, 'boolean', 'showConsoleMessages']
 ];
 
+let item_properties =
+
+`{
+	"*****HELP*****": [
+		"Set show to false to hide a group",
+		"All groups except General*, Metadata* and Other* can be edited, i.e. properties added, removed or changed (keep the properties key)",
+		"All groups can be removed or moved",
+		"New groups can be added",
+		"Group names can be changed except those that auto-expand*",
+		"If edit, maintain the general format. If the file can't be parsed, item properties won't display and the console will report 'item_properties: invalid JSON'",
+		"An on-line JSON validator can be used check integrity and locate errors",
+		"Save file name must include item_properties for recognition, e.g. my_item_properties, can be used",
+		"adjust uppercase list at end if required (| separator: whole word match; applies to auto-expanded names)"
+	],
+	"showEmpty": false,
+	"Metadata": {
+		"show": true,
+		"properties": [
+			{"name": "Artist", "titleformat": "[$meta(artist)]"},
+			{"name": "Track", "titleformat": "[$meta(title)]"},
+			{"name": "Album", "titleformat": "[$meta(album)]"},
+			{"name": "Date", "titleformat": "[%date%]"},
+			{"name": "Genre", "titleformat": "[%genre%]"},
+			{"name": "Track number", "titleformat": "[%tracknumber%]"},
+			{"name": "Composer", "titleformat": "[%composer%]"},
+			{"name": "Performer", "titleformat": "[%performer%]"},
+			{"name": "Album artist", "titleformat": "[$meta(album artist)]"},
+			{"name": "Total tracks", "titleformat": "[%totaltracks%]"},
+			{"name": "Disc number", "titleformat": "[$if2($meta(discnumber),$meta(disc))]"},
+			{"name": "Total discs", "titleformat": "[%totaldiscs%]"},
+			{"name": "Comment", "titleformat": "[%comment%]"}
+		]
+	},
+	"Metadata*": {
+		"show": false,
+		"properties": [
+			"This group item is not configurable: items are auto-expanded. It can only be removed, moved or hidden by setting show to false. Don't change the group name.",
+			"Use for an alternative grouping. It will show all metadata in alphabetical order as opposed to the groupings used by default.",
+			"To use set show to true. If used, it's best to set show to false for the above Metadata, Popularity, AllMusic, Last.fm & Wikipedia groups."
+		]
+	},
+	"Popularity": {
+		"show": true,
+		"properties": [
+			{"name": "Artist", "titleformat": "[$meta(artist statistics last.fm,5[score])]"},
+			{"name": "Album", "titleformat": "[$meta(album statistics last.fm,5[score])]"},
+			{"name": "Track", "titleformat": "[$meta(track statistics last.fm,5[score])]"}
+		]
+	},
+	"AllMusic": {
+		"show": true,
+		"properties": [
+			{"name": "Artist genre", "titleformat": "[%artist genre allmusic%]"},
+			{"name": "Album genre", "titleformat": "[%album genre allmusic%]"},
+			{"name": "Album mood", "titleformat": "[%album mood allmusic%]"},
+			{"name": "Album theme", "titleformat": "[%album theme allmusic%]"},
+			{"name": "Album rating", "titleformat": "[%album rating allmusic%]"}
+		]
+	},
+	"Last.fm": {
+		"show": true,
+		"properties": [
+			{"name": "Artist genre", "titleformat": "[%artist genre last.fm%]"},
+			{"name": "Album genre", "titleformat": "[%album genre last.fm%]"},
+			{"name": "Locale", "titleformat": "[%locale last.fm%]"},
+			{"name": "Similar artists", "titleformat": "[%similar artists last.fm%]"}
+		]
+	},
+	"Wikipedia": {
+		"show": true,
+		"properties": [
+			{"name": "Artist genre", "titleformat": "[%artist genre wikipedia%]"},
+			{"name": "Album genre", "titleformat": "[%album genre wikipedia%]"}
+		]
+	},
+	"YouTube": {
+		"show": true,
+		"properties": [
+			{"name": "Channel title", "titleformat": "[%fy_channel_title%]"},
+			{"name": "Channel url", "titleformat": "[%fy_channel_url%]"},
+			{"name": "Description", "titleformat": "[%fy_description%]"},
+			{"name": "Like count", "titleformat": "[%fy_like_count%]"},
+			{"name": "Dislike count", "titleformat": "[%fy_dislike_count%]"},
+			{"name": "Search title", "titleformat": "[%search_title%]"},
+			{"name": "Thumbnail url", "titleformat": "[%fy_thumbnail_url%]"},
+			{"name": "Title", "titleformat": "[%fy_title%]"},
+			{"name": "Upload date", "titleformat": "[%fy_upload_date%]"},
+			{"name": "View count", "titleformat": "[%fy_view_count%]"}
+		]
+	},
+	"Statistics": {
+		"show": true,
+		"properties": [
+			{"name": "Play count", "titleformat": "[%play_count%]"},
+			{"name": "First played", "titleformat": "[%first_played%]"},
+			{"name": "Last played", "titleformat": "[%last_played%]"},
+			{"name": "Added", "titleformat": "[%added%]"},
+			{"name": "Rating", "titleformat": "[$if3(%_Autorating%,%rating%,$meta(rating))]"}
+		]
+	},
+	"Location": {
+	"show": true,
+		"properties": [
+			{"name": "File name", "titleformat": "[%filename_ext%]"},
+			{"name": "Folder name", "titleformat": "[$directory_path(%path%)]"},
+			{"name": "File path", "titleformat": "[%path%]"},
+			{"name": "Subsong index", "titleformat": "[%subsong%]"},
+			{"name": "File size", "titleformat": "[%filesize_natural%]"},
+			{"name": "Last modified", "titleformat": "[%last_modified%]"},
+			{"name": "Created", "titleformat": "[%file_created%]"}
+		]
+	},
+	"General*": {
+		"show": true,
+		"properties": ["This group item is not configurable: items are auto-expanded. It can only be removed, moved or hidden by setting show to false. Don't change the group name."]
+	},
+	"ReplayGain": {
+		"show": true,
+		"properties": [
+			{"name": "Track gain", "titleformat": "[%replaygain_track_gain%]"},
+			{"name": "Track peak", "titleformat": "[%replaygain_track_peak%]"},
+			{"name": "Album gain", "titleformat": "[%replaygain_album_gain%]"},
+			{"name": "Album peak", "titleformat": "[%replaygain_album_peak%]"}
+		]
+	},
+	"Other*": {
+		"show": true,
+		"properties": ["This group item is not configurable: items are auto-expanded. It can only be removed, moved or hidden by setting show to false. Don't change the group name."]
+	},
+	"uppercase": "ANV|MB"
+}`
+
+let item_properties_alternative_grouping = item_properties
+.replace(/("Metadata\*":\s{\s*?"show":\s)false/, '$1' + true)
+.replace(/(("Metadata"|"Popularity"|"AllMusic"|"Last.fm"|"Wikipedia"):\s{\s*?"show":\s)true/g, '$1' + false);
+
+let nowplaying = `Artist: %artist%$crlf()
+$crlf()
+Title: %title%$crlf()
+$crlf()
+[Album: %album%$crlf()
+$crlf()]
+$if2(%playback_time%,0:00)[ / %length%]`;
+
+let radioParser = `/* RadioStreamParser is written in javascript and can be user edited with care.
+It's designed for use with internet radio streams that contain the artist name and song title in a non-standard format.
+Before editing, make a backup copy in case things go wrong.
+
+1. To add a new radio stream, copy one of the case instances including the break. Paste under the last and within the switch statement.
+2. For each, change the path. For this, open properties and copy and paste the File path. Retain the quotes below. Escape any backslashes: replace \\ with \\\\
+3. Extract artist and title from radio stream item.
+	In many cases this can be done simply by splitting the item, e.g. at -. The 1st item will then be item[0], the 2nd item[1] etc.
+	In more complex cases use RegExp or javascript string manipulation functions. Google for syntax.
+4. Adjust the format (comment out if unwanted). This is aesthetic. It won't affect searching.
+5. Use console.log traces to see what's going on and debug, e.g uncomment those below.
+	
+This parser is also used by Find & Play provided the biography package id {BA9557CE-7B4B-4E0E-9373-99F511E81252} is unaltered.
+*/
+
+'use strict';
+
+class radioStreamParser {
+
+	static getStreamInfo(focus, ignoreLock) {
+		// don't alter the next 4 lines
+		const path = $.eval('%path%', focus, ignoreLock);
+		let artist = '';
+		let item = $.eval('[$trim(' + (typeof cfg !== 'undefined' ? cfg.tf.title : ppt.tfTitle) + ')]', focus, ignoreLock);
+		let title = '';
+
+		switch (path) {
+
+			case 'http://dieneuewelle.cast.addradio.de/dieneuewelle/simulcast/high/stream.mp3':
+				//console.log('original item', item);
+				item = item.split('-');
+				//console.log('split item', item);
+
+				artist = (item[1] || '').trim(); // always return empty string if no match
+				//console.log('artist', artist);
+
+				title = (item[2] || '').trim();
+				//console.log('title', title);
+	
+				break;
+
+			case 'http://energyzuerich.ice.infomaniak.ch/energyzuerich-high.mp3': // items requiring same parsing can be grouped as shown
+			case 'http://vintageradio.ice.infomaniak.ch/vintageradio-high.mp3':
+
+				//console.log('original item', item);
+				item = item.split('˗'); // use correct hyphen(s)!; it's safest to save file as utf-8-BOM especially if there are unicode characters
+				//console.log('split item', item);
+				
+				artist = (item[0] || '').trim();
+				//console.log('artist', artist);
+				
+				title = (item[1] || '').trim();
+				//console.log('title', title);
+
+				break;
+				
+			case 'http://kohina.duckdns.org:8000/stream.ogg':
+
+				//console.log('original item', item);
+				item = item.split('-');
+				//console.log('split item', item);
+
+				artist = (item[0] || '').trim(); // always return empty string if no match
+				//console.log('artist', artist);
+				
+				title = (item[1] || '').trim();
+				if (item[2]) title = (title + ' - ' + item[2].trim());
+				//console.log('title', title);
+
+				break;
+
+			case 'http://www.rcgoldserver.eu:8253/': // artist name and song title in standard format except title has year
+			case 'http://www.rmgoldserver.eu:8199/':
+			
+				//console.log('original item', item);
+				title = this.removeTrailingYear(item);	// item is the original parsed title; trailing year removed as it interferes with searching
+				//console.log('title', title);
+				
+				// artist is correct: return will be '': as its empty  original parsed artist is used without modification
+	
+				break;
+
+			case 'artist and title are switched - a path would need to be put here':
+
+				//console.log('original item', item);
+				artist = item; // item is the title, which is the artist as they're swapped
+				//console.log('artist', artist);
+				
+				title = $.eval('[$trim(' + (typeof cfg !== 'undefined' ? cfg.tf.artist : ppt.tfArtist) + ')]', focus, ignoreLock);
+				//console.log('title', title);
+	
+				break;
+
+		}
+		
+		// adjust format
+		artist = artist.toLowerCase(); // toLowerCase() stops all uppercase being treated as abbreviation by $.titlecase
+		artist = $.titlecase(artist); 
+		//console.log('formatted artist', artist);
+		
+		title = title.toLowerCase();
+		title = $.titlecase(title);
+		//console.log('formatted title', title);
+		
+		// return object containing artist & title: don't alter
+		return {
+			artist: artist,
+			title: title
+		}
+	}
+
+	static removeTrailingYear(title) {
+		const kw = '(-\\s*|\\s+)\\d\\d\\d\\d';
+		let ix = -1;
+		let yr = title.match(RegExp(kw));
+		if (yr) {
+			yr = yr[0].toString();
+			ix = title.indexOf(yr);
+		}
+		if (ix != -1) title = title.slice(0, ix).trim();
+		return title;
+	}
+}`
+
 cfg.init(settings);
 settings = undefined;
+item_properties = undefined;
+item_properties_alternative_grouping = undefined;
+nowplaying = undefined;
+radioParser = undefined;
+
+if ($.file(cfg.radioParser)) {
+	include(cfg.radioParser);
+	isRadioStreamParser = true;
+}

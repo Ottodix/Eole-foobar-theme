@@ -16,6 +16,8 @@ class Library {
 	}
 
 	inLibrary(type, a, l) {
+		if (a) a = a.toLowerCase();
+		if (l) l = l.toLowerCase();
 		switch (type) {
 			case 1: {
 				let q = '';

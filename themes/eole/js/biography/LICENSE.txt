@@ -1,6 +1,6 @@
-License
+﻿License
 
-Copyright (c) 2021 WilB
+Copyright (c) 2021-2022 WilB
 
 The above copyright notice shall be included in all
 copies or substantial portions of the Software.

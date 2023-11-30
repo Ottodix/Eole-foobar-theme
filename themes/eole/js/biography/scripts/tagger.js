@@ -4,6 +4,8 @@ class Tagger {
 	constructor() {
 		this.arr1 = [];
 		this.arr2 = [];
+		this.force = false;
+		this.genres = [];
 		this.simList = [];
 		this.setGenres();
 
@@ -36,27 +38,6 @@ class Tagger {
 	}
 
 	// Methods
-	
-	setGenres() {
-		// edit this.genres on next line to use a different default whitelist for last.fm genres
-		this.genres = ['2 tone', '2-step', 'acid house', 'acid jazz', 'acid rock', 'acid techno', 'acid trance', 'acoustic blues', 'acoustic rock', 'afox\u00ea', 'african blues', 'afrobeat', 'aggrotech', 'alternative country', 'alternative dance', 'alternative folk', 'alternative hip hop', 'alternative metal', 'alternative pop', 'alternative punk', 'alternative rock', 'ambient', 'ambient dub', 'ambient house', 'ambient pop', 'ambient techno', 'ambient trance', 'american primitive guitar', 'americana', 'anarcho-punk', 'anatolian rock', 'andalusian classical', 'anti-folk', 'aor', 'appalachian folk', 'arena rock', 'ars antiqua', 'ars nova', 'ars subtilior', 'art pop', 'art punk', 'art rock', 'atmospheric black metal', 'audiobook', 'avant-garde', 'avant-garde jazz', 'avant-garde metal', 'avant-garde pop', 'avant-prog', 'ax\u00e9', 'bachata', 'bai\u00e3o', 'balearic beat', 'ballad', 'baltimore club', 'barbershop', 'bardcore', 'baroque', 'baroque pop', 'bass house', 'bassline', 'battle rap', 'batucada', 'beat music', 'bebop', 'benga', 'berlin school', 'bhangra', 'big band', 'big beat', 'black metal', 'blackened death metal', 'blackgaze', 'bleep techno', 'blue-eyed soul', 'bluegrass', 'bluegrass gospel', 'blues', 'blues rock', 'bolero', 'bolero son', 'bongo flava', 'boogie rock', 'boogie-woogie', 'boom bap', 'bossa nova', 'bounce', 'breakbeat', 'breakbeat hardcore', 'breakcore', 'breaks', 'brega', 'brega funk', 'brill building', 'brit funk', 'britcore', 'britpop', 'broken beat', 'brostep', 'brutal death metal', 'bubblegum bass', 'bubblegum pop', 'cabaret', 'cajun', 'calypso', 'canci\u00f3n mel\u00f3dica', 'candombe', 'canterbury scene', 'cantopop', 'canzone napoletana', 'cape jazz', 'carimb\u00f3', 'carnatic classical', 'celtic', 'celtic punk', 'chacarera', 'chachach\u00e1', 'chalga', 'chamam\u00e9', 'chamber pop', 'champeta', 'chang\u00fc\u00ed', 'chanson \u00e0 texte', 'chanson fran\u00e7aise', 'chicago blues', 'chicano rap', 'chillout', 'chillstep', 'chillwave', 'chimurenga', 'chiptune', 'chopped and screwed', 'choro', 'christian metal', 'christian rock', 'christmas music', 'chutney', 'city pop', 'classic blues', 'classic country', 'classic jazz', 'classic rock', 'classical', 'classical crossover', 'cloud rap', 'club', 'coco', 'coldwave', 'comedy', 'comedy hip hop', 'comedy rock', 'compas', 'complextro', 'conscious hip hop', 'contemporary christian', 'contemporary classical', 'contemporary folk', 'contemporary gospel', 'contemporary jazz', 'contemporary r&b', 'contra', 'cool jazz', 'copla', 'corrido', 'country', 'country blues', 'country boogie', 'country folk', 'country pop', 'country rap', 'country rock', 'country soul', 'coup\u00e9-d\u00e9cal\u00e9', 'cowpunk', 'crossover jazz', 'crossover prog', 'crossover thrash', 'crunk', 'crust punk', 'cumbia', 'cumbia villera', 'cupl\u00e9', 'cyber metal', 'cybergrind', 'cyberpunk', 'd-beat', 'dance', 'dance-pop', 'dance-punk', 'dance-rock', 'dancehall', 'dangdut', 'dansband', 'danz\u00f3n', 'dark ambient', 'dark cabaret', 'dark electro', 'dark folk', 'dark jazz', 'dark psytrance', 'dark wave', 'darkstep', 'darksynth', "death 'n' roll", 'death industrial', 'death metal', 'death-doom metal', 'deathcore', 'deathgrind', 'deathrock', 'deathstep', 'deconstructed club', 'deep funk', 'deep house', 'delta blues', 'denpa', 'depressive black metal', 'descarga', 'desert blues', 'desert rock', 'detroit techno', 'dhrupad', 'digital hardcore', 'disco', 'disco polo', 'dixieland', 'djent', 'doo-wop', 'doom metal', 'doomcore', 'downtempo', 'dream pop', 'dreampunk', 'drill', 'drill and bass', 'drone', 'drone metal', 'drum and bass', 'dub', 'dub poetry', 'dub techno', 'dubstep', 'dungeon synth', 'east coast hip hop', 'easycore', 'ebm', 'edm', 'electric blues', 'electro', 'electro house', 'electro swing', 'electro-funk', 'electro-industrial', 'electroclash', 'electronic', 'electronic rock', 'electronica', 'electronicore', 'electropop', 'electropunk', 'electrotango', 'emo', 'emo pop', 'emo rap', 'emocore', 'enka', '\u00e9ntekhno', 'ethereal wave', 'euro house', 'euro-disco', 'eurobeat', 'eurodance', 'europop', 'exotica', 'experimental', 'experimental hip hop', 'experimental rock', 'extratone', 'fado', 'fidget house', 'filk', 'finnish tango', 'flamenco', 'flamenco jazz', 'folk', 'folk metal', 'folk pop', 'folk punk', 'folk rock', 'folktronica', 'footwork', 'forr\u00f3', 'forr\u00f3 eletr\u00f4nico', 'forr\u00f3 universit\u00e1rio', 'freak folk', 'freakbeat', 'free folk', 'free improvisation', 'free jazz', 'french house', 'frevo', 'fuji', 'funan\u00e1', 'funeral doom metal', 'funk', 'funk carioca', 'funk metal', 'funk rock', 'funk soul', 'funktronica', 'funky house', 'fusion', 'future bass', 'future funk', 'future garage', 'future house', 'future jazz', 'futurepop', 'g-funk', 'gabber', 'gagaku', 'gangsta rap', 'garage house', 'garage punk', 'garage rock', 'ghazal', 'ghetto house', 'ghettotech', 'glam', 'glam metal', 'glam punk', 'glam rock', 'glitch', 'glitch hop', 'glitch pop', 'go-go', 'goa trance', 'goregrind', 'gospel', 'gothic', 'gothic country', 'gothic metal', 'gothic rock', 'grebo', 'gregorian chant', 'grime', 'grindcore', 'groove metal', 'group sounds', 'grunge', 'guaguanc\u00f3', 'guajira', 'guaracha', 'gypsy jazz', 'gypsy punk', 'happy hardcore', 'hard bop', 'hard house', 'hard rock', 'hard trance', 'hardbass', 'hardcore hip hop', 'hardcore punk', 'hardcore techno', 'hardstyle', 'hardvapour', 'harsh noise', 'harsh noise wall', 'hauntology', 'heartland rock', 'heavy metal', 'heavy psych', 'heavy rock', 'hi-nrg', 'highlife', 'hindustani classical', 'hip hop', 'hip house', 'hiplife', 'honky tonk', 'hopepunk', 'horror punk', 'horrorcore', 'house', 'hyperpop', 'hyphy', 'idm', 'illbient', 'indian pop', 'indie', 'indie folk', 'indie pop', 'indie rock', 'indietronica', 'indorock', 'industrial', 'industrial hardcore', 'industrial hip hop', 'industrial metal', 'industrial musical', 'industrial rock', 'industrial techno', 'instrumental', 'instrumental jazz', 'instrumental rock', 'irish folk', 'italo dance', 'italo-disco', 'j-core', 'j-pop', 'j-rock', 'jaipongan', 'jazz', 'jazz blues', 'jazz fusion', 'jazz rap', 'jazz rock', 'jazz-funk', 'joik', 'j\u00f9j\u00fa', 'juke', 'jump blues', 'jump up', 'jungle', 'jungle terror', 'k-pop', 'kabarett', 'kaseko', 'kas\u00e9k\u00f2', 'kawaii future bass', 'kawaii metal', 'kay\u014dkyoku', 'keroncong', 'khyal', 'kizomba', 'kleinkunst', 'klezmer', 'krautrock', 'kuduro', 'kwaito', 'latin', 'latin ballad', 'latin jazz', 'latin pop', 'latin rock', 'latin soul', 'leftfield', 'levenslied', 'line dance', 'liquid funk', 'lo-fi', 'lo-fi hip hop', 'lolicore', 'louisiana blues', 'lounge', 'lovers rock', 'lowercase', 'luk krung', 'luk thung', 'madchester', 'mainstream rock', 'makossa', 'maloya', 'mambo', 'mandopop', 'mangue beat', 'manila sound', 'march', 'marchinha', 'mariachi', 'marrabenta', 'martial industrial', 'maskanda', 'math rock', 'mathcore', 'mbalax', 'mbaqanga', 'mbube', 'medieval', 'melodic black metal', 'melodic death metal', 'melodic dubstep', 'melodic hardcore', 'melodic metalcore', 'melodic rock', 'melodic trance', 'mento', 'merengue', 'metal', 'metalcore', 'miami bass', 'microhouse', 'microsound', 'milonga', "min'y\u014d", 'mincecore', 'minimal', 'minimal drum and bass', 'minimal techno', 'minimal wave', 'mod', 'modal jazz', 'modern blues', 'modern classical', 'modern country', 'mood kay\u014d', 'moombahcore', 'moombahton', 'mor lam', 'morna', 'motown', 'mpb', 'musical', 'musique concr\u00e8te', 'nashville sound', 'nature sounds', 'nederpop', 'neo soul', 'neo-progressive rock', 'neo-psychedelia', 'neo-rockabilly', 'neo-traditional country', 'neoclassical dark wave', 'neoclassical metal', 'neoclassicism', 'neofolk', 'nerdcore', 'neue deutsche h\u00e4rte', 'neue deutsche welle', 'neurofunk', 'neurohop', 'new age', 'new beat', 'new jack swing', 'new romantic', 'new wave', 'nightcore', 'no wave', 'noise', 'noise pop', 'noise rock', 'noisecore', 'non-music', 'norte\u00f1o', 'northern soul', 'nova can\u00e7\u00f3', 'nu disco', 'nu jazz', 'nu metal', 'nu skool breaks', 'nueva canci\u00f3n', 'nueva trova', 'nuevo flamenco', 'nuevo tango', 'ny\u016b my\u016bjikku', 'occult rock', 'oi', 'old school death metal', 'old-time', 'onkyo', 'opera', 'operatic pop', 'orchestral', 'orchestral jazz', 'outlaw country', 'p-funk', 'pachanga', 'pagod\u00e3o', 'pagode', 'pagode rom\u00e2ntico', 'paisley underground', 'palm-wine', 'parang', 'partido alto', 'pasodoble', 'philly soul', 'phleng phuea chiwit', 'phonk', 'piedmont blues', 'plena', 'plunderphonics', 'political hip hop', 'polka', 'pop', 'pop metal', 'pop punk', 'pop rap', 'pop rock', 'pop soul', 'pornogrind', 'porro', 'post-bop', 'post-classical', 'post-grunge', 'post-hardcore', 'post-metal', 'post-minimalism', 'post-punk', 'post-rock', 'power electronics', 'power metal', 'power noise', 'power pop', 'powerviolence', 'production music', 'progressive', 'progressive bluegrass', 'progressive country', 'progressive folk', 'progressive house', 'progressive metal', 'progressive pop', 'progressive rock', 'progressive trance', 'psybient', 'psychedelic', 'psychedelic folk', 'psychedelic pop', 'psychedelic rock', 'psychobilly', 'psytrance', 'pub rock', 'punk', 'punk blues', 'punk rap', 'punk rock', 'qawwali', 'queercore', 'quiet storm', 'r&b', 'ragga', 'ragga hip-hop', 'ragga jungle', 'ragtime', 'ra\u00ef', 'ranchera', 'rap metal', 'rap rock', 'rapcore', 'rautalanka', 'rave', 'rebetiko', 'red dirt', 'red song', 'reggae', 'reggaeton', 'rhythmic noise', 'ritual ambient', 'rock', 'rock and roll', 'rock opera', 'rockabilly', 'rocksteady', 'romantic classical', 'roots reggae', 'roots rock', 'rumba', 'runo song', 'ry\u016bk\u014dka', 'salegy', 'salsa', 'samba', 'samba-can\u00e7\u00e3o', 'samba-choro', 'samba-exalta\u00e7\u00e3o', 'samba-reggae', 'samba-rock', 'sasscore', 'schlager', 'schranz', 'screamo', 'sea shanty', 's\u00e9ga', 'sertanejo', 'sertanejo raiz', 'sertanejo rom\u00e2ntico', 'sertanejo universit\u00e1rio', 'shibuya-kei', 'shoegaze', 'sierre\u00f1o', 'singer-songwriter', 'ska', 'ska punk', 'skacore', 'skate punk', 'skiffle', 'skweee', 'slow waltz', 'slowcore', 'sludge metal', 'smooth jazz', 'smooth soul', 'soca', 'soft rock', 'son cubano', 'son montuno', 'songo', 'sophisti-pop', 'soukous', 'soul', 'soul blues', 'soul jazz', 'southern gospel', 'southern metal', 'southern rock', 'southern soul', 'space age pop', 'space ambient', 'space disco', 'space rock', 'spectralism', 'speed garage', 'speed metal', 'speedcore', 'spoken word', 'steampunk', 'stoner metal', 'stoner rock', 'street punk', 'stride', 'surf rock', 'swamp pop', 'swamp rock', 'swing', 'symphonic black metal', 'symphonic metal', 'symphonic prog', 'symphonic rock', 'symphony', 'synth funk', 'synth-pop', 'synthwave', 'taarab', 'tango', 'tech house', 'tech trance', 'technical death metal', 'techno', 'techno bass', 'techno kay\u014d', 'techstep', 'tecnobrega', 'teen pop', 'tejano', 'terrorcore', 'texas blues', 'thrash metal', 'thrashcore', 'thumri', 'timba', 'tizita', 'traditional country', 'trance', 'trap', 'trap edm', 'tribal ambient', 'tribal house', 'trip hop', 'tropical house', 'tropic\u00e1lia', 'trot', 'trova', 'tsapiky', 'turbo-folk', 'turntablism', 'twee pop', 'uk drill', 'uk funky', 'uk garage', 'uk hardcore', 'underground hip hop', 'urban cowboy', 'vallenato', 'vaportrap', 'vaporwave', 'vaudeville', 'viking metal', 'visual kei', 'vocal house', 'vocal jazz', 'vocal trance', 'waltz', 'wave', 'west coast hip hop', 'west coast swing', 'western swing', 'witch house', 'wonky', 'xote', 'yacht rock', 'y\u00e9-y\u00e9', 'zamba', 'zamrock', 'zarzuela', 'zeuhl', 'zouk', 'zydeco'];
-
-		if (cfg.customGenres.length) {
-			this.customGenres = cfg.customGenres.split(',');
-			this.customGenres = this.customGenres.map(v => v.trim());
-			this.genres = [...new Set(this.genres.concat(this.customGenres))];
-		}
-		this.genresStripped = this.genres.map(v => $.strip(v));
-		
-		this.arr1 = [];
-		this.arr2 = [];
-		const items = cfg.translate.split(',');
-		items.forEach(v =>{
-			const w = v.split('>');
-			this.arr1.push($.strip(w[0]));
-			this.arr2.push(w[1] ? $.strip(w[1]) : '');
-		});
-	}
 
 	check(handles) {
 		if (!handles) return;
@@ -162,7 +143,7 @@ class Tagger {
 	}
 
 	lfmTidy(n) {
-		// return n; // uncomment to write all the original last.fm tags
+		if (!cfg.useWhitelist || this.genres.length < 701) return n;
 		n.forEach((v, i) => {
 			this.arr1.forEach((w, j) => {
 				if (!w.includes('\\b')) {
@@ -181,6 +162,25 @@ class Tagger {
 		return n;
 	}
 
+	setGenres() {
+		this.genres = $.jsonParse(`${cfg.storageFolder}lastfm_genre_whitelist.json`, [], 'file');
+		if (cfg.customGenres.length) {
+			this.customGenres = cfg.customGenres.split(',');
+			this.customGenres = this.customGenres.map(v => v.trim());
+			this.genres = [...new Set(this.genres.concat(this.customGenres))];
+		}
+		this.genresStripped = this.genres.map(v => $.strip(v));
+
+		this.arr1 = [];
+		this.arr2 = [];
+		const items = cfg.translate.split(',');
+		items.forEach(v =>{
+			const w = v.split('>');
+			this.arr1.push($.strip(w[0]));
+			this.arr2.push(w[1] ? $.strip(w[1]) : '');
+		});
+	}
+
 	uniq(n) {
 		const out = [];
 		const seen = {};
@@ -195,7 +195,7 @@ class Tagger {
 		return out;
 	}
 
-	write(handles, notify) {
+	write(handles, notify, notifyFocus) {
 		if (!handles) return;
 		const kww = 'Founded In: |Born In: |Gegr\\u00fcndet: |Formado en: |Fond\\u00e9 en: |Luogo di fondazione: |\\u51fa\\u8eab\\u5730: |Za\\u0142o\\u017cono w: |Local de funda\\u00e7\\u00e3o: |\\u041c\\u0435\\u0441\\u0442\\u043e \\u043e\\u0441\\u043d\\u043e\\u0432\\u0430\\u043d\\u0438\\u044f: |Grundat \\u00e5r: |Kuruldu\\u011fu tarih: |\\u521b\\u5efa\\u4e8e: |Geboren in: |Lugar de nacimiento: |N\\u00e9\\(e\\) en: |Luogo di nascita: |\\u51fa\\u8eab\\u5730: |Urodzony w: |Local de nascimento: |\\u041c\\u0435\\u0441\\u0442\\u043e \\u0440\\u043e\\u0436\\u0434\\u0435\\u043d\\u0438\\u044f: |F\\u00f6dd: |Do\\u011fum yeri: |\\u751f\\u4e8e: ';
 		const lkw = 'Last.fm: ';
@@ -217,6 +217,7 @@ class Tagger {
 		const artListeners = [];
 		const artTags = [];
 		const cue = [];
+		const force = this.force && notify;
 		const locale = [];
 		const radioStream = notify && panel.isRadio(panel.id.focus);
 		const rem = [];
@@ -231,6 +232,8 @@ class Tagger {
 		const cues = tf_cue.EvalWithMetadbs(handles);
 		const albums = tf_l.EvalWithMetadbs(handles);
 
+		this.setGenres();
+
 		for (let i = 0; i < handles.Count; i++) {
 			artist = artists[i];
 			albumArtist = albumArtists[i];
@@ -240,20 +243,20 @@ class Tagger {
 			if (artist != cur_artist) {
 				cur_artist = artist;
 				similarArtists[i] = '';
-				if (cfg.tagEnabled7 || cfg.tagEnabled8 || cfg.tagEnabled9 || cfg.tagEnabled10 && cfg.tagEnabled13 < 7) {
+				if (cfg.tagEnabled7 || cfg.tagEnabled8 || cfg.tagEnabled9 || cfg.tagEnabled10 && cfg.tagEnabled13 < 7 || force) {
 					artTags[i] = '';
 					artListeners[i] = '';
 					locale[i] = '';
 					const lfmBio = panel.cleanPth(cfg.pth.foLfmBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foLfmBio + '.txt';
 					if ($.file(lfmBio)) {
 						const lBio = $.open(lfmBio);
-						if (cfg.tagEnabled7) {
+						if (cfg.tagEnabled7 || force) {
 							artTags[i] = this.getTag(lBio, 'Top Tags: ').tag;
 							if (artTags[i]) artTags[i] = this.lfmTidy(artTags[i]);
 						}
 						if (cfg.tagEnabled8) artListeners[i] = this.getTag(lBio, lkw, false, 1, 'artist').tag;
-						if (cfg.tagEnabled9) locale[i] = this.getTag(lBio, kww).tag;
-						if (cfg.tagEnabled10 && cfg.tagEnabled13 < 7) {
+						if (cfg.tagEnabled9 || force) locale[i] = this.getTag(lBio, kww).tag;
+						if ((cfg.tagEnabled10 || force) && cfg.tagEnabled13 < 7) {
 							similarArtists[i] = this.getTag(lBio, panel.similarArtistsKey).tag;
 							if (similarArtists[i].length > 6) {
 								similarArtists[i] = '';
@@ -269,20 +272,26 @@ class Tagger {
 					}
 				}
 				if (!similarArtists[i].length) similarArtists[i] = '';
-				if (cfg.tagEnabled4) {
-					artGenre_am[i] = '';
-					const amBio = panel.cleanPth(cfg.pth.foAmBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foAmBio + '.txt';
-					if ($.file(amBio)) {
-						const aBio = $.open(amBio);
-						artGenre_am[i] = this.getTag(aBio, 'Genre: ').tag;
-					}
-				}
-				if (cfg.tagEnabled12) {
+				if (cfg.tagEnabled12 || !locale[i] && notify || force) {
 					artGenre_w[i] = '';
 					const wikiBio = panel.cleanPth(cfg.pth.foWikiBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foWikiBio + '.txt';
 					if ($.file(wikiBio)) {
 						const wBio = $.open(wikiBio);
 						artGenre_w[i] = this.getTag(wBio, 'Genre: ').tag;
+						if (!locale[i] && notify) locale[i] = this.getTag(wBio, kww).tag;
+					}
+				}
+				if (cfg.tagEnabled4 || !locale[i] && notify || force) {
+					artGenre_am[i] = '';
+					const amBio = panel.cleanPth(cfg.pth.foAmBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foAmBio + '.txt';
+					if ($.file(amBio)) {
+						const aBio = $.open(amBio);
+						artGenre_am[i] = this.getTag(aBio, 'Genre: ').tag;
+						const localeTag = this.getTag(aBio, 'Formed: |Born: ').tag;
+						if (localeTag.length && !/\s*in\s/.test(localeTag[0])) localeTag.shift();
+						if (localeTag.length && /\s*in\s/.test(localeTag[0])) localeTag[0] = localeTag[0].split(/\s*in\s/)[1].trim();
+						if (!locale[i] && notify) locale[i] = localeTag;
+						if (!locale[i].length) locale[i] = '';
 					}
 				}
 			} else {
@@ -296,7 +305,7 @@ class Tagger {
 			if (albumArtist + album != cur_albumArtist + cur_album) {
 				cur_albumArtist = albumArtist;
 				cur_album = album;
-				if (cfg.tagEnabled0 || cfg.tagEnabled1 || cfg.tagEnabled2 || cfg.tagEnabled3) {
+				if (cfg.tagEnabled0 || cfg.tagEnabled1 || cfg.tagEnabled2 || cfg.tagEnabled3 || force) {
 					albGenre_am[i] = '';
 					amMoods[i] = '';
 					amRating[i] = '';
@@ -308,8 +317,8 @@ class Tagger {
 					}
 					if ($.file(amRev)) {
 						const aRev = $.open(amRev);
-						if (cfg.tagEnabled0) albGenre_am[i] = this.getTag(aRev, 'Genre: ').tag;
-						if (cfg.tagEnabled1) amMoods[i] = this.getTag(aRev, 'Album Moods: ').tag;
+						if (cfg.tagEnabled0 || force) albGenre_am[i] = this.getTag(aRev, 'Genre: ').tag;
+						if (cfg.tagEnabled1 || force) amMoods[i] = this.getTag(aRev, 'Album Moods: ').tag;
 						if (cfg.tagEnabled2) {
 							const b = aRev.indexOf('>> Album rating: ') + 17;
 							const f = aRev.indexOf(' <<');
@@ -318,10 +327,10 @@ class Tagger {
 								if (amRating[i] == 0) amRating[i] = '';
 							}
 						}
-						if (cfg.tagEnabled3) amThemes[i] = this.getTag(aRev, 'Album Themes: ').tag;
+						if (cfg.tagEnabled3 || force) amThemes[i] = this.getTag(aRev, 'Album Themes: ').tag;
 					}
 				}
-				if (cfg.tagEnabled5 || cfg.tagEnabled6) {
+				if (cfg.tagEnabled5 || cfg.tagEnabled6 || force) {
 					albTags[i] = '';
 					albListeners[i] = '';
 					let lfmRev = panel.cleanPth(cfg.pth.foLfmRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foLfmRev + '.txt';
@@ -331,14 +340,14 @@ class Tagger {
 					}
 					if ($.file(lfmRev)) {
 						const lRev = $.open(lfmRev);
-						if (cfg.tagEnabled5) {
+						if (cfg.tagEnabled5 || force) {
 							albTags[i] = this.getTag(lRev, 'Top Tags: ').tag;
 							if (albTags[i]) albTags[i] = this.lfmTidy(albTags[i]);
 						}
 						if (cfg.tagEnabled6) albListeners[i] = this.getTag(lRev, lkw, false, 1, 'album').tag;
 					}
 				}
-				if (cfg.tagEnabled11) {
+				if (cfg.tagEnabled11 || force) {
 					albGenre_w[i] = '';
 					let wikiRev = panel.cleanPth(cfg.pth.foWikiRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foWikiRev + '.txt';
 					if (wikiRev.length > 259) {
@@ -386,8 +395,10 @@ class Tagger {
 		while (i--) handles.RemoveById(rem[i]);
 		if (handles.Count && tags.length && notify) {
 			window.NotifyOthers('biographyTags', {
+				artist: artists[0],
+				album: albums[0],
 				handle: handles[0],
-				selectionMode: !panel.id.focus ? 'Prefer nowplaying' : 'Follow selected track (playlist)',
+				selectionMode: !notifyFocus ? 'Prefer nowplaying' : 'Follow selected track (playlist)',
 				tags: tags[0]
 			});
 		}

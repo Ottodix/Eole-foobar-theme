@@ -37,7 +37,7 @@ class ResizeHandler {
 			const ed = gr.MeasureString(this.editText(), this.editorFont, 15, 15, panel.w - 15, panel.h - 15, this.lc);
 			gr.FillSolidRect(10, 10, ed.Width + 10, ed.Height + 10, ui.col.edBg);
 			if (!ppt.text_only && !ppt.img_only) {
-				if (ppt.style > 3) {
+				if (ppt.style > 4) {
 					if (!vk.k('shift')) gr.DrawRect(panel.ibox.l + 2, panel.ibox.t + 2, panel.ibox.w - 4, panel.ibox.h - 4, 5, RGB(0, 255, 0));
 					if (!vk.k('alt')) gr.DrawRect(panel.tbox.l + 2, panel.tbox.t + 2, panel.tbox.w - 4, panel.tbox.h - 4, 5, RGB(255, 0, 0));
 				} else if (ppt.style < 4) {
@@ -80,7 +80,7 @@ class ResizeHandler {
 	}
 
 	editText() {
-		return (ppt.text_only ? 'Type: Text Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : (ppt.img_only ? 'Type: Image Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : 'Name: ' + panel.style.name[ppt.style] + (ppt.style < 4 ? '\n\nType: Auto\n - Layout Adjust: Drag Line' + (panel.style.showFilmStrip && !ppt.img_only ? 's' : '') : '\n\nType: Freestyle\n - Layout Adjust: Drag Lines or Boxes: Ctrl (Any), Ctrl + Alt (Image), Ctrl + Shift (Text) or Ctrl + Alt + Shift (Filmstrip)\n - Overlay Strength: Shift + Wheel Over Text'))) + (img.isType('Refl') && !ppt.text_only ? '\n - Reflection Strength: Shift + Wheel Over Main Image' : '') + (!ppt.img_only ? '\n - Text Size: Ctrl + Wheel Over Text' : '') + '\n - Padding: Display Tab';
+		return (ppt.text_only ? 'Type: Text Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : (ppt.img_only ? 'Type: Image Only' + (panel.style.showFilmStrip ? '\n - Layout Adjust: Drag Line' : '') : 'Name: ' + panel.style.name[ppt.style] + (ppt.style < 4 ? '\n\nType: Auto\n - Layout Adjust: Drag Line' + (panel.style.showFilmStrip && !ppt.img_only && ppt.style != 4 ? 's' : '') + '\n - Image Strength: Shift + Wheel Over Text' : ppt.style == 4 ? '\n\nType: Auto' + (panel.style.showFilmStrip && !ppt.img_only ? '\n - Layout Adjust: Drag Line' : '') + '\n - Image Strength: Shift + Wheel Over Text' : '\n\nType: Freestyle\n - Layout Adjust: Drag Lines or Boxes: Ctrl (Any), Ctrl + Alt (Image), Ctrl + Shift (Text) or Ctrl + Alt + Shift (Filmstrip)\n - Overlay Strength: Shift + Wheel Over Text'))) + (img.isType('Refl') && !ppt.text_only && ppt.style != 4 ? '\n - Reflection Strength: Shift + Wheel Over Main Image' : '') + (!ppt.img_only ? '\n - Text Size: Ctrl + Wheel Over Text' : '') + '\n - ' + (ppt.style != 4 ? '' : 'Text ') +'Padding: Display Tab';
 	}
 
 	filmMove(x, y) {
@@ -151,7 +151,7 @@ class ResizeHandler {
 		this.down = false;
 		img.mask.reset = true;
 		if (ppt.style > 3) {
-			const obj = ppt.style == 4 ? panel.style.overlay : panel.style.free[ppt.style - 5];
+			const obj = ppt.style == 4 || ppt.style == 5 ? panel.style.overlay : panel.style.free[ppt.style - 6];
 			const imL = Math.round(panel.im.l * panel.w);
 			const imR = Math.round(panel.im.r * panel.w);
 			const imT = Math.round(panel.im.t * panel.h);
@@ -190,12 +190,12 @@ class ResizeHandler {
 		}
 		filmStrip.clearCache();
 		if (panel.style.showFilmStrip && ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
-		txt.refresh(this.updFilm ? 0 : 5);
+		txt.refresh(this.updFilm ? 0 : 3);
 		filmStrip.paint();
 	}
 
 	imgMove(x, y) {
-		if (!this.focus || ppt.img_only || ppt.text_only) return;
+		if (!this.focus || ppt.img_only || ppt.text_only || ppt.style == 4) return;
 		switch (true) {
 			case ppt.style > 3: {
 				if (!vk.k('ctrl') || vk.k('shift')) break;
@@ -329,7 +329,7 @@ class ResizeHandler {
 	}
 
 	move(x, y) {
-		if (ppt.style < 4 || ppt.img_only || ppt.text_only || !vk.k('ctrl') || vk.k('alt') || !this.focus) return;
+		if (ppt.style < 4 || ppt.img_only || ppt.text_only || !vk.k('ctrl') || vk.k('alt') || !this.focus || ppt.style == 4) return;
 		if (!this.down) {
 			this.st = y > panel.tbox.t - 5 && y < panel.tbox.t + 5 && x > panel.tbox.l + 10 && x < panel.tbox.l + panel.tbox.w - 10 ? 'top' :
 				y > panel.tbox.t - 5 && y < panel.tbox.t + 15 && x > panel.tbox.l && x < panel.tbox.l + 10 ? 'nw' :

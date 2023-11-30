@@ -2,6 +2,7 @@
 
 if (typeof my_utils === 'undefined') include('biography\\scripts\\utils.js');
 
+let isRadioStreamParser = false;
 const loadAsync = window.GetProperty('Load Biography Asynchronously', true);
 
 async function readFiles(files) {
@@ -18,6 +19,7 @@ const files = [
 	'properties.js',
 	'settings.js',
 	'interface.js',
+	'language.js',
 	'panel.js',
 	'server.js',
 	'allmusic.js',
@@ -38,7 +40,7 @@ const files = [
 	'popupbox.js',
 	'initialise.js',
 	'callbacks.js',
-	'eole.js'		
+	'eole.js'	
 ];
 
 if (loadAsync) {

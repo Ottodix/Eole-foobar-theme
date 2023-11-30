@@ -2,7 +2,7 @@
 
 class Timers {
 	constructor() {
-		['dl', 'img', 'lyrics', 'sim1', 'sim2', 'source', 'transition', 'zSearch'].forEach(v => this[v] = {
+		['dl', 'img', 'lyrics', 'sim1', 'sim2', 'source', 'transition', 'tt', 'zSearch'].forEach(v => this[v] = {
 			id: null
 		});
 
@@ -44,5 +44,13 @@ class Timers {
 	res(force) {
 		window.NotifyOthers('bio_getImg', force);
 		if ($.server) img.grab(force);
+	}
+	
+	tooltip() {
+		this.clear(this.tt);
+		this.tt.id = setTimeout(() => {
+			txt.deactivateTooltip();
+			this.tt.id = null;
+		}, 5000);
 	}
 }
