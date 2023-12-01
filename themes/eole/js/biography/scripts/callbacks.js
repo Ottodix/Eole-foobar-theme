@@ -1,7 +1,11 @@
 ﻿'use strict';
 
+var show_lyrics_btns = window.GetProperty("show lyrics btns", false);
+var ww = 0,
+	wh = 0;
 function on_colours_changed() {
 	ui.getColours();
+	if (panel.id.lyricsSource) lyrics.setCol();										
 	alb_scrollbar.setCol();
 	art_scrollbar.setCol();
 	img.createImages();
@@ -75,6 +79,7 @@ function on_item_focus_change() {
 
 function on_key_down(vkey) {
 	switch (vkey) {
+		case VK_ESCAPE: if(g_uihacks.getFullscreenState()) g_uihacks.toggleFullscreen(); break; 																				  
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -162,6 +167,8 @@ function on_mouse_lbtn_dblclk(x, y) {
 }
 
 function on_mouse_lbtn_down(x, y) {
+	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);		
+	var hover_btn = btns_manager.on_mouse("lbtn_down",x, y);
 	if (!ppt.panelActive) return;
 	if (ppt.touchControl) panel.id.last_pressed_coord = {
 		x: x,
@@ -181,19 +188,22 @@ function on_mouse_lbtn_down(x, y) {
 }
 
 function on_mouse_lbtn_up(x, y) {
-	if (!ppt.panelActive) {panel.inactivate(); return;}
-	alb_scrollbar.lbtn_drag_up();
-	art_scrollbar.lbtn_drag_up();
-	art_scroller.lbtn_drag_up();
-	cov_scroller.lbtn_drag_up();
-	if (!ppt.dblClickToggle && !but.Dn && !seeker.dn && !panel.trace.film) panel.click(x, y);
-	if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_up();
-	panel.clicked = false;
-	resize.lbtn_up();
-	but.lbtn_up(x, y);
-	filmStrip.lbtn_up(x, y);
-	img.lbtn_up();
-	seeker.lbtn_up();
+	var down_btn = btns_manager.on_mouse("lbtn_up",x, y);
+	if(!down_btn){	
+		if (!ppt.panelActive) {panel.inactivate(); return;}
+		alb_scrollbar.lbtn_drag_up();
+		art_scrollbar.lbtn_drag_up();
+		art_scroller.lbtn_drag_up();
+		cov_scroller.lbtn_drag_up();
+		if (!ppt.dblClickToggle && !but.Dn && !seeker.dn && !panel.trace.film) panel.click(x, y);
+		if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_up();
+		panel.clicked = false;
+		resize.lbtn_up();
+		but.lbtn_up(x, y);
+		filmStrip.lbtn_up(x, y);
+		img.lbtn_up();
+		seeker.lbtn_up();
+	}
 }
 
 function on_mouse_leave() {
@@ -208,6 +218,9 @@ function on_mouse_leave() {
 	img.leave();
 	filmStrip.leave();
 	panel.m.y = -1;
+	btns_manager.on_mouse("leave");
+	g_cursor.x = 0;
+    g_cursor.y = 0;				 
 }
 
 function on_mouse_mbtn_up(x, y, mask) {
@@ -228,7 +241,9 @@ function on_mouse_mbtn_up(x, y, mask) {
 	}
 }
 
-function on_mouse_move(x, y) {
+function on_mouse_move(x, y, m) {
+	if(x == g_cursor.x && y == g_cursor.y) return;
+	g_cursor.onMouse("move", x, y, m);							   
 	if (!ppt.panelActive) return;
 	if (panel.m.x == x && panel.m.y == y) return;
 	panel.move(x, y);
@@ -244,6 +259,7 @@ function on_mouse_move(x, y) {
 	filmStrip.move(x, y);
 	panel.m.x = x;
 	panel.m.y = y;
+	btns_manager.on_mouse("move",x, y);									 
 }
 
 function on_mouse_rbtn_up(x, y) {
@@ -290,6 +306,12 @@ function on_notify_data(name, info) {
 		on_cui_notify(name, clone);
 	}
 	switch (name) {
+		case 'show_lyrics_btns':
+			show_lyrics_btns = info;
+			window.SetProperty("show lyrics btns", show_lyrics_btns);
+			window.Repaint();
+			break;	
+		case "lyrics_state": lyrics_state.value = info; positionButtons(); break;																 
 		case 'bio_chkTrackRev':
 			if (!$.server && ppt.showTrackRevOptions) {
 				clone = JSON.parse(JSON.stringify(info));
@@ -443,6 +465,7 @@ function on_paint(gr) {
 	but.draw(gr);
 	resize.drawEd(gr);
 	ui.lines(gr);
+	if(show_lyrics_btns) btns_manager.draw(gr);												   
 }
 
 function on_playback_dynamic_info_track() {
