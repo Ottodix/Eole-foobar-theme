@@ -241,9 +241,7 @@ function on_mouse_mbtn_up(x, y, mask) {
 	}
 }
 
-function on_mouse_move(x, y, m) {
-	if(x == g_cursor.x && y == g_cursor.y) return;
-	g_cursor.onMouse("move", x, y, m);							   
+function on_mouse_move(x, y) {							   
 	if (!ppt.panelActive) return;
 	if (panel.m.x == x && panel.m.y == y) return;
 	panel.move(x, y);
