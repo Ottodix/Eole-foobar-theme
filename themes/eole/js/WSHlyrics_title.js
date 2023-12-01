@@ -20,7 +20,7 @@ var properties = {
     wallpaperdisplay: window.GetProperty("Wallpaper 0=Filling 1=Adjust 2=Stretch", 2),
 	showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
 	darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
-	stick2darklayout: window.GetProperty("_DISPLAY: stick to Dark layout", false),
+	stick2darklayout: window.GetProperty("_DISPLAY: stick to Dark layout", true),
     album_review: window.GetProperty("_SYSTEM: Display album review", false)
 }
 function build_buttons(){
@@ -28,8 +28,7 @@ function build_buttons(){
 		buttons.LyricsWidth.N_img = images.lyrics_off_icon;
 		buttons.LyricsWidth.H_img = images.lyrics_off_hover_icon;
 		buttons.LyricsWidth.D_img = buttons.LyricsWidth.H_img;
-	} 
-	else {
+	} else {
 		btn_initialized = true;
 		buttons = {
 			//LyricsWidth: new JSButton(0, 0, 40, images.lyrics_off_icon.Height, "Bio", "Bio", "Show biography", function () {
@@ -106,12 +105,12 @@ function on_font_changed() {
 function get_colors() {
 	get_colors_global();
 	if(properties.darklayout || properties.stick2darklayout){
-		colors.highlight_txt = RGB(75,165,255);
+		colors.highlight_txt = RGB(255,193,0);
 		colors.icons_folder = "white";
 		colors.btn_inactive_opacity = 255;
 		colors.inactive_txt = colors.normal_txt;
 	} else {
-		colors.highlight_txt = RGB(0,128,255);
+		colors.highlight_txt = RGB(215,155,0);
 		colors.icons_folder = "";
 		colors.btn_inactive_opacity = 255;
 		colors.inactive_txt = colors.normal_txt;
@@ -123,6 +122,13 @@ function get_colors() {
 	eslPanel.SetBackgroundColor(colors.normal_bg);
 	lyrics_first_load = utils.Glob(SettingsPath+""+"LYRICSFIRSTLOAD_*");
 	if(lyrics_first_load.length<1){
+	// 	esl.ShowDesktopLyric = false;
+	// 	esl.DesktopLyricAlwaysOnTop = false;
+		eslPanel.SetTextFont("Segoe UI", 12, 0);
+		eslPanel.SetVertMargin(0);
+		eslPanel.SetHorizMargin(13);
+		eslPanel.SetLineSpace(8);
+		eslPanel.SetSentenceSpace(0);			   
 		g_files.CreateTextFile(SettingsPath+"LYRICSFIRSTLOAD_0", true).Close();			
 	}
 };
