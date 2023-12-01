@@ -13,7 +13,7 @@ my_utils.packageInfo = {};
 my_utils.packageInfo.Directories = {};
 my_utils.packageInfo.Directories.Assets = biography_assets;
 my_utils.packageInfo.Directories.Scripts = biography_scripts;
-my_utils.packageInfo.Directories.Storage = ProfilePath+"yttm\\art_img";
+my_utils.packageInfo.Directories.Storage = ProfilePath+"yttm";
 
 //my_utils.scriptInfo = window.ScriptInfo;
 //my_utils.packageInfo = utils.GetPackageInfo(my_utils.scriptInfo.PackageId);
