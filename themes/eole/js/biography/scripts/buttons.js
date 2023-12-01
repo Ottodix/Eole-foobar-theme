@@ -104,6 +104,11 @@ class Buttons {
 		this.lookUp.scale = Math.round(this.lookUp.zoomSize / this.lookUp.baseSize * 100);
 		this.lookUp.font = gdi.Font('FontAwesome', 15 * this.lookUp.scale / 100, 0);
 		this.lookUp.fontLock = gdi.Font('FontAwesome', 14 * this.lookUp.scale / 100, 0);
+		if (ui.fontAwesomeInstalled) {
+			this.lookUp.icon = '\uF107';
+		} else {
+			this.lookUp.icon = '\u02C5';
+		}
 
 		this.scr.btns = this.scr.albBtns.concat(this.scr.artBtns);
 		this.src.iconFont = this.src.font;
@@ -226,7 +231,7 @@ class Buttons {
 		if (n == 'all' || n == 'lookUp') {
 			this.lookUp.col = $.toRGB(ui.col.text);
 			$.gr(1, 1, false, g => {
-				this.lookUp.sz = Math.max(g.CalcTextWidth('\uF107', this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight('\uF107', this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
+				this.lookUp.sz = Math.max(g.CalcTextWidth(this.lookUp.icon, this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight(this.lookUp.icon, this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
 			});
 		}
 	}
@@ -378,7 +383,16 @@ class Buttons {
 		this.scr.init = false;
 		this.checkScrollBtns(x, y, hover_btn);
 		if (hover_btn) hand = hover_btn.hand;
-		if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
+		//if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
+		if (!resize.down) {
+			if(!hand && !seeker.hand && !filmStrip.hand && !(btns_manager.cur_btn && btns_manager.cur_btn.state == ButtonStates.hover)) {
+				window.SetCursor(32512);
+				this.hand = false;
+			} else if(hover_btn){
+				window.SetCursor(32649);
+				this.hand = true;
+			}
+		}	
 		if (hover_btn && hover_btn.hide) {
 			if (this.cur) {
 				this.cur.cs('normal');
@@ -859,8 +873,8 @@ class Btn {
 		const col = this.state !== 'down' ? ui.getBlend(this.item.hover, this.item.normal, this.transition_factor) : this.item.hover;
 		gr.SetTextRenderingHint(5);
 		if (!panel.lock) {
-			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
-			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
+			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
+			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
 		} else {
 			gr.DrawString('\uF023', but.lookUp.fontLock, col, this.x, this.y + 2 * $.scale, this.p1, this.p2, StringFormat(2, 0));
 		}

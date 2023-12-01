@@ -102,6 +102,8 @@ class UserInterface {
 
 		this.getColours();
 		this.getFont(true);
+		
+		this.fontAwesomeInstalled = utils.CheckFont("FontAwesome");
 
 		this.refresh = $.debounce(() => {
 			txt.refresh(3);
