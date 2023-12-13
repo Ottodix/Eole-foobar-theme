@@ -49,44 +49,52 @@ class Lyrics {
 	}
 
 	draw(gr) {
-		if (this.display()) {
-			const top = this.locus * this.lineHeight - this.locusOffset;
-			const transition_factor = $.clamp((this.lineHeight - this.scroll) / this.lineHeight, 0, 1);
-			const transition_factor_in = !this.lyrics[this.locus].multiLine ? transition_factor : 1;
-			const transition_factor_out = $.clamp(transition_factor_in * 3, 0, 1);
-			const alpha = Math.min(255 * transition_factor * 4 / 3, 255);
-			const blendIn = this.type.synced ? ui.getBlend(this.col.text_h, this.col.text, transition_factor_in) : this.col.text;
-			const blendOut = this.type.synced ? ui.getBlend(this.col.text, this.col.text_h, transition_factor_out) : this.col.text;
-			const y = this.y + this.scroll;
-			
-			let col = this.col.text;
+		if (!this.display()) return;
+		const top = this.locus * this.lineHeight - this.locusOffset;
+		const transition_factor = $.clamp((this.lineHeight - this.scroll) / this.lineHeight, 0, 1);
+		const transition_factor_in = !this.lyrics[this.locus].multiLine ? transition_factor : 1;
+		const transition_factor_out = $.clamp(transition_factor_in * 3, 0, 1);
+		const alpha = Math.min(255 * transition_factor * 4 / 3, 255);
+		const blendIn = this.type.synced ? ui.getBlend(ui.col.accent, ui.col.text, transition_factor_in) : ui.col.text;
+		const blendOut = this.type.synced ? ui.getBlend(ui.col.text, ui.col.accent, transition_factor_out) : ui.col.text;
+		const y = this.y + this.scroll;
 
-			let fadeBot = this.transBot[transition_factor];
-			if (!fadeBot) {
-				fadeBot = ui.RGBtoRGBA(col, alpha);
-				this.transBot[transition_factor] = fadeBot;
-			}
+		let col = ui.col.text;
 
-			let fadeTop = this.transTop[transition_factor];
-			if (!fadeTop) {
-				fadeTop = ui.RGBtoRGBA(col, 255 - alpha);
-				this.transTop[transition_factor] = fadeTop;
-			}
+		let fadeBot = !this.shadowEffect ? this.transBot[transition_factor] : col;
+		if (!fadeBot) {
+			fadeBot = $.RGBtoRGBA(col, alpha);
+			this.transBot[transition_factor] = fadeBot;
+		}
 
-			gr.SetTextRenderingHint(5);
+		let fadeTop = !this.shadowEffect ? this.transTop[transition_factor] : col;
+		if (!fadeTop) {
+			fadeTop = $.RGBtoRGBA(col, 255 - alpha);
+			this.transTop[transition_factor] = fadeTop;
+		}
 
-			this.lyrics.forEach((lyric, i) => {
-				const lyric_y = this.lineHeight * i;
-				const line_y = Math.round(y - top + lyric_y);
-				const bottomLine = line_y > this.bot;
-				if (this.showlyric(lyric_y, top)) {
-					col = line_y >= this.top ? lyric.highlight ? blendIn : i == this.locus - 1 ? blendOut : bottomLine ? fadeBot : this.col.text : fadeTop;
-					gr.DrawString(lyric.content, ui.font.lyrics, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
+		gr.SetTextRenderingHint(5);
+
+		this.lyrics.forEach((lyric, i) => {
+			const lyric_y = this.lineHeight * i;
+			const line_y = Math.round(y - top + lyric_y);
+			const bottomLine = line_y > this.bot;
+			if (this.showlyric(lyric_y, top)) {
+				const font = !lyric.highlight ? ui.font.lyrics : this.font.lyrics;
+				if (this.shadowEffect) {
+					if (this.dropNegativeShadowLevel) {
+						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x - this.dropNegativeShadowLevel, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
+						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x, line_y - this.dropNegativeShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
+					}
+					
+					gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x + this.dropShadowLevel, line_y + this.dropShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
 				}
-			});
-			if (this.showOffset) {
-				gr.DrawString(`Offset: ${this.userOffset / 1000}s`, ui.font.main, this.col.text_h, this.x, this.top, this.w, this.lineHeight + 1, this.alignRight);
+				col = line_y >= this.top ? lyric.highlight ? blendIn : i == this.locus - 1 ? blendOut : bottomLine ? fadeBot : ui.col.text : fadeTop;
+				gr.DrawString(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
 			}
+		});
+		if (this.showOffset) {
+			gr.DrawString(`Offset: ${this.userOffset / 1000}s`, ui.font.main, ui.col.lyrAccent, this.x, this.top, this.w, this.lineHeight + 1, this.alignRight);
 		}
 	}
 
@@ -95,7 +103,7 @@ class Lyrics {
 			if (isSynced && lyrics[0].content && lyrics[0].timestamp > this.durationScroll) lyrics.unshift({timestamp: 0, content: ''});
 			$.gr(1, 1, false, g => {
 				for (let i = 0; i < lyrics.length; i++) {
-					const l = g.EstimateLineWrap(lyrics[i].content, ui.font.lyrics, this.w - 10);
+					const l = g.EstimateLineWrap(lyrics[i].content, this.font.lyrics, this.w - 10);
 					if (l[1] > this.maxLyrWidth) this.maxLyrWidth = l[1];
 					if (l.length > 2) {
 						const numLines = l.length / 2;
@@ -169,10 +177,13 @@ class Lyrics {
 			this.lyr = lyr;	
 			this.userOffset = 0;
 		}
+		this.font = {
+			lyrics: !ppt.largerSyncLyricLine ? ui.font.lyrics : gdi.Font(ui.font.main.Name, ui.font.zoomSize * 1.33, ui.font.lyrics.Style)
+		}
 		this.alignCenter = StringFormat(1, 1);
 		this.alignRight = StringFormat(2, 1);
 		this.init = true;
-		this.lineHeight = ui.font.lyrics_h + 4 * $.scale + ppt.textPad;
+		this.lineHeight = !ppt.largerSyncLyricLine ? ui.font.lyrics_h + 4 * $.scale : ui.font.lyrics_h * 1.33;
 		ppt.lyricsScrollTimeMax = $.clamp(Math.round(ppt.lyricsScrollTimeMax), 0, 3000);
 		ppt.lyricsScrollTimeAvg = $.clamp(Math.round(ppt.lyricsScrollTimeAvg), 0, 3000);
 		this.durationScroll = ppt.lyricsScrollMaxMethod ? ppt.lyricsScrollTimeMax : Math.round(ppt.lyricsScrollTimeAvg * 2 / 3);
@@ -185,7 +196,9 @@ class Lyrics {
 		this.minDurationScroll = Math.min(this.durationScroll, 250); 
 		this.newHighlighted = false;
 		this.scroll = 0;
-		this.setCol();
+		this.shadowEffect = ppt.dropShadowLevel > 0;
+		this.dropShadowLevel = ppt.dropShadowLevel;
+		this.dropNegativeShadowLevel = this.dropShadowLevel > 1 ? Math.floor(this.dropShadowLevel / 2) : 0;
 		this.showOffsetTimer = null;
 		this.timer = null;
 		this.trackLength = parseInt(this.tfLength.Eval(true));
@@ -195,13 +208,13 @@ class Lyrics {
 		ppt.lyricsFadeHeight = $.clamp(ppt.lyricsFadeHeight, -1, 2)
 		const fadeHeight = this.lineHeight * ppt.lyricsFadeHeight;
 		this.x = panel.text.l;
-		this.y = panel.text.t - this.lineHeight + fadeHeight;
+		this.y = panel.text.t - (!this.shadowEffect ? this.lineHeight + fadeHeight : 0);
 		this.w = panel.text.w;
-		this.h = panel.lines_drawn * ui.font.main_h + this.lineHeight * 2 - fadeHeight * 2;
-	
+		this.h = panel.lines_drawn * ui.font.main_h + (!this.shadowEffect ? this.lineHeight * 2 - fadeHeight * 2 : 0);
 		const linesDrawn = Math.floor(this.h / this.lineHeight);
 		const oddNumLines = linesDrawn % 2;
-
+		const realHeight = this.lineHeight * linesDrawn;
+		
 		this.locusOffset = this.h / 2 - (oddNumLines ? this.lineHeight / 2 : this.lineHeight);
 		this.top = this.locusOffset - this.lineHeight * (Math.floor(linesDrawn / 2) - (oddNumLines ? 1 : 2)) + this.y;
 		this.bot = this.top + this.lineHeight * (linesDrawn - 3);
@@ -314,25 +327,13 @@ class Lyrics {
 		}
 	}
 
-	setCol() {
-		let valid = false;
-		if (ui.blur.dark && ppt.text_hUse) {
-			const c = ppt.text_h.replace(/[^0-9.,-]/g, '').split(/[,-]/);
-			if (c.length == 3 || c.length == 4) valid = true;
-		}
-		this.col = {
-			text: ui.col.text,
-			text_h: !ui.blur.dark || ppt.text_hUse && valid ? ui.col.text_h : RGB(128, 228, 0)
-		}
-	}
-
 	setHighlight() {
 		const id = this.lyrics[this.locus].id;
 		if (this.type.synced) this.lyrics.forEach(v => {if (v.id == id) v.highlight = true});
 	}
 	
 	showlyric(y, top) {
-		return y >= top && y + this.lineHeight * 2 <= this.h + top;
+		return y >= top && y + this.lineHeight * (!this.shadowEffect ? 2 : 1) <= this.h + top;
 	}
 
 	smoothScroll() {
@@ -358,6 +359,6 @@ class Lyrics {
 	}
 
 	tidy(n) {
-		return n.replace(this.timestamps, '$1$4').replace(this.enhancedTimestamps, '$1$4').replace(/&amp(;|)/g, '&').replace(/&quot(;|)/g, '"').replace(/&#39(;|)/g, "'").replace(/&gt(;|)/g, '>').replace(/&lt(;|)/g, '<').replace(/&nbsp(;|)/g, '').trim();
+		return n.replace(this.timestamps, '$1$4').replace(this.enhancedTimestamps, '$1$4').trim();
 	}
 }

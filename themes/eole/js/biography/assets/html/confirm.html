@@ -39,11 +39,12 @@
 			if (parsed_args) {
 				document.title = parsed_args[0];
 				window.div_text.innerText = parsed_args[1];
+				if (parsed_args[5] == 'center') window.div_text.style.textAlign = "center";
 				var labelInnerHtml = window.btn_ok.innerHTML;
 				window.btn_ok.innerHTML = labelInnerHtml.replace(/Yes/g, parsed_args[2]);
 				var labelInnerHtml = window.btn_cancel.innerHTML;
 				window.btn_cancel.innerHTML = labelInnerHtml.replace(/No/g, parsed_args[3]);
-				callback = parsed_args[4];
+				callback = parsed_args[6];
 			}
 
 			var window_w = 558;

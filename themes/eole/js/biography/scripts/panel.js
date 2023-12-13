@@ -83,15 +83,32 @@ class Panel {
 			lockArt: '',
 			loadTimestamp: Date.now(),
 			lyricsSource: false,
+			nowplayingSource: false,
 			numServersChecked: false,
+			propsSource: false,
 			tr: '',
 			curTr: ''
 		}
 
 		for (let i = 0; i < 8; i++) {
-			if (ppt.txtReaderEnable && ppt[`pthTxtReader${i}`] && ppt[`lyricsTxtReader${i}`]) {
+			if (ppt.txtReaderEnable && ppt[`useTxtReader${i}`] && ppt[`pthTxtReader${i}`] && ppt[`lyricsTxtReader${i}`] && !/item_properties/i.test(utils.SplitFilePath(ppt[`pthTxtReader${i}`])[1]) && !/nowplaying/i.test(utils.SplitFilePath(ppt[`pthTxtReader${i}`])[1])) {
 				this.id.lyricsSource = true;
 				this.id.focus = false;
+				break;
+			}
+		}
+	
+		for (let i = 0; i < 8; i++) {
+			if (ppt.txtReaderEnable && ppt[`useTxtReader${i}`] && /nowplaying/i.test(utils.SplitFilePath(ppt[`pthTxtReader${i}`])[1])) {
+				this.id.nowplayingSource = true;
+				this.id.focus = false;
+				break;
+			}
+		}
+
+		for (let i = 0; i < 8; i++) {
+			if (ppt.txtReaderEnable && ppt[`useTxtReader${i}`] && /item_properties/i.test(utils.SplitFilePath(ppt[`pthTxtReader${i}`])[1])) {
+				this.id.propsSource = true;
 				break;
 			}
 		}
@@ -113,7 +130,7 @@ class Panel {
 		}
 
 		this.logo = {
-			img: null
+			img: my_utils.getImageAsset('Logo.png')
 		}
 
 		this.repaint = {
@@ -177,28 +194,10 @@ class Panel {
 			l: 0
 		}
 
+		this.checkRefreshRates();
 		this.setSummary();
 		this.similarArtistsKey = 'Similar Artists: |\\u00c4hnliche K\\u00fcnstler: |Artistas Similares: |Artistes Similaires: |Artisti Simili: |\\u4f3c\\u3066\\u3044\\u308b\\u30a2\\u30fc\\u30c6\\u30a3\\u30b9\\u30c8: |Podobni Wykonawcy: |Artistas Parecidos: |\\u041f\\u043e\\u0445\\u043e\\u0436\\u0438\\u0435 \\u0438\\u0441\\u043f\\u043e\\u043b\\u043d\\u0438\\u0442\\u0435\\u043b\\u0438: |Liknande Artister: |Benzer Sanat\\u00e7\\u0131lar: |\\u76f8\\u4f3c\\u827a\\u672f\\u5bb6: '; this.d = parseFloat(this.q('0000029142')); this.lfm = this.q($.s);
 		this.topAlbumsKey = 'Top Albums: |Top-Alben: |\\u00c1lbumes M\\u00e1s Escuchados: |Top Albums: |Album Pi\\u00f9 Ascoltati: |\\u4eba\\u6c17\\u30a2\\u30eb\\u30d0\\u30e0: |Najpopularniejsze Albumy: |\\u00c1lbuns Principais: |\\u041f\\u043e\\u043f\\u0443\\u043b\\u044f\\u0440\\u043d\\u044b\\u0435 \\u0430\\u043b\\u044c\\u0431\\u043e\\u043c\\u044b: |Toppalbum: |En Sevilen Alb\\u00fcmler: |\\u6700\\u4f73\\u4e13\\u8f91: ';
-
-		this.focusLoad = $.debounce(() => {
-			if (!ppt.img_only) txt.on_playback_new_track();
-			if (!ppt.text_only || ui.style.isBlur || ppt.showFilmStrip) img.on_playback_new_track();
-		}, 250, {
-			'leading': true,
-			'trailing': true
-		});
-
-		this.focusServer = $.debounce(() => {
-			this.changed();
-		}, 5000, {
-			'leading': true,
-			'trailing': true
-		});
-
-		this.lookUpServer = $.debounce(() => {
-			this.callServer(false, panel.id.focus, 'bio_lookUpItem', 0);
-		}, 1500);
 
 		if (!this.style.free || !$.isArray(this.style.free)) {
 			ppt.set('SYSTEM.Freestyle Custom BackUp', ppt.styleFree);
@@ -293,8 +292,46 @@ class Panel {
 	}
 
 	changed() {
-		if (panel.id.focus || !fb.IsPlaying) this.callServer(false, panel.id.focus, 'bio_lookUpItem', 0);
-		else if ($.server) this.callServer(false, panel.id.focus, '', 1);
+		if (this.id.focus || !fb.IsPlaying) this.callServer(false, this.id.focus, 'bio_lookUpItem', 0);
+		else if ($.server) this.callServer(false, this.id.focus, '', 1);
+	}
+	
+	checkRefreshRates() {
+		[
+			{key: 'focusLoadRate', descr: 'Panel Focus Load Refresh Rate', min: 200, max: 3000, oldDef: 250, newDef: 250},
+			{key: 'focusServerRate', descr: 'Panel Focus Server Refresh Rate', min: 1500, max: 15000, oldDef: 5000, newDef: 5000},
+			{key: 'lookUpServerRate', descr: 'Panel Lookup Refresh Rate', min: 1500, max: 15000, oldDef: 1500, newDef: 1500}
+		].forEach((rate) => {
+			const name = `${rate.descr} ${rate.min}-${rate.max} msec (Max)`;
+			const value = ppt.get(name, null);
+			if (value === null) {throw ('property_name: ' + name + '\nPanel\'s rate property name does not match range checked');}
+			else {
+				if (ppt[rate.key] === rate.oldDef && ppt[rate.key] !== rate.newDef) {ppt[rate.key] = rate.newDef;}
+				ppt[rate.key] = $.clamp(ppt[rate.key], rate.min, rate.max);
+				if (ppt[rate.key] !== Number(value)) {
+					ppt.set(name, ppt[rate.key]);
+				}
+			}
+		});
+
+		this.focusLoad = $.debounce(() => {
+			if (!ppt.img_only) txt.on_playback_new_track();
+			if (!ppt.text_only || ui.style.isBlur || ppt.showFilmStrip) img.on_playback_new_track();
+		}, ppt.focusLoadRate, {
+			'leading': ppt.focusLoadImmediate,
+			'trailing': true
+		});
+
+		this.focusServer = $.debounce(() => {
+			this.changed();
+		}, !ppt.focusLoadImmediate && ppt.focusServerRate == 5000 ? 2000 : ppt.focusServerRate, { // auto-adjust if !immediate & default value
+			'leading': ppt.focusLoadImmediate,
+			'trailing': true
+		});
+
+		this.lookUpServer = $.debounce(() => {
+			this.callServer(false, this.id.focus, 'bio_lookUpItem', 0);
+		}, ppt.lookUpServerRate);
 	}
 
 	checkNumServers() {
@@ -304,7 +341,7 @@ class Panel {
 	}
 
 	changeView(x, y, menu) {
-		if (!menu && (this.zoom() || x < 0 || y < 0 || x > this.w || y > this.h || but.Dn)) return false;
+		if (!menu && (this.zoom() || vk.k('alt') || x < 0 || y < 0 || x > this.w || y > this.h || but.Dn)) return false;
 		if (!menu && !ppt.dblClickToggle && this.isTouchEvent(x, y)) return false;
 		if (!menu && !ppt.img_only && (txt.scrollbar_type().onSbar && !txt.lyricsDisplayed())  || but.trace('heading', x, y) || but.trace('lookUp', x, y)) return false;
 		return true;
@@ -332,15 +369,9 @@ class Panel {
 	}
 
 	cleanPth(pth, item, type, artist, album, bio) {
+		if (!pth) return '';
 		pth = pth.trim().replace(/\//g, '\\');
-		if (pth.toLowerCase().includes('%profile%')) {
-			let fbPth = fb.ProfilePath.replace(/'/g, "''").replace(/([()[\]%,])/g, "'$1'");
-			if (fbPth.includes('$')) {
-				const fbPthSplit = fbPth.split('$');
-				fbPth = fbPthSplit.join("'$$'");
-			}
-			pth = pth.replace(/%profile%(\\|)/gi, fbPth);
-		}
+		pth = cfg.expandPath(pth);
 		switch (type) {
 			case 'remap':
 				pth = bio ? this.tfBio(pth, artist, item) : this.tfRev(pth, artist, album, item);
@@ -407,7 +438,7 @@ class Panel {
 				break;
 		}
 		if (ppt.img_only) img.setCrop(true);
-		sameStyle & !ui.show.btnRedLastfm ? but.check() : but.refresh(true);
+		but.refresh(true);
 		if (!sameStyle && ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
 		if (!ppt.artistView) img.setCheckArr(null);
 		this.move(x, y, true);
@@ -422,9 +453,9 @@ class Panel {
 				ns = input;
 			}
 		}
-		const caption = 'Create New Freestyle Layout';
-		const prompt = 'Enter new style name\n\nFreestyle layouts offer drag style positioning of image & text boxes + text overlay\n\nContinue?';
-		const fallback = soFeatures.gecko && soFeatures.clipboard ? popUpBox.input(caption, prompt, ok_callback, '', 'My Style') : true;
+		const caption = 'Create New Layout';
+		const prompt = 'This copies the current layout style & saves it to the entered name\n\nThe copy is in freestyle format that offers fully flexible drag style positioning of image & text boxes + overlay effects\n\nContinue?';
+		const fallback = popUpBox.isHtmlDialogSupported() ? popUpBox.input(caption, prompt, ok_callback, '', 'My Style') : true;
 		if (fallback) {
 			try {
 				ns = utils.InputBox(0, prompt, caption, 'My Style', true);
@@ -500,8 +531,8 @@ class Panel {
 			if (v.name == ns) ns = ns + ' New';
 		});
 		if (ppt.style > 3 && (ppt.img_only || ppt.text_only)) {
-			if (ppt.style - 5 >= this.style.free.length) this.getStyleFallback();
-			const obj = ppt.style == 4 ? this.style.overlay : this.style.free[ppt.style - 5];
+			if (ppt.style - 6 >= this.style.free.length) this.getStyleFallback();
+			const obj = ppt.style == 4 || ppt.style == 5 ? this.style.overlay : this.style.free[ppt.style - 6];
 			this.im.l = $.clamp(obj.imL, 0, 1);
 			this.im.r = $.clamp(obj.imR, 0, 1);
 			this.im.t = $.clamp(obj.imT, 0, 1);
@@ -526,9 +557,9 @@ class Panel {
 		ppt.styleFree = JSON.stringify(this.style.free);
 		this.style.free.some((v, i) => {
 			if (v.name == ns) {
-				if (ppt.sameStyle) ppt.style = i + 5;
-				else if (ppt.artistView) ppt.bioStyle = i + 5;
-				else ppt.revStyle = i + 5;
+				if (ppt.sameStyle) ppt.style = i + 6;
+				else if (ppt.artistView) ppt.bioStyle = i + 6;
+				else ppt.revStyle = i + 6;
 				return true;
 			}
 		})
@@ -549,7 +580,7 @@ class Panel {
 	deleteStyle(n) {
 		const continue_confirmation = (status, confirmed) => {
 			if (confirmed) {
-				this.style.free.splice(n - 5, 1);
+				this.style.free.splice(n - 6, 1);
 				ppt.styleFree = JSON.stringify(this.style.free);
 				ppt.style = 0;
 				if (!ppt.sameStyle) {
@@ -557,23 +588,24 @@ class Panel {
 					else ppt.revStyle = 0;
 				}
 				this.getStyleNames();
-				txt.refresh(0);
+				if (!ppt.showFilmStrip) txt.refresh(0);
+				else filmStrip.set(ppt.filmStripPos);
 			}
 		}
 		const caption = 'Delete Current Style';
 		const prompt = 'Delete: ' + this.style.name[n] + '\n\nStyle will be set to top';
-		const wsh = soFeatures.gecko && soFeatures.clipboard ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', continue_confirmation) : true;
+		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
 	draw(gr) {
 		let font = ui.font.main;
-		let str = 'POWERED by allmusic and last.fm.\r\n\r\nShift+middle click to activate / inactivate.';
+		let str = 'POWERED by allmusic, last.fm & Wikipedia.\r\n\r\nShift+middle click to activate / inactivate.';
 		let textHeight2;
 		
 		const textHeight1 = Math.round(gr.MeasureString(str, font, 10, 0, this.w - 20, 1000, StringFormat(1, 1)).Height);
 		const version = `  ${window.ScriptInfo.Name}: v${window.ScriptInfo.Version}`;
-		const versionHeight = gr.CalcTextHeight(version, ui.font.small)
+		const versionHeight = gr.CalcTextHeight(version, ui.font.small);
 		const txtSp = this.h * 0.37;
 		
 		if (textHeight1 > txtSp) {
@@ -591,9 +623,16 @@ class Panel {
 			textCol = ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0);
 			textCol_h = ui.dui ? window.GetColourDUI(2) : window.GetColourCUI(2);
 		}
+		const hAvail = (this.h - txtSp - versionHeight) * 0.9;
+		const wAvail = this.w * 0.9;
+		let scale = this.getScale(this.logo.img, wAvail, hAvail);
+		this.logo.w = scale[0];
+		this.logo.h = scale[1];
+		this.logo.x = (this.w - this.logo.w) / 2;
+		this.logo.y =  hAvail - this.logo.h + versionHeight + hAvail * 0.145;
 
 		gr.SetInterpolationMode(7);
-		if (this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, Math.max(this.logo.y, versionHeight), this.logo.w, this.logo.h, 0, 0, this.logo.img.Width, this.logo.img.Height);
+		if (this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.w, this.logo.h, 0, 0, this.logo.img.Width, this.logo.img.Height);
 		gr.SetInterpolationMode(0);
 		gr.GdiDrawText(version, ui.font.small, textCol_h, 0, 0, this.w, this.h, 0x00000800);
 		gr.GdiDrawText(str, font, textCol, 10, this.h - txtSp, this.w - 20, txtSp, txt.ncc);
@@ -602,12 +641,12 @@ class Panel {
 	exportStyle(n) {
 		const continue_confirmation = (status, confirmed) => {
 			if (confirmed) {
-				window.NotifyOthers('bio_customStyle', JSON.stringify(this.style.free[n - 5]));
+				window.NotifyOthers('bio_customStyle', JSON.stringify(this.style.free[n - 6]));
 			}
 		}
 		const caption = 'Export Current Style To Other Biography Panels';
 		const prompt = 'Export: ' + this.style.name[n];
-		const wsh = soFeatures.gecko && soFeatures.clipboard ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', continue_confirmation) : true;
+		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
@@ -619,10 +658,10 @@ class Panel {
 
 	getList(p_clear, isAlbum) {
 		if (!this.id.lookUp) return;
-		const artist = name.artist(panel.id.focus, true) || 'Artist Unknown';
-		const albumArtist = name.albumArtist(panel.id.focus, true) || 'Artist Unknown';
-		const composition = isAlbum ? false : ppt.classicalMusicMode && txt.rev.loaded.am && !txt.rev.amFallback && !txt.rev.wikiFallback;
-		const album = !composition ? name.album(panel.id.focus, true) || 'Album Unknown' : name.composition(panel.id.focus, true) || 'Composition Unknown';
+		const artist = name.artist(this.id.focus, true) || lg['Artist Unknown'];
+		const albumArtist = (!panel.isRadio(this.id.focus) ? name.albumArtist(this.id.focus, true) : artist) || lg['Artist Unknown'];
+		const composition = isAlbum ? false : ppt.classicalMusicMode && (txt.rev.loaded.am && !txt.rev.amFallback || txt.rev.loaded.wiki && !txt.rev.wikiFallback);
+		const album = !composition ? name.album(this.id.focus, true) || lg['Album Unknown'] : name.composition(this.id.focus, true) || lg['Composition Unknown'];
 		if (this.lock) {
 			this.logArtistHistory(artist);
 			this.logAlbumHistory(albumArtist, album, composition);
@@ -630,9 +669,9 @@ class Panel {
 		}
 
 		let k = 0;
-		const lfmBio = this.cleanPth(cfg.pth.foLfmBio, panel.id.focus) + $.clean(artist) + cfg.suffix.foLfmBio + '.txt';
+		const lfmBio = (!panel.isRadio(this.id.focus) ? this.cleanPth(cfg.pth.foLfmBio, this.id.focus) : this.cleanPth(cfg.remap.foLfmBio, this.id.focus, 'remap', artist, '', 1)) + $.clean(artist) + cfg.suffix.foLfmBio + '.txt';
 		const lBio = $.open(lfmBio);
-		const lfmSim = this.cleanPth(cfg.pth.foLfmSim, panel.id.focus) + $.clean(artist) + ' And Similar Artists.json';
+		const lfmSim = (!panel.isRadio(this.id.focus) ? this.cleanPth(cfg.pth.foLfmSim, this.id.focus) : this.cleanPth(cfg.remap.foLfmSim, this.id.focus, 'remap', artist, '', 1)) + $.clean(artist) + ' And Similar Artists.json';
 		const mult_arr = [];
 		let mn = '';
 		let nm = '';
@@ -657,7 +696,7 @@ class Panel {
 					$.take(lSim, cfg.menuSimilarNum);
 					if (lSim.length) {
 						this.art.list.push({
-							name: 'Similar Artists:',
+							name: lg['Similar Artists:'],
 							field: '',
 							type: 'label'
 						});
@@ -690,7 +729,7 @@ class Panel {
 					}
 					if (found && $.isArray(sa) && sa.length) {
 						this.art.list.push({
-							name: 'Similar Artists:',
+							name: lg['Similar Artists:'],
 							field: '',
 							type: 'label'
 						});
@@ -708,9 +747,9 @@ class Panel {
 			this.style.moreTags = false;
 			this.art.fields.forEach(v => {
 				nm = v.replace(/%/g, '');
-				for (let h = 0; h < $.eval('$meta_num(' + nm + ')', panel.id.focus); h++) {
+				for (let h = 0; h < $.eval('$meta_num(' + nm + ')', this.id.focus); h++) {
 					mn = '$trim($meta(' + nm + ',' + h + '))';
-					const name = $.eval(mn, panel.id.focus);
+					const name = $.eval(mn, this.id.focus);
 					if (this.art.list.every(v => v.name !== name) && name.toLowerCase() != cfg.va.toLowerCase()) mult_arr.push({
 						name: name,
 						field: ' ~ ' + $.titlecase(nm),
@@ -730,7 +769,7 @@ class Panel {
 			if (mult_arr.length) {
 				this.style.moreTags = true;
 				this.art.list.push({
-					name: 'More Tags:',
+					name: lg['More Tags:'],
 					field: '',
 					type: 'label'
 				});
@@ -752,7 +791,7 @@ class Panel {
 
 		if (this.art.history.length && ppt.showArtistHistory) {
 			this.art.list.push({
-				name: 'Artist History:',
+				name: lg['Artist History:'],
 				field: '',
 				type: 'label'
 			});
@@ -789,8 +828,8 @@ class Panel {
 			});
 			if (found && $.isArray(ta) && ta.length) {
 				this.alb.list.push({
-					artist: 'Last.fm Top Albums: ' + artist + ':',
-					album: 'Last.fm Top Albums: ' + artist + ':',
+					artist: lg['Last.fm Top Albums: '] + artist + ':',
+					album: lg['Last.fm Top Albums: '] + artist + ':',
 					type: 'label'
 				});
 				ta.forEach((v, i) => this.alb.list.push({
@@ -812,7 +851,7 @@ class Panel {
 		if (this.alb.history.length && ppt.showAlbumHistory) {
 			this.alb.list.push({
 				artist: '',
-				album: 'Album History:',
+				album: lg['Album History:'],
 				type: 'label'
 			});
 			for (let h = 0; h < this.alb.history.length; h++) {
@@ -828,21 +867,11 @@ class Panel {
 		if (!this.albumsSame() && p_clear) this.alb.ix = 0;
 	}
 
-	getLogo() {
-		this.logo.img = my_utils.getImageAsset('Logo.png');
-		if (!this.logo.img) return;
-		let scale = this.getScale(this.logo.img, this.w * Math.min(this.h * 0.8 / this.w, 0.9), this.h * 0.34);
-		this.logo.w = scale[0];
-		this.logo.h = scale[1];
-		this.logo.x = (this.w - this.logo.w) / 2;
-		this.logo.y = this.h * 0.05 + (this.h * 0.66 - this.logo.h) / 2;
-	}
-
 	getPth(sw, focus, artist, album, stnd, supCache, cleanArtist, cleanAlbumArtist, cleanAlbum, folder, basic, server) {
 		let fo, pth;
 		switch (sw) {
 			case 'bio':
-				if (stnd === '') stnd = this.stnd(this.art.ix, this.art.list);
+				if (stnd === '' || panel.isRadio(ppt.focus)) stnd = this.stnd(this.art.ix, this.art.list);
 				if (server) fo = stnd ? this.cleanPth(cfg.pth[folder], focus, 'server') : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
 				else fo = stnd && !this.lock ? this.cleanPth(cfg.pth[folder], focus) : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
 				pth = fo + cleanArtist + cfg.suffix[folder] + '.txt';
@@ -940,17 +969,8 @@ class Panel {
 	}
 
 	getStyleNames() {
-		this.style.name = ['Top', 'Right', 'Bottom', 'Left', 'Overlay'];
+		this.style.name = [lg['Top'], lg['Right'], lg['Bottom'], lg['Left'], lg['Full overlay'], lg['Part overlay']];
 		this.style.free.forEach(v => this.style.name.push(v.name));
-	}
-
-	isRadioFocused() {
-		if (this.lock) return true;
-		const fid = plman.ActivePlaylist.toString() + plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist).toString();
-		const np = plman.GetPlayingItemLocation();
-		let pid = -2;
-		if (np.IsValid) pid = plman.PlayingPlaylist.toString() + np.PlaylistItemIndex.toString();
-		return fid == pid;
 	}
 
 	imgBoxTrace(x, y) {
@@ -978,6 +998,15 @@ class Panel {
 		return fb.IsPlaying && fb.PlaybackLength <= 0 && (!focus || this.isRadioFocused());
 	}
 
+	isRadioFocused() {
+		if (this.lock) return true;
+		const fid = plman.ActivePlaylist.toString() + plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist).toString();
+		const np = plman.GetPlayingItemLocation();
+		let pid = -2;
+		if (np.IsValid) pid = plman.PlayingPlaylist.toString() + np.PlaylistItemIndex.toString();
+		return fid == pid;
+	}
+
 	isTouchEvent(x, y) {
 		return ppt.touchControl && Math.sqrt((Math.pow(this.id.last_pressed_coord.x - x, 2) + Math.pow(this.id.last_pressed_coord.y - y, 2))) > 3 * $.scale;
 	}
@@ -991,7 +1020,7 @@ class Panel {
 	}
 
 	logAlbumHistory(albumArtist, album, composition) {
-		if (albumArtist != 'Artist Unknown' && album != 'Album Unknown') this.alb.history.unshift({
+		if (albumArtist != lg['Artist Unknown'] && album != lg['Album Unknown']) this.alb.history.unshift({
 			artist: albumArtist,
 			album: album,
 			composition: composition,
@@ -1003,7 +1032,7 @@ class Panel {
 	}
 
 	logArtistHistory(artist) {
-		if (artist != 'Artist Unknown') this.art.history.unshift({
+		if (artist != lg['Artist Unknown']) this.art.history.unshift({
 			name: artist,
 			field: '',
 			type: 'history'
@@ -1016,22 +1045,22 @@ class Panel {
 	mbtn_up(x, y, menuLock, bypass) {
 		if ((x < 0 || y < 0 || x > this.w || y > this.h) && !bypass) return;
 		if (this.id.lookUp && (but.btns['lookUp'].trace(x, y) || menuLock || bypass)) {
-			if (panel.id.lyricsSource) {
+			if (this.id.lyricsSource || this.id.nowplayingSource) {
 				this.lock = 0;
 				return;
 			}
 			let mArtist = ppt.artistView && this.art.ix;
 			if (!this.lock && !mArtist) img.artistReset();
 			if (!this.lock) {
-				this.id.lockArt = $.eval(this.art.fields, panel.id.focus);
-				this.id.lockAlb = name.albID(panel.id.focus, 'full') + (this.style.inclTrackRev ? name.trackID(panel.id.focus) : '');
-				this.lockHandle = $.handle(panel.id.focus);
+				this.id.lockArt = $.eval(this.art.fields, this.id.focus);
+				this.id.lockAlb = name.albID(this.id.focus, 'full') + (this.style.inclTrackRev ? name.trackID(this.id.focus) : '');
+				this.lockHandle = $.handle(this.id.focus);
 				img.setAlbID();
-				img.cov.folder = panel.cleanPth(cfg.albCovFolder, panel.id.focus);
+				img.cov.folder = this.cleanPth(cfg.albCovFolder, this.id.focus);
 			}
 			if (!bypass) this.lock = this.lock == 0 || menuLock ? 1 : 0;
 			txt.curHeadingID = this.lock ? txt.headingID() : '';
-			if (!this.lock && (ppt.artistView && this.id.lockArt != $.eval(this.art.fields, panel.id.focus) || !ppt.artistView && this.id.lockAlb != name.albID(panel.id.focus, 'full') + (this.style.inclTrackRev ? name.trackID(panel.id.focus) : ''))) {
+			if (!this.lock && (ppt.artistView && this.id.lockArt != $.eval(this.art.fields, this.id.focus) || !ppt.artistView && this.id.lockAlb != name.albID(this.id.focus, 'full') + (this.style.inclTrackRev ? name.trackID(this.id.focus) : ''))) {
 				txt.on_playback_new_track(true);
 				img.on_playback_new_track(true);
 			}
@@ -1160,7 +1189,7 @@ class Panel {
 				this.style.free.forEach(v => {
 					if (v.name == input) input = input + ' New';
 				});
-				this.style.free[n - 5].name = input;
+				this.style.free[n - 6].name = input;
 				this.sort(this.style.free, 'name');
 				ppt.styleFree = JSON.stringify(this.style.free);
 				this.style.free.some((v, i) => {
@@ -1175,7 +1204,7 @@ class Panel {
 		}
 		const caption = 'Rename Current Style';
 		const prompt = 'Rename style: ' + this.style.name[n] + '\n\nEnter new name\n\nContinue?';
-		const fallback = soFeatures.gecko && soFeatures.clipboard ? popUpBox.input(caption, prompt, ok_callback, '', this.style.name[n]) : true;
+		const fallback = popUpBox.isHtmlDialogSupported() ? popUpBox.input(caption, prompt, ok_callback, '', this.style.name[n]) : true;
 		if (fallback) {
 			let ns = '';
 			let status = 'ok'
@@ -1211,7 +1240,7 @@ class Panel {
 			if (confirmed) {
 				if (ppt.style < 4) ppt.rel_imgs = 0.65;
 				else {
-					const obj = ppt.style == 4 ? this.style.overlay : this.style.free[ppt.style - 5];
+					const obj = ppt.style == 4 || ppt.style == 5 ? this.style.overlay : this.style.free[ppt.style - 6];
 					obj.name = this.style.name[n];
 					obj.imL = 0;
 					obj.imR = 0;
@@ -1221,14 +1250,14 @@ class Panel {
 					obj.txR = 0;
 					obj.txT = 0.632;
 					obj.txB = 0;
-					ppt.style == 4 ? ppt.styleOverlay = JSON.stringify(this.style.overlay) : ppt.styleFree = JSON.stringify(this.style.free);
+					ppt.style == 4 || ppt.style == 5 ? ppt.styleOverlay = JSON.stringify(this.style.overlay) : ppt.styleFree = JSON.stringify(this.style.free);
 				}
-				txt.refresh(5);
+				txt.refresh(3);
 			}
 		}
 		const caption = 'Reset Current Style';
-		const prompt = 'Reset to Default ' + (ppt.style < 4 ? this.style.name[n] : 'Overlay') + ' Style.\n\nContinue?'
-		const wsh = soFeatures.gecko && soFeatures.clipboard ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', continue_confirmation) : true;
+		const prompt = 'Reset to Default ' + (ppt.style < 5 ? this.style.name[n] : 'Overlay') + ' Style.\n\nContinue?'
+		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
@@ -1304,6 +1333,7 @@ class Panel {
 				this.text.r = (ppt.sbarShow ? Math.max(ppt.textR, ui.sbar.sp + sp2) : ppt.textR) + this.filmStripSize.r;
 				this.text.t = !ppt.topAlign ? ppt.textT + (this.h - ppt.textT + this.filmStripSize.t - ppt.textB - this.filmStripSize.b - this.lines_drawn * ui.font.main_h + ui.heading.h) / 2 : ppt.textT + ui.heading.h + this.filmStripSize.t;
 				this.text.w = this.w - this.text.l - this.text.r;
+				this.text.h = this.lines_drawn * ui.font.main_h;
 				this.heading.x = !this.style.fullWidthHeading ? this.text.l : ppt.textL;
 				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - this.heading.x - ppt.textR;
 				if (ppt.sbarShow) {
@@ -1321,20 +1351,19 @@ class Panel {
 				$.key.forEach(v => this.img[v] = this.bor[v] + (v != 'b' ? (!ppt.filmStripOverlay ? this.filmStripSize[v] : 0) : 0));
 				let txt_h = Math.round((this.h - this.img.t - ppt.textB - (!ppt.filmStripOverlay ? this.filmStripSize.b : 0)) * (1 - ppt.rel_imgs));
 				this.lines_drawn = Math.max(Math.floor((txt_h - ui.heading.h) / ui.font.main_h), 0);
-				txt_h = this.lines_drawn * ui.font.main_h + this.style.gap;
+				this.text.h = this.lines_drawn * ui.font.main_h;
+				txt_h = this.text.h + this.style.gap;
 				this.style.imgSize = Math.max(this.h - txt_h - this.img.t - (!ppt.filmStripOverlay ? this.filmStripSize.b : 0) - ppt.textB - ui.heading.h, 10);
 				this.text.l = ppt.textL + (!ppt.filmStripOverlay ? this.filmStripSize.l : 0);
 				this.text.r = (ppt.sbarShow ? Math.max(ppt.textR, ui.sbar.sp + sp2) : ppt.textR) + (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
 				this.text.t = this.img.t + this.style.imgSize + this.style.gap + ui.heading.h;
 				this.text.w = this.w - this.text.l - this.text.r;
 				this.heading.x = (!this.style.fullWidthHeading ? this.text.l : ppt.textL);
-				this.heading.w = !this.style.fullWidthHeading ? this.text.w : panel.w - ppt.textL - ppt.textR;
-				if (ppt.sbarShow) {
-					if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
-					else this.sbar.x = this.text.l + this.text.w + sp1;
-					this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.b ? this.text.t : this.img.t + this.style.imgSize) + this.sbar.top_corr;
-					this.sbar.h = (ui.sbar.type < this.sbar.style || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr : this.h - this.sbar.y) + bot_corr;
-				}
+				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - ppt.textL - ppt.textR;
+				if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
+				else this.sbar.x = this.text.l + this.text.w + sp1;
+				this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.b ? this.text.t : this.img.t + this.style.imgSize) + this.sbar.top_corr;
+				this.sbar.h = (ui.sbar.type < this.sbar.style || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr : this.h - this.sbar.y) + bot_corr;
 				this.repaint.x = this.text.l;
 				this.repaint.y = this.text.t;
 				this.repaint.w = this.w - this.repaint.x - (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
@@ -1357,11 +1386,9 @@ class Panel {
 				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - this.heading.x - this.bor.r;
 				if (this.style.fullWidthHeading) this.img.t = this.text.t;
 				this.img.l = ppt.textL + txt_sp + (!ppt.filmStripOverlay ? this.filmStripSize.l : 0) + this.style.gap + (ppt.sbarShow ? ui.sbar.sp + sp1 : 0);
-				if (ppt.sbarShow) {
-					this.sbar.x = this.text.l + this.text.w + sp1;
-					this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.t || this.filmStripSize.b ? this.text.t : 0) + this.sbar.top_corr;
-					this.sbar.h = ui.sbar.type < this.sbar.style || this.filmStripSize.t || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.h - this.sbar.y + bot_corr;
-				}
+				this.sbar.x = this.text.l + this.text.w + sp1;
+				this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.t || this.filmStripSize.b ? this.text.t : 0) + this.sbar.top_corr;
+				this.sbar.h = ui.sbar.type < this.sbar.style || this.filmStripSize.t || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.h - this.sbar.y + bot_corr;
 				this.repaint.x = this.text.l;
 				this.repaint.y = this.text.t;
 				this.repaint.w = this.img.l - this.repaint.x - this.style.gap;
@@ -1373,7 +1400,8 @@ class Panel {
 				$.key.forEach(v => this.img[v] = this.bor[v] + (v != 't' && v != 'b' ? (!ppt.filmStripOverlay ? this.filmStripSize[v] : 0) : 0));
 				let txt_h = Math.round((this.h - ppt.textT - this.img.b - (!ppt.filmStripOverlay ? this.filmStripSize.t : 0) - (!ppt.filmStripOverlay ? this.filmStripSize.b : 0)) * (1 - ppt.rel_imgs));
 				this.lines_drawn = Math.max(Math.floor((txt_h - ui.heading.h) / ui.font.main_h), 0);
-				txt_h = this.lines_drawn * ui.font.main_h + this.style.gap;
+				this.text.h = this.lines_drawn * ui.font.main_h;
+				txt_h = this.text.h + this.style.gap;
 				this.style.imgSize = Math.max(this.h - txt_h - ppt.textT - this.img.b - (!ppt.filmStripOverlay ? this.filmStripSize.t : 0) - (!ppt.filmStripOverlay ? this.filmStripSize.b : 0) - ui.heading.h, 10);
 				this.img.t = this.h - this.bor.b - this.style.imgSize - (!ppt.filmStripOverlay ? this.filmStripSize.b : 0);
 				this.text.l = ppt.textL + (!ppt.filmStripOverlay ? this.filmStripSize.l : 0);
@@ -1381,13 +1409,11 @@ class Panel {
 				this.text.t = this.img.t - txt_h;
 				this.text.w = this.w - this.text.l - this.text.r;
 				this.heading.x = (!this.style.fullWidthHeading ? this.text.l : ppt.textL);
-				this.heading.w = !this.style.fullWidthHeading ? this.text.w : panel.w - ppt.textL - ppt.textR;
-				if (ppt.sbarShow) {
-					if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
-					else this.sbar.x = this.text.l + this.text.w + sp1;
-					this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading ? this.text.t : 0) + this.sbar.top_corr;
-					this.sbar.h = ui.sbar.type < this.sbar.style ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.img.t - this.sbar.y + bot_corr;
-				}
+				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - ppt.textL - ppt.textR;
+				if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
+				else this.sbar.x = this.text.l + this.text.w + sp1;
+				this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading ? this.text.t : 0) + this.sbar.top_corr;
+				this.sbar.h = ui.sbar.type < this.sbar.style ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.img.t - this.sbar.y + bot_corr;
 				this.repaint.x = this.text.l;
 				this.repaint.y = this.text.t;
 				this.repaint.w = this.w - this.repaint.x - (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
@@ -1409,12 +1435,10 @@ class Panel {
 				this.heading.x = !this.style.fullWidthHeading ? this.text.l : this.bor.l;
 				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - this.heading.x - ppt.textR;
 				if (this.style.fullWidthHeading) this.img.t = this.text.t;
-				if (ppt.sbarShow) {
-					if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
-					else this.sbar.x = this.text.l + this.text.w + sp1;
-					this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.t || this.filmStripSize.b ? this.text.t : 0) + this.sbar.top_corr;
-					this.sbar.h = ui.sbar.type < this.sbar.style || this.filmStripSize.t || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.h - this.sbar.y + bot_corr;
-				}
+				if (!this.filmStripSize.r) this.sbar.x = this.w - ui.sbar.sp;
+				else this.sbar.x = this.text.l + this.text.w + sp1;
+				this.sbar.y = (ui.sbar.type < this.sbar.style || ppt.heading || this.filmStripSize.t || this.filmStripSize.b ? this.text.t : 0) + this.sbar.top_corr;
+				this.sbar.h = ui.sbar.type < this.sbar.style || this.filmStripSize.t || this.filmStripSize.b ? ui.font.main_h * this.lines_drawn + bot_corr * 2 : this.h - this.sbar.y + bot_corr;
 				this.repaint.x = this.text.l;
 				this.repaint.y = this.text.t;
 				this.repaint.w = this.w - this.repaint.x - (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
@@ -1423,8 +1447,8 @@ class Panel {
 			}
 
 			case ppt.style > 3: {
-				if (ppt.style - 5 >= this.style.free.length) this.getStyleFallback();
-				const obj = ppt.style == 4 ? this.style.overlay : this.style.free[ppt.style - 5];
+				if (ppt.style - 6 >= this.style.free.length) this.getStyleFallback();
+				const obj = ppt.style == 4 || ppt.style == 5 ? this.style.overlay : this.style.free[ppt.style - 6];
 				if (!bypass) {
 					this.im.l = $.clamp(obj.imL, 0, 1);
 					this.im.r = $.clamp(obj.imR, 0, 1);
@@ -1439,24 +1463,23 @@ class Panel {
 				const imR = Math.round(this.im.r * this.w) + (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
 				const imT = Math.round(this.im.t * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.t : 0);
 				const imB = Math.round(this.im.b * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.b : 0);
-				const txL = Math.round(this.tx.l * this.w) + (!ppt.filmStripOverlay ? this.filmStripSize.l : 0);
-				const txR = Math.round(this.tx.r * this.w) + (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
-				const txT = Math.round(this.tx.t * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.t : 0);
-				const txB = Math.round(this.tx.b * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.b : 0);
+				const txL = ppt.style == 4 ? 0 : Math.round(this.tx.l * this.w) + (!ppt.filmStripOverlay ? this.filmStripSize.l : 0);
+				const txR = ppt.style == 4 ? 0 : Math.round(this.tx.r * this.w) + (!ppt.filmStripOverlay ? this.filmStripSize.r : 0);
+				const txT = ppt.style == 4 ? 0 : Math.round(this.tx.t * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.t : 0);
+				const txB = ppt.style == 4 ? 0 : Math.round(this.tx.b * this.h) + (!ppt.filmStripOverlay ? this.filmStripSize.b : 0);
 				this.ibox.l = Math.max(imL, 0);
 				this.ibox.t = Math.max(imT, 0);
 				this.ibox.w = this.w - imL - imR;
 				this.ibox.h = this.h - imT - imB;
-				this.img.l = imL + this.bor.l;
-				this.img.r = imR + this.bor.r;
-				this.img.t = imT + this.bor.t;
-				this.img.b = imB + this.bor.b;
-
-				const t_l = ppt.textL + ui.overlay.borderWidth;
-				const t_t = ppt.textT + ui.overlay.borderWidth;
-				let t_r = ppt.textR + ui.overlay.borderWidth;
-				let t_b = ppt.textB + ui.overlay.borderWidth;
-				if (ppt.typeOverlay == 2 || ppt.typeOverlay == 4) {
+				this.img.l = ppt.style == 4 ? 0 : imL + this.bor.l;
+				this.img.r = ppt.style == 4 ? 0 : imR + this.bor.r;
+				this.img.t = ppt.style == 4 ? 0 : imT + this.bor.t;
+				this.img.b = ppt.style == 4 ? 0 : imB + this.bor.b;
+				const t_l = (ppt.style == 4 ? this.filmStripSize.l : 0) + ppt.textL + ui.overlay.borderWidth;
+				const t_t = (ppt.style == 4 ? this.filmStripSize.t : 0) + ppt.textT + ui.overlay.borderWidth;
+				let t_r = (ppt.style == 4 ? this.filmStripSize.r : 0) + ppt.textR + ui.overlay.borderWidth;
+				let t_b = (ppt.style == 4 ? this.filmStripSize.b : 0) + ppt.textB + ui.overlay.borderWidth;
+				if ((ppt.typeOverlay == 2 || ppt.typeOverlay == 4) && ppt.style != 4) {
 					t_r += 1;
 					t_b += 1;
 				}
@@ -1467,22 +1490,21 @@ class Panel {
 				this.text.r = txR + (ppt.sbarShow ? Math.max(t_r, ui.sbar.sp + sp1) : t_r);
 				this.text.t = txT + ui.heading.h + t_t;
 				this.text.w = this.w - this.text.l - this.text.r;
-				this.heading.x = !this.style.fullWidthHeading ? this.text.l : Math.min(this.img.l, this.text.l, (!ppt.filmStripOverlay ? this.filmStripSize.l : 0) ? filmStrip.x : this.w);
-				this.heading.w = !this.style.fullWidthHeading ? this.text.w : this.w - this.heading.x - Math.min(this.img.r, this.text.r, (!ppt.filmStripOverlay ? this.filmStripSize.r : 0) ? this.w - filmStrip.x - filmStrip.w : this.w);
+				this.text.h = this.lines_drawn * ui.font.main_h;
+				this.heading.x = !this.style.fullWidthHeading ? this.text.l : ppt.style == 4 ? ppt.textL : Math.min(this.img.l, this.text.l, (!ppt.filmStripOverlay ? this.filmStripSize.l : 0) ? filmStrip.x : this.w);
+				this.heading.w = !this.style.fullWidthHeading ? this.text.w : ppt.style == 4 ? this.w - this.heading.x * 2 : this.w - this.heading.x - Math.min(this.img.r, this.text.r, (!ppt.filmStripOverlay ? this.filmStripSize.r : 0) ? this.w - filmStrip.x - filmStrip.w : this.w);
 				this.tbox.l = Math.max(txL, 0);
 				this.tbox.t = Math.max(txT, 0);
 				this.tbox.w = this.w - Math.max(txL, 0) - Math.max(txR, 0);
 				this.tbox.h = this.h - Math.max(txT, 0) - Math.max(txB, 0);
 				this.style.minH = ui.font.main_h + ui.heading.h + t_t + t_b;
-				if (ppt.typeOverlay == 2) ui.overlay.borderWidth = Math.max(Math.min(ui.overlay.borderWidth, this.tbox.w / 3, this.tbox.h / 3), 1);
-				if (ppt.typeOverlay) this.arc = Math.max(Math.min(ui.font.main_h / 1.5, this.tbox.w / 3, this.tbox.h / 3), 1);
+				if (ppt.typeOverlay == 2 && ppt.style != 4) ui.overlay.borderWidth = Math.max(Math.min(ui.overlay.borderWidth, this.tbox.w / 3, this.tbox.h / 3), 1);
+				if (ppt.typeOverlay && ppt.style != 4) this.arc = Math.max(Math.min(ui.font.main_h / 1.5, this.tbox.w / 3, this.tbox.h / 3), 1);
 				this.clip = this.ibox.t + 100 < this.tbox.t && this.tbox.t < this.ibox.t + this.ibox.h && (this.tbox.l < this.ibox.l + this.ibox.w || this.tbox.l + this.tbox.w < this.ibox.l + this.ibox.w);
 				this.style.imgSize = this.clip ? this.tbox.t - this.ibox.t : Math.min(this.h - imT - imB - this.bor.t - this.bor.b, this.w - imL - imR - this.bor.l - this.bor.r);
-				if (ppt.sbarShow) {
-					this.sbar.x = this.tbox.l + this.tbox.w - ui.sbar.sp - ui.overlay.borderWidth;
-					this.sbar.y = this.text.t + this.sbar.top_corr;
-					this.sbar.h = ui.font.main_h * this.lines_drawn + bot_corr * 2;
-				}
+				this.sbar.x = this.tbox.l + this.tbox.w - ui.sbar.sp - ui.overlay.borderWidth;
+				this.sbar.y = this.text.t + this.sbar.top_corr;
+				this.sbar.h = ui.font.main_h * this.lines_drawn + bot_corr * 2;
 				this.repaint.x = this.tbox.l;
 				this.repaint.y = this.tbox.t;
 				this.repaint.w = this.tbox.w;
@@ -1579,15 +1601,15 @@ class Panel {
 		switch (true) {
 			case ppt.artistView:
 				this.id.curArtist = this.id.artist;
-				this.id.artist = $.eval(this.art.fields, panel.id.focus);
+				this.id.artist = $.eval(this.art.fields, this.id.focus);
 				if (!this.id.lookUp) return true;
 				else return this.id.artist != this.id.curArtist || !this.art.list.length || !this.art.ix;
 			case !ppt.artistView:
 				this.id.curAlb = this.id.alb;
-				this.id.alb = name.albID(panel.id.focus, 'simple');
+				this.id.alb = name.albID(this.id.focus, 'simple');
 				if (this.style.inclTrackRev) {
 					this.id.curTr = this.id.tr;
-					this.id.tr = name.trackID(panel.id.focus);
+					this.id.tr = name.trackID(this.id.focus);
 				} else this.id.curTr = this.id.tr = '';
 				if (!this.id.lookUp) return true;
 				else return this.id.alb != this.id.curAlb || this.id.tr != this.id.curTr || !this.alb.list.length || !this.alb.ix;

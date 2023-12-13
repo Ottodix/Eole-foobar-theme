@@ -43,15 +43,15 @@ class Server {
 			wikisearch: 'https://www.wikidata.org/w/api.php?action=query&list=search&srprop=snippet|titlesnippet&srlimit=100&utf8&format=json&srsearch='
 		}
 
-		this.on_playback_new_track = $.debounce(() => {
+		this.call = $.debounce(focus => {
 			this.download(false, {
 				ix: 0,
-				focus: false,
+				focus: focus || false,
 				arr: []
 			},
 			{
 				ix: 0,
-				focus: false,
+				focus: focus || false,
 				arr: []
 			});
 		}, 2000, {
@@ -224,6 +224,11 @@ class Server {
 		let supCache = false;
 		if (!stndBio) supCache = cfg.supCache && !lib.inLibrary(0, this.artist);
 
+		if (this.expired(`${cfg.storageFolder}lastfm_genre_whitelist.json`, this.exp) || tag.genres.length < 701 || force) {
+			const lfm_genres = new DldLastfmGenresWhitelist(() => lfm_genres.onStateChange());
+			lfm_genres.search();
+		}
+
 		switch (type) {
 			case 0: {
 				if (cfg.dlLfmBio && !artist_done) {
@@ -270,7 +275,7 @@ class Server {
 					} else timer.decelerating();
 
 					if (cfg.lfmSim && stndBio) {
-						const fo_sim = panel.cleanPth(cfg.pth.foLfmSim, art.focus, 'server');
+						const fo_sim = !panel.isRadio(art.focus) ? panel.cleanPth(cfg.pth.foLfmSim, art.focus, 'server') : panel.cleanPth(cfg.remap.foLfmSim, art.focus, 'remap', this.artist, '', 1);
 						const pth_sim = fo_sim + $.clean(this.artist) + ' And Similar Artists.json';
 						let len = 0;
 						let valid = false;
@@ -665,7 +670,7 @@ class Server {
 
 	tidy(n, cutLeadThe) {
 		const nn = cutLeadThe ? n.replace(/^The /i, '') : n;
-		return nn.replace(/&amp(;|)/g, '&').replace(/&quot(;|)/g, '"').replace(/&#39(;|)/g, "'").replace(/&gt(;|)/g, '>').replace(/&nbsp(;|)/g, '').replace(/\band\b|\//gi, '&').replace(/[.,!?:;'\u2019"\u201C\u201D\-_()[\]\u2010\s+]/g, '').replace(/\u00D7/g, 'x').replace(/\$/g, 's').toLowerCase() || n.trim(); // added r & l double quotes \u201C\u201D & \u00D7 (×) to x (12 X 5)
+		return nn.replace(/&amp(;|)/g, '&').replace(/&quot(;|)/g, '"').replace(/&#39(;|)/g, "'").replace(/&gt(;|)/g, '>').replace(/&nbsp(;|)/g, '').replace(/\band\b|\//gi, '&').replace(/[.,!?:;'\u2019"\u201C\u201D\-_()[\]\u2010\s+]/g, '').replace(/\u00D7/g, 'x').replace(/\$/g, 's').toLowerCase() || n.trim();
 	}
 
 	updateNotFound(f) {

@@ -13,6 +13,7 @@ class Images {
 		this.nh = 10;
 		this.nw = 10;
 		this.removed = 0;
+		this.themed = null;
 		this.x = 0;
 		this.y = 0;
 		this.exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 29520, 35875, 37235, 47700, 52526, 68626, 86884, 92172];
@@ -108,7 +109,7 @@ class Images {
 
 		this.refl = {
 			adjust: false,
-			gradient: ppt.overlayGradient / 10 - 1,
+			gradient: ppt.reflGradient / 10 - 1,
 			size: $.clamp(ppt.reflSize / 100, 0.1, 1),
 			strength: $.clamp(255 * ppt.reflStrength / 100, 0, 255)
 		}
@@ -184,14 +185,13 @@ class Images {
 
 		this.transition.incr = Math.pow(284.2171 / this.transition.level, 0.0625);
 		if (this.transition.level == 100) this.transition.level = 255;
-
 		this.cycImages = this.cov.folderSameAsArt ? this.artImages : v => {
 			if (!$.file(v)) return false;
 			return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		}
 
 		['Front', 'Back', 'Disc', 'Icon', 'Art'].forEach((v, i) => {
-			const f = ppt[`panel${v}Stub`].replace(/%profile%\\/i, fb.ProfilePath);
+			const f = cfg.expandPath(ppt[`panel${v}Stub`]);
 			if ($.file(f)) {
 				this.stub[i].panel = true;
 				this.stub[i].path = f;
@@ -255,13 +255,13 @@ class Images {
 			this.art.folderSup = '';
 			let files = [];
 			if (ppt.cycPhotoLocation == 1) {
-				this.art.folder = panel.cleanPth(cfg.artCusImgFolder, panel.id.focus);
+				this.art.folder = !panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.artCusImgFolder, panel.id.focus) : panel.cleanPth(cfg.remap.foCycPhoto, panel.id.focus, 'remap', this.artist, '', 1);
 				files = utils.Glob(this.art.folder + '*');
 			}
 			if (files.length && files.some(v => /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)))) {
 				this.art.cusPhotoLocation = true;
 			} else {
-				this.art.folder = panel.cleanPth(cfg.pth.foImgArt, panel.id.focus);
+				this.art.folder = !panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 				this.art.cusPhotoLocation = false;
 			}
 			this.clearArtCache(true);
@@ -272,6 +272,20 @@ class Images {
 			}
 		}
 	}
+
+	async load_image_async(image_path) {
+		const image = await gdi.LoadImageAsyncV2(0, image_path);
+		const caller = this.getCallerId(image_path);
+		if (caller.art_id === this.art.ix) {
+			if (!image) {
+				this.art.images.splice(this.art.ix, 1);
+				if (this.art.images.length > 1) this.changePhoto(1);
+				filmStrip.check('imgUpd');
+				return;
+			}
+			this.processArtImg(image, image_path);	
+		}
+    }
 
 	blacklist(clean_artist) {
 		let black_list = [];
@@ -290,7 +304,7 @@ class Images {
 	}
 
 	blurCheck() {
-		if (!(ppt.covBlur && ui.style.isBlur) && !ppt.imgSmoothTrans) return;
+		if (!(ppt.covBlur && ui.style.isBlur) && !ppt.imgSmoothTrans || ppt.themed) return;
 		this.id.curBlur = this.id.blur;
 		this.id.blur = name.albID(panel.id.focus, 'stnd');
 		this.id.blur += ppt.covType;
@@ -333,7 +347,7 @@ class Images {
 			this.cov.newBlur = false;
 			if (this.cov.blur && !ppt.blurAutofill) this.cov.blur = this.cov.blur.Resize(panel.w, panel.h);
 		}
-		if (this.covBlur() && this.cov.blur) image = this.cov.blur;
+		if (this.covBlur() && this.cov.blur) image = this.cov.blur.Clone(0, 0, this.cov.blur.Width, this.cov.blur.Height); // clone to stop blurring same img more than once
 		image = ppt.blurAutofill ? this.format(image, 1, 'crop', panel.w, panel.h, 'blurAutofill', o) : this.format(image, 1, 'stretch', panel.w, panel.h, 'blurStretch', o);
 		const i = $.gr(panel.w, panel.h, true, (g, gi) => {
 			g.SetInterpolationMode(0);
@@ -508,7 +522,7 @@ class Images {
 		const font2 = gdi.Font('Segoe UI', 120, 1);
 		const font3 = gdi.Font('Segoe UI', 200, 1);
 		const font4 = gdi.Font('Segoe UI', 90, 1);
-		const tcol = !bg ? ui.col.text : ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0);
+		const tcol = ui.col.text;
 		const sz = 600;
 		for (let i = 0; i < 3; i++) {
 			this.stub.default[i] = $.gr(sz, sz, true, g => {
@@ -540,9 +554,14 @@ class Images {
 			if (ppt.showFilmStrip && this.get) this.getImgFallback();
 			return;
 		}
-		if (ui.style.isBlur && this.blur) gr.DrawImage(this.blur, 0, 0, this.blur.Width, this.blur.Height, 0, 0, this.blur.Width, this.blur.Height);
+		if (ui.style.isBlur) {
+			const bImg = !this.themed ? this.blur : this.themed;
+			if (bImg) gr.DrawImage(bImg, 0, 0, panel.w, panel.h, 0, 0, bImg.Width, bImg.Height);
+		}
 		if (this.get) return this.getImgFallback();
-		if (!ppt.text_only && this.cur) gr.DrawImage(this.cur, this.x, this.y, this.cur.Width, this.cur.Height, 0, 0, this.cur.Width, this.cur.Height, 0, this.style.alpha);
+		if (!ppt.text_only && this.cur) {
+			gr.DrawImage(this.cur, this.x, this.y, this.cur.Width, this.cur.Height, 0, 0, this.cur.Width, this.cur.Height, 0, this.style.alpha);
+		}
 	}
 
 	fadeMask(image, x, y, w, h) {
@@ -564,9 +583,22 @@ class Images {
 				}
 			});
 			this.mask.reset = false;
+			if (ppt.style == 4 && panel.style.showFilmStrip) {
+				const rotate = [2, 3, 0, 1][ppt.filmStripPos];
+				this.mask.fade.RotateFlip(rotate);
+			}
 		}
 		const mask = $.gr(w, h, true, g => g.DrawImage(this.mask.fade, xl, yl, wl, hl, 0, 0, this.mask.fade.Width, this.mask.fade.Height));
 		image.ApplyMask(mask);
+	}
+
+	filmOK(newArr) {
+		return newArr && this.art.list.length && ppt.showFilmStrip && filmStrip.scroll.pos.art[this.artist] && filmStrip.scroll.pos.art[this.artist].arr && filmStrip.scroll.pos.art[this.artist].arr.length;
+	}
+
+	forceStnd() {
+		const n = ppt.artistView ? 'bio' : 'rev';
+		return !ppt.sourceAll && txt[n].loaded.txt && (txt.reader[n].props || txt.reader[n].lyrics) && (ppt.artistView && panel.art.ix || !ppt.artistView && panel.alb.ix);
 	}
 
 	format(image, n, type, w, h, caller, o, blur, border, fade, reflection) {
@@ -628,7 +660,7 @@ class Images {
 
 	fresh() {
 		this.counter++;
-		if (this.counter < ppt.cycTimePic || panel.id.lyricsSource && lyrics.scroll) return;
+		if (this.counter < ppt.cycTimePic || panel.id.lyricsSource && lyrics.display() && lyrics.scroll) return;
 		this.counter = 0;
 		if (panel.block() || !ppt.cycPic || ppt.text_only || seeker.dn || panel.zoom()) return;
 		if (ppt.artistView) {
@@ -638,10 +670,6 @@ class Images {
 			if (this.cov.images.length < 2 || Date.now() - this.timeStamp.cov < this.style.delay || panel.alb.ix) return;
 			this.changeCov(1);
 		}
-	}
-
-	filmOK(newArr) {
-		return newArr && this.art.list.length && ppt.showFilmStrip && filmStrip.scroll.pos.art[this.artist] && filmStrip.scroll.pos.art[this.artist].arr && filmStrip.scroll.pos.art[this.artist].arr.length;
 	}
 
 	getImgAlpha(image) {
@@ -680,7 +708,6 @@ class Images {
 				return;
 			}
 		} else filmStrip.logScrollPos(this.art.list);
-
 		let arr = this.art.list.slice();
 		if (this.filter.size) arr = arr.filter(this.sizeFilter.bind(this));
 		this.art.images = this.art.images.concat(arr);
@@ -692,16 +719,12 @@ class Images {
 		filmStrip.check(newArr);
 	}
 
-	getImages(force) {
-		if (ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return;
-		if (ppt.artistView && ppt.cycPhoto) {
-			if (!panel.art.ix) this.artistReset(force);
-			this.getArtImg();
-		} else this.getFbImg();
-	}
-
-	getArtImg(update) {
+	getArtImg(update, bypass) {
 		if (!ppt.artistView || ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return;
+		if (!bypass && (panel.id.lyricsSource || panel.id.nowplayingSource || panel.id.propsSource)) {
+			this.getItem(panel.art.ix, panel.alb.ix);
+			this.init = false;
+		}
 		if (!this.art.done || update) {
 			this.art.done = true;
 			if (this.artist) this.getArtImages();
@@ -791,10 +814,11 @@ class Images {
 
 	getFbImg() {
 		if (ppt.artistView && this.art.images.length && ppt.cycPhoto) return;
+		const forceStnd = this.forceStnd();
 		this.cov.ix = this.cov.cycle && !panel.alb.ix ? this.cov.cycle_ix : panel.alb.ix + 1000000;
 		this.blurCheck();
 		if (this.getCovImages()) return;
-		if (panel.alb.ix && panel.alb.ix < panel.alb.list.length && !ppt.artistView) { // !stndAlb
+		if (!forceStnd && (panel.alb.ix && panel.alb.ix < panel.alb.list.length && !ppt.artistView)) { // !stndAlb
 			const a = panel.alb.list[panel.alb.ix].artist;
 			const l = panel.alb.list[panel.alb.ix].album;
 			const l_handle = lib.inLibrary(2, a, l);
@@ -816,10 +840,10 @@ class Images {
 				return;
 			}
 		}
-		if (!panel.alb.ix && cfg.cusCov && !ppt.artistView && !ppt.covType) {
+		if ((forceStnd || !panel.alb.ix) && cfg.cusCov && !ppt.artistView && !ppt.covType) {
 			if (this.chkPths(cfg.cusCovPaths, '', 0, true)) return;
 		}
-		if (panel.art.ix && panel.art.ix < panel.art.list.length && ppt.artistView) { // !stndBio
+		if (!forceStnd && (panel.art.ix && panel.art.ix < panel.art.list.length && ppt.artistView)) { // !stndBio
 			const a_handle = lib.inLibrary(3, this.artist);
 			if (a_handle) {
 				this.getImg(a_handle, 4, false);
@@ -832,7 +856,7 @@ class Images {
 		const handle = $.handle(panel.id.focus);
 		if (handle) {
 			let id = ppt.artistView ? 4 : ppt.covType;
-			if (!ppt.loadCovAllFb || ppt.artistView) this.getImg(handle, id, this.stub[id].panel ? false : !ppt.covType || ppt.artistView ? false : true);
+			if (!ppt.loadCovAllFb || forceStnd || ppt.artistView) this.getImg(handle, id, this.stub[id].panel ? false : !ppt.covType || ppt.artistView ? false : true);
 			else {
 				id = this.cov.selFiltered[0];
 				let image = null;
@@ -847,6 +871,14 @@ class Images {
 		}
 		if (fb.IsPlaying && handle) return;
 		this.setStub(this.cache(), 'noitem', true, 2);
+	}
+
+	getImages(force) {
+		if (ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return;
+		if (ppt.artistView && ppt.cycPhoto) {
+			if (!panel.art.ix) this.artistReset(force);
+			this.getArtImg();
+		} else this.getFbImg();
 	}
 
 	getImg(handle, id, needStub) {
@@ -866,6 +898,10 @@ class Images {
 	}
 
 	getItem(art_ix, alb_ix, force) {
+		if (this.forceStnd()) {
+			art_ix = 0;
+			alb_ix = 0;
+		}
 		switch (true) {
 			case ppt.artistView: {
 				if (ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return;
@@ -880,7 +916,7 @@ class Images {
 				if (ppt.cycPhoto) {
 					if (new_artist) {
 						this.counter = 0;
-						this.art.folder = panel.lock ? panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1) : stndBio ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
+						this.art.folder = panel.lock || panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1) : stndBio ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 						this.art.folderSup = '';
 						if (!stndBio && cfg.supCache && !$.folder(this.art.folder)) this.art.folderSup = panel.cleanPth(cfg.sup.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 						this.clearArtCache(true);
@@ -888,7 +924,7 @@ class Images {
 						if (!this.art.images.length) this.art.allFilesLength = 0;
 						this.art.ix = 0;
 					}
-					this.getArtImg();
+					this.getArtImg(false, true);
 				} else this.getFbImg();
 				this.get = false;
 				break;
@@ -989,7 +1025,7 @@ class Images {
 			freqTot += v.freq;
 		});
 		const avgCol = [$.clamp(Math.round(Math.sqrt(rTot / freqTot)), 0, 255), $.clamp(Math.round(Math.sqrt(gTot / freqTot)), 0, 255), $.clamp(Math.round(Math.sqrt(bTot / freqTot)), 0, 255)];
-		return ui.getSelCol(avgCol, true, true) == 50 ? true : false;
+		return ui.isLightCol(avgCol, true) ? true : false;
 	}
 
 	isType(n, image) {
@@ -1001,10 +1037,11 @@ class Images {
 			case 'AnyBor':
 				return ['artBorderImgOnly', 'artBorderDual', 'covBorderImgOnly', 'covBorderDual'].some(v => ppt[v]);
 			case 'Fade':
-				return !ppt.typeOverlay && ppt.style > 3 && !ppt.img_only;
+				return (!ppt.typeOverlay || ppt.style == 4 && !ppt.typeOverlay) && ppt.style > 3 && !ppt.img_only;
 			case 'Overlay':
 				return ppt.style > 3 && ppt.alignAuto && !ppt.img_only;
 			case 'Circ':
+			if (ppt.style == 4) return false;
 				switch (ppt.artistView) {
 					case true:
 						return !ppt.img_only ? ppt.artStyleDual == 2 : ppt.artStyleImgOnly == 2;
@@ -1209,10 +1246,11 @@ class Images {
 
 	on_get_album_art_done(handle, art_id, image, image_path) {
 		const embedded = handle.Path == image_path;
+		const forceStnd = this.forceStnd();
 		if (!this.cur_handle || !this.cur_handle.Compare(handle) || image && this.cache().cacheHit(image_path + (!embedded ? '' : art_id))) return;
-		if (this.loadCycCov(handle, art_id, image, image_path)) return;
-		if (panel.alb.ix && panel.alb.ix < panel.alb.list.length && !image && !ppt.artistView) return this.loadAltCov(handle, 1);
-		if (!image && !ppt.artistView && (!art_id || ppt.loadCovAllFb) && !panel.alb.ix) {
+		if (!forceStnd && this.loadCycCov(handle, art_id, image, image_path)) return;
+		if (!forceStnd && panel.alb.ix && panel.alb.ix < panel.alb.list.length && !image && !ppt.artistView) return this.loadAltCov(handle, 1);
+		if (!image && !ppt.artistView && (!art_id || ppt.loadCovAllFb) && (!panel.alb.ix || forceStnd)) {
 			if (this.loadAltCov(handle, 0)) return;
 			if (ppt.loadCovAllFb) art_id = this.cov.selFiltered[0];
 			if (this.stub[art_id].user) {
@@ -1227,20 +1265,13 @@ class Images {
 		const caller = this.getCallerId(image_path);
 		if (caller.art_id === this.art.ix) {
 			if (!image) {
-				this.art.images.splice(this.art.ix, 1);
-				if (this.art.images.length > 1) this.changePhoto(1);
-				filmStrip.check('imgUpd');
+				setTimeout(() => {
+					this.load_image_async(image_path); // try again in case dnlded fails to load: folder temp locked?
+				}, 1000);
 				return;
 			}
-			if (this.filter.size && (!ppt.imgFilterBothPx ? image.Width < this.filter.minPx && image.Height < this.filter.minPx : image.Width < this.filter.minPx || image.Height < this.filter.minPx) && this.art.images.length > this.filter.minNo) {
-				this.art.images.splice(this.art.ix, 1);
-				seeker.upd(false, false, true);
-				if (ppt.showFilmStrip) filmStrip.trimCache(image_path);
-				this.changePhoto(1);
-				filmStrip.check('imgUpd');
-				return;
-			}
-			art.cacheIt(image, image_path);
+			
+			this.processArtImg(image, image_path);
 		}
 		if (caller.cov_id === this.cov.ix) {
 			if (!txt.rev.lookUp && !this.cov.cycle) this.clearCovCache();
@@ -1255,6 +1286,21 @@ class Images {
 				return;
 			}
 			cov.cacheIt(image, image_path);
+		}
+	}
+	
+	processArtImg(image, image_path) {
+		const caller = this.getCallerId(image_path);
+		if (caller.art_id === this.art.ix) {
+			if (this.filter.size && (!ppt.imgFilterBothPx ? image.Width < this.filter.minPx && image.Height < this.filter.minPx : image.Width < this.filter.minPx || image.Height < this.filter.minPx) && this.art.images.length > this.filter.minNo) {
+				this.art.images.splice(this.art.ix, 1);
+				seeker.upd(false, false, true);
+				if (ppt.showFilmStrip) filmStrip.trimCache(image_path);
+				this.changePhoto(1);
+				filmStrip.check('imgUpd');
+				return;
+			}
+			art.cacheIt(image, image_path);
 		}
 	}
 
@@ -1347,7 +1393,7 @@ class Images {
 				this.im.h = this.nh;
 				break;
 		}
-		return this.format(image, n, type, this.im.w, this.im.h, 'img', o, this.style.blur, this.style.border, this.style.fade, this.style.reflection);
+		return this.format(image, n, type, this.im.w, this.im.h, 'img', o, !ppt.themed ? this.style.blur : false, this.style.border, this.style.fade, this.style.reflection);
 	}
 
 	processSizeFilter() {
@@ -1545,7 +1591,7 @@ class Images {
 	setCrop(sz) {
 		const imgRefresh = ppt.img_only;
 		this.style.crop = this.isType('Circ') ? false :
-			ppt.artistView && (ppt.artStyleImgOnly == 1 && imgRefresh || ppt.artStyleDual == 1 && !ppt.img_only) || !ppt.artistView && (ppt.covStyleImgOnly == 1 && imgRefresh || ppt.covStyleDual == 1 && !ppt.img_only);
+			ppt.artistView && (ppt.artStyleImgOnly == 1 && imgRefresh || (ppt.artStyleDual == 1 || ppt.style == 4) && !ppt.img_only) || !ppt.artistView && (ppt.covStyleImgOnly == 1 && imgRefresh || (ppt.covStyleDual == 1 || ppt.style == 4) && !ppt.img_only);
 		panel.setBorder(imgRefresh && this.style.crop, this.isType('Border'), this.isType('Refl'));
 		if (sz) {
 			panel.setStyle();
@@ -1712,7 +1758,8 @@ class ImageCache {
 			return;
 		}
 		const o = this.cache[key];
-		if (!o || !o.img || o.filmID != filmStrip.id() || img.refl.adjust) return false;
+		const id = filmStrip.id();
+		if (!o || !o.img || o.filmID.id != id.id || o.filmID.bor != id.bor || img.refl.adjust) return false;
 		img.x = o.x;
 		seeker.counter.x = o.counter_x;
 		img.y = o.y;
@@ -1804,18 +1851,18 @@ class Seeker {
 			}
 			gr.FillEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
 			gr.DrawEllipse(this.bar.x2 + prog, this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
-			gr.SetSmoothingMode(0);		
+			gr.SetSmoothingMode(0);
 		}
 		
 		if (ppt.imgSeeker && ppt.imgSeekerDots == 0) { // bar
 			prog = this.dn ? $.clamp(panel.m.x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo;
-			//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+			gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
 			gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.style.l_w, this.bar.h - ui.style.l_w, RGBA(0, 0, 0, 75));
 			gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.style.l_w, this.bar.h - ui.style.l_w, RGB(245, 245, 245));
-			//gr.SetSmoothingMode(2);
-			//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
-			//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
-			//gr.SetSmoothingMode(0);			
+			gr.SetSmoothingMode(2);
+			gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+			gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			gr.SetSmoothingMode(0);
 		}
 
 		if (ppt.imgCounter) { // counter

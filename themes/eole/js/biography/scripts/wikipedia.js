@@ -684,33 +684,37 @@ class DldWikipedia {
 				if (this.type || !$.file(this.pth)) $.trace('wikipedia: ' + (this.title || this.artist) + ': not found', true);
 				return;
 			}
-			$.buildPth(this.fo);
-			
-			this.wiki = txt.add([`Wikipedia language: ${this.site.toUpperCase()}`], this.wiki);
-			$.save(this.pth, this.wiki, true);
-			server.res();
+			if (this.fo) {
+				$.buildPth(this.fo);
+				
+				this.wiki = txt.add([`Wikipedia language: ${this.site.toUpperCase()}`], this.wiki);
+				$.save(this.pth, this.wiki, true);
+				server.res();
+			}
 		} else {
 			const text = $.jsonParse(this.pth, {}, 'file');
-			$.buildPth(this.fo);
-			if (this.site == 'en') {
-				text[this.title] = {
-					composer: this.info.composer,
-					date: this.info.released,
-					genre: genres,
-					length: this.info.length,
-					wiki: this.wiki,
-					lang: this.site.toUpperCase(),
-					update: Date.now()
-				};
-			} else {
-				text[this.title] = {
-					genre: genres,
-					wiki: this.wiki,
-					lang: this.site.toUpperCase(),
-					update: Date.now()
-				};
+			if (this.fo) {
+				$.buildPth(this.fo);
+				if (this.site == 'en') {
+					text[this.title] = {
+						composer: this.info.composer,
+						date: this.info.released,
+						genre: genres,
+						length: this.info.length,
+						wiki: this.wiki,
+						lang: this.site.toUpperCase(),
+						update: Date.now()
+					};
+				} else {
+					text[this.title] = {
+						genre: genres,
+						wiki: this.wiki,
+						lang: this.site.toUpperCase(),
+						update: Date.now()
+					};
+				}
+				$.save(this.pth, JSON.stringify($.sortKeys(text), null, 3), true);
 			}
-			$.save(this.pth, JSON.stringify($.sortKeys(text), null, 3), true);
 			if (genres.length || this.info.composer.length || this.info.released || this.info.length || this.wiki) server.res();
 			else $.trace('wikipedia: ' + this.name + ': not found', true);
 		}
@@ -771,6 +775,7 @@ class Infobox {
 		.replace(/[[\]]/g, '')
 		.replace(/{{-}}/g, '')
 		.replace(/{{ref\|a}}/g, '')
+		.replace(/{{refn/g, '')
 		.replace(/\(see below\)/g, '')
 		.replace(/[{}]/g, '');
 		return this.tidyPunctuation(n);
@@ -830,7 +835,7 @@ class Infobox {
 			const f = [];
 			const lc = v.toLowerCase();
 			['composer', 'lyricist', 'producer'].forEach(v => {
-				const ix = lc.indexOf(v);
+				const ix = RegExp(`[^\\(]${v}`).test(lc) ? lc.indexOf(v) : -1;
 				if (ix != -1) f.push(ix);
 			});
 			const i = f.length ? Math.min(...f) : -1;

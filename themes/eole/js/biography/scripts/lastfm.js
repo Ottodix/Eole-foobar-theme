@@ -199,6 +199,7 @@ class DldLastfmBio {
 			$.trace('last.fm biography: ' + this.artist + ': not found', true);
 			return;
 		}
+		if (!this.fo_bio) return;
 		$.buildPth(this.fo_bio);
 		$.save(this.pth_bio, this.con, true);
 		server.res();
@@ -247,7 +248,7 @@ class DldArtImages {
 
 	run(dl_ar, force, art, p_stndBio, p_supCache) {
 		if (!$.file(`${cfg.storageFolder}foo_lastfm_img.vbs`)) return;
-		let img_folder = p_stndBio ? panel.cleanPth(cfg.pth.foImgArt, art.focus, 'server') : panel.cleanPth(cfg.remap.foImgArt, art.focus, 'remap', dl_ar, '', 1);
+		let img_folder = p_stndBio && !panel.isRadio(art.focus) ? panel.cleanPth(cfg.pth.foImgArt, art.focus, 'server') : panel.cleanPth(cfg.remap.foImgArt, art.focus, 'remap', dl_ar, '', 1);
 		if (p_supCache && !$.folder(img_folder)) img_folder = panel.cleanPth(cfg.sup.foImgArt, art.focus, 'remap', dl_ar, '', 1);
 		const getNo = this.img_exp(dl_ar, img_folder, !force ? server.exp : 0);
 		if (!getNo[0]) return;
@@ -454,9 +455,11 @@ class LfmAlbum {
 			}
 			wiki = wiki ? wiki + this.tags + this.stats : this.tags + this.stats;
 			wiki = wiki.trim();
-			$.buildPth(this.fo);
-			$.save(this.pth, wiki, true);
-			server.res();
+			if (this.fo) {
+				$.buildPth(this.fo);
+				$.save(this.pth, wiki, true);
+				server.res();
+			}
 		} else if (this.rev) {
 			doc.open();
 			const counts = ['', '', ''];
@@ -635,7 +638,11 @@ class LfmTrack {
 				this.timer = null;
 			}, 30000);
 		}
-		this.xmlhttp.send();
+		try {
+			this.xmlhttp.send();
+		} catch (e) {
+			this.revSave();
+		}
 	}
 
 	analyse() {
@@ -783,8 +790,10 @@ class LfmTrack {
 			lang: this.retry ? 'EN' : cfg.language,
 			update: Date.now()
 		};
-		$.buildPth(this.fo);
-		$.save(this.pth, JSON.stringify($.sortKeys(this.text), null, 3), true);
+		if (this.fo) {
+			$.buildPth(this.fo);
+			$.save(this.pth, JSON.stringify($.sortKeys(this.text), null, 3), true);
+		}
 		if (ret) return $.trace('last.fm track review: ' + $.titlecase(this.track) + ' / ' + this.artist + ': not found', true);
 		server.res();
 	}
@@ -855,6 +864,7 @@ class LfmSimilarArtists {
 						name: this.artist,
 						score: 100
 					});
+					if (!this.pth_sim) break;
 					$.buildPth(this.pth_sim);
 					$.save(this.fn_sim, JSON.stringify(list), true);
 					if (cfg.lfmSim) {
@@ -917,5 +927,63 @@ class LfmTopAlbums {
 		topAlbums = [...new Set(topAlbums)];
 		topAlbums.length = Math.min(6, topAlbums.length);
 		this.on_search_done_callback(this.artist, topAlbums);
+	}
+}
+
+class DldLastfmGenresWhitelist {
+	constructor(state_callback) {
+		this.func = null;
+		this.ready_callback = state_callback;
+		this.timer = null;
+		this.xmlhttp = null;
+	}
+
+	onStateChange() {
+		if (this.xmlhttp != null && this.func != null)
+			if (this.xmlhttp.readyState == 4) {
+				clearTimeout(this.timer);
+				this.timer = null;
+				if (this.xmlhttp.status == 200) this.func();
+				else $.trace('unable to update last.fm genres whitelist' + ' Status error: ' + this.xmlhttp.status, true);
+			}
+	}
+
+	search() {
+		this.func = null;
+		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		const URL = 'https://musicbrainz.org/genres';
+		this.func = this.analyse;
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
+		this.xmlhttp.send();
+	}
+
+	analyse() {
+		doc.open();
+		const div = doc.createElement('div');
+		div.innerHTML = this.xmlhttp.responseText;
+		const a = div.getElementsByTagName('a');
+		let genres = [];
+		for (let i = 0; i < a.length; i++) {
+			if (a[i].href.includes('/genre/')) {
+				genres.push(a[i].innerText.trim());
+			}
+		}
+
+		if (genres.length > 860) {
+			const pth = `${cfg.storageFolder}lastfm_genre_whitelist.json`;
+			const existingGenres = $.jsonParse(pth, [], 'file');
+			if (genres.length > existingGenres.length) {
+				$.buildPth(pth);
+				$.save(pth, JSON.stringify(genres), true);
+			}
+		}
 	}
 }

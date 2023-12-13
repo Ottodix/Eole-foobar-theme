@@ -101,11 +101,12 @@ class Helpers {
 		if (!n) return '';
 		const tfo = FbTitleFormat(n);
 		if (panel.isRadio(focus)) return tfo.Eval();
-		const handle = $.handle(focus, ignoreLock);
+		const handle = this.handle(focus, ignoreLock);
 		return handle ? tfo.EvalWithMetadb(handle) : '';
 	}
 
 	equal(arr1, arr2) {
+		if (!this.isArray(arr1) || !this.isArray(arr2)) return false;
 		let i = arr1.length;
 		if (i != arr2.length) return false;
 		while (i--)
@@ -114,11 +115,11 @@ class Helpers {
 	}
 
 	file(f) {
-		return fso.FileExists(f);
+		return typeof f === 'string' && fso.FileExists(f);
 	}
 
 	folder(fo) {
-		return fso.FolderExists(fo);
+		return typeof fo === 'string' && fso.FolderExists(fo);
 	}
 
 	getClipboardData() {
@@ -260,7 +261,7 @@ class Helpers {
 	}
 
 	regexEscape(n) {
-		return n.replace(/([*+\-?^!:&"~${}()|[\]/\\])/g, '\\$1');
+		return n.replace(/[*+\-?^!:&"~${}()|[\]/\\]/g, '\\$&');
 	}
 
 	removeDiacritics(str) {
@@ -367,16 +368,11 @@ class Helpers {
 	}
 
 	tfEscape(n) {
-		let str = n.replace(/'/g, "''").replace(/[()[\],%]/g, "'$&'");
-		if (str.indexOf('$') != -1) {
-			const strSplit = str.split('$');
-			str = strSplit.join("'$$'");
-		}
-		return str;
+		return n.replace(/'/g, "''").replace(/[()[\],%]/g, "'$&'").replace(/\$/g, `'$$$$'`);
 	}
 
 	throttle(e,i,t) {
-		var n=!0,r=!0;if('function'!=typeof e)throw new TypeError('throttle: invalid function');return this.isObject(t)&&(n='leading'in t?!!txt.leading:n,r='trailing'in t?!!txt.trailing:r),this.debounce(e,i,{leading:n,maxWait:i,trailing:r})
+		var n=!0,r=!0;if('function'!=typeof e)throw new TypeError('throttle: invalid function');return this.isObject(t)&&(n='leading'in t?!!txt.leading:n,r='trailing'in t?!!txt.trailing:r),this.debounce(e,i,{leading:n,maxWait:i,trailing:r});
 	}
 
 	titlecase(n) {

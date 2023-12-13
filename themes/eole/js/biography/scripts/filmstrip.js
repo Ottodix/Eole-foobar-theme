@@ -79,11 +79,19 @@ class FilmStrip {
 			this.clearCache();
 			this.setSize();
 			this.check();
-			txt.refresh(0)
+			txt.refresh(0);
 		}, 100);
 	}
 
 	// Methods
+
+	async load_image_async(image_path) {
+		const image = await gdi.LoadImageAsyncV2(0, image_path);
+		if (!panel.style.showFilmStrip) return;
+		const key = this.getLoadKey(image_path);
+		const o = this.cache[key];
+		if (o && o.img == 'called') this.cacheIt(image, key, o.style);
+    }
 
 	cacheIt(image, key, style) {
 		try {
@@ -190,6 +198,7 @@ class FilmStrip {
 		if (id.id != this.cur.id) {
 			this.cur.id = id.id;
 			if (n != 'clear') {
+				txt.logScrollPos();
 				this.setSize(); // check required for initially hidden panels
 				txt.albumFlush(); // handle track change no filmStrip to needed
 				txt.artistFlush();
@@ -528,7 +537,14 @@ class FilmStrip {
 		if (!panel.style.showFilmStrip) return;
 		const key = this.getLoadKey(image_path);
 		const o = this.cache[key];
-		if (o && o.img == 'called') this.cacheIt(image, key, o.style);
+		if (o && o.img == 'called') {
+			if (image) this.cacheIt(image, key, o.style);
+			else {
+				setTimeout(() => {
+					this.load_image_async(image_path); // try again some dnlded can fail to load: folder temp locked?
+				}, 1500);
+			}
+		}
 	}
 
 	on_size() {
@@ -566,6 +582,7 @@ class FilmStrip {
 			case 1:
 			case 2:
 			case 3:
+				ppt.showFilmStrip = true;
 				ppt.filmStripPos = i;
 				break;
 			case 5: {
@@ -574,12 +591,13 @@ class FilmStrip {
 				}
 				const caption = 'Reset Filmstrip To Default Size';
 				const prompt = 'Continue?';
-				const wsh = soFeatures.gecko && soFeatures.clipboard ? popUpBox.confirm(caption, prompt, 'Yes', 'No', continue_confirmation) : true;
+				const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'Yes', 'No', '', '', continue_confirmation) : true;
 				if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 				break;
 			}
 		}
 		filmStrip.logScrollPos();
+		img.mask.reset = true;
 		this.clearCache();
 		this.setSize();
 		this.check(i);
@@ -732,7 +750,7 @@ class FilmStrip {
 
 	trace(x, y) {
 		if (!panel.style.showFilmStrip) return false;
-		return [y > this.y && y < this.y + this.h, x > this.x && x < this.x + this.w, y > this.y && y < this.y + this.h, x > this.x && x < this.x + this.w][ppt.filmStripPos];
+		return y > this.y && y < this.y + this.h && x > this.x && x < this.x + this.w;
 	}
 
 	trimCache(image_path, key) {

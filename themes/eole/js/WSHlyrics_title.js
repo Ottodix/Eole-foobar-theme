@@ -31,11 +31,11 @@ function build_buttons(){
 	} else {
 		btn_initialized = true;
 		buttons = {
-			LyricsWidth: new JSButton(0, 0, 40, images.lyrics_off_icon.Height, "Bio", "Bio", "Show biography", function () {
-				lyrics_state.decrement(1);
-				positionButtons();
-				window.Repaint();
-			}, false, false,images.lyrics_off_icon,images.lyrics_off_hover_icon,-1, false, false, true)
+			//LyricsWidth: new JSButton(0, 0, 40, images.lyrics_off_icon.Height, "Bio", "Bio", "Show biography", function () {
+			//	lyrics_state.decrement(1);
+			//	positionButtons();
+			//	window.Repaint();
+			//}, false, false,images.lyrics_off_icon,images.lyrics_off_hover_icon,-1, false, false, true)
 		}
 
 		all_btns = new JSButtonGroup("top-left", padding_left, padding_top+10, 'all_btns', true);
@@ -128,7 +128,7 @@ function get_colors() {
 		eslPanel.SetVertMargin(0);
 		eslPanel.SetHorizMargin(13);
 		eslPanel.SetLineSpace(8);
-		eslPanel.SetSentenceSpace(0);
+		eslPanel.SetSentenceSpace(0);			   
 		g_files.CreateTextFile(SettingsPath+"LYRICSFIRSTLOAD_0", true).Close();			
 	}
 };

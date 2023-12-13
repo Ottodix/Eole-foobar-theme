@@ -86,6 +86,7 @@ class PanelProperties {
 }
 
 let properties = [
+	['- Show Html Dialog Unsupported-0 Supported-1 Autocheck-2', 2, 'isHtmlDialogSupported'],
 	['Album History', JSON.stringify([]), 'albumHistory'],
 	['Artist History', JSON.stringify([]), 'artistHistory'],
 	['Artist View', false, 'artistView'],
@@ -95,6 +96,7 @@ let properties = [
 
 	['Classical Music Mode', false, 'classicalMusicMode'],
 	['Classical Music Mode Album Fallback', false, 'classicalAlbFallback'],
+	['Colour Line Dark', false, 'colLineDark'],
 	['Colour Swap', false, 'swapCol'],
 
 	['Cover Border [Dual Mode]', false, 'covBorderDual'],
@@ -231,6 +233,7 @@ let properties = [
 	['Image Smooth Transition', false, 'imgSmoothTrans'],
 	['Image Smooth Transition Level (%)', 92, 'transLevel'],
 
+	['Language [Menu] EN-0 ZH-CN-1 ZH-TW-2', 0, 'menuLanguage'],
 	['Layout', 0, 'style'],
 	['Layout Bio Mode', 0, 'bioMode'],
 	['Layout Bio', 0, 'bioStyle'],
@@ -250,7 +253,6 @@ let properties = [
 
 	['Line Padding', 0, 'textPad'],
 	['Lock Bio', false, 'lockBio'],
-	['Lock Rev', false, 'lockRev'],
 	['Lock Auto', false, 'autoLock'],
 
 	['Menu Show Inactivate', 0, 'menuShowInactivate'],
@@ -275,7 +277,12 @@ let properties = [
 	['Overlay Gradient (%)', 10, 'overlayGradient'],
 	['Overlay Strength (%)', 84.5, 'overlayStrength'],
 	['Overlay Type', 0, 'typeOverlay'],
+
 	['Panel Active', true, 'panelActive'],
+	['Panel Focus Load Immediate', false, 'focusLoadImmediate'],
+	['Panel Focus Load Refresh Rate 200-3000 msec (Max)', 250, 'focusLoadRate'],
+	['Panel Focus Server Refresh Rate 1500-15000 msec (Max)', 5000, 'focusServerRate'],
+	['Panel Lookup Refresh Rate 1500-15000 msec (Max)', 1500, 'lookUpServerRate'],
 
 	['Photo Border [Dual Mode]', false, 'artBorderDual'],
 	['Photo Border [Image Only]', false, 'artBorderImgOnly'],
@@ -298,7 +305,8 @@ let properties = [
 	['Reflection Size (%)', 100, 'reflSize'],
 	['Reflection Strength (%)', 14.5, 'reflStrength'],
 
-	['Scrollbar Height Prefer Full', false, 'sbarFullHeight'],
+	['Scroll Position Bio', JSON.stringify({}), 'bioScrollPos'],
+	['Scroll Position Rev', JSON.stringify({}), 'revScrollPos'],
 	['Scroll Step 0-10 (0 = Page)', 3, 'scrollStep'],
 	['Scroll Smooth Duration 0-5000 msec (Max)', 500, 'durationScroll'],
 	['Scroll Touch Flick Duration 0-5000 msec (Max)', 3000, 'durationTouchFlick'],
@@ -310,6 +318,7 @@ let properties = [
 	['Scrollbar Button Type', 0, 'sbarButType'],
 	['Scrollbar Colour Grey-0 Blend-1', 1, 'sbarCol'],
 	['Scrollbar Grip MinHeight', Math.round(20 * $.scale), 'sbarGripHeight'],
+	['Scrollbar Height Prefer Full', false, 'sbarFullHeight'],
 	['Scrollbar Padding', 0, 'sbarPad'],
 	['Scrollbar Narrow Bar Width (0 = Auto)', 0, 'narrowSbarWidth'],
 	['Scrollbar Show', 1, 'sbarShow'],
@@ -333,19 +342,20 @@ let properties = [
 	['Statistics Show Last.fm Metacritic Score', true, 'score'],
 	['Statistics Show Last.fm Scrobbles & Listeners', true, 'stats'],
 
-	['Stub Path: Front [No Title Format Except %profile%]', '', 'panelFrontStub'],
-	['Stub Path: Back [No Title Format Except %profile%]', '', 'panelBackStub'],
-	['Stub Path: Disc [No Title Format Except %profile%]', '', 'panelDiscStub'],
-	['Stub Path: Icon [No Title Format Except %profile%]', '', 'panelIconStub'],
-	['Stub Path: Artist [No Title Format Except %profile%]', '', 'panelArtStub'],
+	['Stub Path Artist [No TF Bar %profile% & %storage_folder%]', '', 'panelArtStub'],
+	['Stub Path Back [No TF Bar %profile% & %storage_folder%]', '', 'panelBackStub'],
+	['Stub Path Disc [No TF Bar %profile% & %storage_folder%]', '', 'panelDiscStub'],
+	['Stub Path Front [No TF Bar %profile% & %storage_folder%]', '', 'panelFrontStub'],
+	['Stub Path Icon [No TF Bar %profile% & %storage_folder%]', '', 'panelIconStub'],
 
 	['Subheading [Track Review] Title Format', '> $if2(%BIO_ARTIST%,Artist Unknown) - $if2(%BIO_TITLE%,Title Unknown)', 'trackSubHeading'],
-	['Subheading Source Hide-0 Auto-1 Show-2', 0, 'sourceHeading'],
+	['Subheading Source Hide-0 Auto-1 Show-2', 1, 'sourceHeading'],
 	['Subheading Source Style', 4, 'sourceStyle'],
 	['Subheading Track Hide-0 Auto-1 Show-2', 1, 'trackHeading'],
 	['Subheading Track Style', 4, 'trackStyle'],
 	['Subheading Wikipedia Style', 5, 'wikiStyle'],
 
+	['Summary Compact', true, 'summaryCompact'],
 	['Summary Dates', true, 'summaryDate'],
 	['Summary Genres', true, 'summaryGenre'],
 	['Summary Locale', true, 'summaryLocale'],
@@ -358,7 +368,21 @@ let properties = [
 	['Text Auto Optimise Multiple Items', true, 'autoOptimiseText'],
 	['Text Only', false, 'text_only'],
 
-	['Text Reader Enable', false, 'txtReaderEnable'],
+	['Text Reader Enable', true, 'txtReaderEnable'],
+	['Text Reader Item Properties: Field Width', 0, 'fieldWidth'],
+	['Text Reader Item Properties: Show Line Dividers', true, 'lineDividers'],
+	['Text Reader Item Properties: Show Row Stripes', true, 'rowStripes'],
+	['Text Reader Nowplaying: Vertical Center', false, 'vCenter'],
+	['Text Reader Nowplaying: Horizontal Center', true, 'hCenter'],
+	['Text Reader 1 Use', true, 'useTxtReader0'],
+	['Text Reader 2 Use', true, 'useTxtReader1'],
+	['Text Reader 3 Use', true, 'useTxtReader2'],
+	['Text Reader 4 Use', true, 'useTxtReader3'],
+	['Text Reader 5 Use', true, 'useTxtReader4'],
+	['Text Reader 6 Use', true, 'useTxtReader5'],
+	['Text Reader 7 Use', true, 'useTxtReader6'],
+	['Text Reader 8 Use', true, 'useTxtReader7'],
+	['Text Reader Larger Sync Line', 0, 'largerSyncLyricLine'],
 	['Text Reader Lyrics Fade Height', 0, 'lyricsFadeHeight'],
 	['Text Reader Lyrics Font Style', 1, 'lyricsFontStyle'],
 	['Text Reader Lyrics Scroll Max Method', 0, 'lyricsScrollMaxMethod'],
@@ -369,19 +393,19 @@ let properties = [
 	['Text Reader 1 Name', 'lyrics', 'nmTxtReader0'],
 	['Text Reader 2 Name', 'lyrics', 'nmTxtReader1'],
 	['Text Reader 3 Name', 'lyrics', 'nmTxtReader2'],
-	['Text Reader 4 Name', '', 'nmTxtReader3'],
+	['Text Reader 4 Name', 'nowplaying', 'nmTxtReader3'],
 	['Text Reader 5 Name', 'lyrics', 'nmTxtReader4'],
 	['Text Reader 6 Name', 'lyrics', 'nmTxtReader5'],
 	['Text Reader 7 Name', 'lyrics', 'nmTxtReader6'],
-	['Text Reader 8 Name', '', 'nmTxtReader7'],
+	['Text Reader 8 Name', 'item properties', 'nmTxtReader7'],
 	['Text Reader 1 Item (field or full path)', '%profile%\\lyrics\\%BIO_ARTIST% - %BIO_TITLE%.lrc', 'pthTxtReader0'],
 	['Text Reader 2 Item (field or full path)', '$if3(%lyrics%,%syncedlyrics%,%unsynced lyrics%,%unsyncedlyrics%)', 'pthTxtReader1'],
 	['Text Reader 3 Item (field or full path)', '%profile%\\lyrics\\%BIO_ARTIST% - %BIO_TITLE%.txt', 'pthTxtReader2'],
-	['Text Reader 4 Item (field or full path)', '', 'pthTxtReader3'],
+	['Text Reader 4 Item (field or full path)', '%storage_folder%\\nowplaying.txt', 'pthTxtReader3'],
 	['Text Reader 5 Item (field or full path)', '%profile%\\lyrics\\%BIO_ARTIST% - %BIO_TITLE%.lrc', 'pthTxtReader4'],
 	['Text Reader 6 Item (field or full path)', '$if3(%lyrics%,%syncedlyrics%,%unsynced lyrics%,%unsyncedlyrics%)', 'pthTxtReader5'],
 	['Text Reader 7 Item (field or full path)', '%profile%\\lyrics\\%BIO_ARTIST% - %BIO_TITLE%.txt', 'pthTxtReader6'],
-	['Text Reader 8 Item (field or full path)', '', 'pthTxtReader7'],
+	['Text Reader 8 Item (field or full path)', '%storage_folder%\\item_properties.json', 'pthTxtReader7'],
 	['Text Reader 1 Lyrics', true, 'lyricsTxtReader0'],
 	['Text Reader 2 Lyrics', true, 'lyricsTxtReader1'],
 	['Text Reader 3 Lyrics', true, 'lyricsTxtReader2'],
@@ -390,9 +414,14 @@ let properties = [
 	['Text Reader 6 Lyrics', true, 'lyricsTxtReader5'],
 	['Text Reader 7 Lyrics', true, 'lyricsTxtReader6'],
 	['Text Reader 8 Lyrics', false, 'lyricsTxtReader7'],
+	['Text Reader Lyrics/Nowplaying Drop Shadow Level', 0, 'dropShadowLevel'],
 	['Text Reader Synchronise With Lyrics Download', false, 'syncTxtReaderLyrics'],
 
 	['Theme', 0, 'theme'],
+	['Theme Background Image', false, 'themeBgImage'],
+	['Theme Colour', 3, 'themeColour'],
+	['Theme Light', false, 'themeLight'],
+	['Themed', false, 'themed'], // reserved: don't enable
 	['Touch Control', false, 'touchControl'],
 	['Track Review', 0, 'inclTrackRev'],
 	['Track Review Show Options', false, 'showTrackRevOptions'],
@@ -408,6 +437,18 @@ const ppt = new PanelProperties;
 ppt.init('auto', properties);
 properties = undefined;
 
+if (ppt.get('Update Properties', true)) { // ~22.7.22
+	ppt.nmTxtReader7 = 'item properties';
+	ppt.pthTxtReader7 = '%storage_folder%\\item_properties.json';
+	ppt.lyricsTxtReader7 = false;
+	if (ppt.summary == '128,228,0') ppt.summary = '128,228,27';
+	const oldProperties = ['Stub Path: Front [No Title Format Except %profile%]', 'Stub Path: Back [No Title Format Except %profile%]', 'Stub Path: Disc [No Title Format Except %profile%]', 'Stub Path: Icon [No Title Format Except %profile%]', 'Stub Path: Artist [No Title Format Except %profile%]'];
+	const props = ['panelFrontStub', 'panelBackStub', 'panelDiscStub', 'panelIconStub', 'panelArtStub'];
+	oldProperties.forEach((v, i) => {const value = window.GetProperty(v); if (value) ppt[props[i]] = value; window.SetProperty(v, null);});
+	window.SetProperty('Lock Rev', null);
+	ppt.set('Update Properties', false);
+}
+
 if (ppt.get('Reset Track Review', true)) {
 	ppt.inclTrackRev = 0;
 	ppt.set('Reset Track Review', false);
@@ -416,6 +457,5 @@ if (ppt.get('Reset Track Review', true)) {
 if (ppt.get('Remove Old Properties', true)) {
 	const oldProperties = ['Allmusic Alb', 'Allmusic Bio', 'Both Bio', 'Both Rev', 'Heading', 'Heading BtnName Biography [AllMusic]', 'Heading BtnName Biography [Last.fm]', 'Heading BtnName Biography [Wikipedia]', 'Heading BtnName Review [AllMusic]', 'Heading BtnName Review [Last.fm]', 'Heading BtnName Review [Wikipedia]', 'Heading Title Format Album Review [AllMusic]', 'Heading Title Format Album Review [Last.fm]', 'Heading Title Format Biography [AllMusic]', 'Heading Title Format Biography [Last.fm]', 'Heading Title Format Track Review [AllMusic]', 'Heading Title Format Track Review [Last.fm]', 'Layout Dual Image+Text', 'Image Seeker Dots', 'Subheading [Source] Text Biography [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Biography [Last.fm]: Heading|No Heading', 'Subheading [Source] Text Biography [Wikipedia]: Heading|No Heading', 'Subheading [Source] Text Review [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Review [Last.fm]: Heading|No Heading', 'Subheading Source Hide-0 Show-1', 'Subheading [Source] Text Review [Wikipedia]: Heading|No Heading', 'Subheading [Track Review] Title Format [AllMusic]', 'Subheading [Track Review] Title Format [Last.fm]', 'Summary First', 'Tagger Last.fm Genre Find>Replace', 'Tagger Last.fm Genre Number Clean Up', 'Tagger Last.fm Genre Run Find>Replace', 'Tagger Last.fm Genre Strip Artist+Album Names', 'Text Album + Track Auto Optimise', 'Text Reader Source 0 Name', 'Text Reader Source 1 Name', 'Text Reader Source 2 Name', 'Text Reader Source 3 Name', 'Text Reader Source 4 Name', 'Text Reader Source 5 Name', 'Text Reader Source 6 Name', 'Text Reader Source 7 Name', 'Text Reader Source 1 (field or full path)', 'Text Reader Source 2 (field or full path)', 'Text Reader Source 3 (field or full path)', 'Text Reader Source 4 (field or full path)', 'Text Reader Source 5 (field or full path)', 'Text Reader Source 6 (field or full path)', 'Text Reader Source 7 (field or full path)', 'Text Reader Source 8 (field or full path)', 'Text Reader Source 1 Lyrics', 'Text Reader Source 2 Lyrics', 'Text Reader Source 3 Lyrics', 'Text Reader Source 4 Lyrics', 'Text Reader Source 5 Lyrics', 'Text Reader Source 6 Lyrics','Text Reader Source 7 Lyrics', 'Text Reader Source 8 Lyrics'];
 	oldProperties.forEach(v => window.SetProperty(v, null));
-	ppt.lockRev = ppt.lockBio;
 	ppt.set('Remove Old Properties', false);
 }

@@ -6,6 +6,7 @@ class Buttons {
 		this.btns = {};
 		this.cur = null;
 		this.Dn = false;
+		this.traceBtn = false;
 		this.transition;
 		
 		this.flag = {
@@ -59,7 +60,6 @@ class Buttons {
 			bahnInstalled: utils.CheckFont('Bahnschrift SemiBold SemiConden'),
 			col: {},
 			font: gdi.Font('Segoe UI Symbol', 12, 1),
-			fontSize: 12,
 			h: 19,
 			icon: false,
 			item_w: {
@@ -104,6 +104,11 @@ class Buttons {
 		this.lookUp.scale = Math.round(this.lookUp.zoomSize / this.lookUp.baseSize * 100);
 		this.lookUp.font = gdi.Font('FontAwesome', 15 * this.lookUp.scale / 100, 0);
 		this.lookUp.fontLock = gdi.Font('FontAwesome', 14 * this.lookUp.scale / 100, 0);
+		if (ui.fontAwesomeInstalled) {
+			this.lookUp.icon = '\uF107';
+		} else {
+			this.lookUp.icon = '\u02C5';
+		}
 
 		this.scr.btns = this.scr.albBtns.concat(this.scr.artBtns);
 		this.src.iconFont = this.src.font;
@@ -112,7 +117,6 @@ class Buttons {
 		ppt.zoomLookUpBtn = this.lookUp.scale;
 
 		this.setSbarIcon();
-		this.setTooltipFont();
 		this.createImages('all');
 	}
 
@@ -227,72 +231,72 @@ class Buttons {
 		if (n == 'all' || n == 'lookUp') {
 			this.lookUp.col = $.toRGB(ui.col.text);
 			$.gr(1, 1, false, g => {
-				this.lookUp.sz = Math.max(g.CalcTextWidth('\uF107', this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight('\uF107', this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
+				this.lookUp.sz = Math.max(g.CalcTextWidth(this.lookUp.icon, this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight(this.lookUp.icon, this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
 			});
 		}
 	}
 
-	createStars() {
+	createStars(force) {
 		this.src.icon = ui.show.btnLabel == 2 ? 1 : 0;
 		const hs = ui.font.heading.Size;
 		const fs = ui.stars != 1 ? (this.src.icon ? (this.src.bahnInstalled ? 12 : 11) : 10) * $.scale : 12 * $.scale;
+		const srcFontSize = this.src.fontSize; 
 		this.src.fontSize = $.clamp(Math.round(hs * 0.47) + (ppt.zoomHeadBtn - 100) / 10, Math.min(fs, hs), Math.max(fs, hs));
-		this.src.font = gdi.Font('Segoe UI', this.src.fontSize, 1);
+		if (this.src.fontSize != srcFontSize || force) this.src.font = gdi.Font('Segoe UI', this.src.fontSize, 1);
 		$.gr(1, 1, false, g => {
 			this.src.h = g.CalcTextHeight('allmusic', this.src.font);
-		});
-		switch (this.src.icon) {
-			case 0:
-				this.src.amBio = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.lfmBio = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.lfmRev = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.wikiBio = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.wikiRev = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				if (!ui.show.btnLabel) {
-					this.src.amBio = '';
-					this.src.amRev = '';
-					this.src.lfmBio = '';
-					this.src.lfmRev = '';
-					this.src.wikiBio = '';
-					this.src.wikiRev = '';
-					this.src.txtBio = '';
-					this.src.txtRev = '';
-				}
-				$.gr(1, 1, false, g => {
-					['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font))
-				});
-				break;
-			case 1: {
-				this.src.amBio = this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.lfmBio = this.src.lfmRev = '\uF202' + (!ppt.sourceAll ? '' : '... ');
-				this.src.wikiBio = this.src.wikiRev = '\uF266' + (!ppt.sourceAll ? '' : '... ');
-				this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-				this.src.font = gdi.Font(this.src.bahnInstalled ? this.src.bahn : 'Segoe UI Semibold', this.src.fontSize, 0);
-				this.src.iconFont = gdi.Font('FontAwesome', Math.round(this.src.fontSize * (this.src.bahnInstalled ? 1.09 : 1.16)), 0);
-				const alt_w = [];
-				alt_w[9] = ' ';
-				const fonts = [this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont];
-				$.gr(1, 1, false, g => {
+			switch (this.src.icon) {
+				case 0:
+					this.src.amBio = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.lfmBio = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.lfmRev = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.wikiBio = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.wikiRev = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					if (!ui.show.btnLabel) {
+						this.src.amBio = '';
+						this.src.amRev = '';
+						this.src.lfmBio = '';
+						this.src.lfmRev = '';
+						this.src.wikiBio = '';
+						this.src.wikiRev = '';
+						this.src.txtBio = '';
+						this.src.txtRev = '';
+					}
+					$.gr(1, 1, false, g => {
+						['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font, true))
+					});
+					break;
+				case 1: {
+					this.src.amBio = this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.lfmBio = this.src.lfmRev = '\uF202' + (!ppt.sourceAll ? '' : '... ');
+					this.src.wikiBio = this.src.wikiRev = '\uF266' + (!ppt.sourceAll ? '' : '... ');
+					this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
+					if (this.src.fontSize != srcFontSize || force) {
+						this.src.font = gdi.Font(this.src.bahnInstalled ? this.src.bahn : 'Segoe UI Semibold', this.src.fontSize, 0);
+						this.src.iconFont = gdi.Font('FontAwesome', Math.round(this.src.fontSize * (this.src.bahnInstalled ? 1.09 : 1.16)), 0);
+					}
+					const alt_w = [];
+					alt_w[9] = ' ';
+					const fonts = [this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont];
 					['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio', 'spaceIconFont'].forEach((v, i) => {
-						this.src.item_w[v] = g.CalcTextWidth(i < 9 ? this.src[v] : alt_w[i], fonts[i]);
-					})
-				});
-				this.src.item_w.space = Math.max(this.src.item_w.space, this.src.item_w.spaceIconFont);
-				const n = ppt.artistView ? 'bio' : 'rev';
-				this.src.y = this.src.fontSize < 12 || txt[n].loaded.ix == 2 ? 1 : 0;
-				break;
+						this.src.item_w[v] = g.CalcTextWidth(i < 9 ? this.src[v] : alt_w[i], fonts[i], true);
+					});
+					this.src.item_w.space = Math.max(this.src.item_w.space, this.src.item_w.spaceIconFont);
+					const n = ppt.artistView ? 'bio' : 'rev';
+					this.src.y = this.src.fontSize < 12 || txt[n].loaded.ix == 2 ? 1 : 0;
+					break;
+				}
 			}
-		}
+		});
 		if (ui.stars == 1) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), ui.col.starOn, ui.col.starOff, ui.col.starBor, false);
 		else if (ui.stars == 2) {
 			this.setRatingImages(Math.round(ui.font.main_h / 1.75) * 5, Math.round(ui.font.main_h / 1.75), ui.col.starOn, ui.col.starOff, ui.col.starBor, false);
 		}
 		if (ui.stars == 1 && ui.show.btnRedLastfm) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), RGBA(225, 225, 245, 255), RGBA(225, 225, 245, 60), ui.col.starBor, true);
-
 		this.src.pxShift = /[gjpqy]/.test(this.src.amRev + this.src.lfmRev + this.src.wikiRev + this.src.txtRev + this.src.amBio + this.src.lfmBio + this.src.wikiBio + this.src.txtBio);
 	}
 
@@ -330,7 +334,7 @@ class Buttons {
 
 	isNextSourceAvailable() {
 		let n = ppt.artistView ? 'Bio' : 'Rev';
-		if (ppt[`lock${n}`] && !ppt.sourceAll) return true;
+		if (ppt.lockBio && !ppt.sourceAll) return true;
 		n = ppt.artistView ? 'bio' : 'rev';
 		const types = txt[n].reader && panel.stndItem() ? $.source.amLfmWikiTxt : $.source.amLfmWiki;
 		let found = 0;
@@ -388,7 +392,7 @@ class Buttons {
 				window.SetCursor(32649);
 				this.hand = true;
 			}
-		}			
+		}	
 		if (hover_btn && hover_btn.hide) {
 			if (this.cur) {
 				this.cur.cs('normal');
@@ -476,8 +480,14 @@ class Buttons {
 			this.btns.lookUp = new Btn(this.lookUp.x, this.lookUp.y, this.lookUp.w, this.lookUp.h, 7, this.lookUp.p1, this.lookUp.p2, '', {
 				normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
 				hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
-			}, !panel.id.lookUp, '', () => men.buttonMenu(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => 'Click: look up...\r\n' + (!panel.id.lyricsSource ? 'Middle click: ' + (!panel.lock ? 'lock: stop track change updates' : 'Unlock') + '...' : 'Lock N/A with enabled lyrics source'), true, 'lookUp');
+			}, !panel.id.lookUp, '', () => bMenu.load(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => 'Click: look up...\r\n' + (!panel.id.lyricsSource && !panel.id.nowplayingSource ? 'Middle click: ' + (!panel.lock ? 'lock: stop track change updates' : 'Unlock') + '...' : 'Lock N/A with enabled lyrics or nowplaying sources'), true, 'lookUp');
 		} else delete this.btns.lookUp;
+		if (ppt.summaryShow) {
+			this.btns.summary = new Btn(panel.text.l, panel.text.t, panel.text.w, ppt.artistView ? (txt.line.h.bio * txt.bio.summaryEnd) : (txt.line.h.rev * txt.rev.summaryEnd), 8, this.lookUp.p1, this.lookUp.p2, '', {
+				normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
+				hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
+			}, '', '', () => {ppt.toggle('summaryCompact'); txt.refresh(1);}, '', false, 'summary');
+		} else delete this.btns.summary;
 		if (ppt.sbarShow) {
 			switch (ui.sbar.type) {
 				case 2:
@@ -518,6 +528,8 @@ class Buttons {
 	}
 
 	resetZoom() {
+		txt.bio.scrollPos = {};
+		txt.rev.scrollPos = {};
 		ppt.zoomFont = 100;
 		ppt.zoomHead = 115;
 		this.lookUp.zoomSize = this.lookUp.baseSize;
@@ -531,17 +543,17 @@ class Buttons {
 		this.createImages('lookUp');
 		this.setTooltipFont();
 		this.refresh(true);
-		txt.refresh(4);
+		txt.refresh(2);
 		const n = ppt.artistView ? 'bio' : 'rev';
-		if (txt[n].loaded.txt && txt.reader.lyrics) txt.getText();
+		if (txt[n].loaded.txt && txt.reader[n].lyrics) txt.getText();
 	}
 
 	scrollAlb() {
-		return ppt.sbarShow && !ppt.artistView && !ppt.img_only && txt.rev.text && alb_scrollbar.scrollable_lines > 0 && alb_scrollbar.active && !alb_scrollbar.narrow.show && !txt.lyricsDisplayed();
+		return ppt.sbarShow && !ppt.artistView && !ppt.img_only && txt.rev.text.length && alb_scrollbar.scrollable_lines > 0 && alb_scrollbar.active && !alb_scrollbar.narrow.show && !txt.lyricsDisplayed();
 	}
 
 	scrollArt() {
-		return ppt.sbarShow && ppt.artistView && !ppt.img_only && txt.bio.text && art_scrollbar.scrollable_lines > 0 && art_scrollbar.active && !art_scrollbar.narrow.show && !txt.lyricsDisplayed();
+		return ppt.sbarShow && ppt.artistView && !ppt.img_only && txt.bio.text.length && art_scrollbar.scrollable_lines > 0 && art_scrollbar.active && !art_scrollbar.narrow.show && !txt.lyricsDisplayed();
 	}
 
 	setLookUpPos() {
@@ -663,13 +675,13 @@ class Buttons {
 	}
 
 	setTooltipFont() {
-		tooltip.SetFont('Segoe UI', 15 * $.scale * ppt.zoomTooltip / 100, 0);
+		tooltip.SetFont(ui.font.main.Name, ui.font.main.Size, ui.font.main.Style);
 	}
 	
 	srcTiptext() {
 		const suffix = this.isNextSourceAvailable() ? 'text' : 'N/A';
 		const type = panel.m.x > panel.heading.x + panel.heading.w / 2 ? 'Next ' : 'Previous ';
-		return this.src.visible && this.trace_src(panel.m.x, panel.m.y) || !but.tooltip.name ? `${type}${suffix}` : but.tooltip.name;
+		return this.src.visible && this.trace_src(panel.m.x, panel.m.y) || !but.tooltip.name ? `${type}${suffix}` : but.tooltip.name.replace(/&/g, '&&');
 	}
 
 	trace(btn, x, y) {
@@ -754,6 +766,8 @@ class Btn {
 	}
 
 	drawHeading(gr) {
+		const n = ppt.artistView ? 'bio' : 'rev';
+		const flag = txt[n].flag;
 		let dh, dx1, dx2;
 		let dw = this.w + (but.lookUp.pos == 2 ? but.lookUp.sz + (ppt.hdLine != 2 ? but.lookUp.gap : 10) * $.scale : 0);
 		let spacer = 0;
@@ -779,7 +793,7 @@ class Btn {
 					const src_w = but.src.w + (but.lookUp.pos == 2 ? but.lookUp.sz + (ppt.hdBtnShow || ppt.hdPos == 1 ? 10 * $.scale : 0) : 0);
 					let dh_w = gr.CalcTextWidth(dh, ui.font.heading) + but.src.item_w.space * (ppt.hdPos != 1 || dh ? 2 : 0) + (ppt.hdPos == 1 && but.lookUp.pos == 2 ? but.lookUp.sz + 10 * $.scale : 0);
 					if (!ppt.hdPos && dh_w < dw - src_w - but.src.item_w.space * (ppt.hdPos != 2 || !but.src.visible ? 3 : 1)) {
-						gr.DrawLine(this.x + dh_w, Math.round(this.y + this.h / 2), this.x + dw - src_w - but.src.item_w.space * 3, Math.round(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
+						gr.DrawLine(this.x + dh_w + (flag ? but.flag.sp : 0), Math.round(this.y + this.h / 2), this.x + dw - src_w - but.src.item_w.space * 3, Math.round(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
 					}
 					else if ((!ppt.hdBtnShow || ppt.hdPos != 0) && src_w + but.src.item_w.space * 2 + dh_w < dw) {
 						gr.DrawLine(dx1 + (but.src.visible ? but.src.item_w.space * (!ui.show.btnBg ? 2 : 3) : ppt.hdPos == 1 ? 0 : dh_w), Math.ceil(this.y + this.h / 2), this.x + dw - (ppt.hdBtnShow ? dh_w : ppt.hdPos == 1 ? dh_w : 0), Math.ceil(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
@@ -797,8 +811,6 @@ class Btn {
 				}
 				break;
 		}
-		const n = ppt.artistView ? 'bio' : 'rev';
-		const flag = txt[n].flag;
 		if (flag) {
 			gr.SetInterpolationMode(7);
 			if (!ppt.hdPos) {
@@ -844,8 +856,7 @@ class Btn {
 				break;
 			case 1: {
 				let iconFont = false;
-				const b = ppt.artistView ? 'Bio' : 'Rev';
-				if (!ppt[`lock${b}`] || ppt.sourceAll) iconFont = txt[n].loaded.ix == 1 || txt[n].loaded.ix == 2;
+				if (!ppt.lockBio || ppt.sourceAll) iconFont = txt[n].loaded.ix == 1 || txt[n].loaded.ix == 2;
 				else iconFont = ppt[`source${n}`] == 1 || ppt[`source${n}`] == 2;
 				gr.GdiDrawText(but.src.name, !iconFont ? but.src.font : but.src.iconFont, col, dx2, this.p1 + (!iconFont ? 0 : but.src.y), but.src.w, but.src.h, !but.rating.show ? txt.cc : txt.c[0]);
 				break;
@@ -862,8 +873,8 @@ class Btn {
 		const col = this.state !== 'down' ? ui.getBlend(this.item.hover, this.item.normal, this.transition_factor) : this.item.hover;
 		gr.SetTextRenderingHint(5);
 		if (!panel.lock) {
-			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
-			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
+			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
+			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
 		} else {
 			gr.DrawString('\uF023', but.lookUp.fontLock, col, this.x, this.y + 2 * $.scale, this.p1, this.p2, StringFormat(2, 0));
 		}
@@ -892,7 +903,9 @@ class Btn {
 	}
 
 	trace(x, y) {
-		return !this.hide && x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h;
+		but.traceBtn = !this.hide && x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h;
+		if (this.name == 'summary' && (ppt.artistView && art_scrollbar.delta > txt.line.h.bio * txt.bio.summaryEnd || !ppt.artistView && alb_scrollbar.delta > txt.line.h.rev * txt.rev.summaryEnd)) but.traceBtn = false;
+		return but.traceBtn;
 	}
 }
 
