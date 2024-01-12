@@ -745,7 +745,7 @@ playlistInfo = function(){
 			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
 			txt_mins = (totalM > 0) ? `${totalM} minute${totalM > 1 ? 's' : ''}, ` : '';
 
-			time_txt = `${txt_month}${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}sec`;
+			this.time_txt = `${txt_month}${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}sec`;
 			this.items_txt=displayed_count+' items';
 
 			// Main Text, Left justified
@@ -835,7 +835,7 @@ function on_paint(gr) {
 	}
 
 	gr.GdiDrawText(g_pinfo.main_txt, g_font.italicplus2, colors.normal_txt, margin_left, 1, main_txt_space, wh - 2, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
-	gr.GdiDrawText(g_pinfo.time_txt+((g_pinfo.time_txt !== "") ? ",  " : "") + g_pinfo.items_txt, g_font.italic, colors.faded_txt, 53, 0, ww - time_txt_right_margin, wh, DT_VCENTER | DT_END_ELLIPSIS | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX);
+	gr.GdiDrawText(g_pinfo.time_txt+((g_pinfo.time_txt !== "") ? ", " : "") + g_pinfo.items_txt, g_font.italic, colors.faded_txt, 53, 0, ww - time_txt_right_margin, wh, DT_VCENTER | DT_END_ELLIPSIS | DT_RIGHT | DT_CALCRECT | DT_NOPREFIX);
 
 	showTitleTooltip = (g_pinfo.main_txt_width >  main_txt_space);
 

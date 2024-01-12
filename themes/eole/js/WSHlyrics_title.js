@@ -25,9 +25,9 @@ var properties = {
 }
 function build_buttons(){
 	if(btn_initialized){
-		buttons.LyricsWidth.N_img = images.lyrics_off_icon;
-		buttons.LyricsWidth.H_img = images.lyrics_off_hover_icon;
-		buttons.LyricsWidth.D_img = buttons.LyricsWidth.H_img;
+		//buttons.LyricsWidth.N_img = images.lyrics_off_icon;
+		//buttons.LyricsWidth.H_img = images.lyrics_off_hover_icon;
+		//buttons.LyricsWidth.D_img = buttons.LyricsWidth.H_img;
 	} else {
 		btn_initialized = true;
 		buttons = {
