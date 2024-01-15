@@ -671,7 +671,7 @@ playlistInfo = function(){
 		this.artists = "";
 		this.albums = "";
 		this.dates = "";
-		this.totalTime = this.plist_items[0].length;
+		this.totalTime = this.plist_items[0].Length;
 
 		all_metas = TF.genre_artist_album_date.EvalWithMetadb(this.plist_items[0]).split(" ^^ ");
 
