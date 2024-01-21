@@ -1,6 +1,6 @@
-window.DefinePanel("ColourPicker", { author: "marc2003" });
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('ColourPicker', { author: 'marc2003' });
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 const font = gdi.Font('Segoe UI', 16, 1);
 
@@ -13,6 +13,6 @@ function on_paint(gr) {
 }
 
 function on_mouse_lbtn_up() {
-    colour = utils.ColourPicker(window.ID, colour);
+    colour = utils.ColourPicker(0, colour);
     window.Repaint();
 }

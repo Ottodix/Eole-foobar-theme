@@ -1,0 +1,9 @@
+﻿{
+  "author": "WilB",
+  "description": "Feature rich all-in-one biography plugin\r\n\r\nDownloads and displays artist photos, biographies and reviews from last.fm, allmusic and wikipedia\r\n\r\n• main artist, similar artists, contributing artists, performers and composers etc\r\n\r\n• main album and top albums\r\n\r\n• history\r\n\r\n• lyrics\r\n\r\n• textreader\r\n\r\n• item properties\r\n\r\n• now playing display\r\n\r\n• layout presets: top, left, right, bottom and overlay. Fully customisable with freestyle layouts\r\n\r\n• themes: user interface, dark, blend, light and random\r\n\r\n• custom colours and fonts\r\n\r\n• filmstrip: top, left, right, bottom or hidden\r\n\r\n• image+text, image only or text only\r\n\r\n• drag resizing of image and filmstrip (press Ctrl while panel has focus)\r\n\r\n• custom title format for field remapping and save locations\r\n\r\n• and more...",
+  "enableDragDrop": false,
+  "id": "{BA9557CE-7B4B-4E0E-9373-99F511E81252}",
+  "name": "Biography",
+  "shouldGrabFocus": true,
+  "version": "1.4.1"
+}

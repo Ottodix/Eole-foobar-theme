@@ -124,7 +124,7 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
 		if(this.hover_color && (this.state==ButtonStates.hover || this.state==ButtonStates.down))
 			gr.FillSolidRect(this.x, this.y, this.w, this.h, this.hover_color);
 
-		if((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "idle" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0)) {
+		if((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0)) {
 			if(this.state==ButtonStates.hover || this.state==ButtonStates.down){
 				//gr.FillSolidRect(this.x, -1, this.w, this.h, colors.settings_btn_hover_bg);
 				//gr.DrawRect(this.x-1, -1, this.w, this.h+1, 1.0, colors.settings_btn_line);
@@ -151,10 +151,10 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
 		if(this.hover_bar_bottom && !this.hover_color && (main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down))
 			gr.FillSolidRect(this.x, wh-colors.active_tab_line_height, this.w, colors.active_tab_line_height, colors.active_tab);
 		
-		if(this.label=="" && !this.hover_color && (this.state==ButtonStates.hover || this.state==ButtonStates.down) && !((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "idle" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0))) {
+		if(this.label=="" && !this.hover_color && (this.state==ButtonStates.hover || this.state==ButtonStates.down) && !((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0))) {
 			btn_opacity = 255;
 			text_color = colors.normal_txt;
-		} else if((main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down) && !this.hover_color && !((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "idle" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0))) {
+		} else if((main_panel_state.isEqual(this.btn_index) || this.state==ButtonStates.hover || this.state==ButtonStates.down) && !this.hover_color && !((this.name == "search" || this.name == "fullscreen" || this.name == "lightswitch" || this.name == "nowplaying" || this.name == "rightsidebar") && compact_titlebar.isActive() && layout_state.isEqual(0))) {
 			btn_opacity = 255;
 			text_color = colors.normal_txt;
 		} else if(this.label=="") {

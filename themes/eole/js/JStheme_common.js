@@ -5,6 +5,7 @@ var FoobarPath = fb.FoobarPath;
 
 var skin_global_path = ProfilePath + "themes\\"+theme_name;
 var theme_img_path = skin_global_path + "\\img";
+var theme_scripts_path = skin_global_path + "\\js";
 var search_results_order = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 var sort_by_default = "%album artist%|%date%|%album%|%discnumber%|%tracknumber%";
 var sort_by_album_artist = "%album artist%|%date%|%album%|%discnumber%|%tracknumber%";
@@ -18,13 +19,12 @@ var sort_by_rating = "$sub(10,%rating%)|%album artist%|%album%";
 var sort_by_time = "%length%|%album artist%|%date%|%album%";
 var randomBtnTimer = false;
 
-var PlaylistExclude = Array("Whole Library","Filter Results");
 var last_mouse_move_notified = (new Date).getTime();
 var foo_playcount = utils.CheckComponent("foo_playcount", true);
 var timers = []
 var globalProperties = {
-	theme_version: '1.2.3b18',
-	lastest_breaking_version: '1.2.3b15',
+	theme_version: '1.2.3b22',
+	lastest_breaking_version: '1.2.3b20',
     thumbnailWidthMax: window.GetProperty("GLOBAL thumbnail width max", 200),
     coverCacheWidthMax: window.GetProperty("GLOBAL cover cache width max", 400),
 	TextRendering: 4,
@@ -40,9 +40,6 @@ var globalProperties = {
 	fontAdjustement_max:5,
     fontAdjustement: window.GetProperty("GLOBAL Font Adjustement", 0),
 	mem_solicitation:window.GetProperty("GLOBAL memory solicitation", 0),
-	enable_screensaver:window.GetProperty("GLOBAL enable screensaver", false),
-	escape_on_mouse_move:window.GetProperty("GLOBAL screensaver escape on mouse move", false),
-	mseconds_before_screensaver:window.GetProperty("GLOBAL screensaver mseconds before activation", 60000),
 	loaded_covers2memory:window.GetProperty("COVER keep loaded covers in memory", false),
     load_covers_at_startup: window.GetProperty("COVER Load all at startup", true),
     load_artist_img_at_startup: window.GetProperty("ARTIST IMG Load all at startup", true),
@@ -52,20 +49,24 @@ var globalProperties = {
 	colorsMainPanel: window.GetProperty("GLOBAL colorsMainPanel",0),
 	colorsControls: window.GetProperty("GLOBAL colorsControls",0),
 	colorsMiniPlayer: window.GetProperty("GLOBAL colorsMiniPlayer",0),
+	keepProportion: window.GetProperty("GLOBAL keepProportion", false),	
 	record_move_every_x_ms:3000,
 	refreshRate:40,
 	crc: "$if(%album artist%,$if(%album%,$crc32(%album artist%##%album%),undefined),undefined)",
 	crc_artist: "$crc32('artists'$meta(artist))",
+	create_playlist : "Create Playlist",
 	selection_playlist : "Library Selection",
 	playing_playlist : "Library Playback",
 	filter_playlist : "Filter Results",	
 	whole_library : "Whole Library",
+	media_library : "Media Library",
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
 	ResizeQLY: 2,
 	use_ratings_file_tags: window.GetProperty("GLOBAL use ratings in file tags", false),
 }
+var PlaylistExclude = Array(globalProperties.whole_library,globalProperties.filter_playlist);
 globalProperties.tf_crc = fb.TitleFormat(globalProperties.crc);
 globalProperties.tf_genre = fb.TitleFormat("%genre%");
 globalProperties.tf_album = fb.TitleFormat("%album%");
@@ -131,7 +132,16 @@ function setMemoryParameters(){
 	}
 }
 setMemoryParameters();
-
+function setGlobalParameter(parameter_name, parameter_value, notify_others){
+	var notify_others = typeof notify_others !== 'undefined' ? notify_others : false;	
+	window.SetProperty("GLOBAL "+parameter_name, parameter_value);
+	eval("globalProperties."+parameter_name+" = "+parameter_value);
+	if(notify_others) window.NotifyOthers("setGlobalParameter",Array(parameter_name,parameter_value));
+	if(parameter_name=="keepProportion") {
+		setImageCachePath();
+		g_image_cache.resetCache();
+	}
+}
 var cScrollBar = {
     enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
     visible: true,
@@ -194,12 +204,6 @@ var oCursor = function () {
 				if(this.y==-10) this.first_y = y;
 				this.x = x;
 				this.y = y;
-				if(!globalProperties.enable_screensaver) return;
-				var current_ms = (new Date).getTime();
-				if(current_ms >= last_mouse_move_notified+globalProperties.record_move_every_x_ms){
-					window.NotifyOthers("mouse_move",current_ms);
-					last_mouse_move_notified = current_ms;
-				}
 			break;
 			case 'leave':
 				this.x = -10;
@@ -339,6 +343,7 @@ function chooseMemorySettings(title, top_msg, bottom_msg, dialog_name, inter_tex
 		data: [title, top_msg, 'Cancel', ok_callback,'0 - Minimum##1 - Keep loaded covers in memory##2 - Load all covers at startup##3 - Load all covers & artist thumbnails at startup',globalProperties.mem_solicitation,bottom_msg,globalProperties.coverCacheWidthMax,inter_text],
 	});
 }
+
 function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, input_labels){
 	function ok_callback(status, input_values) {
 		if(status!="cancel"){
@@ -346,41 +351,59 @@ function customFilterGrouping(title, top_msg, bottom_msg, input_default_values, 
 			var refresh_filters = false;
 			switch(properties.tagMode) {
 				case 1:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
-						properties.album_customGroup_label = input_values[0].substring(0, 10);
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[1]==input_values[0])) {
+						properties.album_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: album customGroup name", properties.album_customGroup_label);
 						window.NotifyOthers("album_customGroup_label",properties.album_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
-						properties.tf_groupkey_album = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_album==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_album = properties.tf_groupkey_album_default;
+						else properties.tf_groupkey_album = input_values[1];
 						window.SetProperty("_PROPERTY Album TitleFormat", properties.tf_groupkey_album);
 						refresh_filters = true;
 					}
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_album==input_values[2])) {
+						properties.tf_sort_album = input_values[2];
+						window.SetProperty("Sort Order - Album TitleFormat", properties.tf_sort_album);
+						refresh_filters = true;
+					}					
 				break;
 				case 2:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {
-						properties.artist_customGroup_label = input_values[0].substring(0, 10);
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[2]==input_values[0])) {
+						properties.artist_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: artist customGroup name", properties.artist_customGroup_label);
 						window.NotifyOthers("artist_customGroup_label",properties.artist_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
-						properties.tf_groupkey_artist = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_artist==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_artist = properties.tf_groupkey_artist_default;
+						else properties.tf_groupkey_artist = input_values[1];
 						window.SetProperty("_PROPERTY Artist TitleFormat", properties.tf_groupkey_artist);
 						refresh_filters = true;
 					}
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_artist==input_values[2])) {
+						properties.tf_sort_artist = input_values[2];
+						window.SetProperty("Sort Order - Artist TitleFormat", properties.tf_sort_artist);
+						refresh_filters = true;
+					}					
 				break;
 				case 3:
-					if (!(input_values[0] == "" || typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
-						properties.genre_customGroup_label = input_values[0].substring(0, 10);
+					if (!(typeof input_values[0] == 'undefined' || g_tagswitcherbar.items_txt[3]==input_values[0])) {
+						properties.genre_customGroup_label = input_values[0].substring(0, 20);
 						window.SetProperty("_DISPLAY: genre customGroup name", properties.genre_customGroup_label);
 						window.NotifyOthers("genre_customGroup_label",properties.genre_customGroup_label);
 						refresh_filters = true;
 					}
-					if (!(input_values[1] == "" || typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
-						properties.tf_groupkey_genre = input_values[1];
+					if (!(typeof input_values[1] == 'undefined' || properties.tf_groupkey_genre==input_values[1])) {
+						if(input_values[1] == "") properties.tf_groupkey_genre = properties.tf_groupkey_genre_default;
+						else properties.tf_groupkey_genre = input_values[1];
 						window.SetProperty("_PROPERTY Genre TitleFormat", properties.tf_groupkey_genre);
+						refresh_filters = true;
+					}
+					if (!(typeof input_values[2] == 'undefined' || properties.tf_sort_genre==input_values[2])) {
+						properties.tf_sort_genre = input_values[2];
+						window.SetProperty("Sort Order - Genre TitleFormat", properties.tf_sort_genre);
 						refresh_filters = true;
 					}
 				break;
@@ -407,6 +430,23 @@ function customGraphicBrowserGrouping(title, top_msg, bottom_msg, input_default_
 				window.SetProperty("MAINPANEL Library Group TitleFormat", properties.TFgrouping);
 				g_showlist.close();
 				brw.populate(5,false);
+			}
+		}
+	}
+	utils.ShowHtmlDialog(window.ID, htmlCode(skin_global_path+"\\html","InputDialog.html"), {
+		data: [title, top_msg, 'Cancel', ok_callback,bottom_msg,input_default_values,input_labels],
+	});
+}
+function customNowPlayingInfos(title, top_msg, bottom_msg, input_default_values, input_labels){
+	function ok_callback(status, input_values) {
+		if(status!="cancel"){
+			var input_values = input_values.split('##');
+			if (!(properties.customInfos==input_values[0]+" ^^ "+input_values[1])) {
+				if((input_values[0] == "" || typeof input_values[0] == 'undefined') && (input_values[1] == "" || typeof input_values[1] == 'undefined')) properties.customInfos = "";				
+				else properties.customInfos = input_values[0]+" ^^ "+input_values[1];
+				setCustominfos();
+				window.SetProperty("_DISPLAY: infos titleformat", properties.customInfos);
+				g_infos.getTrackInfos();
 			}
 		}
 	}
@@ -566,7 +606,7 @@ function get_colors_global(){
 		colors.highlight = RGB(255,175,050);
 
 		colors.headerbar_bg = GetGrey(255,240);
-		colors.headerbar_line = GetGrey(0,37);
+		colors.headerbar_line = GetGrey(0,36);
 
 		colors.scrollbar_normal_cursor = GetGrey(0,120);
 		colors.scrollbar_hover_cursor = GetGrey(0);
@@ -707,6 +747,23 @@ g_files.CreateFolder(data_global_path);
 var cover_img_cache = data_global_path+"\\"+theme_name+"-img-cache";
 if(!g_files.FolderExists(cover_img_cache))
 g_files.CreateFolder(cover_img_cache);
+
+/*
+var square_img_cache = cover_img_cache+"\\square";
+if(!g_files.FolderExists(square_img_cache))
+g_files.CreateFolder(square_img_cache);
+
+var keepProportion_img_cache = cover_img_cache+"\\keepProportion";
+if(!g_files.FolderExists(keepProportion_img_cache))
+g_files.CreateFolder(keepProportion_img_cache);
+*/
+function setImageCachePath(){
+	//cover_img_cache=keepProportion_img_cache;
+	//if(globalProperties.keepProportion) cover_img_cache=keepProportion_img_cache;
+	//else cover_img_cache=square_img_cache;
+}
+setImageCachePath();
+
 
 var SettingsPath = data_global_path+"\\"+theme_name+"-settings\\";
 if (!g_files.FolderExists(SettingsPath))
@@ -1154,23 +1211,6 @@ function PlaylistRename(name){
 	}
 	return name;
 }
-function setScreensaverTime(new_time){
-	globalProperties.mseconds_before_screensaver = new_time;
-	window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
-	window.NotifyOthers("mseconds_before_screensaver",globalProperties.mseconds_before_screensaver);
-}
-function escapeOnMouseMove(new_state){
-	new_state = typeof new_state !== 'undefined' ? new_state : !globalProperties.escape_on_mouse_move;
-	globalProperties.escape_on_mouse_move = new_state;
-	window.SetProperty("GLOBAL screensaver escape on mouse move", globalProperties.escape_on_mouse_move);
-	window.NotifyOthers("escape_on_mouse_move",globalProperties.escape_on_mouse_move);
-}
-function enableScreensaver(new_state){
-	new_state = typeof new_state !== 'undefined' ? new_state : !globalProperties.enable_screensaver;
-	globalProperties.enable_screensaver = new_state;
-	window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-	window.NotifyOthers("enable_screensaver",globalProperties.enable_screensaver);
-}
 
 function check_playlist(name){
     var pl_name = "", pl_idx = -1;
@@ -1354,10 +1394,10 @@ function shutdown_computer(){
 var MF_SEPARATOR = 0x00000800;
 var MF_ENABLED = 0x00000000;
 var MF_GRAYED = 0x00000001;
+var MF_STRING = 0x00000000;
 var MF_DISABLED = 0x00000002;
 var MF_UNCHECKED = 0x00000000;
 var MF_CHECKED = 0x00000008;
-var MF_STRING = 0x00000000;
 var MFT_RADIOCHECK = 0x00000200;
 var MFS_CHECKED = 0x00000008;
 var MF_POPUP = 0x00000010;
@@ -1387,8 +1427,6 @@ var DT_WORD_ELLIPSIS = 0x00040000;
 var DT_NOFULLWIDTHCHARBREAK = 0x00080000;
 var DT_HIDEPREFIX = 0x00100000;
 var DT_PREFIXONLY = 0x00200000;
-var MF_SEPARATOR = 0x00000800;
-var MF_STRING = 0x00000000;
 var VK_F1 = 0x70;
 var VK_F2 = 0x71;
 var VK_F3 = 0x72;
@@ -1549,11 +1587,11 @@ FontTypeDUI = {
     console: 5
 };
 function RGB(r, g, b) {
-    return (0xff000000 | (r << 16) | (g << 8) | (b))
-}
+    return (0xff000000 | (r << 16) | (g << 8) | (b));
+};
 function RGBA(r, g, b, a) {
-    return ((a << 24) | (r << 16) | (g << 8) | (b))
-}
+    return ((a << 24) | (r << 16) | (g << 8) | (b));
+};
 function GetGrey(grey,alpha){
 	alpha = typeof alpha !== 'undefined' ? alpha : 255;
 	return RGBA(grey,grey,grey,alpha);
@@ -1636,7 +1674,37 @@ function RGB2HSL(RGB_colour) {
     HSL_colour.L = Math.round(L * 100);
     return HSL_colour;
 };
+function getRed(color) {
+    return ((color >> 16) & 0xff);
+};
+function getGreen(color) {
+    return ((color >> 8) & 0xff);
+};
 
+function getBlue(color) {
+    return (color & 0xff);
+};
+function setAlpha(color, alpha) {
+	colorRGB = toRGB(color);
+    return RGBA(colorRGB[0], colorRGB[1], colorRGB[2],alpha);
+};
+function toRGB(d){ // convert back to RGB values
+	var d = d - 0xff000000;
+	var r = d >> 16;
+	var g = d >> 8 & 0xFF;
+	var b = d & 0xFF;
+	return [r,g,b];
+};
+
+function blendColors(c1, c2, factor) {
+	// When factor is 0, result is 100% color1, when factor is 1, result is 100% color2.
+	var c1 = toRGB(c1);
+	var c2 = toRGB(c2);
+	var r = Math.round(c1[0] + factor * (c2[0] - c1[0]));
+	var g = Math.round(c1[1] + factor * (c2[1] - c1[1]));
+	var b = Math.round(c1[2] + factor * (c2[2] - c1[2]));
+	return (0xff000000 | (r << 16) | (g << 8) | (b));
+};
 oGenreCache = function () {
     this.genreList = Array();
 	this.tf_genre = globalProperties.tf_genre;
@@ -2401,60 +2469,6 @@ function StringFormat() {
 
 
 // Used everywhere!
-function RGB(r, g, b) {
-    return (0xff000000 | (r << 16) | (g << 8) | (b));
-};
-function RGBA(r, g, b, a) {
-    return ((a << 24) | (r << 16) | (g << 8) | (b));
-};
-function getAlpha(color) {
-    return ((color >> 24) & 0xff);
-};
-
-function getRed(color) {
-    return ((color >> 16) & 0xff);
-};
-
-function getGreen(color) {
-    return ((color >> 8) & 0xff);
-};
-
-function getBlue(color) {
-    return (color & 0xff);
-};
-function setAlpha(color, alpha) {
-	colorRGB = toRGB(color);
-    return RGBA(colorRGB[0], colorRGB[1], colorRGB[2],alpha);
-};
-function negative(colour) {
-	var R = getRed(colour);
-	var G = getGreen(colour);
-	var B = getBlue(colour);
-	return RGB(Math.abs(R-255), Math.abs(G-255), Math.abs(B-255));
-};
-
-function toRGB(d){ // convert back to RGB values
-	var d = d - 0xff000000;
-	var r = d >> 16;
-	var g = d >> 8 & 0xFF;
-	var b = d & 0xFF;
-	return [r,g,b];
-};
-
-function blendColors(c1, c2, factor) {
-	// When factor is 0, result is 100% color1, when factor is 1, result is 100% color2.
-	var c1 = toRGB(c1);
-	var c2 = toRGB(c2);
-	var r = Math.round(c1[0] + factor * (c2[0] - c1[0]));
-	var g = Math.round(c1[1] + factor * (c2[1] - c1[1]));
-	var b = Math.round(c1[2] + factor * (c2[2] - c1[2]));
-	return (0xff000000 | (r << 16) | (g << 8) | (b));
-};
-function return_colors_from_string(string) {
-    var arr;
-    arr = string.split("-");
-    return RGB(arr[0], arr[1], arr[2]);
-};
 function TrackType(metadb) {
     var taggable;
     var type;
@@ -2871,7 +2885,7 @@ function get_font() {
 
 // ========================================= IMAGES =========================================
 function FormatCover(image, w, h, rawBitmap, callID, keepratio) {
-	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;	
+	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;		
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
 		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
@@ -3038,13 +3052,13 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
     }
 	g_image_cache.loadCounter++;			
 	debugger_hint(window.TotalMemoryUsage+" - "+(window.MemoryLimit-window.TotalMemoryUsage-10000000));
-    let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
+    let result = await utils.GetAlbumArtAsyncV2(0, metadb, AlbumArtId.front, need_stub, only_embed, no_load);
 	try {
 		if(isImage(result.image)) {
-			save_image_to_cache(result.image, albumIndex, cachekey, metadb);
+			if(properties.disableCoverCache !== true) save_image_to_cache(result.image, albumIndex, cachekey, metadb);
 			if (typeof g_cover == "object") {
-				if(addArgs && addArgs.isplaying) g_cover.setArtwork(result.image,true,false,addArgs.isplaying,metadb);
-				else g_cover.setArtwork(result.image,true,false);
+				if(addArgs && addArgs.isplaying) g_cover.setArtwork(result.image,true,false,addArgs.isplaying,metadb,cachekey);
+				else g_cover.setArtwork(result.image,true,false,false,metadb,cachekey);
 				window.Repaint();
 			}
 		} else if (typeof brw == "object" && albumIndex>=0) {
@@ -3060,8 +3074,9 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				brw.repaint();
 			}
 		} else if (typeof g_cover == "object") {
+			console.log("fallback")
 			img = get_fallbackCover(metadb,undefined);
-			g_cover.setArtwork(img,true,false,addArgs.isplaying,metadb);
+			g_cover.setArtwork(img,true,false,addArgs.isplaying,metadb,cachekey);
 			window.Repaint();
 		}
 	} catch(e){
@@ -3082,7 +3097,9 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
     if(freeCacheMemory()) return;
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
-			image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
+			//image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion);
+			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", true);
+			//image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
 		if(!g_files.FileExists(filename) && save2cache){
 			image.SaveAs(cover_img_cache+"\\"+crc+"."+globalProperties.ImageCacheExt, globalProperties.ImageCacheFileType);
@@ -3160,7 +3177,7 @@ oImageCache = function () {
 		if(!globalProperties.loaded_covers2memory || freeCacheMemory()) return;
 		var resize_height = typeof resize_height !== 'undefined' ? resize_height : resize_width;
 		if(cachekey!="undefined") {
-			if(this.coverCacheWidthMax>0) this.cachelist[cachekey] = FormatCover(image, this.coverCacheWidthMax, this.coverCacheWidthMax, false, "addToCache", true);
+			if(this.coverCacheWidthMax>0) this.cachelist[cachekey] = FormatCover(image, this.coverCacheWidthMax, this.coverCacheWidthMax, false, "addToCache", globalProperties.keepProportion);
 			else this.cachelist[cachekey] = image;
 		}
 	}
@@ -3558,7 +3575,7 @@ function openCoverFullscreen(metadb){
 	img.SaveAs(filepath, globalProperties.ImageCacheFileType);
 	var WshShell = new ActiveXObject("WScript.Shell");		
 	try {
-		WshShell.Run("\"" + filepath + "\"", 0);
+		WshShell.Run("\"" + filepath + "\"");
 	} catch(e) {
 		//HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file."+filepath,"Ok");
 	}		

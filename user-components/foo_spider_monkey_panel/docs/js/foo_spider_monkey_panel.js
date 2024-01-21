@@ -9,9 +9,10 @@
  * - Has script caching - script file will be read only once from filesystem (even if it is included from different panels).<br>
  * - Has better error reporting.<br>
  * <br>
- * Note: when the relative `path` is used it will be evaluated to the following values:<br>
- * - `${fb.ComponentPath}/${path}`, if the method is invoked from a top-level script (i.e. panel's `Configure` dialog).<br>
- * - `${current_script_path}/${path}`, otherwise.
+ * Note: when the relative `path` is used it will be searched in the following paths:<br>
+ * - `${current_package_path}/scripts/${path}`, if the panel uses a package script.<br>
+ * - `${current_script_path}/${path}`, if the script is not a top-level `in-memory` script.<br>
+ * - `${fb.ComponentPath}/${path}`, otherwise.
  *
  * @param {string} path Absolute or relative path to JavaScript file.
  * @param {object=} [options=undefined]
@@ -41,7 +42,7 @@ function clearInterval(timerID) { } // (void)
  *
  * @param {function()} func
  * @param {number} delay
- * @param {...*} [func_args]
+ * @param {...*} func_args
  * @return {number}
  */
 function setInterval(func, delay, ...func_args) { } // (uint)
@@ -51,7 +52,7 @@ function setInterval(func, delay, ...func_args) { } // (uint)
  *
  * @param {function()} func
  * @param {number} delay
- * @param {...*} [func_args]
+ * @param {...*} func_args
  * @return {number}
  *
  * @example
@@ -122,36 +123,44 @@ function ActiveXObject(name) {
 }
 
 /**
- * See {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Microsoft_JavaScript_extensions/Enumerator}.
- *
+ * Deprecated: use `for ... of` loop instead.
+ * 
+ * @deprecated
+ * 
  * @constructor
  * @param {ActiveXObject} active_x_object Any ActiveX collection object.
+ * 
+ * @example
+     * let e = new Enumerator(active_x_object);
+     * for (e.moveFirst(); !e.atEnd(); e.moveNext()) {
+     *   console.log(e.item());
+     * }
  */
 function Enumerator(active_x_object) {
 
     /**
-     * Returns a Boolean value indicating if the enumerator is at the end of the collection.
+     * Returns a boolean value indicating if the enumerator has reached the end of the collection.
      *
      * @return {boolean}
      */
     this.atEnd = function () { };
 
     /**
-     * Returns the current item in the collection.
+     * Returns the item at the current enumerator position.
      *
      * @return {*}
      */
     this.item = function () { };
 
     /**
-     * Resets the current item in the collection to the first item.
+     * Resets enumerator position to the first item.
      *
      * @method
      */
     this.moveFirst = function () { };
 
     /**
-     * Moves the current item to the next item in the collection.
+     * Moves enumerator position to the next item.
      *
      * @method
      */
@@ -262,6 +271,16 @@ let fb = {
     StopAfterCurrent: undefined, // (boolean) (read, write)
 
     /**
+    * @type {string}
+    * @readonly
+    *
+    * @example
+    * console.log(fb.Version)
+    * // 1.4.1
+    */
+    Version: undefined,
+
+    /**
      * @type {float}
      *
      * @example
@@ -306,7 +325,7 @@ let fb = {
      *
      * @example <caption>Cut playlist items</caption>
      * let ap = plman.ActivePlaylist;
-     * if (!plman.IsPlaylistLocked(ap)) {
+     * if (!plman.GetPlaylistLockedActions(ap).includes('RemoveItems')) {
      *    let handle_list = plman.GetPlaylistSelectedItems(ap);
      *    if (fb.CopyHandleListToClipboard(handle_list)) {
      *        plman.UndoBackup(ap);
@@ -329,6 +348,7 @@ let fb = {
      * Deprecated: use {@link FbMetadbHandleList} constructor instead.
      *
      * @deprecated
+     * 
      * @return {FbMetadbHandleList}
      */
     CreateHandleList: function () { }, // (FbMetadbHandleList)
@@ -367,8 +387,14 @@ let fb = {
      *   cursor icon will be changed, on_drag_drop won't be called after releasing lmbtn, on_drag_leave will be called instead.<br>
      * - DROPEFFECT_LINK should be used as fallback in case effect argument does not have DROPEFFECT_COPY (===1), since some external drops only allow DROPEFFECT_LINK effect.<br>
      * - Changing effect on key modifiers is nice (to be in line with native Windows behaviour): see the example below.<br>
-     *
-     * @param {number} window_id see {@link window.ID}
+     * <br>
+     * Note: due to the asynchronous nature of event handling, `fb.DoDragDrop()` might exit before `on_drag_drop` callback is triggered
+     * when dropping data on the same panel as the one that had a call to `fb.DoDragDrop()`.<br>
+     * <br>
+     * Related callbacks: {@link module:callbacks~on_drag_enter on_drag_enter, {@link module:callbacks~on_drag_drop on_drag_drop},
+     * {@link module:callbacks~on_drag_over on_drag_over}, {@link module:callbacks~on_drag_leave on_drag_leave}
+     * 
+     * @param {number} window_id unused
      * @param {FbMetadbHandleList} handle_list
      * @param {number} effect Allowed effects.
      * @param {object=} [options=undefined] Customization options for the data displayed in the drag window.
@@ -392,17 +418,17 @@ let fb = {
      * <br>
      * Performance note: validate clipboard content with {@link fb.CheckClipboardContents} before calling this method.
      *
-     * @param {number} window_id
+     * @param {number=} [window_id=0] unused
      * @return {FbMetadbHandleList}
      *
      * @example
      * function on_mouse_rbtn_up(x, y) {
      *    let ap = plman.ActivePlaylist;
      *    let menu = window.CreatePopupMenu();
-     *    menu.AppendMenuItem(!plman.IsPlaylistLocked(ap) && fb.CheckClipboardContents() ? MF_STRING : MF_GRAYED, 1, "Paste"); // see Flags.js for MF_* definitions
+     *    menu.AppendMenuItem(!plman.GetPlaylistLockedActions(ap).includes('AddItems') && fb.CheckClipboardContents() ? MF_STRING : MF_GRAYED, 1, "Paste"); // see Flags.js for MF_* definitions
      *    let idx = menu.TrackPopupMenu(x, y);
      *    if (idx == 1) {
-     *        let handle_list  = fb.GetClipboardContents(window.ID);
+     *        let handle_list  = fb.GetClipboardContents();
      *        plman.InsertPlaylistItems(ap, plman.PlaylistItemCount(ap), handle_list );
      *    }
      *    return true;
@@ -413,7 +439,9 @@ let fb = {
     /**
      * Available only in foobar2000 v1.4 and above. Throws a script error on v1.3. * <br>
      * Returns a JSON array in string form so you need to use JSON.parse() on the result.
-     *
+     * <br>
+     * Related methods: {@link fb.SetDSPPreset}.
+     * 
      * @return {string}
      *
      * @example
@@ -476,7 +504,9 @@ let fb = {
     /**
      * Available only in foobar2000 v1.4 and above. Throws a script error on v1.3. * <br>
      * Returns a JSON array in string form so you need to use JSON.parse() on the result.
-     *
+     * <br>
+     * Related methods: {@link fb.SetOutputDevice}.
+     * 
      * @return {string}
      *
      * @example
@@ -555,7 +585,7 @@ let fb = {
     /**
      * Retrieves what the selection type is.
      *
-     * @return {number}
+     * @return {number} Possible values:<br>
      *     0 - undefined (no item)<br>
      *     1 - active_playlist_selection<br>
      *     2 - caller_active_playlist<br>
@@ -618,6 +648,26 @@ let fb = {
     Random: function () { }, // (void)
 
     /**
+     * Registers a main menu item that will be displayed under `main menu`>`File`>`Spider Monkey Panel`>`Script commands`>`{Current panel name}`.<br>
+     * Being main menu item means you can bind it to global keyboard shortcuts, standard toolbar buttons, panel stack splitter buttons and etc.<br>
+     * Execution of the correspoding menu item will trigger {@link module:callbacks~on_main_menu_dynamic on_main_menu_dynamic} callback.<br>
+     * <br>
+     * Note: SMP uses a combination of panel name and command id to identify and bind the command. Hence all corresponding binds will fail
+     * if the id or the panel name is changed. This also means that collision WILL occur if there are two panels with the same name.<br>
+     * <br>
+     * Related methods: {@link fb.UnregisterMainMenuCommand}<br>
+     * Related callbacks: {@link module:callbacks~on_main_menu_dynamic on_main_menu_dynamic}
+     * 
+     * @param {number} id
+     * @param {string} name
+     * @param {string=} [description='']
+     */
+    RegisterMainMenuCommand: function (id, name, description) { },
+
+    /** @method */
+    Restart: function () { }, // (void)
+
+    /**
      * Shows context menu for currently played track.
      *
      * @param {string} command
@@ -657,7 +707,8 @@ let fb = {
 
     /**
      * Available only in foobar2000 v1.4 and above. Throws a script error on v1.3.<br>
-     * See {@link fb.GetDSPPresets}.
+     * <br>
+     * Related methods: {@link fb.GetDSPPresets}.
      *
      * @param {number} idx
      *
@@ -671,7 +722,8 @@ let fb = {
 
     /**
      * Available only in foobar2000 v1.4 and above. Throws a script error on v1.3.<br>
-     * See {@link fb.GetOutputDevices}.
+     * <br>
+     * Related methods: {@link fb.GetOutputDevices}.
      *
      * @param {string} output
      * @param {string} device
@@ -717,6 +769,15 @@ let fb = {
      * @return {FbTitleFormat}
      */
     TitleFormat: function (expression) { }, // (FbTitleFormat)
+
+    /**
+     * Unregisters a main menu item.<br>
+     * <br>
+     * Related methods: {@link fb.RegisterMainMenuCommand}
+     *
+     * @param {number} id
+     */
+    UnregisterMainMenuCommand: function (id, name, description) { },
 
     /** @method */
     VolumeDown: function () { }, // (void)
@@ -772,7 +833,7 @@ let gdi = {
     /**
      * Load image from file asynchronously.
      *
-     * @param {number} window_id see {@link window.ID}
+     * @param {number} window_id unused
      * @param {string} path
      * @return {number} a unique id, which is used in {@link module:callbacks~on_load_image_done on_load_image_done}.
      *
@@ -785,7 +846,7 @@ let gdi = {
      * Load image from file asynchronously.
      * Returns a `Promise` object, which will be resolved when image loading is done.
      *
-     * @param {number} window_id see {@link window.ID}
+     * @param {number} window_id unused
      * @param {string} path
      * @return {Promise.<?GdiBitmap>}
      *
@@ -981,6 +1042,27 @@ let plman = {
     GetPlaylistItems: function (playlistIndex) { }, // (FbMetadbHandleList)
 
     /**
+     * Returns the list of blocked actions
+     * 
+     * @param {number} playlistIndex
+     * @return {Array<string>} May contain the following:<br>
+     *   - 'AddItems'<br>
+     *   - 'RemoveItems'<br>
+     *   - 'ReorderItems'<br>
+     *   - 'ReplaceItems'<br>
+     *   - 'RenamePlaylist'<br>
+     *   - 'RemovePlaylist'<br>
+     *   - 'ExecuteDefaultAction'
+     */
+    GetPlaylistLockedActions: function (playlistIndex) { },
+
+    /**
+     * @param {number} playlistIndex
+     * @return {?string} name of lock owner if there is a lock, null otherwise
+     */
+    GetPlaylistLockName: function (playlistIndex) { },
+
+    /**
      * @param {number} playlistIndex
      * @return {string}
      *
@@ -1040,11 +1122,35 @@ let plman = {
     /**
      * Note: returns true, if the playlist is an autoplaylist. To determine if a playlist is not an autoplaylist,
      * but locked with something like `foo_utils` or `foo_playlist_attributes`, use with conjunction of {@link plman.IsAutoPlaylist}.
+     * <br>
+     * Deprecated: use {@link plman.GetPlaylistLockedActions}.
      *
+     * @deprecated
+     * 
      * @param {number} playlistIndex
      * @return {boolean}
      */
     IsPlaylistLocked: function (playlistIndex) { }, // (boolean)
+
+    /**
+     * Returns whether a redo restore point is available for specified playlist.
+     * <br>
+     * Related methods: {@link plman.IsUndoAvailable}, {@link plman.Redo}, {@link plman.Undo}, {@link plman.UndoBackup}
+     *
+     * @param {number} playlistIndex
+     * @return {boolean}
+     */
+    IsRedoAvailable: function (playlistIndex) { }, // (void)
+
+    /**
+     * Returns whether an undo restore point is available for specified playlist.
+     * <br>
+     * Related methods: {@link plman.IsRedoAvailable}, {@link plman.Redo}, {@link plman.Undo}, {@link plman.UndoBackup}
+     *
+     * @param {number} playlistIndex
+     * @return {boolean}
+     */
+    IsUndoAvailable: function (playlistIndex) { }, // (void)
 
     /**
      * @param {number} from
@@ -1072,6 +1178,17 @@ let plman = {
      * console.log(plman.PlaylistItemCount(plman.PlayingPlaylist)); // 12
      */
     PlaylistItemCount: function (playlistIndex) { }, // (uint) (read)
+
+    /**
+     * Reverts specified playlist to the next redo restore point and generates an undo restore point.<br>
+     * Note: revert operation may be not applied if the corresponding action is locked.
+     * Use {@link plman.GetPlaylistLockedActions} to check if there are any locks present.<br>
+     * <br>
+     * Related methods: {@link plman.IsRedoAvailable}, {@link plman.IsUndoAvailable}, {@link plman.Undo}, {@link plman.UndoBackup}
+     *
+     * @param {number} playlistIndex
+     */
+    Redo: function (playlistIndex) { }, // (void)
 
     /**
      * Removes the specified playlist.<br>
@@ -1147,6 +1264,24 @@ let plman = {
     SetPlaylistFocusItemByHandle: function (playlistIndex, handle) { }, // (void)
 
     /**
+     * Blocks requested actions.<br>
+     * Note: the lock can be changed only if there is no lock or if it's owned by `foo_spider_monkey_panel`.
+     * The owner of the lock can be checked via {@link plman.GetPlaylistLockName}.
+     * 
+     * 
+     * @param {number} playlistIndex
+     * @param {Array<string>} lockedActions May contain the following:<br>
+     *   - 'AddItems'<br>
+     *   - 'RemoveItems'<br>
+     *   - 'ReorderItems'<br>
+     *   - 'ReplaceItems'<br>
+     *   - 'RenamePlaylist'<br>
+     *   - 'RemovePlaylist'<br>
+     *   - 'ExecuteDefaultAction'
+    */
+    SetPlaylistLockedActions: function (playlistIndex, lockedActions) { },
+
+    /**
      * @param {number} playlistIndex
      * @param {Array<number>} affectedItems An array of item indexes.
      * @param {boolean} state
@@ -1211,9 +1346,22 @@ let plman = {
     SortPlaylistsByName: function (direction) { }, //(void)
 
     /**
-     * Saves playlist's current state: this will enable `Edit`>`Undo` menu item after calling other {@link plman} methods that change playlist content.<br>
-     * Note: this method should be called before performing modification to the playlist.
+     * Reverts specified playlist to the last undo restore point and generates a redo restore point.<br>
+     * Note: revert operation may be not applied if the corresponding action is locked.
+     * Use {@link plman.GetPlaylistLockedActions} to check if there are any locks present.<br>
+     * <br>
+     * Related methods: {@link plman.IsRedoAvailable}, {@link plman.IsUndoAvailable}, {@link plman.Redo}, {@link plman.UndoBackup}
      *
+     * @param {number} playlistIndex
+     */
+    Undo: function (playlistIndex) { }, // (void)
+
+    /**
+     * Creates an undo restore point for the specified playlist. This will enable `Edit`>`Undo` menu item after calling other {@link plman} methods that change playlist content.<br>
+     * Note: this method should be called before performing modification to the playlist.<br>
+     * <br>
+     * Related methods: {@link plman.IsRedoAvailable}, {@link plman.IsUndoAvailable}, {@link plman.Redo}, {@link plman.Undo}
+     * 
      * @param {number} playlistIndex
      */
     UndoBackup: function (playlistIndex) { }, // (void)
@@ -1336,19 +1484,50 @@ let utils = {
     /**
      * Spawns a windows popup dialog to let you choose a colour.
      *
-     * @param {number} window_id {@link window.ID}
+     * @param {number} window_id unused
      * @param {number} default_colour This colour is used if OK button was not clicked.
      * @return {number}
      *
      * @example
-     * let colour = utils.ColourPicker(window.ID, RGB(255, 0, 0));
+     * let colour = utils.ColourPicker(0, RGB(255, 0, 0));
      * // See docs\Helper.js for RGB function.
      */
     ColourPicker: function (window_id, default_colour) { }, // (uint)
 
     /**
-     * Various utility functions for working with file.
+     * Detect the codepage of the file.\n
+     * Note: detection algorithm is probability based (unless there is a UTF BOM),
+     * i.e. even though the returned codepage is the most likely one, 
+     * there's no 100% guarantee it's the correct one.\n
+     * Performance note: detection algorithm is quite slow, so results should be cached as much as possible.
      *
+     * @param {number} path Path to file
+     * @return {number} Codepage number on success, 0 if codepage detection failed
+     */
+    DetectCharset: function (path) { },
+
+    /**
+     * Edit a text file with the default text editor. <br>
+     * Default text editor can be changed via `Edit` button on the main tab of {@link window.ShowConfigureV2}.
+     *
+     * @param {number} path Path to file
+     */
+    EditTextFile: function (path) { }, // (uint)
+
+    /**
+     * @param {number} path Path to file
+     * @return {boolean} true, if file exists.
+     */
+    FileExists: function (path) { },
+
+    /**
+     * Various utility functions for working with file.<br>
+     * <br>
+     * Deprecated: use {@link utils.DetectCharset}, {@link utils.FileExists}, {@link utils.GetFileSize},
+     * {@link utils.IsDirectory}, {@link utils.IsFile} and {@link utils.SplitFilePath} instead.
+     *
+     * @deprecated
+     * 
      * @param {string} path
      * @param {string} mode
      *     "chardet" - Detects the codepage of the given file. Returns a corresponding codepage number on success, 0 if codepage detection failed.<br>
@@ -1390,7 +1569,7 @@ let utils = {
      * Performance note: consider using {@link gdi.LoadImageAsync} or {@link gdi.LoadImageAsyncV2} if there are a lot of images to load
      * or if the image is big.
      *
-     * @param {number} window_id {@link window.ID}
+     * @param {number} window_id unused
      * @param {FbMetadbHandle} handle
      * @param {number=} [art_id=0] See Flags.js > AlbumArtId
      * @param {boolean=} [need_stub=true]
@@ -1412,7 +1591,7 @@ let utils = {
      * Load art image for the track asynchronously.<br>
      * Returns a `Promise` object, which will be resolved when art loading is done.
      *
-     * @param {number} window_id {@link window.ID}
+     * @param {number} window_id unused
      * @param {FbMetadbHandle} handle
      * @param {number=} [art_id=0] See Flags.js > AlbumArtId
      * @param {boolean=} [need_stub=true] If true, will return a stub image from `Preferences`>`Display`>`Stub image path` when there is no art image available.
@@ -1455,6 +1634,51 @@ let utils = {
     GetAlbumArtV2: function (handle, art_id, need_stub) { }, // (GdiBitmap) [, art_id][, need_stub]
 
     /**
+     * @param {string} path
+     * @return {number} File size, in bytes
+     */
+    GetFileSize: function (path) { },
+
+    /**
+     * Note: returned directories are not guaranteed to exist.
+     * 
+     * @typedef {Object} JsPackageDirs
+     * @property {string} Root Root directory of the package
+     * @property {string} Assets Directory inside package folder that contains assets
+     * @property {string} Scripts Directory inside package folder that contains scripts
+     * @property {string} Storage Persistent and unique directory inside foobar2000 profile folder that can be used to store runtime data (e.g. cache)
+     */
+
+    /**
+     * Return value of {@link window.GetPackageInfo}.<br>
+     *
+     * @typedef {Object} JsPackageInfo
+     * @property {string} Version Package version
+     * @property {JsPackageDirs} Directories Package directories
+     */
+
+    /**
+     * Get information about a package with the specified id.<br>
+     * 
+     * @param {string} package_id
+     * @return {?JsPackageInfo} null if not found, package information otherwise
+     */
+    GetPackageInfo: function (package_id) { },
+
+    /**
+     * Get path to a package directory with the specified id.<br>
+     * Throws exception if package is not found. <br>
+     * <br>
+     * Deprecated: use {@link window.GetPackageInfo} instead.
+     * 
+     * @deprecated
+     * 
+     * @param {string} package_id
+     * @return {string}
+     */
+    GetPackagePath: function (package_id) { },
+
+    /**
      * @param {number} index {@link https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolor}
      * @return {number} 0 if failed
      *
@@ -1492,7 +1716,7 @@ let utils = {
      *
      * @example
      * // With "error_on_cancel" not set (or set to false), cancelling the dialog will return "default_val".
-     * let username = utils.InputBox(window.ID, "Enter your username", "Spider Monkey Panel", "");
+     * let username = utils.InputBox(0, "Enter your username", "Spider Monkey Panel", "");
      *
      * @example
      * // Using Example1, you can't tell if OK or Cancel was pressed if the return value is the same
@@ -1500,13 +1724,25 @@ let utils = {
      * // when Cancel is pressed.
      * let username = "";
      * try {
-     *    username = utils.InputBox(window.ID, "Enter your username", "Spider Monkey Panel", "", true);
+     *    username = utils.InputBox(0, "Enter your username", "Spider Monkey Panel", "", true);
      *    // OK was pressed.
      * } catch(e) {
      *     // Dialog was closed by pressing Esc, Cancel or the Close button.
      * }
      */
     InputBox: function (window_id, prompt, caption, default_val, error_on_cancel) { }, // (string)
+
+    /**
+     * @param {string} path
+     * @return {boolean} true, if location exists and it's a directory
+     */
+    IsDirectory: function (path) { },
+
+    /**
+     * @param {string} path
+     * @return {boolean} true, if location exists and it's a file
+     */
+    IsFile: function (path) { },
 
     /**
      * @param {number} vkey {@link https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes}. Some are defined in Flags.js > Used with utils.IsKeyPressed().
@@ -1575,9 +1811,9 @@ let utils = {
      *   - Basic types: number, string, boolean, null, undefined.<br>
      *   - Objects as string: the only way to pass objects is to convert them to string and back with `JSON.stringify()` and `JSON.parse()`.<br>
      *   - Arrays: must be cast via `.toArray()` inside html. Each element has same type limitations as options.data.<br>
-     *   - Functions: with maximum of 7 arguments. Each argument has same type limitations as options.data.
+     *   - Functions: has maximum of 7 arguments. Each argument has same type limitations as options.data.
      *
-     * @param {number} window_id {@link window.ID}
+     * @param {number} window_id unused
      * @param {string} code_or_path Html code or file path. File path must begin with `file://` prefix.
      * @param {object=} [options=undefined]
      * @param {number=} [options.width=250] Window width
@@ -1596,9 +1832,21 @@ let utils = {
      * // See `samples/basic/HtmlDialogWithCheckbox.js`
      *
      * @example <caption>Dialog from file</caption>
-     * utils.ShowHtmlDialog(window.ID, `file://${fb.ComponentPath}samples/basic/html/PopupWithCheckBox.html`);
+     * utils.ShowHtmlDialog(0, `file://${fb.ComponentPath}samples/basic/html/PopupWithCheckBox.html`);
      */
     ShowHtmlDialog: function (window_id, code_or_path, options) { },
+
+    /**
+     * @param {string} path
+     * @return {Array<string>} An array of [directory, filename, filename_extension]
+     *
+     * @example
+     * let arr = utils.SplitFilePath('D:\\Somedir\\Somefile.txt');
+     * // arr[0] <= 'D:\\Somedir\\' (always includes backslash at the end)
+     * // arr[1] <= 'Somefile'
+     * // arr[2] <= '.txt'
+     */
+    SplitFilePath: function (path) { }, // (boolean)
 
     /**
      * @param {string} filename
@@ -1652,8 +1900,7 @@ let window = {
     DlgCode: undefined, // (uint) (read, write)
 
     /**
-     * Required in multiple methods such as {@link fb.GetClipboardContents}, {@link utils.ColourPicker}, {@link utils.GetAlbumArtAsync},
-     * {@link utils.InputBox}, {@link utils.LoadImageAsync} and etc.
+     * Window handle casted to uint32_t.
      *
      * @type {number}
      * @readonly
@@ -1688,6 +1935,25 @@ let window = {
     IsVisible: undefined, // (boolean) (read)
 
     /**
+    * Return value of {@link window.JsMemoryStats}.<br>
+    * 
+    * @typedef {Object} JsMemoryStats
+    * @property {number} MemoryUsage Memory usage of the current panel (in bytes)
+    * @property {number} TotalMemoryUsage Total memory usage of all panels (in bytes)
+    * @property {number} TotalMemoryLimit 
+    *    Maximum allowed memory usage for the component (in bytes).<br>
+    *    If the total memory usage exceeds this value, all panels will fail with OOM error.
+    */
+
+    /**
+     * Get memory statistics for JavaScript engine.
+     * 
+     * @type {JsMemoryStats}
+     * @readonly
+     */
+    JsMemoryStats: undefined,
+
+    /**
      * @type {number}
      * @readonly
      */
@@ -1710,8 +1976,12 @@ let window = {
 
     /**
      * Maximum allowed memory usage for the component (in bytes).<br>
-     * If the total memory usage exceeds this value, all panels will fail with OOM error.
+     * If the total memory usage exceeds this value, all panels will fail with OOM error.<br>
+     * <br>
+     * Deprecated: use {@link window.JsMemoryStats.total_memory_limit} instead.
      *
+     * @deprecated
+     * 
      * @type {number}
      * @readonly
      */
@@ -1732,8 +2002,7 @@ let window = {
     MinWidth: undefined, // (uint) (read, write)
 
     /**
-     * Returns the author set in {@link window.DefinePanel}.
-     * If it isn't present, the GUID of the panel is returned.
+     * Returns the panel name set in {@link window.ShowConfigureV2}.
      *
      * @type {string}
      * @readonly
@@ -1741,12 +2010,35 @@ let window = {
     Name: undefined, // (string) (read)
 
     /**
-     * Memory usage of the current panel (in bytes).
+     * Memory usage of the current panel (in bytes).<br>
+     * <br>
+     * Deprecated: use {@link window.JsMemoryStats.memory_usage} instead.
      *
+     * @deprecated
+     * 
      * @type {number}
      * @readonly
      */
     PanelMemoryUsage: undefined, // (uint) (read)
+
+    /**
+    * Return value of {@link window.ScriptInfo}.<br>
+    * Note: package_id is only present when the panel script is a package.
+    * 
+    * @typedef {Object} ScriptInfo
+    * @property {string} Name
+    * @property {string} [Author]
+    * @property {string} [Version]
+    * @property {string} [PackageId]
+    */
+
+    /**
+     * Information about the panel script.
+     *
+     * @type {ScriptInfo}
+     * @readonly
+     */
+    ScriptInfo: undefined,
 
     /**
      * Get associated tooltip object.
@@ -1757,8 +2049,12 @@ let window = {
     Tooltip: undefined,
 
     /**
-     * Total memory usage of all panels (in bytes).
+     * Total memory usage of all panels (in bytes).<br>
+     * <br>
+     * Deprecated: use {@link window.JsMemoryStats.total_memory_usage} instead.
      *
+     * @deprecated
+     * 
      * @type {number}
      * @readonly
      */
@@ -1785,11 +2081,16 @@ let window = {
     ClearInterval: function (timerID) { }, // (void)
 
     /**
-     * Setups the panel information and available features.<br>
+     * Setups panel and script information and available features.<br>
      * Can be called only once, so it's better to define it
-     * directly in the panel Configure menu.
+     * directly in the panel Configure menu.<br>
+     * <br>
+     * Deprecated: use {@link window.DefineScript} instead.
+     * Panel name can be changed via {@link window.ShowConfigureV2}.
      *
-     * @param {string} name Displayed panel name
+     * @deprecated
+     *
+     * @param {string} name Script name and panel name
      * @param {object=} [options={}]
      * @param {string=} [options.author=''] Script author
      * @param {string=} [options.version=''] Script version
@@ -1797,6 +2098,26 @@ let window = {
      * @param {boolean=} [options.features.drag_n_drop=false] Indicates if drag_n_drop functionality should be enabled
      */
     DefinePanel: function (name, options) { }, // (void)
+
+    /**
+     * Setup the script information.<br>
+     * Can be called only once for the whole panel.
+     * 
+     * @param {string} name Script name
+     * @param {object=} [options={}]
+     * @param {string=} [options.author=''] Script author
+     * @param {string=} [options.version=''] Script version
+     * @param {object=} [options.features=undefined] Additional script features
+     * @param {boolean=} [options.features.drag_n_drop=false] Indicates if drag_n_drop functionality should be enabled
+     * @param {boolean=} [options.features.grab_focus=true] Indicates if panel should grab mouse focus
+     */
+    DefineScript: function (name, options) { }, // (void)
+
+     /**
+     * Open the current panel script in the default text editor.<br>
+     * Default text editor can be changed via `Edit` button on the main tab of {@link window.ShowConfigureV2}.
+     */
+    EditScript: function () { },
 
     /**
      * @return {MenuObject}
@@ -1817,8 +2138,8 @@ let window = {
 
     /**
      * Note: a single panel can have only a single tooltip object.
-     * Creating a new tooltip will replace the previous one.
-     * 
+     * Creating a new tooltip will replace the previous one.<br>
+     * <br>
      * Deprecated: use {@link fb.Tooltip} and {@link FbTooltip.SetFont} instead.
      *
      * @deprecated
@@ -1882,9 +2203,19 @@ let window = {
 
     /**
      * This will trigger {@link module:callbacks~on_notify_data on_notify_data}(name, info) in other panels.<br>
+     * <b>!!! Beware !!!</b>: data passed via `info` argument must NOT be used or modified in the source panel after invoking this method.
      *
      * @param {string} name
      * @param {*} info
+     * 
+     * @example
+     * let data = { 
+     *    // some data
+     * };
+     * window.NotifyOthers('have_some_data', data);
+     * 
+     * data = null; // stop using the object immediately
+     * // AddSomeAdditionalValues(data); // don't try to modify it, since it will affect the object in the other panel as well
      */
     NotifyOthers: function (name, info) { }, // (void)
 
@@ -1960,10 +2291,21 @@ let window = {
     SetTimeout: function (func, delay) { }, // (uint)
 
     /**
-     * Show configuration window of current panel
+     * Show configuration window of current panel.
+     * <br>
+     * Deprecated: use {@link window.ShowConfigureV2} to configure panel and {@link window.EditScript} to edit script.
+     *
+     * @deprecated
+     * 
      * @method
      */
     ShowConfigure: function () { }, // (void)
+
+    /**
+     * Show configuration window of current panel
+     * @method
+     */
+    ShowConfigureV2: function () { }, // (void)
 
     /**
      * Show properties window of current panel
@@ -2769,8 +3111,18 @@ function FbUiSelectionHolder() {
      * Sets the selected items.
      *
      * @param {FbMetadbHandleList} handle_list
+     * 
+     * @param {number} [type=0] Selection type. Possible values:<br>
+     *     0 - default, undefined<br>
+     *     1 - active_playlist_selection<br>
+     *     2 - caller_active_playlist<br>
+     *     3 - playlist_manager<br>
+     *     4 - now_playing<br>
+     *     5 - keyboard_shortcut_list<br>
+     *     6 - media_library_viewer
+     * 
      */
-    this.SetSelection = function (handle_list) { }; // (void)
+    this.SetSelection = function (handle_list, type) { }; // (void)
 
     /**
      * Sets selected items to playlist selection and enables tracking.<br>
@@ -3007,12 +3359,17 @@ function GdiGraphics() {
 
     /**
      * Calculates text width for {@link GdiGraphics#GdiDrawText}.
+     * 
+     * Note: When the str contains a kerning pair that is found in the specified 
+     * font, the return value will be larger than the actual drawn width of the
+     * text. If accurate values are required, set use_exact to true.
      *
      * @param {string} str
      * @param {GdiFont} font
+     * @param {boolean=} [use_exact=false] Uses a slower, but more accurate method of calculating text width which accounts for kerning pairs.  
      * @return {number}
      */
-    this.CalcTextWidth = function (str, font) { }; // (uint)
+    this.CalcTextWidth = function (str, font, use_exact) { }; // (uint)
 
     /**
      * @param {number} x
@@ -3196,7 +3553,7 @@ function GdiGraphics() {
      * this will result in visual artifacts caused by ClearType hinting.<br>
      * Use {@link GdiGraphics#DrawString} instead in such cases.<br>
      * <br>
-     * To calculate text dimensions use {@link GdiGraphics#CalcTextHeight}, {@link GdiGraphics#CalcTextWidth} or DT_CALCRECT flag.<br>
+     * To calculate text dimensions use {@link GdiGraphics#CalcTextHeight}, {@link GdiGraphics#CalcTextWidth}.<br>
      * <br>
      * Note: uses special rules for `&` character by default, which consumes the `&` and causes the next character to be underscored.
      * This behaviour can be changed (or disabled) via `format` parameter.
@@ -3209,15 +3566,8 @@ function GdiGraphics() {
      * @param {number} w
      * @param {number} h
      * @param {number=} [format=0] See Flags.js > DT_*
-     * @return {Array<number>}
-     *     index | meaning <br>
-     *     [0] left   (DT_CALCRECT) <br>
-     *     [1] top    (DT_CALCRECT) <br>
-     *     [2] right  (DT_CALCRECT) <br>
-     *     [3] bottom (DT_CALCRECT) <br>
-     *     [4] characters drawn
      */
-    this.GdiDrawText = function (str, font, colour, x, y, w, h, format) { }; // (Array) [, format]
+    this.GdiDrawText = function (str, font, colour, x, y, w, h, format) { };
 
     /**
      * Calculates text dimensions for {@link GdiGraphics#DrawString}.
@@ -3371,6 +3721,15 @@ function DropTargetAction() {
      * @type {boolean}
      */
     this.ToSelect = undefined; // (boolean) (write)
+
+    /**
+     * True, if the drag session was started by {@link fb.DoDragDrop}.
+     * False, otherwise.
+     * 
+     * @type {boolean}
+     * @readonly
+     */
+    this.IsInternal = undefined;
 }
 
 /**

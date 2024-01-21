@@ -174,7 +174,7 @@ function _thumbs() {
 	
 	this.playback_time = () => {
 		this.counter++;
-		if (this.properties.auto_download.enabled && this.counter == 2 && this.images.length == 0) {
+		if (this.properties.source.value == 1 && this.properties.auto_download.enabled && this.counter == 2 && this.images.length == 0) {
 			var np = fb.GetNowPlaying();
 			// check selection matches playing item
 			if (panel.metadb.Path == np.Path && panel.metadb.SubSong == np.SubSong) {
@@ -389,7 +389,7 @@ function _thumbs() {
 			this.update();
 			break;
 		case 1003:
-			const tmp = utils.InputBox(window.ID, 'Enter title formatting or an absolute path to a folder.\n\n%profile% will resolve to your foobar2000 profile folder or the program folder if using portable mode.', window.Name, this.properties.tf.value);
+			const tmp = utils.InputBox(window.ID, 'Enter title formatting or an absolute path to a folder.\n\n%profile% will resolve to your foobar2000 profile folder or the program folder if using portable mode.', window.ScriptInfo.Name, this.properties.tf.value);
 			this.properties.tf.value = tmp || '$directory_path(%path%)';
 			this.folder = '';
 			panel.item_focus_change();
@@ -535,8 +535,8 @@ function _thumbs() {
 	}
 	
 	this.success = (base) => {
-		_(_getElementsByTagName(this.xmlhttp.responseText, 'a'))
-			.filter({ className : 'image-list-item' })
+		_(_getElementsByTagName(this.xmlhttp.responseText, 'li'))
+			.filter({ className : 'image-list-item-wrapper' })
 			.take(this.properties.limit.value)
 			.forEach((item) => {
 				const url = item.getElementsByTagName('img')[0].src.replace('avatar170s/', '');

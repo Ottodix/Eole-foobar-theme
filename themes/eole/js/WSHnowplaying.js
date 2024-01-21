@@ -9,7 +9,6 @@ var properties = {
 	darklayout: window.GetProperty("_DISPLAY: Main layout:Dark", true),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", true),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", true),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", true),
     visualization_dark_theme: window.GetProperty("VISUALIZATION dark theme", true),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     bio_dark_theme: window.GetProperty("BIO dark theme", true),
@@ -19,8 +18,8 @@ var properties = {
 	forcedarklayout: window.GetProperty("_DISPLAY: force dark layout", false),
 	follow_cursor: window.GetProperty("_DISPLAY: cover follow cursor", false),
 	circleMode: window.GetProperty("_DISPLAY: circle mode", true),
-	keepProportion: window.GetProperty("_DISPLAY: keepProportion", true),
 	doubleRowText: window.GetProperty("_DISPLAY: doubleRowText", false),
+	customInfos: window.GetProperty("_DISPLAY: infos titleformat", ""),	
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
@@ -29,6 +28,7 @@ var properties = {
 	showRating: window.GetProperty("_DISPLAY: showRating", true),
 	tintOnHover : true,
 	coverNoPadding : window.GetProperty("_DISPLAY: cover no padding", true),
+	disableCoverCache : window.GetProperty("_DISPLAY: disable cover cache", false),
 	rawBitmap: false,
 	panelFontAdjustement: 0,
 	showInfos:true,
@@ -97,11 +97,13 @@ g_tfo = {
 	title: fb.TitleFormat("$if2(%title%,)"),
 	artist: fb.TitleFormat("$if2(%artist%,)"),
 	album: fb.TitleFormat("$if(%album%,  |  %album%,)"),
-	codec: fb.TitleFormat("%codec%"),
-	playcount: fb.TitleFormat("$if2(%play_count%,0)"),
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)"),
-	allinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,) ^^ $if(%album%,  |  %album%,) ^^ $if2(%date%,?) ^^ %codec% ^^ $if2(%play_count%,0) ^^ $if(%codec_profile%, | %codec_profile%)$if(%bitrate%, | %bitrate%K)"),
+	defaultinfos: fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ $if2(%artist%,)$if(%album%,  |  %album%,)$if(%date%,' ('%date%')') ^^ %codec%$if(%codec_profile%, | %codec_profile%)$if(%bitrate%, | %bitrate%K) ^^ $if2(%play_count%,0)"),
 }
+function setCustominfos(){
+	g_tfo.customInfos = fb.TitleFormat((globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " ^^ $if2(%title%,) ^^ "+properties.customInfos);
+}
+setCustominfos();
 function setButtons(){
 	buttons = {
 		Pause: new SimpleButton(ww/2-images.pause_img.Width/2,wh/2-images.pause_img.Height/2, images.pause_img.Width, 74, "Pause", "Resume Playback", function () {
@@ -327,8 +329,10 @@ function on_paint(gr) {
 		try{
 			tracktype = TrackType(fb.GetNowPlaying());
 			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
-			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
-		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
+			else g_cover.setArtwork(img_blank_cover,true,true);
+		} catch (e){
+			g_cover.setArtwork(img_blank_cover,true,true)
+		}
 	}
 	setButtonStates();
 	g_cover.draw(gr,0,0);
@@ -567,11 +571,12 @@ oImageCache = function () {
 		if (typeof(img) == "undefined" || img == null && globalProperties.enableDiskCache ) {
 			cache_filename = check_cache(metadb, 0, g_cover.cachekey);
 			// load img from cache
-			if(cache_filename) {
+			if(cache_filename && !properties.disableCoverCache) {
 				img = load_image_from_cache_direct(cache_filename);
 				cover_path = cache_filename;
-			} else get_albumArt_async(metadb,AlbumArtId.front, g_cover.cachekey, false, false, false, {isplaying:is_playing});
-		} else if(nowPlaying_cachekey==old_cachekey) return "unchanged";
+			} else
+				get_albumArt_async(metadb,AlbumArtId.front, g_cover.cachekey, false, false, false, {isplaying:is_playing});
+		} else if(typeof(nowPlaying_cachekey) !== "undefined" && nowPlaying_cachekey==old_cachekey) return "unchanged";
 		return img;
     };
     this.reset = function(key) {
@@ -606,6 +611,7 @@ oCover = function() {
 	this.padding_norating = Array(20,7,0,7);	
 	this.padding_noinfos = Array(24,24,24,24);
 	this.nopadding = Array(0,0,0,0);	
+	this.padding = this.padding_default;
 	this.repaint = function() {window.Repaint()}
 	this.borders = true;
 	this.is_playing = false;
@@ -670,7 +676,10 @@ oCover = function() {
 	}
 	this.setArtwork = function(image, resize, filler, is_playing, metadb, cachekey, playlistIndex) {
 		this.filler = typeof filler !== 'undefined' ? filler : false;
-		if(typeof cachekey !== 'undefined') this.cachekey = cachekey;
+		if(typeof cachekey !== 'undefined') {
+			this.cachekey = cachekey;
+			g_image_cache.cachelist[cachekey] = image;
+		}
 		if(typeof playlistIndex !== 'undefined') this.playlistIndex = playlistIndex;
 		this.resized = false;
 		this.artwork = image;
@@ -701,7 +710,6 @@ oCover = function() {
 			}
 		} else var is_playing_new = is_playing;
 		this.setPlaying(is_playing_new, metadb);
-
 		if(this.is_playing!=is_playing_old) this.ResetMask();
 		if(this.metadb && this.metadb.Compare(metadb)) {
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
@@ -716,13 +724,14 @@ oCover = function() {
 			if(this.is_playing && properties.showVisualization) this.setVisualisationY();
 			return;
 		}
+		
 		if(isImage(img) && !globalProperties.loaded_covers2memory) g_image_cache.resetAll();
 		this.setArtwork(img,true,false,this.is_playing, metadb);
 	}
 	this.reset = function(reset_artwork) {
 		if(reset_artwork) {
 			this.artwork = null;
-			this.metadb = null;
+			this.metadb = null;		
 		}
 		this.artwork_resized = null;
 		this.resized = false;
@@ -743,8 +752,9 @@ oCover = function() {
 		if(isImage(this.artwork)) this.resize();
 		window.Repaint();
 	}
-	this.refreshCurrent = function (is_playing) {
-		this.refresh(this.metadb, false, this.playing_cachekey, false, is_playing);
+	this.refreshCurrent = function (is_playing, reset_artwork) {
+		reset_artwork = typeof reset_artwork !== 'undefined' ? reset_artwork : false;		
+		this.refresh(this.metadb, false, this.playing_cachekey, reset_artwork, is_playing);
 	}
 	this.resize = function(w,h) {
 		var w = typeof w !== 'undefined' ? w : this.w;
@@ -753,8 +763,9 @@ oCover = function() {
 		//w = w - this.padding[1] - this.padding[3];
 		//h = h - this.padding[0] - this.padding[2];
 
-		if(properties.keepProportion) {
+		if(globalProperties.keepProportion) {
 			if(this.artwork.Height>=this.artwork.Width) {
+				
 				this.resize_ratio = this.artwork.Width / this.artwork.Height;
 				//this.h = Math.min(h,w);
 			//	this.w = this.h * this.resize_ratio;
@@ -991,6 +1002,9 @@ function on_layout_change() {
 }
 function on_notify_data(name, info) {
     switch(name) {
+		case "setGlobalParameter":
+			setGlobalParameter(info[0],info[1]);
+		break;	
 		case "use_ratings_file_tags":
 			globalProperties.use_ratings_file_tags = info;
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
@@ -1017,7 +1031,7 @@ function on_notify_data(name, info) {
 			metadb = new FbMetadbHandleList(info.metadb);
 			if(info.tracklist) var tracklist = new FbMetadbHandleList(info.tracklist);
 			else var tracklist = null;
-			if(info.cover_img==null) {
+			if(info.cover_img==null || properties.disableCoverCache) {
 				g_cover.on_item_focus_change(info.playlist, -1, info.trackIndex, metadb[0]);
 				if (properties.follow_cursor) {
 					g_infos.updateInfos(info.firstRow, info.secondRow+" | "+info.length+' | '+info.totalTracks, info.genre, metadb, true, undefined, tracklist)
@@ -1118,17 +1132,6 @@ function on_notify_data(name, info) {
 			mini_controlbar.value = info;
 			on_layout_change()
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "escape_screensaver":
-			last_mouse_move_notified = (new Date).getTime();
-		break;
-		case "mseconds_before_screensaver":
-			globalProperties.mseconds_before_screensaver = info;
-			window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
-		break;
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
@@ -1223,15 +1226,6 @@ function on_notify_data(name, info) {
 			on_layout_change();
 			window.Repaint();
 		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-			on_layout_change();
-			window.Repaint();
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
-		break;
 		case "Randomsetfocus":
 			Randomsetfocus = info;
 			if (!Randomsetfocus && properties.random_function >= 1000 && properties.random_function < 2001){
@@ -1293,21 +1287,6 @@ function on_notify_data(name, info) {
 		break;
 	}
 }
-function showNowPlayingCover(){
-	if (globalProperties.enableDiskCache) {
-		cache_filename = check_cache(fb.GetNowPlaying(), 0, g_cover.cachekey);
-		// load img from cache
-		if(cache_filename) {
-			cover_path = cache_filename;
-		} else cover_path = "sfsfsf##";
-	} else if(fb.GetNowPlaying().path == cover_path) cover_path = cover_path.substring(0, cover_path.lastIndexOf("\\")) + "\\folder.jpg";
-	var WshShell = new ActiveXObject("WScript.Shell");
-	try {
-		WshShell.Run("\"" + cover_path + "\"", 0);
-	} catch(e) {
-		HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
-	}
-}
 
 /* ======================= RATING AND TRACK INFO ========================== */
 TextBtn = function() {
@@ -1328,6 +1307,7 @@ var TextBtn_info = new TextBtn();
  *****************************************/
 function ButtonUI_R() {
 	this.y = 10;
+	this.x = 10;	
 	this.width = imgw;
 	this.height = imgh;
 
@@ -1469,18 +1449,37 @@ function oInfos() {
 		}
 	}
 	this.getTrackInfos = function(){
-		var allinfos = g_tfo.allinfos.EvalWithMetadb(this.metadb);
-		allinfos = allinfos.split(" ^^ ");
+		if(properties.customInfos!="") {
+			this.getTrackInfosCustom();
+		} else {
+			var defaultinfos = g_tfo.defaultinfos.EvalWithMetadb(this.metadb);
+			defaultinfos = defaultinfos.split(" ^^ ");
 
-		this.rating = allinfos[0];
+			this.rating = defaultinfos[0];
 
-		var txt_title = allinfos[1];
-		var txt_info = allinfos[2] + allinfos[3] + (allinfos[4]!='?'?" ("+allinfos[4]+")":"");
-		var _playcount = allinfos[6];
-		if(foo_playcount) var txt_profile = allinfos[5] + allinfos[7] + " | " + _playcount + (_playcount > 1 ? " plays" : " play");
-		else var txt_profile = allinfos[5] + allinfos[7];
+			var row1 = defaultinfos[1];
+			var row2 = defaultinfos[2];
+			var _playcount = defaultinfos[4];
+			if(foo_playcount) var row3 = defaultinfos[3] + " | " + _playcount + (_playcount > 1 ? " plays" : " play");
+			else var row3 = defaultinfos[3];
+			this.show_info = true;
+			this.updateInfos(row1, row2, row3, this.metadb, false, this.rating);
+		}		
+	}
+	this.getTrackInfosCustom = function(metadb, album_infos, rating, tracklist){
+		var customInfos = g_tfo.customInfos.EvalWithMetadb(this.metadb);
+		customInfos = customInfos.split(" ^^ ");
+		this.rating = customInfos[0];
+		var row1 = customInfos[1];
+		var row2 = customInfos[2];
+		var row3 = customInfos[3];
 		this.show_info = true;
-		this.updateInfos(txt_title, txt_info, txt_profile, this.metadb, false, this.rating);
+		if(typeof metadb != "undefined") this.metadb = metadb;
+		if(typeof album_infos != "undefined") this.album_infos = album_infos;
+		else this.album_infos = false;
+		if(typeof rating != "undefined") this.rating = rating;		
+		if(typeof tracklist != "undefined") this.tracklist = tracklist;			
+		this.updateInfos(row1, row2, row3, this.metadb, this.album_infos, this.rating, this.tracklist);
 	}
 	this.updateInfos = function(row1, row2, row3, metadb, album_infos, rating, tracklist){
 		this.txt_line1 = row1;
@@ -1671,11 +1670,10 @@ function on_mouse_rbtn_up(x, y){
 			window.Repaint();
 			break;
 		case (idx == 12):
-			properties.keepProportion = !properties.keepProportion;
+			setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
 			get_images();
 			adaptButtons();
-			g_cover.refreshCurrent();
-			window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
+			g_cover.refreshCurrent(undefined,true);
 			window.Repaint();
 			break;
 		case (idx == 100):
@@ -1776,14 +1774,18 @@ function draw_settings_menu(x,y){
 		_menu.AppendMenuItem(MF_STRING, 11, "Circle artwork");
 		_menu.CheckMenuItem(11,properties.circleMode);
 		_menu.AppendMenuItem(MF_STRING, 12, "Keep proportion")
-		_menu.CheckMenuItem(12,properties.keepProportion);
+		_menu.CheckMenuItem(12,globalProperties.keepProportion);
 		_menu.AppendMenuItem(MF_STRING, 13, "Fill the whole space");
+		_menu.AppendMenuItem(MF_STRING, 20, "Disable cover cache for this artwork");
+		_menu.CheckMenuItem(20,properties.disableCoverCache);		
 		_menu.CheckMenuItem(13,!trackinfostext_state.isActive() && properties.coverNoPadding);				
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 18, "Show track details");
 		_menu.CheckMenuItem(18, trackinfostext_state.isActive());		
 		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 17, "Show details on 2 rows");
 		_menu.CheckMenuItem(17, properties.doubleRowText);
+		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 19, "Edit displayed infos");	
+		_menu.CheckMenuItem(19, properties.customInfos!="");
 		_menu.AppendMenuItem(trackinfostext_state.isActive()?MF_STRING:MF_GRAYED, 16, "Show rating");
 		_menu.CheckMenuItem(16,properties.showRating);		
 		_menu.AppendMenuSeparator();
@@ -1857,17 +1859,18 @@ function draw_settings_menu(x,y){
 			case (idx == 11):
 				properties.circleMode = !properties.circleMode;
 				window.SetProperty("_DISPLAY: circle mode", properties.circleMode);
+				g_image_cache.resetCache();				
 				get_images();
 				adaptButtons();
 				g_cover.refreshCurrent();
 				window.Repaint();
 				break;
 			case (idx == 12):
-				properties.keepProportion = !properties.keepProportion;
+				setGlobalParameter("keepProportion",!globalProperties.keepProportion, true);
+				g_image_cache.resetCache();
 				get_images();
 				adaptButtons();
-				g_cover.refreshCurrent();
-				window.SetProperty("_DISPLAY: keepProportion", properties.keepProportion);
+				g_cover.refreshCurrent(undefined,true);
 				window.Repaint();
 				break;
 			case (idx == 13):
@@ -1908,6 +1911,26 @@ function draw_settings_menu(x,y){
 				g_cover.refreshCurrent();
 				on_size(window.Width,window.Height);			
 				adaptButtons();				
+				window.Repaint();
+				break;					
+			case (idx == 19): 
+					var customInfos_splitted = properties.customInfos.split(" ^^ ");
+					if(typeof customInfos_splitted[1] === "undefined") customInfos_splitted[1] = "";
+					customNowPlayingInfos("Edit displayed infos"
+										,"<div class='titleBig'>Edit displayed infos</div><div class='separator'></div><br/>Enter a title formatting script for each line of informations displayed. Leave both lines empty for default informations. Default informations are:\n\n     Line 1: %artist%  |  %album% (%date%)\n     Line 2: %codec% | %codec_profile% | %bitrate%K | %play_count%\n\nYou can use the full foobar2000 title formatting syntax here.<br/><a href=\"http://tinyurl.com/lwhay6f\" target=\"_blank\">Click here</a> for informations about foobar title formatting. (http://tinyurl.com/lwhay6f)<br/>"
+										,''
+										,'First line:##Second line:'
+										,customInfos_splitted[0]+'##'+customInfos_splitted[1]);
+		
+				window.Repaint();
+				break;				
+			case (idx == 20): 
+				properties.disableCoverCache = !properties.disableCoverCache;
+				window.SetProperty("_DISPLAY: disable cover cache", properties.disableCoverCache);
+				get_images();
+				adaptButtons();
+				g_image_cache.resetCache();
+				g_cover.refreshCurrent(undefined,true);
 				window.Repaint();
 				break;					
 			case (idx == 200):
@@ -2109,6 +2132,11 @@ function get_images(){
 		gb.FillPolygon(colors.rating_icon_off, 0, pointArr.p1);
 		gb.SetSmoothingMode(0);
 	img_rating_off.ReleaseGraphics(gb);
+	
+	img_blank_cover = gdi.CreateImage(10, 10);
+	gb = img_blank_cover.GetGraphics();
+		gb.FillSolidRect(0,0,10,10,colors.normal_bg);
+	img_blank_cover.ReleaseGraphics(gb);	
 }
 function toggleWallpaper(wallpaper_state){
 	wallpaper_state = typeof wallpaper_state !== 'undefined' ? wallpaper_state : !properties.showwallpaper;

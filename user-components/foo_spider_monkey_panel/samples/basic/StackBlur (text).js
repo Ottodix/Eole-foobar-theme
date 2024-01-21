@@ -1,9 +1,9 @@
-window.DefinePanel("StackBlur (text)", {author: "T.P Wang / marc2003"});
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('StackBlur (text)', {author: 'T.P Wang / marc2003'});
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 const g_font = gdi.Font('Segoe UI', 32, FontStyle.Bold);
-const text = '"Stack Blur" Sample';
+const text = '\'Stack Blur\' Sample';
 
 let ww = 0, wh = 0;
 let img_to_blur;

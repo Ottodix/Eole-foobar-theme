@@ -1,6 +1,6 @@
-window.DefinePanel("SimpleThemedButton", {author: "T.P Wang"});
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('SimpleThemedButton', {author: 'T.P Wang'});
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 const g_theme = window.CreateThemeManager('Button');
 const g_font = gdi.Font('Segoe UI', 12);

@@ -11,7 +11,6 @@ var properties = {
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
     wallpaperblurvalue: window.GetProperty("_DISPLAY: Wallpaper Blur Value", 1.05),
     wallpaperdisplay: window.GetProperty("_DISPLAY: Wallpaper 0=Filling 1=Adjust 2=Stretch", 0),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", false),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
     displayDevice: window.GetProperty("_DISPLAY device", false),	
@@ -635,7 +634,7 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.RunMainMenuCommand("View/DSP/Equalizer");
 		},false,equalizer_img,equalizer_img_hover),
-		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device & DSP presets", function () {
+		Device: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "Device", "Output device && DSP presets", function () {
 			g_tooltip.Deactivate();
 			menuOutputAndDSP(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,device_img,device_img_hover),		
@@ -643,7 +642,7 @@ function build_buttons(){
 			g_tooltip.Deactivate();
 			fb.AddFiles()
 		},false,open_img,open_img_hover),
-		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", "Play randomly a selection of tracks...", function () {
+		playRandom: new SimpleButton(-button_right_m-(button_width+button_padding)*(displayed_button++), buttons_right_top_m, button_width, 32, "playRandom", "Play a random selection of tracks...", function () {
 			g_tooltip.Deactivate();
 			randomPlayMenu(window.Width-button_right_m-(button_width+button_padding)*1-130, 15);
 		},false,false,random_img,random_img_hover),
@@ -858,7 +857,6 @@ function on_paint(gr) {
 	}
 
 	switch(true){
-		case (layout_state.isEqual(0) && screensaver_state.isActive() && properties.screensaver_dark_theme && properties.darklayout):
 		case (layout_state.isEqual(1) && properties.minimode_dark_theme && properties.darklayout):
 		case (main_panel_state.isEqual(0) && properties.library_dark_theme && layout_state.isEqual(0) && properties.darklayout):
 		case (main_panel_state.isEqual(1) && properties.playlists_dark_theme && layout_state.isEqual(0) && properties.darklayout):
@@ -1008,10 +1006,27 @@ function is_hover_track_info(x,y){
     return false;
 }
 function setVolume(val){
+	// fb.volume goes from -100 to 0
 	var volume = (val-volume_vars.margin_left) / volume_vars.width;
 	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
-	volume = 100 * (Math.pow(volume,1/2) - 1);
-	fb.Volume = volume;
+	
+	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
+	
+	fb.Volume = 100 * (Math.pow(volume_log,1/2) - 1);
+}
+function fbVolumeFromX(x){
+	var volume = (x-volume_vars.margin_left) / volume_vars.width;
+	volume = (volume<0) ? 0 : (volume<1) ? volume : 1;
+	
+	volume_log = (volume==0)?0:1/2*Math.log10(volume)+1;
+	volum_return = 100 * (Math.pow(volume_log,1/2) - 1)
+	if(isNaN(volum_return)) volum_return = -100;	
+	return volum_return;	
+}
+function getVolume(){
+	volume_log = Math.pow(fb.Volume/100 + 1,2);
+	volume_linear = (volume_log==0)?0:Math.pow(10,2*(volume_log-1));
+	return volume_linear;
 }
 function on_mouse_lbtn_down(x,y,m){
 	if(g_cursor.x!=x || g_cursor.y!=y) on_mouse_move(x,y);
@@ -1115,7 +1130,10 @@ function on_mouse_move(x,y,m){
 					volume_vars.height=volume_vars.height_hover;
 					repaint = true;
 				}
-			}
+				var volume = fbVolumeFromX(x);			
+				new_tooltip_text=volume.toFixed(2) + ' dB';
+				g_tooltip.Activate(new_tooltip_text, Math.min(Math.max(x-17,volume_vars.margin_left),volume_vars.margin_left+volume_vars.volumesize), volume_vars.margin_top-35, 0, false, 'volume_level');
+			} else if (g_tooltip.activeZone == 'volume_level') g_tooltip.Deactivate();
 			else if(!volume_vars.drag){ResetVolume();}
 		} else if(hoovervolume && !volume_vars.drag){
 			ResetVolume();
@@ -1125,10 +1143,12 @@ function on_mouse_move(x,y,m){
 			showVolumeSlider(false);
 		}
 
-		if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {showVolumeSlider(true);repaint = true;}
+		if(is_hover_volume_btn(x,y) && layout_state.isEqual(0) && !VolumeSliderActive) {
+			showVolumeSlider(true);repaint = true;		
+		}
 
 		if(volume_vars.drag){
-			setVolume(x);
+			setVolume(x);	
 		}
 	}
 	if(is_hover_time_elapsed(x,y) && TimeTotalSeconds!="ON AIR"){
@@ -1286,7 +1306,7 @@ function on_volume_change(val) {
 	window.Repaint();
 }
 function calculateVolumeSize(){
-	volume_vars.gradvolume = Math.pow((100+fb.Volume)/100,2);
+	volume_vars.gradvolume = getVolume();
 	volume_vars.volumesize = Math.round((volume_vars.width*volume_vars.gradvolume>volume_vars.width_min) ? volume_vars.width*volume_vars.gradvolume :volume_vars.width_min);
 	return volume_vars.volumesize;
 }
@@ -1467,16 +1487,16 @@ function Scheduler(callBackName){
 function oPanel(){
 	this.title_length = -1;
 	this.title_prefix_length = -1;
-    this.title_secondary_length = -1;
+	this.title_secondary_length = -1;
 	this.artist_length = -1;
 	this.time_length = -1;
 	this.fullTitle_length = -1;
 	this.title_txt = '';
-    this.title_prefix_txt = '';
-    this.title_secondary_txt = '';
+	this.title_prefix_txt = '';
+	this.title_secondary_txt = '';
 	this.artist_txt = '';
 	this.time_txt = '';
-	this.on_font_changed = function(){
+	this.on_font_changed = () => {
 		this.title_length = -1;
 		this.artist_length = -1;
 		this.time_length = -1;
@@ -1537,7 +1557,7 @@ function oPanel(){
 		this.time_length = -1;
 	}
 	this.get_time_length = function(gr){
-		if(this.time_length<0){
+		if (this.time_length < 0) {
 			this.time_length = gr.CalcTextWidth(this.time_txt, g_font.plus1) + 10;
 		}
 		return this.time_length;
@@ -1556,15 +1576,18 @@ function on_drag_leave() {
 }
 
 function on_drag_over(action, x, y, mask) {
-    if(x == g_dragndrop_x && y == g_dragndrop_y) return true;
+	if(x == g_dragndrop_x && y == g_dragndrop_y) {
+		return true;
+	}
 
-	try{
-		if(fb.IsPlaying || fb.IsPaused) action.Text = "Play next";
-		else action.Text = "Play";
-	} catch(e){}
+	try {
+		action.Text = fb.IsPlaying || fb.IsPaused
+			? 'Play next'
+			: 'Play';
+	} catch (e) {}
 
-    g_dragndrop_x = x;
-    g_dragndrop_y = y;
+	g_dragndrop_x = x;
+	g_dragndrop_y = y;
 };
 
 function on_drag_drop(action, x, y, mask) {
@@ -1726,18 +1749,6 @@ function on_notify_data(name, info) {
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
 			window.SetProperty("COVER Disk Cache", globalProperties.enableDiskCache);
-			window.Repaint();
-		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
-		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
 			window.Repaint();
 		break;
 		case "RefreshImageCover":
@@ -2497,7 +2508,7 @@ function moreMenu(x, y){
 		_menu_button.CheckMenuItem(4020, properties.displayPlayRandom);
 		_menu_button.AppendMenuItem(MF_STRING, 4017, "Equalizer");
 		_menu_button.CheckMenuItem(4017, properties.displayEqualizer);
-		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device / DSP presets");
+		_menu_button.AppendMenuItem(MF_STRING, 4024, "Output device && DSP presets");
 		_menu_button.CheckMenuItem(4024, properties.displayDevice);		
 		_menu_button.AppendMenuItem(MF_STRING, 4018, "Rating");
 		_menu_button.CheckMenuItem(4018, properties.displayRating);
@@ -3128,7 +3139,7 @@ function draw_settings_menu(x,y){
 		_menu_button.CheckMenuItem(3020, properties.displayPlayRandom);		
 		_menu_button.AppendMenuItem(MF_STRING, 3023, "Open");
 		_menu_button.CheckMenuItem(3023, properties.displayOpen);
-		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device");
+		_menu_button.AppendMenuItem(MF_STRING, 3029, "Output device && DSP presets");
 		_menu_button.CheckMenuItem(3029, properties.displayDevice);				
 		_menu_button.AppendMenuItem(MF_STRING, 3017, "Equalizer");
 		_menu_button.CheckMenuItem(3017, properties.displayEqualizer);	

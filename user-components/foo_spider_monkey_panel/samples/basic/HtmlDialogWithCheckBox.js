@@ -1,6 +1,6 @@
-window.DefinePanel('Html window with checkbox', {author: 'TheQwertiest'});
+window.DefineScript('Html window with checkbox', {author: 'TheQwertiest'});
 
-include(`${fb.ComponentPath}docs\\Flags.js`);
+include('docs/Flags.js');
 
 let WshShell = new ActiveXObject('WScript.Shell');
 
@@ -8,9 +8,9 @@ function get_windows_version() {
     let version = '';
 
     try {
-        version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
+        version = (WshShell.RegRead('HKLM/SOFTWARE/Microsoft/Windows NT/CurrentVersion/CurrentMajorVersionNumber')).toString();
         version += '.';
-        version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
+        version += (WshShell.RegRead('HKLM/SOFTWARE/Microsoft/Windows NT/CurrentVersion/CurrentMinorVersionNumber')).toString();
 
         return version;
     }
@@ -18,7 +18,7 @@ function get_windows_version() {
     }
 
     try {
-        version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
+        version = WshShell.RegRead('HKLM/SOFTWARE/Microsoft/Windows NT/CurrentVersion/CurrentVersion');
 
         return version;
     }
@@ -29,14 +29,14 @@ function get_windows_version() {
 }
 
 const htmlCode = function() {
-    let htmlCode = utils.ReadTextFile( `${fb.ComponentPath}samples\\basic\\html\\PopupWithCheckBox.html`);
+    let htmlCode = utils.ReadTextFile( `${fb.ComponentPath}samples/basic/html/PopupWithCheckBox.html`);
     
-    let cssPath = `${fb.ComponentPath}samples\\basic\\html\\`;
+    let cssPath = `${fb.ComponentPath}samples/basic/html/`;
     if ( get_windows_version() === '6.1' ) {
-        cssPath += "styles7.css";
+        cssPath += 'styles7.css';
     }
     else {
-        cssPath += "styles10.css";
+        cssPath += 'styles10.css';
     }
     htmlCode = htmlCode.replace(/href="styles10.css"/i, `href="${cssPath}"`);
     return htmlCode;
@@ -58,7 +58,7 @@ function on_size(w,h) {
 }
 
 function on_mouse_lbtn_up() {
-    utils.ShowHtmlDialog(window.ID, htmlCode, {
+    utils.ShowHtmlDialog(0, htmlCode, {
         data: ['Html Window', 'This is an HTML notification window with a check box\n', '< Click me', window_ok_callback],            
     });
 }

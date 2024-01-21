@@ -1,4 +1,4 @@
-window.DefinePanel("Watch Metadb Change", { author: "T.P Wang" });
+window.DefineScript('Watch Metadb Change', { author: 'T.P Wang' });
 
 // Callback
 function on_metadb_changed(handle_list) {

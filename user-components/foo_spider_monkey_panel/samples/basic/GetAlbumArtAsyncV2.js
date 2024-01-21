@@ -1,11 +1,11 @@
-window.DefinePanel("GetAlbumArtAsyncV2", { author: "TheQwertiest" });
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('GetAlbumArtAsyncV2', { author: 'TheQwertiest' });
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 // Nothing will show until you start playing a new track
 
 let g_img = null;
-let path = "";
+let path = '';
 let ww = 0, wh = 0;
 let cur_metadb = null;
 
@@ -53,7 +53,7 @@ function on_mouse_lbtn_dblclk(x, y) {
 
 const get_album_art_async = async (metadb, art_id) =>
 {
-    let result = await utils.GetAlbumArtAsyncV2(window.ID, metadb, art_id);
+    let result = await utils.GetAlbumArtAsyncV2(0, metadb, art_id);
     if (metadb === cur_metadb) {
         path = result.path;
         g_img = result.image;

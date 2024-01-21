@@ -133,7 +133,13 @@ function RefreshPSS_old2() {
 var main_panel_state = new oPanelSetting("main_panel_state", "MAINPANEL_", 0, 0, 3);
 var layout_state = new oPanelSetting("layout_state", "LAYOUT_", 0, 0, 1);
 
+var darklib_state = new oPanelSetting("darklib_state", "DARKLIB_", 0, 0, 1);
 var darkplaylist_state = new oPanelSetting("darkplaylist_state", "DARKPLAYLIST_", 0, 0, 1);
+var darkbio_state = new oPanelSetting("darkbio_state", "DARKBIO_", 0, 0, 1);
+var darkbiostick_state = new oPanelSetting("darkbiostick_state", "DARKBIOSTICK_", 0, 0, 1);
+var darkvisu_state = new oPanelSetting("darkvisu_state", "DARKVISU_", 0, 0, 1);
+var darkmini_state = new oPanelSetting("darkmini_state", "DARKMINI_", 0, 0, 1);
+
 var showtrackinfo_big = new oPanelSetting("showtrackinfo_big", "SHOWTRACKINFOBIG_", 1, 0, 1);
 var showtrackinfo_small = new oPanelSetting("showtrackinfo_small", "SHOWTRACKINFOSMALL_", 0, 0, 1);
 
@@ -141,8 +147,7 @@ var coverpanel_state_mini = new oPanelSetting("coverpanel_state_mini", "COVERPAN
 var coverpanel_state_big = new oPanelSetting("coverpanel_state_big", "COVERPANELBIG_", 1, 0, 1);
 var filters_panel_state = new oPanelSetting("filters_panel_state", "FILTERSPANEL_", 1, 0, 5);
 var libraryfilter_state = new oPanelSetting("libraryfilter_state", "LIBRARYFILTER_", 1, 0, 1);
-var screensaver_state = new oPanelSetting("screensaver_state", "SCREENSAVER_", 0, 0, 1);
-var lyrics_state = new oPanelSetting("lyrics_state", "LYRICS_", 1, 0, 5);
+var lyrics_state = new oPanelSetting("lyrics_state", "LYRICS_", 1, 0, 11);
 var librarytree = new oPanelSetting("librarytree", "LIBRARYTREE_", 0, 0, 1);
 var mini_controlbar = new oPanelSetting("mini_controlbar", "MINICONTROLBAR_", 1, 0, 1);
 var compact_titlebar = new oPanelSetting("compacttitlebar", "COMPACTTITLEBAR_", 0, 0, 1);

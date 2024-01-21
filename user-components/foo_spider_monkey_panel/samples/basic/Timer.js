@@ -1,4 +1,4 @@
-window.DefinePanel("Timer", { author: "T.P Wang" });
+window.DefineScript('Timer', { author: 'T.P Wang' });
 
 // This sample create two timers
 // Click the window to start the timer, and see the result after the console is shown.

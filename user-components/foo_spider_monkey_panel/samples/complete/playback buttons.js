@@ -1,6 +1,6 @@
 'use strict';
 
-window.DefinePanel('Playback Buttons', {author:'marc2003'});
+window.DefineScript('Playback Buttons', {author:'marc2003', options:{grab_focus:false}});
 include(fb.ComponentPath + 'samples\\complete\\js\\lodash.min.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\helpers.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\panel.js');
@@ -16,30 +16,19 @@ buttons.update = () => {
 	buttons.buttons.next = new _button(bs * 3, 0, bs, bs, {normal : 'buttons\\next.png'}, (x, y) => { fb.Next(); }, 'Next');
 }
 
-function on_colours_changed() {
-	panel.colours_changed();
-	window.Repaint();
-}
-
-function on_mouse_lbtn_up(x, y, mask) {
-	buttons.lbtn_up(x, y, mask);
-}
-
-function on_mouse_leave() {
-	buttons.leave();
-}
-
-function on_mouse_move(x, y) {
-	buttons.move(x, y);
-}
-
-function on_mouse_rbtn_up(x, y) {
-	return panel.rbtn_up(x, y);
+function on_size() {
+	panel.size();
+	buttons.update();
 }
 
 function on_paint(gr) {
 	panel.paint(gr);
 	buttons.paint(gr);
+}
+
+function on_playback_stop() {
+	buttons.update();
+	window.Repaint();
 }
 
 function on_playback_pause() {
@@ -52,12 +41,23 @@ function on_playback_starting() {
 	window.Repaint();
 }
 
-function on_playback_stop() {
-	buttons.update();
-	window.Repaint();
+function on_mouse_move(x, y) {
+	buttons.move(x, y);
 }
 
-function on_size() {
-	panel.size();
-	buttons.update();
+function on_mouse_leave() {
+	buttons.leave();
+}
+
+function on_mouse_lbtn_up(x, y, mask) {
+	buttons.lbtn_up(x, y, mask);
+}
+
+function on_mouse_rbtn_up(x, y) {
+	return panel.rbtn_up(x, y);
+}
+
+function on_colours_changed() {
+	panel.colours_changed();
+	window.Repaint();
 }

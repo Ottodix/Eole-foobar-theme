@@ -8,6 +8,32 @@ this[z]=this[z].join('');}
 
 function on_script_unload() {
 	_tt('');
+	if (_bmp) {
+		_bmp.ReleaseGraphics(_gr);
+	}
+	_gr = null;
+	_bmp = null;
+}
+
+function _artistFolder(artist) {
+	const a = _fbSanitise(artist);
+	let folder = folders.artists + a;
+	if (_isFolder(folder)) {
+		return fso.GetFolder(folder) + '\\';
+	} else {
+		folder = folders.artists + _.truncate(a, { length : 64 });
+		_createFolder(folder);
+		return fso.GetFolder(folder) + '\\';
+	}
+}
+
+function _blendColours(c1, c2, f) {
+	c1 = _toRGB(c1);
+	c2 = _toRGB(c2);
+	const r = Math.round(c1[0] + f * (c2[0] - c1[0]));
+	const g = Math.round(c1[1] + f * (c2[1] - c1[1]));
+	const b = Math.round(c1[2] + f * (c2[2] - c1[2]));
+	return _RGB(r, g, b);
 }
 
 function _button(x, y, w, h, img_src, fn, tiptext) {
@@ -96,129 +122,16 @@ function _buttons() {
 	this.btn = null;
 }
 
-function _hacks() {
-	this.disable = () => {
-		this.uih.MainMenuState = this.MainMenuState.Show;
-		this.uih.FrameStyle = this.FrameStyle.Default;
-		this.uih.StatusBarState = true;
-	}
-	
-	this.enable = () => {
-		this.uih.MainMenuState = this.MainMenuState.Hide;
-		this.uih.FrameStyle = this.FrameStyle.NoBorder;
-		this.uih.StatusBarState = false;
-	}
-	
-	this.set_caption = (x, y, w, h) => {
-		this.uih.SetPseudoCaption(x, y, w, h);
-	}
-	
-	this.MainMenuState = { Show : 0, Hide : 1, Auto : 2 };
-	this.FrameStyle = { Default : 0, SmallCaption : 1, NoCaption : 2, NoBorder : 3 };
-	this.MoveStyle = { Default : 0, Middle : 1, Left : 2, Both : 3 };
-	
-	this.uih = new ActiveXObject('UIHacks');
-	this.uih.MoveStyle = this.MoveStyle.Default;
-	this.uih.DisableSizing = false;
-	this.uih.BlockMaximize = false;
-	this.uih.MinSize = false;
-	this.uih.MaxSize = false;
-}
-
-function _p(a, b) {
-	Object.defineProperty(this, _.isBoolean(b) ? 'enabled' : 'value', {
-		get() {
-			return this.b;
-		},
-		set(value) {
-			this.b = value;
-			window.SetProperty(this.a, this.b);
-		}
-	});
-	
-	this.toggle = () => {
-		this.b = !this.b;
-		window.SetProperty(this.a, this.b);
-	}
-	
-	this.a = a;
-	this.b = window.GetProperty(a, b);
-}
-
-function _sb(t, x, y, w, h, v, fn) {
-	this.paint = (gr, colour) => {
-		gr.SetTextRenderingHint(4);
-		if (this.v()) {
-			gr.DrawString(this.t, this.font, colour, this.x, this.y, this.w, this.h, SF_CENTRE);
-		}
-	}
-	
-	this.trace = (x, y) => {
-		return x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h && this.v();
-	}
-	
-	this.move = (x, y) => {
-		if (this.trace(x, y)) {
-			window.SetCursor(IDC_HAND);
-			return true;
-		} else {
-			//window.SetCursor(IDC_ARROW);
-			return false;
-		}
-	}
-	
-	this.lbtn_up = (x, y) => {
-		if (this.trace(x, y)) {
-			if (this.fn) {
-				this.fn(x, y);
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	this.t = t;
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
-	this.v = v;
-	this.fn = fn;
-	this.font = gdi.Font('FontAwesome', this.h);
-}
-
-function _artistFolder(artist) {
-	const a = _fbSanitise(artist);
-	let folder = folders.artists + a;
-	if (_isFolder(folder)) {
-		return fso.GetFolder(folder) + '\\';
-	} else {
-		folder = folders.artists + _.truncate(a, { length : 64 });
-		_createFolder(folder);
-		return fso.GetFolder(folder) + '\\';
-	}
-}
-
-function _blendColours(c1, c2, f) {
-	c1 = _toRGB(c1);
-	c2 = _toRGB(c2);
-	const r = Math.round(c1[0] + f * (c2[0] - c1[0]));
-	const g = Math.round(c1[1] + f * (c2[1] - c1[1]));
-	const b = Math.round(c1[2] + f * (c2[2] - c1[2]));
-	return _RGB(r, g, b);
-}
-
 function _cc(name) {
 	return utils.CheckComponent(name, true);
 }
 
-function _chrToImg(chr, colour) {
+function _chrToImg(chr, colour, font) {
 	const size = 96;
 	let temp_bmp = gdi.CreateImage(size, size);
 	let temp_gr = temp_bmp.GetGraphics();
 	temp_gr.SetTextRenderingHint(4);
-	temp_gr.DrawString(chr, fontawesome, colour, 0, 0, size, size, SF_CENTRE);
+	temp_gr.DrawString(chr, font || fontawesome, colour, 0, 0, size, size, SF_CENTRE);
 	temp_bmp.ReleaseGraphics(temp_gr);
 	temp_gr = null;
 	return temp_bmp;
@@ -328,7 +241,11 @@ function _gdiFont(name, size, style) {
 }
 
 function _getClipboardData() {
-	return doc.parentWindow.clipboardData.getData('Text');
+	try {
+		return doc.parentWindow.clipboardData.getData('Text');
+	} catch (e) {
+		return null;
+	}
 }
 
 function _getElementsByTagName(value, tag) {
@@ -340,16 +257,24 @@ function _getElementsByTagName(value, tag) {
 	return data;
 }
 
+function _getExt(path) {
+	return path.split('.').pop().toLowerCase();
+}
+
 function _getFiles(folder, exts, newest_first) {
 	let files = [];
 	if (_isFolder(folder)) {
 		let e = new Enumerator(fso.GetFolder(folder).Files);
 		for (; !e.atEnd(); e.moveNext()) {
 			const path = e.item().Path;
-			if (exts.toLowerCase().includes(path.split('.').pop().toLowerCase())) {
-				files.push(path);
-			}
+			files.push(path);
 		}
+	}
+	if (exts) {
+		files = _.filter(files, function (item) {
+			let ext = _getExt(item);
+			return exts.includes(ext);
+		});
 	}
 	if (newest_first) {
 		return _.orderBy(files, (item) => {
@@ -359,6 +284,35 @@ function _getFiles(folder, exts, newest_first) {
 		files.srt();
 		return files;
 	}
+}
+
+function _hacks() {
+	this.disable = () => {
+		this.uih.MainMenuState = this.MainMenuState.Show;
+		this.uih.FrameStyle = this.FrameStyle.Default;
+		this.uih.StatusBarState = true;
+	}
+	
+	this.enable = () => {
+		this.uih.MainMenuState = this.MainMenuState.Hide;
+		this.uih.FrameStyle = this.FrameStyle.NoBorder;
+		this.uih.StatusBarState = false;
+	}
+	
+	this.set_caption = (x, y, w, h) => {
+		this.uih.SetPseudoCaption(x, y, w, h);
+	}
+	
+	this.MainMenuState = { Show : 0, Hide : 1, Auto : 2 };
+	this.FrameStyle = { Default : 0, SmallCaption : 1, NoCaption : 2, NoBorder : 3 };
+	this.MoveStyle = { Default : 0, Middle : 1, Left : 2, Both : 3 };
+	
+	this.uih = new ActiveXObject('UIHacks');
+	this.uih.MoveStyle = this.MoveStyle.Default;
+	this.uih.DisableSizing = false;
+	this.uih.BlockMaximize = false;
+	this.uih.MinSize = false;
+	this.uih.MaxSize = false;
 }
 
 function _help(x, y, flags) {
@@ -438,60 +392,45 @@ function _lockSize(w, h) {
 }
 
 function _menu(x, y, flags) {
-	let m1 = window.CreatePopupMenu();
-	let s1 = window.CreatePopupMenu();
-	let s2 = window.CreatePopupMenu();
-	let s3 = window.CreatePopupMenu();
-	let s4 = window.CreatePopupMenu();
-	let s5 = window.CreatePopupMenu();
-	let s6 = window.CreatePopupMenu();
-	let mm1 = fb.CreateMainMenuManager();
-	let mm2 = fb.CreateMainMenuManager();
-	let mm3 = fb.CreateMainMenuManager();
-	let mm4 = fb.CreateMainMenuManager();
-	let mm5 = fb.CreateMainMenuManager();
-	let mm6 = fb.CreateMainMenuManager();
-	mm1.Init('File');
-	mm2.Init('Edit');
-	mm3.Init('View');
-	mm4.Init('Playback');
-	mm5.Init('Library');
-	mm6.Init('Help');
-	mm1.BuildMenu(s1, 1000, 999);
-	mm2.BuildMenu(s2, 2000, 999);
-	mm3.BuildMenu(s3, 3000, 999);
-	mm4.BuildMenu(s4, 4000, 999);
-	mm5.BuildMenu(s5, 5000, 999);
-	mm6.BuildMenu(s6, 6000, 999);
-	s1.AppendTo(m1, MF_STRING, 'File');
-	s2.AppendTo(m1, MF_STRING, 'Edit');
-	s3.AppendTo(m1, MF_STRING, 'View');
-	s4.AppendTo(m1, MF_STRING, 'Playback');
-	s5.AppendTo(m1, MF_STRING, 'Library');
-	s6.AppendTo(m1, MF_STRING, 'Help');
-	const idx = m1.TrackPopupMenu(x, y, flags);
+	let menu = window.CreatePopupMenu();
+	let file = new _main_menu_helper('File', 1000, menu);
+	let edit = new _main_menu_helper('Edit', 2000, menu);
+	let view = new _main_menu_helper('View', 3000, menu);
+	let playback = new _main_menu_helper('Playback', 4000, menu);
+	let library = new _main_menu_helper('Library', 5000, menu);
+	let help = new _main_menu_helper('Help', 6000, menu);
+	
+	let idx = menu.TrackPopupMenu(x, y, flags);
 	switch (true) {
 	case idx == 0:
 		break;
 	case idx < 2000:
-		mm1.ExecuteByID(idx - 1000);
+		file.mm.ExecuteByID(idx - 1000);
 		break;
 	case idx < 3000:
-		mm2.ExecuteByID(idx - 2000);
+		edit.mm.ExecuteByID(idx - 2000);
 		break;
 	case idx < 4000:
-		mm3.ExecuteByID(idx - 3000);
+		view.mm.ExecuteByID(idx - 3000);
 		break;
 	case idx < 5000:
-		mm4.ExecuteByID(idx - 4000);
+		playback.mm.ExecuteByID(idx - 4000);
 		break;
 	case idx < 6000:
-		mm5.ExecuteByID(idx - 5000);
+		library.mm.ExecuteByID(idx - 5000);
 		break;
 	case idx < 7000:
-		mm6.ExecuteByID(idx - 6000);
+		help.mm.ExecuteByID(idx - 6000);
 		break;
 	}
+}
+
+function _main_menu_helper(name, base_id, main_menu) {
+	this.popup = window.CreatePopupMenu();
+	this.mm = fb.CreateMainMenuManager();
+	this.mm.Init(name);
+	this.mm.BuildMenu(this.popup, base_id, -1);
+	this.popup.AppendTo(main_menu, MF_STRING, name);
 }
 
 function _open(file) {
@@ -502,13 +441,37 @@ function _open(file) {
 	}
 }
 
+function _p(a, b) {
+	Object.defineProperty(this, _.isBoolean(b) ? 'enabled' : 'value', {
+		get() {
+			return this.b;
+		},
+		set(value) {
+			this.b = value;
+			window.SetProperty(this.a, this.b);
+		}
+	});
+
+	this.toggle = () => {
+		this.b = !this.b;
+		window.SetProperty(this.a, this.b);
+	}
+
+	this.a = a;
+	this.b = window.GetProperty(a, b);
+}
+
 function _q(value) {
 	return '"' + value + '"';
 }
 
 function _recycleFile(file) {
 	if (_isFile(file)) {
-		app.NameSpace(10).MoveHere(file);
+		try {
+			app.NameSpace(10).MoveHere(file);
+		} catch (e) {
+			console.log(N, 'Failed to recycle file:', file);
+		}
 	}
 }
 
@@ -544,8 +507,55 @@ function _save(file, value) {
 	return false;
 }
 
+function _sb(t, x, y, w, h, v, fn) {
+	this.paint = (gr, colour) => {
+		gr.SetTextRenderingHint(4);
+		if (this.v()) {
+			gr.DrawString(this.t, this.font, colour, this.x, this.y, this.w, this.h, SF_CENTRE);
+		}
+	}
+	
+	this.trace = (x, y) => {
+		return x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h && this.v();
+	}
+	
+	this.move = (x, y) => {
+		if (this.trace(x, y)) {
+			window.SetCursor(IDC_HAND);
+			return true;
+		} else {
+			//window.SetCursor(IDC_ARROW);
+			return false;
+		}
+	}
+	
+	this.lbtn_up = (x, y) => {
+		if (this.trace(x, y)) {
+			if (this.fn) {
+				this.fn(x, y);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	this.t = t;
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+	this.v = v;
+	this.fn = fn;
+	this.font = gdi.Font('FontAwesome', this.h);
+}
+
 function _setClipboardData(value) {
-	doc.parentWindow.clipboardData.setData('Text', value.toString());
+	try {
+		doc.parentWindow.clipboardData.setData('Text', value.toString());
+	} catch(e) {
+		console.log(N, 'Failed to set clipboard text.');
+	}
 }
 
 function _scale(size) {
@@ -626,15 +636,13 @@ const ONE_DAY = 86400000;
 const ONE_WEEK = 604800000;
 
 const DEFAULT_ARTIST = '$meta(artist,0)';
-const N = window.Name + ':';
+const N = window.ScriptInfo.Name + ':';
 
-const DPI = WshShell.RegRead('HKCU\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI');
+let DPI = 96;
+try { DPI = WshShell.RegRead('HKCU\\Control Panel\\Desktop\\WindowMetrics\\AppliedDPI'); } catch (e) {}
 
 const LM = _scale(5);
 const TM = _scale(20);
-
-let _bmp = gdi.CreateImage(1, 1);
-let _gr = _bmp.GetGraphics();
 
 let tooltip = window.CreateTooltip('Segoe UI', _scale(12));
 tooltip.SetMaxWidth(1200);
@@ -688,10 +696,13 @@ let image = {
 };
 
 let ha_links = [
-	['Title Formatting Reference', 'http://wiki.hydrogenaud.io/index.php?title=Foobar2000:Title_Formatting_Reference'],
-	['Query Syntax', 'http://wiki.hydrogenaud.io/index.php?title=Foobar2000:Query_syntax'],
+	['Title Formatting Reference', 'https://wiki.hydrogenaud.io/index.php?title=Foobar2000:Title_Formatting_Reference'],
+	['Query Syntax', 'https://wiki.hydrogenaud.io/index.php?title=Foobar2000:Query_syntax'],
 	['Homepage', 'https://www.foobar2000.org/'],
 	['Components', 'https://www.foobar2000.org/components'],
-	['Wiki', 'http://wiki.hydrogenaud.io/index.php?title=Foobar2000:Foobar2000'],
+	['Wiki', 'https://wiki.hydrogenaud.io/index.php?title=Foobar2000:Foobar2000'],
 	['Forums', 'https://hydrogenaud.io/index.php/board,28.0.html']
 ];
+
+let _bmp = gdi.CreateImage(1, 1);
+let _gr = _bmp.GetGraphics();

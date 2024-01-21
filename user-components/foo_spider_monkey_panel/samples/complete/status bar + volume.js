@@ -1,6 +1,6 @@
 'use strict';
 
-window.DefinePanel('Status Bar + Volume', {author:'marc2003'});
+window.DefineScript('Status Bar + Volume', {author:'marc2003', options:{grab_focus:false}});
 include(fb.ComponentPath + 'samples\\complete\\js\\lodash.min.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\helpers.js');
 include(fb.ComponentPath + 'samples\\complete\\js\\volume.js');
@@ -28,29 +28,47 @@ let volume = new _volume(0, 3, 100, font.Height - 9);
 
 refresh();
 
-function refresh() {
-	let items = plman.GetPlaylistItems(plman.ActivePlaylist);
-	const count = items.Count;
-	let tmp = [];
-	if (properties.name.enabled) {
-		tmp.push(plman.GetPlaylistName(plman.ActivePlaylist));
+function on_size() {
+	ww = window.Width;
+	wh = window.Height;
+	volume.x = ww - 190;
+}
+
+function on_paint(gr) {
+	gr.FillSolidRect(0, 0, ww, wh, properties.background.value);
+	if (fb.IsPlaying) {
+		gr.GdiDrawText(tfo.Eval(), font, properties.text.value, 5, -1, ww - right_text_width - 300, font.Height, LEFT);
 	}
-	if (properties.count.enabled) {
-		tmp.push(count + (count == 1 ? ' track' : ' tracks'));
+	if (plman.ActivePlaylist > -1 && plman.ActivePlaylist < plman.PlaylistCount) {
+		gr.GdiDrawText(right_text, font, properties.text.value, 0, -1, ww - 250, font.Height, RIGHT);
 	}
-	if (properties.duration.enabled) {
-		tmp.push(utils.FormatDuration(items.CalcTotalDuration()));
-	}
-	if (properties.size.enabled) {
-		tmp.push(utils.FormatFileSize(items.CalcTotalSize()));
-	}
-	right_text = tmp.join(' :: ');
-	right_text_width = _textWidth(right_text, font);
+	gr.DrawRect(volume.x, volume.y, volume.w, volume.h, 1, properties.text.value);
+	gr.FillSolidRect(volume.x, volume.y, volume.pos(), volume.h, properties.text.value);
+	gr.GdiDrawText(fb.Volume.toFixed(2) + ' dB', font, properties.text.value, 0, -1, ww - 5, font.Height, RIGHT);
+}
+
+function on_playback_new_track() {
 	window.Repaint();
 }
 
-function on_mouse_lbtn_dblclk() {
-	fb.RunMainMenuCommand('View/Show now playing in playlist');
+function on_playback_time() {
+	window.Repaint();
+}
+
+function on_playback_stop() {
+	window.Repaint();
+}
+
+function on_volume_change() {
+	window.Repaint();
+}
+
+function on_mouse_wheel(s) {
+	volume.wheel(s);
+}
+
+function on_mouse_move(x, y) {
+	volume.move(x, y);
 }
 
 function on_mouse_lbtn_down(x, y) {
@@ -61,8 +79,8 @@ function on_mouse_lbtn_up(x, y) {
 	volume.lbtn_up(x, y);
 }
 
-function on_mouse_move(x, y) {
-	volume.move(x, y);
+function on_mouse_lbtn_dblclk() {
+	fb.RunMainMenuCommand('View/Show now playing in playlist');
 }
 
 function on_mouse_rbtn_up(x, y) {
@@ -111,11 +129,11 @@ function on_mouse_rbtn_up(x, y) {
 		refresh();
 		break;
 	case 10004:
-		properties.background.value = utils.ColourPicker(window.ID, properties.background.value);
+		properties.background.set(utils.ColourPicker(window.ID, properties.background.value));
 		window.Repaint();
 		break;
 	case 10005:
-		properties.text.value = utils.ColourPicker(window.ID, properties.text.value);
+		properties.text.set(utils.ColourPicker(window.ID, properties.text.value));
 		window.Repaint();
 		break;
 	case 10010:
@@ -126,31 +144,6 @@ function on_mouse_rbtn_up(x, y) {
 		break;
 	}
 	return true;
-}
-
-function on_mouse_wheel(s) {
-	volume.wheel(s);
-}
-
-function on_paint(gr) {
-	gr.FillSolidRect(0, 0, ww, wh, properties.background.value);
-	if (fb.IsPlaying) {
-		gr.GdiDrawText(tfo.Eval(), font, properties.text.value, 5, -1, ww - right_text_width - 300, font.Height, LEFT);
-	}
-	if (plman.ActivePlaylist > -1 && plman.ActivePlaylist < plman.PlaylistCount) {
-		gr.GdiDrawText(right_text, font, properties.text.value, 0, -1, ww - 250, font.Height, RIGHT);
-	}
-	gr.DrawRect(volume.x, volume.y, volume.w, volume.h, 1, properties.text.value);
-	gr.FillSolidRect(volume.x, volume.y, volume.pos(), volume.h, properties.text.value);
-	gr.GdiDrawText(fb.Volume.toFixed(2) + ' dB', font, properties.text.value, 0, -1, ww - 5, font.Height, RIGHT);
-}
-
-function on_playback_time() {
-	window.Repaint();
-}
-
-function on_playback_stop() {
-	window.Repaint();
 }
 
 function on_playlist_items_added(p) {
@@ -165,22 +158,33 @@ function on_playlist_items_removed(p) {
 	}
 }
 
-function on_playlist_switch() {
-	refresh();
-}
-
 function on_playlists_changed() {
 	if (properties.name.enabled) {
 		refresh();
 	}
 }
 
-function on_size() {
-	ww = window.Width;
-	wh = window.Height;
-	volume.x = ww - 190;
+function on_playlist_switch() {
+	refresh();
 }
 
-function on_volume_change() {
+function refresh() {
+	let items = plman.GetPlaylistItems(plman.ActivePlaylist);
+	const count = items.Count;
+	let tmp = [];
+	if (properties.name.enabled) {
+		tmp.push(plman.GetPlaylistName(plman.ActivePlaylist));
+	}
+	if (properties.count.enabled) {
+		tmp.push(count + (count == 1 ? ' track' : ' tracks'));
+	}
+	if (properties.duration.enabled) {
+		tmp.push(utils.FormatDuration(items.CalcTotalDuration()));
+	}
+	if (properties.size.enabled) {
+		tmp.push(utils.FormatFileSize(items.CalcTotalSize()));
+	}
+	right_text = tmp.join(' :: ');
+	right_text_width = _textWidth(right_text, font);
 	window.Repaint();
 }

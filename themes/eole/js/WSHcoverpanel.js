@@ -9,7 +9,6 @@ var properties = {
 	minidarklayout: window.GetProperty("_DISPLAY: Mini layout:Dark", true),
     minimode_dark_theme: window.GetProperty("MINIMODE dark theme", true),
     library_dark_theme: window.GetProperty("LIBRARY dark theme", true),
-    screensaver_dark_theme: window.GetProperty("SCREENSAVER dark theme", true),
     playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", true),
     bio_dark_theme: window.GetProperty("BIO dark theme", true),
     dble_click_action: window.GetProperty("PROPERTY double click action", 0),
@@ -141,15 +140,9 @@ function startAnimation(){
 		animationStartTime = Date.now();
 	}catch(e){}
 	animationCounter = 0;
-	if(properties.showVisualization>0 || globalProperties.enable_screensaver){
+	if(properties.showVisualization>0){
 		animationTimer = setInterval(function() {
 			animationCounter++;
-			if(fb.IsPlaying && globalProperties.enable_screensaver && !screensaver_state.isActive() && layout_state.isEqual(0) && !main_panel_state.isEqual(3)){
-				current_ms = (new Date).getTime();
-				if(current_ms >= last_mouse_move_notified+globalProperties.mseconds_before_screensaver){
-					screensaver_state.setValue(1);
-				}
-			}
 			if(fb.IsPlaying && !fb.IsPaused && !Randomsetfocus && window.IsVisible) {
 				//Restart if the animation is desyncronised
 				try{
@@ -290,27 +283,33 @@ function calculate_visu_margin_left(){
 
 function on_paint(gr) {
 	dont_resize = false;
-	if(!fb.IsPlaying){
-		if(layout_state.isEqual(0) && mini_controlbar.isActive() && showtrackinfo_big.isActive()) {
-			g_cover.setArtwork(images.nothing_played_compact,false,true);
-			nowPlaying_cachekey = null;
-		} else if(layout_state.isEqual(0) && mini_controlbar.isActive()){
-			g_cover.setArtwork(images.nothing_played_supercompact,false,true);
-			nowPlaying_cachekey = null;
-		} else if(layout_state.isEqual(0)) {
-			g_cover.setArtwork(images.nothing_played,false,true);
-			nowPlaying_cachekey = null;
+
+	if (ww === 0 || wh === 0) {
+    return;
+  }
+
+	if (!fb.IsPlaying) {
+		if (layout_state.isEqual(0) && mini_controlbar.isActive() && showtrackinfo_big.isActive()) {
+			g_cover.setArtwork(images.nothing_played_compact, false, true);
+		} else if (layout_state.isEqual(0) && mini_controlbar.isActive()) {
+			g_cover.setArtwork(images.nothing_played_supercompact, false, true);
+		} else if (layout_state.isEqual(0)) {
+			g_cover.setArtwork(images.nothing_played, false, true);
 		} else {
-			g_cover.setArtwork(images.nothing_played_mini,false,true);
-			nowPlaying_cachekey = null;
+			g_cover.setArtwork(images.nothing_played_mini, false, true);
 		}
+    nowPlaying_cachekey = null;
 	}
-	if(!g_cover.isSetArtwork()) {
-		try{
+
+	if (!g_cover.isSetArtwork()) {
+		try {
 			tracktype = TrackType(fb.GetNowPlaying());
-			if(tracktype == 3) g_cover.setArtwork(globalProperties.stream_img,true,true)
-			else g_cover.setArtwork(globalProperties.nocover_img,true,true);
-		} catch (e){g_cover.setArtwork(globalProperties.nocover_img,true,true)}
+			tracktype === 3
+        ? g_cover.setArtwork(globalProperties.stream_img, true, true)
+        : g_cover.setArtwork(globalProperties.nocover_img, true, true);
+		} catch (e) {
+      g_cover.setArtwork(globalProperties.nocover_img, true, true);
+    }
 	}
 
 	g_cover.draw(gr,0,0);
@@ -326,57 +325,60 @@ function on_paint(gr) {
 	}
 
 	drawAllButtons(gr);
-	switch(true){
-		case (main_panel_state.isEqual(0) && properties.library_dark_theme && layout_state.isEqual(0)):
-		case (main_panel_state.isEqual(1) && properties.playlists_dark_theme && layout_state.isEqual(0)):
-		case (main_panel_state.isEqual(2) && properties.bio_dark_theme && layout_state.isEqual(0)):
-		case (main_panel_state.isEqual(3) && layout_state.isEqual(0)):
-		case (properties.minimode_dark_theme && layout_state.isEqual(1)):
-			gr.FillSolidRect(0, 0, ww, border_top, colors.border_light);
-		break;
-		default:
-			gr.FillSolidRect(0, 0, ww, border_top, colors.border_dark);
-		break;
-	}
+
+  if (
+    layout_state === 0 && 
+    (main_panel_state === 0 && properties.library_dark_theme ||
+    main_panel_state === 1 && properties.playlists_dark_theme ||
+    main_panel_state === 2 && properties.bio_dark_theme ||
+    main_panel_state === 3) ||
+    properties.minimode_dark_theme && layout_state === 1
+  ) {
+    gr.FillSolidRect(0, 0, ww, border_top, colors.border_light);
+  } else {
+    gr.FillSolidRect(0, 0, ww, border_top, colors.border_dark);
+  }
 
 	gr.FillSolidRect(0, wh-border_bottom, ww, border_right, colors.border_dark);
 	gr.FillGradRect(0, wh-1, ww, 1, 0,colors.line_bottom,colors.line_bottom);
-	//if(!properties.darklayout) gr.FillSolidRect(ww-1, 0, 1, wh, colors.border_right);
 }
+
 function on_size(w, h) {
-    ww = w;
-    wh = h;
+  ww = w;
+  wh = h;
 	calculate_visu_margin_left();
 	text_height=wh-8;
-	if(properties.showVisualization>0 || globalProperties.enable_screensaver) startAnimation();
-    positionButtons();
-	g_cover.setSize(ww,wh);
+	properties.showVisualization > 0 && startAnimation();
+  positionButtons();
+	g_cover.setSize(ww, wh);
 }
 
 function on_mouse_lbtn_up(x, y) {
-    g_down = false;
+  g_down = false;
 
-    if (cur_btn && cur_btn.state!=ButtonStates.hide && !g_dble_click) {
-        cur_btn.onClick();
-        window.Repaint();
-    }
-    g_dble_click=false;
+  if (cur_btn && cur_btn.state!=ButtonStates.hide && !g_dble_click) {
+    cur_btn.onClick();
+    window.Repaint();
+  }
+  g_dble_click=false;
 }
+
 function on_mouse_lbtn_down(x, y) {
-    g_down = true;
-    click_on_btn = false;
-    cur_btn = chooseButton(x, y);
-    if (cur_btn && cur_btn.state!=ButtonStates.hide) {
-        cur_btn.changeState(ButtonStates.down);
-		click_on_btn=true;
-        window.Repaint();
-    }
-    if(!fb.IsPlaying) {
-        play_random(properties.random_function);
-    } else if(!click_on_btn) {
-        showNowPlaying(false);
-    }
-	g_tooltip.Deactivate();
+  g_down = true;
+  click_on_btn = false;
+  cur_btn = chooseButton(x, y);
+
+  if (cur_btn && cur_btn.state !== ButtonStates.hide) {
+    cur_btn.changeState(ButtonStates.down);
+    click_on_btn=true;
+    window.Repaint();
+  }
+
+  !fb.IsPlaying
+    ? play_random(properties.random_function)
+    : !click_on_btn && showNowPlaying(false);
+
+  g_tooltip.Deactivate();
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
@@ -428,14 +430,15 @@ function on_mouse_leave() {
     }
 }
 
-function on_playback_stop(){
-	if(!globalProperties.enable_screensaver) resetAnimation();
+function on_playback_stop() {
+	resetAnimation();
 	window.Repaint();
 }
 
-function on_playback_pause(){
+function on_playback_pause() {
 	window.Repaint();
 }
+
 //=================================================// Drag'n'Drop Callbacks
 function on_drag_enter() {
 };
@@ -482,7 +485,8 @@ function on_drag_drop(action, x, y, mask) {
 			g_dragndrop_timer = false;
         },50);
 	}
-};
+}
+
 //=================================================// Cover Tools
 oImageCache = function () {
     this.cachelist = Array();
@@ -629,7 +633,8 @@ oCover = function() {
 			break;
 		}
     }
-};
+}
+
 function on_get_album_art_done(metadb, art_id, image, image_path) {
     cover_path = image_path;
 	if(image){
@@ -641,18 +646,21 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 	else g_cover.reset();
     window.Repaint();
 }
+
 function on_playback_new_track(metadb) {
 	if (metadb)	{
 		//current_played_track = metadb;
 		g_cover.getArtwork(metadb);
-		if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) startAnimation();
+		if(!animationTimer && properties.showVisualization>0) startAnimation();
 		//setRatingBtn(metadb);
 	}
 	window.Repaint();
 }
+
 function on_playback_time() {
-	if(!animationTimer && (properties.showVisualization>0 || globalProperties.enable_screensaver)) {startAnimation();}
+	if(!animationTimer && properties.showVisualization>0) {startAnimation();}
 }
+
 function on_layout_change() {
 	if(layout_state.isEqual(0)) properties.darklayout = properties.maindarklayout;
 	else properties.darklayout = properties.minidarklayout;
@@ -683,7 +691,10 @@ function on_layout_change() {
 	adaptButtons();
 }
 function on_notify_data(name, info) {
-    switch(name) {
+  switch(name) {
+		case "setGlobalParameter":
+			setGlobalParameter(info[0],info[1]);
+		break;			
 		case "use_ratings_file_tags":
 			globalProperties.use_ratings_file_tags = info;
 			window.SetProperty("GLOBAL use ratings in file tags", globalProperties.use_ratings_file_tags);
@@ -732,17 +743,6 @@ function on_notify_data(name, info) {
 		case "mini_controlbar":
 			mini_controlbar.value = info;
 			on_layout_change()
-		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
-		case "escape_screensaver":
-			last_mouse_move_notified = (new Date).getTime();
-		break;
-		case "mseconds_before_screensaver":
-			globalProperties.mseconds_before_screensaver = info;
-			window.SetProperty("GLOBAL screensaver mseconds before activation", globalProperties.mseconds_before_screensaver);
 		break;
 		case "DiskCacheState":
 			globalProperties.enableDiskCache = info;
@@ -848,15 +848,6 @@ function on_notify_data(name, info) {
 			on_layout_change();
 			window.Repaint();
 		break;
-		case "screensaver_dark_theme":
-			properties.screensaver_dark_theme=info;
-			window.SetProperty("SCREENSAVER dark theme", properties.screensaver_dark_theme);
-			on_layout_change();
-			window.Repaint();
-		break;
-		case "screensaver_state":
-			screensaver_state.value=info;
-		break;
 		case "Randomsetfocus":
 			Randomsetfocus = info;
 			if (!Randomsetfocus && properties.random_function >= 1000 && properties.random_function < 2001){
@@ -920,21 +911,7 @@ function on_notify_data(name, info) {
 		break;*/
 	}
 }
-function showNowPlayingCover(){
-	if (globalProperties.enableDiskCache) {
-		cache_filename = check_cache(fb.GetNowPlaying(), 0, nowPlaying_cachekey);
-		// load img from cache
-		if(cache_filename) {
-			cover_path = cache_filename;
-		} else cover_path = "sfsfsf##";
-	} else if(fb.GetNowPlaying().path == cover_path) cover_path = cover_path.substring(0, cover_path.lastIndexOf("\\")) + "\\folder.jpg";
-	var WshShell = new ActiveXObject("WScript.Shell");
-	try {
-		WshShell.Run("\"" + cover_path + "\"", 0);
-	} catch(e) {
-		HtmlMsg("Error", "Image not found, this cover is probably embedded inside the audio file.","Ok");
-	}
-}
+
 function on_key_down(vkey) {
     var mask = GetKeyboardMask();
 	if (mask == KMask.none) {
@@ -944,22 +921,24 @@ function on_key_down(vkey) {
 				break;
 		};
 	}
-};
-function on_mouse_rbtn_up(x, y){
-	var main_menu = window.CreatePopupMenu();
-	var Context = fb.CreateContextMenuManager();
-	var context_menu = window.CreatePopupMenu();	
-	var idx;
+}
+
+function on_mouse_rbtn_up(x, y) {
+	const main_menu = window.CreatePopupMenu();
+	const Context = fb.CreateContextMenuManager();
+  let now_playing_track;
 
 	main_menu.AppendMenuItem(MF_STRING, 35, "Settings...");
 	main_menu.AppendMenuSeparator();
+
 	if(fb.IsPlaying){
-		var now_playing_track = fb.GetNowPlaying();
+		now_playing_track = fb.GetNowPlaying();
 		main_menu.AppendMenuItem(MF_STRING, 1, "Open cover in its full/original size");
-		main_menu.AppendMenuItem(MF_STRING, 9, "Show on all panels");
+		main_menu.AppendMenuItem(MF_STRING, 9, "Show now playing on all panels");
 		main_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
 		main_menu.AppendMenuItem(MF_STRING, 8, "Refresh this image");
-		var quickSearchMenu = window.CreatePopupMenu();
+
+		const quickSearchMenu = window.CreatePopupMenu();
 		quickSearchMenu.AppendMenuItem(MF_STRING, 34,"Same title");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 30,"Same artist");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 31,"Same album");
@@ -968,33 +947,30 @@ function on_mouse_rbtn_up(x, y){
 		quickSearchMenu.AppendTo(main_menu, MF_STRING, "Quick search for...");
 		main_menu.AppendMenuSeparator();
 	} else {
-		var checked_item_menu=3;
+		let checked_item_menu = 3;
 		main_menu.AppendMenuItem(MF_DISABLED, 0, "Play randomly :");
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 3, "Tracks");
-			if(properties.random_function=='200_tracks') checked_item_menu=3;
 		main_menu.AppendMenuItem(MF_STRING, 2, "Albums");
-			if(properties.random_function=='20_albums') checked_item_menu=2;
 		main_menu.AppendMenuItem(MF_STRING, 5, "Artist");
-			if(properties.random_function=='1_artist') checked_item_menu=5;
+    main_menu.AppendMenuItem(MF_STRING, 4, "Genre");
 
-		var genreValue=parseInt(properties.random_function);
-			main_menu.AppendMenuItem(MF_STRING, 4, "Genre");
-		if((genreValue >= 1000 && genreValue < 2001) || properties.random_function=='1_genre')	checked_item_menu=4;
+    properties.random_function === '200_tracks' && (checked_item_menu = 3);
+    properties.random_function === '20_albums' && (checked_item_menu = 2);
+    properties.random_function === '1_artist' && (checked_item_menu = 5);
+
+		let genreValue = parseInt(properties.random_function);
+		((genreValue >= 1000 && genreValue < 2001) || properties.random_function=='1_genre') && (checked_item_menu = 4);
 
 		main_menu.CheckMenuRadioItem(2, 5, checked_item_menu);
 
-		var genrePopupMenu = window.CreatePopupMenu();
+		let genrePopupMenu = window.CreatePopupMenu();
 		createGenrePopupMenu(false, -1, genrePopupMenu);
 		genrePopupMenu.AppendTo(main_menu, MF_STRING, "A specific genre");
 	}
 	
-	if(fb.IsPlaying){
-		//Context.InitContext(new FbMetadbHandleList(fb.GetNowPlaying()));
-		//Context.BuildMenu(context_menu, 100, -1);
-		//context_menu.AppendTo(main_menu, MF_STRING, "Track properties");
-		main_menu.AppendMenuItem(MF_STRING, 2, "Properties");
-	}
+	fb.IsPlaying && main_menu.AppendMenuItem(MF_STRING, 200, "Properties");
+
 	if(utils.IsKeyPressed(VK_SHIFT)) {
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 100, "Properties ");
@@ -1002,184 +978,187 @@ function on_mouse_rbtn_up(x, y){
 		main_menu.AppendMenuSeparator();
 		main_menu.AppendMenuItem(MF_STRING, 102, "Reload");
 	}
-	idx = main_menu.TrackPopupMenu(x,y,0x0020);
-	switch(true) {
-		case (idx == 2):
-			fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
-		break;
-		case (idx == 100):
-			window.ShowProperties();
-			break;
-		case (idx == 101):
-			window.ShowConfigure();
-			break;
-		case (idx == 102):
-			window.Reload();
-			break;
-		case (idx == 1):
-			openCoverFullscreen(fb.GetNowPlaying());
-			break;
-		case (idx == 2):
-			properties.random_function = '20_albums';
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(properties.random_function);
-			break;
-		case (idx == 3):
-			properties.random_function = '200_tracks';
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(properties.random_function);
-			break;
-		case (idx == 4):
-			properties.random_function = '1_genre';
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(properties.random_function);
-			break;
-		case (idx == 5):
-			properties.random_function = '1_artist';
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(properties.random_function);
-			break;
-		case (idx >= 1000 && idx < 2001):
-			properties.random_function = idx;
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(idx);
-			break;
-		case (idx == 7):
-			properties.random_function = 'default';
-			window.SetProperty("Random function", properties.random_function);
-			window.NotifyOthers("SetRandom", properties.random_function);
-			play_random(properties.random_function);
-			break;
-		case (idx == 6):
-			fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
-			break;
-		case (idx == 8):
-			g_cover.refresh(now_playing_track, true);
-			window.NotifyOthers("RefreshImageCover",now_playing_track);
-			break;
-		case (idx == 9):
-			showNowPlaying(true);
-			break;
-		case (idx == 30):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
-			quickSearch(fb.GetNowPlaying(),"artist");
-			break;
-		case (idx == 31):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
-			quickSearch(fb.GetNowPlaying(),"album");
-			break;
-		case (idx == 32):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
-			quickSearch(fb.GetNowPlaying(),"genre");
-			break;
-		case (idx == 33):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
-			quickSearch(fb.GetNowPlaying(),"date");
-			break;
-		case (idx == 34):
-			if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
-				main_panel_state.setValue(0)
-			}
-			quickSearch(fb.GetNowPlaying(),"title");
-			break;
-		case (idx == 35):
-			draw_settings_menu(x,y);
-			break;
-		case (idx >= 100 && idx < 800):
-			Context.ExecuteByID(idx - 100);
-			break;			
-		case (idx == 10000):
-			g_genre_cache.build_from_library();
-			break;
-		default:
-			return true;
-	}
-	main_menu = undefined;
-	genrePopupMenu = undefined;
-	return true;
-}
-function draw_settings_menu(x,y){
-        var _menu = window.CreatePopupMenu();
-        var idx;
 
-		var _dble_click_menu = window.CreatePopupMenu();
-		_dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover in its full/original size");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
-		_dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
-		_dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);
-		_dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");
-		_menu.AppendMenuSeparator();
+	let idx = main_menu.TrackPopupMenu(x, y, 0x0020);
 
-		var _visu_menu = window.CreatePopupMenu();
-		_visu_menu.AppendMenuItem(MF_STRING, 8, "Always show");
-		_visu_menu.CheckMenuItem(8,properties.showVisualization==2);
-		_visu_menu.AppendMenuItem(MF_STRING, 10, "Never");
-		_visu_menu.CheckMenuItem(10,properties.showVisualization==0);
-		
-		_menu.AppendMenuItem(MF_STRING, 8, "Animation on playback");
-		_menu.CheckMenuItem(8,properties.showVisualization==2);
-
-		_menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
-		_menu.CheckMenuItem(2, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
-
-
-        idx = _menu.TrackPopupMenu(x,y,0x0020);
-        switch(true) {
-            case (idx == 2):
-				if(layout_state.isEqual(0)) coverpanel_state_big.toggleValue();
-				else coverpanel_state_mini.toggleValue();
-                break;
-            case (idx == 3):
-				properties.dble_click_action = 0;
-				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;
-            case (idx == 4):
-				properties.dble_click_action = 1;
-				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;
-            case (idx == 5):
-				properties.dble_click_action = 2;
-				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;
-            case (idx == 6):
-				properties.dble_click_action = 3;
-				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;
-            case (idx == 7):
-				properties.dble_click_action = 4;
-				window.SetProperty("PROPERTY double click action", properties.dble_click_action);
-                break;
-			case (idx == 8):
-				if(properties.showVisualization==0) properties.showVisualization = 2;
-				else properties.showVisualization = 0;
-				window.SetProperty("Show Visualization", properties.showVisualization);
-				if(!globalProperties.enable_screensaver) resetAnimation();
-				calculate_visu_margin_left();
-				window.Repaint();
-				break;
-            default:
-				return true;
+    switch (idx) {
+      case 100:
+        window.ShowProperties();
+        break;
+      case 101:
+        window.ShowConfigure();
+        break;
+      case 102:
+        window.Reload();
+        break;
+      case 1:
+        openCoverFullscreen(fb.GetNowPlaying());
+        break;
+      case 2:
+        properties.random_function = '20_albums';
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(properties.random_function);
+        break;
+      case 3:
+        properties.random_function = '200_tracks';
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(properties.random_function);
+        break;
+      case 4:
+        properties.random_function = '1_genre';
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(properties.random_function);
+        break;
+      case 5:
+        properties.random_function = '1_artist';
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(properties.random_function);
+        break;
+      case (idx >= 1000 && idx < 2001):
+        properties.random_function = idx;
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(idx);
+        break;
+      case 7:
+        properties.random_function = 'default';
+        window.SetProperty("Random function", properties.random_function);
+        window.NotifyOthers("SetRandom", properties.random_function);
+        play_random(properties.random_function);
+        break;
+      case 6:
+        fb.RunContextCommandWithMetadb("Open containing folder", now_playing_track, 8);
+        break;
+      case 8:
+        g_cover.refresh(now_playing_track, true);
+        window.NotifyOthers("RefreshImageCover",now_playing_track);
+        break;
+      case 9:
+        showNowPlaying(true);
+        break;
+      case 30:
+        if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+          main_panel_state.setValue(0)
         }
-		setTooltipDoubleClicText();
-        _menu = undefined;
+        quickSearch(fb.GetNowPlaying(),"artist");
+        break;
+      case 31:
+        if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+          main_panel_state.setValue(0)
+        }
+        quickSearch(fb.GetNowPlaying(),"album");
+        break;
+      case 32:
+        if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+          main_panel_state.setValue(0)
+        }
+        quickSearch(fb.GetNowPlaying(),"genre");
+        break;
+      case 33:
+        if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+          main_panel_state.setValue(0)
+        }
+        quickSearch(fb.GetNowPlaying(),"date");
+        break;
+      case 34:
+        if(!main_panel_state.isEqual(0) && !main_panel_state.isEqual(1)) {
+          main_panel_state.setValue(0)
+        }
+        quickSearch(fb.GetNowPlaying(),"title");
+        break;
+      case 35:
+        draw_settings_menu(x,y);
+        break;
+      case 200:
+        fb.RunContextCommandWithMetadb("Properties", fb.GetNowPlaying());
+      break;
+	  case (idx >= 100 && idx < 800):
+		Context.ExecuteByID(idx - 100);
+	  break;
+      case 10000:
+        g_genre_cache.build_from_library();
+        break;
+      default:
         return true;
+    }
+
+  return true;
 }
-function on_mouse_wheel(step, stepstrait, delta){
+
+function draw_settings_menu(x,y) {
+  var _menu = window.CreatePopupMenu();
+  var idx;
+
+  var _dble_click_menu = window.CreatePopupMenu();
+  _dble_click_menu.AppendMenuItem(MF_STRING, 3, "Pause playback");
+  _dble_click_menu.AppendMenuItem(MF_STRING, 4, "Show now playing on all panels");
+  _dble_click_menu.AppendMenuItem(MF_STRING, 5, "Open cover in its full/original size");
+  _dble_click_menu.AppendMenuItem(MF_STRING, 6, "Open containing folder");
+  _dble_click_menu.AppendMenuItem(MF_STRING, 7, "Activate/quit mini player");
+  _dble_click_menu.CheckMenuRadioItem(3, 7, 3+properties.dble_click_action);
+  _dble_click_menu.AppendTo(_menu, MF_STRING, "Double click action");
+  _menu.AppendMenuSeparator();
+
+  var _visu_menu = window.CreatePopupMenu();
+  _visu_menu.AppendMenuItem(MF_STRING, 8, "Always show");
+  _visu_menu.CheckMenuItem(8,properties.showVisualization==2);
+  _visu_menu.AppendMenuItem(MF_STRING, 10, "Never");
+  _visu_menu.CheckMenuItem(10,properties.showVisualization==0);
+  
+  _menu.AppendMenuItem(MF_STRING, 8, "Animation on playback");
+  _menu.CheckMenuItem(8,properties.showVisualization==2);
+
+  _menu.AppendMenuItem(MF_STRING, 2, "Show now playing artwork");
+  _menu.CheckMenuItem(2, (layout_state.isEqual(0)?coverpanel_state_big.isActive():coverpanel_state_mini.isActive()));
+
+  idx = _menu.TrackPopupMenu(x,y,0x0020);
+
+  switch(idx) {
+    case 2:
+      if(layout_state.isEqual(0)) coverpanel_state_big.toggleValue();
+      else coverpanel_state_mini.toggleValue();
+      break;
+    case 3:
+      properties.dble_click_action = 0;
+      window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+      break;
+    case 4:
+      properties.dble_click_action = 1;
+      window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+      break;
+    case 5:
+      properties.dble_click_action = 2;
+      window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+      break;
+    case 6:
+      properties.dble_click_action = 3;
+      window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+      break;
+    case 7:
+      properties.dble_click_action = 4;
+      window.SetProperty("PROPERTY double click action", properties.dble_click_action);
+      break;
+  case 8:
+    properties.showVisualization === 0 ? (properties.showVisualization = 2) : (properties.showVisualization = 0);
+    window.SetProperty("Show Visualization", properties.showVisualization);
+    resetAnimation();
+    calculate_visu_margin_left();
+    window.Repaint();
+    break;
+  default:
+    return true;
+  }
+
+  setTooltipDoubleClicText();
+  _menu = undefined;
+  return true;
+}
+
+function on_mouse_wheel(step, stepstrait, delta) {
 	if(typeof(stepstrait) == "undefined" || typeof(delta) == "undefined") intern_step = step;
 	else intern_step = stepstrait/delta;
 	if(utils.IsKeyPressed(VK_CONTROL)) { // zoom all elements
@@ -1207,6 +1186,7 @@ function on_mouse_wheel(step, stepstrait, delta){
 		window.NotifyOthers("AdjustVolume", true);
 	}
 }
+
 var colors = {};
 function get_colors(){
 	if(properties.darklayout) {

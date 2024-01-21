@@ -385,7 +385,8 @@ function _list(mode, x, y, w, h) {
 			panel.item_focus_change();
 			break;
 		case 1400:
-			this.properties.tf.value = utils.InputBox(window.ID, 'Enter title formatting', window.Name, this.properties.tf.value);
+			let tmp = utils.InputBox(window.ID, 'Enter title formatting', window.ScriptInfo.Name, this.properties.tf.value);
+			this.properties.tf.value = tmp || this.properties.tf.default_;
 			this.tfo = fb.TitleFormat(this.properties.tf.value);
 			this.update();
 			break;
@@ -751,16 +752,16 @@ function _list(mode, x, y, w, h) {
 			}
 			
 			this.add = () => {
-				const new_name = utils.InputBox(window.ID, 'Enter autoplaylist name', window.Name);
+				const new_name = utils.InputBox(window.ID, 'Enter autoplaylist name', window.ScriptInfo.Name);
 				if (!new_name.length) {
 					return;
 				}
-				const new_query = utils.InputBox(window.ID, 'Enter autoplaylist query', window.Name);
+				const new_query = utils.InputBox(window.ID, 'Enter autoplaylist query', window.ScriptInfo.Name);
 				if (!new_query.length) {
 					return;
 				}
-				const new_sort = utils.InputBox(window.ID, 'Enter sort pattern\n\n(optional)', window.Name);
-				const new_forced = (new_sort.length ? WshShell.Popup('Force sort?', 0, window.Name, popup.question + popup.yes_no) : popup.no) == popup.yes;
+				const new_sort = utils.InputBox(window.ID, 'Enter sort pattern\n\n(optional)', window.ScriptInfo.Name);
+				const new_forced = (new_sort.length ? WshShell.Popup('Force sort?', 0, window.ScriptInfo.Name, popup.question + popup.yes_no) : popup.no) == popup.yes;
 				this.data.push({
 					name : new_name,
 					query : new_query,
@@ -792,25 +793,25 @@ function _list(mode, x, y, w, h) {
 					this.run_query(this.data[z].name, this.data[z].query, this.data[z].sort, this.data[z].forced);
 					break;
 				case 2:
-					const new_name = utils.InputBox(window.ID, 'Rename autoplaylist', window.Name, this.data[z].name);
+					const new_name = utils.InputBox(window.ID, 'Rename autoplaylist', window.ScriptInfo.Name, this.data[z].name);
 					if (new_name.length && new_name != this.data[z].name) {
 						this.data[z].name = new_name;
 						this.edit_done(z);
 					}
 					break;
 				case 3:
-					const new_query = utils.InputBox(window.ID, 'Enter autoplaylist query', window.Name, this.data[z].query);
+					const new_query = utils.InputBox(window.ID, 'Enter autoplaylist query', window.ScriptInfo.Name, this.data[z].query);
 					if (new_query.length && new_query != this.data[z].query) {
 						this.data[z].query = new_query;
 						this.edit_done(z);
 					}
 					break;
 				case 4:
-					const new_sort = utils.InputBox(window.ID, 'Enter sort pattern\n\n(optional)', window.Name, this.data[z].sort);
+					const new_sort = utils.InputBox(window.ID, 'Enter sort pattern\n\n(optional)', window.ScriptInfo.Name, this.data[z].sort);
 					if (new_sort != this.data[z].sort) {
 						this.data[z].sort = new_sort;
 						if (new_sort.length) {
-							this.data[z].forced = WshShell.Popup('Force sort?', 0, window.Name, popup.question + popup.yes_no) == popup.yes;
+							this.data[z].forced = WshShell.Popup('Force sort?', 0, window.ScriptInfo.Name, popup.question + popup.yes_no) == popup.yes;
 						}
 						this.edit_done(z);
 					}
@@ -848,8 +849,12 @@ function _list(mode, x, y, w, h) {
 						i++;
 					}
 				}
-				plman.CreateAutoPlaylist(plman.PlaylistCount, n, q, s, f ? 1 : 0);
-				plman.ActivePlaylist = plman.PlaylistCount - 1;
+				try {
+					plman.CreateAutoPlaylist(plman.PlaylistCount, n, q, s, f ? 1 : 0);
+					plman.ActivePlaylist = plman.PlaylistCount - 1;
+				} catch (e) {
+					fb.ShowPopupMessage(`${e}`);
+				}
 			}
 			
 			_createFolder(folders.data);
@@ -1003,7 +1008,7 @@ function _list(mode, x, y, w, h) {
 				let tmp = [];
 				for (let i = 0; i < f.InfoCount; i++) {
 					const name = f.InfoName(i);
-					const value = f.InfoValue(i);
+					const value = f.InfoValue(i).replace(/\s{2,}/g, ' ');
 					tmp.push({
 						name : name.toUpperCase(),
 						value : value,

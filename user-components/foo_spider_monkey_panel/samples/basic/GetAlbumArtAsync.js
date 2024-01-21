@@ -1,11 +1,11 @@
-window.DefinePanel("GetAlbumArtAsync", { author: "T.P Wang" });
-include(`${fb.ComponentPath}docs\\Flags.js`);
-include(`${fb.ComponentPath}docs\\Helpers.js`);
+window.DefineScript('GetAlbumArtAsync', { author: 'T.P Wang' });
+include('docs/Flags.js');
+include('docs/Helpers.js');
 
 // Nothing will show until you start playing a new track
 
 let g_img = null;
-let path = "";
+let path = '';
 let ww = 0, wh = 0;
 
 function on_paint(gr) {
@@ -35,7 +35,7 @@ function on_playback_new_track(metadb) {
     if (!metadb) {
         return;
     }
-    utils.GetAlbumArtAsync(window.ID, metadb, AlbumArtId.front);
+    utils.GetAlbumArtAsync(0, metadb, AlbumArtId.front);
     g_img = null;
     path = null;
 }

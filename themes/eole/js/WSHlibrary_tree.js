@@ -1,5 +1,5 @@
 var properties = {
-	panelName: 'WSHlibrary_tree',
+    panelName: 'WSHlibrary_tree',
     darklayout: window.GetProperty("_DISPLAY: Dark layout", false),
     showwallpaper: window.GetProperty("_DISPLAY: Show Wallpaper", false),
     wallpaperblurred: window.GetProperty("_DISPLAY: Wallpaper Blurred", true),
@@ -11,11 +11,12 @@ var properties = {
     album_customGroup_label: window.GetProperty("_DISPLAY: album customGroup name", ""),
     showInLibrary_RightPlaylistOn: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist on", true),
     showInLibrary_RightPlaylistOff: window.GetProperty("MAINPANEL adapt now playing to left menu righ playlist off", true),
-	headerbar_height:39,
-	TagSwitcherBarHeight: 30,
-	panelFontAdjustement: -1,
-	showLibraryTreeSwitch:true,
-	DropInplaylist: true
+    headerbar_height:39,
+    TagSwitcherBarHeight: 40,
+    TagSwitcherBarHeight_old: 30,		
+    panelFontAdjustement: -1,
+    showLibraryTreeSwitch:true,
+    DropInplaylist: true
 };
 
 function setShowInLibrary(){
@@ -79,7 +80,7 @@ String.prototype.trim = function() {
     return this.replace(/^\s+|[\n\s]+$/g, "");
 }
 
-oTagSwitcherBar = function() {
+oTagSwitcherBar_old = function() {
     this.setItems_infos = function(){
 		this.items_functions = new Array(
 			function() {}
@@ -140,7 +141,8 @@ oTagSwitcherBar = function() {
 	this.margin_left = 6;
 	this.images = {};
 	this.hide_bt = false;
-
+	this.default_height = properties.TagSwitcherBarHeight_old;
+	
     this.setHideButton = function(){
 		this.hscr_btn_w = 18
 		var xpts_mtop = Math.ceil((this.h-9)/2);
@@ -267,7 +269,220 @@ oTagSwitcherBar = function() {
         };
     };
 };
+oTagSwitcherBar = function() {
+    this.setItems_infos = function(){
+		this.items_functions = new Array(
+			function() {}
+		,
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",1);
+				librarytree.setValue(0);
+				window.NotifyOthers("left_filter_state","album");
+			}
+		,
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",2);
+				librarytree.setValue(0);
+				window.NotifyOthers("left_filter_state","artist");
+			}
+		,
+			function() {
+				window.NotifyOthers("libraryFilter_tagMode",3);
+				librarytree.setValue(0);
+				window.NotifyOthers("left_filter_state","genre");
+			}
+		);
+		this.items_width = new Array(0, 0, 0, 0);
+		this.items_x = new Array(0, 0, 0, 0);
+		this.items_txt = new Array("Library Tree","Albums", "Artists", "Genres");
+		this.items_tooltips = new Array("Library tree","Album filter", "Artist filter", "Genre filter");
+		properties.album_label = this.items_txt[1];
+		properties.artist_label = this.items_txt[2];
+		properties.genre_label = this.items_txt[3];		
+		if(properties.album_customGroup_label != this.items_txt[1] && properties.album_customGroup_label!=""){
+			properties.album_label = properties.album_customGroup_label;			
+			this.items_txt[1] = properties.album_customGroup_label;
+			this.items_tooltips[1] = properties.album_customGroup_label+" filter";
+		}
+		if(properties.artist_customGroup_label != this.items_txt[2] && properties.artist_customGroup_label!=""){
+			properties.artist_label = properties.artist_customGroup_label;			
+			this.items_txt[2] = properties.artist_customGroup_label;
+			this.items_tooltips[2] = properties.artist_customGroup_label+" filter";
+		}
+		if(properties.genre_customGroup_label != this.items_txt[3] && properties.genre_customGroup_label!=""){
+			properties.genre_label = properties.genre_customGroup_label;			
+			this.items_txt[3] = properties.genre_customGroup_label;
+			this.items_tooltips[3] = properties.genre_customGroup_label+" filter";
+		}
+		if(!properties.showLibraryTreeSwitch){
+			this.items_txt.shift();
+			this.items_width.shift();
+			this.items_x.shift();
+			this.items_functions.shift();
+		}
+	}
 
+	this.setItems_infos();
+	this.hoverItem = -1;
+	this.txt_top_margin = 0;
+	this.margin_right = 2;
+	this.margin_left = 6;
+	this.images = {};
+	this.hide_bt = false;
+	this.default_height = properties.TagSwitcherBarHeight;
+	
+    this.setHideButton = function(){
+		this.hscr_btn_w = 18
+		var xpts_mtop = Math.ceil((this.h-9)/2);
+		var xpts_mright_prev = Math.floor((this.hscr_btn_w-5)/2);
+		this.hide_bt_off = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_off.GetGraphics();
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);
+			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
+			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
+			gb.FillPolygon(colors.inactive_txt, 0, xpts3);
+			gb.FillPolygon(colors.inactive_txt, 0, xpts4);
+		this.hide_bt_off.ReleaseGraphics(gb);
+		this.hide_bt_ov = gdi.CreateImage(this.hscr_btn_w, this.h);
+		gb = this.hide_bt_ov.GetGraphics();
+			gb.FillSolidRect(0, 0, 1, this.h-1, colors.sidesline);
+			var xpts3 = Array(4+xpts_mright_prev,xpts_mtop, xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,8+xpts_mtop, 5+xpts_mright_prev,7+xpts_mtop, 2+xpts_mright_prev,4+xpts_mtop, 5+xpts_mright_prev,1+xpts_mtop);
+			var xpts4 = Array(4+xpts_mright_prev,1+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop, 4+xpts_mright_prev,7+xpts_mtop, 1+xpts_mright_prev,4+xpts_mtop);
+			gb.FillPolygon(colors.normal_txt, 0, xpts3);
+			gb.FillPolygon(colors.normal_txt, 0, xpts4);
+		this.hide_bt_ov.ReleaseGraphics(gb);
+		this.hide_bt = new button(this.hide_bt_off, this.hide_bt_ov, this.hide_bt_ov,"hide_filters", "Hide this menu");
+	}
+    this.getImages = function() {
+		if(properties.darklayout) icon_theme_subfolder = "\\white";
+		else icon_theme_subfolder = "";
+		this.images.library_tree = gdi.Image(theme_img_path + "\\icons"+icon_theme_subfolder+"\\icon_tree.png");
+		if(this.hide_bt) this.setHideButton();
+		this.images.search_history_icon = gdi.Image(theme_img_path  + "\\icons"+icon_theme_subfolder+"\\search_history.png");
+		this.images.search_history_hover_icon = gdi.Image(theme_img_path  + "\\icons"+icon_theme_subfolder+"\\search_history_hover.png");
+		this.search_history_bt = new button(this.images.search_history_icon, this.images.search_history_hover_icon, this.images.search_history_hover_icon,"search_history_bt","Change grouping");		
+	};
+	this.getImages();
+	this.on_init = function() {
+		this.setItems_infos();
+		this.activeItem = properties.tagMode+((properties.showLibraryTreeSwitch)?0:1);
+    };
+	this.on_init();
+
+    this.setSize = function(w, h, font_size) {
+        this.w = w;
+		this.h = h;
+		this.font_size = font_size;
+		if(!this.hide_bt) this.setHideButton();
+    };
+	this.draw = function(gr, x, y) {
+		this.x = x;
+		this.y = y;
+		var prev_text_width=0;
+
+		// draw background part above playlist (headerbar)
+		gr.FillSolidRect(this.x, this.y, this.w, this.h-1, colors.headerbar_bg);
+		gr.FillSolidRect(this.x, this.y+this.h-1, this.w - this.x, 1, colors.headerbar_line);
+
+		//Calculate text size
+		total_txt_size = 0
+		for(i = this.items_txt.length-1; i >= 0; i--) {
+			this.items_width[i] = gr.CalcTextWidth(this.items_txt[i],g_font.min1);
+			total_txt_size += this.items_width[i];
+		}
+		var tx = this.x + this.margin_left;
+
+		//Draw texts	
+		var text_x = 16;
+		gr.GdiDrawText(this.items_txt[0], g_font.normal, colors.full_txt, text_x, this.txt_top_margin, this.w, this.h, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		var switcher_x = gr.CalcTextWidth(this.items_txt[0],g_font.normal)+text_x;
+		this.search_history_bt.draw(gr, switcher_x, this.y+Math.round(this.h/2 - this.images.search_history_icon.Height/2), 255);
+		
+		if(p.showFiltersTogglerBtn) this.hide_bt.draw(gr, this.x+this.w-(this.hide_bt.w), this.y, 255);
+    };
+    this.setHoverStates = function(x, y){
+		var prev_hover_item = this.hoverItem;
+		this.hoverItem = -1;
+		for(i = 0; i < this.items_txt.length; i++) {
+			if (x > this.items_x[i] && x < this.items_x[i]+this.items_width[i] && y > this.y && y < this.y + this.h) this.hoverItem = i;
+		}
+		if(prev_hover_item!=this.hoverItem){
+			if(this.hoverItem==-1) g_cursor.setCursor(IDC_ARROW,20);
+			else g_cursor.setCursor(IDC_HAND,this.items_txt[this.hoverItem]);
+		}
+		return (prev_hover_item!=this.hoverItem);
+	}
+	this.drawSwitchMenu = function(x, y) {
+		var basemenu = window.CreatePopupMenu();
+		if (typeof x == "undefined") x=ww;
+		if (typeof y == "undefined") y=30;
+		
+		this.search_history_bt.changeState(ButtonStates.normal);
+		
+		basemenu.AppendMenuItem(MF_GRAYED, 0, "Group by:");
+		basemenu.AppendMenuSeparator();
+		
+		for(i = this.items_txt.length-1; i >= 0; i--) {
+			basemenu.AppendMenuItem(MF_STRING, i+1, this.items_txt[i]);
+		}
+		//basemenu.AppendMenuSeparator();
+		//basemenu.AppendMenuItem(MF_STRING, 0, "Custom grouping");
+		
+		idx = 0;
+		idx = basemenu.TrackPopupMenu(x, y, 0x0008);
+
+		switch (true) {
+			case (idx > 0 && idx <= this.items_txt.length):
+				if((idx-1)!=this.activeItem) {
+					this.items_functions[idx-1]();
+					if(p.s_txt.length>0) sL.clear();
+				}			
+			break;
+			case (idx == properties.searchHistory_max_items+10):
+				g_searchHistory.reset();
+			break;
+		}
+		basemenu = undefined;
+	}	
+    this.on_mouse = function(event, x, y, delta) {
+        switch(event) {
+            case "lbtn_down":	
+				if(this.search_history_bt.state == ButtonStates.hover) this.drawSwitchMenu(this.x+this.w,this.h+this.y-1);
+				
+				if(this.hoverItem != properties.tagMode-((properties.showLibraryTreeSwitch)?0:1) && this.hoverItem>-1) {
+					this.items_functions[this.hoverItem]();
+					if(g_filterbox.inputbox.text.length > 0) {
+						g_filterbox.inputbox.text = "";
+						g_filterbox.inputbox.offset = 0;
+						filter_text = "";
+						g_sendResponse();
+					}
+				}
+				if(p.showFiltersTogglerBtn && this.hide_bt.checkstate("hover", x, y)){
+					this.hide_bt.checkstate("up", -1, -1);
+					this.hide_bt.checkstate("leave", -1, -1);
+					libraryfilter_state.toggleValue();
+				}
+				g_tooltip.Deactivate();
+				break;
+            case "lbtn_up":
+                break;
+            case "lbtn_dblclk":
+                break;
+            case "rbtn_down":
+                break;
+            case "move":
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("move", x, y);
+				if(x<this.search_history_bt.x) x = this.search_history_bt.x+10;
+				this.search_history_bt.checkstate("move", x, y);				
+                break;
+            case "leave":
+				this.search_history_bt.changeState(ButtonStates.normal);
+				if(p.showFiltersTogglerBtn) this.hide_bt.checkstate("leave", x, y);
+                break;
+        };
+    };
+};
 oPlaylist = function(idx, rowId) {
     this.idx = idx;
     this.rowId = rowId;
@@ -415,7 +630,7 @@ oPlaylistManager = function(name) {
             };
 
 			//Overlay
-			//height_top_fix = (properties.showHeaderBar ? (properties.showTagSwitcherBar ? properties.TagSwitcherBarHeight+properties.headerBarHeight : properties.headerBarHeight) : 0)
+			//height_top_fix = (properties.showHeaderBar ? (properties.showTagSwitcherBar ? g_tagswitcherbar.default_height+properties.headerBarHeight : properties.headerBarHeight) : 0)
 			height_top_fix = 0;
             gr.FillSolidRect(0, height_top_fix+1, ui.w, ui.h-height_top_fix-1, colors.pm_overlay);
 
@@ -1145,6 +1360,32 @@ function scrollbar() {
 }
 
 function panel_operations() {
+	ViewIsInited = window.GetProperty("View: View Is Inited", false);
+	if(!ViewIsInited)
+	{
+		window.SetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
+		
+		window.SetProperty("View 01: Name // Pattern", "View by Artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 02: Name // Pattern", "View by Album Artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 03: Name // Pattern", "View by Album Artist - Album // [%album artist% - ]['['%date%']' ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 04: Name // Pattern", "View by Album // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 05: Name // Pattern", "View by Genre // %genre%|[%album artist% - ][(%date%) ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		window.SetProperty("View 06: Name // Pattern", "View by Year // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		
+		window.SetProperty("View Filter 01: Name // Query", "No // Query Not Configurable");
+		window.SetProperty("View Filter 02: Name // Query", "Lossless // \"$info(encoding)\" IS lossless");
+		window.SetProperty("View Filter 03: Name // Query", "Lossy // \"$info(encoding)\" IS lossy");
+		window.SetProperty("View Filter 04: Name // Query", "Missing Replaygain // %replaygain_track_gain% MISSING");
+		window.SetProperty("View Filter 05: Name // Query", "Never Played // %play_count% MISSING");
+		window.SetProperty("View Filter 06: Name // Query", "Played Often // %play_count% GREATER 9");
+		window.SetProperty("View Filter 07: Name // Query", "Recently Added // %added% DURING LAST 2 WEEKS");
+		window.SetProperty("View Filter 08: Name // Query", "Recently Played // %last_played% DURING LAST 2 WEEKS");
+		window.SetProperty("View Filter 09: Name // Query", "Top Rated // " + (globalProperties.use_ratings_file_tags ? "$meta(rating)" : "%rating%") + " GREATER 3");
+		
+		window.SetProperty("View: View Is Inited", true);
+	}
+	
+	
     var def_ppt = window.GetProperty("View by Folder Structure: Name // Pattern", "View by Folder Structure // Pattern Not Configurable");
     var DT_LEFT = 0x00000000,
         DT_CENTER = 0x00000001,
@@ -1377,9 +1618,9 @@ function panel_operations() {
         this.s_w2 = this.s_show > 1 ? this.f_x1 - this.s_x - 11 : this.s_w1 - Math.round(ui.row_h * 0.75) - this.s_x + 1;
         this.ln_sp = this.s_show ? ui.row_h * 0.1 : 0;
         //this.s_h = this.s_show ? ui.row_h + this.ln_sp : ui.margin;
-		this.s_h = properties.headerbar_height + ((p.tag_switcherbar)?properties.TagSwitcherBarHeight:0);
-		if (!p.s_show) this.s_h = ((p.tag_switcherbar)?properties.TagSwitcherBarHeight-1:0);
-        this.s_sp = this.s_h - ((p.tag_switcherbar)?properties.TagSwitcherBarHeight:0);
+		this.s_h = properties.headerbar_height + ((p.tag_switcherbar)?g_tagswitcherbar.default_height:0);
+		if (!p.s_show) this.s_h = ((p.tag_switcherbar)?g_tagswitcherbar.default_height-1:0);
+        this.s_sp = this.s_h - ((p.tag_switcherbar)?g_tagswitcherbar.default_height:0);
         this.sp = ui.h - this.s_h - (this.s_show ? 0 : ui.margin);
         this.rows = this.sp / ui.row_h;
         if (this.autofit) {
@@ -1822,7 +2063,7 @@ function populate() {
     var dbl_action = window.GetProperty("Double-Click Action: ExplorerStyle-0 Play-1", 1);
     var alt_lbtn_pl = btn_pl[3] == 1 ? true : false,
         mbtn_pl = btn_pl[5] == 1 ? true : false;
-    var lib_playlist = window.GetProperty("Playlist", "Library Selection");
+	var lib_playlist = globalProperties.selection_playlist;
     this.show_counts = window.GetProperty("Node: Show Item Counts", false);
 	this.autoExpandSingleChild = window.GetProperty("Node: Auto Expand Single Childs", false);
     this.show_aggregate_item = window.GetProperty("Node: Show Aggregate Item", false);
@@ -2851,7 +3092,7 @@ function on_size(w, h) {
 		jS.on_size();
 		if(properties.DropInplaylist) pman.setSize(ui.w, 0, ui.w, ui.h);
 
-		g_tagswitcherbar.setSize(ui.w, properties.TagSwitcherBarHeight, g_fsize-1);
+		g_tagswitcherbar.setSize(ui.w, g_tagswitcherbar.default_height, g_fsize-1);
 
 		// set wallpaper
 		if(properties.showwallpaper){
@@ -3232,7 +3473,7 @@ function searchLibrary() {
     }
 	this.setSize = function(w,h,x,y){
 		this.x = x;
-		this.y = ((p.tag_switcherbar)?properties.TagSwitcherBarHeight:0);
+		this.y = ((p.tag_switcherbar)?g_tagswitcherbar.default_height:0);
 		this.w = w;
 		this.h = h;
 	}
@@ -3240,7 +3481,7 @@ function searchLibrary() {
         s = Math.min(Math.max(s, 0), p.s_txt.length);
         e = Math.min(Math.max(e, 0), p.s_txt.length);
         cx = Math.min(Math.max(cx, 0), p.s_txt.length);
-        gr.FillSolidRect(0, this.y, ui.w, p.s_sp, colors.headerbar_bg);
+        gr.FillSolidRect(0, this.y-1, ui.w, p.s_sp+1, colors.headerbar_bg);
        // gr.DrawLine(0, this.y+p.s_sp, ww -((draw_right_line)?2:1), this.y+p.s_sp, 1,colors.headerbar_line);
 		gr.FillSolidRect(0, this.y+p.s_sp, ww -((draw_right_line)?1:0), 1,colors.headerbar_line);
 
@@ -4630,7 +4871,7 @@ function on_drag_over(action, x, y, mask) {
 		pman.on_mouse("move", x, y);
 	};
 	try{
-		action.Text = "Insert";
+		//action.Text = "Insert";
 	} catch(e){}
     p.m_x = x;
     p.m_y = y;
@@ -4888,10 +5129,6 @@ function on_notify_data(name, info) {
 			on_font_changed();
 			window.Repaint();
 		break;
-		case "enable_screensaver":
-			globalProperties.enable_screensaver = info;
-			window.SetProperty("GLOBAL enable screensaver", globalProperties.enable_screensaver);
-		break;
 		case"library_dark_theme":
 			properties.darklayout = info;
 			window.SetProperty("_DISPLAY: Dark layout", properties.darklayout);
@@ -4986,7 +5223,8 @@ function on_init() {
 	get_images();
 	g_tooltip = new oTooltip('ui');
 	g_cursor = new oCursor();
-	g_resizing = new Resizing("libraryfilter",false,true,properties.TagSwitcherBarHeight);
+	g_tagswitcherbar = new oTagSwitcherBar();	
+	g_resizing = new Resizing("libraryfilter",false,true,g_tagswitcherbar.default_height);
 	ui = new userinterface();
 	sbar = new scrollbar();
 	p = new panel_operations();
@@ -5002,7 +5240,7 @@ function on_init() {
 	timer = new oTimers();
 	timer.lib('on_init');
 
-	g_tagswitcherbar = new oTagSwitcherBar();
+
 
 	if (timer.init === 0) {
 		lib.get_library();
