@@ -22,7 +22,7 @@ Just open an issue ticket, share the code, or create a pull request.
 0. Close foobar.
 
 1. Download this [github repository](https://github.com/Ottodix/Eole-foobar-theme/zipball/master/) and copy each folder into your foobar profile directory (`user-components`, `themes`, and `plugins`).
-   - STANDARD foobar2000 installation: your foobar profile directory is in here: `%AppData%\foobar2000`
+   - STANDARD foobar2000 installation: your foobar profile directory is in here: `%AppData%\foobar2000` or `%AppData%\foobar2000-v2`
    - PORTABLE foobar2000 installation: your foobar profile directory is in a folder named "`profile`" inside your installation directory.
 
 2. Run foobar, choose `ColumnUI` as user interface (from the prompt, or in `File` > `Preferences` > `Display`).
