@@ -1903,7 +1903,11 @@ oBrowser = function(name) {
         var str_filter = process_string(filter_text);
 		for(var i = 0; i < total; i++) {
 			handle = this.list[i];
-            arr = tf.EvalWithMetadb(handle).split(" ## ");
+			console.log(tf.EvalWithMetadb(handle));
+            arr = tf.EvalWithMetadb(handle).split(/ ## (.*)/);
+			console.log("[0] " + arr[0]); 
+			console.log("[1] " + arr[1]); 
+			console.log("[2] " + arr[2]); 
             current = arr[0].toLowerCase();
             if(str_filter.length > 0) {
                 var toAdd = match(arr[0]+" "+arr[1], str_filter);
