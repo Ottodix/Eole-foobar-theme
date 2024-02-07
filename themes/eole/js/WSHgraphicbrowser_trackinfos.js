@@ -6928,13 +6928,23 @@ function get_colors() {
 	}
 	colors.showlist_arrow = colors.showlist_bg;
 	if(properties.darklayout){
-		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
-			colors.showlist_bg = GetGrey(0, 25);
-			colors.showlist_arrow = GetGrey(25,255);
-			colors.showlist_border_color = GetGrey(255,30);
-		} else if(globalProperties.colorsMainPanel==2){
-			colors.showlist_bg = GetGrey(0, 25);
-			colors.showlist_border_color = GetGrey(255,50);
+		switch (globalProperties.colorsMainPanel) {
+			case 1: //Dark and Album Art
+				colors.showlist_bg = GetGrey(25, 70);
+				colors.showlist_arrow = GetGrey(25,255);
+				colors.showlist_border_color = GetGrey(255,30);
+				break;
+				
+			case 2: //Dark and Coal and Album Art
+				colors.showlist_bg = GetGrey(25, 70);
+				colors.showlist_border_color = GetGrey(255,50);
+				break;
+				
+			default: //Pure dark (Main color for tracklist is default grey)
+				colors.showlist_bg = GetGrey(25);
+				colors.showlist_arrow = GetGrey(25,255);
+				colors.showlist_border_color = GetGrey(255,30);
+				break;
 		}
 		colors.grad_bottom_1 = GetGrey(0,70);
 		colors.grad_bottom_2 = GetGrey(0,0);
@@ -7001,13 +7011,23 @@ function get_colors() {
 		
 		colors.overlay_on_hover = GetGrey(0,130);
 	} else {
-		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
-			colors.showlist_bg = GetGrey(255,70);
-			colors.showlist_arrow = GetGrey(255,255);
-			colors.showlist_border_color = GetGrey(210);
-		} else if(globalProperties.colorsMainPanel==2){
-			colors.showlist_bg = GetGrey(0,10);
-			colors.showlist_border_color = GetGrey(210);
+		switch (globalProperties.colorsMainPanel) {
+			case 1: //White and Album Art
+				colors.showlist_bg = GetGrey(255,70);
+				colors.showlist_arrow = GetGrey(255,255);
+				colors.showlist_border_color = GetGrey(210);
+				break;
+				
+			case 2: //White and Grey and Album Art
+				colors.showlist_bg = GetGrey(0,10);
+				colors.showlist_border_color = GetGrey(210);
+				break;
+				
+			default: //Pure white (Main color for tracklist is default white)
+				colors.showlist_bg = GetGrey(255);
+				colors.showlist_arrow = GetGrey(255,255);
+				colors.showlist_border_color = GetGrey(210);
+				break;
 		}
 		colors.grad_bottom_1 = GetGrey(230,90);
 		colors.grad_bottom_2 = GetGrey(230,0);
