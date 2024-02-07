@@ -6929,11 +6929,11 @@ function get_colors() {
 	colors.showlist_arrow = colors.showlist_bg;
 	if(properties.darklayout){
 		if(globalProperties.colorsMainPanel==0 || globalProperties.colorsMainPanel==1){
-			colors.showlist_bg = GetGrey(25);
+			colors.showlist_bg = GetGrey(0, 25);
 			colors.showlist_arrow = GetGrey(25,255);
 			colors.showlist_border_color = GetGrey(255,30);
 		} else if(globalProperties.colorsMainPanel==2){
-			colors.showlist_bg = GetGrey(25);
+			colors.showlist_bg = GetGrey(0, 25);
 			colors.showlist_border_color = GetGrey(255,50);
 		}
 		colors.grad_bottom_1 = GetGrey(0,70);
