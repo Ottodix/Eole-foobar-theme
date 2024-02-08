@@ -4,9 +4,8 @@ This is a skin for the [foobar2000](https://www.foobar2000.org) audio player.
 This theme requires Foobar2000 32bit, version 1.4 or newer.
 Follow the [instructions below](https://github.com/Ottodix/Eole-foobar-theme#installation) to install it properly.
 
-```bash
-  WARNING: The components required for this theme do not work with foobar 64bit
-```
+> [!WARNING]
+> The components required for this theme do not work with foobar 64bit
 
 ## Contribute to the theme
 
@@ -25,17 +24,22 @@ Just open an issue ticket, share the code, or create a pull request.
    - STANDARD foobar2000 installation: your foobar profile directory is in here: `%AppData%\foobar2000` or `%AppData%\foobar2000-v2`
    - PORTABLE foobar2000 installation: your foobar profile directory is in a folder named "`profile`" inside your installation directory.
 
-2. Run foobar, choose `ColumnUI` as user interface (from the prompt, or in `File` > `Preferences` > `Display`).
+2. Run foobar, choose `Columns UI` as user interface (from the prompt, or in `File` > `Preferences` > `Display`).
+   - If `Columns UI` is not present Download and install [Columns UI](https://www.foobar2000.org/components/view/foo_ui_columns) component, restart foobar. Select `Columns UI` from the user interface prompt.
 
-3. From the Columns UI settings in `File` > `Preferences` > `Display` > `Columns UI`, click on `Import`, and select the following file: `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl`.
+4. From the Columns UI settings in `File` > `Preferences` > `Display` > `Columns UI`, click on `Import`, and select the following file: `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\columnsUI_eole.fcl`.
 
-4. Configure the Winamp directory in Shpeck for the visualisations, it's at the bottom of the preferences window: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Visualisations` > `Shpeck`. Click on the `...` button in the top right to browse and select the directory `[FOOBAR_PROFILE_DIRECTORY]\plugins\winamp`. Validate, close the preferences, and go to the `Visualization` tab of the skin. Right click and select `Milkdrop` in the `Autostart Plugin` submenu.
+5. Configure the Winamp directory in Shpeck for the visualisations, it's at the bottom of the preferences window: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Visualisations` > `Shpeck`. Click on the `...` button in the top right to browse and select the directory `[FOOBAR_PROFILE_DIRECTORY]\plugins\winamp`. Validate, close the preferences, and go to the `Visualization` tab of the skin. Right click and select `Milkdrop` in the `Autostart Plugin` submenu.
 
-5. Optionally, if you want some extra polish you can change the systray icon: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Display` > `Columns UI`. Go to the `Notification area` tab and tick `Use custom icon`, then click `Select icon...` and select the file `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico` (or any of the alternative icons in this folder).
+## Optional
+  
+If you want some extra polish you can change the systray icon: Click the `Foobar` button in the top left and navigate to `File` > `Preferences` > `Display` > `Columns UI`. Go to the `Notification area` tab and tick `Use custom icon`, then click `Select icon...` and select the file `[FOOBAR_PROFILE_DIRECTORY]\themes\eole\img\systray icons\white\uniEC4F.ico` (or any of the alternative icons in this folder).
 
 That's it! Enjoy your music!
 
-WARNING: The visualization tab is powered by Shpeck, which can be unstable. So if it doesn't work or it makes foobar crash on your computer, you'll have to figure what's wrong yourself. You can try to find the lastest informations at the end of the discussion topic of Shpeck here http://tinyurl.com/hr2ybp2, or completely remove the visualisations (you will need to edit the theme a little bit for that: right click the `Visualization` tab at the top and select `Settings`. Check `Hide visualization panel`. Remove the Shpeck component at the bottom of the panel list in `File` > `Preferences` > `Display` > `Columns UI` > `Layout`).
+> [!WARNING]
+> The visualization tab is powered by Shpeck, which can be unstable. So if it doesn't work or it makes foobar crash on your computer, you'll have to figure what's wrong yourself. You can try to find the lastest informations at the end of the discussion topic of Shpeck here http://tinyurl.com/hr2ybp2, or completely remove the visualisations (you will need to edit the theme a little bit for that: right click the `Visualization` tab at the top and select `Settings`. Check `Hide visualization panel`. Remove the Shpeck component at the bottom of the panel list in `File` > `Preferences` > `Display` > `Columns UI` > `Layout`).
+
 
 ## Useful to know
 
