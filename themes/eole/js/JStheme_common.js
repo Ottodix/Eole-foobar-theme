@@ -63,7 +63,7 @@ var globalProperties = {
 	default_wallpaper : theme_img_path+"\\nothing_played_full.png",
     nocover_img: gdi.Image(theme_img_path+"\\no_cover.png"),
     stream_img: gdi.Image(theme_img_path+"\\stream_icon.png"),
-	ResizeQLY: 2,
+	ResizeQLY: 0,
 	use_ratings_file_tags: window.GetProperty("GLOBAL use ratings in file tags", false),
 }
 var PlaylistExclude = Array(globalProperties.whole_library,globalProperties.filter_playlist);
@@ -2884,13 +2884,14 @@ function get_font() {
 };
 
 // ========================================= IMAGES =========================================
-function FormatCover(image, w, h, rawBitmap, callID, keepratio) {
+function FormatCover(image, w, h, rawBitmap, callID, keepratio, resize_qlty) {
 	var keepratio = typeof keepratio !== 'undefined' ? keepratio : false;		
+	var resize_qlty = typeof resize_qlty !== 'undefined' ? resize_qlty : globalProperties.ResizeQLY;		
 	if(!image || w<=0 || h<=0) return image;
 	if(rawBitmap) {
-		return image.Resize(w, h, globalProperties.ResizeQLY).CreateRawBitmap();
+		return image.Resize(w, h, resize_qlty).CreateRawBitmap();
 	} else if(!keepratio){
-		return image.Resize(w, h, globalProperties.ResizeQLY);
+		return image.Resize(w, h, resize_qlty);
 	} else {	
 		if(image.Height>=image.Width) {
 			var ratio = image.Width / image.Height;
@@ -2901,7 +2902,7 @@ function FormatCover(image, w, h, rawBitmap, callID, keepratio) {
 			var pw = w;
 			var ph = h * ratio;
 		};		
-		return image.Resize(pw, ph, globalProperties.ResizeQLY);
+		return image.Resize(pw, ph, resize_qlty);
 	}
 };
 function isImage(variable){
@@ -3098,7 +3099,7 @@ function save_image_to_cache(image, albumIndex, cachekey, metadb){
 	try {
 		if(image.Width>globalProperties.coverCacheWidthMax || image.Height>globalProperties.coverCacheWidthMax) {
 			//image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", globalProperties.keepProportion);
-			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", true);
+			image = FormatCover(image, globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax, false, "save_image_to_cache", true, 3);
 			//image = image.Resize(globalProperties.coverCacheWidthMax, globalProperties.coverCacheWidthMax,2);
 		}		
 		if(!g_files.FileExists(filename) && save2cache){
