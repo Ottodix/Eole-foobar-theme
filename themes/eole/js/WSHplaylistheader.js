@@ -4,7 +4,8 @@ var properties = {
 	displayToggleBtns: window.GetProperty("_DISPLAY: Toggle buttons", true),
 	savedFilterState: window.GetProperty("_PROPERTY: Saved filter state", -1),
     filtred_playlist_idx: window.GetProperty("_PROPERTY: filtred playlist idx", -1),		
-	panelFontAdjustement: -1
+	panelFontAdjustement: -1,
+	TFsorting: window.GetProperty("MAINPANEL Playlist Sort TitleFormat",""),
 }
 
 var b_img;
@@ -396,7 +397,7 @@ function draw_menu(x, y) {
 		basemenu.AppendMenuSeparator();
 		var SortMenu = window.CreatePopupMenu(); //Custom Entries
 		SortMenu.AppendTo(basemenu, MF_STRING, "Sort By");
-
+		
 		SortMenu.AppendMenuItem(MF_STRING, 3001, "Artist / Album / Tracknumber");
 		SortMenu.AppendMenuItem(MF_STRING, 3002, "Album / Tracknumber");
 		SortMenu.AppendMenuItem(MF_STRING, 3003, "Tracknumber");
@@ -405,10 +406,12 @@ function draw_menu(x, y) {
 		SortMenu.AppendMenuItem(MF_STRING, 3006, "Date");
 		SortMenu.AppendMenuItem(MF_STRING, 3007, "Shortest to longest");
 		SortMenu.AppendMenuItem(MF_STRING, 3008, "Longest to shortest");
-		SortMenu.AppendMenuItem(MF_STRING, 3009, "Rating");		
+		SortMenu.AppendMenuItem(MF_STRING, 3009, "Rating");
+		SortMenu.AppendMenuItem(MF_STRING, 3010, "Custom titleformat...");
 		SortMenu.AppendMenuSeparator();
-		SortMenu.AppendMenuItem(MF_STRING, 3010, "Randomize");	
+		SortMenu.AppendMenuItem(MF_STRING, 3011, "Randomize");
 	}
+	
     basemenu.AppendMenuSeparator();
     basemenu.AppendMenuItem(MF_STRING, 3000, "Select all");
     basemenu.AppendMenuItem(MF_STRING, 2998, "Remove all");
@@ -434,7 +437,7 @@ function draw_menu(x, y) {
 
     idx = 0;
     idx = basemenu.TrackPopupMenu(x, y, 0x0008);
-
+	
     switch (true) {
 	case(idx > 1 && idx < 800) :
 		Context.ExecuteByID(idx - 2);
@@ -509,39 +512,50 @@ function draw_menu(x, y) {
 		positionButtons();
 		window.Repaint();
         break;
-    case (idx == 3000):
-        fb.RunMainMenuCommand("Edit/Select all");
-        break;
-    case (idx == 3001):
-        plman.SortByFormat(plman.ActivePlaylist,sort_by_album_artist);
-        break;
+	case (idx == 3000):
+		fb.RunMainMenuCommand("Edit/Select all");
+		break;
+	case (idx == 3001):
+		plman.SortByFormat(plman.ActivePlaylist,sort_by_album_artist);
+		break;
 	case (idx == 3002):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_album);
 		break;
 	case (idx == 3003):
-        plman.SortByFormat(plman.ActivePlaylist,sort_by_tracknumber);
-        break;
+		plman.SortByFormat(plman.ActivePlaylist,sort_by_tracknumber);
+		break;
 	case (idx == 3004):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_path,1);
 		break;
-    case (idx == 3005):
-        plman.SortByFormat(plman.ActivePlaylist,sort_by_title);
-        break;
+	case (idx == 3005):
+		plman.SortByFormat(plman.ActivePlaylist,sort_by_title);
+		break;
 	case (idx == 3006):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_date);
 		break;
 	case (idx == 3007):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_time,1);
 		break;
-    case (idx == 3008):
+	case (idx == 3008):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_time,-1);
 		break;
 	case (idx == 3009):
 		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_rating,1);
 		break;
-    case (idx == 3010):
-        plman.SortByFormat(plman.ActivePlaylist,"");
-        break;
+	case (idx == 3010):
+		try {
+			new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting, true);
+			if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+				properties.TFsorting = new_TFsorting;
+				window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+				plman.SortByFormat(plman.ActivePlaylist, properties.TFsorting);
+			}
+		}
+		catch(e) {}
+		break;
+	case (idx == 3011):
+		plman.SortByFormat(plman.ActivePlaylist,"");
+		break;
     case (idx == 4989):
 		properties.displayToggleBtns=!properties.displayToggleBtns;
         window.NotifyOthers("display_toggle_buttons", properties.displayToggleBtns);

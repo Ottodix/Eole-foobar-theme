@@ -135,6 +135,8 @@ var properties_common = {
 	panelFontAdjustement: 0,
 	extraBottomRows: 1,
 	load_image_from_cache_direct:true,
+	TFsorting: window.GetProperty("MAINPANEL Playlist Sort TitleFormat",""),
+
 };
 var properties = {}
 function setShowHeaderBar(){
@@ -4008,6 +4010,7 @@ oBrowser = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 1041, "Shortest to longest");
 			SortMenu.AppendMenuItem(MF_STRING, 1042, "Longest to shortest");
 			SortMenu.AppendMenuItem(MF_STRING, 1046, "Rating");			
+			SortMenu.AppendMenuItem(MF_STRING, 1047, "Custom titleformat...");			
 			SortMenu.AppendMenuSeparator();
 			SortMenu.AppendMenuItem(MF_STRING, 1039, "Randomize");
 		}
@@ -4161,7 +4164,18 @@ oBrowser = function(name) {
                     this.dont_scroll_to_focus = true;
                     plman.SortByFormatV2(g_active_playlist,sort_by_rating,1);
                     this.scroll = this.offset = 0;
-                    break;				
+                    break;
+				case 1047:
+					try {
+						new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting, true);
+						if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+							properties.TFsorting = new_TFsorting;
+							window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+							plman.SortByFormat(plman.ActivePlaylist, properties.TFsorting);
+						}
+					}
+					catch(e) {}
+					break;					
                 case 2000:
                     fb.RunMainMenuCommand("File/New playlist");
                     plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);
