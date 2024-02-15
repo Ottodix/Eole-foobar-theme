@@ -398,10 +398,16 @@ function draw_menu(x, y) {
 		SortMenu.AppendTo(basemenu, MF_STRING, "Sort By");
 
 		SortMenu.AppendMenuItem(MF_STRING, 3001, "Artist / Album / Tracknumber");
-		SortMenu.AppendMenuItem(MF_STRING, 3003, "Title");
-		SortMenu.AppendMenuItem(MF_STRING, 3004, "Tracknumber");
+		SortMenu.AppendMenuItem(MF_STRING, 3002, "Album / Tracknumber");
+		SortMenu.AppendMenuItem(MF_STRING, 3003, "Tracknumber");
+		SortMenu.AppendMenuItem(MF_STRING, 3004, "File path");
+		SortMenu.AppendMenuItem(MF_STRING, 3005, "Title");
+		SortMenu.AppendMenuItem(MF_STRING, 3006, "Date");
+		SortMenu.AppendMenuItem(MF_STRING, 3007, "Shortest to longest");
+		SortMenu.AppendMenuItem(MF_STRING, 3008, "Longest to shortest");
+		SortMenu.AppendMenuItem(MF_STRING, 3009, "Rating");		
 		SortMenu.AppendMenuSeparator();
-		SortMenu.AppendMenuItem(MF_STRING, 3002, "Randomize");
+		SortMenu.AppendMenuItem(MF_STRING, 3010, "Randomize");	
 	}
     basemenu.AppendMenuSeparator();
     basemenu.AppendMenuItem(MF_STRING, 3000, "Select all");
@@ -509,14 +515,32 @@ function draw_menu(x, y) {
     case (idx == 3001):
         plman.SortByFormat(plman.ActivePlaylist,sort_by_album_artist);
         break;
-    case (idx == 3002):
-        plman.SortByFormat(plman.ActivePlaylist,"");
+	case (idx == 3002):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_album);
+		break;
+	case (idx == 3003):
+        plman.SortByFormat(plman.ActivePlaylist,sort_by_tracknumber);
         break;
-    case (idx == 3003):
+	case (idx == 3004):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_path,1);
+		break;
+    case (idx == 3005):
         plman.SortByFormat(plman.ActivePlaylist,sort_by_title);
         break;
-    case (idx == 3004):
-        plman.SortByFormat(plman.ActivePlaylist,sort_by_tracknumber);
+	case (idx == 3006):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_date);
+		break;
+	case (idx == 3007):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_time,1);
+		break;
+    case (idx == 3008):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_time,-1);
+		break;
+	case (idx == 3009):
+		plman.SortByFormatV2(plman.ActivePlaylist,sort_by_rating,1);
+		break;
+    case (idx == 3010):
+        plman.SortByFormat(plman.ActivePlaylist,"");
         break;
     case (idx == 4989):
 		properties.displayToggleBtns=!properties.displayToggleBtns;
