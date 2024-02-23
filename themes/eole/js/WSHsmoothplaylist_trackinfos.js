@@ -3340,7 +3340,12 @@ oBrowser = function(name) {
 
         // rating check
         if(this.activeRow > -1) {
-            var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -5;
+            this.nowplaying = plman.GetPlayingItemLocation();
+            if (this.activeRow == this.nowplaying.PlaylistItemIndex) {
+                var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -15;
+            } else {
+                var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -5;
+            }
             var rating_y = Math.floor(this.y + (this.activeRow * properties.rowHeight) - scroll_);
             if(properties.showRating && (!properties.showRatingSelected || this.rows[this.activeRow].selected || (properties.showRatingRated && this.rows[this.activeRow].rating>0))) {
                 this.ishover_rating = (this.rows[this.activeRow].type == 0 && x >= rating_x-this.rows[this.activeRow].rating_length/5  && x <= rating_x + this.rows[this.activeRow].rating_length && y >= rating_y && y <= rating_y + properties.rowHeight);
