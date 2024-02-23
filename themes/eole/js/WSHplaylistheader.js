@@ -548,6 +548,7 @@ function draw_menu(x, y) {
 			if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
 				properties.TFsorting = new_TFsorting;
 				window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+				window.NotifyOthers("playlist_titleformat", properties.TFsorting);
 				plman.SortByFormat(plman.ActivePlaylist, properties.TFsorting);
 			}
 		}
@@ -1090,7 +1091,11 @@ function on_notify_data(name, info) {
 				properties.filtred_playlist_idx = -1;
 				window.SetProperty("_PROPERTY: filtred playlist idx", properties.filtred_playlist_idx)
 			}
-		break;			
+		break;
+		case "playlist_titleformat":
+			properties.TFsorting = info;
+			window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+		break;		
     };
 };
 function on_init(){

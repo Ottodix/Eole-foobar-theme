@@ -4171,6 +4171,7 @@ oBrowser = function(name) {
 						if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
 							properties.TFsorting = new_TFsorting;
 							window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+							window.NotifyOthers("playlist_titleformat", properties.TFsorting);
 							plman.SortByFormat(plman.ActivePlaylist, properties.TFsorting);
 						}
 					}
@@ -6831,6 +6832,10 @@ function on_notify_data(name, info) {
 		case "cover_cache_finalized":
 			//g_image_cache.cachelist = cloneImgs(info);
 			//window.Repaint();
+		break;
+		case "playlist_titleformat":
+			properties.TFsorting = info;
+			window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
 		break;
 		case "WSH_panels_reload":
 			window.Reload();
