@@ -135,6 +135,8 @@ var properties_common = {
 	panelFontAdjustement: 0,
 	extraBottomRows: 1,
 	load_image_from_cache_direct:true,
+	TFsorting: window.GetProperty("MAINPANEL Playlist Sort TitleFormat",""),
+
 };
 var properties = {}
 function setShowHeaderBar(){
@@ -3338,7 +3340,12 @@ oBrowser = function(name) {
 
         // rating check
         if(this.activeRow > -1) {
-            var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -5;
+            this.nowplaying = plman.GetPlayingItemLocation();
+            if (this.activeRow == this.nowplaying.PlaylistItemIndex) {
+                var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -15;
+            } else {
+                var rating_x = this.x + this.w - cColumns.track_time_part - this.rows[this.activeRow].rating_length -5;
+            }
             var rating_y = Math.floor(this.y + (this.activeRow * properties.rowHeight) - scroll_);
             if(properties.showRating && (!properties.showRatingSelected || this.rows[this.activeRow].selected || (properties.showRatingRated && this.rows[this.activeRow].rating>0))) {
                 this.ishover_rating = (this.rows[this.activeRow].type == 0 && x >= rating_x-this.rows[this.activeRow].rating_length/5  && x <= rating_x + this.rows[this.activeRow].rating_length && y >= rating_y && y <= rating_y + properties.rowHeight);
@@ -4008,6 +4015,7 @@ oBrowser = function(name) {
 			SortMenu.AppendMenuItem(MF_STRING, 1041, "Shortest to longest");
 			SortMenu.AppendMenuItem(MF_STRING, 1042, "Longest to shortest");
 			SortMenu.AppendMenuItem(MF_STRING, 1046, "Rating");			
+			SortMenu.AppendMenuItem(MF_STRING, 1047, "Custom titleformat...");			
 			SortMenu.AppendMenuSeparator();
 			SortMenu.AppendMenuItem(MF_STRING, 1039, "Randomize");
 		}
@@ -4161,7 +4169,19 @@ oBrowser = function(name) {
                     this.dont_scroll_to_focus = true;
                     plman.SortByFormatV2(g_active_playlist,sort_by_rating,1);
                     this.scroll = this.offset = 0;
-                    break;				
+                    break;
+				case 1047:
+					try {
+						new_TFsorting = utils.InputBox(window.ID, "Enter a title formatting script.\nYou can use the full foobar2000 title formatting syntax here.\n\nSee http://tinyurl.com/lwhay6f\nfor informations about foobar title formatting.", "Custom Sort Order", properties.TFsorting, true);
+						if (!(new_TFsorting == "" || typeof new_TFsorting == 'undefined')) {
+							properties.TFsorting = new_TFsorting;
+							window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
+							window.NotifyOthers("playlist_titleformat", properties.TFsorting);
+							plman.SortByFormat(plman.ActivePlaylist, properties.TFsorting);
+						}
+					}
+					catch(e) {}
+					break;					
                 case 2000:
                     fb.RunMainMenuCommand("File/New playlist");
                     plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, this.metadblist_selection, false);
@@ -6817,6 +6837,10 @@ function on_notify_data(name, info) {
 		case "cover_cache_finalized":
 			//g_image_cache.cachelist = cloneImgs(info);
 			//window.Repaint();
+		break;
+		case "playlist_titleformat":
+			properties.TFsorting = info;
+			window.SetProperty("MAINPANEL Playlist Sort TitleFormat", properties.TFsorting);
 		break;
 		case "WSH_panels_reload":
 			window.Reload();
