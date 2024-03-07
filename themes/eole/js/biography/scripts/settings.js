@@ -71,8 +71,7 @@ class Settings {
 		this.photoRecycler = `${this.storageFolder}oldPhotosForDeletion\\`;
 		this.settingsKeys = [];
 		
-		this.caPath = `${this.storageFolder}biography-cache`;
-		this.cachePath = `${this.caPath}\\`;
+		this.cachePath = `${this.storageFolder}`;
 		
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
@@ -717,8 +716,8 @@ let settings = [
 	['Auto-Save Folder', '$directory_path(%path%)', 'text', 'foImgCov'],
 	['Auto-Save File Name', 'cover', 'text', 'fnImgCov'],
 
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
+	['Folder', '%storage_folder%\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
+	['Folder', '%storage_folder%\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
 	['Album Name Auto-Clean', false, 'boolean', 'albStrip'],
 	['Cache Expiry (days: minimum 28)', 28, 'num', 'exp'],
 
