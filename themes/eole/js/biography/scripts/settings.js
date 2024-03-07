@@ -71,8 +71,7 @@ class Settings {
 		this.photoRecycler = `${this.storageFolder}oldPhotosForDeletion\\`;
 		this.settingsKeys = [];
 		
-		this.caPath = `${this.storageFolder}biography-cache`;
-		this.cachePath = `${this.caPath}\\`;
+		this.cachePath = `${this.storageFolder}`;
 		
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
