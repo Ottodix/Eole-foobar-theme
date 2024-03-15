@@ -150,7 +150,7 @@ var libraryfilter_state = new oPanelSetting("libraryfilter_state", "LIBRARYFILTE
 var lyrics_state = new oPanelSetting("lyrics_state", "LYRICS_", 1, 0, 11);
 var librarytree = new oPanelSetting("librarytree", "LIBRARYTREE_", 0, 0, 1);
 var mini_controlbar = new oPanelSetting("mini_controlbar", "MINICONTROLBAR_", 1, 0, 1);
-var compact_titlebar = new oPanelSetting("compacttitlebar", "COMPACTTITLEBAR_", 0, 0, 1);
+var compact_titlebar = new oPanelSetting("compacttitlebar", "COMPACTTITLEBAR_", 0, 0, 2);
 
 //Individual Filter state
 var filter1_state = new oPanelSetting("filter1_state", "FILTER1_", 1, 0, 1);

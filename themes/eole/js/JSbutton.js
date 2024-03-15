@@ -1,5 +1,6 @@
-function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDbleClick, N_img, H_img, btn_index, state, hover_color, hover_bar_bottom) {
+function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDbleClick, N_img, H_img, btn_index, state, hover_color, hover_bar_bottom, btn_font) {
     this.state = state ? state : ButtonStates.normal;
+    this.font = btn_font ? btn_font : g_font.normal;	
     this.x = x;
     this.y = y;
     this.w = w; 
@@ -179,7 +180,7 @@ function JSButton(x, y, w, h, label, name, tooltip_text, fonDown, fonUp, fonDble
 
 		if(this.display_label && this.label!="") {
 			var text2_draw = (this.upperCase) ? this.label_uppercase : this.label;
-			gr.GdiDrawText(text2_draw, g_font.normal, text_color, padding_x+b_img.Width+this.txt_x_adjustement, this.y+this.txt_y_adjustement, this.w, this.h, DT_LEFT| DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
+			gr.GdiDrawText(text2_draw, this.font, text_color, padding_x+b_img.Width+this.txt_x_adjustement, this.y+this.txt_y_adjustement, this.w, this.h, DT_LEFT| DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);	
 		}
     }
     this.onMouse = function (state,x,y) {    
