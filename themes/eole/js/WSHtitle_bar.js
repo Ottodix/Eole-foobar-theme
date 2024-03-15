@@ -23,6 +23,7 @@ var properties = {
 	full_titlebar_height:64,
 	minimode_titlebar_height:64,
 	compact_titlebar_height:36,
+	compact_titlebar_big_height:50,	
 	searchHistory_max_items: window.GetProperty("Max items in search history", 6),
 	library_dark_theme: window.GetProperty("LIBRARY dark theme", false),
 	playlists_dark_theme: window.GetProperty("PLAYLISTS dark theme", false),
@@ -84,10 +85,12 @@ var cSearchBoxMainLight = {
 var cSearchBoxCompact = {
 	width:270,
 	marginRight:190,
+	marginRightSmall:185,	
+	marginRightBig:198,	
 	marginLeft:5,
 	marginTop:1,
 	marginBottom:0,
-	paddingLeft:37,
+	paddingLeft:27,
 	paddingRight:40,
 	paddingTop:5,
 	paddingBottom:6
@@ -118,7 +121,10 @@ var btn = {
 	width:85,
 	width_small_btns:27,
 	width_small_btns_compact:36,
+	width_small_btns_compact_big:43,	
 	height:33,
+	height_small:33,		
+	height_big:47,	
 	padding:[0,7,0,0],
 	top_m:31,
 	top_m_to_uppercase:32,
@@ -194,6 +200,7 @@ function build_images() {
 		minimode_off_img: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\minimode_off_icon.png`),
 		library_img: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\library_icon.png`),
 		global_settings_img: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\global_settings.png`),
+		global_settings_big_img: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\global_settings_big.png`),		
 		nowplaying_off_icon: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\nowplaying_off.png`),
 		nowplaying_off_hover_icon: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\nowplaying_off_hover.png`),
 		nowplaying_on_icon: gdi.Image(`${theme_img_path}\\icons\\${colors.icons_folder}\\nowplaying_on.png`),
@@ -286,7 +293,7 @@ function get_colors(){
 	build_images();
 }
 
-get_colors();
+//get_colors();
 
 function Lightswitch(switch_all,new_state){
 	switch_all = typeof switch_all !== 'undefined' ? switch_all : false;
@@ -475,9 +482,13 @@ function build_buttons(){
 		buttons.Fullscreen.H_img = images.fullscreen_img;
 		buttons.Fullscreen.N_img = images.fullscreen_img;
 		buttons.Fullscreen.D_img = buttons.Fullscreen.H_img;
-
-		buttons.Settings.H_img = images.global_settings_img;
-		buttons.Settings.N_img = images.global_settings_img;
+		if(compact_titlebar.isEqual(2) && layout_state.isEqual(0)){
+			buttons.Settings.H_img = images.global_settings_big_img;
+			buttons.Settings.N_img = images.global_settings_big_img;
+		} else {
+			buttons.Settings.H_img = images.global_settings_img;
+			buttons.Settings.N_img = images.global_settings_img;			
+		}
 		buttons.Settings.D_img = buttons.Settings.H_img;
 
 		buttons.Close.N_img = images.nowplaying_on_hover_icon;
@@ -498,29 +509,34 @@ function build_buttons(){
 		buttons.Reduce.hover_color = colors.titlebar_btn_hover_bg;
 	} else {
 		btn_initialized = true;
+		if(compact_titlebar.isEqual(2) && layout_state.isEqual(0)){
+			btn.height = btn.height_big;
+		} else {
+			btn.height = btn.height_small;			
+		}
 		buttons = {
 			Library: new JSButton(btn.left_m+btn.margin*0, btn.top_m, btn.width, btn.height, "Library", "Library", "", function () {
 				main_panel_state.setValue(0);
 				get_colors();g_searchbox.adapt_look_to_layout();
-			}, false,false,images.library_img,images.library_img,0, false, false, true),
+			}, false,false,images.library_img,images.library_img,0, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),
 			Playlists: new JSButton(btn.left_m+btn.width+btn.margin*1, btn.top_m, btn.width, btn.height, "Playlists", "Playlists", "", function () {
 				main_panel_state.setValue(1);
 				get_colors();g_searchbox.adapt_look_to_layout();
-			}, false,false,images.playlist_img,images.playlist_img,1, false, false, true),
+			}, false,false,images.playlist_img,images.playlist_img,1, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),
 			Artist_Bio: new JSButton(btn.left_m+btn.width+btn.width+btn.margin*2, btn.top_m, btn.width, btn.height, "Now playing", "Now playing", "", function () {
 				main_panel_state.setValue(2);
 				get_colors();g_searchbox.adapt_look_to_layout();
-			}, false,false,images.artist_bio_img,images.artist_bio_img,2, false, false, true),
+			}, false,false,images.artist_bio_img,images.artist_bio_img,2, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),
 			Visualization: new JSButton(btn.left_m+btn.width+btn.width+btn.width+btn.margin*3, btn.top_m, btn.width, btn.height, "Visualization", "Visualization", "", function () {
 				main_panel_state.setValue(3);
 				get_colors();g_searchbox.adapt_look_to_layout();
-			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true),
+			}, false,false,images.visualization_img,images.visualization_img,3, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),
 			NowPlaying: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "nowplaying", "Hide/show right sidebar", function () {
 				toggleNowPlayingState();
-			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true),
+			}, false, false,images.nowplaying_off_icon,images.nowplaying_off_icon,-1, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),
 			ConfigLayout: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "Configlayout", "Configure Layout", function () {
 				draw_layout_menu(this.x+this.w,this.y+this.h-1);
-			}, false, false,images.config_layout_img,images.config_layout_img,-1, false, false, true),			
+			}, false, false,images.config_layout_img,images.config_layout_img,-1, false, false, true,(compact_titlebar.isEqual(2)?g_font.plus1:g_font.normal)),			
 			RightSidebar: new JSButton(-38, btn.top_m, btn.width_small_btns, btn.height, "", "rightsidebar", "Hide/show track infos", function () {
 				if(getNowPlayingState()==1) {
 					toggleTrackInfosState();
@@ -550,7 +566,7 @@ function build_buttons(){
 			Settings: new JSButton(2, -1, Settings_width, btn.height-3, "Foobar", "Foobar", "Main menu", function () {
 				g_tooltip.Deactivate();
 				draw_main_menu(0, 28);
-			}, false,false,images.global_settings_img,images.global_settings_img,-1, false, false, false),
+			}, false,false,((compact_titlebar.isEqual(2) && layout_state.isEqual(0))?images.global_settings_big_img:images.global_settings_img),((compact_titlebar.isEqual(2) && layout_state.isEqual(0))?images.global_settings_big_img:images.global_settings_img),-1, false, false, false),
 			Close: new JSButton(-45, 0, 45, 29, "", "close", "", false, function () {
 				fb.Exit();
 			},false,images.nowplaying_on_hover_icon,images.nowplaying_on_hover_icon_hover,-1,false,RGB(232,17,35),true),
@@ -641,7 +657,7 @@ function toggleLayoutMode(new_layout_state, main_window_state){
 		g_uihacks.enableMinSize();
 		g_uihacks.setMinWidth(Math.max(properties.fullMode_savedwidth,globalProperties.fullMode_minwidth));
 		try{
-			g_uihacks.setMinHeight(Math.max(properties.fullMode_pmanagerheight+(mini_controlbar.isActive()?(showtrackinfo_big.isActive()?properties.compactcontrolsHeight:properties.compactNoTrackcontrolsHeight):properties.fullcontrolsHeight)+(compact_titlebar.isActive()?properties.compact_titlebar_height:properties.full_titlebar_height),globalProperties.fullMode_minheight) + 1);
+			g_uihacks.setMinHeight(Math.max(properties.fullMode_pmanagerheight+(mini_controlbar.isActive()?(showtrackinfo_big.isActive()?properties.compactcontrolsHeight:properties.compactNoTrackcontrolsHeight):properties.fullcontrolsHeight)+(compact_titlebar.isActive()?(compact_titlebar.isEqual(2)?properties.compact_titlebar_big_height:properties.compact_titlebar_height):properties.full_titlebar_height),globalProperties.fullMode_minheight) + 1);
 		} catch (e) {
 			g_uihacks.setMinHeight(window.Height);
 		}
@@ -656,6 +672,11 @@ function toggleLayoutMode(new_layout_state, main_window_state){
 	}
 }
 function adapt_buttons_to_layout(){
+	if(compact_titlebar.isEqual(2) && layout_state.isEqual(0)){
+		btn.height = btn.height_big;
+	} else {
+		btn.height = btn.height_small;			
+	}	
 	if(layout_state.isEqual(1)) {
 		main_panel_btns.hide = true;
 		buttons.Fullscreen.setVisibility(false);
@@ -722,10 +743,12 @@ function adapt_buttons_to_layout(){
 
 		additional_btns.x = 14;
 
-
-		window_btns.setBtnsWidth(45);
+		if(compact_titlebar.isEqual(2))
+			window_btns.setBtnsWidth(50);
+		else
+			window_btns.setBtnsWidth(45);			
 		if(properties.mini_mainmenu_button) {
-			buttons.Settings.w = buttons.Settings.N_img.Width+5;
+			buttons.Settings.w = buttons.Settings.N_img.Width+5+(compact_titlebar.isEqual(2)?19:0);
 			buttons.Settings.displayLabel(false);
 		} else {
 			buttons.Settings.w = 43+buttons.Settings.N_img.Width+btn.padding/2;
@@ -734,9 +757,23 @@ function adapt_buttons_to_layout(){
 		if(compact_titlebar.isActive()) {
 			//properties.showPanelBtnText = false;
 			compact_btns.setBtnsHeight(btn.height+4);
-			topleft_btns.setPadding([0,8,0,4]);
-			window_btns.setBtnsHeight(36);
-			additional_btns.setBtnsWidth(btn.width_small_btns_compact);
+			if(compact_titlebar.isEqual(1)){
+				topleft_btns.setPadding([0,8,0,4]);
+				window_btns.setBtnsHeight(36);
+				additional_btns.setBtnsWidth(btn.width_small_btns_compact);
+			} else {		
+				topleft_btns.setPadding([0,18,0,14]);
+				if(properties.mini_mainmenu_button) {
+					topleft_btns.setPadding([0,18,0,14]);					
+					topleft_btns.imgXAdjust(0);
+				} else {
+					topleft_btns.setPadding([0,18,0,18]);					
+					topleft_btns.imgXAdjust(-4);						
+				}
+				window_btns.setBtnsHeight(50);		
+				additional_btns.setBtnsWidth(btn.width_small_btns_compact_big);				
+			}
+			
 		} else {
 			//properties.showPanelBtnText = true;
 			topleft_btns.setBtnsHeight(btn.height-3);
@@ -753,7 +790,7 @@ function adapt_buttons_to_layout(){
 			cSearchBoxMainLight.marginRight -= 10;
 			cSearchBoxMainDark.marginRight -= 10;
 		}
-		main_panel_btns.txtYAdjust(1);
+		main_panel_btns.txtYAdjust(compact_titlebar.isEqual(2)?0:1);
 		if(properties.toUpperCase) main_panel_btns.toUpperCase(true);
 		if(!properties.showPanelBtnText) main_panel_btns.displayLabel(false);
 	}
@@ -843,20 +880,20 @@ function SetPseudoCaption(){
 	if(layout_state.isEqual(0)) {
 		if(!compact_titlebar.isActive()){
 			var topleft_btns_w = topleft_btns.getWidth();
-			g_uihacks.SetPseudoCaption(topleft_btns_w, 8, ww-280, 25);
+			g_uihacks.SetPseudoCaption(topleft_btns_w, 8, ww-280, 28);
 		} else {
 			if(g_searchbox.hide) {
 				var compact_btns_w = compact_btns.getWidth();
 				var window_btns_w = window_btns.getWidth();
-				g_uihacks.SetPseudoCaption(compact_btns_w, 8, ww - compact_btns_w - window_btns_w, 25);
+				g_uihacks.SetPseudoCaption(compact_btns_w, 8, ww - compact_btns_w - window_btns_w, (compact_titlebar.isEqual(2)?42:28));
 			} else {
-				g_uihacks.SetPseudoCaption(0, 8, 0, 25);
+				g_uihacks.SetPseudoCaption(0, 8, 0, 28);
 			}
 		}
 	} else {
 		var window_btns_w = window_btns.getWidth();
 		var topleft_btns_w = topleft_btns.getWidth();
-		g_uihacks.SetPseudoCaption(topleft_btns_w, 8, ww - window_btns_w - topleft_btns_w, 25);
+		g_uihacks.SetPseudoCaption(topleft_btns_w, 8, ww - window_btns_w - topleft_btns_w, 28);
 	}
 }
 function on_paint(gr) {
@@ -1065,8 +1102,13 @@ function draw_settings_menu(x,y){
 		var _menu_button = window.CreatePopupMenu();
         var idx;
 
-		_menu.AppendMenuItem(MF_STRING, 1811, "Compact title bar");
-		_menu.CheckMenuItem(1811, compact_titlebar.isActive())
+		_menu.AppendMenuItem(MF_STRING, 1811, "Normal title bar");
+		_menu.AppendMenuItem(MF_STRING, 1812, "Compact title bar - small");
+		_menu.AppendMenuItem(MF_STRING, 1813, "Compact title bar - big");		
+		_menu.CheckMenuRadioItem(1811, 1813, (parseInt(compact_titlebar.getValue())+1811));
+		
+		_menu.AppendMenuSeparator();
+		
 		_menu.AppendMenuItem((compact_titlebar.isActive() && layout_state.isEqual(0))?MF_GRAYED:MF_STRING, 1800, "Display played track title on top");
 		_menu.CheckMenuItem(1800, properties.tracktitle_ontop)
 		_menu.AppendMenuItem((compact_titlebar.isActive() && layout_state.isEqual(0))?MF_GRAYED:MF_STRING, 1809, "Played track title format...");
@@ -1185,11 +1227,26 @@ function draw_settings_menu(x,y){
 				window.Repaint();
 				break;
 			case (idx == 1811):
-				compact_titlebar.toggleValue();
+				btn_initialized = false;
+				compact_titlebar.setValue(0);
 				get_colors();
 				adapt_buttons_to_layout();
 				window.Repaint();
 				break;
+			case (idx == 1812):
+				btn_initialized = false;
+				compact_titlebar.setValue(1);
+				get_colors();
+				adapt_buttons_to_layout();
+				window.Repaint();
+				break;
+			case (idx == 1813):
+				btn_initialized = false;
+				compact_titlebar.setValue(2);
+				get_colors();
+				adapt_buttons_to_layout();
+				window.Repaint();
+				break;				
 			case (idx == 1809):
 			case (idx == 1900):
 				properties.Remember_previous_state = !properties.Remember_previous_state;
@@ -2580,7 +2637,11 @@ oSearch = function() {
 				case (compact_titlebar.isActive()):
 					for (var c in cSearchBoxCompact)
 						if(cSearchBoxCompact.hasOwnProperty(c))
-							cSearchBox[c] = cSearchBoxCompact[c]
+							cSearchBox[c] = cSearchBoxCompact[c];
+					if(compact_titlebar.isEqual(2))
+							cSearchBox.marginRight = cSearchBoxCompact.marginRightBig;
+					else
+							cSearchBox.marginRight = cSearchBoxCompact.marginRightSmall;						
 				break;
 				case (main_panel_state.isEqual(0) && properties.library_dark_theme):
 				case (main_panel_state.isEqual(1) && properties.playlists_dark_theme):
