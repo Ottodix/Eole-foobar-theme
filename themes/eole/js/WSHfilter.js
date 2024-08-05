@@ -2239,6 +2239,7 @@ oBrowser = function(name) {
                     //being much faster overall compared to the OrderByFormat function
 					if (this.groups[dest].traIndex[0] > i) {
 						this.groups[dest].pl.Insert(0, handle);
+						this.groups[dest].start = i;
 					} else {
 						this.groups[dest].pl.Insert(this.groups[dest].count, handle);
 					}
@@ -2259,9 +2260,11 @@ oBrowser = function(name) {
 			}
 		};
 
-        //Update group metadb (needed for correct 1st item thumbnail) and remove prefixes if set
+        //Update group metadb & index (needed for correct 1st item thumbnail) and remove prefixes if set
 		for (var i = 0; i < g; i++) {
+			this.groups[i].index = i;
 			this.groups[i].metadb = this.groups[i].pl[0];
+			this.groups[i].cachekey = process_cachekey(this.groups[i].metadb);
 			if(properties.removePrefix) this.groups[i].removePrefix();
 		}
 
