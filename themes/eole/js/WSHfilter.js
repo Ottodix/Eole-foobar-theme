@@ -2264,7 +2264,9 @@ oBrowser = function(name) {
 		for (var i = 0; i < g; i++) {
 			this.groups[i].index = i;
 			this.groups[i].metadb = this.groups[i].pl[0];
-			this.groups[i].cachekey = process_cachekey(this.groups[i].metadb);
+			if (properties.tagMode != 2) {
+				this.groups[i].cachekey = process_cachekey(this.groups[i].metadb);
+			}
 			if(properties.removePrefix) this.groups[i].removePrefix();
 		}
 
