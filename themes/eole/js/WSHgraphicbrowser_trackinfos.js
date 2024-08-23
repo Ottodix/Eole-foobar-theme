@@ -895,7 +895,7 @@ oRow = function(metadb,itemIndex) {
 			var TagsString = TF.titleB.EvalWithMetadb(metadb);
 		} else
 			var TagsString = TF.title.EvalWithMetadb(metadb);
-		Tags = TagsString.split(" ^^ ");
+		Tags = TagsString.replace(/\r?\n/gm, ' ').split(" ^^ ");
 		
 		this.artist = Tags[0];
 		if(this.artist=="?") this.artist="Unknown artist";
