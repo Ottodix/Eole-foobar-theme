@@ -4398,7 +4398,7 @@ oBrowser = function(name) {
 						trackinfos = TF.grouping_default_filterbox.EvalWithMetadb(this.list[k]);
 						this.current_grouping = properties.TFgrouping_default;
 					}
-					arr = trackinfos.split(" ^^ ");
+					arr = trackinfos.replace(/\r?\n/gm, ' ').split(" ^^ ");
 					group_string = arr[0]+arr[1];
 				} else {
 					if(properties.SingleMultiDisc) {
@@ -4419,7 +4419,7 @@ oBrowser = function(name) {
 
 				if(i>0) {
 					if(this.custom_groupby) {
-						var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).split(" ^^ ");
+						var groupinfos_rows = TF.grouping.EvalWithMetadb(this.groups[i-1].pl[0]).replace(/\r?\n/gm, ' ').split(" ^^ ");
 						this.groups[i-1].firstRow = groupinfos_rows[0];
 						this.groups[i-1].secondRow = (groupinfos_rows[1]!="")?groupinfos_rows[1]:this.groups[i-1].pl.Count+(this.groups[i-1].pl.Count>1?" tracks":" track");
 					} else {
@@ -4436,7 +4436,7 @@ oBrowser = function(name) {
 
 				if(properties.TFgrouping.length > 0) {
 					groupinfoscustom = TF.groupinfoscustom.EvalWithMetadb(this.list[k]);
-					groupinfoscustom = groupinfoscustom.split(" ^^ ");
+					groupinfoscustom = groupinfoscustom.replace(/\r?\n/gm, ' ').split(" ^^ ");
 					this.groups[i].artist = groupinfoscustom[0];
 					this.groups[i].album = groupinfoscustom[1];
 					this.groups[i].genre = groupinfoscustom[2];
@@ -4444,9 +4444,9 @@ oBrowser = function(name) {
 					this.groups[i].discnb = groupinfoscustom[4];
 					this.groups[i].cachekey = process_cachekey(this.list[k]);
 				} else {
-					if(!this.showFilterBox) arr = trackinfos.split(" ^^ ");
+					if(!this.showFilterBox) arr = trackinfos.replace(/\r?\n/gm, ' ').split(" ^^ ");
 					groupinfos = TF.groupinfos.EvalWithMetadb(this.list[k]);
-					groupinfos = groupinfos.split(" ^^ ");
+					groupinfos = groupinfos.replace(/\r?\n/gm, ' ').split(" ^^ ");
 					this.groups[i].artist = arr[0];
 					this.groups[i].album = arr[1];
 					this.groups[i].genre = groupinfos[0];
@@ -4454,6 +4454,7 @@ oBrowser = function(name) {
 					this.groups[i].discnb = groupinfos[2];
 					this.groups[i].cachekey = process_cachekey(this.list[k],'',groupinfos[3]);
 				}
+				
 				if(this.groups[i].album=="?") this.groups[i].album="Single(s)";
 				if(this.groups[i].artist=="?") this.groups[i].artist="Unknown artist(s)";
 				if(this.groups[i].genre=="?") this.groups[i].genre="";
