@@ -72,16 +72,15 @@ var properties = {
     scrollRowDivider: window.GetProperty("SYSTEM Scroll Row Divider", 1),
     tf_artist: fb.TitleFormat("%artist%"),
     tf_albumartist: fb.TitleFormat("%album artist%"),
-    tf_groupkey_genre: window.GetProperty("_PROPERTY Genre TitleFormat", "$if2($meta(genre,0),?)"),
-    tf_groupkey_genre_default: "$if2($meta(genre,0),?)",
-    tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta(artist),?)"),
-    tf_groupkey_artist_default: "$if2($meta(artist),?)",
+    tf_groupkey_genre: window.GetProperty("_PROPERTY Genre TitleFormat", "$if2($meta_sep(genre,';'),?)"),
+    tf_groupkey_genre_default: "$if2($meta_sep(genre,';'),?)",
+    tf_groupkey_artist: window.GetProperty("_PROPERTY Artist TitleFormat", "$if2($meta_sep(artist,';'),?)"),
+    tf_groupkey_artist_default: "$if2($meta_sep(artist,';'),?)",
     tf_groupkey_album: window.GetProperty("_PROPERTY Album TitleFormat", "%album artist% ^^ %album%"),
     tf_groupkey_album_default: "%album artist% ^^ %album%",
-    tf_groupkey_album_addinfos: " ## %title% ## %date%",
     albumsTFsortingdefault: "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%",
-    artistsTFsortingdefault: "$meta(artist) | %date% | %album% | %discnumber% | %tracknumber% | %title%",
-    genresTFsortingdefault: "$meta(genre,0) | %album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%",	
+    artistsTFsortingdefault: "%date% | %album% | %discnumber% | %tracknumber% | %title%",
+    genresTFsortingdefault: "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%",	
 	tf_sort_genre_default: "%album artist% | %date% | %album% | %discnumber% | %tracknumber% | %title%",
 	tf_sort_artist_default: "%date% | %album% | %discnumber% | %tracknumber% | %title%",	
 	tf_sort_album_default: "%date% | %album% | %discnumber% | %tracknumber% | %title%",		
@@ -1823,6 +1822,9 @@ oGroup = function(index, start, handle, groupkey, sortkey) {
     this.load_requested = 0;
     this.save_requested = false;
 	this.cover_formated = false;
+	this.tra = [];
+	this.traIndex = [];
+	this.pl = new FbMetadbHandleList;
     this.finalize = function(count, tracks, handles) {
         this.tra = tracks.slice(0);
         this.pl = handles.Clone();
@@ -2165,13 +2167,12 @@ oBrowser = function(name) {
         plman.SetPlaylistSelection(g_active_playlist, affectedItems, true);
     };
     this.init_groups = function() {
+		//gTime_group = fb.CreateProfiler();
+		//gTime_group.Reset();
+		//console.log("Group populate started time:"+gTime_group.Time);
 		var handle = null;
-		var current = "";
-		var previous = "";
-        var g = 0, t = 0;
+        var g = 0;
         var arr = [];
-        var tr = [];
-        var pl = new FbMetadbHandleList();
         var total = this.list.Count;
         var t_all = 0;
         var tr_all = [];
@@ -2179,15 +2180,10 @@ oBrowser = function(name) {
         var flag = [];
 		var default_grouping = false;
 		this.groups.splice(0, this.groups.length);
-
         switch(properties.tagMode) {
             case 1: // album
-				if(properties.tf_groupkey_album==properties.tf_groupkey_album_default){
-					default_grouping = true;
-					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos);
-				} else
-					var tf = fb.TitleFormat(properties.tf_groupkey_album+properties.tf_groupkey_album_addinfos+" ## "+properties.tf_groupkey_album_default);
-                break;
+				var tf = fb.TitleFormat(properties.tf_groupkey_album);
+				break;
             case 2: // artist
                 var tf = fb.TitleFormat(properties.tf_groupkey_artist);
                 break;
@@ -2197,96 +2193,96 @@ oBrowser = function(name) {
         };
         var str_filter = process_string(filter_text);
 		var previous_item_genre = "123456789";
+
+		var tf_album = fb.TitleFormat('%album%');
+		var tf_artist = fb.TitleFormat('%artist%');
+		var tf_date = fb.TitleFormat('%date%');
+		var tf_title = fb.TitleFormat('%title%');
+
+		var groupcache = [];
 		for(var i = 0; i < total; i++) {
-
 			handle = this.list[i];
-            arr = tf.EvalWithMetadb(handle).split(" ## ");
-			current = arr[0].toLowerCase();
+			arr = tf.EvalWithMetadb(handle).split(";");
+			var added = false;
 
-            if(str_filter.length > 0) {
-                var comp_str = (arr.length > 1 ? arr[0]+" "+arr[1] : arr[0]);
-                var toAdd = match(comp_str, str_filter);
-            } else {
-                var toAdd = true;
-            };
-            if(toAdd) {
-                if(current != previous && !flag["#"+current]) {
-                    if(this.current_sourceMode == 1 || this.current_sourceMode == 3) {
-						flag["#"+current] = true;
-					}
-                    if(g > 0) {
-                        // update current group
-                        this.groups[g-1].finalize(t, tr, pl);
-                        tr.splice(0, t);
-                        pl.RemoveAll();
-                        t = 0;
-                    };
-                    if(i < total) {
-                        // add new group
-                        tr.push(arr[1]);
-                        pl.Add(handle);
-                        if(properties.showAllItem) {
-                            tr_all.push(arr[1]);
-                            pl_all.Add(handle);
-                        };
-                        t_all++;
-                        t++;
-                        this.groups.push(new oGroup(g+1, i, handle, arr[0], arr[0]));
-                        g++;
-						this.groups[g-1].date = arr[2];
-						if(properties.tagMode==1){
-							if(default_grouping){
-								var artist_album = arr[0].split(" ^^ ");
-							} else {
-								var artist_album = arr[3].split(" ^^ ");
-							}
-							this.groups[g-1].artist_name = artist_album[0];
-							this.groups[g-1].album = artist_album[1];
+			for (var j = 0; j < arr.length; j++) {
+				//Get index  containing the non-1st genre, use groupcache rather than this.groups for performance
+				var dest = groupcache.indexOf(arr[j]);
+				if (dest == -1) { //If returns index of -1, group does not exist; create
+					//Push group to groupcache and sort array
+					groupcache.push(arr[j]);
+					groupcache.sort();
+					dest = groupcache.indexOf(arr[j]);
+					//Create new group at sorted index
+					this.groups.splice(dest, 0, new oGroup(g, i, handle, arr[j], arr[j]));
+					//Add song to group playlist
+					this.groups[dest].pl.Add(handle);
+					//Add to aggregate item, 'added' used to prevent duplicate entries on multiple value tags
+					if (added == false) {
+						if(properties.showAllItem) {
+							tr_all.push(arr[j]);
+							pl_all.Add(handle);
 						}
-                        previous = current;
-                    };
-                } else {
-                    // add track to current group
-                    tr.push(arr[1]);
-                    pl.Add(handle);
-                    if(properties.showAllItem) {
-                        tr_all.push(arr[1]);
-                        pl_all.Add(handle);
-                    };
-                    t_all++;
-                    t++;
-                };
-            };
-		};
-        if(g > 0) {
-            // update last group properties
-            this.groups[g-1].finalize(t, tr, pl);
-			//this.groups[g-1].date = arr[2];
-
-			/*if(properties.tagMode==1){
-				if(default_grouping){
-					var artist_album = arr[0].split(" ^^ ");
-				} else {
-					var artist_album = arr[3].split(" ^^ ");
+						t_all++;
+						added = true;
+					}
+					//Set group date, artist, album, and add track titles to array
+					this.groups[dest].date = tf_date.EvalWithMetadb(handle);
+					this.groups[dest].artist_name = tf_artist.EvalWithMetadb(handle);
+					this.groups[dest].album = tf_album.EvalWithMetadb(handle);
+					this.groups[dest].tra.push(tf_title.EvalWithMetadb(handle));
+					this.groups[dest].traIndex.push(i);
+                    //Update group count
+					g++;
+				} else { //Add track to group if the group exists
+                    //Compare track index against group index, allows for sorting based on group sorting while
+                    //being much faster overall compared to the OrderByFormat function
+					if (this.groups[dest].traIndex[0] > i) {
+						this.groups[dest].pl.Insert(0, handle);
+						this.groups[dest].start = i;
+					} else {
+						this.groups[dest].pl.Insert(this.groups[dest].count, handle);
+					}
+					//Add to aggregate item
+					if (added == false) {
+						if(properties.showAllItem) {
+							tr_all.push(arr[j]);
+							pl_all.Add(handle);
+						}
+						t_all++;
+						added = true;
+					}
+					//Add title to array
+					this.groups[dest].tra.push(tf_title.EvalWithMetadb(handle));
+					//Update group item count
+					this.groups[dest].count += 1;
 				}
-				this.groups[g-1].artist_name = artist_album[0];
-				this.groups[g-1].album = artist_album[1];
-			}*/
+			}
+		};
 
-			//this.groups[g-1].artist_name = arr[4];
-            // add 1st group ("ALL" item)
-            if(properties.showAllItem && g > 1) {
-                this.groups.unshift(new oGroup(0, 0, null, null,""));
-                this.groups[0].finalize(t_all, tr_all, pl_all);
-            };
-        };
+        //Update group metadb & index (needed for correct 1st item thumbnail) and remove prefixes if set
+		for (var i = 0; i < g; i++) {
+			this.groups[i].index = i;
+			this.groups[i].metadb = this.groups[i].pl[0];
+			if (properties.tagMode != 2) {
+				this.groups[i].cachekey = process_cachekey(this.groups[i].metadb);
+			}
+			if(properties.removePrefix) this.groups[i].removePrefix();
+		}
+
+		// add 1st group ("ALL" item)
+		if(properties.showAllItem && g > 1) {
+			this.groups.unshift(new oGroup(0, 0, null, null,""));
+			this.groups[0].finalize(t_all, tr_all, pl_all);
+		};
+
 		if(properties.removePrefix) this.sort();
         // free memory
-        tr.splice(0, tr.length);
         tr_all.splice(0, tr_all.length);
         flag.splice(0, flag.length);
-        pl.RemoveAll();
+		groupcache.splice(0, groupcache.length);
         pl_all.RemoveAll();
+		//console.log("Group populate finished time:"+gTime_group.Time);
     };
 	this.sort = function() {
 		function noPrefixSorting(a,b) {
@@ -2327,37 +2323,22 @@ oBrowser = function(name) {
         // define sort order
         switch(properties.tagMode) {
             case 1: // album
-				if(properties.tf_groupkey_album == properties.tf_groupkey_album_default){
-					if(properties.tf_sort_album=='') var TFsorting = properties.albumsTFsortingdefault;
-					else var TFsorting =  properties.tf_groupkey_album_default + " | " + properties.tf_sort_album;						
-					this.customGroups = false;
-				} else {
-					if(properties.tf_sort_album=='') var TFsorting = properties.tf_groupkey_album + " | " + properties.tf_sort_album_default;
-					else var TFsorting = properties.tf_groupkey_album + " | " + properties.tf_sort_album;					
-					this.customGroups = true;
-                }
+                if(properties.tf_groupkey_album == properties.tf_groupkey_album_default) this.customGroups = false;
+				else this.customGroups = true;
+				if(properties.tf_sort_album=='') properties.tf_sort_album = properties.albumsTFsortingdefault;
+				var TFsorting = properties.tf_sort_album;
 				break;
             case 2: // artist
-				if(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default) {
-					if(properties.tf_sort_artist=='') var TFsorting = properties.artistsTFsortingdefault;
-					else var TFsorting =  properties.tf_groupkey_artist_default + " | " + properties.tf_sort_artist;							
-					this.customGroups = false;
-				} else {
-					if(properties.tf_sort_artist=='') var TFsorting = properties.tf_groupkey_artist + " | " + properties.tf_sort_artist_default;
-					else var TFsorting = properties.tf_groupkey_artist + " | " + properties.tf_sort_artist;
-					this.customGroups = true;
-				}
+				if(properties.tf_groupkey_artist == properties.tf_groupkey_artist_default) this.customGroups = false;
+				else this.customGroups = true;
+				if(properties.tf_sort_artist=='') properties.tf_sort_artist = properties.artistsTFsortingdefault;
+				var TFsorting = properties.tf_sort_artist;
                 break;
             case 3: // genre
-				if(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default) {
-					if(properties.tf_sort_genre=='') var TFsorting = properties.genresTFsortingdefault;
-					else var TFsorting =  properties.tf_groupkey_genre_default + " | " + properties.tf_sort_genre;					
-					this.customGroups = false;
-				} else {
-					if(properties.tf_sort_genre=='') var TFsorting = properties.tf_groupkey_genre + " | " + properties.tf_sort_genre_default;
-					else var TFsorting = properties.tf_groupkey_genre + " | " + properties.tf_sort_genre;					
-					this.customGroups = true;
-                }
+				if(properties.tf_groupkey_genre == properties.tf_groupkey_genre_default) this.customGroups = false;
+				else this.customGroups = true;
+				if(properties.tf_sort_genre=='') properties.tf_sort_genre = properties.genresTFsortingdefault;
+				var TFsorting = properties.tf_sort_genre;
 				break;
         };
 
