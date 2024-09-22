@@ -1453,7 +1453,7 @@ function oInfos() {
 			this.getTrackInfosCustom();
 		} else {
 			var defaultinfos = g_tfo.defaultinfos.EvalWithMetadb(this.metadb);
-			defaultinfos = defaultinfos.split(" ^^ ");
+			defaultinfos = defaultinfos.replace(/\r?\n/gm, ' ').split(" ^^ ");
 
 			this.rating = defaultinfos[0];
 

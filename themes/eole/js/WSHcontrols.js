@@ -735,7 +735,7 @@ function get_text(metadb) {
 	
 		if(properties.custom_firstRow=="") {
 			var infos = properties.default_firstRow.Eval();
-			infos = infos.split(" ^^ ");
+			infos = infos.replace(/\r?\n/gm, ' ').split(" ^^ ");
 			g_text_title = infos[1];		
 			if(infos[2]) g_text_artist = " -  "+infos[2];
 			if (properties.showTrackPrefix) g_text_title_prefix = infos[0]+".  ";
