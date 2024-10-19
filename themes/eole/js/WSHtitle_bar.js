@@ -944,7 +944,7 @@ function on_playback_new_track(metadb){
 }
 function eval_caption_title(metadb){
 	if(metadb)
-		caption_title = fb.TitleFormat(properties.tracktitle_format).EvalWithMetadb(metadb);
+		caption_title = fb.TitleFormat(properties.tracktitle_format).EvalWithMetadb(metadb).replace(/\r?\n/gm, ' ');
 }
 function on_playback_stop(reason) {
 	switch(reason) {

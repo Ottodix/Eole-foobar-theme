@@ -1905,7 +1905,7 @@ oBrowser = function(name) {
         var str_filter = process_string(filter_text);
 		for(var i = 0; i < total; i++) {
 			handle = this.list[i];
-            arr = tf.EvalWithMetadb(handle).split(/ ## (.*)/);
+            arr = tf.EvalWithMetadb(handle).replace(/\r?\n/gm, ' ').split(/ ## ([^]*)/);
             current = arr[0].toLowerCase();
             if(str_filter.length > 0) {
                 var toAdd = match(arr[0]+" "+arr[1], str_filter);
@@ -2186,18 +2186,18 @@ oBrowser = function(name) {
 					switch(this.rows[i].type) {
 					case this.groupHeaderRowHeight: // last group header row
 						// group tags
-						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");
 						// track tags
-						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");
 						break;
 					case 0: // track row
 						// group tags
-						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].groupkey = tf_grp.EvalWithMetadb(this.rows[i].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[i].groupkeysplit = this.rows[i].groupkey.split(" ^^ ");
 						// track tags
-						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb);
+						this.rows[i].infosraw = tf_trk.EvalWithMetadb(this.rows[i].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[i].infos = this.rows[i].infosraw.split(" ^^ ");
 						break;
 					};
@@ -2209,12 +2209,12 @@ oBrowser = function(name) {
 					switch(this.rows[g_start_].type) {
 					case this.groupHeaderRowHeight: // last group header row
 						// track tags
-						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
+						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");
 						break;
 					case 0: // track row
 						// track tags
-						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb);
+						this.rows[g_start_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_start_].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[g_start_].infos = this.rows[g_start_].infosraw.split(" ^^ ");
 						break;
 					};
@@ -2224,12 +2224,12 @@ oBrowser = function(name) {
                 switch(this.rows[g_end_].type) {
 					case this.groupHeaderRowHeight: // last group header row
 						// track tags
-						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
+						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
 						break;
 					case 0: // track row
 						// track tags
-						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb);
+						this.rows[g_end_].infosraw = tf_trk.EvalWithMetadb(this.rows[g_end_].metadb).replace(/\r?\n/mg, ' ');
 						this.rows[g_end_].infos = this.rows[g_end_].infosraw.split(" ^^ ");
 						break;
 					};
@@ -2512,9 +2512,9 @@ oBrowser = function(name) {
                             // =====
                             // text
                             // =====
+                            
 
-
-							arr_e[2]=arr_e[2].replace(/\s+/g, " ");
+                            arr_e[2]=arr_e[2].replace(/\s+/g, " ");
 							if(!isDefined(this.groups[g].row1_Width)) this.groups[g].row1_Width = gr.CalcTextWidth(this.groups[g].group_header_row_1, g_font.italicplus3);
 							if(!isDefined(this.groups[g].row2_Width)) this.groups[g].row2_Width = gr.CalcTextWidth(this.groups[g].group_header_row_2, g_font.normal);
                             if(!isDefined(this.groups[g].timeWidth)) this.groups[g].timeWidth = gr.CalcTextWidth(this.groups[g].TimeString, ((properties.doubleRowText)?g_font.normal:g_font.min1)) + 10;
