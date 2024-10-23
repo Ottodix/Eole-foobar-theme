@@ -2208,6 +2208,13 @@ oBrowser = function(name) {
 			for (var j = 0; j < arr.length; j++) {
 				//Get index  containing the non-1st genre, use groupcache rather than this.groups for performance
 				var dest = groupcache.indexOf(arr[j]);
+
+				//Apply search filter if given
+				if (str_filter.length > 0)
+				{
+					//If current item (set to lower case for matching) does not contain str_filter, continue to next item without adding
+					if (arr[j].toLowerCase().search(str_filter) == -1) continue;
+				}
 				if (dest == -1) { //If returns index of -1, group does not exist; create
 					//Push group to groupcache and sort array
 					groupcache.push(arr[j]);
