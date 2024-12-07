@@ -294,6 +294,7 @@ let properties = [
 	['Photo Style [Image Only] Regular-0 Auto-Fill-1 Circular-2', 0, 'artStyleImgOnly'],
 
 	['Prefer Focus', false, 'focus'],
+
 	['Rating Position Prefer Heading-0 Text-1', 0, 'star'],
 	['Rating Show AllMusic', true, 'amRating'],
 	['Rating Show Last.fm', true, 'lfmRating'],
@@ -318,11 +319,12 @@ let properties = [
 	['Scrollbar Button Type', 0, 'sbarButType'],
 	['Scrollbar Colour Grey-0 Blend-1', 1, 'sbarCol'],
 	['Scrollbar Grip MinHeight', Math.round(20 * $.scale), 'sbarGripHeight'],
+	['Scrollbar Grip Rounded', false, 'sbarGripRounded'],
 	['Scrollbar Height Prefer Full', false, 'sbarFullHeight'],
 	['Scrollbar Padding', 0, 'sbarPad'],
 	['Scrollbar Narrow Bar Width (0 = Auto)', 0, 'narrowSbarWidth'],
 	['Scrollbar Show', 1, 'sbarShow'],
-	['Scrollbar Type Default-0 Styled-1 Windows-2', 0, 'sbarType'],
+	['Scrollbar Type Default-0 Styled-1 WindowsLightMode-2 WindowsDarkMode-3', 0, 'sbarType'],
 	['Scrollbar Width', Math.round(11 * $.scale), 'sbarWidth'],
 	['Scrollbar Width Bar', 11, 'sbarBase_w'],
 	['Scrollbar Windows Metrics', false, 'sbarWinMetrics'],
@@ -426,6 +428,7 @@ let properties = [
 	['Track Review', 0, 'inclTrackRev'],
 	['Track Review Show Options', false, 'showTrackRevOptions'],
 	['Touch Step 1-10', 1, 'touchStep'],
+	['Update Not Found', true, 'updateNotFound'],
 	['Zoom Font Size (%)', 100, 'zoomFont'],
 	['Zoom Heading Font Size (%)', 115, 'zoomHead'],
 	['Zoom Button Heading Size (%)', 100, 'zoomHeadBtn'],
@@ -459,3 +462,5 @@ if (ppt.get('Remove Old Properties', true)) {
 	oldProperties.forEach(v => window.SetProperty(v, null));
 	ppt.set('Remove Old Properties', false);
 }
+
+window.SetProperty('Scrollbar Type Default-0 Styled-1 Windows-2', null);

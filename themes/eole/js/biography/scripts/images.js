@@ -550,6 +550,10 @@ class Images {
 	}
 
 	draw(gr) {
+		if (sync.get && sync.img) {
+			sync.image(sync.img.image, sync.img.id);
+			sync.get = false;
+		}
 		if (ppt.text_only && !ui.style.isBlur) {
 			if (ppt.showFilmStrip && this.get) this.getImgFallback();
 			return;
@@ -991,12 +995,12 @@ class Images {
 	}
 
 	isColOk(c) {
-		const hsp = Math.sqrt(
+		const brightness = Math.sqrt(
 			0.299 * (c[0] * c[0]) +
 			0.587 * (c[1] * c[1]) +
 			0.114 * (c[2] * c[2])
 		);
-		return hsp > 55;
+		return brightness > 55;
 	}
 
 	isEmbedded(type, ix) { // also identifies yt etc
@@ -1856,13 +1860,13 @@ class Seeker {
 		
 		if (ppt.imgSeeker && ppt.imgSeekerDots == 0) { // bar
 			prog = this.dn ? $.clamp(panel.m.x - this.bar.x1, 0, this.bar.w1) : (ppt.artistView ? img.art.ix + 0.5 : img.cov.ix + 0.5) * this.bar.w1 / this.imgNo;
-			gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
+			//gr.DrawRect(this.bar.x1, this.bar.y2, this.bar.w1, this.bar.h, ui.style.l_w, RGB(128, 128, 128));
 			gr.FillSolidRect(this.bar.x2, this.bar.y3, this.bar.w1 - ui.style.l_w, this.bar.h - ui.style.l_w, RGBA(0, 0, 0, 75));
 			gr.FillSolidRect(this.bar.x2, this.bar.y3, prog - ui.style.l_w, this.bar.h - ui.style.l_w, RGB(245, 245, 245));
-			gr.SetSmoothingMode(2);
-			gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
-			gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
-			gr.SetSmoothingMode(0);
+			//gr.SetSmoothingMode(2);
+			//gr.FillEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, RGB(245, 245, 245));
+			//gr.DrawEllipse(this.bar.x2 + prog - Math.round((this.bar.grip_h) / 2), this.bar.y3 - this.bar.gripOffset, this.bar.grip_h, this.bar.grip_h, ui.style.l_w, RGB(128, 128, 128));
+			//gr.SetSmoothingMode(0);
 		}
 
 		if (ppt.imgCounter) { // counter

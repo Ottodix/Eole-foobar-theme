@@ -23,11 +23,13 @@ class Text {
 		this.font = {main: ''}
 		this.get = 1;
 		this.heading = '';
+		this.local = $.file('C:\\check_local\\1450343922.txt');
 		this.l = DT_NOPREFIX;
 		this.lc = DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_WORD_ELLIPSIS;
 		this.lp = DT_SINGLELINE | DT_NOPREFIX | DT_WORD_ELLIPSIS;
 		this.c = [this.lc, DT_RIGHT | this.lc];
 		this.ncc = DT_CENTER | DT_VCENTER | DT_NOCLIP | DT_WORDBREAK | DT_CALCRECT | DT_NOPREFIX | DT_WORD_ELLIPSIS;
+		this.tc = DT_CENTER | DT_NOPREFIX | DT_WORD_ELLIPSIS;
 		this.na = '';
 		this.newText = false;
 		this.repaint = true;
@@ -66,6 +68,7 @@ class Text {
 			fallbackText: ppt.bioFallbackText.split('|'),
 			flag: null,
 			flagCode: '',
+			flagCountry: '',
 			foundedIn: 'Founded In: |Gegr\\u00fcndet: |Formado en: |Fond\\u00e9 en: |Luogo di fondazione: |\\u51fa\\u8eab\\u5730: |Za\\u0142o\\u017cono w: |Local de funda\\u00e7\\u00e3o: |\\u041c\\u0435\\u0441\\u0442\\u043e \\u043e\\u0441\\u043d\\u043e\\u0432\\u0430\\u043d\\u0438\\u044f: |Grundat \\u00e5r: |Kuruldu\\u011fu tarih: |\\u521b\\u5efa\\u4e8e: ',
 			ix: -1,
 			lang: ['biography', 'Biografie', 'biograf\u00eda', 'biographie', 'biografia', '\u4f1d\u8a18', 'biografia', 'biografia', '\u0431\u0438\u043e\u0433\u0440\u0430\u0444\u0438\u044f', 'biografi', 'ya\u015fam \u00f6yk\u00fcs\u00fc', '\u4f20\u8bb0'],
@@ -154,6 +157,16 @@ class Text {
 				rev: 20
 			}
 		}
+		
+		this.logo = {
+			fonts: ['Arial Black', 'Bauhaus 93', 'Blackadder ITC', 'Brush Script MT', 'Castellar', 'Colonna MT', 'Comic Sans MS', 'DomCasual BT', 'Forte', 'Freestyle Script', 'Harrington', 'Imprint MT Shadow', 'Informal Roman', 'Ink Free', 'Jokerman', 'Lucida Calligraphy', 'Lucida Handwriting', 'Magneto', 'Matura MT Script Capitals', 'Mistral', 'Monotype Corsiva', 'MV Boli', 'Old English Text MT', 'Pristina', 'Ravie', 'Script MT Bold', 'Segoe Print', 'Segoe Script', 'Segoe UI Black', 'Showcard Gothic', 'Snap ITC', 'Tango BT', 'Tempus Sans ITC', 'Viner Hand ITC', 'Vivaldi', 'Vladimir Script'],
+			id: '',
+			img: null,
+			show: false,
+			x: 20,
+			y: 20
+		}
+		this.logo.fonts = this.logo.fonts.filter(v => utils.CheckFont(v));
 
 		this.lyrics = {
 			ESLyricInstalled: utils.CheckComponent('foo_uie_eslyric'),
@@ -239,6 +252,7 @@ class Text {
 			fallbackText: ppt.revFallbackText.split('|'),
 			flag: null,
 			flagCode: '',
+			flagCountry: '',
 			ix: -1,
 			lang: ['review', 'Rezension', 'rese\u00f1a', 'examen', 'recensione', '\u6279\u8a55', 'przegl\u0105d', 'revis\u00e3o', '\u043e\u0431\u0437\u043e\u0440', 'granskning', 'ele\u015ftiri', '\u56de\u987e'],
 			len: 'Length: |Dauer: |Duraci\\u00f3n: |Dur\\u00e9e: |Durata: |\\u518d\\u751f\\u6642\\u9593: |Czas trwania: |Dura\\u00e7\\u00e3o: |\\u041f\\u0440\\u043e\\u0434\\u043e\\u043b\\u0436\\u0438\\u0442\\u0435\\u043b\\u044c\\u043d\\u043e\\u0441\\u0442\\u044c: |L\\u00e4ngd: |S\\u00fcresi: |\\u65f6\\u957f: ',
@@ -292,7 +306,7 @@ class Text {
 			},
 			y: Math.round(Math.max(1, ui.font.main_h * 0.05))
 		}
-		
+
 		this.rev.subhead = {
 			am: [cfg.amDisplayName, `${cfg.amDisplayName} ${this.rev.lang[cfg.lang.ix]}`],
 			lfm: [cfg.lfmDisplayName, `${cfg.lfmDisplayName} ${this.rev.lang[cfg.lang.ix]}`],
@@ -359,7 +373,7 @@ class Text {
 							l = g.EstimateLineWrap(v, font, panel.text.w);
 							for (let i = 0; i < l.length; i += 2) arr.push({text: l[i].trim()});
 						}
-					} else if (!this.lyricsArr('rev')){
+					} else if (!this.isLyricsArr('rev', v)){
 						arr = arr.concat(JSON.parse(JSON.stringify(v)));
 					}
 				} else {
@@ -486,7 +500,7 @@ class Text {
 			const new_track = this.id.tr != this.id.curTr;
 			if (new_track) {
 				this.rev.checkedTrackSubHead = this.done.amRev = this.done.lfmRev = this.done.wikiRev = false;
-				if (panel.style.inclTrackRev == 1) this.logScrollPos('rev');
+				if (panel.style.inclTrackRev == 1 && !new_album) this.logScrollPos('rev');
 			}
 		}
 	}
@@ -631,7 +645,7 @@ class Text {
 							l = g.EstimateLineWrap(v, font, panel.text.w);
 							for (let i = 0; i < l.length; i += 2) arr.push({text: l[i].trim()});
 						}
-					} else if (!this.lyricsArr('bio')) {
+					} else if (!this.isLyricsArr('bio', v)) {
 						arr = arr.concat(JSON.parse(JSON.stringify(v)));
 					}
 				} else {
@@ -651,7 +665,6 @@ class Text {
 					}
 				}
 			});
-			
 			let y = this.bio.loaded.txt && this.reader.bio.nowplaying && !ppt.sourceAll && ppt.vCenter ? Math.max(panel.text.t + (panel.text.h - arr.length * this.line.h.bio) / 2, panel.text.t) : panel.text.t;
 			arr.forEach((v, i) => {
 				if (v.sectionHeading) j = 0;
@@ -839,6 +852,7 @@ class Text {
 				const b = Math.max(Math.round(art_scrollbar.delta / this.line.h.bio + 0.4), 0);
 				const f = Math.min(b + this.line.drawn.bio, this.bio.arr.length);
 				this.bio.drawn = 0;
+				if (this.logo.show && this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.img.Width, this.logo.img.Height, 0, 0, this.logo.img.Width, this.logo.img.Height, 0, 16);
 				for (let i = b; i < f; i++) {
 					const item = this.bio.arr[i];
 					const item_y = item.h1 * i + item.y - art_scrollbar.delta;
@@ -878,6 +892,7 @@ class Text {
 				const b = Math.max(Math.round(alb_scrollbar.delta / this.line.h.rev + 0.4), 0);
 				const f = Math.min(b + this.line.drawn.rev, this.rev.arr.length);
 				this.rev.drawn = 0;
+				if (this.logo.show && this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.img.Width, this.logo.img.Height, 0, 0, this.logo.img.Width, this.logo.img.Height, 0, 16);
 				for (let i = b; i < f; i++) {
 					const item = this.rev.arr[i];
 					const item_y = item.h1 * i + item.y - alb_scrollbar.delta;
@@ -987,24 +1002,31 @@ class Text {
 	findFile(v, n) {
 		const type = /_\.(lrc|txt)$/.test(v.pth) ? 0 : /\.(lrc|txt)$/.test(v.pth) ? 1 : 2;
 		let pth = '';
+		let item = n == 'bio' ? v.pth.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%') : v.pth.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
+
+		const a = $.tfEscape(name.artist(!v.lyrics ? panel.id.focus : false, !v.lyrics ? false: true));
+		const aa = $.tfEscape(name.albumArtist(!v.lyrics ? panel.id.focus : false, !v.lyrics ? false: true));
+		const l = $.tfEscape(name.album(!v.lyrics ? panel.id.focus : false, !v.lyrics ? false: true));
+		const tr = $.tfEscape(name.title(!v.lyrics ? panel.id.focus : false, !v.lyrics ? false: true));
+		item = item // substitue bio var + check advanced radio stream parser (tfBio & tfRev do lookUps not parser)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, a ? '$&#@!%path%#@!' : '$&').replace(/%bio_artist%/gi, a)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_albumartist%/gi, aa ? '$&#@!%path%#@!' : '$&').replace(/%bio_albumartist%/gi, aa)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_album%/gi, l ? '$&#@!%path%#@!' : '$&').replace(/%bio_album%/gi, l)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_title%/gi, tr ? '$&#@!%path%#@!' : '$&').replace(/%bio_title%/gi, tr);
+
 		switch (type) {
-			case 0: pth = v.pth.replace(/_\.(lrc|txt)$/, '.$1'); break;
-			case 1: pth = v.pth.replace(/\.(lrc|txt)$/, '_.$1'); break;
+			case 0: pth = item.replace(/_\.(lrc|txt)$/, '.$1'); break;
+			case 1: pth = item.replace(/\.(lrc|txt)$/, '_.$1'); break;
 		}
-		let pths = !v.lyrics ? [v.pth] : [v.pth, pth];
-		const a = n == 'bio' ? $.clean(this.artist) : $.clean(this.albumartist);
-		const l = $.clean(this.album);
-		const stndItem = panel.isRadio(panel.id.focus) ? false : v.lyrics || panel.stndItem();
+		let pths = !v.lyrics ? [item] : [item, pth];
 		return pths.some(w => {
 			const wildCard = /[*?]/.test(w);
-			if (!wildCard) {						
-				const wr = n == 'bio' ? w.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%') : w.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
-				this[n].readerItem = stndItem ? panel.cleanPth(cfg.substituteTf(w), !v.lyrics ? panel.id.focus : false, !v.lyrics ? '' : 'lyr').slice(0, -1) : panel.cleanPth(wr, !v.lyrics ? panel.id.focus : false, 'remap', a, l, ppt.artistView).slice(0, -1);
+			if (!wildCard) {	
+				this[n].readerItem = panel.cleanPth(w, !v.lyrics ? panel.id.focus : false, !v.lyrics ? '' : 'lyr').slice(0, -1).replace(/#@!.*?#@!/g, '');
 				return $.file(this[n].readerItem);
 			} else {
-				const wr = n == 'bio' ? w.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%') : w.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
-				let p = stndItem ? panel.cleanPth(cfg.substituteTf(w).replace(/\*/g, '@!@').replace(/\?/g, '!@!'), !v.lyrics ? ppt.focus : false , !v.lyrics ? '' : 'lyr').slice(0, -1) : panel.cleanPth(wr.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), !v.lyrics ? panel.id.focus : false, 'remap', a, l, ppt.artistView).slice(0, -1);
-				p = p.replace(/@!@/g, '*').replace(/!@!/g, '?');
+				let p = panel.cleanPth(w.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), !v.lyrics ? ppt.focus : false , !v.lyrics ? '' : 'lyr').slice(0, -1);
+				p = p.replace(/@!@/g, '*').replace(/!@!/g, '?').replace(/#@!.*?#@!/g, '');
 				const arr = utils.Glob(p);
 				if (!arr.length) return false;
 				this[n].readerItem = arr[0];
@@ -1234,20 +1256,34 @@ class Text {
 	}
 
 	getFlag(artist, n) {
-		if (ppt[`${n}FlagShow`]) {
+		if (ppt[`${n}FlagShow`] && !ppt.hdPos) {
 			let codes = $.jsonParse(this.countryCodes, {}, 'file');
-			const code = (codes[artist.toLowerCase()] || '').slice(0, 2);
+			let handle = null;
+			let code = (codes[artist.toLowerCase()] || '').slice(0, 2);
+			let country = '';
+			if (code) country = codeToCountry[code] || '';
+			if (!code) handle = $.handle(panel.id.focus);
+			if (!code && handle) {
+				country = FbTitleFormat('[$meta(artistcountry,0)]').EvalWithMetadb(handle);
+				code = countryToCode[$.strip(country)];
+			}
+			if (!code && handle) {
+				country = FbTitleFormat('[$meta(locale last.fm,$sub($meta_num(locale last.fm),1))]').EvalWithMetadb(handle);
+				code = countryToCode[$.strip(country)];
+			}
 			const path = `${my_utils.packageInfo.Directories.Assets}/images/flags/${code}.png`;
 			if ($.file(path)) {
 				if (code && this[n].flagCode != code) {
 					this[n].flag = my_utils.getFlagAsset(`${code}.png`);
 					this[n].flagCode = code;
+					this[n].flagCountry = country;
 				}
 				return;
 			}
 		}
 		this[n].flag = null;
 		this[n].flagCode = '';
+		this[n].flagCountry = '';
 	}
 
 	getFoundedIn(source) {
@@ -1327,6 +1363,22 @@ class Text {
 						if (value && /like count|dislike count|view count/i.test(w.name)) {
 							value = parseInt(value);
 							value = !isNaN(value) ? value.toLocaleString() : '';
+						}
+						if (w.name == 'Rating' && this.local) {
+							w.name = 'Dynamic rating';
+							value = this.formatValue($.eval(`[%play_count%]|%added%|$if($strstr(%path%,'://'),1,0)`, panel.id.focus));
+							const i = value.split('|');
+							if (!i[0] || i[2] == 1) value = 0;
+							else {
+								const now_d = Math.max(Math.floor((Date.now() - Date.parse(i[1])) / 86400000), 365);
+								const sensitivity = 1;
+								const kr = 469 * 1 / sensitivity;
+								const ka = 171429 * 1 / sensitivity;
+								const ppd = Math.floor(i[0] * 100000 / now_d);
+								const score1 = Math.floor(i[0] *10000000 / (ka * 2 + (i[0] * 100000)));
+								const score2 = Math.floor((Math.floor(100 * ppd / (kr + ppd)) + Math.floor(i[0] *10000000 / (ka + (i[0] * 100000)))) / 2);
+								value = Math.max(score1, score2);
+							}
 						}
 						if (showEmpty || value) arr.push({text: '', name: w.name, value: value, property: true});
 					});
@@ -1435,17 +1487,76 @@ class Text {
 		});
 		return sub + (suffix ? end : '');
 	}
-	
+
+	getLogo(artist, n) { // experimental feature: disabled in release version: best in large panel
+		if (this[n].loaded.txt && this.reader[n].props && this.local && window.Name == 'Details' && panel.text.w && panel.text.h) {
+			const a = $.clean(artist);
+			const path = `D:\\artistlogos\\${a}.png`;
+			const id = `${a}-${panel.text.t}-${panel.text.l}-${panel.text.h}-${panel.text.w}`;
+			if ($.file(path)) {
+				if (a && this.logo.id != id) {
+					this.logo.img = gdi.Image(path);
+					const sc = Math.min(panel.text.h / this.logo.img.Height, panel.text.w / this.logo.img.Width);
+					const w = Math.round(this.logo.img.Width * sc);
+					const h = Math.round(this.logo.img.Height * sc);
+					this.logo.x = panel.text.l + (panel.text.w - w) / 2;
+					this.logo.y = panel.text.t + (panel.text.h - h) / 2;
+					this.logo.img = this.logo.img.Resize(w, h, 2);
+					this.logo.id = id;
+				}
+				this.logo.show = true;
+				return
+			} else {
+				if (artist && this.logo.id != id) {
+					const ix = Math.floor(Math.random() * this.logo.fonts.length);
+					const size = Math.max(Math.round(Math.min(panel.text.w, panel.text.h) / 4),10);
+					const font = gdi.Font(this.logo.fonts[ix], size, 1);
+					let htFull = 0;
+					let htSingle = 0;
+					$.gr(1, 1, false, g => {
+						htFull = g.MeasureString(artist, font, 0, 0, panel.text.w, 5000, StringFormat(1, 1)).Height;
+						htSingle = g.CalcTextHeight('String', font);
+					});
+					const offset = Math.max(htSingle * 0.01, 1);
+					const ht = Math.min(panel.text.h, htFull);
+					this.logo.img = $.gr(panel.text.w, ht, true, g => {
+						g.GdiDrawText(artist, font, RGB(0, 0, 0), 0, 0, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
+						g.GdiDrawText(artist, font, RGB(0, 0, 0), offset * 2, offset * 2, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
+						g.GdiDrawText(artist, font, RGB(255, 255, 255), offset, offset, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
+					});
+					this.logo.x = panel.text.l;
+					this.logo.y = panel.text.t + (panel.text.h - ht) / 2;
+					this.logo.id = id;
+				}
+				this.logo.show = true;
+				return;
+			}
+		}
+		this.logo.show = false;
+	}
+
 	getNowplaying(item, n) {
-		item = item.replace(/\r\n|\r|\n/g, '');
+		if (!item || typeof item !== 'string') return;
+		const focus = fb.IsPlaying ? false : panel.id.focus;
+		item = item.replace(/\r\n|\r|\n/g, '')
+		const a = $.tfEscape(name.artist(focus, true));
+		const aa = $.tfEscape(name.albumArtist(focus, true));
+		const l = $.tfEscape(name.album(focus, true));
+		const tr = $.tfEscape(name.title(focus, true));
+		item = item
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, a ? '$&#@!%path%#@!' : '$&').replace(/%bio_artist%/gi, a)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_albumartist%/gi, aa ? '$&#@!%path%#@!' : '$&').replace(/%bio_albumartist%/gi, aa)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_album%/gi, l ? '$&#@!%path%#@!' : '$&').replace(/%bio_album%/gi, l)
+			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_title%/gi, tr ? '$&#@!%path%#@!' : '$&').replace(/%bio_title%/gi, tr);
 		this.reader[n].perSec = /%playback_time|%bitrate%|\$progress/i.test(item);
 		item = fb.IsPlaying ? (!this.reader[n].perSec ? $.eval('[$trim(' + item + ')]', false) : FbTitleFormat(item).Eval()) : $.eval('[$trim(' + item + ')]', panel.id.focus);
+		item = item.replace(/#@!.*?#@!/g, '')
 		return item;
 	}
 
 	getPlainTxtLyrics(item) {
 		const isSynced = this.isSynced(item, true);
-		item = isSynced ? lyrics.parseSyncLyrics(item, !item.length) : lyrics.parseUnsyncedLyrics(item, !item.length);
+		item = lyrics ? (isSynced ? lyrics.parseSyncLyrics(item, !item.length) : lyrics.parseUnsyncedLyrics(item, !item.length)) : [];
 		let lyr = item.map(v => v.content);
 		const ln = Math.min(5, lyr.length);
 		if (ppt.sourceAll) {
@@ -1569,7 +1680,7 @@ class Text {
 		});
 	}
 
-	getText(p_calc, update) {
+	getText(p_calc, update, caller) {
 		if (ppt.img_only) return;
 		const a = $.clean(this.artist);
 		const n = ppt.artistView ? 'bio' : 'rev';
@@ -1717,22 +1828,22 @@ class Text {
 				this[n].ln.x1 = panel.text.l + subHeadingWidth;
 				this[n].ln.x2 = Math.max(this[n].ln.x1, panel.text.l + panel.text.w);
 			}
-
-			img.setCrop(true);
+			if (caller != 'playbackTime') img.setCrop(true); // stop nowplaying time trigger
 			if (ppt.artistView) {
 				const bioText = JSON.stringify(this.bio.text);
-				if (bioText != this.bio.cur || p_calc && p_calc !== 2) this.artCalc();
+				if (bioText != this.bio.cur || p_calc) this.artCalc();
 				this.bio.cur = bioText;
 			} else {
 				const revText = JSON.stringify(this.rev.text);
-				if (revText != this.rev.cur || p_calc && p_calc !== 1) this.albCalc();
+				if (revText != this.rev.cur || p_calc) this.albCalc();
 				this.rev.cur = revText;
 			}
 			if (ppt.text_only && !ui.style.isBlur || panel.alb.ix && panel.style.inclTrackRev) this.paint();
 		}
 		const lyrPropsNowp = this[n].loaded.txt && (this.reader[n].lyrics || this.reader[n].props || this.reader[n].nowplaying);
-		const flagArtist = ppt.artistView ? (!lyrPropsNowp ? this.artist : name.artist(panel.id.focus)) : (!lyrPropsNowp ? this.albumartist : name.albumArtist(panel.id.focus));
-		this.getFlag(flagArtist, n);
+		const artist = ppt.artistView ? (!lyrPropsNowp ? this.artist : name.artist(panel.id.focus)) : (!lyrPropsNowp ? this.albumartist : name.albumArtist(panel.id.focus));
+		this.getFlag(artist, n);
+		this.getLogo(artist, n);
 		if (!ppt.heading) {
 			this.newText = false;
 			return;
@@ -1768,7 +1879,6 @@ class Text {
 		if (this.get) {
 			this.albumReset();
 			this.artistReset();
-			if (this.calc) this.calc = ppt.artistView ? 1 : 2;
 			this.getText(this.calc);
 			if (this.get == 2) panel.focusServer();
 			this.calc = false;
@@ -1798,11 +1908,16 @@ class Text {
 		return !ppt.artistView && ppt.classicalMusicMode && (this.rev.loaded.am && !this.rev.amFallback || this.rev.loaded.wiki && !this.rev.wikiFallback) && !panel.alb.ix;
 	}
 
+	isLyricsArr(n, v) {
+		return this.reader[n].lyrics && !this.reader[n].txtLyrics || v.some(w => w.text === undefined);
+	}
+
 	isMainAvail(n) {
 		return $.source.amLfmWiki.some(v => this[n][v] && ppt[`source${n}`] != 3);
 	}
 
 	isSynced(n, lines) {
+		if (!n || !lyrics) return false;
 		return lines ? n.some(line => lyrics.leadingTimestamps.test(line)) : n.match(RegExp(lyrics.leadingTimestamps, 'm'));
 	}
 
@@ -2042,18 +2157,14 @@ class Text {
 		return this.reader.items.some(v => {
 			if (v.lyrics) {
 				if (v.tag) return $.eval('[$trim(' + v.pth + ')]', false);
-				else return $.file(panel.cleanPth(v.pth, false, 'lyr').slice(0, -1));
+				else return this.findFile(v, ppt.artistView ? 'bio' : 'rev');
 			}
 		});
 	}
 
-	lyricsArr(n) {
-		return this.reader[n].lyrics && !this.reader[n].txtLyrics;
-	}
-
 	lyricsDisplayed() {
 		const n = ppt.artistView ? 'bio' : 'rev';
-		return this[n].loaded.txt && this.lyricsArr(n) && !ppt.img_only;
+		return this[n].loaded.txt && this.reader[n].lyrics && !this.reader[n].txtLyrics && !ppt.img_only;
 	}
 
 	lyricsSave() {
@@ -2068,7 +2179,7 @@ class Text {
 					this.loadLyric();
 				}
 			}
-			if (this.lyrics.ESLyricInstalled && !this.reader.ESLyricSaved) {
+			if (this.lyrics.ESLyricInstalled && !this.reader.ESLyricSaved && counter % 3 === 0) {
 				if (!this.lyricExists()) {
 					fb.RunMainMenuCommand('View/ESLyric/Panels/Save lyric');
 				} else {
@@ -2084,9 +2195,11 @@ class Text {
 	move(x, y) {
 		this.get_ix(x, y);
 		if (this.rev.ix != -1) {
-			this.check_tooltip(this.rev.arr[this.rev.ix], x, y, false, this.line.h.rev);
+			if (!ppt.img_only && !this.lyricsDisplayed()) this.check_tooltip(this.rev.arr[this.rev.ix], x, y, false, this.line.h.rev);
+			else this.deactivateTooltip();
 		} else if (this.bio.ix != -1) {
-			this.check_tooltip(this.bio.arr[this.bio.ix], x, y, true, this.line.h.bio);
+			if (!ppt.img_only && !this.lyricsDisplayed()) this.check_tooltip(this.bio.arr[this.bio.ix], x, y, true, this.line.h.bio);
+			else this.deactivateTooltip();
 		} else this.deactivateTooltip();
 		if (this.rev.ix == this.rev.cur_ix && this.bio.ix == this.bio.cur_ix) return;
 		this.rev.cur_ix = this.rev.ix;
@@ -2139,7 +2252,7 @@ class Text {
 
 	paint() {
 		if (!this.repaint) return;
-		if (!panel.style.showFilmStrip) window.Repaint();
+		if (!panel.style.showFilmStrip || ppt.filmStripOverlay) window.Repaint();
 		else window.RepaintRect(panel.filmStripSize.l, panel.filmStripSize.t, panel.w - panel.filmStripSize.l - panel.filmStripSize.r, panel.h - panel.filmStripSize.t - panel.filmStripSize.b);
 	}
 
@@ -2246,7 +2359,7 @@ class Text {
 		if (panel.lock) n = n.replace(/%artist%|\$meta\(artist,0\)/g, '#\u00a6#\u00a6#%artist%#\u00a6#\u00a6#').replace(/%title%|\$meta\(title,0\)/g, '#!#!#%title%#!#!#');
 		const b = artistView ? 'bio' : 'rev';
 		let a = this[b].loaded.txt && (this.reader[b].lyrics || this.reader[b].props || this.reader[b].nowplaying) ? $.tfEscape(name.artist(panel.id.focus)) : $.tfEscape(artistView ? this.artist : (!trackreview ? (panel.alb.ix ? this.albumartist : this.artist) : this.trackartist));
-		let aa = this[b].loaded.txt && (this.reader[b].lyrics || this.reader[b].props || this.reader[b].nowplaying) || panel.isRadio(panel.id.focus) ? $.tfEscape(name.albumArtist(panel.id.focus)) : $.tfEscape(artistView ? (panel.art.ix ? this.artist : this.albumartist) : (!trackreview ? this.albumartist : this.trackartist));
+		let aa = this[b].loaded.txt && (this.reader[b].lyrics || this.reader[b].props || this.reader[b].nowplaying) || panel.isRadio(panel.id.focus) && !panel.alb.ix ? $.tfEscape(name.albumArtist(panel.id.focus)) : $.tfEscape(artistView ? (panel.art.ix ? this.artist : this.albumartist) : (!trackreview ? this.albumartist : this.trackartist));
 		let composition = this.isCompositionLoaded();
 		let l = composition ? $.tfEscape(this.composition.replace('Album Unknown', '')) : $.tfEscape(this.album.replace('Album Unknown', ''));
 		let tr = $.tfEscape(this.track);
@@ -2269,7 +2382,8 @@ class Text {
 		.replace(/\uFF1A/g, ':')
 		.replace(/\uFF08/g, '(')
 		.replace(/\uFF09/g, ')')
-		.replace(/\u00E2\u20AC\u2122|\u2019|\uFF07|[\u0060\u00B4]|â€™(;|)|â€˜(;|)|&#39(;|)|&apos(;|)/g, "'") // Apostrophe variants
+		.replace(/\u00E2\u20AC\u2122|\u2019|\uFF07|[\u0060\u00B4]|â€™(;|)|â€˜(;|)|&#39(;|)|&apos(;|)/g, "'")
+		.replace(/[\u2000-\u200F\u2028-\u202F\u205F-\u206F\u3000\uFEFF]/g, ' ')
 		.trim();
 	}
 
@@ -2301,7 +2415,6 @@ class Text {
 	}
 
 	txtReader() {
-		let readerStart = Date.now();
 		const n = ppt.artistView ? 'bio' : 'rev';
 		this[n].readerTag = false;
 		let found = -1;

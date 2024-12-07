@@ -71,7 +71,8 @@ class Settings {
 		this.photoRecycler = `${this.storageFolder}oldPhotosForDeletion\\`;
 		this.settingsKeys = [];
 		
-		this.cachePath = `${this.storageFolder}`;
+		this.caPath = `${this.storageFolder}biography-cache`;
+		this.cachePath = `${this.caPath}\\`;
 		
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
@@ -417,7 +418,7 @@ class Settings {
 		items.forEach((v, i) => {
 			if (!this.autoCache || i > 7) this.pth[v] = this[v];
 			else {
-				this.pth[v] = this.remap[v] = this[`${v}_internal`].default_value.replace('%profile%\\yttm\\', this.cachePath);
+				this.pth[v] = this.remap[v] = this[`${v}_internal`].default_value.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
 			}
 			this.pth[v] = this.substituteTf(this.pth[v]);
 		});
@@ -471,7 +472,7 @@ class Settings {
 		this.tagEnabled13 = $.clamp(this.tagEnabled13, 1, 6);
 		
 		if (this.autoCache) {
-			this.remap['foImgRev'] = this['foImgRev_internal'].default_value.replace('%profile%\\yttm\\', this.cachePath);
+			this.remap['foImgRev'] = this['foImgRev_internal'].default_value.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
 		} else {
 			bioRevItems.forEach(v => {
 				this.remap[v] = this[v];
@@ -716,8 +717,8 @@ let settings = [
 	['Auto-Save Folder', '$directory_path(%path%)', 'text', 'foImgCov'],
 	['Auto-Save File Name', 'cover', 'text', 'fnImgCov'],
 
-	['Folder', '%storage_folder%\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
-	['Folder', '%storage_folder%\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
+	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
+	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
 	['Album Name Auto-Clean', false, 'boolean', 'albStrip'],
 	['Cache Expiry (days: minimum 28)', 28, 'num', 'exp'],
 
@@ -881,7 +882,7 @@ let item_properties =
 			{"name": "First played", "titleformat": "[%first_played%]"},
 			{"name": "Last played", "titleformat": "[%last_played%]"},
 			{"name": "Added", "titleformat": "[%added%]"},
-			{"name": "Rating", "titleformat": "[$if3(%_Autorating%,%rating%,$meta(rating))]"}
+			{"name": "Rating", "titleformat": "[$if2(%rating%,$meta(rating))]"}
 		]
 	},
 	"Location": {
@@ -920,11 +921,11 @@ let item_properties_alternative_grouping = item_properties
 .replace(/("Metadata\*":\s{\s*?"show":\s)false/, '$1' + true)
 .replace(/(("Metadata"|"Popularity"|"AllMusic"|"Last.fm"|"Wikipedia"):\s{\s*?"show":\s)true/g, '$1' + false);
 
-let nowplaying = `Artist: %artist%$crlf()
+let nowplaying = `Artist: %BIO_ARTIST%$crlf()
 $crlf()
-Title: %title%$crlf()
+Title: %BIO_TITLE%$crlf()
 $crlf()
-[Album: %album%$crlf()
+[Album: %BIO_ALBUM%$crlf()
 $crlf()]
 $if2(%playback_time%,0:00)[ / %length%]`;
 
@@ -939,6 +940,8 @@ Before editing, make a backup copy in case things go wrong.
 	In more complex cases use RegExp or javascript string manipulation functions. Google for syntax.
 4. Adjust the format (comment out if unwanted). This is aesthetic. It won't affect searching.
 5. Use console.log traces to see what's going on and debug, e.g uncomment those below.
+6. If fb2K artist name is required, use, e.g. $.eval('[$trim(' + (typeof cfg !== 'undefined' ? cfg.tf.artist : ppt.tfArtist) + ')]', focus, ignoreLock)
+7. For info, biography uses cfg.tf.artist and cfg.tf.title; Find & Play uses ppt.tfArtist and ppt.tfTitle.
 	
 This parser is also used by Find & Play provided the biography package id {BA9557CE-7B4B-4E0E-9373-99F511E81252} is unaltered.
 */
@@ -1005,9 +1008,21 @@ class radioStreamParser {
 				//console.log('original item', item);
 				title = this.removeTrailingYear(item);	// item is the original parsed title; trailing year removed as it interferes with searching
 				//console.log('title', title);
-				
-				// artist is correct: return will be '': as its empty  original parsed artist is used without modification
+
+				// artist is correct: return will be '': as its empty original parsed artist is used without modification
 	
+				break;
+
+			case 'https://stream.arrowrockradio.com/arrowrockradio':
+
+				// artist needs stream name and playing removing
+				artist = $.eval('[$trim($replace(' + (typeof cfg !== 'undefined' ? cfg.tf.artist : ppt.tfArtist) + ',Arrow Rock Radio:,,PLAYING:,))]', focus, ignoreLock);
+				//console.log('artist', artist);
+
+				// title is correct except it's uppercase: including here means it goes through the titlecase converter
+				title = (item || '').trim();
+				//console.log('title', title);
+
 				break;
 
 			case 'artist and title are switched - a path would need to be put here':
@@ -1022,16 +1037,16 @@ class radioStreamParser {
 				break;
 
 		}
-		
+
 		// adjust format
 		artist = artist.toLowerCase(); // toLowerCase() stops all uppercase being treated as abbreviation by $.titlecase
 		artist = $.titlecase(artist); 
 		//console.log('formatted artist', artist);
-		
+
 		title = title.toLowerCase();
 		title = $.titlecase(title);
 		//console.log('formatted title', title);
-		
+
 		// return object containing artist & title: don't alter
 		return {
 			artist: artist,
@@ -1040,7 +1055,7 @@ class radioStreamParser {
 	}
 
 	static removeTrailingYear(title) {
-		const kw = '(-\\s*|\\s+)\\d\\d\\d\\d';
+		const kw = '(-\\\\s*|\\\\s+)\\\\d\\\\d\\\\d\\\\d';
 		let ix = -1;
 		let yr = title.match(RegExp(kw));
 		if (yr) {

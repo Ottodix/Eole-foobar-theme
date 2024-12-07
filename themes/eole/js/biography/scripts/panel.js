@@ -318,16 +318,13 @@ class Panel {
 			if (!ppt.img_only) txt.on_playback_new_track();
 			if (!ppt.text_only || ui.style.isBlur || ppt.showFilmStrip) img.on_playback_new_track();
 		}, ppt.focusLoadRate, {
-			'leading': ppt.focusLoadImmediate,
-			'trailing': true
+			leading: ppt.focusLoadImmediate,
+			trailing: true
 		});
 
 		this.focusServer = $.debounce(() => {
 			this.changed();
-		}, !ppt.focusLoadImmediate && ppt.focusServerRate == 5000 ? 2000 : ppt.focusServerRate, { // auto-adjust if !immediate & default value
-			'leading': ppt.focusLoadImmediate,
-			'trailing': true
-		});
+		}, ppt.focusServerRate);
 
 		this.lookUpServer = $.debounce(() => {
 			this.callServer(false, this.id.focus, 'bio_lookUpItem', 0);
@@ -354,12 +351,15 @@ class Panel {
 			switch (item) {
 				case 'stndArtist':
 					!this.id.lookUp ? txt.getText(true) : txt.getItem(true, this.art.ix, this.alb.ix);
+					img.getImages();
 					break;
 				case 'stndAlbum':
 					this.style.inclTrackRev != 1 || !this.id.lookUp ? txt.getText(true) : txt.getItem(true, this.art.ix, this.alb.ix);
+					img.getImages();
 					break;
 				case 'lookUp':
 					txt.getItem(true, this.art.ix, this.alb.ix);
+					img.getItem(this.art.ix, this.alb.ix);
 					break;
 			}
 			but.refresh(true);
@@ -417,7 +417,6 @@ class Panel {
 		if (!sameStyle) this.setStyle();
 		txt.na = '';
 		timer.clear(timer.source);
-		if (this.calc) this.calc = ppt.artistView ? 1 : 2;
 		if (!this.lock && this.updateNeeded()) {
 			this.getList(true, true);
 			if (!ppt.artistView) txt.albumReset();
@@ -439,7 +438,7 @@ class Panel {
 		}
 		if (ppt.img_only) img.setCrop(true);
 		but.refresh(true);
-		if (!sameStyle && ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
+		if (!sameStyle && ppt.filmStripOverlay && ppt.showFilmStrip) filmStrip.set(ppt.filmStripPos);
 		if (!ppt.artistView) img.setCheckArr(null);
 		this.move(x, y, true);
 		txt.getScrollPos();
@@ -871,7 +870,7 @@ class Panel {
 		let fo, pth;
 		switch (sw) {
 			case 'bio':
-				if (stnd === '' || panel.isRadio(ppt.focus)) stnd = this.stnd(this.art.ix, this.art.list);
+				if (panel.isRadio(ppt.focus)) stnd = false; else if(stnd === '') stnd = this.stnd(this.art.ix, this.art.list);
 				if (server) fo = stnd ? this.cleanPth(cfg.pth[folder], focus, 'server') : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
 				else fo = stnd && !this.lock ? this.cleanPth(cfg.pth[folder], focus) : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
 				pth = fo + cleanArtist + cfg.suffix[folder] + '.txt';
@@ -1085,6 +1084,7 @@ class Panel {
 	mode(n) {
 		if (!ppt.sameStyle) ppt.artistView ? ppt.bioMode = n : ppt.revMode = n;
 		let calcText = true;
+		this.calc = true;
 		filmStrip.logScrollPos();
 		switch (n) {
 			case 0: {
@@ -1093,7 +1093,6 @@ class Panel {
 				ppt.text_only = false;
 				this.setStyle();
 				img.clearCache();
-				if (calcText && !ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) calcText = ppt.artistView ? 1 : 2;
 				if (!this.art.ix && ppt.artistView && !txt.bio.lookUp || !this.alb.ix && !ppt.artistView && !txt.rev.lookUp) {
 					txt.albumReset();
 					txt.artistReset();
@@ -1103,6 +1102,7 @@ class Panel {
 					txt.getItem(calcText, this.art.ix, this.alb.ix);
 					img.getItem(this.art.ix, this.alb.ix);
 				}
+				this.calcText = false;
 				break;
 			}
 			case 1:
@@ -1118,7 +1118,7 @@ class Panel {
 				ppt.text_only = true;
 				this.setStyle();
 				if (ui.style.isBlur) img.clearCache();
-				if (!ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) calcText = ppt.artistView ? 1 : 2;
+				if (!ppt.sameStyle && (ppt.bioMode != ppt.revMode || ppt.bioStyle != ppt.revStyle)) calcText = true;
 				if (!this.art.ix && ppt.artistView && !txt.bio.lookUp || !this.alb.ix && !ppt.artistView && !txt.rev.lookUp) {
 					txt.albumReset();
 					txt.artistReset();
@@ -1129,11 +1129,11 @@ class Panel {
 					if (ui.style.isBlur) img.getItem(this.art.ix, this.alb.ix);
 					img.setCheckArr(null);
 				}
+				this.calcText = true;
 				break;
 		}
-		this.calcText = false;
 		if (ppt.text_only) seeker.upd(true);
-		if (ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
+		if (ppt.filmStripOverlay && ppt.showFilmStrip) filmStrip.set(ppt.filmStripPos);
 		but.refresh(true);
 	}
 
@@ -1557,14 +1557,14 @@ class Panel {
 	}
 
 	tfBio(n, artist, focus) {
-		n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, '$&#@!%path%#@!').replace(/%bio_artist%/gi, $.tfEscape(artist)).replace(/%bio_album%/gi, this.tf.album).replace(/%bio_title%/gi, this.tf.title);
+		n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_artist%/gi, '$&#@!%path%#@!').replace(/%bio_artist%/gi, $.tfEscape(artist)).replace(/%bio_album%/gi, cfg.tf.album).replace(/%bio_title%/gi, cfg.tf.title);
 		n = $.eval(n, focus);
 		n = n.replace(/#@!.*?#@!/g, '');
 		return n;
 	}
 
 	tfRev(n, albumArtist, album, focus) {
-		n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*(%bio_albumartist%|%bio_album%)/gi, '$&#@!%path%#@!').replace(/%bio_albumartist%/gi, $.tfEscape(albumArtist)).replace(/%bio_album%/gi, $.tfEscape(album)).replace(/%bio_title%/gi, this.tf.title);
+		n = n.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*(%bio_albumartist%|%bio_album%)/gi, '$&#@!%path%#@!').replace(/%bio_albumartist%/gi, $.tfEscape(albumArtist)).replace(/%bio_album%/gi, $.tfEscape(album)).replace(/%bio_title%/gi, cfg.tf.title);
 		n = $.eval(n, focus);
 		n = n.replace(/#@!.*?#@!/g, '');
 		return n;
