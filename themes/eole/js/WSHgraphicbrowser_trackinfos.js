@@ -1815,7 +1815,6 @@ oShowList = function(parentPanelName) {
 
 		if(properties.TFgrouping!="" || properties.groupCustomFirstRow == true || properties.groupCustomSecondRow == true){
 			var groupinfos_rows = TF.grouping.EvalWithMetadb(this.pl[0]).split(" ^^ ");
-			console.log("eho")
 			this.firstRow = ((properties.groupCustomFirstRow == true) ? fb.TitleFormat(properties.groupCustomFirstRowTF).EvalWithMetadb(this.pl[0]) : brw.groups[this.idx].secondRow+this.date);
 			this.secondRow = ((properties.groupCustomSecondRow == true) ? fb.TitleFormat(properties.groupCustomSecondRowTF).EvalWithMetadb(this.pl[0]) : brw.groups[this.idx].firstRow);
 		}
