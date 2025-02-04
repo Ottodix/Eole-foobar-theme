@@ -2880,7 +2880,7 @@ oHeaderBar = function(name) {
         }
     }
 	this.append_sort_menu = function(basemenu,actions){
-		if(!plman.IsAutoPlaylist(plman.ActivePlaylist)){
+	//	if(!plman.IsAutoPlaylist(plman.ActivePlaylist)){
 			var SortMenu = window.CreatePopupMenu(); //Custom Entries
 			SortMenu.AppendTo(basemenu, MF_STRING, "Sort By");
 
@@ -3007,7 +3007,7 @@ oHeaderBar = function(name) {
 					window.SetProperty("MAINPANEL Default library Sort TitleFormat", "");
 				}
 			}
-		}
+		//}
 	}
 	this.append_group_menu = function(basemenu,actions){
 		var GroupMenu = window.CreatePopupMenu(); //Custom Entries
