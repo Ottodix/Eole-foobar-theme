@@ -149,7 +149,20 @@ var TF = {
 	play_count: fb.TitleFormat("%play_count%"),
 	playback_time_seconds: fb.TitleFormat("%playback_time_seconds%"),
 }
-
+function init_properties(){
+	switch(properties.tagMode) {
+		case 1:
+			window.NotifyOthers("left_filter_state","album");
+			break;
+		case 2:
+			window.NotifyOthers("left_filter_state","artist");
+			break;
+		case 3:
+			window.NotifyOthers("left_filter_state","genre");
+			break;
+	};	
+}
+//init_properties();
 if(!filter3_state.isActive() && properties.filterOrder==1) properties.showPanelToggleButtons=true
 else if(!filter3_state.isActive() && !filter2_state.isActive() && properties.filterOrder==0 && main_panel_state.isEqual(1)) properties.showPanelToggleButtons=true
 if(properties.deleteSpecificImageCache!="") {

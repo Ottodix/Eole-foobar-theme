@@ -2501,7 +2501,7 @@ function populate() {
 							if(!first_node_loaded && properties.showInLibrary) {
 								pop.load(v.item, true, false, false, pop.gen_pl, false);first_node_loaded=true;
 								//window.NotifyOthers("seek_nowplaying_in_current",now_playing);
-							}
+							} 
 							//if(this.tree[np_node].child.length < 1) {
 								//this.branch(pop.tree[np_node]);
 							//}

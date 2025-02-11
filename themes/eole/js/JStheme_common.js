@@ -3075,7 +3075,6 @@ const get_albumArt_async = async(metadb, albumIndex, cachekey, need_stub, only_e
 				brw.repaint();
 			}
 		} else if (typeof g_cover == "object") {
-			console.log("fallback")
 			img = get_fallbackCover(metadb,undefined);
 			g_cover.setArtwork(img,true,false,addArgs.isplaying,metadb,cachekey);
 			window.Repaint();

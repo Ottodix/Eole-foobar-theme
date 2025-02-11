@@ -3119,7 +3119,7 @@ oHeaderBar = function(name) {
                 break;
             case (idx == 8):
                 scroll = scroll_ = 0;
-                brw.populate(0);
+                brw.populate(19);
                 break;
 			case (idx >= 1000 && idx < 2001):
 				SetGenre(idx-1000,plman.GetPlaylistItems(plman.ActivePlaylist));
@@ -3367,7 +3367,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			break;
 		case (idx == 8):
 			scroll = scroll_ = 0;
-			brw.populate(0);
+			brw.populate(28);
 			break;
 		case (idx == 9):
 			delete_full_cache();
@@ -3530,7 +3530,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 53):
 			properties.showInLibrary_RightPlaylistOff = true;
 			window.SetProperty("MAINPANEL adapt now playing to left menu righ playlist off", properties.showInLibrary_RightPlaylistOff);
-			window.NotifyOthers("showInLibrary_RightPlaylistOn", properties.showInLibrary_RightPlaylistOn);
+			window.NotifyOthers("showInLibrary_RightPlaylistOff", properties.showInLibrary_RightPlaylistOff);
 			setShowInLibrary();
 			break;
 		case (idx == 54):
@@ -3825,7 +3825,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 		case (idx == 328):
 			properties.enableAutoSwitchPlaylistMode = !properties.enableAutoSwitchPlaylistMode;
 			window.SetProperty("MAINPANEL Automatically change displayed playlist", properties.enableAutoSwitchPlaylistMode);
-			brw.populate(0);
+			brw.populate(15);
 			break;
 		case (idx == 329):
 			properties.lockOnPlaylistNamed="";
@@ -3834,7 +3834,7 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("MAINPANEL Follow active playlist", properties.followActivePlaylist);
 			window.SetProperty("MAINPANEL Always display full library", properties.lockOnFullLibrary);
 			window.SetProperty("MAINPANEL lock on specific playlist name", properties.lockOnPlaylistNamed);
-			brw.populate(0);
+			brw.populate(16);
 			break;
 		case (idx == 330):
 			properties.lockOnPlaylistNamed="";
@@ -3843,16 +3843,16 @@ function draw_settings_menu(x,y,right_align,sort_group){
 			window.SetProperty("MAINPANEL Follow active playlist", properties.followActivePlaylist);
 			window.SetProperty("MAINPANEL Always display full library", properties.lockOnFullLibrary);
 			window.SetProperty("MAINPANEL lock on specific playlist name", properties.lockOnPlaylistNamed);
-			brw.populate(0);
+			brw.populate(17);
 			break;
-		case (idx > 331):
+		case (idx > 331 && idx < 2999):
 			properties.lockOnPlaylistNamed=plman.GetPlaylistName(idx-331);
 			properties.lockOnFullLibrary=false;
 			properties.followActivePlaylist=false;
 			window.SetProperty("MAINPANEL Follow active playlist", properties.followActivePlaylist);
 			window.SetProperty("MAINPANEL Always display full library", properties.lockOnFullLibrary);
 			window.SetProperty("MAINPANEL lock on specific playlist name", properties.lockOnPlaylistNamed);
-			brw.populate(0);
+			brw.populate(25);
 			break;
 	}
 	if(actions[idx]) actions[idx]();
@@ -5780,7 +5780,7 @@ oBrowser = function(name) {
 	this.focus_on_nowplaying = function (track){
 		FocusOnNowPlaying = true;
 		if(!track) return;
-		if(this.getSourcePlaylist()!=plman.PlayingPlaylist){
+		if(this.getSourcePlaylist()!=plman.PlayingPlaylist && (this.getSourcePlaylist()!=this.getWholeLibraryPlaylist() || !properties.showInLibrary)){
 			if(this.followActivePlaylist || this.followActivePlaylist_temp){
 				plman.ActivePlaylist = plman.PlayingPlaylist;
 				g_avoid_on_playlist_switch = true;
@@ -5796,7 +5796,7 @@ oBrowser = function(name) {
 			}
 		} else {
 			if(!(properties.showInLibrary && ((this.getSourcePlaylist()!=this.getSelectionPlaylist() && libraryfilter_state.isActive()) || (this.getSourcePlaylist()!=this.getWholeLibraryPlaylist() && !libraryfilter_state.isActive()))))
-			var isFound = this.seek_track(track);
+				var isFound = this.seek_track(track);
 			if(!isFound) {
 				if(fb.GetNowPlaying()!=null) {
 					if(plman.ActivePlaylist!=plman.PlayingPlaylist && this.followActivePlaylist){
@@ -7981,7 +7981,7 @@ function on_init() {
 	timer = new oTimers();
 
 	LibraryItems_counter = fb.GetLibraryItems().Count;
-
+	
 	if((globalProperties.load_covers_at_startup || globalProperties.load_artist_img_at_startup) && globalProperties.enableDiskCache) {
 		populate_with_library_covers(0,"123456789123456789","");
 	}
@@ -7989,6 +7989,7 @@ function on_init() {
 		g_seconds = TF.playback_time_seconds.Eval();
 		playing_track_playcount = TF.play_count.Eval();
 	}
+
 }
 
 on_init();
