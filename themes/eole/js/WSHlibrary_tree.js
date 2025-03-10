@@ -2501,7 +2501,7 @@ function populate() {
 							if(!first_node_loaded && properties.showInLibrary) {
 								pop.load(v.item, true, false, false, pop.gen_pl, false);first_node_loaded=true;
 								//window.NotifyOthers("seek_nowplaying_in_current",now_playing);
-							}
+							} 
 							//if(this.tree[np_node].child.length < 1) {
 								//this.branch(pop.tree[np_node]);
 							//}
@@ -2866,7 +2866,7 @@ function populate() {
                 this.sel_items = [];
                 if (!add) this.clear();
                 if (!add) this.tree[idx].sel = true;
-                this.sel_items.push.apply(this.sel_items, this.tree[idx].item);
+                this.sel_items = this.sel_items.concat(this.tree[idx].item);
                 this.sel_items = uniq(this.sel_items);
                 last_sel = idx;
 				this.sel_group_count = 1;

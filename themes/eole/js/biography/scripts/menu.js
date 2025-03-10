@@ -1,4 +1,4 @@
-﻿'use strict';
+﻿	'use strict';
 
 class MenuManager {
 	constructor(name, clearArr, baseMenu) {
@@ -432,7 +432,7 @@ class MenuItems {
 			str: v,
 			func: () => {
 				if (i == 4) ppt.toggle('filmStripOverlay');
-				filmStrip.set(i == 4 ? ppt.filmStripPos : i)
+				if (i != 4 || ppt.showFilmStrip) filmStrip.set(i == 4 ? ppt.filmStripPos : i);
 			},
 			flags: i != 4 || ppt.style != 4 ? MF_STRING : MF_GRAYED,
 			checkItem: i == 4 && (ppt.filmStripOverlay || (ppt.style == 4 && !ppt.text_only && !ppt.img_only)),
@@ -660,10 +660,10 @@ class MenuItems {
 		const m = ppt.artistView ? ppt.bioMode : ppt.revMode;
 		this.display.check = [ppt.sameStyle ? !ppt.img_only && !ppt.text_only : m == 0, ppt.sameStyle ? ppt.img_only : m == 1, ppt.sameStyle ? ppt.text_only : m == 2, ppt.showFilmStrip, ppt.heading, ppt.summaryShow, false, ppt.artistView, !ppt.artistView, !panel.id.focus, panel.id.focus];
 		const n = [lg['Image+text'], lg['Image'], lg['Text'], lg['Filmstrip'], lg['Heading'], lg['Summary'], ppt.summaryCompact ? lg['Summary expand'] : lg['Summary compact'], lg['Artist view'], lg['Album view'], lg['Prefer nowplaying'], !panel.id.lyricsSource && !panel.id.nowplayingSource ? lg['Follow selected track (playlist)'] : lg['Follow selected track: N/A lyrics or nowplaying enabled']];
-		const click = [!this.display.check[0] ? '\t' + lg['Middle click'] : '', !this.display.check[1] && !ppt.text_only && !ppt.img_only ? '\t' + lg['Middle click'] : '', !this.display.check[2] && !ppt.img_only ? '\t' + lg['Middle click'] : '', '\t' + lg['Alt+Middle click'], '', '', '\t' + lg['Click'], !ppt.artistView ? (!ppt.dblClickToggle ? '\t' + lg['Click'] : '\t' + lg['Double click']) : '', ppt.artistView ? (!ppt.dblClickToggle ? '\t' + lg['Click'] : '\t' + lg['Double click']) : '', '', ''];
+		const click = [!this.display.check[0] ? '\t' + lg['Middle click'] : '', !this.display.check[1] && !ppt.text_only && !ppt.img_only ? '\t' + lg['Middle click'] : '', !this.display.check[2] && !ppt.img_only ? '\t' + lg['Middle click'] : '', '\t' + lg['Alt+Middle click'], '', '', !ppt.sourceAll ? '\t' + lg['Click'] : '', !ppt.artistView ? (!ppt.dblClickToggle ? '\t' + lg['Click'] : '\t' + lg['Double click']) : '', ppt.artistView ? (!ppt.dblClickToggle ? '\t' + lg['Click'] : '\t' + lg['Double click']) : '', '', ''];
 		this.display.str = n.map((v, i) => v + click[i])
 	}
-	
+
 	getlookUpStr(i, j, artist) {
 		return [
 			[lg['Manual cycle: wheel over button'], lg['Auto cycle items'], popUpBox.ok ? lg['Options...'] : lg['Options: see console'], lg['Reload']][i],
@@ -1285,7 +1285,7 @@ class MenuItems {
 		img.mask.reset = true;
 		ppt.img_only = false; ppt.text_only = false; 
 		txt.refresh(0);
-		if (ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
+		if (ppt.filmStripOverlay && ppt.showFilmStrip) filmStrip.set(ppt.filmStripPos);
 	}
 
 	setStyles(i) {

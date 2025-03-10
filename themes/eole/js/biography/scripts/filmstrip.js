@@ -161,6 +161,8 @@ class FilmStrip {
 			this.images = [];
 			this.items = [];
 			switch (true) {
+				case ppt.style == 4 && ppt.filmStripOverlay:
+					break;
 				case !this.style.auto:
 					panel.style.showFilmStrip = true;
 					switch (true) {

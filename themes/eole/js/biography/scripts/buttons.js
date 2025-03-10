@@ -6,16 +6,15 @@ class Buttons {
 		this.btns = {};
 		this.cur = null;
 		this.Dn = false;
+		this.fbv1 = fb.Version.startsWith('1');
 		this.traceBtn = false;
 		this.transition;
 		
 		this.flag = {
 			x: panel.heading.x,
-			w: Math.round(ui.font.heading_h * 0.9)
+			h: Math.round(ui.font.heading_h * 0.56)
 		}
-		this.flag.h = Math.round(this.flag.w * 0.6);
 		this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
-		this.flag.sp = Math.round(this.flag.w * 1.42);
 
 		this.lookUp = {
 			baseSize: 15 * $.scale,
@@ -104,11 +103,6 @@ class Buttons {
 		this.lookUp.scale = Math.round(this.lookUp.zoomSize / this.lookUp.baseSize * 100);
 		this.lookUp.font = gdi.Font('FontAwesome', 15 * this.lookUp.scale / 100, 0);
 		this.lookUp.fontLock = gdi.Font('FontAwesome', 14 * this.lookUp.scale / 100, 0);
-		if (ui.fontAwesomeInstalled) {
-			this.lookUp.icon = '\uF107';
-		} else {
-			this.lookUp.icon = '\u02C5';
-		}
 
 		this.scr.btns = this.scr.albBtns.concat(this.scr.artBtns);
 		this.src.iconFont = this.src.font;
@@ -216,14 +210,17 @@ class Buttons {
 			const iconFont = gdi.Font(this.scr.iconFontName, sz, this.scr.iconFontStyle);
 			this.alpha = !ui.sbar.col ? [75, 192, 228] : [68, 153, 255];
 			const hovAlpha = (!ui.sbar.col ? 75 : (!ui.sbar.type ? 68 : 51)) * 0.4;
-			this.scr.hover = !ui.sbar.col ? RGBA(ui.col.t, ui.col.t, ui.col.t, hovAlpha) : ui.col.text & RGBA(255, 255, 255, hovAlpha);
+			this.scr.hover = ppt.sbarType == 3 ? RGBA(55, 55, 55, 255) : !ui.sbar.col ? RGBA(ui.col.t, ui.col.t, ui.col.t, hovAlpha) : ui.col.text & RGBA(255, 255, 255, hovAlpha);
 			this.scr.img = $.gr(sz, sz, true, g => {
 				g.SetTextRenderingHint(3);
 				g.SetSmoothingMode(2);
-				if (ppt.sbarCol) {
-					this.scr.arrow == 0 ? g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(this.scr.arrow, iconFont, ui.col.text, 0, sz * this.scr.pad, sz, sz, StringFormat(1, 1));
-				} else {
-					this.scr.arrow == 0 ? g.FillPolygon(RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(this.scr.arrow, iconFont, RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 0, sz * this.scr.pad, sz, sz, StringFormat(1, 1));
+				if (ppt.sbarType == 3) g.DrawString(this.scr.arrow, iconFont, RGBA(103, 103, 103, 255), 0, sz * this.scr.pad, sz, sz, StringFormat(1, 1));
+				else {
+					if (ppt.sbarCol) {
+						this.scr.arrow == 0 ? g.FillPolygon(ui.col.text, 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(this.scr.arrow, iconFont, ui.col.text, 0, sz * this.scr.pad, sz, sz, StringFormat(1, 1));
+					} else {
+						this.scr.arrow == 0 ? g.FillPolygon(RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 1, [50 * sc, 0, 100 * sc, 76 * sc, 0, 76 * sc]) : g.DrawString(this.scr.arrow, iconFont, RGBA(ui.col.t, ui.col.t, ui.col.t, 255), 0, sz * this.scr.pad, sz, sz, StringFormat(1, 1));
+					}
 				}
 				g.SetSmoothingMode(0);
 			});
@@ -231,7 +228,7 @@ class Buttons {
 		if (n == 'all' || n == 'lookUp') {
 			this.lookUp.col = $.toRGB(ui.col.text);
 			$.gr(1, 1, false, g => {
-				this.lookUp.sz = Math.max(g.CalcTextWidth(this.lookUp.icon, this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight(this.lookUp.icon, this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
+				this.lookUp.sz = Math.max(g.CalcTextWidth('\uF107', this.lookUp.font), g.CalcTextWidth('\uF023', this.lookUp.fontLock), g.CalcTextHeight('\uF107', this.lookUp.font), g.CalcTextHeight('\uF023', this.lookUp.fontLock));
 			});
 		}
 	}
@@ -383,7 +380,6 @@ class Buttons {
 		this.scr.init = false;
 		this.checkScrollBtns(x, y, hover_btn);
 		if (hover_btn) hand = hover_btn.hand;
-		//if (!resize.down) window.SetCursor(!hand && !seeker.hand && !filmStrip.hand ? 32512 : 32649);
 		if (!resize.down) {
 			if(!hand && !seeker.hand && !filmStrip.hand && !(btns_manager.cur_btn && btns_manager.cur_btn.state == ButtonStates.hover)) {
 				window.SetCursor(32512);
@@ -392,7 +388,7 @@ class Buttons {
 				window.SetCursor(32649);
 				this.hand = true;
 			}
-		}	
+		}
 		if (hover_btn && hover_btn.hide) {
 			if (this.cur) {
 				this.cur.cs('normal');
@@ -433,7 +429,8 @@ class Buttons {
 			this.scr.x1 = panel.sbar.x;
 			this.scr.yUp1 = Math.round(panel.sbar.y);
 			this.scr.yDn1 = Math.round(panel.sbar.y + panel.sbar.h - ui.sbar.but_h);
-			if (ui.sbar.type < 2) {
+				
+			if (ppt.sbarType != 2) {
 				this.scr.x1 -= 1;
 				this.scr.x2 = (ui.sbar.but_h - ui.sbar.but_w) / 2;
 				this.scr.yUp2 = -ui.sbar.arrowPad + this.scr.yUp1 + (ui.sbar.but_h - 1 - ui.sbar.but_w) / 2;
@@ -442,6 +439,7 @@ class Buttons {
 			this.setLookUpPos();
 		}
 		this.check();
+		const n = ppt.artistView ? 'bio' : 'rev';
 		if (ppt.heading) {
 			this.btns.heading = new Btn(panel.heading.x, panel.text.t - ui.heading.h, panel.heading.w - (this.lookUp.pos == 2 ? this.lookUp.sz + (ppt.hdPos != 2 ? this.lookUp.gap : 10) * $.scale : 0), ui.font.heading_h, 6, $.clamp(Math.round(panel.text.t - ui.heading.h + (ui.font.heading_h - this.src.h) / 2 + ppt.hdBtnPad), panel.text.t - ui.heading.h, panel.text.t - ui.heading.h + ui.font.heading_h - this.src.h), '', '', '', !ppt.heading || ppt.img_only, '', () => {
 				if (this.isNextSourceAvailable()) {
@@ -460,7 +458,6 @@ class Buttons {
 				this.check(true);
 				if (ui.style.isBlur) window.Repaint();
 			}, () => this.srcTiptext(), true, 'heading');
-			const n = ppt.artistView ? 'bio' : 'rev';
 			this.src.col = {
 				normal: txt[n].loaded.ix != 1 || !ui.show.btnRedLastfm ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light || ui.col.headingBtn !== '' ? ui.col.headBtn : RGB(255, 255, 255) : RGB(225, 225, 245),
 				hover: txt[n].loaded.ix != 1 || !ui.show.btnRedLastfm ? ui.style.bg || !ui.style.bg && !ui.style.trans || ui.blur.dark || ui.blur.light || ui.col.headingBtn !== '' ? ui.col.text_h : RGB(255, 255, 255) : RGB(225, 225, 245)
@@ -468,12 +465,10 @@ class Buttons {
 			if (!ppt.hdPos) {
 				this.flag = {
 					x: panel.heading.x,
-					w: Math.round(ui.font.heading_h * 0.9)
+					h: Math.round(ui.font.heading_h * 0.56)
 				}
-				this.flag.h = Math.round(this.flag.w * 0.6);
 				this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
 				if (ui.font.heading_h >= 28 && ui.font.heading_h % 2 == 0) this.flag.y++;
-				this.flag.sp = Math.round(this.flag.w * 1.42);
 			} else this.flag.sp = 0;
 		} else delete this.btns.heading;
 		if (panel.id.lookUp) {
@@ -483,13 +478,15 @@ class Buttons {
 			}, !panel.id.lookUp, '', () => bMenu.load(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => 'Click: look up...\r\n' + (!panel.id.lyricsSource && !panel.id.nowplayingSource ? 'Middle click: ' + (!panel.lock ? 'lock: stop track change updates' : 'Unlock') + '...' : 'Lock N/A with enabled lyrics or nowplaying sources'), true, 'lookUp');
 		} else delete this.btns.lookUp;
 		if (ppt.summaryShow) {
-			this.btns.summary = new Btn(panel.text.l, panel.text.t, panel.text.w, ppt.artistView ? (txt.line.h.bio * txt.bio.summaryEnd) : (txt.line.h.rev * txt.rev.summaryEnd), 8, this.lookUp.p1, this.lookUp.p2, '', {
+			const hide = txt[n].loaded.txt && (txt.reader[n].lyrics || txt.reader[n].props || txt.reader[n].nowplaying) || ppt.img_only;
+			this.btns.summary = new Btn(panel.text.l, panel.text.t, panel.text.w, 
+			ppt.artistView ? (txt.line.h.bio * txt.bio.summaryEnd) : (txt.line.h.rev * txt.rev.summaryEnd), 8, this.lookUp.p1, this.lookUp.p2, '', {
 				normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
 				hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
-			}, '', '', () => {ppt.toggle('summaryCompact'); txt.refresh(1);}, '', false, 'summary');
+			}, hide, '', () => {ppt.toggle('summaryCompact'); txt.refresh(1);}, '', false, 'summary');
 		} else delete this.btns.summary;
 		if (ppt.sbarShow) {
-			switch (ui.sbar.type) {
+			switch (ppt.sbarType) {
 				case 2:
 					this.btns.alb_scrollUp = new Btn(this.scr.x1, this.scr.yUp1, ui.sbar.but_h, ui.sbar.but_h, 5, '', '', '', {
 						normal: 1,
@@ -557,7 +554,7 @@ class Buttons {
 	}
 
 	setLookUpPos() {
-		this.lookUp.pos = ppt.hdLine == 2 && ppt.hdPos == 2 ? 0 : ui.sbar.type < panel.sbar.style || !ppt.text_only ? panel.id.lookUp : 0;
+		this.lookUp.pos = ppt.hdLine == 2 && ppt.hdPos == 2 ? 0 : ppt.heading ? panel.id.lookUp : 0;
 		this.lookUp.x = [0, 1 * $.scale, (!ppt.heading || ppt.img_only ? panel.w - 1 * $.scale - this.lookUp.sz - 1 : panel.heading.x + panel.heading.w - this.lookUp.sz) - 9 * $.scale][this.lookUp.pos];
 		this.lookUp.y = [0, 0, !ppt.heading || ppt.img_only ? 0 : panel.text.t - ui.heading.h + (ui.font.heading_h - this.lookUp.sz) / 2][this.lookUp.pos];
 		this.lookUp.w = [12, this.lookUp.sz * 1.5, panel.w - this.lookUp.x][this.lookUp.pos];
@@ -626,28 +623,33 @@ class Buttons {
 	}
 
 	setSbarIcon() {
-		switch (ppt.sbarButType) {
-			case 0:
-				this.scr.iconFontName = 'Segoe UI Symbol';
-				this.scr.iconFontStyle = 0;
-				if (!ui.sbar.type) {
-					this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
-					this.scr.pad = ui.sbar.but_w < Math.round(15 * $.scale) ? -0.3 : -0.22;
-				} else {
-					this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
-					this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
-				}
-				break;
-			case 1:
-				this.scr.arrow = 0;
-				break;
-			case 2:
-				this.scr.iconFontName = ppt.butCustIconFont;
-				this.scr.iconFontStyle = 0;
-				this.scr.arrow = ppt.arrowSymbol.charAt().trim();
-				if (!this.scr.arrow.length) this.scr.arrow = 0;
-				this.scr.pad = $.clamp(ppt.sbarButPad / 100, -0.5, 0.3);
-				break;
+		if (ppt.sbarType == 3) {
+			this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
+			this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
+		} else {
+			switch (ppt.sbarButType) {
+				case 0:
+					this.scr.iconFontName = 'Segoe UI Symbol';
+					this.scr.iconFontStyle = 0;
+					if (!ui.sbar.type) {
+						this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
+						this.scr.pad = ui.sbar.but_w < Math.round(15 * $.scale) ? -0.3 : -0.22;
+					} else {
+						this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
+						this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
+					}
+					break;
+				case 1:
+					this.scr.arrow = 0;
+					break;
+				case 2:
+					this.scr.iconFontName = ppt.butCustIconFont;
+					this.scr.iconFontStyle = 0;
+					this.scr.arrow = ppt.arrowSymbol.charAt().trim();
+					if (!this.scr.arrow.length) this.scr.arrow = 0;
+					this.scr.pad = $.clamp(ppt.sbarButPad / 100, -0.5, 0.3);
+					break;
+			}
 		}
 	}
 
@@ -677,11 +679,12 @@ class Buttons {
 	setTooltipFont() {
 		tooltip.SetFont(ui.font.main.Name, ui.font.main.Size, ui.font.main.Style);
 	}
-	
+
 	srcTiptext() {
+		const n = ppt.artistView ? 'bio' : 'rev';
 		const suffix = this.isNextSourceAvailable() ? 'text' : 'N/A';
-		const type = panel.m.x > panel.heading.x + panel.heading.w / 2 ? 'Next ' : 'Previous ';
-		return this.src.visible && this.trace_src(panel.m.x, panel.m.y) || !but.tooltip.name ? `${type}${suffix}` : but.tooltip.name.replace(/&/g, '&&');
+		const type = panel.m.x > panel.heading.x + panel.heading.w / 2 ? 'Next ' + suffix : panel.m.x > panel.heading.x ? (txt[n].flag && txt[n].flagCountry && panel.m.x < panel.heading.x + but.flag.w ? txt[n].flagCountry : 'Previous ' + suffix) : '';
+		return this.src.visible && this.trace_src(panel.m.x, panel.m.y) || !but.tooltip.name ? type : !this.fbv1 ? but.tooltip.name : but.tooltip.name.replace(/&/g, '&&');
 	}
 
 	trace(btn, x, y) {
@@ -759,6 +762,8 @@ class Btn {
 			case 7:
 				this.drawLookUp(gr);
 				break;
+			case 8: // summary doesn't draw
+				break;
 			default:
 				this.drawScrollBtn(gr);
 				break;
@@ -816,6 +821,8 @@ class Btn {
 			if (!ppt.hdPos) {
 				const w = ui.style.l_w;
 				const o = Math.floor(w / 2);
+				but.flag.w = Math.round(but.flag.h * flag.Width / flag.Height);
+				but.flag.sp = Math.round(but.flag.h * 0.75 + but.flag.w);
 				gr.DrawImage(flag, but.flag.x, but.flag.y, but.flag.w, but.flag.h, 0, 0, flag.Width, flag.Height, '', 212);
 				gr.DrawRect(but.flag.x + o, but.flag.y + o, but.flag.w - w, but.flag.h - w + 1, w, ui.col.imgBor);
 			}
@@ -823,7 +830,7 @@ class Btn {
 			const h_x = (ppt.hdPos != 2 ? dx1 : this.x) + but.flag.sp;
 			const h_w = (ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer) - but.flag.sp;
 			gr.GdiDrawText(dh, ui.font.heading, ui.col.headingText, h_x, this.y, h_w, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
-			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? dh : '';
+			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? (!flag || !txt[n].flagCountry ? dh : `${txt[n].flagCountry} | ${dh}`): '';
 			but.tooltip.x = h_x;
 			but.tooltip.w = h_w;
 		} else {
@@ -873,17 +880,20 @@ class Btn {
 		const col = this.state !== 'down' ? ui.getBlend(this.item.hover, this.item.normal, this.transition_factor) : this.item.hover;
 		gr.SetTextRenderingHint(5);
 		if (!panel.lock) {
-			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
-			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? but.lookUp.icon : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
+			gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y, this.p1, this.p2, StringFormat(2, 0));
+			if (this.state == 'hover') gr.DrawString(!panel.style.moreTags || !ppt.artistView ? '\uF107' : '\uF13A', but.lookUp.font, col, this.x, this.y + 1, this.p1, this.p2, StringFormat(2, 0));
 		} else {
 			gr.DrawString('\uF023', but.lookUp.fontLock, col, this.x, this.y + 2 * $.scale, this.p1, this.p2, StringFormat(2, 0));
 		}
 	}
 
 	drawScrollBtn(gr) {
-		const a = this.state !== 'down' ? Math.min(but.alpha[0] + (but.alpha[1] - but.alpha[0]) * this.transition_factor, but.alpha[1]) : but.alpha[2];
-		if (this.state !== 'normal' && ui.sbar.type == 1) gr.FillSolidRect(panel.sbar.x, this.y, ui.sbar.w, this.h, but.scr.hover);
+		gr.SetSmoothingMode(3);
+		const type3 = ppt.sbarType == 3;
+		const a = type3 ? 255 : this.state !== 'down' ? Math.min(but.alpha[0] + (but.alpha[1] - but.alpha[0]) * this.transition_factor, but.alpha[1]) : but.alpha[2];
+		if (this.state !== 'normal' && (ui.sbar.type == 1 || type3)) gr.FillSolidRect(panel.sbar.x + (!type3 ?  0 : ui.style.l_w), this.y, ui.sbar.w - (!type3 ? 0 : ui.style.l_w * 2), this.h, but.scr.hover);
 		if (but.scr.img) gr.DrawImage(but.scr.img, this.x + this.p1, this.p2, this.p3, this.p3, 0, 0, but.scr.img.Width, but.scr.img.Height, this.type == 1 || this.type == 3 ? 0 : 180, a);
+		gr.SetSmoothingMode(0);
 	}
 
 	lbtn_dn(x, y) {

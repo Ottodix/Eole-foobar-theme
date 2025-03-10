@@ -9,29 +9,29 @@ class Tagger {
 		this.simList = [];
 		this.setGenres();
 
-		this.score = { // excel generated values for full precision
+		this.score = { // version 30 May 2023; excel generated values for full precision
 			artist: {
 				pc: {
 					baseLog: 1 / Math.log(2.1197528928493),
-					scale: 257550.499880261,
-					threshold: 545943.417175967
+					scale: 306607.737952692,
+					threshold: 649932.639495198
 				},
 				lis: {
 					baseLog: 1 / Math.log(1.54156558875185),
-					scale: 74462.4243948203,
-					threshold: 114788.711102091
+					scale: 88645.743327167,
+					threshold: 136653.22750249
 				}
 			},
 			album: {
 				pc: {
 					baseLog: 1 / Math.log(2.325),
-					scale: 16307.4298580876,
-					threshold: 37914.7744200536
+					scale: 19413.6069739138,
+					threshold: 45136.6362143495
 				},
 				lis: {
 					baseLog: 1 / Math.log(2.0205),
-					scale: 2680.06783221579,
-					threshold: 5415.07705499201
+					scale: 3190.55694311404,
+					threshold: 6446.52030356192
 				}
 			}
 		}

@@ -102,8 +102,6 @@ class UserInterface {
 
 		this.getColours();
 		this.getFont(true);
-		
-		this.fontAwesomeInstalled = utils.CheckFont("FontAwesome");
 
 		this.refresh = $.debounce(() => {
 			txt.refresh(3);
@@ -447,7 +445,6 @@ class UserInterface {
 	getLineCol(type) {
 		if (!ppt.colLineDark) return this.col.line === '' ? this.getBlend(this.blur.dark ? RGB(0, 0, 0) : this.blur.light ? RGB(255, 255, 255) : this.col.bg == 0 ? 0xff000000 : this.col.bg, ppt.highlightHdLine ? this.col.txt_h : this.col.txt, type == 'bottom' || this.style.isBlur ? 0.25 : 0.5) : this.col.line;
 		const lightBg = this.isLightBackground();
-		const isLightBg = !this.blur.dark && lightBg;
 		const nearBlack = ((ppt.theme == 1 || ppt.theme == 2) && !this.col.themeLight || (ppt.theme == 0 || ppt.theme == 6 || ppt.theme == 7) && !lightBg) && this.getColSat(this.col.bg) < 45;
 		const alpha = !lightBg ? nearBlack ? 0x20ffffff : 0x50000000 : 0x30000000;
 		return this.col.text & alpha;
@@ -671,7 +668,7 @@ class UserInterface {
 		panel.checkNumServers();
 
 		if (ppt.showFilmStrip && ppt.autoFilm) txt.getScrollPos();
-		if (ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
+		if (ppt.filmStripOverlay && ppt.showFilmStrip) filmStrip.set(ppt.filmStripPos);
 		if (ppt.text_only && !this.style.isBlur) txt.paint();
 	}
 
@@ -685,9 +682,9 @@ class UserInterface {
 		ppt.durationScroll = $.clamp($.value(ppt.durationScroll, 500, 0), 0, 5000);
 		ppt.flickDistance = $.clamp(ppt.flickDistance, 0, 10);
 		ppt.touchStep = $.clamp(ppt.touchStep, 1, 10);
-		ppt.sbarType = $.value(ppt.sbarType, 0, 2);
-		this.sbar.type = ppt.sbarType;
-		if (this.sbar.type == 2) {
+		ppt.sbarType = $.value(ppt.sbarType, 0, 0);
+		this.sbar.type = Math.min(ppt.sbarType, 2);
+		if (ppt.sbarType == 2) { // light mode only
 			this.theme = window.CreateThemeManager('scrollbar');
 			$.gr(21, 21, false, g => {
 				try {
@@ -726,16 +723,16 @@ class UserInterface {
 		} catch (e) {}
 		if (ppt.sbarWinMetrics) {
 			this.sbar.w = themed_w;
-			this.sbar.but_w = this.sbar.w;
+			this.sbar.but_w = ppt.sbarType != 3 ? this.sbar.w : this.sbar.w * 10 / 18;
 		}
-		if (!ppt.sbarWinMetrics && this.sbar.type == 2) this.sbar.w = Math.max(this.sbar.w, 12);
+		if (!ppt.sbarWinMetrics && this.sbar.type == 2) this.sbar.w = Math.max(this.sbar.w, 13);
 		if (!ppt.sbarShow) this.sbar.w = 0;
-		this.sbar.but_h = this.sbar.w + (this.sbar.type != 2 ? 1 : 0);
-		if (this.sbar.type != 2) {
+		this.sbar.but_h = this.sbar.w + (ppt.sbarType != 2 ? 1 : 0);
+		if (ppt.sbarType != 2) {
 			if (ppt.sbarButType || !this.sbar.type && this.sbar.but_w < Math.round(15 * $.scale)) this.sbar.but_w += 1;
 			else if (this.sbar.type == 1 && this.sbar.but_w < Math.round(14 * $.scale)) this.sbar.arrowPad += 1;
 		}
-		const sp = this.sbar.w - this.sbar.but_w < 5 || this.sbar.type == 2 ? Math.round(1 * $.scale) : 0;
+		const sp = this.sbar.type == 2 || this.sbar.w - this.sbar.but_w > 4 ? 0 : Math.round(1 * $.scale);
 		this.sbar.sp = this.sbar.w ? this.sbar.w + sp : 0;
 		this.sbar.arrowPad = $.clamp(-this.sbar.but_h / 5, this.sbar.arrowPad, this.sbar.but_h / 5);
 	}

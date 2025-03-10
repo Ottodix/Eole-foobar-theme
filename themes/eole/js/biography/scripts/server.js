@@ -19,6 +19,13 @@ class Server {
 		this.langFallback = false;
 		this.lastGetTrack = Date.now();
 		this.notFound = `${cfg.storageFolder}update_bio.json`;
+		if (ppt.updateNotFound) {
+			$.save(this.notFound, JSON.stringify([{
+				'name': 'update',
+				'time': Date.now()
+			}], null, 3), true);
+			ppt.updateNotFound = false;
+		}
 		this.similar = ['Similar Artists: ', '\u00c4hnliche K\u00fcnstler: ', 'Artistas Similares: ', 'Artistes Similaires: ', 'Artisti Simili: ', '\u4f3c\u3066\u3044\u308b\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8: ', 'Podobni Wykonawcy: ', 'Artistas Parecidos: ', '\u041f\u043e\u0445\u043e\u0436\u0438\u0435 \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438: ', 'Liknande Artister: ', 'Benzer Sanat\u00e7\u0131lar: ', '\u76f8\u4f3c\u827a\u672f\u5bb6: '];
 		this.urlRequested = {};
 
@@ -326,9 +333,9 @@ class Server {
 				const am_bio = panel.getPth('bio', art.focus, this.artist, '', stndBio, supCache, $.clean(this.artist), '', '', 'foAmBio', true, true);
 
 				if (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + title, false) && !$.open(am_bio.pth).includes('Custom Biography')) {
-					const dl_am_bio = new DldAllmusicBio(() => dl_am_bio.onStateChange());
+					const dl_am_bio = new DldAllmusicBio;
 					const url = title ? server.url.am + 'songs/' + encodeURIComponent(title + ' ' + this.artist) : server.url.am + 'artists/' + encodeURIComponent(this.artist);
-					dl_am_bio.search(0, url, title, this.artist, am_bio.fo, am_bio.pth, force);
+					dl_am_bio.init(url, 'https://allmusic.com', title, this.artist, am_bio.fo, am_bio.pth, force);
 				}
 				break;
 			}
@@ -420,7 +427,6 @@ class Server {
 		const am_bio = panel.getPth('bio', alb.focus, artiste, '', stndAlb, cfg.supCache && !lib.inLibrary(0, artiste), $.clean(artiste), '', '', 'foAmBio', true, true);
 		const va = this.albumArtist.toLowerCase() == cfg.va.toLowerCase() || this.albumArtist.toLowerCase() != artiste.toLowerCase();
 
-
 		if (this.album) {
 			if (!onlyForceLfm) {
 				const art_upd = cfg.dlAmBio && (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + am_rev.pth, false) && !$.open(am_bio.pth).includes('Custom Biography'));
@@ -428,11 +434,7 @@ class Server {
 				if (cfg.dlAmRev) {
 					rev_upd = force;
 					if (!rev_upd) {
-						rev_upd = !this.done('Rev ' + cfg.partialMatch + ' ' + am_rev.pth, this.exp);
-						if (rev_upd) {
-							let amRev = $.open(am_rev.pth);
-							rev_upd = !amRev || (!amRev.includes('Genre: ') || !amRev.includes('Review by ') && Date.now() - $.lastModified(am_rev.pth) < this.exp) && !amRev.includes('Custom Review');
-						}
+						rev_upd = !$.file(am_rev.pth) && !this.done('Rev ' + cfg.partialMatch + ' ' + am_rev.pth, this.exp);
 					}
 				}
 				let dn_type = '';
@@ -440,9 +442,8 @@ class Server {
 					if (rev_upd && art_upd) dn_type = 'review+biography';
 					else if (rev_upd) dn_type = 'review';
 					else if (art_upd) dn_type = 'biography';
-
-					const dl_am_rev = new DldAllmusicRev(() => dl_am_rev.onStateChange());
-					dl_am_rev.search(0, server.url.am + 'albums/' + encodeURIComponent(this.album + (!va ? ' ' + this.albumArtist : '')), this.album, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
+					const dl_am_rev = new DldAllmusicRev;
+					dl_am_rev.init(server.url.am + 'albums/' + encodeURIComponent(this.album + (!va ? ' ' + this.albumArtist : '')), 'https://allmusic.com', this.album, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
 				}
 			}
 		} else this.getBio(force, art, 1);
@@ -454,8 +455,12 @@ class Server {
 			if (comp_upd) {
 				const artUpd = cfg.dlAmBio && (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + am_comp.pth, false) && !$.open(am_bio.pth).includes('Custom Biography'));
 				const dn_type = comp_upd && artUpd ? 'composition+biography' : 'composition';
-				const dl_am_comp = new DldAllmusicRev(() => dl_am_comp.onStateChange());
-				dl_am_comp.search(0, server.url.am + 'compositions/' + encodeURIComponent(this.composition + (!va ? ' ' + this.albumArtist : '')), this.composition, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_comp.pth, am_bio.fo, am_bio.pth, art, force);
+				const amAlbumArtist = this.albumArtist;
+				const amWork = this.composition;
+				setTimeout(() => {
+				const dl_am_comp = new DldAllmusicRev;
+					dl_am_comp.init(server.url.am + 'compositions/' + encodeURIComponent(amWork + (!va ? ' ' + amAlbumArtist : '')), 'https://allmusic.com', amWork, amAlbumArtist, artiste, va, dn_type, am_rev.fo, am_comp.pth, am_bio.fo, am_bio.pth, art, force);
+				}, 3200); // throttle
 			}
 		}
 
@@ -562,12 +567,16 @@ class Server {
 			const amTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foAmRev', true, true);
 			const am_bio = panel.getPth('bio', tr.focus, tr.artist, '', true, cfg.supCache && !lib.inLibrary(0, tr.artist), $.clean(tr.artist), '', '', 'foAmBio', true, true);
 			const amText = $.jsonParse(amTracks.pth, false, 'file');
+			const amArtist = tr.artist;
+			const amTrk = trk;
 
 			let track_upd = !this.done('Rev ' + cfg.partialMatch + ' ' + amTracks.pth + ' ' + trk + ' ' + tr.artist, this.exp * 6);
 			track_upd = track_upd && (!amText || !amText[trk] || !amText[trk].wiki && amText[trk].update < Date.now() - this.exp * 6) || tr.force;
 			if (track_upd) {
-				const dl_am_trk = new DldAllmusicRev(() => dl_am_trk.onStateChange());
-				dl_am_trk.search(0, server.url.am + 'songs/' + encodeURIComponent(trk + ' ' + tr.artist), trk, tr.artist, tr.artist, false, 'track', amTracks.fo, amTracks.pth, am_bio.fo, am_bio.pth, [], tr.force);
+				setTimeout(() => {
+					const dl_am_trk = new DldAllmusicRev;
+					dl_am_trk.init(server.url.am + 'songs/' + encodeURIComponent(amTrk + ' ' + amArtist), 'https://allmusic.com', amTrk, amArtist, amArtist, false, 'track', amTracks.fo, amTracks.pth, am_bio.fo, am_bio.pth, [], tr.force);
+				}, 1600); // throttle
 			}
 		}
 
