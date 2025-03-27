@@ -3602,3 +3602,16 @@ function JSON_stringify(info) {
 		console.log(e)
 	}
 }
+function CreatePlaylist(pl_place, pl_name) {
+	try {
+		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Playlist", "New Playlist", true);
+		if (result){
+			if (result == "") {
+				plman.CreatePlaylist(pl_place, "New Playlist");
+			} else plman.CreatePlaylist(pl_place, result);
+			//on_playlist_switch();
+			return true;
+		} else return false;
+	} catch(e) {
+	}
+}

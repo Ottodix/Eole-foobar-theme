@@ -6752,8 +6752,10 @@ function on_mouse_rbtn_down(x, y){
 				g_genre_cache.build_from_library();
 				break;
 			case (idx == 5000):
-				fb.RunMainMenuCommand("File/New playlist");
-				plman.InsertPlaylistItems(plman.PlaylistCount-1, 0, metadblist_selection, false);
+				var total = plman.PlaylistCount;
+				if(CreatePlaylist(total, "")){
+					plman.InsertPlaylistItems(total, 0, metadblist_selection, false);
+				}			
 				break;
 			case (idx > 5000):
 				var insert_index = plman.PlaylistItemCount(idx-5001);

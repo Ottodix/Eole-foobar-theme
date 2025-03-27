@@ -139,20 +139,6 @@ function renamePlaylist() {
     brw.inputboxID = -1;
 }
 
-function CreatePlaylist(pl_place, pl_name) {
-	try {
-		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Playlist", "New Playlist", true);
-		if (result){
-			if (result == "") {
-				plman.CreatePlaylist(pl_place, "New Playlist");
-			} else plman.CreatePlaylist(pl_place, result);
-			//on_playlist_switch();
-			return true;
-		} else return false;
-	} catch(e) {
-	}
-}
-
 function CreateAutoPlaylist(pl_place, pl_name, query) {
 	try {
 		result = utils.InputBox(window.ID, "Give your playlist a name.", "Create New Autoplaylist", "New Autoplaylist", true);
