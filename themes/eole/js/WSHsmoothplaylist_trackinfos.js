@@ -1495,12 +1495,12 @@ oGroup = function(index, start, handle, groupkey) {
 			totalS -= (totalH = Math.floor(totalS / 3600)) * 3600;
 			totalS -= (totalM = Math.floor(totalS / 60)) * 60;
 
-			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''}, ` : '';
-			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''}, ` : '';
-			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
-            txt_mins = (totalM > 0) ? `${totalM} minute${totalM > 1 ? 's' : ''}, ` : '';
+			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''} ` : '';
+			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''} ` : '';
+			txt_hour = (totalH > 0) ? `${totalH} h ` : '';
+            txt_mins = (totalM > 0) ? `${totalM} min ` : '';
 
-			time_txt = `${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}sec`;
+			time_txt = `${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS} s`;
 		}
 		return time_txt;
 	}

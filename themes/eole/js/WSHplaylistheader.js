@@ -777,14 +777,14 @@ playlistInfo = function(){
 			totalM=Math.floor(r_timetodraw/60); r_timetodraw=r_timetodraw-totalM*60;
 			totalS=Math.round(r_timetodraw);
 			totalS = (totalS > 9) ? totalS : '0' + totalS;
-
+			
 			txt_month = (totalMth > 0) ? `${totalMth} month${totalMth > 1 ? 's' : ''}, `: '';
-			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''}, ` : '';
-			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''}, ` : '';
-			txt_hour = (totalH > 0) ? `${totalH} hour${totalH > 1 ? 's' : ''}, ` : '';
-			txt_mins = (totalM > 0) ? `${totalM} minute${totalM > 1 ? 's' : ''}, ` : '';
+			txt_week = (totalW > 0) ? `${totalW} week${totalW > 1 ? 's' : ''} ` : '';
+			txt_day = (totalD > 0) ? `${totalD} day${totalD > 1 ? 's' : ''} ` : '';
+			txt_hour = (totalH > 0) ? `${totalH} h ` : '';
+            txt_mins = (totalM > 0) ? `${totalM} min ` : '';
 
-			this.time_txt = `${txt_month}${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}sec`;
+			this.time_txt = `${txt_month}${txt_week}${txt_day}${txt_hour}${txt_mins}${totalS}s`;
 			this.items_txt=displayed_count+' items';
 
 			// Main Text, Left justified
