@@ -4461,11 +4461,13 @@ oBrowser = function(name) {
 		var currentCallIndex = 0;
         this.gTime.Reset();
         var trackinfos = "", arr = [], group = "";
-
+		var trackinfosTF = fb.TitleFormat('%TITLE%');
+		
 		if(this.list==undefined) return;
         while(k < this.totalTracks){
             if(properties.TFgrouping.length > 0) {
                 group_string = TF.grouping.EvalWithMetadb(this.list[k]);
+				trackinfos = trackinfosTF.EvalWithMetadb(this.list[k]);
 				this.current_grouping = properties.TFgrouping;
             } else {
 				if(this.showFilterBox){
