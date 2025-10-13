@@ -2828,7 +2828,12 @@ function g_launchSearch(play_results) {
 	var play_results = typeof play_results !== 'undefined' ? play_results : false;
 	if(g_searchbox.inputbox.text.length < 3)
 		return;
-	var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text.toLowerCase());
+	try {
+		var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text);
+	}
+	catch {
+		var search_results = fb.GetQueryItems(library_list, g_searchbox.inputbox.text.toLowerCase());
+	}
 	//window.NotifyOthers("search_launched",0);
 	apply_playlist(search_results,play_results,true,false);
 	search_results = undefined;
