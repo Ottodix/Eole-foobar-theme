@@ -3996,6 +3996,7 @@ oBrowser = function(name) {
 		var _menu = window.CreatePopupMenu();
 		var Context = fb.CreateContextMenuManager();
 		var _child01 = window.CreatePopupMenu();
+		let albumIndex = 0;
 
 		if(properties.showSettingsMenu) {
 			_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
@@ -4056,7 +4057,6 @@ oBrowser = function(name) {
 				};
 			}
 
-            let albumIndex = 0;
 			brw.activeRow > -1 && (albumIndex = this.rows[this.activeRow].albumId);
 
 			Context.InitContext(context_items);
