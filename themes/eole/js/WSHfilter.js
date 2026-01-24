@@ -446,6 +446,7 @@ oPlaylistManager = function(name) {
 
     this.populate = function(exclude_active, reset_scroll) {
 		reset_scroll = typeof reset_scroll !== 'undefined' ? reset_scroll : true;
+		//console.log("populate with reset_scroll="+reset_scroll);
         this.playlists.splice(0, this.playlists.length);
         this.total_playlists = plman.PlaylistCount;
         var rowId = 0;
@@ -475,7 +476,7 @@ oPlaylistManager = function(name) {
         // adjust panel height / rowHeight + rowTotal
         this.adjustPanelHeight();
 
-        if(reset_scroll || this.rowTotal <= this.totalRows) {
+		if(reset_scroll || this.rowTotal <= this.totalRows) {
             this.scroll = 0;
         } else {
             //check it total playlist is coherent with scroll value
@@ -1571,6 +1572,11 @@ oScrollbar = function(themed) {
         // set cursor y pos
         this.setCursorY();
         if(this.cursorh != prev_cursorh) this.setCursorButton();
+
+		if (scroll > 0) {
+			window.SetProperty("_PROPERTY: Filter Browser Scroll Pos", scroll)
+			//console.log("saving scroll = " + scroll);
+		}
     };
 
     this.setCursorY = function() {
@@ -2338,7 +2344,6 @@ oBrowser = function(name) {
         if(this.list) this.list = undefined;
         if(this.list_unsorted) this.list_unsorted = undefined;
 		if(!globalProperties.loaded_covers2memory) g_image_cache.resetAll();
-		scroll = scroll_ = 0;
 
         // define sort order
         switch(properties.tagMode) {
@@ -5671,7 +5676,15 @@ function check_scroll(scroll___){
     //var g2 = Math.floor(g1 / scroll_step) * scroll_step;
 
     var end_limit = ((brw.rowsCount+properties.addedRows_end) * properties.rowHeight) - (brw.totalRowsVis * properties.rowHeight) - g1 + properties.first_item_top_margin;
-    if(scroll___ != 0 && scroll___ > end_limit) {
+	saved_scroll = window.GetProperty("_PROPERTY: Filter Browser Scroll Pos", undefined)
+	if (saved_scroll !== undefined && scroll___ ===0) {
+		if (!g_first_populate_done || !g_first_populate_launched) {
+			console.log("resetting to saved scroll" + saved_scroll)
+			return saved_scroll;
+		}
+	} 
+	
+	if(scroll___ != 0 && scroll___ > end_limit) {
         scroll___ = end_limit;
     };
     return scroll___;
