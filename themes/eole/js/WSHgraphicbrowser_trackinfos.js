@@ -396,7 +396,9 @@ oFilterBox = function() {
 	this.paddingTop = 2;
 	this.paddingBottom = 2;
 	this.isActive = false;
-
+	this.filtered_tracks_count = 0;
+	this.filtered_tracks_time = 0;
+	
 	this.images = {
 		search_icon: null,
         resetIcon_off: null,
@@ -541,8 +543,8 @@ oFilterBox = function() {
 	this.search = (string) => {
 		str = process_string(string);
 		brw.groups_draw.splice(0, brw.groups_draw.length);
-
-		var row_count = brw.totalRows;
+		this.filtered_tracks_count = 0;
+		this.filtered_tracks_time = 0;
 		for(var i in brw.groups){
 			if(properties.filterBox_filter_tracks) {
 				brw.groups[i].filtered_tr.splice(0, brw.groups[i].filtered_tr.length);
@@ -551,12 +553,16 @@ oFilterBox = function() {
 			for(var j in brw.groups[i].tr){
 				if(match(brw.groups[i].tr[j], str) || string.length == 0){
 					if(properties.filterBox_filter_tracks) {
+						this.filtered_tracks_count++;
+						this.filtered_tracks_time+=brw.groups[i].pl[j].Length;
 						brw.groups[i].filtered_tr.push(j);
 						if(!group_match) {
 							brw.groups_draw.push(i);
 							group_match = true;
 						}
 					} else {
+						this.filtered_tracks_count+=brw.groups[i].pl.Count;
+						this.filtered_tracks_time+=brw.groups[i].length;							
 						brw.groups_draw.push(i);
 						break;
 					}
@@ -565,7 +571,7 @@ oFilterBox = function() {
 		}
 		scroll && (scroll_ = brw.rowHeight*2);
 		scroll = 0;
-
+		g_headerbar.setDisplayedInfo();
 		brw.rowsCount = Math.ceil(brw.groups_draw.length / brw.totalColumns);
 		g_scrollbar.setCursor(brw.totalRowsVis*brw.rowHeight, brw.rowHeight*brw.rowsCount + g_showlist.h, scroll_);
 		brw.repaint();
@@ -1693,7 +1699,6 @@ oShowList = function(parentPanelName) {
 						this.links[i].onClick(); return;
 					}
 				}
-				//console.log("oShowlist idx"+this.idx+" brw.groups.length"+brw.groups.length)
 				if(this.isHoverCover) brw.playGroup(this.idx);
                 break;
             case "up":
@@ -1963,8 +1968,8 @@ oShowList = function(parentPanelName) {
 		this.x = brw.x;
 		this.y = Math.round(brw.y + ((this.rowIdx + 1) * brw.rowHeight) + brw.marginTop - scroll_)
 
-		this.genreTextLenght = 0;
-		this.timeTextLenght = 0;
+		this.genreTextLength = 0;
+		this.timeTextLength = 0;
 
 		this.playing_row_x = 0;
 		this.playing_row_y = 0;
@@ -2396,8 +2401,8 @@ oShowList = function(parentPanelName) {
 					}
 					var item_height = 5+g_fsize;
 					var genreText = this.genre.replace(/\s+/g, " ");
-					if(this.genreTextLenght==0) this.genreTextLenght = gr.CalcTextWidth(genreText,g_font.normal);
-					if(this.timeTextLenght==0) this.timeTextLenght = gr.CalcTextWidth(this.length+',  '+this.total_tracks,g_font.normal);
+					if(this.genreTextLength==0) this.genreTextLength = gr.CalcTextWidth(genreText,g_font.normal);
+					if(this.timeTextLength==0) this.timeTextLength = gr.CalcTextWidth(this.length+',  '+this.total_tracks,g_font.normal);
 
 					if (this.links.album.state == ButtonStates.hover) {
 						var first_row_color = this.colorSchemeTextFaded;
@@ -2424,8 +2429,8 @@ oShowList = function(parentPanelName) {
 					}
 
 					//if (!properties.disableGroupHeader) {
-						gr.GdiDrawText(this.firstRow, first_row_font, first_row_color, tx+4, ty, this.w - this.MarginRight - 40 - this.timeTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-						gr.GdiDrawText(this.secondRow, second_row_font, second_row_color, tx+4, ty + 8+g_fsize, this.w - this.MarginRight - 25 - this.genreTextLenght, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(this.firstRow, first_row_font, first_row_color, tx+4, ty, this.w - this.MarginRight - 40 - this.timeTextLength, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+						gr.GdiDrawText(this.secondRow, second_row_font, second_row_color, tx+4, ty + 8+g_fsize, this.w - this.MarginRight - 25 - this.genreTextLength, item_height, DT_LEFT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 						//if(!trackinfostext_state.isActive() || !(trackinfoslib_state.isActive() && nowplayinglib_state.isActive())){
 							gr.GdiDrawText(this.length+',  '+this.total_tracks, g_font.normal, this.colorSchemeTextFaded, (brw.groups_draw.length>1) ? tx-32 : tx-13, ty-2, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 							gr.GdiDrawText(genreText, genre_font, genre_color, tx-13, ty + item_height +1, this.text_w, item_height, DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -2440,17 +2445,17 @@ oShowList = function(parentPanelName) {
 						if(properties.TFgrouping==""){
 							this.links.album.setPosition( tx+4, ty,this.firstRowLength,item_height);
 							this.links.artist.setPosition( tx+4, ty + 8+g_fsize,this.secondRowLength,item_height);
-							this.links.genre.setPosition( tx-13+this.text_w-this.genreTextLenght, ty + item_height,this.genreTextLenght,item_height);
+							this.links.genre.setPosition( tx-13+this.text_w-this.genreTextLength, ty + item_height,this.genreTextLength,item_height);
 						} else {
 							this.links.album.changeState(ButtonStates.hide);
 							this.links.artist.changeState(ButtonStates.hide);
-							this.links.genre.setPosition( tx-13+this.text_w-this.genreTextLenght, ty + item_height,this.genreTextLenght,item_height);
+							this.links.genre.setPosition( tx-13+this.text_w-this.genreTextLength, ty + item_height,this.genreTextLength,item_height);
 						}
 
 						this.TopInfoY = ty;
 						this.TopInfoHeight = 18+g_fsize*3;
 	
-						this.showToolTip = (this.firstRowLength > (this.w - this.MarginRight - 40 - this.timeTextLenght) || this.secondRowLength > (this.w - this.MarginRight - 40 - this.timeTextLenght))
+						this.showToolTip = (this.firstRowLength > (this.w - this.MarginRight - 40 - this.timeTextLength) || this.secondRowLength > (this.w - this.MarginRight - 40 - this.timeTextLength))
 					//}
 				}
 
@@ -2770,13 +2775,20 @@ oHeaderBar = function(name) {
 	}
 	this.setDisplayedInfo = function() {
 		this.timeTxt="";
+		var time_total = 0;
 		if(brw.finishLoading) {
 			if(brw.playlistItemCount) {
+				if(g_filterbox.isActive) {
+					this.itemsTxt=((properties.showTotalTime)?',  ':'')+g_filterbox.filtered_tracks_count+' track'+((g_filterbox.filtered_tracks_count>1)?"s":"")+',  '+brw.groups_draw.length+' group'+((brw.groups_draw.length>1)?"s":"");
+					time_total = g_filterbox.filtered_tracks_time;
+				} else {
+					this.itemsTxt=((properties.showTotalTime)?',  ':'')+brw.playlistItemCount+' track'+((brw.playlistItemCount>1)?"s":"")+',  '+brw.groups_draw.length+' group'+((brw.groups_draw.length>1)?"s":"");
+					time_total = brw.totalTime;
+				}
+				
 				if(!properties.showTotalTime) this.timeTxt = '';
-				else if(brw.totalTime>0) this.timeTxt = brw.FormatTime(brw.totalTime);
-				else this.timeTxt = 'ON AIR';
-
-				this.itemsTxt=((properties.showTotalTime)?',  ':'')+brw.playlistItemCount+' track'+((brw.playlistItemCount>1)?"s":"")+',  '+brw.groups_draw.length+' group'+((brw.groups_draw.length>1)?"s":"");
+				else if(brw.totalTime>0) this.timeTxt = brw.FormatTime(time_total);
+				else this.timeTxt = 'ON AIR';					
 
 				// Main Text, Left justified
 				if(brw.playlistName==globalProperties.whole_library){
@@ -3060,7 +3072,8 @@ oHeaderBar = function(name) {
 		if(fb.IsPlaying) basemenu.AppendMenuItem(MF_STRING, 802, "Show now playing");
 		basemenu.AppendMenuItem(MF_STRING, 803, "Play all");
 		basemenu.AppendMenuSeparator();
-		basemenu.AppendMenuItem(MF_STRING, 801, "Tracks properties");
+				
+		//basemenu.AppendMenuItem(MF_STRING, 801, "Tracks properties");		
 		actions[801] = function(){
 			fb.RunContextCommandWithMetadb("Properties", plman.GetPlaylistItems(brw.getSourcePlaylist()), 0);
 		}
@@ -4461,11 +4474,13 @@ oBrowser = function(name) {
 		var currentCallIndex = 0;
         this.gTime.Reset();
         var trackinfos = "", arr = [], group = "";
-
+		var trackinfosTF = fb.TitleFormat('%TITLE%');
+		
 		if(this.list==undefined) return;
         while(k < this.totalTracks){
             if(properties.TFgrouping.length > 0) {
                 group_string = TF.grouping.EvalWithMetadb(this.list[k]);
+				trackinfos = trackinfosTF.EvalWithMetadb(this.list[k]);
 				this.current_grouping = properties.TFgrouping;
             } else {
 				if(this.showFilterBox){
@@ -4855,10 +4870,21 @@ oBrowser = function(name) {
 	this.freeMemory = function () {
 		this.refresh_all_images();
 	}
-	this.GetFilteredTracks = function(idx){
+    this.GetAllFilteredTracks = function () {
 		if(properties.filterBox_filter_tracks && g_filterbox.isActive){
 			var playlist = new FbMetadbHandleList();
-				//console.log("oShowlist idx"+idx+" brw.groups.length"+brw.groups.length)			
+			for(var idx = 0;idx < this.groups.length;idx++){		
+				for(var i = 0; i < brw.groups[idx].filtered_tr.length; i++) {
+					playlist.Add(brw.groups[idx].pl[brw.groups[idx].filtered_tr[i]]);
+				}
+			}
+			return playlist;
+		}
+		else return plman.GetPlaylistItems(brw.getSourcePlaylist());
+	}	
+	this.GetFilteredTracks = function(idx){
+		if(properties.filterBox_filter_tracks && g_filterbox.isActive){
+			var playlist = new FbMetadbHandleList();		
 			for(var i = 0; i < brw.groups[idx].filtered_tr.length; i++) {
 				playlist.Add(brw.groups[idx].pl[brw.groups[idx].filtered_tr[i]]);
 			}
@@ -5211,7 +5237,7 @@ oBrowser = function(name) {
             }
 
         }
-		//console.log("draw albums finished time:"+gTime_draw.Time);	
+		//console.log("draw albums finished time:"+gTime_draw.Time);		
     }
 	this.stopResizing = function() {
 		if(this.resize_click || this.resize_drag) {
@@ -6093,7 +6119,6 @@ function populate_with_library_covers(start_items, str_comp_items){
 		ClearCoversTimers();
 		gTime_covers = null;
 		covers_loading_progress = 101;
-		//console.log("covers_array size: "+g_image_cache.cachelist.length);
 		//window.NotifyOthers("cover_cache_finalized",g_image_cache.cachelist)
 	}
 }
@@ -6543,6 +6568,7 @@ function on_mouse_rbtn_down(x, y){
         var menu_settings = window.CreatePopupMenu();
         var Context = fb.CreateContextMenuManager();
 		var sendTo = window.CreatePopupMenu();
+		var contextMenu = window.CreatePopupMenu();
         var idx;
 
         var check__ = brw.activeIndex;
@@ -6662,6 +6688,12 @@ function on_mouse_rbtn_down(x, y){
 			g_headerbar.append_sort_menu(_menu, actions);
 			g_headerbar.append_group_menu(_menu, actions);
 			g_headerbar.append_properties_menu(_menu, actions);
+			
+			
+			Context.InitContext(brw.GetAllFilteredTracks());
+			Context.BuildMenu(contextMenu, 100, -1);	
+			contextMenu.AppendTo(_menu, MF_STRING, "Tracks context menu");	
+			
 			drawSeparator = true;
 		}
 
@@ -6766,6 +6798,7 @@ function on_mouse_rbtn_down(x, y){
         Context = undefined;
         _menu = undefined;
 		sendTo = undefined;
+		contextMenu = undefined;
         return true;
     } else {
         return true;
@@ -7958,7 +7991,7 @@ function on_focus(is_focused) {
 
 function on_init() {
     get_font();
-	get_colors();
+	get_colors(); 
     brw = new oBrowser("brw");
 	brw.startTimer();
 
