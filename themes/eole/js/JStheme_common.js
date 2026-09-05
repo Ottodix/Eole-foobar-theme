@@ -3251,7 +3251,7 @@ oImageCache = function () {
 			} else {
 				if(artist_name!=''){
 					var artist_name = artist_name.sanitise();
-					var path = ProfilePath+"\yttm\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
+					var path = ProfilePath+"\yttm\\biography-cache\\art_img\\"+artist_name.toLowerCase().charAt(0)+"\\"+artist_name;
 					var filepath = '';
 					var all_files = utils.Glob(path + "\\*");
 					for (var j = 0; j < all_files.length; j++) {
