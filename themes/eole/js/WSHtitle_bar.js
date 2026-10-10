@@ -244,6 +244,10 @@ function get_colors(){
 		colors.active_tab_line_height = 1;
 
 		colors.inactive_txt = GetGrey(110);
+		if(properties.showwallpaper) {
+			colors.btn_inactive_opacity = 190;
+			colors.inactive_txt = GetGrey(190);
+		}
 		colors.faded_txt = GetGrey(240);
 
 		colors.search_txt = GetGrey(240);
