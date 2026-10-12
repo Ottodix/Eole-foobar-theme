@@ -2797,6 +2797,7 @@ oSearch = function() {
 
     this.on_char = function(code) {
 		if(this.hide) return;
+		if(!this.inputbox.isActive()) return;
 		if(code==13) {
 			if(this.inputbox.text.length < 3)
 				return;

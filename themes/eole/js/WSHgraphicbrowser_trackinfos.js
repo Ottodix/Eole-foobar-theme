@@ -3071,8 +3071,8 @@ oHeaderBar = function(name) {
 		basemenu.AppendMenuSeparator();
 		if(fb.IsPlaying) basemenu.AppendMenuItem(MF_STRING, 802, "Show now playing");
 		basemenu.AppendMenuItem(MF_STRING, 803, "Play all");
-		basemenu.AppendMenuSeparator();
-				
+		//basemenu.AppendMenuSeparator();
+
 		//basemenu.AppendMenuItem(MF_STRING, 801, "Tracks properties");		
 		actions[801] = function(){
 			fb.RunContextCommandWithMetadb("Properties", plman.GetPlaylistItems(brw.getSourcePlaylist()), 0);
