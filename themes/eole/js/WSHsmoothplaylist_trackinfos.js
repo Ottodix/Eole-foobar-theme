@@ -2696,7 +2696,7 @@ oBrowser = function(name) {
                                             gr.GdiDrawText(track_title_part, g_font.normal, colors.normal_txt, tx+10, ay_1, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+10), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                             gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
-                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay_1, cColumns.track_time_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, (tx+tw-8)-gr.CalcTextWidth(track_time_part, g_font.normal, true), ay_1, cColumns.track_time_part, ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 										if(properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)){
 											if(track_num_part>9) var select_start=4;
@@ -2723,7 +2723,6 @@ oBrowser = function(name) {
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)
 													pt.SetTextRenderingHint(5);
-													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 1, total_size+6, ah_1, 554696704);
 												playingText.ReleaseGraphics(pt);
 
 												var progress_x = ax+22-properties.track_gradient_size
@@ -2739,6 +2738,8 @@ oBrowser = function(name) {
 													gr.GdiDrawText(track_title_part, g_font.normal, colors.albumartprogressbar_txt, progress_x + margin_left, ay_1, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15-this.rows[i].rating_length), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 													gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.albumartprogressbar_txt, progress_x + margin_left, ay_2, Math.min(progress_w-margin_left,tw-cColumns.track_time_part-15), ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 												};
+                                                var time_x = (tx+tw-8)-gr.CalcTextWidth(track_time_part, g_font.normal, true);                                                                                                                    
+                                                gr.GdiDrawText(track_time_part, g_font.normal, colors.albumartprogressbar_txt, time_x, ay_1, Math.max((progress_x+progress_w)-time_x, 0), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 
 											} else {
 												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, colors.progressbar_bg_off, colors.progressbar, 1.0); //grad top
@@ -2927,7 +2928,7 @@ oBrowser = function(name) {
                                         if(!properties.doubleRowShowCover) gr.GdiDrawText(track_num_part, g_font_light, colors.tracknumber_txt, ax+8, ay_1, cColumns.track_num_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         gr.GdiDrawText(track_artist_part, g_font.italicmin1, colors.fadedsmall_txt, tx+10, ay_2, tw-cColumns.track_time_part-15, ah_2, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         gr.GdiDrawText(track_title_part, g_font.normal, colors.normal_txt, tx+10, ay_1, tw-cColumns.track_time_part-15-(this.rows[i].rating_length+5), ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
-                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay_1, cColumns.track_time_part, ah_1, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, (tx+tw-8)-gr.CalcTextWidth(track_time_part, g_font.normal, true), ay_1, cColumns.track_time_part, ah_1, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         // rating Stars
 										try {
 											if(!this.drag_tracks && properties.showRating && track_type != 3 && ((properties.showRatingSelected && t_selected) || (properties.showRatingRated && track_rating_part>0) || (!properties.showRatingRated && !properties.showRatingSelected))) {
@@ -3046,7 +3047,7 @@ oBrowser = function(name) {
                                         } else if(show_track_part2) {
                                             gr.GdiDrawText(track_part2, g_font_lightmin1, colors.fadedsmall_txt, tx+this.rows[i].track_part1+8, ay, tw-this.rows[i].track_part1-cColumns.track_time_part-5-(this.rows[i].rating_length+5), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
                                         };
-                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, tx+tw-cColumns.track_time_part-8, ay, cColumns.track_time_part, ah, DT_RIGHT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
+                                        gr.GdiDrawText(track_time_part, g_font.normal, colors.normal_txt, (tx+tw-8)-gr.CalcTextWidth(track_time_part, g_font.normal, true), ay, cColumns.track_time_part, ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 										if(properties.drawProgressBar && (cNowPlaying.flashescounter<5 || !cNowPlaying.flashEnable)){
 											if(track_num_part>9) var select_start=4;
@@ -3071,7 +3072,6 @@ oBrowser = function(name) {
 													pt.DrawImage(this.groups[this.rows[i].albumId].g_wallpaperImg, 0, 0, total_size+15,  ah, 0, 0, this.groups[this.rows[i].albumId].g_wallpaperImg.Width, ah);
 													pt.FillSolidRect(0, 0, total_size+15, ah,colors.albumartprogressbar_overlay)
 													pt.SetTextRenderingHint(5);
-													pt.DrawString(track_time_part, g_font.normal, colors.albumartprogressbar_txt, 0, 0, total_size+6, ah, 554696704);
 												playingText.ReleaseGraphics(pt);
 												var progress_x = ax+22-properties.track_gradient_size
 												var progress_w = ax+current_size+5;
@@ -3088,6 +3088,8 @@ oBrowser = function(name) {
 														gr.GdiDrawText(track_part2, g_font_lightmin1, colors.albumartprogressbar_txt, tx+this.rows[i].track_part1+8, ay, Math.min(progress_w-margin_left-this.rows[i].track_part1+5,tw-this.rows[i].track_part1-cColumns.track_time_part-10-this.rows[i].rating_length), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 
 												};
+                                                var time_x = (tx+tw-8)-gr.CalcTextWidth(track_time_part, g_font.normal, true);                                                                                                                
+                                                gr.GdiDrawText(track_time_part, g_font.normal, colors.albumartprogressbar_txt, time_x, ay, Math.max((progress_x+progress_w)-time_x, 0), ah, DT_LEFT | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX);
 											} else {
 												gr.FillGradRect(ax+25-properties.track_gradient_size, ay, (properties.track_gradient_size>current_size+6)?current_size+6:properties.track_gradient_size, 1, 0, colors.progressbar_bg_off, colors.progressbar, 1.0); //grad top
 												gr.FillSolidRect(ax+25-properties.track_gradient_size, ay,1,1,colors.progressbar_bg_off)  // 1px bug fix
